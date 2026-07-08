@@ -20,14 +20,16 @@
     "capture_count": 6,
     "blocking_capture_count": 6,
     "blocker_counts": {
-      "visible_proxy_water_overlay_geometry": 6
+      "low_color_texture_entropy": 6,
+      "visible_proxy_water_card_geometry": 6
     },
     "per_river": {
       "american_south_fork": {
         "capture_count": 2,
         "blocking_capture_count": 2,
         "blockers": [
-          "visible_proxy_water_overlay_geometry"
+          "low_color_texture_entropy",
+          "visible_proxy_water_card_geometry"
         ],
         "status": "preview_only_not_lifelike_quality_blockers"
       },
@@ -35,7 +37,8 @@
         "capture_count": 2,
         "blocking_capture_count": 2,
         "blockers": [
-          "visible_proxy_water_overlay_geometry"
+          "low_color_texture_entropy",
+          "visible_proxy_water_card_geometry"
         ],
         "status": "preview_only_not_lifelike_quality_blockers"
       },
@@ -43,7 +46,8 @@
         "capture_count": 2,
         "blocking_capture_count": 2,
         "blockers": [
-          "visible_proxy_water_overlay_geometry"
+          "low_color_texture_entropy",
+          "visible_proxy_water_card_geometry"
         ],
         "status": "preview_only_not_lifelike_quality_blockers"
       }
@@ -54,7 +58,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "sha256": "68a57673a10ea352753b8cf422a7edf72f3ccd5912bac08ba0fe51e465aade8a",
+      "sha256": "46aeac0d0c54c8fd252f5c73e18771d50a1110ac9c2feb89ddcb8455e693a687",
       "metrics": {
         "analysis_size": [
           320,
@@ -65,26 +69,33 @@
           720
         ],
         "rgb_mean": [
-          89.0,
-          114.9,
-          94.3
+          78.92,
+          104.91,
+          86.25
         ],
-        "luma_mean": 107.9,
-        "luma_std": 53.06,
-        "edge_density": 0.1999,
-        "low_gradient_fraction": 0.5721,
-        "quantized_entropy_bits": 4.61,
-        "quantized_color_count": 64,
-        "flat_blue_field_fraction": 0.0642,
-        "bottom_center_dark_fraction": 0.0066
+        "luma_mean": 98.04,
+        "luma_std": 47.94,
+        "edge_density": 0.0803,
+        "low_gradient_fraction": 0.6506,
+        "quantized_entropy_bits": 4.12,
+        "quantized_color_count": 47,
+        "flat_blue_field_fraction": 0.0643,
+        "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.12,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"
@@ -93,7 +104,7 @@
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-      "sha256": "80705454d1e455bdb60749d21538964dfb967509dcd4f09266ae866e07fbe2e9",
+      "sha256": "d52487bc91dd20ebe630be1fc21210fb4cd261a95be87ad8fed5c01526ff57f3",
       "metrics": {
         "analysis_size": [
           320,
@@ -104,26 +115,33 @@
           720
         ],
         "rgb_mean": [
-          90.16,
-          122.84,
-          96.11
+          80.1,
+          112.98,
+          88.16
         ],
-        "luma_mean": 113.96,
-        "luma_std": 52.74,
-        "edge_density": 0.1765,
-        "low_gradient_fraction": 0.5949,
-        "quantized_entropy_bits": 4.45,
-        "quantized_color_count": 56,
+        "luma_mean": 104.2,
+        "luma_std": 48.64,
+        "edge_density": 0.055,
+        "low_gradient_fraction": 0.6743,
+        "quantized_entropy_bits": 4.03,
+        "quantized_color_count": 45,
         "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0066
+        "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.03,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"
@@ -132,7 +150,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-      "sha256": "5ca8d8f110be37cda58954736135e92d6cb9ec13a24d42170b759ed9a2bf4606",
+      "sha256": "5634502ed684c9b7b2d6eeca38ea1b5151342f6f64c24c24307db09068badb59",
       "metrics": {
         "analysis_size": [
           320,
@@ -143,26 +161,33 @@
           720
         ],
         "rgb_mean": [
-          123.69,
-          114.45,
-          95.92
+          112.59,
+          103.09,
+          85.5
         ],
-        "luma_mean": 115.07,
-        "luma_std": 48.47,
-        "edge_density": 0.2343,
-        "low_gradient_fraction": 0.5255,
-        "quantized_entropy_bits": 4.84,
-        "quantized_color_count": 61,
-        "flat_blue_field_fraction": 0.0554,
-        "bottom_center_dark_fraction": 0.0063
+        "luma_mean": 103.84,
+        "luma_std": 41.0,
+        "edge_density": 0.0847,
+        "low_gradient_fraction": 0.6423,
+        "quantized_entropy_bits": 4.23,
+        "quantized_color_count": 45,
+        "flat_blue_field_fraction": 0.0,
+        "bottom_center_dark_fraction": 0.011
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.23,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"
@@ -171,7 +196,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-      "sha256": "82c8f0540b8e506fb0459fec631a67778e5a1828259f322e2a1bccbbf12bf4ef",
+      "sha256": "8423a0f50293262de0db8cb420c92e22ff8a16d2f3a2196ba9f81b73fcacd8f6",
       "metrics": {
         "analysis_size": [
           320,
@@ -182,26 +207,33 @@
           720
         ],
         "rgb_mean": [
-          138.83,
-          129.64,
-          109.27
+          127.95,
+          118.51,
+          99.06
         ],
-        "luma_mean": 130.13,
-        "luma_std": 50.64,
-        "edge_density": 0.223,
-        "low_gradient_fraction": 0.5559,
-        "quantized_entropy_bits": 4.68,
-        "quantized_color_count": 62,
-        "flat_blue_field_fraction": 0.0552,
-        "bottom_center_dark_fraction": 0.0063
+        "luma_mean": 119.11,
+        "luma_std": 47.04,
+        "edge_density": 0.0716,
+        "low_gradient_fraction": 0.6728,
+        "quantized_entropy_bits": 4.06,
+        "quantized_color_count": 44,
+        "flat_blue_field_fraction": 0.0,
+        "bottom_center_dark_fraction": 0.0108
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.06,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"
@@ -210,7 +242,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "sha256": "01e9d80be62e80b099fb818eddb7594410c67610ceaad24e786dd3c52f031782",
+      "sha256": "2955c551f56a9b6fab87ce1427898e0d62dded2e4e383dea0490c73d0d8ca305",
       "metrics": {
         "analysis_size": [
           320,
@@ -221,26 +253,33 @@
           720
         ],
         "rgb_mean": [
-          60.93,
-          103.1,
-          76.03
+          55.97,
+          94.32,
+          70.5
         ],
-        "luma_mean": 92.18,
-        "luma_std": 46.78,
-        "edge_density": 0.1985,
-        "low_gradient_fraction": 0.5419,
-        "quantized_entropy_bits": 4.5,
-        "quantized_color_count": 60,
+        "luma_mean": 84.45,
+        "luma_std": 39.24,
+        "edge_density": 0.0827,
+        "low_gradient_fraction": 0.6124,
+        "quantized_entropy_bits": 4.01,
+        "quantized_color_count": 42,
         "flat_blue_field_fraction": 0.0344,
-        "bottom_center_dark_fraction": 0.0427
+        "bottom_center_dark_fraction": 0.0001
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.01,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"
@@ -249,7 +288,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-      "sha256": "da010c3cf242d94f853a7359d1b41b132ae7bd3d7fa34436be721bab5d980967",
+      "sha256": "d7b4f2db829de1e13a4aba87ce27697b0f4b8337eabdc81231c0771afabb20e8",
       "metrics": {
         "analysis_size": [
           320,
@@ -260,26 +299,33 @@
           720
         ],
         "rgb_mean": [
-          67.1,
-          115.3,
-          84.07
+          62.15,
+          106.65,
+          78.63
         ],
-        "luma_mean": 102.8,
-        "luma_std": 49.22,
-        "edge_density": 0.18,
-        "low_gradient_fraction": 0.5563,
-        "quantized_entropy_bits": 4.51,
-        "quantized_color_count": 54,
+        "luma_mean": 95.17,
+        "luma_std": 43.9,
+        "edge_density": 0.0638,
+        "low_gradient_fraction": 0.6265,
+        "quantized_entropy_bits": 4.08,
+        "quantized_color_count": 41,
         "flat_blue_field_fraction": 0.0,
-        "bottom_center_dark_fraction": 0.0426
+        "bottom_center_dark_fraction": 0.0001
       },
       "blockers": [
         {
-          "id": "visible_proxy_water_overlay_geometry",
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 4.08,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        },
+        {
+          "id": "visible_proxy_water_card_geometry",
           "metric": "renderer_coverage",
-          "value": "first_party_source_aware_tapered_water_chroma_microbreakup",
-          "threshold": "production_water_material_or_human_approved_proxy_replacement",
-          "why_it_blocks_lifelike_review": "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+          "value": "first_party_capture_quality_water_texture_fleck_cards",
+          "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+          "why_it_blocks_lifelike_review": "Water detail is still carried by visible preview card geometry; it must be folded into the water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers"

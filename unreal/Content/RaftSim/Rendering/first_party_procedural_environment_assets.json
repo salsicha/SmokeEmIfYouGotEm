@@ -166,14 +166,15 @@
       "first_party_low_specular_water_capture_material_tuning",
       "first_party_capture_camera_flat_blue_field_reduction",
       "first_party_foreground_raft_luma_blocker_reduction",
-      "first_party_source_aware_tapered_water_chroma_microbreakup",
+      "first_party_integrated_base_water_chroma_microbreakup",
+      "first_party_capture_quality_water_texture_fleck_cards",
       "photoreal_capture_quality_review_blockers_recorded"
     ],
     "missing_renderer_coverage_before_lifelike": [
       "production_landscape_or_nanite_terrain_material_layers",
       "photoreal_rock_and_boulder_mesh_variation",
       "dense_biome_specific_foliage_library_or_instanced_first_party_equivalent",
-      "replace_visible_proxy_water_overlay_geometry_with_production_water_materials",
+      "replace_visible_capture_quality_water_fleck_cards_with_integrated_water_material_or_vfx",
       "physically_plausible_water_shader_reflection_refraction_depth_turbidity",
       "niagara_or_equivalent_spray_mist_foam_particle_layers",
       "approved_raft_and_oar_foreground_art",
@@ -198,14 +199,16 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "visible_proxy_water_overlay_geometry": 6
+        "low_color_texture_entropy": 6,
+        "visible_proxy_water_card_geometry": 6
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "visible_proxy_water_overlay_geometry"
+            "low_color_texture_entropy",
+            "visible_proxy_water_card_geometry"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -213,7 +216,8 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "visible_proxy_water_overlay_geometry"
+            "low_color_texture_entropy",
+            "visible_proxy_water_card_geometry"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -221,26 +225,29 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "visible_proxy_water_overlay_geometry"
+            "low_color_texture_entropy",
+            "visible_proxy_water_card_geometry"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "pixel_metric_blockers_removed_visible_proxy_water_overlay_still_blocks_lifelike_review",
+      "status": "integrated_water_chroma_overlay_retired_low_entropy_and_water_card_blockers_recorded",
       "capture_quality_summary": {
         "capture_count": 6,
         "blocking_capture_count": 6,
         "blocker_counts": {
-          "visible_proxy_water_overlay_geometry": 6
+          "low_color_texture_entropy": 6,
+          "visible_proxy_water_card_geometry": 6
         },
         "per_river": {
           "american_south_fork": {
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "visible_proxy_water_overlay_geometry"
+              "low_color_texture_entropy",
+              "visible_proxy_water_card_geometry"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           },
@@ -248,7 +255,8 @@
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "visible_proxy_water_overlay_geometry"
+              "low_color_texture_entropy",
+              "visible_proxy_water_card_geometry"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           },
@@ -256,7 +264,8 @@
             "capture_count": 2,
             "blocking_capture_count": 2,
             "blockers": [
-              "visible_proxy_water_overlay_geometry"
+              "low_color_texture_entropy",
+              "visible_proxy_water_card_geometry"
             ],
             "status": "preview_only_not_lifelike_quality_blockers"
           }
@@ -267,10 +276,13 @@
         "excess_low_gradient_area",
         "large_flat_blue_field",
         "low_edge_density",
-        "low_luma_variation",
-        "low_color_texture_entropy"
+        "low_luma_variation"
       ],
       "remaining_blocker_classes": [
+        "low_color_texture_entropy",
+        "visible_proxy_water_card_geometry"
+      ],
+      "closed_renderer_blocker_classes": [
         "visible_proxy_water_overlay_geometry"
       ]
     }
