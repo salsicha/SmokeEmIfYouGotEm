@@ -17,6 +17,9 @@ CAPTURE_ROOT_RELATIVE_PATH = Path("docs/environment-captures/photoreal_river_pre
 CAPTURE_MANIFEST_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "environment_capture_manifest.json"
 CAPTURE_QUALITY_REVIEW_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_capture_quality_review.json"
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
+VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
+    "first_party_capture_quality_water_texture_fleck_cards",
+}
 
 
 @dataclass(frozen=True)
@@ -150,21 +153,37 @@ def _renderer_proxy_blockers(repo_root: Path, capture_manifest: dict) -> list[di
     asset_plan = json.loads(asset_plan_path.read_text(encoding="utf-8"))
     unreal_integration = asset_plan.get("unreal_integration", {})
     renderer_coverage = set(unreal_integration.get("current_renderer_coverage", []))
-    if PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID not in renderer_coverage:
-        return []
+    blockers: list[dict[str, str | float]] = []
+    if PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID in renderer_coverage:
+        blockers.append(
+            {
+                "id": "visible_proxy_water_overlay_geometry",
+                "metric": "renderer_coverage",
+                "value": PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID,
+                "threshold": "production_water_material_or_human_approved_proxy_replacement",
+                "why_it_blocks_lifelike_review": (
+                    "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, "
+                    "so the frame can pass pixel statistics while still reading as non-photoreal preview art."
+                ),
+            }
+        )
 
-    return [
-        {
-            "id": "visible_proxy_water_overlay_geometry",
-            "metric": "renderer_coverage",
-            "value": PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID,
-            "threshold": "production_water_material_or_human_approved_proxy_replacement",
-            "why_it_blocks_lifelike_review": (
-                "Water color/texture entropy is still carried by visible first-party proxy overlay geometry, "
-                "so the frame can pass pixel statistics while still reading as non-photoreal preview art."
-            ),
-        }
-    ]
+    active_water_card_coverage = sorted(VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS & renderer_coverage)
+    if active_water_card_coverage:
+        blockers.append(
+            {
+                "id": "visible_proxy_water_card_geometry",
+                "metric": "renderer_coverage",
+                "value": ",".join(active_water_card_coverage),
+                "threshold": "integrated_water_material_or_approved_water_vfx_replacement",
+                "why_it_blocks_lifelike_review": (
+                    "Water detail is still carried by visible preview card geometry; it must be folded into the "
+                    "water material, Niagara/equivalent VFX, or a human-approved replacement before lifelike review."
+                ),
+            }
+        )
+
+    return blockers
 
 
 def analyze_capture(

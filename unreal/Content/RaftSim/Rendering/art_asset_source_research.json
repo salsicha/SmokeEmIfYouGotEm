@@ -161,14 +161,19 @@
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
     "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
     "photoreal_capture_quality_blockers": {
-      "visible_proxy_water_overlay_geometry": 6
+      "low_color_texture_entropy": 6,
+      "visible_proxy_water_card_geometry": 6
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "pixel_metric_blockers_removed_visible_proxy_water_overlay_still_blocks_lifelike_review",
+      "status": "integrated_water_chroma_overlay_retired_low_entropy_and_water_card_blockers_recorded",
       "remaining_blocker_counts": {
-        "visible_proxy_water_overlay_geometry": 6
+        "low_color_texture_entropy": 6,
+        "visible_proxy_water_card_geometry": 6
       },
-      "art_direction_note": "The current preview clears the old pixel-metric screenshot blockers, but all six captures are still blocked by visible proxy water overlay geometry plus smooth terrain, placeholder rocks/foliage, and review-only material instances requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement."
+      "art_direction_note": "The visible tapered chroma overlay is now disabled and its color/noise/relief contribution moved into the base water mesh, but the regenerated captures remain preview-only: all six block on low color/texture entropy and visible proxy water card geometry, with smooth terrain, placeholder rocks/foliage, and review-only material instances still requiring production terrain, water, raft, foliage, foam, mist, and lighting replacement.",
+      "closed_renderer_blocker_classes": [
+        "visible_proxy_water_overlay_geometry"
+      ]
     }
   },
   "buy_paid_assets_only_if_free_open_and_ai_generated_assets_are_not_good_enough": true
