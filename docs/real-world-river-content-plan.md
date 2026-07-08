@@ -181,6 +181,8 @@ The July 8 preview capture passes removed the automated `large_flat_blue_field`,
 
 The follow-up source-drape promotion pass increases terrain tessellation and raises the approved aerial microtile overlays above the procedural bank drape so source-derived corridor texture is visible in the generated maps. The next environment fidelity step is human review and replacement or promotion of remaining proxy terrain, water, rock, foliage, foam/mist, lighting, and review-only material surfaces with true texture-sampled source/atlas materials or rights-cleared production assets.
 
+The source-conditioned material-map pass now derives 2048px macro albedo, material-zone, and packed AO/roughness/height candidates for all three rivers from the active review-gated aerial drapes, DEM relief, water masks, and vegetation masks. The manifest is `unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/first_party_source_conditioned_material_map_manifest.json`. These are concrete material-replacement candidates for Unreal terrain, water-edge, vegetation, wet-bank, and relief-driven surface response, but they remain unpromoted until assigned to in-engine materials, recaptured, and reviewed for geospatial alignment, guide fidelity, rights/provenance, hazard readability, and performance.
+
 ## Rapid Identification From Aerial And Satellite Imagery
 
 Identify candidate rapids by combining terrain, hydrography, image analysis, and human review.

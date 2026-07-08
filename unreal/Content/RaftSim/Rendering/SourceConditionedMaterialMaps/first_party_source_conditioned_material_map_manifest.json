@@ -1,0 +1,123 @@
+{
+  "schema": "raftsim.unreal.source_conditioned_material_maps.v1",
+  "generated_on": "2026-07-08",
+  "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+  "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
+  "policy": {
+    "source_inputs_are_manifest_recorded": true,
+    "third_party_social_or_outfitter_media_used": false,
+    "maps_are_review_gated_not_lifelike_evidence": true,
+    "material_maps_must_not_hide_hazards_rescue_targets_or_physics_failures": true,
+    "promotion_requires_unreal_material_assignment_capture_review_guide_review_and_performance_evidence": true
+  },
+  "map_semantics": {
+    "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, and DEM-relief shading.",
+    "material_zones": "RGB material-zone weights: R=terrain/wet bank, G=vegetation away from water, B=visible water.",
+    "ao_roughness_height": "Packed RGB map: R=relief-derived ambient-occlusion proxy, G=material roughness candidate, B=DEM relief height candidate."
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "flow_band_id": "median_runnable",
+      "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+      "source_inputs": {
+        "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+        "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png"
+      },
+      "maps": {
+        "macro_albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
+          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7",
+          "width": 2048,
+          "height": 2048
+        },
+        "material_zones": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
+          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe",
+          "width": 2048,
+          "height": 2048
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
+          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de",
+          "width": 2048,
+          "height": 2048
+        }
+      },
+      "promotion_gate": "Use as source-conditioned Unreal material candidates only after geospatial/source review, rights/provenance review, guide readability review, in-engine material assignment, capture comparison, and desktop/VR performance evidence pass."
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River Grand Canyon",
+      "flow_band_id": "moderate_release_planning",
+      "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+      "source_inputs": {
+        "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
+        "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/vegetation_mask_2048.png"
+      },
+      "maps": {
+        "macro_albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
+          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85",
+          "width": 2048,
+          "height": 2048
+        },
+        "material_zones": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
+          "sha256": "832e9d59479afd12e4cfb9b01a70de832f9d0bc91a030701c79f36169e75d12f",
+          "width": 2048,
+          "height": 2048
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
+          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d",
+          "width": 2048,
+          "height": 2048
+        }
+      },
+      "promotion_gate": "Use as source-conditioned Unreal material candidates only after geospatial/source review, rights/provenance review, guide readability review, in-engine material assignment, capture comparison, and desktop/VR performance evidence pass."
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River Rainforest",
+      "flow_band_id": "rainfed_runnable_planning",
+      "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+      "source_inputs": {
+        "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
+        "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
+        "heightfield_preview_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/heightfield_candidate_2017.png",
+        "water_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
+        "vegetation_mask_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/vegetation_mask_2048.png"
+      },
+      "maps": {
+        "macro_albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
+          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254",
+          "width": 2048,
+          "height": 2048
+        },
+        "material_zones": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
+          "sha256": "79bd2ded5666c55afbb6ac720f4f7e41ddf4108d281904e82ba149316cb36bb6",
+          "width": 2048,
+          "height": 2048
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
+          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb",
+          "width": 2048,
+          "height": 2048
+        }
+      },
+      "promotion_gate": "Use as source-conditioned Unreal material candidates only after geospatial/source review, rights/provenance review, guide readability review, in-engine material assignment, capture comparison, and desktop/VR performance evidence pass."
+    }
+  ],
+  "current_decision": "Use these source-conditioned maps as the next first-party material replacement candidates for Unreal terrain, water-edge, vegetation, wet-bank, and relief-driven surface response. They are derived from review-gated aerial/DEM/mask inputs and are not lifelike approval or production-playable evidence."
+}

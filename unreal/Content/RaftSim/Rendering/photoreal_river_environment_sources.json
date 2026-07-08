@@ -1554,7 +1554,11 @@
       "zero_blocker_capture_set_human_review_domains_recorded",
       "photoreal_human_lifelike_review_packet_recorded",
       "zero_blocker_capture_set_review_packet_markdown_recorded",
-      "photoreal_human_lifelike_review_results_template_recorded"
+      "photoreal_human_lifelike_review_results_template_recorded",
+      "source_conditioned_material_map_manifest_recorded",
+      "source_conditioned_macro_albedo_material_maps_recorded",
+      "source_conditioned_material_zone_maps_recorded",
+      "source_conditioned_ao_roughness_height_maps_recorded"
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
@@ -1669,6 +1673,18 @@
       "review_domain_count": 7,
       "open_review_result_count": 21,
       "approved_river_count": 0
+    },
+    "source_conditioned_material_map_manifest": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/first_party_source_conditioned_material_map_manifest.json",
+    "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
+    "source_conditioned_material_map_summary": {
+      "river_count": 3,
+      "map_count": 9,
+      "map_size_px": 2048,
+      "map_ids": [
+        "macro_albedo",
+        "material_zones",
+        "ao_roughness_height"
+      ]
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
@@ -1685,5 +1701,7 @@
   "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
   "photoreal_human_lifelike_review_packet_status": "awaiting_human_lifelike_review_not_approved",
   "photoreal_human_lifelike_review_results_template": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_results_template.json",
-  "photoreal_human_lifelike_review_results_template_status": "awaiting_external_human_review_inputs_not_approved"
+  "photoreal_human_lifelike_review_results_template_status": "awaiting_external_human_review_inputs_not_approved",
+  "source_conditioned_material_map_manifest": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/first_party_source_conditioned_material_map_manifest.json",
+  "source_conditioned_material_map_status": "generated_review_gated_source_conditioned_material_maps_not_lifelike"
 }
