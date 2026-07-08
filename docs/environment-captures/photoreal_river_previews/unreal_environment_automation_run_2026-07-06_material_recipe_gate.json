@@ -76,6 +76,7 @@
     "first_party_foliage_card_canopy_artifact_demotion": true,
     "first_party_square_foliage_source_card_artifact_demotion": true,
     "first_party_remaining_square_card_cull": true,
+    "first_party_blocky_bank_ecology_and_sphere_foliage_cull": true,
     "flow_aware_waterline_pebble_scatter": true,
     "first_party_irregular_rock_geometry_variants": true,
     "first_party_boulder_wetness_abrasion_moss_surface_variants": true,
@@ -122,37 +123,37 @@
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [52.85, 87.58, 92.51],
+      "rgb_mean": [52.87, 87.6, 92.52],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [44.07, 87.72, 95.22],
+      "rgb_mean": [44.08, 87.73, 95.23],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [76.19, 70.3, 59.29],
+      "rgb_mean": [76.21, 70.32, 59.3],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [74.96, 70.0, 59.2],
+      "rgb_mean": [74.98, 70.01, 59.21],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [32.51, 71.13, 70.13],
+      "rgb_mean": [32.53, 71.15, 70.15],
       "nonblank": true
     },
     {
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
       "size": [1280, 720],
-      "rgb_mean": [27.6, 71.47, 71.78],
+      "rgb_mean": [27.61, 71.47, 71.79],
       "nonblank": true
     }
   ],
@@ -200,6 +201,7 @@
     "Demoted first-party foliage card/canopy artifacts by thinning mask-aware canopy cards, reducing rainforest vine curtains, shrinking procedural crown blobs, and lowering leaf-card width/brightness.",
     "Demoted remaining square foliage/source-card artifacts by lowering bank texture card counts, scale, opacity, and silhouette-card visibility while keeping source-aware placement scaffolds for later production foliage replacement.",
     "Culled remaining square card scaffolds by sharply reducing visible bank/source cards, atmospheric/backdrop cards, and blocky foliage proxy cluster counts, scale, and opacity, and replacing canopy/vine/desert scrub upright planes with organic first-party branch/frond geometry where a visible marker is still useful.",
+    "Culled blocky bank ecology and instanced sphere foliage proxy artifacts by replacing deadfall/root cube meshes with horizontal cylinder geometry and disabling visible instanced sphere canopy/understory blobs while retaining organic branch/frond/twig foliage passes.",
     "Added first-party source-aware sky gradient and atmosphere-depth sheets so the preview horizon has river-specific sky warmth, haze, and humid depth without claiming final sky/weather assets.",
     "Hardened raft-hidden river-eye evidence capture by hiding foreground raft/oar proxy actors through scene-capture actor/component filtering, primitive-component visibility flags, temporary editor/game actor visibility, and a temporary textured river-eye-only water-color center artifact cover, then restoring or destroying those helpers after capture.",
     "Added a first-party textured river-eye center artifact cover with bounded depth/current mottle and ripple relief for raft-hidden environment-review captures without claiming production water shader approval.",
