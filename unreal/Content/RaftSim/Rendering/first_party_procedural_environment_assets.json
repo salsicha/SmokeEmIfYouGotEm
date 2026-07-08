@@ -88,6 +88,7 @@
       "first_party_demoted_source_detail_contours",
       "first_party_post_contour_terrain_readability_fill",
       "first_party_source_masked_bank_bar_microgeometry",
+      "first_party_near_field_riverbed_debris_and_pebble_dressing",
       "flow_aware_waterline_pebble_scatter",
       "first_party_irregular_rock_geometry_variants",
       "first_party_boulder_wetness_abrasion_moss_surface_variants",
