@@ -101,6 +101,7 @@
       "lit_vertex_color_water_gradients",
       "first_party_photographic_water_exposure_calibration",
       "first_party_near_field_water_surface_grain",
+      "first_party_near_camera_water_macro_ripple_mottle",
       "first_party_base_water_depth_current_grading",
       "first_party_base_water_center_guide_stripe_breakup",
       "first_party_base_water_cross_channel_breakup",
