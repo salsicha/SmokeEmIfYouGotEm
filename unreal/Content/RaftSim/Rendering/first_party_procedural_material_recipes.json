@@ -765,8 +765,9 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass. Importable first-party texture atlas candidates are generated, hash-recorded, imported as review-only Unreal Texture2D assets, bound into review-only Material Instance Constant assets, and sampled by the review-only M_RaftSim_AtlasSampleReview parent shader graph. They do not mark any river lifelike until production material promotion, capture comparison, guide/geospatial review, hazard readability, and performance evidence pass.",
+  "current_decision": "Use this manifest as the concrete first-party procedural material target catalog for the next renderer iteration. The existing preview materials remain active fallbacks, and no river can claim lifelike status until production-quality materials/assets, captures, guide review, and performance evidence pass. Importable first-party texture atlas candidates are generated, hash-recorded, imported as review-only Unreal Texture2D assets, bound into review-only Material Instance Constant assets, and sampled by the review-only M_RaftSim_AtlasSampleReview and assigned in saved preview maps for durable proxy-surface review parent shader graph. They do not mark any river lifelike until production material promotion, capture comparison, guide/geospatial review, hazard readability, and performance evidence pass.",
   "importable_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
   "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
-  "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset"
+  "atlas_sampler_review_material": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+  "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike"
 }
