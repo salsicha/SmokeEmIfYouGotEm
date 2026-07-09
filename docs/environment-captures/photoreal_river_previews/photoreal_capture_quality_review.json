@@ -46,7 +46,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-      "sha256": "9f18eef47261f8a280856b997ee1bf20015dafdbfe1ece66ace36d3e3e93eeda",
+      "sha256": "67e83eb3f05ad15ac5bc316b5299f5a89edfae0be77dc0c4fe108585a9ffaf9a",
       "metrics": {
         "analysis_size": [
           320,
@@ -77,7 +77,7 @@
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-      "sha256": "ba5755f5354759eb050995704e8428f53d457779e7b099eb68415ed04d8c9b61",
+      "sha256": "997d294b5f04b57997a03d319914e49bd95e7b718930bba42725ff039e7e3a56",
       "metrics": {
         "analysis_size": [
           320,
@@ -108,7 +108,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-      "sha256": "8f87f526aa65d7b9157bc5218ffba09c4cc274c40dfaba5ea274c83e77726081",
+      "sha256": "a3f9a9567fdf24de96270cc063afbf3bde818120b3d3fcb64a4e72f203e784c3",
       "metrics": {
         "analysis_size": [
           320,
@@ -170,7 +170,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-      "sha256": "3e8f770682587094bed7ad428f118007b38837cf46dac46c9f79b7622958a0cf",
+      "sha256": "e753a428adffa5a3b634c1dae54a5f8d4170118f566c9049b0076fa8b0553974",
       "metrics": {
         "analysis_size": [
           320,
@@ -201,7 +201,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-      "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
+      "sha256": "3accf4373f7922fdd7015b2b9f4909734d9642cfd6567de389c0b125a06efb28",
       "metrics": {
         "analysis_size": [
           320,

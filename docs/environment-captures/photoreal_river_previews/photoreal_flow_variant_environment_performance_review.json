@@ -59,15 +59,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_low_runnable.umap",
           "exists": true,
           "size_bytes": 271301240,
-          "sha256": "71aeeb450dad8f17882205825d3f7f9761e57c412521ad66e1b89b203f91efc7"
+          "sha256": "5209e9a148175db6ea2c3bd120e01975e2369da5736586604b6d17d5786422e9"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "82bb46a1d0ab5d529133a8df64bb712ebe319f232061d13640f8a13340063c13",
-            "size_bytes": 1405691,
+            "sha256": "a3fce30c39a696b3517b8c3f9c870b3eca9be2100fdc11ae349ed6d54c8d28dc",
+            "size_bytes": 1405679,
             "source_size": [
               1280,
               720
@@ -79,8 +79,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_river_eye_downstream.png",
             "exists": true,
-            "sha256": "7b9f69ceb074605ebfbfaf1e935f5ea4b2a087e10f259389ca74316238dca786",
-            "size_bytes": 1423932,
+            "sha256": "ecd1fce92a76d7a8e49e2eff118f99f480e9adf2bf6333173777ddf985ebad61",
+            "size_bytes": 1423922,
             "source_size": [
               1280,
               720
@@ -89,7 +89,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2829623
+        "total_capture_png_bytes": 2829601
       },
       "profiles": [
         {
@@ -189,15 +189,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_median_runnable.umap",
           "exists": true,
           "size_bytes": 271434754,
-          "sha256": "ada0ab6d83a351b56715ba170372e22828878a988a0de77ed844bd53df753d0b"
+          "sha256": "60825dbff6f7dc54dcc0fc98bdbc39149f94bdbc2d6dd91462bb1edcf9a65240"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "a7248ad5d5c55738d14946aff590da7efb663ca73e7062c190574ce270ba1fc1",
-            "size_bytes": 1406994,
+            "sha256": "d1e87a9ac297d63fddfb2d42a12a3cccbe232c0d19583b270f3c8099106b23b0",
+            "size_bytes": 1406989,
             "source_size": [
               1280,
               720
@@ -219,7 +219,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2838434
+        "total_capture_png_bytes": 2838429
       },
       "profiles": [
         {
@@ -319,15 +319,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_high_runnable.umap",
           "exists": true,
           "size_bytes": 271555944,
-          "sha256": "6812da5b1a6ce80af1e3108838fe6294f86fbd2217bde8b3e39aadc45b04d07d"
+          "sha256": "eb4acbc99548e86db0e6b66b4c90171a294acbb19f410229209b69e62ca6e936"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "1b0e2d993009e8adc33a66766b8d86a9c38ae7bb8fc4adbf3cb6b1b9d3658ebf",
-            "size_bytes": 1401225,
+            "sha256": "557044a9b9dc729218cfdd0f2bb34c1d3e020a80d8968624343e096da7b0f661",
+            "size_bytes": 1401220,
             "source_size": [
               1280,
               720
@@ -339,8 +339,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_river_eye_downstream.png",
             "exists": true,
-            "sha256": "8505a6ac851b5c7a3e566a436d896f0942651d072361015f674a4478f439f350",
-            "size_bytes": 1429550,
+            "sha256": "e9362f8fb46c1eac50e9c28465bd102f3855663e6376fb42a68d6916b087f9b7",
+            "size_bytes": 1429548,
             "source_size": [
               1280,
               720
@@ -349,7 +349,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2830775
+        "total_capture_png_bytes": 2830768
       },
       "profiles": [
         {
@@ -449,14 +449,14 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_low_release_planning.umap",
           "exists": true,
           "size_bytes": 260029328,
-          "sha256": "a9af90a3dc9ee70fcbc6f1c4d53837021f8c1b45c76101c2f8d32a512900c5c3"
+          "sha256": "83ca92f3ced98c9e91bf1a9d1685a7faaab2f87df94c9c54dc7cbb02ff5a3d11"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "7e82fef8a6e088e919ec5233b25854a5320d556f8c39f88978089f38f928d59a",
+            "sha256": "d5ff40dcdbfb3d8a25652164fd79d46eb31b1b1b8561b07096eeb19a998aa004",
             "size_bytes": 1437430,
             "source_size": [
               1280,
@@ -579,15 +579,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_moderate_release_planning.umap",
           "exists": true,
           "size_bytes": 260024549,
-          "sha256": "68c82590a50afb52e2f3dec78224bd910d69f4771e27aa9614e57b2bbb324608"
+          "sha256": "4133a3cdbb7b19b600fd7bc57af910b0281caadced671484b0f36ea2b5b0165e"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "83b0a15dc3901bc635258563319a907bb9cf53a056b218351c3f42b2c835855a",
-            "size_bytes": 1429734,
+            "sha256": "43e6661f9fe62c1151b5a3e940e5c158d9518b4e9fee6239087d3290e3280091",
+            "size_bytes": 1429643,
             "source_size": [
               1280,
               720
@@ -609,7 +609,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2892544
+        "total_capture_png_bytes": 2892453
       },
       "profiles": [
         {
@@ -709,15 +709,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_high_release_planning.umap",
           "exists": true,
           "size_bytes": 260246029,
-          "sha256": "6d19fd13d7fba26f2ca5e971d97ef352d548dcd1e0e3317e354e7a939b5fed64"
+          "sha256": "45acbf015ef7118f45f8d8c8071b54487ab6eda7ce27d4e898daf2d99f661e8d"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "3458dff0516b5eb5658dec588bcedfcee244366f256301617c828f483b641f3c",
-            "size_bytes": 1421747,
+            "sha256": "4334dda45a1552221f39692bfe0ff05b04d5c3f819d75d4f71af0d8d10ff2633",
+            "size_bytes": 1421750,
             "source_size": [
               1280,
               720
@@ -739,7 +739,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2879631
+        "total_capture_png_bytes": 2879634
       },
       "profiles": [
         {
@@ -839,15 +839,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_clear_season_low_planning.umap",
           "exists": true,
           "size_bytes": 305838319,
-          "sha256": "e4a2f8af6fb161a64d808597bd0d3e9c197ad6d6ddd06034bbb2a2fd40d3b56f"
+          "sha256": "8996460f8dcc0e5cff095f843f4b1731f336e92479f2261c9b990a18389a442c"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "647926d9a8a418a7a47e54dfdda6247b9ce75e977007b147523db44a366c24e2",
-            "size_bytes": 1467092,
+            "sha256": "9ed2778062a4a982fb50a15389464de839ef123a58a872f067a60ecde2ae6d4c",
+            "size_bytes": 1467116,
             "source_size": [
               1280,
               720
@@ -859,8 +859,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_river_eye_downstream.png",
             "exists": true,
-            "sha256": "e01eac94e96e27fff46b38742a4a8abde447f6626aa87bbb34185e3f6561066c",
-            "size_bytes": 1482041,
+            "sha256": "ecb489b20185615e8b32ada56fc73590faa6fa7439bfbbb052b9eac14b1ae79a",
+            "size_bytes": 1482044,
             "source_size": [
               1280,
               720
@@ -869,7 +869,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2949133
+        "total_capture_png_bytes": 2949160
       },
       "profiles": [
         {
@@ -969,15 +969,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainfed_runnable_planning.umap",
           "exists": true,
           "size_bytes": 306697338,
-          "sha256": "3d7c8fa51c5649a2a2e2b0990e4f3968e6178897217816e2bf336a807fc72036"
+          "sha256": "29a719eeb1ac81f91f4e16edb1667268beda823e53ae250ce34175b4de8a9525"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "2828c23bae5f8cd3e33ddc95218c285bcc08460037b10a9ac6ca331768958242",
-            "size_bytes": 1467790,
+            "sha256": "f4b0c67b27fe012c5496238e6a0910b30faf3b904d4bd1870a8d646c04126d81",
+            "size_bytes": 1467797,
             "source_size": [
               1280,
               720
@@ -989,7 +989,7 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_river_eye_downstream.png",
             "exists": true,
-            "sha256": "334c2b93394d78943f0e04c460df2e3c9ffcbb6cea1c945f7befcc4f8682087d",
+            "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
             "size_bytes": 1496971,
             "source_size": [
               1280,
@@ -999,7 +999,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2964761
+        "total_capture_png_bytes": 2964768
       },
       "profiles": [
         {
@@ -1099,14 +1099,14 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainy_season_high_planning.umap",
           "exists": true,
           "size_bytes": 306611210,
-          "sha256": "09b6e756eac2538b999c715f5301e7b13a718ae61e63c4d1a7f6e34af73756c1"
+          "sha256": "009960fe85dad45fe9bc62d713a28db485793e8ccbd8f4a2addb096c72c59974"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "6345db5a9242889e23d1efcc0aeca7d3b596cebcadd8c77d7a07a8d934627303",
+            "sha256": "5429642275f10fa0d7773689f0b80e987b81e9f40c612fed4bee4f1d62348187",
             "size_bytes": 1459730,
             "source_size": [
               1280,
@@ -1229,15 +1229,15 @@
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_flash_response_review_only.umap",
           "exists": true,
           "size_bytes": 306012315,
-          "sha256": "e9e36817f0ec5badb45dc26b4b6363e0850dadfaadc3872c20ccf96b44f7952a"
+          "sha256": "c309e4dcce2b9f31c88c81d5b6fba812d1f6e58b7a94aed820415595f72893e7"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "3a8edf2c736265e134446c1d9a701b32617411dad41b9a85e5dc5729daa68f41",
-            "size_bytes": 1448735,
+            "sha256": "5c2079e1bee1419b4e28fbd4d1b99a3eb6c92cf9ececd5a4dcecf9d6282e1390",
+            "size_bytes": 1448737,
             "source_size": [
               1280,
               720
@@ -1259,7 +1259,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2929142
+        "total_capture_png_bytes": 2929144
       },
       "profiles": [
         {
