@@ -139,7 +139,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_guide_seat_downstream.png",
-          "sha256": "12cf205a63e090328f9bdaeafd2bbfbe118ff5ce48b7462d9d88fbd6c24618c3",
+          "sha256": "9c2ea916f4e74ce817cb4be7c4c711d2a5a919e5702e93e6808c2bc874d5b6be",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -472,7 +472,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_guide_seat_downstream.png",
-          "sha256": "c6f0bc1df8e0dcf52c192c5eb894eff7f438bed8a14d6dc0479350dd0b312689",
+          "sha256": "c5a7a4dd16079f570bef4f9cde82b33fa985ffffdee70d50616e15ddf911eb63",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -805,7 +805,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_guide_seat_downstream.png",
-          "sha256": "8893f0f4941fa8ed03f7119faea974f94e76ebd0f9d833555317bbb238bcddcb",
+          "sha256": "ffbc710d00de7d32250c2ce15d6174129c8652a72dffd95ccdccc4820d321393",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -847,7 +847,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_river_eye_downstream.png",
-          "sha256": "b099dd0e831f8e1465be92c3cbaf3798540083cca3e62da5c9ea5107a1f45737",
+          "sha256": "8505a6ac851b5c7a3e566a436d896f0942651d072361015f674a4478f439f350",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -1138,7 +1138,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
-          "sha256": "8884094739016abcc548cbff89717410e7276de31073a95c010a68a0a5e5146d",
+          "sha256": "92e9540967d71fc6a9a869aa70b32a488bf30f3e16d116934663d7589a21a669",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -1180,7 +1180,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_river_eye_downstream.png",
-          "sha256": "56b0e958c5638934a026e75e835b87fca14795e90fbfd6ee2f83918a64c139c9",
+          "sha256": "dbc3354ce4ca8a2bc237a5c64920210940d4aa9c8b3425b262499e9493f058bb",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -1474,7 +1474,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_guide_seat_downstream.png",
-          "sha256": "d208696d04c3df818c748d84beb90f892630dde51f379a39004144d94dde2cb9",
+          "sha256": "bfda94c4841a36d1b5097298780cb56eff83c0ae7abc9ff7a8565ef217e6e21a",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -1810,7 +1810,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_guide_seat_downstream.png",
-          "sha256": "3458dff0516b5eb5658dec588bcedfcee244366f256301617c828f483b641f3c",
+          "sha256": "f61ec93fe888c1d99a1a237048ecaaac4f7545dedc6cd07925ba62e5a88dfdf8",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2146,7 +2146,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_guide_seat_downstream.png",
-          "sha256": "0b4bae39e743aebd43f30db4d3df92f74a638193b52d3ad8ef3d57bd6a1af03a",
+          "sha256": "904968a5e28704e3da73961830e9d43ab8fadb906ed33940a9cf205315d6c081",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2188,7 +2188,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_river_eye_downstream.png",
-          "sha256": "e01eac94e96e27fff46b38742a4a8abde447f6626aa87bbb34185e3f6561066c",
+          "sha256": "ecb489b20185615e8b32ada56fc73590faa6fa7439bfbbb052b9eac14b1ae79a",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2481,7 +2481,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_guide_seat_downstream.png",
-          "sha256": "09bf3453cc54f28fa06048b1f2d55fe58d3d3e62f27457cb62a29650461c7021",
+          "sha256": "28a1af291b9c2114981febb610129661d59abdfb87e9b2e0dd823b44ff507107",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2523,7 +2523,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_river_eye_downstream.png",
-          "sha256": "3accf4373f7922fdd7015b2b9f4909734d9642cfd6567de389c0b125a06efb28",
+          "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2816,7 +2816,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_guide_seat_downstream.png",
-          "sha256": "8f2e9d287547386f6b9c364c9d9bcbbae0858c06fc727a85585993de2fbf6d25",
+          "sha256": "5c9db24d7150fc4e85b04e608d37f721c8a83589d192901441ac08c433b158b5",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -2858,7 +2858,7 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_river_eye_downstream.png",
-          "sha256": "dccf94ba11bc4918788cf204401b02954d59bc024c7ac7827834ea5639be67c3",
+          "sha256": "cf2f65741454781686756d8cd7bc17fd4b736c0e92bfc29790af56842d4df9ab",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
@@ -3151,7 +3151,7 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_guide_seat_downstream.png",
-          "sha256": "3761074330934526b822d1918a25ead2f33b60fecd74aeda98be484e912bf867",
+          "sha256": "dde340ddca11e2fde773a8de5566d20e3df440c358fcb8223ca7aa62ef92e24c",
           "automated_status": "candidate_for_human_lifelike_review_not_approved",
           "automated_blockers": [],
           "metrics": {
