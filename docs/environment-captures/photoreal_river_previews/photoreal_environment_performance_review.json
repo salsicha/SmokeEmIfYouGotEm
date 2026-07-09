@@ -82,8 +82,8 @@
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "32bc526324179a68f01ecef19377c886b1630fecc147a855d047dca92de8705d",
-            "size_bytes": 1407012,
+            "sha256": "f01c5aadb89dbd56a5cd11c3c14c60f8f438be376080298495b3f325be98406c",
+            "size_bytes": 1407011,
             "source_size": [
               1280,
               720
@@ -105,7 +105,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2838452,
+        "total_capture_png_bytes": 2838451,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
@@ -218,8 +218,8 @@
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "8648b78a0f8a41b220e9231e94f7c73a2bb4a963ff009aef2b097a4aa2e2f724",
-            "size_bytes": 1429663,
+            "sha256": "2ac8459123986ef19ae6a34974c5a0da7b29114792c40572a1f7783680a1b35f",
+            "size_bytes": 1429641,
             "source_size": [
               1280,
               720
@@ -231,8 +231,8 @@
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
             "exists": true,
-            "sha256": "d0c7d42a6fbf22d8c16268aff451ab9b8b51bbe16acd6a7d2fc907255d410071",
-            "size_bytes": 1462808,
+            "sha256": "e41b2a91c9618fdffc689ee77971a85c69429bdca908ebd7071b1197d2918d9e",
+            "size_bytes": 1462810,
             "source_size": [
               1280,
               720
@@ -241,7 +241,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2892471,
+        "total_capture_png_bytes": 2892451,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
@@ -354,8 +354,8 @@
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "8de7e3bd5b0f6a6278c72c838f5527fd210c0d192543eebfcf72c437a7ea12f5",
-            "size_bytes": 1467771,
+            "sha256": "9959d49c6df44d150837eec8d1dfca219264adb80a046a6fca46ecbcfdbc5a9c",
+            "size_bytes": 1467788,
             "source_size": [
               1280,
               720
@@ -377,7 +377,7 @@
             "automated_status": "candidate_for_human_lifelike_review_not_approved"
           }
         ],
-        "total_capture_png_bytes": 2964742,
+        "total_capture_png_bytes": 2964759,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
           "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",

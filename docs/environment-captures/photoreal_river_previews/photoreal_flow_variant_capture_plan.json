@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.photoreal_flow_variant_capture_plan.v1",
   "generated_on": "2026-07-09",
-  "status": "awaiting_flow_variant_unreal_captures_not_approved",
+  "status": "band_named_flow_variant_captures_available_not_lifelike_approved",
   "source_flow_visual_bands": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "source_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
   "source_capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
@@ -21,10 +21,10 @@
     "variant_count": 10,
     "default_variant_count": 3,
     "required_capture_count": 20,
-    "existing_band_named_capture_count": 0,
-    "missing_band_named_capture_count": 20,
+    "existing_band_named_capture_count": 20,
+    "missing_band_named_capture_count": 0,
     "current_default_capture_count": 6,
-    "fully_captured_variant_count": 0,
+    "fully_captured_variant_count": 10,
     "approved_variant_count": 0,
     "per_river_variant_count": {
       "american_south_fork": 3,
@@ -41,7 +41,7 @@
       "capture_manifest_default_flow_band": "median_runnable",
       "source_context": "USGS-11445500 planning presets plus guide-review requirement",
       "variant_count": 3,
-      "band_named_capture_count": 0,
+      "band_named_capture_count": 6,
       "current_default_capture_count": 2,
       "variants": [
         {
@@ -64,31 +64,30 @@
           "promotion_blockers": [
             "Attached evidence is only a 30-day early-summer CDEC context window.",
             "A25 X-flag meaning and station-to-reach routing remain unresolved.",
-            "Guide/outfitter review and lifelike capture evidence are missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Guide/outfitter review and lifelike capture evidence are missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "median_runnable",
@@ -110,31 +109,30 @@
           "promotion_blockers": [
             "Seasonal representativeness is not proven.",
             "Release routing and guide interpretation remain open.",
-            "No low/median/high capture variant set has been rendered and reviewed.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "No low/median/high capture variant set has been rendered and reviewed."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "The current default-band capture can help orient review, but this variant still needs band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, and performance review before it can be promoted."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "high_runnable",
@@ -156,31 +154,30 @@
           "promotion_blockers": [
             "No 3000 cfs examples were observed in the attached CDEC window.",
             "Requires separate runoff or release evidence.",
-            "Requires guide review before high-water visuals or forcing can be authoritative.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Requires guide review before high-water visuals or forcing can be authoritative."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         }
       ]
     },
@@ -192,7 +189,7 @@
       "capture_manifest_default_flow_band": "moderate_release_planning",
       "source_context": "USGS-09380000, USGS-09402500, and Glen Canyon Dam release context are required before these planning values become authoritative.",
       "variant_count": 3,
-      "band_named_capture_count": 0,
+      "band_named_capture_count": 6,
       "current_default_capture_count": 2,
       "variants": [
         {
@@ -215,31 +212,30 @@
           "promotion_blockers": [
             "Daily release totals do not capture hourly hydropower fluctuations.",
             "Gauge lag and river-mile routing assumptions remain open.",
-            "Sandbar/wet-bank masks and oarsman review are missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Sandbar/wet-bank masks and oarsman review are missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "moderate_release_planning",
@@ -261,31 +257,30 @@
           "promotion_blockers": [
             "USBR units and terms confirmation remain open.",
             "Subdaily release/routing evidence is missing.",
-            "No oarsman-reviewed capture variant has been accepted.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "No oarsman-reviewed capture variant has been accepted."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "The current default-band capture can help orient review, but this variant still needs band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, and performance review before it can be promoted."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "high_release_planning",
@@ -307,31 +302,30 @@
           "promotion_blockers": [
             "Current 18000 cfs planning band is not observed in water-year 2026 to date.",
             "Requires high-release evidence and river-mile routing review.",
-            "Requires oarsman validation before gameplay or lifelike visual use.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Requires oarsman validation before gameplay or lifelike visual use."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         }
       ]
     },
@@ -343,7 +337,7 @@
       "capture_manifest_default_flow_band": "rainfed_runnable_planning",
       "source_context": "Relative planning bands only until Costa Rica hydrology, rainfall history, flash-response, and guide review clear numeric ranges.",
       "variant_count": 4,
-      "band_named_capture_count": 0,
+      "band_named_capture_count": 8,
       "current_default_capture_count": 2,
       "variants": [
         {
@@ -366,31 +360,30 @@
           "promotion_blockers": [
             "No accepted discharge or stage station time series is attached.",
             "Rainfall/stage basin relation is metadata-only.",
-            "Local guide/outfitter review is missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Local guide/outfitter review is missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "rainfed_runnable_planning",
@@ -412,31 +405,30 @@
           "promotion_blockers": [
             "No rainfall-to-stage relation is attached.",
             "No station coordinates, variables, units, quality flags, or time zones are promoted.",
-            "Guide/outfitter validation is missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Guide/outfitter validation is missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
               "current_default_capture_exists": true,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "The current default-band capture can help orient review, but this variant still needs band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, and performance review before it can be promoted."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "rainy_season_high_planning",
@@ -458,31 +450,30 @@
           "promotion_blockers": [
             "Numeric high-water criteria are not accepted.",
             "Rescue readability and no-go/unsafe thresholds are not reviewed.",
-            "Local guide/outfitter safety review is missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Local guide/outfitter safety review is missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         },
         {
           "flow_band": "flash_response_review_only",
@@ -504,34 +495,33 @@
           "promotion_blockers": [
             "No rainfall-to-stage or rainfall-to-discharge lag evidence is attached.",
             "No station time series or basin relation is promoted.",
-            "Guide/outfitter safety review and evacuation constraints are missing.",
-            "Band-named guide-seat and river-eye Unreal captures are missing for this variant."
+            "Guide/outfitter safety review and evacuation constraints are missing."
           ],
           "required_captures": [
             {
               "view_id": "guide_seat_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_guide_seat_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             },
             {
               "view_id": "river_eye_downstream",
               "expected_capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_river_eye_downstream.png",
-              "exists": false,
+              "exists": true,
               "current_default_capture": null,
               "current_default_capture_exists": false,
-              "status": "band_named_capture_missing",
+              "status": "band_named_capture_attached",
               "review_requirement": "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
             }
           ],
-          "status": "requires_band_named_unreal_capture",
-          "current_decision": "Do not promote this flow variant until Unreal captures exist for both required views and the intake ledger promotion blockers are closed."
+          "status": "band_named_capture_set_available_not_approved",
+          "current_decision": "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured performance review are closed."
         }
       ]
     }
   ],
-  "current_decision": "Use this plan to drive the next Unreal capture automation pass for seasonal, release, and rainfed flow variants. The existing six downstream captures cover only the three default preview bands and are not enough to review low/high water, flash response, hazard readability, swimmer drift, or flow-dependent hydraulic behavior."
+  "current_decision": "All required band-named guide-seat and river-eye flow-variant captures exist as preview evidence, but no variant is lifelike or gameplay-approved until guide/geospatial, hazard/readability, rights, solver/forcing nonmasking, and measured desktop/VR performance review pass."
 }
