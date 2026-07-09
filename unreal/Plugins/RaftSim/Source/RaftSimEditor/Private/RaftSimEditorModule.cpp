@@ -6516,6 +6516,30 @@ void AddPreviewRiverRibbonMesh(
                         (0.76f + CenterT * 0.18f + EdgeT * 0.12f),
                     0.0f,
                     Spec.bDesertCanyon ? 0.48f : 0.44f));
+            const float BaseWaterEdgeRailArtifactDemotion = SmoothPreviewStep(0.84f, 0.995f, EdgeT);
+            const FLinearColor BaseWaterEdgeRailMutedColor = FMath::Lerp(
+                Spec.WaterColor,
+                ShallowWater,
+                Spec.bDesertCanyon ? 0.18f : (Spec.bHasWaterfalls ? 0.12f : 0.14f));
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                BaseWaterEdgeRailMutedColor,
+                FMath::Clamp(
+                    BaseWaterEdgeRailArtifactDemotion *
+                        (Spec.bDesertCanyon ? 0.58f : (Spec.bHasWaterfalls ? 0.66f : 0.62f)),
+                    0.0f,
+                    Spec.bHasWaterfalls ? 0.70f : 0.64f));
+            const float BaseWaterEdgeRailLumaCeiling =
+                Spec.bDesertCanyon ? 0.52f : (Spec.bHasWaterfalls ? 0.36f : 0.39f);
+            const float BaseWaterEdgeRailLuma = GetPreviewColorLuma(WaterColor);
+            if (BaseWaterEdgeRailLuma > BaseWaterEdgeRailLumaCeiling)
+            {
+                const float LumaScale = BaseWaterEdgeRailLumaCeiling / FMath::Max(BaseWaterEdgeRailLuma, 0.001f);
+                WaterColor = FMath::Lerp(
+                    WaterColor,
+                    ScalePreviewColor(WaterColor, LumaScale),
+                    FMath::Clamp(BaseWaterEdgeRailArtifactDemotion * 0.86f, 0.0f, 0.86f));
+            }
             WaterColor.R = FMath::Max(WaterColor.R, BaseWaterResidualDarkStreakLumaFloor.R);
             WaterColor.G = FMath::Max(WaterColor.G, BaseWaterResidualDarkStreakLumaFloor.G);
             WaterColor.B = FMath::Max(WaterColor.B, BaseWaterResidualDarkStreakLumaFloor.B);
@@ -11941,6 +11965,11 @@ void AddPreviewNearFieldPhotorealReviewDressing(
         const float MinX = -5480.0f;
         const float MaxX = 6200.0f;
         const float NearFieldInboardBankShelfCullT = 1.0f;
+        const float ContinuousNearFieldBankShelfRailDemotion = 0.0f;
+        if (ContinuousNearFieldBankShelfRailDemotion <= KINDA_SMALL_NUMBER)
+        {
+            continue;
+        }
         const float InnerOffset = ActiveRiverHalfWidth +
             (Spec.bDesertCanyon ? 164.0f : 92.0f) * NearFieldInboardBankShelfCullT;
         const float OuterOffset = ActiveRiverHalfWidth +
