@@ -33,6 +33,7 @@
     "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
     "additional_source_leads_review": "physics/data/real_world/production_additional_source_leads_review.json",
     "production_visual_source_acquisition_queue": "physics/data/real_world/production_visual_source_acquisition_queue.json",
+    "production_visual_source_item_intake": "physics/data/real_world/production_visual_source_item_intake.json",
     "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
     "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
