@@ -37,6 +37,7 @@
     "reference_media_links": "physics/data/real_world/reference_media_link_manifest.json",
     "art_asset_source_research": "unreal/Content/RaftSim/Rendering/art_asset_source_research.json",
     "capture_manifest": "docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json",
+    "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
     "first_party_material_texture_atlases": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
     "first_party_material_instance_candidates": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
     "first_party_material_texture_assets": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
