@@ -1,0 +1,462 @@
+{
+  "schema": "raftsim.production_visual_source_item_intake.v1",
+  "generated_on": "2026-07-08",
+  "status": "item_level_intake_slots_recorded_no_media_downloaded_no_items_promoted",
+  "purpose": "Convert the visual source acquisition queue into item-level intake slots for official layers, flow windows, photos, footage, social/public links, and first-party capture requests needed to make the three Unreal river environments lifelike.",
+  "source_acquisition_queue": "physics/data/real_world/production_visual_source_acquisition_queue.json",
+  "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
+  "reference_media_review_queue": "physics/data/real_world/reference_media_review_queue.json",
+  "policy": {
+    "item_level_metadata_required_before_art_use": true,
+    "no_media_downloaded_or_packaged_by_this_manifest": true,
+    "no_social_media_scraping_training_texture_extraction_or_photogrammetry_without_explicit_rights": true,
+    "official_sources_still_require_item_layer_date_terms_and_attribution_review": true,
+    "first_party_capture_is_preferred_for_final_asset_inputs": true,
+    "promotion_requires_guide_or_oarsman_review_and_hazard_rescue_readability_check": true
+  },
+  "required_fields_before_promotion": [
+    "source_url",
+    "creator_or_responsible_institution",
+    "license_or_written_permission",
+    "allowed_game_uses",
+    "required_credit_or_attribution",
+    "capture_or_publication_date",
+    "river_id",
+    "section_or_station_or_river_mile",
+    "flow_or_release_or_rain_context",
+    "source_file_or_layer_identifier",
+    "local_copy_or_asset_path_if_promoted",
+    "guide_oarsman_or_local_reviewer",
+    "hazard_rescue_readability_notes",
+    "public_screenshot_sensitivity_notes",
+    "final_promotion_decision"
+  ],
+  "blocked_uses_until_promoted": [
+    "production_texture_or_material_source",
+    "photogrammetry_or_scan_reconstruction",
+    "AI_training_or_style_reference_dataset",
+    "packaged_media_or_marketing_art",
+    "copied_caption_or_audio_or_commentary",
+    "shipping_route_or_access_geometry",
+    "lifelike_screenshot_approval"
+  ],
+  "intake_items": [
+    {
+      "item_id": "south_fork_blm_map_pdf_access_context",
+      "river_id": "american_south_fork",
+      "source_kind": "official_map_pdf",
+      "source_url": "https://www.blm.gov/sites/blm.gov/files/documents/files/Maps_California_south-fork-of-the-american-river-map.pdf",
+      "source_queue_id": "blm_south_fork_american_recreation_map_photo_lead",
+      "target_use_after_promotion": [
+        "access_context_review",
+        "put_in_take_out_annotation",
+        "route_publication_sensitivity_review"
+      ],
+      "current_status": "candidate_item_metadata_needed_no_geometry_imported",
+      "known_metadata": {
+        "provider": "Bureau of Land Management",
+        "responsible_institution": "Bureau of Land Management",
+        "approximate_section": "South Fork American River recreation corridor",
+        "rights_state": "official_page_lead_item_terms_and_map_credit_review_required"
+      },
+      "missing_metadata": [
+        "map_date",
+        "cartographic_credit",
+        "scale_or_coordinate_assumptions",
+        "current_access_status",
+        "derivative_geometry_permission",
+        "local_guide_review"
+      ],
+      "allowed_before_promotion": [
+        "manual access comparison",
+        "editor annotation planning",
+        "guide/outfitter review questions"
+      ],
+      "blocked_uses": [
+        "shipping access geometry",
+        "public route guidance",
+        "production route authority"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "south_fork_cdec_cbr_low_medium_high_flow_windows",
+      "river_id": "american_south_fork",
+      "source_kind": "official_flow_timeseries_window",
+      "source_url": "https://cdec.water.ca.gov/dynamicapp/QueryF?s=CBR",
+      "source_queue_id": "cdec_chili_bar_cbr_live_and_historical_flow",
+      "target_use_after_promotion": [
+        "seasonal_flow_variant_selection",
+        "wet_bank_width_calibration",
+        "foam_hole_lateral_eddyline_flow_response"
+      ],
+      "current_status": "candidate_flow_windows_need_csv_json_pull_and_guide_review",
+      "known_metadata": {
+        "provider": "California Data Exchange Center",
+        "station_id": "CBR",
+        "station_name": "AMERICAN RIVER AT CHILI BAR",
+        "observed_variables": [
+          "stage",
+          "flow",
+          "reservoir_elevation"
+        ],
+        "provisional_note": "Displayed CDEC values can be provisional and require station metadata/final-status review."
+      },
+      "missing_metadata": [
+        "selected_low_flow_datetime_window",
+        "selected_commercial_flow_datetime_window",
+        "selected_high_flow_datetime_window",
+        "units_and_timezone",
+        "csv_or_json_source_url",
+        "powerhouse_or_release_context",
+        "guide_interpretation"
+      ],
+      "allowed_before_promotion": [
+        "flow-band planning",
+        "data pull script design",
+        "guide review question drafting"
+      ],
+      "blocked_uses": [
+        "final flow preset authority",
+        "gameplay feature forcing calibration",
+        "lifelike water-width approval"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "south_fork_first_party_field_capture_request",
+      "river_id": "american_south_fork",
+      "source_kind": "first_party_capture_request",
+      "source_url": "",
+      "source_queue_id": "american_south_fork_public_social_reference_search",
+      "target_use_after_promotion": [
+        "production_texture_reference",
+        "wet_rock_and_bank_material_reference",
+        "guide_seat_lifelike_review"
+      ],
+      "current_status": "field_capture_needed",
+      "known_metadata": {
+        "preferred_targets": [
+          "Chili Bar put-in",
+          "Troublemaker-style boulder garden",
+          "late-summer exposed rock and wet-bank line",
+          "commercial-flow guide-seat downstream view"
+        ],
+        "preferred_capture": "first-party photos, video, photogrammetry-safe stills, and flow/gauge notes"
+      },
+      "missing_metadata": [
+        "field_capture_date",
+        "photographer",
+        "camera_or_phone_model",
+        "gps_or_stationing",
+        "CBR_or_USGS_flow_context",
+        "release_permission",
+        "guide_review"
+      ],
+      "allowed_before_promotion": [
+        "shot-list planning",
+        "permission planning"
+      ],
+      "blocked_uses": [
+        "production material source",
+        "photogrammetry",
+        "public screenshot claim"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "colorado_nps_public_domain_photo_archive_selection",
+      "river_id": "colorado_river",
+      "source_kind": "official_photo_archive_item_selection",
+      "source_url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
+      "source_queue_id": "nps_grand_canyon_public_domain_photo_broll_archive",
+      "target_use_after_promotion": [
+        "canyon_wall_color_scale_reference",
+        "sandbar_talus_reference",
+        "atmosphere_lighting_reference"
+      ],
+      "current_status": "archive_items_need_individual_metadata_selection",
+      "known_metadata": {
+        "provider": "National Park Service",
+        "archive_note": "NPS page describes public-domain and Creative Commons Attribution photo leads.",
+        "preferred_item_types": [
+          "Colorado River corridor photos",
+          "rafting or river-level canyon views",
+          "sandbar or beach views",
+          "canyon atmosphere and lighting"
+        ]
+      },
+      "missing_metadata": [
+        "exact_archive_item_url",
+        "title",
+        "creator",
+        "capture_date",
+        "license_or_public_domain_statement",
+        "credit_line",
+        "river_mile_or_location",
+        "route_publication_sensitivity_review"
+      ],
+      "allowed_before_promotion": [
+        "manual archive search",
+        "candidate title list",
+        "oarsman review questions"
+      ],
+      "blocked_uses": [
+        "texture extraction",
+        "photogrammetry",
+        "asset packaging",
+        "lifelike capture approval"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "colorado_usbr_usgs_release_and_gauge_pairing",
+      "river_id": "colorado_river",
+      "source_kind": "official_release_and_gauge_context",
+      "source_url": "https://www.usbr.gov/uc/water/crsp/cs/gcd.html",
+      "source_queue_id": "usbr_glen_canyon_water_operations_release_context",
+      "target_use_after_promotion": [
+        "release_band_visual_variants",
+        "sandbar_wetness_calibration",
+        "rowing_current_wave_train_and_eddyline_tuning"
+      ],
+      "current_status": "release_windows_need_pairing_with_usgs_gauges_and_oarsman_review",
+      "known_metadata": {
+        "provider": "Bureau of Reclamation",
+        "related_gauge_leads": [
+          "USGS-09380000 Colorado River at Lees Ferry",
+          "USGS-09402500 Colorado River near Grand Canyon"
+        ],
+        "operation_context": "Glen Canyon Dam current operations and release context."
+      },
+      "missing_metadata": [
+        "selected_low_release_window",
+        "selected_moderate_release_window",
+        "selected_high_release_window",
+        "gauge_lag_assumption",
+        "release_units_and_timezone",
+        "USGS_daily_or_instantaneous_source_urls",
+        "oarsman_review"
+      ],
+      "allowed_before_promotion": [
+        "release-band planning",
+        "gauge pull script design",
+        "oarsman review question drafting"
+      ],
+      "blocked_uses": [
+        "final Colorado flow preset authority",
+        "gameplay feature forcing calibration",
+        "lifelike water appearance approval"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "colorado_first_party_or_permitted_boater_media_request",
+      "river_id": "colorado_river",
+      "source_kind": "first_party_or_explicit_permission_capture_request",
+      "source_url": "",
+      "source_queue_id": "colorado_grand_canyon_public_social_reference_search",
+      "target_use_after_promotion": [
+        "oar_rig_foreground_reference",
+        "river_level_wave_train_reference",
+        "rescue_visibility_reference"
+      ],
+      "current_status": "permission_or_first_party_capture_needed",
+      "known_metadata": {
+        "preferred_targets": [
+          "Lees Ferry river-level rowing setup",
+          "Grand Canyon sandbar camp low/moderate release",
+          "wave train and eddyline from oarsman view",
+          "long-water swimmer visibility"
+        ],
+        "preferred_capture": "first-party or explicit-permission photos/video with release/gauge context"
+      },
+      "missing_metadata": [
+        "creator_or_trip_party",
+        "source_url_or_first_party_path",
+        "written_permission",
+        "river_mile_or_named_rapid",
+        "USBR_or_USGS_release_context",
+        "required_credit",
+        "oarsman_review"
+      ],
+      "allowed_before_promotion": [
+        "permission outreach planning",
+        "shot-list planning"
+      ],
+      "blocked_uses": [
+        "download",
+        "texture extraction",
+        "packaged media",
+        "public screenshot approval"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "pacuare_snit_orthophoto_and_environment_layer_selection",
+      "river_id": "pacuare",
+      "source_kind": "official_ogc_layer_selection",
+      "source_url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+      "source_queue_id": "snit_cr_ogc_pacuare_orthophoto_environment_hydrology_nodes",
+      "target_use_after_promotion": [
+        "orthophoto_or_model_source_selection",
+        "forest_cover_and_protected_area_context",
+        "hydrology_station_and_basin_context"
+      ],
+      "current_status": "candidate_layers_need_exact_layer_terms_crs_and_corridor_intersection",
+      "known_metadata": {
+        "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+        "service_types": [
+          "WMS",
+          "WMTS",
+          "WFS"
+        ],
+        "candidate_nodes": [
+          "Ortofoto",
+          "Modelo",
+          "MINAE Direccion de Agua",
+          "IMN",
+          "SINAC",
+          "SENARA",
+          "ICE",
+          "ICT"
+        ]
+      },
+      "missing_metadata": [
+        "exact_layer_name",
+        "service_url",
+        "CRS",
+        "terms_and_attribution",
+        "metadata_date",
+        "Pacuare_corridor_intersection",
+        "protected_area_publication_sensitivity_review",
+        "local_guide_or_geospatial_review"
+      ],
+      "allowed_before_promotion": [
+        "layer selection",
+        "metadata triage",
+        "guide/geospatial review question drafting"
+      ],
+      "blocked_uses": [
+        "map tile import",
+        "geometry import",
+        "production orthophoto use",
+        "public route screenshot approval"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "pacuare_public_social_and_creator_permission_candidates",
+      "river_id": "pacuare",
+      "source_kind": "public_social_link_intake_slots",
+      "source_url": "",
+      "source_queue_id": "pacuare_public_social_reference_search",
+      "target_use_after_promotion": [
+        "rainforest_gorge_canopy_reference",
+        "waterfall_mist_and_wet_rock_reference",
+        "rainfed_flow_water_color_reference"
+      ],
+      "current_status": "manual_link_collection_and_creator_permission_needed",
+      "known_metadata": {
+        "candidate_platforms": [
+          "Wikimedia Commons",
+          "Flickr Creative Commons search",
+          "YouTube creator-permission requests",
+          "Instagram creator-permission requests",
+          "Mapillary street-level link review",
+          "local guide/outfitter first-party submissions"
+        ],
+        "target_sections": [
+          "Huacas Gorge",
+          "Double Drop",
+          "Cimarones",
+          "Siquirres or Finca La Cruz planning corridor"
+        ]
+      },
+      "missing_metadata": [
+        "exact_public_url",
+        "creator_or_account",
+        "license_or_written_permission",
+        "approximate_section_or_rapid",
+        "rainfall_or_flow_context",
+        "protected_area_or_indigenous_context_sensitivity",
+        "required_credit",
+        "local_guide_review"
+      ],
+      "allowed_before_promotion": [
+        "manual visual question notes",
+        "permission outreach planning",
+        "first-party capture shot-list planning"
+      ],
+      "blocked_uses": [
+        "download",
+        "scrape",
+        "thumbnail_or_frame_extraction",
+        "audio_or_caption_use",
+        "training",
+        "production texture or asset source"
+      ],
+      "promotion_decision": "not_promoted"
+    },
+    {
+      "item_id": "pacuare_first_party_outfitter_capture_request",
+      "river_id": "pacuare",
+      "source_kind": "first_party_or_outfitter_permission_capture_request",
+      "source_url": "",
+      "source_queue_id": "pacuare_public_social_reference_search",
+      "target_use_after_promotion": [
+        "production_rainforest_material_reference",
+        "wet_rock_and_waterfall_reference",
+        "canopy_rescue_readability_reference"
+      ],
+      "current_status": "field_capture_or_outfitter_permission_needed",
+      "known_metadata": {
+        "preferred_targets": [
+          "rainforest gorge river-eye downstream view",
+          "side waterfall and plunge mist",
+          "wet basalt or mossy boulder contact",
+          "canopy-shadow swimmer visibility",
+          "clear-season and rainfed water color"
+        ],
+        "preferred_capture": "first-party or explicit outfitter-permitted photos/video with rain/flow notes"
+      },
+      "missing_metadata": [
+        "creator_or_outfitter",
+        "source_url_or_first_party_path",
+        "written_permission",
+        "capture_date",
+        "section_or_rapid",
+        "rainfall_or_flow_context",
+        "required_credit",
+        "local_guide_review"
+      ],
+      "allowed_before_promotion": [
+        "permission outreach planning",
+        "shot-list planning"
+      ],
+      "blocked_uses": [
+        "download",
+        "texture extraction",
+        "photogrammetry",
+        "packaged media",
+        "lifelike screenshot approval"
+      ],
+      "promotion_decision": "not_promoted"
+    }
+  ],
+  "summary": {
+    "river_count": 3,
+    "intake_item_count": 9,
+    "official_source_item_count": 5,
+    "first_party_or_permission_request_count": 4,
+    "promoted_item_count": 0,
+    "media_files_downloaded": 0,
+    "rights_cleared_for_asset_use": 0,
+    "per_river_item_count": {
+      "american_south_fork": 3,
+      "colorado_river": 3,
+      "pacuare": 3
+    }
+  },
+  "next_checkpoint": "Fill exact item URLs/layers/windows and rights metadata, then promote only accepted items into per-river source manifests, material inputs, or Unreal asset imports with guide review and capture evidence."
+}
