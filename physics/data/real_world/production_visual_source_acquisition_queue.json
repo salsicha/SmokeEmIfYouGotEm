@@ -1,0 +1,274 @@
+{
+  "schema": "raftsim.production_visual_source_acquisition_queue.v1",
+  "generated_on": "2026-07-08",
+  "status": "rights_gated_visual_source_queue_recorded_no_third_party_media_downloaded",
+  "purpose": "Queue the official map, flow, aerial, public-media, social-link, and first-party capture work needed to move South Fork American, Colorado River, and Pacuare from source-aware preview captures toward lifelike Unreal environments without importing unreviewed third-party photos, video frames, captions, audio, comments, or model-training data.",
+  "policy": {
+    "official_sources_first": true,
+    "social_media_and_public_photo_sites_link_only_until_explicit_item_rights_clear": true,
+    "no_scraping_downloading_training_or_packaging_third_party_media_without_rights": true,
+    "each_promoted_item_requires_url_creator_license_terms_capture_date_location_flow_context_attribution_and_guide_review": true,
+    "procedural_or_first_party_generation_allowed_when_source_manifest_and_seed_are_recorded": true,
+    "visual_sources_must_not_hide_hazards_rescue_targets_or_physics_failures": true
+  },
+  "reviewed_official_source_leads": [
+    {
+      "source_id": "blm_south_fork_american_recreation_map_photo_lead",
+      "river_ids": [
+        "american_south_fork"
+      ],
+      "provider": "Bureau of Land Management",
+      "url": "https://www.blm.gov/visit/south-fork-american-river",
+      "source_classes": [
+        "protected_area_and_access_context",
+        "river_map_and_access_points",
+        "official_photo_reference_leads",
+        "official_social_link_seeds"
+      ],
+      "web_reviewed_evidence": [
+        "official .gov page for the South Fork American recreation corridor",
+        "page lists access points including Chili Bar, Henningsen-Lotus Park, Highway 49 Bridge West, Marshall Gold Discovery State Historical Park, Camp Lotus, Greenwood Creek, and Salmon Falls Bridge",
+        "page links a full-screen map and general map PDF lead",
+        "page includes BLM-captioned South Fork American River photo leads",
+        "page footer exposes BLM social channels including YouTube, Instagram, and Flickr for manual link-only search followup"
+      ],
+      "next_action": "Attach exact map/PDF metadata, current access restrictions, photo item credits, social item URLs, and guide/outfitter validation before deriving route geometry or visual reference targets.",
+      "promotion_gate": "Do not digitize access geometry or use any BLM-hosted/social image as art input until current terms, attribution, publication sensitivity, and item-level rights are recorded."
+    },
+    {
+      "source_id": "cdec_chili_bar_cbr_live_and_historical_flow",
+      "river_ids": [
+        "american_south_fork"
+      ],
+      "provider": "California Data Exchange Center",
+      "url": "https://cdec.water.ca.gov/dynamicapp/QueryF?s=CBR",
+      "source_classes": [
+        "seasonal_flow_or_release_history",
+        "flow_band_calibration",
+        "feature_forcing_flow_response"
+      ],
+      "web_reviewed_evidence": [
+        "station AMERICAN RIVER AT CHILI BAR (CBR) is in the American River basin",
+        "page exposes hourly and 15-minute stage/flow/reservoir-elevation tables",
+        "page links CDEC JSON/CSV historical data services and station metadata lookup",
+        "page labels displayed data provisional and subject to change"
+      ],
+      "next_action": "Pull reviewed CSV/JSON windows for low, summer-commercial, and high/runnable conditions, then bind water width, wet-bank, foam, holes, laterals, and rescue readability variants to explicit date/time flow bands.",
+      "promotion_gate": "Do not promote a South Fork flow preset until CDEC data window, units, provisional/final status, powerhouse/release context, and guide interpretation are recorded."
+    },
+    {
+      "source_id": "nps_grand_canyon_river_trip_and_media_leads",
+      "river_ids": [
+        "colorado_river"
+      ],
+      "provider": "National Park Service",
+      "url": "https://www.nps.gov/grca/planyourvisit/whitewater-rafting.htm",
+      "source_classes": [
+        "protected_area_and_access_context",
+        "river_mile_and_trip_context",
+        "official_photo_reference_leads",
+        "official_social_link_seeds"
+      ],
+      "web_reviewed_evidence": [
+        "official .gov river trips and permits page for Grand Canyon National Park",
+        "page describes Lees Ferry to Diamond Creek commercial and noncommercial whitewater trips",
+        "page includes official rafting and Colorado River below Nankoweap photo leads with NPS credit lines",
+        "page footer exposes NPS social channels including YouTube, Instagram, and Flickr for manual link-only search followup"
+      ],
+      "next_action": "Attach river-mile, launch/takeout, photo item metadata, public-screenshot sensitivity, and oarsman/guide review before using this source in route or art decisions.",
+      "promotion_gate": "Use only as official context until item-level media rights, route geometry, and river-mile relation are accepted."
+    },
+    {
+      "source_id": "nps_grand_canyon_public_domain_photo_broll_archive",
+      "river_ids": [
+        "colorado_river"
+      ],
+      "provider": "National Park Service",
+      "url": "https://www.nps.gov/grca/learn/photosmultimedia/index.htm",
+      "source_classes": [
+        "official_photo_reference_leads",
+        "official_video_reference_leads",
+        "atmosphere_lighting_reference"
+      ],
+      "web_reviewed_evidence": [
+        "page advertises a digital photo archive with more than 5000 Grand Canyon photos in the public domain or Creative Commons Attribution",
+        "page advertises public-domain b-roll video footage for multimedia use",
+        "page links webcams and virtual tours useful for atmosphere and lighting review",
+        "page footer exposes official NPS social/photo channels for manual link-only discovery"
+      ],
+      "next_action": "Select exact river-corridor archive items, then record creator, date, license, credit line, location/river mile, flow context if available, and permitted derivative use before art reference or texture-study promotion.",
+      "promotion_gate": "No frame, photo, or clip may become a material, photogrammetry, training, or packaged reference input until item-level metadata and attribution are attached."
+    },
+    {
+      "source_id": "usbr_glen_canyon_water_operations_release_context",
+      "river_ids": [
+        "colorado_river"
+      ],
+      "provider": "Bureau of Reclamation",
+      "url": "https://www.usbr.gov/uc/water/crsp/cs/gcd.html",
+      "source_classes": [
+        "seasonal_flow_or_release_history",
+        "release_schedule_context",
+        "feature_forcing_flow_response"
+      ],
+      "web_reviewed_evidence": [
+        "official Glen Canyon Dam water operations page",
+        "page records current operations, monthly release context, and operational-tier context",
+        "page notes daily scheduled fluctuations and instantaneous release adjustments can affect downstream flow",
+        "page links the USGS Colorado River at Lees Ferry downstream streamflow station"
+      ],
+      "next_action": "Pair USBR monthly/daily release context with USGS Lees Ferry/Grand Canyon gauge histories and Grand Canyon rapid review before tuning rowing-current, eddyline, wave-train, and flip/pin flow variants.",
+      "promotion_gate": "Do not promote Colorado flow visuals or feature forcing until release schedule, gauge lag, river-mile reach, and oarsman review are recorded."
+    },
+    {
+      "source_id": "snit_cr_ogc_pacuare_orthophoto_environment_hydrology_nodes",
+      "river_ids": [
+        "pacuare"
+      ],
+      "provider": "Sistema Nacional de Informacion Territorial de Costa Rica / IDECORI",
+      "url": "https://www.snitcr.go.cr/ico_servicios_ogc",
+      "source_classes": [
+        "aerial_or_satellite_imagery",
+        "terrain_dem_or_lidar",
+        "hydrography_and_centerline",
+        "protected_area_and_access_context",
+        "forest_cover_and_environment_context"
+      ],
+      "web_reviewed_evidence": [
+        "official Costa Rica OGC service catalog page",
+        "page explains WMS, WMTS, and WFS service types",
+        "page notes CRTM05, CR05/CRTM05, and WGS84 projection availability",
+        "page lists orthophoto, model, MINAE Direccion de Agua, IMN, SINAC, SENARA, ICE, and ICT node leads"
+      ],
+      "next_action": "Select exact Pacuare corridor layers for orthophoto, hydrology, forest cover, protected area, rainfall/stations, and tourism context; capture layer metadata, CRS, terms, responsible institution, and corridor intersection before import.",
+      "promotion_gate": "Do not import or package SNIT layers until layer-level terms, CRS, attribution, metadata date, corridor relevance, and Costa Rica guide/geospatial review pass."
+    }
+  ],
+  "social_and_public_media_link_queue": [
+    {
+      "queue_id": "american_south_fork_public_social_reference_search",
+      "river_ids": [
+        "american_south_fork"
+      ],
+      "allowed_use_before_rights_clearance": "manual_visual_questions_only",
+      "candidate_platforms": [
+        "BLM official YouTube",
+        "BLM official Instagram",
+        "BLM official Flickr",
+        "Wikimedia Commons",
+        "Flickr Creative Commons search",
+        "outfitter or guide-submitted first-party links"
+      ],
+      "search_targets": [
+        "Chili Bar rapid South Fork American River",
+        "Troublemaker rapid South Fork American River",
+        "Meatgrinder South Fork American River",
+        "Satan's Cesspool South Fork American River",
+        "South Fork American River rafting high water low water"
+      ],
+      "must_record_per_item": [
+        "source_url",
+        "creator_or_account",
+        "license_or_written_permission",
+        "capture_date_or_season",
+        "approximate_station_or_rapid",
+        "observed_flow_or_gauge_context",
+        "allowed_use",
+        "required_credit",
+        "guide_validation_notes"
+      ],
+      "blocked_until": "explicit_item_rights_and_guide_review"
+    },
+    {
+      "queue_id": "colorado_grand_canyon_public_social_reference_search",
+      "river_ids": [
+        "colorado_river"
+      ],
+      "allowed_use_before_rights_clearance": "manual_visual_questions_only",
+      "candidate_platforms": [
+        "NPS official photo archive",
+        "NPS official b-roll",
+        "NPS official YouTube",
+        "NPS official Instagram",
+        "NPS official Flickr",
+        "Wikimedia Commons",
+        "Flickr Creative Commons search",
+        "private-boater or guide-submitted first-party links"
+      ],
+      "search_targets": [
+        "Lees Ferry rowing raft Grand Canyon",
+        "Colorado River Grand Canyon Nankoweap rapid",
+        "Colorado River Grand Canyon muddy release",
+        "Grand Canyon rowing eddyline wave train",
+        "Grand Canyon Colorado River sandbar camp low water"
+      ],
+      "must_record_per_item": [
+        "source_url",
+        "creator_or_account",
+        "license_or_written_permission",
+        "river_mile_or_named_rapid",
+        "trip_date_or_season",
+        "USBR_or_USGS_release_context_if_known",
+        "allowed_use",
+        "required_credit",
+        "oarsman_validation_notes"
+      ],
+      "blocked_until": "explicit_item_rights_route_sensitivity_and_oarsman_review"
+    },
+    {
+      "queue_id": "pacuare_public_social_reference_search",
+      "river_ids": [
+        "pacuare"
+      ],
+      "allowed_use_before_rights_clearance": "manual_visual_questions_only",
+      "candidate_platforms": [
+        "Wikimedia Commons",
+        "Flickr Creative Commons search",
+        "YouTube creator-permission requests",
+        "Instagram creator-permission requests",
+        "Mapillary street-level link review",
+        "local guide/outfitter first-party submissions"
+      ],
+      "search_targets": [
+        "Pacuare River Huacas Gorge rafting",
+        "Pacuare River Double Drop rapid",
+        "Pacuare River Cimarones rapid",
+        "Pacuare River rainforest waterfalls low water high water",
+        "Rio Pacuare rafting Siquirres Finca La Cruz"
+      ],
+      "must_record_per_item": [
+        "source_url",
+        "creator_or_account",
+        "license_or_written_permission",
+        "approximate_section_or_rapid",
+        "rainfall_or_flow_context_if_known",
+        "protected_area_or_indigenous_context_sensitivity",
+        "allowed_use",
+        "required_credit",
+        "local_guide_validation_notes"
+      ],
+      "blocked_until": "explicit_item_rights_local_guide_and_sensitivity_review"
+    }
+  ],
+  "per_river_next_actions": {
+    "american_south_fork": [
+      "Attach BLM map/PDF metadata and reconcile with existing NHD/NAIP/3DEP stationing.",
+      "Pull CDEC CBR historical CSV/JSON windows for low, commercial, and high flow examples.",
+      "Collect link-only BLM/Wikimedia/Flickr/social rapid references and request explicit rights for any candidate production reference item.",
+      "Generate first-party procedural canyon-bank, wet-rock, grass/scrub, and foam/wetness variants from the reviewed flow bands."
+    ],
+    "colorado_river": [
+      "Pair NPS route/river-mile context with USBR Glen Canyon release context and USGS Lees Ferry/Grand Canyon gauges.",
+      "Select public-domain or CC-BY NPS archive items with exact credits and river-mile/rapid evidence.",
+      "Collect link-only private-boater/social rowing references and request explicit rights for any candidate production reference item.",
+      "Generate first-party procedural canyon strata, sandbar, muddy-water, eddyline, wave-train, and oar-rig variants from accepted release bands."
+    ],
+    "pacuare": [
+      "Select Pacuare-relevant SNIT orthophoto, model, Direccion de Agua, IMN, SINAC, SENARA, ICE, and ICT layers with CRS and terms.",
+      "Collect link-only rainforest gorge, waterfall, Huacas, Double Drop, and Cimarones visual references with guide/outfitter review.",
+      "Request explicit rights for any social/photo/video item before use beyond manual review questions.",
+      "Generate first-party procedural rainforest canopy, moss/wet-rock, waterfall mist, muddy-clear flow, and leaf-litter variants from accepted source masks and rainfall/flow bands."
+    ]
+  },
+  "next_checkpoint": "Promote exact source layers and media items into river manifests only after metadata, terms, attribution, location, flow context, guide review, and capture/regression evidence are attached."
+}
