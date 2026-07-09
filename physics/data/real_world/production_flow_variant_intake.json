@@ -1,0 +1,386 @@
+{
+  "schema": "raftsim.production_flow_variant_intake.v1",
+  "generated_on": "2026-07-08",
+  "status": "review_gated_flow_variant_intake_recorded_no_visual_or_gameplay_promotion",
+  "purpose": "Consolidate the seasonal, release, rainfed, and flash-response flow evidence that should drive Unreal water width, wet-bank, foam, current, hydraulic feature, and gameplay/visual variants for the three runnable river environments.",
+  "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
+  "production_visual_source_item_intake": "physics/data/real_world/production_visual_source_item_intake.json",
+  "policy": {
+    "flow_controls_visuals_only_until_promoted": true,
+    "must_not_hide_conservation_or_solver_failures": true,
+    "feature_forcing_requires_flow_response_and_manifest_recording": true,
+    "promotion_requires_station_terms_units_time_zone_and_quality_flags": true,
+    "promotion_requires_guide_or_oarsman_review": true,
+    "promotion_requires_capture_evidence_for_each_variant": true
+  },
+  "visual_and_gameplay_parameters_controlled": [
+    "river_width_scale",
+    "water_level_offset_cm",
+    "foam_scale",
+    "wet_bank_scale",
+    "current_cue_scale",
+    "hole_stickiness_or_washout",
+    "wave_train_strength",
+    "eddyline_shear",
+    "lateral_wave_strength",
+    "swimmer_drift_speed",
+    "wet_rock_exposure",
+    "rescue_readability"
+  ],
+  "required_fields_before_promotion": [
+    "source_station_or_release_id",
+    "source_url",
+    "terms_and_attribution",
+    "units_and_timezone",
+    "quality_or_provisional_flags",
+    "selected_datetime_window",
+    "reach_or_river_mile_relation",
+    "travel_time_or_release_routing_assumption",
+    "guide_oarsman_or_local_review",
+    "capture_variant_png_or_video",
+    "hazard_rescue_readability_review",
+    "solver_conservation_or_forcing_nonmasking_check",
+    "final_promotion_decision"
+  ],
+  "source_artifacts": {
+    "american_south_fork": {
+      "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+      "review_artifact": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+      "primary_evidence": "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+      "source_item_intake": "south_fork_cdec_cbr_low_medium_high_flow_windows"
+    },
+    "colorado_river": {
+      "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+      "review_artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/release_band_review.json",
+      "release_context": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrology/production_import_pilot/usbr_glen_canyon_release_context.json",
+      "source_item_intake": "colorado_usbr_usgs_release_and_gauge_pairing"
+    },
+    "pacuare": {
+      "flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+      "rainfall_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+      "flash_response_review": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/flash_response_review.json",
+      "source_item_intake": "pacuare_snit_orthophoto_and_environment_layer_selection"
+    }
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "section_id": "chili_bar_to_coloma",
+      "source_status": "short_cdec_release_window_attached_not_seasonal_authority",
+      "variant_items": [
+        {
+          "flow_band": "low_runnable",
+          "display_name": "Low Runnable",
+          "reference_discharge_cfs": 900.0,
+          "reference_discharge_m3s": 25.4851619328,
+          "season_or_context": "late_summer_low_water",
+          "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+          "selected_or_candidate_windows": [
+            {
+              "date_local": "2026-06-13",
+              "flow_peak_cfs": 1688.0,
+              "flow_peak_time_local": "2026-06-13T11:30",
+              "stage_peak_ft": 4.04
+            },
+            {
+              "date_local": "2026-06-14",
+              "flow_peak_cfs": 1680.0,
+              "flow_peak_time_local": "2026-06-14T11:30",
+              "stage_peak_ft": 4.03
+            }
+          ],
+          "visual_parameters": {
+            "river_width_scale": 0.92,
+            "water_level_offset_cm": -8.0,
+            "foam_scale": 0.75,
+            "wet_bank_scale": 0.85,
+            "current_cue_scale": 0.82
+          },
+          "hydraulic_feature_expectation": "Expose more rocks and shallows; reduce foam and sticky hydraulics unless guide review identifies low-water holes.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "Attached evidence is only a 30-day early-summer CDEC context window.",
+            "A25 X-flag meaning and station-to-reach routing remain unresolved.",
+            "Guide/outfitter review and lifelike capture evidence are missing."
+          ]
+        },
+        {
+          "flow_band": "median_runnable",
+          "display_name": "Median Runnable",
+          "reference_discharge_cfs": 1600.0,
+          "reference_discharge_m3s": 45.3069545472,
+          "season_or_context": "summer_commercial",
+          "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+          "selected_or_candidate_windows": [
+            {
+              "date_local": "2026-06-20",
+              "flow_peak_cfs": 1672.0,
+              "flow_peak_time_local": "2026-06-20T11:15",
+              "stage_peak_ft": 4.02
+            },
+            {
+              "date_local": "2026-07-04",
+              "flow_peak_cfs": 1664.0,
+              "flow_peak_time_local": "2026-07-04T11:45",
+              "stage_peak_ft": 4.01
+            }
+          ],
+          "visual_parameters": {
+            "river_width_scale": 1.0,
+            "water_level_offset_cm": 0.0,
+            "foam_scale": 1.0,
+            "wet_bank_scale": 1.0,
+            "current_cue_scale": 1.0
+          },
+          "hydraulic_feature_expectation": "Default commercial-style validation band with readable tongues, wet rocks, eddy lines, and moderate wave trains.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "Seasonal representativeness is not proven.",
+            "Release routing and guide interpretation remain open.",
+            "No low/median/high capture variant set has been rendered and reviewed."
+          ]
+        },
+        {
+          "flow_band": "high_runnable",
+          "display_name": "High Runnable",
+          "reference_discharge_cfs": 3000.0,
+          "reference_discharge_m3s": 84.950539776,
+          "season_or_context": "spring_runoff_or_release",
+          "evidence_status": "not_observed_in_attached_30_day_context",
+          "selected_or_candidate_windows": [],
+          "visual_parameters": {
+            "river_width_scale": 1.12,
+            "water_level_offset_cm": 12.0,
+            "foam_scale": 1.25,
+            "wet_bank_scale": 1.25,
+            "current_cue_scale": 1.25
+          },
+          "hydraulic_feature_expectation": "Stronger laterals, wave trains, eddy-line shear, faster raft response, and high wet-bank marks while keeping boulder hazards visible.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "No 3000 cfs examples were observed in the attached CDEC window.",
+            "Requires separate runoff or release evidence.",
+            "Requires guide review before high-water visuals or forcing can be authoritative."
+          ]
+        }
+      ]
+    },
+    {
+      "river_id": "colorado_river",
+      "section_id": "grand_canyon_lees_ferry_to_diamond_creek",
+      "source_status": "usbr_daily_release_history_attached_subdaily_routing_and_oarsman_review_block_promotion",
+      "variant_items": [
+        {
+          "flow_band": "low_release_planning",
+          "display_name": "Low Release Planning",
+          "reference_discharge_cfs": 8000.0,
+          "reference_discharge_m3s": 226.534772736,
+          "season_or_context": "water_year_2026_low_release_planning",
+          "evidence_status": "observed_in_water_year_2026_daily_release_context_not_subdaily_validation",
+          "selected_or_candidate_windows": [
+            {
+              "date": "2025-10-01_to_2026-07-05",
+              "window_summary": "water_year_2026_to_date",
+              "minimum_release_cfs": 7044.695,
+              "p25_release_cfs": 7868.888,
+              "median_release_cfs": 8237.467
+            }
+          ],
+          "visual_parameters": {
+            "river_width_scale": 0.96,
+            "water_level_offset_cm": -6.0,
+            "foam_scale": 0.85,
+            "wet_bank_scale": 0.88,
+            "current_cue_scale": 0.9
+          },
+          "hydraulic_feature_expectation": "More exposed bars and sharper ferry setup while preserving big-water scale and swimmer visibility.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "Daily release totals do not capture hourly hydropower fluctuations.",
+            "Gauge lag and river-mile routing assumptions remain open.",
+            "Sandbar/wet-bank masks and oarsman review are missing."
+          ]
+        },
+        {
+          "flow_band": "moderate_release_planning",
+          "display_name": "Moderate Release Planning",
+          "reference_discharge_cfs": 12000.0,
+          "reference_discharge_m3s": 339.802159104,
+          "season_or_context": "default_large_volume_rowing_planning",
+          "evidence_status": "partly_supported_by_long_release_history_but_not_water_year_2026_default",
+          "selected_or_candidate_windows": [
+            {
+              "date": "2025-07-06_to_2026-07-05",
+              "window_summary": "last_365_available_days",
+              "maximum_release_cfs": 12754.211,
+              "peak_example_date": "2025-08-01"
+            },
+            {
+              "date": "2000-01-01_to_2026-07-05",
+              "window_summary": "post_2000_operations",
+              "median_release_cfs": 11151.733,
+              "p75_release_cfs": 13364.982
+            }
+          ],
+          "visual_parameters": {
+            "river_width_scale": 1.08,
+            "water_level_offset_cm": 8.0,
+            "foam_scale": 1.15,
+            "wet_bank_scale": 1.1,
+            "current_cue_scale": 1.15
+          },
+          "hydraulic_feature_expectation": "Longer tongues, lateral waves, broad current streaks, and default oar-rig sightline readability.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "USBR units and terms confirmation remain open.",
+            "Subdaily release/routing evidence is missing.",
+            "No oarsman-reviewed capture variant has been accepted."
+          ]
+        },
+        {
+          "flow_band": "high_release_planning",
+          "display_name": "High Release Planning",
+          "reference_discharge_cfs": 18000.0,
+          "reference_discharge_m3s": 509.703238656,
+          "season_or_context": "high_release_review_needed",
+          "evidence_status": "not_observed_in_water_year_2026_to_date_requires_separate_high_release_evidence",
+          "selected_or_candidate_windows": [
+            {
+              "date": "2000-01-01_to_2026-07-05",
+              "window_summary": "post_2000_operations",
+              "peak_example_date": "2023-04-26",
+              "peak_example_release_cfs": 38878.937
+            }
+          ],
+          "visual_parameters": {
+            "river_width_scale": 1.18,
+            "water_level_offset_cm": 18.0,
+            "foam_scale": 1.35,
+            "wet_bank_scale": 1.3,
+            "current_cue_scale": 1.35
+          },
+          "hydraulic_feature_expectation": "Stronger wave trains, eddy fences, laterals, faster swimmer drift, and higher wet-bank marks without losing rescue targets.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "Current 18000 cfs planning band is not observed in water-year 2026 to date.",
+            "Requires high-release evidence and river-mile routing review.",
+            "Requires oarsman validation before gameplay or lifelike visual use."
+          ]
+        }
+      ]
+    },
+    {
+      "river_id": "pacuare",
+      "section_id": "lower_pacuare_planning_corridor",
+      "source_status": "relative_rainfed_bands_only_numeric_station_records_blocked",
+      "variant_items": [
+        {
+          "flow_band": "clear_season_low_planning",
+          "display_name": "Clear Season Low Planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "low",
+          "season_or_context": "clear_season_low",
+          "evidence_status": "planning_placeholder_requires_station_records_and_local_guide_review",
+          "selected_or_candidate_windows": [],
+          "visual_parameters": {
+            "river_width_scale": 0.9,
+            "water_level_offset_cm": -9.0,
+            "foam_scale": 0.8,
+            "wet_bank_scale": 0.88,
+            "current_cue_scale": 0.82
+          },
+          "hydraulic_feature_expectation": "Clearer low-season read with exposed rocks, tighter tongues, and reduced bank pressure.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "No accepted discharge or stage station time series is attached.",
+            "Rainfall/stage basin relation is metadata-only.",
+            "Local guide/outfitter review is missing."
+          ]
+        },
+        {
+          "flow_band": "rainfed_runnable_planning",
+          "display_name": "Rain-Fed Runnable Planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "medium",
+          "season_or_context": "rainfed_runnable",
+          "evidence_status": "planning_placeholder_requires_rainfall_and_station_record_promotion",
+          "selected_or_candidate_windows": [],
+          "visual_parameters": {
+            "river_width_scale": 1.05,
+            "water_level_offset_cm": 7.0,
+            "foam_scale": 1.2,
+            "wet_bank_scale": 1.2,
+            "current_cue_scale": 1.18
+          },
+          "hydraulic_feature_expectation": "Pushy tongues, active wave trains, wet banks, and vegetation pressure after rain.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "No rainfall-to-stage relation is attached.",
+            "No station coordinates, variables, units, quality flags, or time zones are promoted.",
+            "Guide/outfitter validation is missing."
+          ]
+        },
+        {
+          "flow_band": "rainy_season_high_planning",
+          "display_name": "Rainy Season High Planning",
+          "reference_discharge_cfs": null,
+          "relative_flow": "high",
+          "season_or_context": "rainy_season_high",
+          "evidence_status": "review_only_placeholder_requires_safety_and_rescue_review",
+          "selected_or_candidate_windows": [],
+          "visual_parameters": {
+            "river_width_scale": 1.18,
+            "water_level_offset_cm": 20.0,
+            "foam_scale": 1.4,
+            "wet_bank_scale": 1.35,
+            "current_cue_scale": 1.35
+          },
+          "hydraulic_feature_expectation": "Faster reaction windows, stronger laterals, fewer eddies, and stronger swimmer drift cues.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "Numeric high-water criteria are not accepted.",
+            "Rescue readability and no-go/unsafe thresholds are not reviewed.",
+            "Local guide/outfitter safety review is missing."
+          ]
+        },
+        {
+          "flow_band": "flash_response_review_only",
+          "display_name": "Flash Response Review Only",
+          "reference_discharge_cfs": null,
+          "relative_flow": "rapid_rise",
+          "season_or_context": "unsafe_or_review_only_flash_response",
+          "evidence_status": "blocked_until_rainfall_stage_lag_station_records_and_guide_review",
+          "selected_or_candidate_windows": [],
+          "visual_parameters": {
+            "river_width_scale": 1.3,
+            "water_level_offset_cm": 34.0,
+            "foam_scale": 1.55,
+            "wet_bank_scale": 1.5,
+            "current_cue_scale": 1.55
+          },
+          "hydraulic_feature_expectation": "Reserved for warning/no-go study, visual/audio hazard behavior, and rescue-boundary review; not playable.",
+          "promotion_decision": "not_promoted",
+          "promotion_blockers": [
+            "No rainfall-to-stage or rainfall-to-discharge lag evidence is attached.",
+            "No station time series or basin relation is promoted.",
+            "Guide/outfitter safety review and evacuation constraints are missing."
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "river_count": 3,
+    "variant_count": 10,
+    "numeric_reference_variant_count": 6,
+    "relative_only_variant_count": 4,
+    "promoted_variant_count": 0,
+    "capture_variant_count": 0,
+    "per_river_variant_count": {
+      "american_south_fork": 3,
+      "colorado_river": 3,
+      "pacuare": 4
+    }
+  },
+  "next_checkpoint": "Render and review low/median/high or rain/release capture sets only after exact datetime windows, station terms, units, routing assumptions, guide/oarsman review, and solver/forcing nonmasking checks are recorded."
+}

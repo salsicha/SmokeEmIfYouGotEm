@@ -6,6 +6,7 @@
   "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "first_party_material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
+  "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
   "generated_on": "2026-07-06",
@@ -1437,7 +1438,8 @@
       "approved_source_conditioned_material_texture_assets_and_capture_review",
       "approved_source_conditioned_normal_detail_texture_assets_and_capture_review",
       "approved_item_level_visual_source_acquisition_queue_promotions",
-      "approved_visual_source_item_intake_promotions"
+      "approved_visual_source_item_intake_promotions",
+      "approved_flow_variant_intake_promotions"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1597,6 +1599,7 @@
       "photoreal_human_lifelike_review_packet_recorded",
       "zero_blocker_capture_set_review_packet_markdown_recorded",
       "photoreal_human_lifelike_review_results_template_recorded",
+      "production_flow_variant_intake_recorded",
       "production_visual_source_acquisition_queue_recorded",
       "production_visual_source_item_intake_recorded",
       "source_conditioned_material_map_manifest_recorded",
@@ -1612,6 +1615,7 @@
     ],
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
+    "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
     "production_visual_source_acquisition_queue": "physics/data/real_world/production_visual_source_acquisition_queue.json",
     "production_visual_source_item_intake": "physics/data/real_world/production_visual_source_item_intake.json",
     "required_editor_commands": [

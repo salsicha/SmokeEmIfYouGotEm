@@ -2,6 +2,7 @@
   "schema": "raftsim.unreal.river_flow_visual_bands.v1",
   "generated_on": "2026-07-06",
   "status": "preview_visual_contract_for_source_backed_flow_context; not_solver_validation_or_final_photoreal_water",
+  "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
   "policy": {
     "flow_controls_visuals_only": true,
     "must_record_selected_band_in_capture_manifest": true,
