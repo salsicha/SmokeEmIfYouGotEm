@@ -1,6 +1,6 @@
 {
   "schema": "raftsim.unreal.first_party_material_instance_candidates.v1",
-  "generated_on": "2026-07-08",
+  "generated_on": "2026-07-09",
   "status": "candidate_unreal_material_instance_texture_bindings_shader_parent_scene_assignment_and_review_assets_created_not_lifelike",
   "material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
   "material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
@@ -217,19 +217,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -488,19 +488,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -759,19 +759,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1030,19 +1030,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1301,19 +1301,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1572,19 +1572,19 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_macro_albedo.png",
-          "sha256": "6f2affca398bfe653c5d738da4bf07f4789abd1142c84726a905b81828df8ac7"
+          "sha256": "846c409a16c5f6a44405041353339ee3c441c55921b6c7b0f0708d47931f606a"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_material_zones.png",
-          "sha256": "b3a874684d6fd1615a07d6d31fb9b96300612c7d69a90a05e7ff4233d87d77fe"
+          "sha256": "fcf42c219c85fe07f2c8c93c0b06008cd599b41388a41e6f7f9ca8fa850f8e64"
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_ao_roughness_height.png",
-          "sha256": "d1e3e1f8d3a3d5efb7cc017ad272d1ade77136a236f7b82b8b6f21fc72e249de"
+          "sha256": "0edc04dee226731ace23afa9ff6c8e94cdd8909ed6bb072dfae0f838ec439a73"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/american_south_fork_source_conditioned_normal_detail.png",
-          "sha256": "4d933f35776f9bd499a45923b1b0ea4ba67cfa50dad75a224cde96d6b5c38662"
+          "sha256": "fff9213f85a6bdacc267c3ac66edf4a0108f2443d089508bd473942d11335e9d"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -1843,7 +1843,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -1851,11 +1851,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2114,7 +2114,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -2122,11 +2122,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2385,7 +2385,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -2393,11 +2393,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2656,7 +2656,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -2664,11 +2664,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -2927,7 +2927,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -2935,11 +2935,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3198,7 +3198,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_macro_albedo.png",
-          "sha256": "e2db7b8c7dfa02a568b257eff18598766e6d7f2c53cf57308867eddcf50e0d85"
+          "sha256": "a8e206f5ff0167436437f29be5fc758a99fad8d525089971de1dc18116030764"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_material_zones.png",
@@ -3206,11 +3206,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_ao_roughness_height.png",
-          "sha256": "c5d529bdda226e37eddaf0ec4f9fd3e2e6fdbd96af1b602203b1d891411ea99d"
+          "sha256": "816892a49e9618fe9023dfea53cc28291bc3543b23e86b51aa7107734018a684"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/colorado_river_source_conditioned_normal_detail.png",
-          "sha256": "227561c0890789968e2430963c2c9c6d16425264b44f5ab7cc546c23cdd995b0"
+          "sha256": "0ac0c73546608e5f275cc91b044ed1c294493a28bfc39b390f5a13876088dd68"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3469,7 +3469,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -3477,11 +3477,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -3740,7 +3740,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -3748,11 +3748,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4011,7 +4011,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -4019,11 +4019,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4282,7 +4282,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -4290,11 +4290,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4553,7 +4553,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -4561,11 +4561,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
@@ -4824,7 +4824,7 @@
       "source_conditioned_texture_bindings": {
         "SourceConditionedMacroAlbedo": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_macro_albedo.png",
-          "sha256": "b94ebf301aace80284550d6e4159e6591fd9db53df415162f33619dc7f704254"
+          "sha256": "1474fc0f9a6e5baf8085ece3a9baffdef58d11c0d91dc6b03ace6719cf452732"
         },
         "SourceConditionedMaterialZones": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_material_zones.png",
@@ -4832,11 +4832,11 @@
         },
         "SourceConditionedAORoughnessHeight": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
-          "sha256": "caf89c0c98d117dbe3e164b3a5cc506e7b6d92cac7439309770babfa031e7ebb"
+          "sha256": "c37fc65b4fc99e0a4d0415fa443e76f67f622147b65c6c11dcc8c192c53f215f"
         },
         "SourceConditionedNormalDetail": {
           "path": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png",
-          "sha256": "983d47b52d2ffc789f5d0fe7993dc234197459284e74a76a8c03870e03cb69c1"
+          "sha256": "8666b4dbb79bf64cff351cb21168390d8ef25f97a2e43f555f6a470ad19293e6"
         }
       },
       "source_conditioned_texture_asset_bindings": {
