@@ -504,7 +504,7 @@
         "river-specific weather and lighting notes",
         "capture manifest"
       ],
-      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, color temperature, and photographic palette-compression presets for review captures; show low-footprint guide-seat raft/oar proxies for player-view context, keep river-eye captures foreground-hidden, and replace the proxies once production raft art is approved.",
+      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, color temperature, and photographic palette-compression presets for editor/playtest context; keep review-only raft/oar proxies in the generated maps, cull them from guide-seat and river-eye lifelike-candidate capture exports until approved production foreground art exists, and replace the proxies once production raft art is approved.",
       "tunable_parameters": [
         "sun_angle",
         "sky_intensity",
@@ -515,7 +515,8 @@
         "photographic_exposure_bias",
         "bounded_capture_film_grain_dither",
         "raft_visibility",
-        "oar_rig_readability"
+        "oar_rig_readability",
+        "guide_seat_placeholder_foreground_capture_cull"
       ],
       "promotion_gate": "Guide-seat frames must read like a player view downriver, and river-eye frames must reveal terrain/water quality without placeholder art masking the environment."
     }

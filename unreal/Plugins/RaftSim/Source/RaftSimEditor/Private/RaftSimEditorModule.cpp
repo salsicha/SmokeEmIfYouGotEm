@@ -13029,7 +13029,7 @@ FString GetPreviewFlowVariantCaptureRelativePath(const FRaftSimEnvironmentPrevie
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; guide-seat and river-eye capture exports cull review-only foreground raft/oar proxies until approved production foreground art exists, so lifelike-candidate screenshots judge the river corridor instead of placeholder gameplay props; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -15078,6 +15078,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
 
     FString EntriesJson;
     bool bAllCaptured = true;
+    const bool bCullReviewOnlyForegroundRaftForGuideSeatCaptures = true;
     const TArray<FRaftSimEnvironmentPreviewSpec> Specs = GetEnvironmentPreviewSpecs();
     for (int32 Index = 0; Index < Specs.Num(); ++Index)
     {
@@ -15092,7 +15093,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
             TEXT("guide_seat_downstream"),
             TEXT("guide-seat downstream warm-up"),
-            false,
+            bCullReviewOnlyForegroundRaftForGuideSeatCaptures,
             OutSummary);
         const bool bGuideSeatCaptured = CapturePreviewImageForSpec(
             Spec,
@@ -15101,7 +15102,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
             TEXT("guide_seat_downstream"),
             TEXT("guide-seat downstream"),
-            false,
+            bCullReviewOnlyForegroundRaftForGuideSeatCaptures,
             OutSummary);
         const bool bRiverEyeCaptured = CapturePreviewImageForSpec(
             Spec,
@@ -15253,6 +15254,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
 
     FString FlowVariantEntriesJson;
     bool bAllFlowVariantCaptured = bFlowVariantCapturePlanAvailable;
+    const bool bCullReviewOnlyForegroundRaftForFlowVariantGuideSeatCaptures = true;
     const TArray<FRaftSimEnvironmentPreviewSpec> FlowVariantSpecs = GetEnvironmentPreviewFlowVariantSpecs();
     for (int32 VariantIndex = 0; VariantIndex < FlowVariantSpecs.Num(); ++VariantIndex)
     {
@@ -15277,7 +15279,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
                 TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
                 TEXT("guide_seat_downstream"),
                 TEXT("flow-variant guide-seat downstream warm-up"),
-                false,
+                bCullReviewOnlyForegroundRaftForFlowVariantGuideSeatCaptures,
                 OutSummary);
         }
         const bool bGuideSeatVariantCaptured =
@@ -15289,7 +15291,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
                 TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
                 TEXT("guide_seat_downstream"),
                 TEXT("flow-variant guide-seat downstream"),
-                false,
+                bCullReviewOnlyForegroundRaftForFlowVariantGuideSeatCaptures,
                 OutSummary);
         const bool bRiverEyeVariantCaptured =
             bVariantMapBuilt &&

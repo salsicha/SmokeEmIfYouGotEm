@@ -1561,6 +1561,7 @@
       "first_party_refined_raft_oar_foreground_proxy_recorded",
       "first_party_rounded_raft_oar_foreground_proxy_recorded",
       "first_party_tagged_river_eye_foreground_proxy_cull_recorded",
+      "first_party_guide_seat_foreground_proxy_capture_cull_recorded",
       "first_party_river_eye_near_field_dressing_cull_recorded",
       "first_party_dedicated_river_eye_downstream_capture_camera_recorded",
       "first_party_centerline_following_river_eye_capture_camera_recorded",
