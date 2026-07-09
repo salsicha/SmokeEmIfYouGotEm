@@ -607,13 +607,19 @@ def build_photoreal_flow_variant_capture_plan(
                     if existing_count == len(required_captures)
                     else "requires_band_named_unreal_capture",
                     "current_decision": (
-                        "The current default-band capture can help orient review, but this variant still needs "
-                        "band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, and "
-                        "performance review before it can be promoted."
-                        if is_default_band and default_existing_count
+                        "Band-named guide-seat and river-eye Unreal captures are attached for this variant, but do "
+                        "not promote it until the intake ledger blockers plus guide/geospatial, hazard/readability, "
+                        "rights, solver/forcing nonmasking, and measured performance review are closed."
+                        if existing_count == len(required_captures)
                         else (
+                            "The current default-band capture can help orient review, but this variant still needs "
+                            "band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, "
+                            "and performance review before it can be promoted."
+                            if is_default_band and default_existing_count
+                            else (
                             "Do not promote this flow variant until Unreal captures exist for both required views "
                             "and the intake ledger promotion blockers are closed."
+                            )
                         )
                     ),
                 }
@@ -645,10 +651,18 @@ def build_photoreal_flow_variant_capture_plan(
         )
 
     missing_band_named_capture_count = required_capture_count - existing_band_named_capture_count
+    all_required_flow_variant_captures_exist = (
+        required_capture_count > 0 and missing_band_named_capture_count == 0
+    )
+    plan_status = (
+        "band_named_flow_variant_captures_available_not_lifelike_approved"
+        if all_required_flow_variant_captures_exist
+        else "awaiting_flow_variant_unreal_captures_not_approved"
+    )
     return {
         "schema": "raftsim.unreal.photoreal_flow_variant_capture_plan.v1",
         "generated_on": generated_on,
-        "status": "awaiting_flow_variant_unreal_captures_not_approved",
+        "status": plan_status,
         "source_flow_visual_bands": str(FLOW_VISUAL_BAND_MANIFEST_RELATIVE_PATH),
         "source_flow_variant_intake": str(PRODUCTION_FLOW_VARIANT_INTAKE_RELATIVE_PATH),
         "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
@@ -677,10 +691,16 @@ def build_photoreal_flow_variant_capture_plan(
         },
         "rivers": rivers,
         "current_decision": (
-            "Use this plan to drive the next Unreal capture automation pass for seasonal, release, and rainfed "
-            "flow variants. The existing six downstream captures cover only the three default preview bands and "
-            "are not enough to review low/high water, flash response, hazard readability, swimmer drift, or "
-            "flow-dependent hydraulic behavior."
+            "All required band-named guide-seat and river-eye flow-variant captures exist as preview evidence, "
+            "but no variant is lifelike or gameplay-approved until guide/geospatial, hazard/readability, rights, "
+            "solver/forcing nonmasking, and measured desktop/VR performance review pass."
+            if all_required_flow_variant_captures_exist
+            else (
+                "Use this plan to drive the next Unreal capture automation pass for seasonal, release, and "
+                "rainfed flow variants. The existing six downstream captures cover only the three default preview "
+                "bands and are not enough to review low/high water, flash response, hazard readability, swimmer "
+                "drift, or flow-dependent hydraulic behavior."
+            )
         ),
     }
 
