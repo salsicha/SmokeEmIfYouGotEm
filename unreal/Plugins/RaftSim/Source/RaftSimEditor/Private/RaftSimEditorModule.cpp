@@ -8306,63 +8306,110 @@ void AddPreviewFoamRibbon(
         return;
     }
 
-    constexpr int32 Segments = 10;
+    constexpr int32 Segments = 28;
     TArray<FVector> Vertices;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
     TArray<int32> Triangles;
-    Vertices.Reserve((Segments + 1) * 2);
-    UVs.Reserve((Segments + 1) * 2);
-    Triangles.Reserve(Segments * 6);
+    Vertices.Reserve(Segments * 6);
+    UVs.Reserve(Segments * 6);
+    VertexColors.Reserve(Segments * 6);
+    Triangles.Reserve(Segments * 12);
 
     const float RibbonMidX = StartX + Length * 0.50f;
     const float RemainingWaterOverlaySlabDemotion = SmoothPreviewStep(5600.0f, 10800.0f, RibbonMidX);
-    const float PaleFoamSlashArtifactDemotion = 0.48f;
+    const float PaleFoamSlashArtifactDemotion = 0.26f;
+    const float FoamRailContinuityBreakupT =
+        FMath::Lerp(0.62f, 0.42f, RemainingWaterOverlaySlabDemotion);
     const bool bNearFrameWaterRibbon = RibbonMidX < 7800.0f;
     const float NearFrameRibbonWidthScale =
-        FMath::Lerp(0.12f, 0.46f, RemainingWaterOverlaySlabDemotion) *
+        FMath::Lerp(0.08f, 0.31f, RemainingWaterOverlaySlabDemotion) *
         PaleFoamSlashArtifactDemotion;
     const FLinearColor RibbonColor = ClampPreviewColor(FMath::Lerp(
         Spec.WaterColor,
         Color,
-        FMath::Lerp(Spec.bDesertCanyon ? 0.060f : 0.070f, Spec.bDesertCanyon ? 0.34f : 0.30f, RemainingWaterOverlaySlabDemotion) *
+        FMath::Lerp(Spec.bDesertCanyon ? 0.030f : 0.034f, Spec.bDesertCanyon ? 0.18f : 0.16f, RemainingWaterOverlaySlabDemotion) *
             PaleFoamSlashArtifactDemotion));
 
-    for (int32 SegmentIndex = 0; SegmentIndex <= Segments; ++SegmentIndex)
+    auto AddFoamLaceCrossSection = [&](float T, float WidthFade, float SegmentFade) -> int32
     {
-        const float T = static_cast<float>(SegmentIndex) / static_cast<float>(Segments);
         const float X = StartX + Length * T;
         const float RiverCenterY = GetPreviewRiverCenterY(Spec, X);
         const float Sway = FMath::Sin(Phase + T * UE_TWO_PI) * Width * 0.32f * NearFrameRibbonWidthScale;
         const float Taper = FMath::Sin(T * PI);
-        const float LocalHalfWidth = FMath::Max(3.0f, Width * NearFrameRibbonWidthScale * (0.18f + 0.62f * Taper));
+        const float LocalHalfWidth =
+            FMath::Max(1.1f, Width * NearFrameRibbonWidthScale * (0.10f + 0.50f * Taper) * WidthFade);
         const float CenterY = RiverCenterY + LateralOffset + Sway;
         const float SurfaceWave = FMath::Sin(X * 0.011f + CenterY * 0.015f) * (Spec.bDesertCanyon ? 2.0f : 4.5f);
         const float Z = GetPreviewWaterSurfaceBaseZCm(Spec) + (bNearFrameWaterRibbon ? 5.0f : 12.0f) +
             SurfaceWave + 2.0f * FMath::Sin(Phase * 1.7f + T * PI);
 
+        const int32 BaseVertex = Vertices.Num();
         Vertices.Add(FVector(X, CenterY - LocalHalfWidth, Z));
         Vertices.Add(FVector(X, CenterY + LocalHalfWidth, Z + 0.6f));
         UVs.Add(FVector2D(T, 0.0f));
         UVs.Add(FVector2D(T, 1.0f));
-    }
+        const FLinearColor LaceColor = ClampPreviewColor(FMath::Lerp(
+            Spec.WaterColor,
+            RibbonColor,
+            FMath::Clamp(0.36f + SegmentFade * 0.38f, 0.0f, 0.72f)));
+        VertexColors.Add(LaceColor);
+        VertexColors.Add(LaceColor);
+        return BaseVertex;
+    };
 
     for (int32 SegmentIndex = 0; SegmentIndex < Segments; ++SegmentIndex)
     {
-        const int32 A = SegmentIndex * 2;
+        const float SegmentStartT = static_cast<float>(SegmentIndex) / static_cast<float>(Segments);
+        const float SegmentEndT = static_cast<float>(SegmentIndex + 1) / static_cast<float>(Segments);
+        const float SegmentMidT = (SegmentStartT + SegmentEndT) * 0.50f;
+        const float LacePulse =
+            0.50f + 0.50f * FMath::Sin(Phase * 2.17f + SegmentMidT * UE_TWO_PI * 7.0f) +
+            0.18f * FMath::Sin(Phase * 0.91f + SegmentMidT * UE_TWO_PI * 19.0f);
+        const float SegmentFade = SmoothPreviewStep(FoamRailContinuityBreakupT, 1.10f, LacePulse);
+        if (SegmentFade <= 0.02f)
+        {
+            continue;
+        }
+
+        const float EndWidthFade = FMath::Clamp(0.18f + SegmentFade * 0.24f, 0.14f, 0.42f);
+        const int32 A = AddFoamLaceCrossSection(SegmentStartT, EndWidthFade, SegmentFade);
+        const int32 C = AddFoamLaceCrossSection(SegmentMidT, SegmentFade, SegmentFade);
+        const int32 E = AddFoamLaceCrossSection(SegmentEndT, EndWidthFade, SegmentFade);
         const int32 B = A + 1;
-        const int32 C = A + 2;
-        const int32 D = A + 3;
+        const int32 D = C + 1;
+        const int32 F = E + 1;
         Triangles.Add(A);
         Triangles.Add(C);
         Triangles.Add(B);
         Triangles.Add(B);
         Triangles.Add(C);
         Triangles.Add(D);
+        Triangles.Add(C);
+        Triangles.Add(E);
+        Triangles.Add(D);
+        Triangles.Add(D);
+        Triangles.Add(E);
+        Triangles.Add(F);
+    }
+
+    if (Vertices.IsEmpty() || Triangles.IsEmpty())
+    {
+        return;
     }
 
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
-    AddPreviewProceduralMeshActor(World, Label, Vertices, Triangles, Normals, UVs, RibbonColor);
+    AddPreviewProceduralMeshActor(
+        World,
+        Label,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        RibbonColor,
+        LoadOrCreatePreviewWaterVertexColorMaterial(),
+        &VertexColors);
 }
 
 void AddPreviewFlowTextureRibbon(

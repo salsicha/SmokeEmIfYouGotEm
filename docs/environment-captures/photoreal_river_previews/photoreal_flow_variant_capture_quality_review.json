@@ -135,7 +135,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_guide_seat_downstream.png",
-      "sha256": "9c2ea916f4e74ce817cb4be7c4c711d2a5a919e5702e93e6808c2bc874d5b6be",
+      "sha256": "82bb46a1d0ab5d529133a8df64bb712ebe319f232061d13640f8a13340063c13",
       "metrics": {
         "analysis_size": [
           320,
@@ -223,7 +223,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_guide_seat_downstream.png",
-      "sha256": "c5a7a4dd16079f570bef4f9cde82b33fa985ffffdee70d50616e15ddf911eb63",
+      "sha256": "a7248ad5d5c55738d14946aff590da7efb663ca73e7062c190574ce270ba1fc1",
       "metrics": {
         "analysis_size": [
           320,
@@ -311,7 +311,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_guide_seat_downstream.png",
-      "sha256": "ffbc710d00de7d32250c2ce15d6174129c8652a72dffd95ccdccc4820d321393",
+      "sha256": "1b0e2d993009e8adc33a66766b8d86a9c38ae7bb8fc4adbf3cb6b1b9d3658ebf",
       "metrics": {
         "analysis_size": [
           320,
@@ -399,7 +399,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
-      "sha256": "92e9540967d71fc6a9a869aa70b32a488bf30f3e16d116934663d7589a21a669",
+      "sha256": "7e82fef8a6e088e919ec5233b25854a5320d556f8c39f88978089f38f928d59a",
       "metrics": {
         "analysis_size": [
           320,
@@ -443,7 +443,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_river_eye_downstream.png",
-      "sha256": "dbc3354ce4ca8a2bc237a5c64920210940d4aa9c8b3425b262499e9493f058bb",
+      "sha256": "56b0e958c5638934a026e75e835b87fca14795e90fbfd6ee2f83918a64c139c9",
       "metrics": {
         "analysis_size": [
           320,
@@ -487,7 +487,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_guide_seat_downstream.png",
-      "sha256": "bfda94c4841a36d1b5097298780cb56eff83c0ae7abc9ff7a8565ef217e6e21a",
+      "sha256": "83b0a15dc3901bc635258563319a907bb9cf53a056b218351c3f42b2c835855a",
       "metrics": {
         "analysis_size": [
           320,
@@ -504,7 +504,7 @@
         ],
         "luma_mean": 112.74,
         "luma_std": 44.58,
-        "edge_density": 0.1181,
+        "edge_density": 0.118,
         "low_gradient_fraction": 0.2793,
         "quantized_entropy_bits": 4.5,
         "quantized_color_count": 77,
@@ -575,7 +575,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_guide_seat_downstream.png",
-      "sha256": "f61ec93fe888c1d99a1a237048ecaaac4f7545dedc6cd07925ba62e5a88dfdf8",
+      "sha256": "3458dff0516b5eb5658dec588bcedfcee244366f256301617c828f483b641f3c",
       "metrics": {
         "analysis_size": [
           320,
@@ -663,7 +663,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_guide_seat_downstream.png",
-      "sha256": "904968a5e28704e3da73961830e9d43ab8fadb906ed33940a9cf205315d6c081",
+      "sha256": "647926d9a8a418a7a47e54dfdda6247b9ce75e977007b147523db44a366c24e2",
       "metrics": {
         "analysis_size": [
           320,
@@ -707,7 +707,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_river_eye_downstream.png",
-      "sha256": "ecb489b20185615e8b32ada56fc73590faa6fa7439bfbbb052b9eac14b1ae79a",
+      "sha256": "e01eac94e96e27fff46b38742a4a8abde447f6626aa87bbb34185e3f6561066c",
       "metrics": {
         "analysis_size": [
           320,
@@ -751,7 +751,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_guide_seat_downstream.png",
-      "sha256": "28a1af291b9c2114981febb610129661d59abdfb87e9b2e0dd823b44ff507107",
+      "sha256": "2828c23bae5f8cd3e33ddc95218c285bcc08460037b10a9ac6ca331768958242",
       "metrics": {
         "analysis_size": [
           320,
@@ -795,7 +795,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_river_eye_downstream.png",
-      "sha256": "b7be6675ab57f1ce26bc408f50c8c5374489dd8f33afd5c3ceaaf4f0c8ad1c92",
+      "sha256": "334c2b93394d78943f0e04c460df2e3c9ffcbb6cea1c945f7befcc4f8682087d",
       "metrics": {
         "analysis_size": [
           320,
@@ -839,7 +839,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_guide_seat_downstream.png",
-      "sha256": "5c9db24d7150fc4e85b04e608d37f721c8a83589d192901441ac08c433b158b5",
+      "sha256": "6345db5a9242889e23d1efcc0aeca7d3b596cebcadd8c77d7a07a8d934627303",
       "metrics": {
         "analysis_size": [
           320,
@@ -927,7 +927,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_guide_seat_downstream.png",
-      "sha256": "dde340ddca11e2fde773a8de5566d20e3df440c358fcb8223ca7aa62ef92e24c",
+      "sha256": "3a8edf2c736265e134446c1d9a701b32617411dad41b9a85e5dc5729daa68f41",
       "metrics": {
         "analysis_size": [
           320,
