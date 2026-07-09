@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+import numpy as np
 from PIL import Image, ImageChops, ImageEnhance, ImageFilter, ImageOps
 
 
@@ -21,6 +22,9 @@ SOURCE_CONDITIONED_MATERIAL_MAP_MANIFEST_RELATIVE_PATH = (
 )
 SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH = (
     SOURCE_CONDITIONED_MATERIAL_MAP_ROOT_RELATIVE_PATH / "Textures"
+)
+FIRST_PARTY_MATERIAL_INSTANCE_CANDIDATE_MANIFEST_RELATIVE_PATH = Path(
+    "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json"
 )
 SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_STATUS = (
     "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike"
@@ -64,6 +68,9 @@ UNREAL_TEXTURE_ASSET_BY_MAP_ID = {
         "lod_group": "TEXTUREGROUP_WorldNormalMap",
     },
 }
+SOURCE_CONDITIONED_TEXTURE_PARAMETERS = {
+    spec["parameter"]: map_id for map_id, spec in UNREAL_TEXTURE_ASSET_BY_MAP_ID.items()
+}
 
 
 @dataclass(frozen=True)
@@ -102,8 +109,92 @@ def _scale_mask(mask: Image.Image, factor: float) -> Image.Image:
     return mask.point(lambda pixel: max(0, min(255, int(pixel * factor))))
 
 
+def _odd_kernel_size(size: int) -> int:
+    size = max(3, int(round(size)))
+    return size if size % 2 else size + 1
+
+
+def _fast_rank_filter(mask: Image.Image, size: int, filter_class: type[ImageFilter.Filter]) -> Image.Image:
+    mask = mask.convert("L")
+    if size <= 9:
+        return mask.filter(filter_class(_odd_kernel_size(size)))
+
+    downsample = 4
+    reduced_size = (
+        max(1, mask.size[0] // downsample),
+        max(1, mask.size[1] // downsample),
+    )
+    reduced = mask.resize(reduced_size, _resample_filter())
+    reduced_filter_size = _odd_kernel_size(size / downsample)
+    filtered = reduced.filter(filter_class(reduced_filter_size))
+    return filtered.resize(mask.size, _resample_filter()).convert("L")
+
+
+def _fast_dilate(mask: Image.Image, size: int) -> Image.Image:
+    return _fast_rank_filter(mask, size, ImageFilter.MaxFilter)
+
+
+def _fast_erode(mask: Image.Image, size: int) -> Image.Image:
+    return _fast_rank_filter(mask, size, ImageFilter.MinFilter)
+
+
 def _invert_mask(mask: Image.Image) -> Image.Image:
     return ImageOps.invert(mask.convert("L"))
+
+
+def _source_luma_detail(source_drape: Image.Image) -> Image.Image:
+    luma = ImageOps.autocontrast(source_drape.convert("L"), cutoff=0.5)
+    local_contrast = luma.filter(ImageFilter.UnsharpMask(radius=2.0, percent=160, threshold=4))
+    broad = luma.filter(ImageFilter.GaussianBlur(radius=9.0))
+    highpass = ImageChops.subtract(local_contrast, broad, scale=1.0, offset=128)
+    return ImageOps.autocontrast(highpass.filter(ImageFilter.GaussianBlur(radius=0.45)), cutoff=0.25)
+
+
+def _wet_edge_mask(water_mask: Image.Image) -> Image.Image:
+    return ImageChops.subtract(
+        _fast_dilate(water_mask, 41),
+        _fast_erode(water_mask, 9),
+    ).filter(ImageFilter.GaussianBlur(radius=1.1))
+
+
+def _outer_water_edge_mask(water_mask: Image.Image, size: int) -> Image.Image:
+    return ImageChops.subtract(_fast_dilate(water_mask, size), water_mask.convert("L"))
+
+
+def _detail_shade(detail: Image.Image, strength: float) -> Image.Image:
+    strength = max(0.0, min(1.0, strength))
+    return detail.point(lambda p: max(0, min(255, int(255 - (128 - p) * strength))))
+
+
+def _blend_luma(base: Image.Image, detail: Image.Image, mask: Image.Image, strength: float) -> Image.Image:
+    detail_shade = _detail_shade(detail, strength)
+    detailed = ImageChops.multiply(base, Image.merge("RGB", (detail_shade, detail_shade, detail_shade)))
+    return Image.composite(detailed, base, _scale_mask(mask, 1.0))
+
+
+def _height_with_source_microdetail(
+    relief: Image.Image,
+    source_detail: Image.Image,
+    water_mask: Image.Image,
+    vegetation_mask: Image.Image,
+) -> Image.Image:
+    relief_height = ImageOps.autocontrast(relief)
+    wet_edge = _wet_edge_mask(water_mask)
+    non_water = _invert_mask(water_mask)
+    non_water_detail = ImageChops.multiply(source_detail, non_water)
+    bank_detail = ImageChops.multiply(source_detail.filter(ImageFilter.UnsharpMask(radius=1.2, percent=120)), wet_edge)
+    vegetation_detail = ImageChops.multiply(
+        source_detail.filter(ImageFilter.GaussianBlur(radius=0.6)),
+        ImageChops.multiply(vegetation_mask, non_water),
+    )
+    height = Image.blend(relief_height, non_water_detail, 0.18)
+    height = Image.composite(Image.blend(height, bank_detail, 0.34), height, _scale_mask(wet_edge, 1.20))
+    height = Image.composite(
+        Image.blend(height, vegetation_detail, 0.20),
+        height,
+        _scale_mask(vegetation_mask, 0.62),
+    )
+    return ImageOps.autocontrast(height.filter(ImageFilter.GaussianBlur(radius=0.45)), cutoff=0.15)
 
 
 def _apply_relief_shade(image: Image.Image, relief: Image.Image) -> Image.Image:
@@ -121,39 +212,49 @@ def _macro_albedo(
     water_mask: Image.Image,
     vegetation_mask: Image.Image,
 ) -> Image.Image:
+    source_detail = _source_luma_detail(source_drape)
     base = ImageOps.autocontrast(source_drape, cutoff=0.5)
     base = ImageEnhance.Color(base).enhance(1.08)
     base = ImageEnhance.Contrast(base).enhance(1.10)
 
     water_tint = Image.blend(base, Image.new("RGB", base.size, (42, 88, 82)), 0.42)
     veg_tint = Image.blend(base, Image.new("RGB", base.size, (42, 86, 42)), 0.28)
-    water_edge = ImageChops.subtract(water_mask.filter(ImageFilter.MaxFilter(31)), water_mask)
+    water_edge = _outer_water_edge_mask(water_mask, 31)
     wet_bank_tint = Image.blend(base, Image.new("RGB", base.size, (42, 44, 38)), 0.30)
 
     result = Image.composite(veg_tint, base, _scale_mask(vegetation_mask, 0.78))
     result = Image.composite(wet_bank_tint, result, _scale_mask(water_edge, 1.25))
     result = Image.composite(water_tint, result, _scale_mask(water_mask, 0.90))
-    return _apply_relief_shade(result.filter(ImageFilter.UnsharpMask(radius=1.0, percent=90, threshold=3)), relief)
+    result = _blend_luma(result, source_detail, _invert_mask(water_mask), 0.20)
+    result = _blend_luma(result, source_detail, ImageChops.multiply(vegetation_mask, _invert_mask(water_mask)), 0.16)
+    result = _blend_luma(result, source_detail, water_edge, 0.24)
+    return _apply_relief_shade(result.filter(ImageFilter.UnsharpMask(radius=1.0, percent=95, threshold=3)), relief)
 
 
 def _material_zones(water_mask: Image.Image, vegetation_mask: Image.Image) -> Image.Image:
     water = water_mask.filter(ImageFilter.GaussianBlur(radius=0.6))
     vegetation = vegetation_mask.filter(ImageFilter.GaussianBlur(radius=0.6))
-    wet_bank = ImageChops.subtract(water.filter(ImageFilter.MaxFilter(37)), water).filter(ImageFilter.GaussianBlur(radius=1.0))
+    wet_bank = _outer_water_edge_mask(water, 37).filter(ImageFilter.GaussianBlur(radius=1.0))
     non_water = _invert_mask(water)
     terrain = ImageChops.lighter(_scale_mask(non_water, 0.92), _scale_mask(wet_bank, 1.25))
     vegetation_channel = ImageChops.multiply(vegetation, non_water)
     return Image.merge("RGB", (terrain, vegetation_channel, water))
 
 
-def _ao_roughness_height(relief: Image.Image, water_mask: Image.Image, vegetation_mask: Image.Image) -> Image.Image:
-    height = ImageOps.autocontrast(relief)
-    edges = relief.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.GaussianBlur(radius=1.0))
+def _ao_roughness_height(
+    source_drape: Image.Image,
+    relief: Image.Image,
+    water_mask: Image.Image,
+    vegetation_mask: Image.Image,
+) -> Image.Image:
+    source_detail = _source_luma_detail(source_drape)
+    height = _height_with_source_microdetail(relief, source_detail, water_mask, vegetation_mask)
+    edges = height.filter(ImageFilter.FIND_EDGES).filter(ImageFilter.GaussianBlur(radius=1.0))
     ao = edges.point(lambda p: max(84, min(244, int(226 - p * 0.42))))
 
     water = water_mask.filter(ImageFilter.GaussianBlur(radius=0.8))
     vegetation = vegetation_mask.filter(ImageFilter.GaussianBlur(radius=0.8))
-    wet_bank = ImageChops.subtract(water.filter(ImageFilter.MaxFilter(33)), water)
+    wet_bank = _wet_edge_mask(water)
     non_water = _invert_mask(water)
 
     rough_terrain = Image.new("L", relief.size, 210)
@@ -163,53 +264,53 @@ def _ao_roughness_height(relief: Image.Image, water_mask: Image.Image, vegetatio
     roughness = Image.composite(rough_veg, rough_terrain, _scale_mask(vegetation, 0.9))
     roughness = Image.composite(rough_wet_bank, roughness, _scale_mask(wet_bank, 1.2))
     roughness = Image.composite(rough_water, roughness, _scale_mask(water, 0.95))
+    rough_micro = source_detail.point(lambda p: max(0, min(255, int(194 + (p - 128) * 0.28))))
+    roughness = Image.composite(
+        ImageChops.multiply(roughness, rough_micro),
+        roughness,
+        _scale_mask(non_water, 0.82),
+    )
     roughness = ImageChops.multiply(roughness, non_water.point(lambda p: max(220, p)))
     return Image.merge("RGB", (ao, roughness, height))
 
 
-def _normal_detail(relief: Image.Image, water_mask: Image.Image, vegetation_mask: Image.Image) -> Image.Image:
-    height = ImageOps.autocontrast(relief).filter(ImageFilter.GaussianBlur(radius=1.0))
+def _normal_detail(
+    source_drape: Image.Image,
+    relief: Image.Image,
+    water_mask: Image.Image,
+    vegetation_mask: Image.Image,
+) -> Image.Image:
+    source_detail = _source_luma_detail(source_drape)
+    height = _height_with_source_microdetail(relief, source_detail, water_mask, vegetation_mask).filter(
+        ImageFilter.GaussianBlur(radius=0.8)
+    )
     water = water_mask.filter(ImageFilter.GaussianBlur(radius=0.9))
     vegetation = vegetation_mask.filter(ImageFilter.GaussianBlur(radius=1.1))
-    wet_bank = ImageChops.subtract(water.filter(ImageFilter.MaxFilter(35)), water).filter(ImageFilter.GaussianBlur(radius=1.0))
+    wet_bank = _outer_water_edge_mask(water, 35).filter(ImageFilter.GaussianBlur(radius=1.0))
 
-    height_px = height.load()
-    water_px = water.load()
-    vegetation_px = vegetation.load()
-    wet_bank_px = wet_bank.load()
-    width, height_px_count = height.size
-    normal = Image.new("RGB", height.size)
-    normal_px = normal.load()
+    height_array = np.asarray(height, dtype=np.float32) / 255.0
+    dy, dx = np.gradient(height_array)
+    dx *= 2.0
+    dy *= 2.0
 
-    for y in range(height_px_count):
-        y_prev = max(0, y - 1)
-        y_next = min(height_px_count - 1, y + 1)
-        for x in range(width):
-            x_prev = max(0, x - 1)
-            x_next = min(width - 1, x + 1)
-            dx = (height_px[x_next, y] - height_px[x_prev, y]) / 255.0
-            dy = (height_px[x, y_next] - height_px[x, y_prev]) / 255.0
+    water_t = np.asarray(water, dtype=np.float32) / 255.0
+    vegetation_t = np.asarray(vegetation, dtype=np.float32) / 255.0
+    wet_bank_t = np.asarray(wet_bank, dtype=np.float32) / 255.0
+    terrain_t = np.maximum(0.0, 1.0 - water_t)
+    strength = 2.25 * terrain_t + 0.72 * vegetation_t + 1.20 * wet_bank_t + 0.18 * water_t
 
-            water_t = water_px[x, y] / 255.0
-            vegetation_t = vegetation_px[x, y] / 255.0
-            wet_bank_t = wet_bank_px[x, y] / 255.0
-            terrain_t = max(0.0, 1.0 - water_t)
-            strength = (
-                2.25 * terrain_t
-                + 0.72 * vegetation_t
-                + 1.20 * wet_bank_t
-                + 0.18 * water_t
-            )
-            nx = -dx * strength
-            ny = -dy * strength
-            nz = 1.0
-            inv_len = (nx * nx + ny * ny + nz * nz) ** -0.5
-            normal_px[x, y] = (
-                max(0, min(255, int((nx * inv_len * 0.5 + 0.5) * 255))),
-                max(0, min(255, int((ny * inv_len * 0.5 + 0.5) * 255))),
-                max(0, min(255, int((nz * inv_len * 0.5 + 0.5) * 255))),
-            )
-    return normal
+    nx = -dx * strength
+    ny = -dy * strength
+    nz = np.ones_like(nx)
+    length = np.sqrt(nx * nx + ny * ny + nz * nz)
+    normal = np.dstack(
+        (
+            np.clip((nx / length * 0.5 + 0.5) * 255.0, 0, 255),
+            np.clip((ny / length * 0.5 + 0.5) * 255.0, 0, 255),
+            np.clip((nz / length * 0.5 + 0.5) * 255.0, 0, 255),
+        )
+    ).astype(np.uint8)
+    return Image.fromarray(normal, "RGB")
 
 
 def _record_for_capture(repo_root: Path, capture: dict[str, object], output_root: Path) -> SourceConditionedMaterialMapRecord:
@@ -229,8 +330,8 @@ def _record_for_capture(repo_root: Path, capture: dict[str, object], output_root
     images = {
         "macro_albedo": _macro_albedo(source_drape, relief, water, vegetation),
         "material_zones": _material_zones(water, vegetation),
-        "ao_roughness_height": _ao_roughness_height(relief, water, vegetation),
-        "normal_detail": _normal_detail(relief, water, vegetation),
+        "ao_roughness_height": _ao_roughness_height(source_drape, relief, water, vegetation),
+        "normal_detail": _normal_detail(source_drape, relief, water, vegetation),
     }
     output_root.mkdir(parents=True, exist_ok=True)
     outputs = {
@@ -306,7 +407,7 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
         )
     return {
         "schema": "raftsim.unreal.source_conditioned_material_maps.v1",
-        "generated_on": "2026-07-08",
+        "generated_on": "2026-07-09",
         "status": "generated_review_gated_source_conditioned_material_maps_not_lifelike",
         "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
         "unreal_texture_asset_root": str(SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH),
@@ -331,11 +432,30 @@ def _records_to_manifest(repo_root: Path, records: Iterable[SourceConditionedMat
             "SourceConditionedSurfaceResponseWeight",
             "SourceConditionedNormalDetailWeight",
         ],
+        "source_conditioned_detail_model": {
+            "model_id": "source_luma_wet_vegetation_microdetail_v2",
+            "source_inputs": [
+                "aerial_drape_luma_local_contrast",
+                "dem_relief_edges",
+                "water_mask_wet_edge_band",
+                "vegetation_mask_non_water_detail",
+            ],
+            "safety_bounds": [
+                "visible_water_normal_strength_remains_low",
+                "wet_edge_microdetail_is_visual_only",
+                "maps_do_not_create_or_hide_hydraulic_geometry",
+                "promotion_still_requires_capture_guide_geospatial_hazard_and_performance_review",
+            ],
+            "intended_visual_delta": (
+                "Add source-drape texture variation to banks, rocks, vegetation, wet edges, roughness, height, "
+                "and normal-detail candidates so reviewed materials read less like smooth DEM-only proxies."
+            ),
+        },
         "map_semantics": {
-            "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, and DEM-relief shading.",
+            "macro_albedo": "Source-drape-colored material macro map with bounded water, wet-bank, vegetation, DEM-relief shading, and source-luma microdetail.",
             "material_zones": "RGB material-zone weights: R=terrain/wet bank, G=vegetation away from water, B=visible water.",
-            "ao_roughness_height": "Packed RGB map: R=relief-derived ambient-occlusion proxy, G=material roughness candidate, B=DEM relief height candidate.",
-            "normal_detail": "Tangent-space normal-detail candidate derived from DEM relief plus water, wet-bank, and vegetation masks; visible water is deliberately low-strength so material response does not invent hidden hydraulic geometry.",
+            "ao_roughness_height": "Packed RGB map: R=source/relief-derived ambient-occlusion proxy, G=material roughness candidate with aerial-luma variation, B=DEM plus source-luma height candidate.",
+            "normal_detail": "Tangent-space normal-detail candidate derived from DEM relief, source-drape luma, water wet-edge bands, and vegetation masks; visible water is deliberately low-strength so material response does not invent hidden hydraulic geometry.",
         },
         "rivers": river_maps,
         "current_decision": (
@@ -355,7 +475,47 @@ def generate_source_conditioned_material_maps(repo_root: Path) -> dict:
     manifest_path = repo_root / SOURCE_CONDITIONED_MATERIAL_MAP_MANIFEST_RELATIVE_PATH
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    refresh_source_conditioned_material_instance_candidate_bindings(repo_root)
     return manifest
+
+
+def refresh_source_conditioned_material_instance_candidate_bindings(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    source_map_manifest_path = repo_root / SOURCE_CONDITIONED_MATERIAL_MAP_MANIFEST_RELATIVE_PATH
+    candidate_manifest_path = repo_root / FIRST_PARTY_MATERIAL_INSTANCE_CANDIDATE_MANIFEST_RELATIVE_PATH
+    if not candidate_manifest_path.exists():
+        return {}
+
+    source_map_manifest = json.loads(source_map_manifest_path.read_text(encoding="utf-8"))
+    candidate_manifest = json.loads(candidate_manifest_path.read_text(encoding="utf-8"))
+    source_maps_by_river = {river["river_id"]: river["maps"] for river in source_map_manifest["rivers"]}
+
+    for candidate in candidate_manifest["candidates"]:
+        source_maps = source_maps_by_river[candidate["river_id"]]
+        candidate["source_conditioned_texture_bindings"] = {
+            parameter: {
+                "path": source_maps[map_id]["path"],
+                "sha256": source_maps[map_id]["sha256"],
+            }
+            for parameter, map_id in SOURCE_CONDITIONED_TEXTURE_PARAMETERS.items()
+        }
+        candidate["source_conditioned_texture_asset_bindings"] = {
+            parameter: source_maps[map_id]["unreal_texture_asset"]
+            for parameter, map_id in SOURCE_CONDITIONED_TEXTURE_PARAMETERS.items()
+        }
+
+    candidate_manifest["generated_on"] = "2026-07-09"
+    candidate_manifest["source_conditioned_material_map_manifest"] = str(
+        SOURCE_CONDITIONED_MATERIAL_MAP_MANIFEST_RELATIVE_PATH
+    )
+    candidate_manifest["source_conditioned_material_texture_asset_root"] = str(
+        SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_ROOT_RELATIVE_PATH
+    )
+    candidate_manifest["source_conditioned_material_texture_asset_status"] = (
+        SOURCE_CONDITIONED_MATERIAL_TEXTURE_ASSET_STATUS
+    )
+    candidate_manifest_path.write_text(json.dumps(candidate_manifest, indent=2) + "\n", encoding="utf-8")
+    return candidate_manifest
 
 
 if __name__ == "__main__":
