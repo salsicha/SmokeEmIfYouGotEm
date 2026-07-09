@@ -9,11 +9,13 @@ Every art, audio, VFX, haptic, UI, accessibility, and scalability asset needs so
 
 ## Rivers And Biomes
 
-The coverage manifest now tracks three real-world targets:
+The coverage manifest now tracks five real-world targets:
 
 - South Fork American: California Sierra foothill riparian corridor with seasonal low, commercial, high, and storm-response looks.
 - Colorado River: Grand Canyon desert canyon big water with oar-rig context, large walls, laterals, wave trains, and canyon audio scale.
 - Pacuare River: Costa Rica tropical rainforest gorge with dense canopy, wet walls, waterfalls, rain, mist, woody debris, and protected-area/source-rights review.
+- Zambezi River: Batoka Gorge big-water basalt canyon below Victoria Falls, with steep gorge walls, massive wave trains, holes, laterals, warm spray/mist, seasonal flow-shape changes, and cross-border source-rights/publication review.
+- Futaleufu River: Chile/Patagonia turquoise big-water corridor with granite boulder gardens, forested valley walls, Andean backdrop, snowmelt/rain-driven seasonal flow bands, and guide/outfitter/source-rights review.
 
 Highly detailed, immersive, photoreal landscape and foliage are core content goals, not optional dressing. The same pass must also preserve hazard visibility, guide sightlines, rescue-target readability, and solver/replay review clarity.
 
