@@ -28,7 +28,10 @@ HUMAN_LIFELIKE_REVIEW_RESULTS_TEMPLATE_RELATIVE_PATH = (
 PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH = (
     CAPTURE_ROOT_RELATIVE_PATH / "photoreal_environment_performance_review.json"
 )
+FLOW_VARIANT_CAPTURE_PLAN_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_flow_variant_capture_plan.json"
 RUNTIME_BUDGETS_RELATIVE_PATH = Path("physics/config/runtime_budgets.json")
+FLOW_VISUAL_BAND_MANIFEST_RELATIVE_PATH = Path("unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json")
+PRODUCTION_FLOW_VARIANT_INTAKE_RELATIVE_PATH = Path("physics/data/real_world/production_flow_variant_intake.json")
 PROXY_WATER_OVERLAY_RENDERER_COVERAGE_ID = "first_party_source_aware_tapered_water_chroma_microbreakup"
 VISIBLE_WATER_CARD_RENDERER_COVERAGE_IDS = {
     "first_party_capture_quality_water_texture_fleck_cards",
@@ -460,6 +463,236 @@ def write_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
     output_path = repo_root / CAPTURE_QUALITY_REVIEW_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
+def _variant_items_by_key(flow_variant_intake: dict[str, object]) -> dict[tuple[str, str], dict[str, object]]:
+    variants: dict[tuple[str, str], dict[str, object]] = {}
+    for river in flow_variant_intake.get("rivers", []):
+        if not isinstance(river, dict) or not isinstance(river.get("river_id"), str):
+            continue
+        river_id = str(river["river_id"])
+        for variant in river.get("variant_items", []):
+            if not isinstance(variant, dict) or not isinstance(variant.get("flow_band"), str):
+                continue
+            variants[(river_id, str(variant["flow_band"]))] = variant
+    return variants
+
+
+def _capture_manifest_rivers_by_id(capture_manifest: dict[str, object]) -> dict[str, dict[str, object]]:
+    return {
+        str(river["river_id"]): river
+        for river in capture_manifest.get("captures", [])
+        if isinstance(river, dict) and isinstance(river.get("river_id"), str)
+    }
+
+
+def _flow_variant_expected_capture_path(river_id: str, flow_band: str, view_id: str) -> str:
+    return str(CAPTURE_ROOT_RELATIVE_PATH / "flow_variants" / f"{river_id}_{flow_band}_{view_id}.png")
+
+
+def _flow_variant_required_capture(
+    repo_root: Path,
+    river_id: str,
+    flow_band: str,
+    view_id: str,
+    capture_manifest_river: dict[str, object],
+) -> dict[str, object]:
+    expected_capture = _flow_variant_expected_capture_path(river_id, flow_band, view_id)
+    current_default_capture = None
+    if capture_manifest_river.get("flow_band_id") == flow_band:
+        current_default_capture = capture_manifest_river.get(
+            "guide_seat_capture" if view_id == "guide_seat_downstream" else "river_eye_capture"
+        )
+
+    return {
+        "view_id": view_id,
+        "expected_capture": expected_capture,
+        "exists": (repo_root / expected_capture).exists(),
+        "current_default_capture": current_default_capture,
+        "current_default_capture_exists": bool(current_default_capture)
+        and (repo_root / str(current_default_capture)).exists(),
+        "status": "band_named_capture_attached"
+        if (repo_root / expected_capture).exists()
+        else "band_named_capture_missing",
+        "review_requirement": (
+            "Capture this exact river/flow/view combination from Unreal and keep the selected flow band recorded "
+            "in the manifest before using the image for flow-specific art, guide, hazard, or performance review."
+        ),
+    }
+
+
+def build_photoreal_flow_variant_capture_plan(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> dict[str, object]:
+    """Build the required capture plan for every review-gated river flow variant."""
+
+    flow_visual_bands = _read_json_if_present(repo_root, FLOW_VISUAL_BAND_MANIFEST_RELATIVE_PATH)
+    flow_variant_intake = _read_json_if_present(repo_root, PRODUCTION_FLOW_VARIANT_INTAKE_RELATIVE_PATH)
+    capture_manifest = _read_json_if_present(repo_root, CAPTURE_MANIFEST_RELATIVE_PATH)
+    variants_by_key = _variant_items_by_key(flow_variant_intake)
+    capture_rivers = _capture_manifest_rivers_by_id(capture_manifest)
+    view_ids = ["guide_seat_downstream", "river_eye_downstream"]
+
+    rivers: list[dict[str, object]] = []
+    variant_count = 0
+    required_capture_count = 0
+    existing_band_named_capture_count = 0
+    current_default_capture_count = 0
+    default_variant_count = 0
+    fully_captured_variant_count = 0
+    for river in flow_visual_bands.get("rivers", []):
+        if not isinstance(river, dict) or not isinstance(river.get("river_id"), str):
+            continue
+        river_id = str(river["river_id"])
+        default_flow_band = str(river.get("default_preview_flow_band", ""))
+        capture_manifest_river = capture_rivers.get(river_id, {})
+        variant_rows: list[dict[str, object]] = []
+        for band in river.get("bands", []):
+            if not isinstance(band, dict) or not isinstance(band.get("flow_band"), str):
+                continue
+            flow_band = str(band["flow_band"])
+            intake_variant = variants_by_key.get((river_id, flow_band), {})
+            is_default_band = flow_band == default_flow_band
+            required_captures = [
+                _flow_variant_required_capture(repo_root, river_id, flow_band, view_id, capture_manifest_river)
+                for view_id in view_ids
+            ]
+            existing_count = sum(1 for capture in required_captures if capture["exists"])
+            default_existing_count = sum(
+                1 for capture in required_captures if capture["current_default_capture_exists"]
+            )
+            variant_count += 1
+            required_capture_count += len(required_captures)
+            existing_band_named_capture_count += existing_count
+            current_default_capture_count += default_existing_count
+            if is_default_band:
+                default_variant_count += 1
+            if existing_count == len(required_captures):
+                fully_captured_variant_count += 1
+
+            reference_discharge_cfs = band.get("reference_discharge_cfs")
+            if reference_discharge_cfs is None:
+                reference_discharge_cfs = intake_variant.get("reference_discharge_cfs")
+            visual_parameters = {
+                "river_width_scale": band.get("river_width_scale"),
+                "water_level_offset_cm": band.get("water_level_offset_cm"),
+                "foam_scale": band.get("foam_scale"),
+                "wet_bank_scale": band.get("wet_bank_scale"),
+                "current_cue_scale": band.get("current_cue_scale"),
+            }
+            blockers = list(intake_variant.get("promotion_blockers", []))
+            if existing_count < len(required_captures):
+                blockers.append("Band-named guide-seat and river-eye Unreal captures are missing for this variant.")
+
+            variant_rows.append(
+                {
+                    "flow_band": flow_band,
+                    "display_name": intake_variant.get("display_name") or flow_band.replace("_", " ").title(),
+                    "is_default_preview_band": is_default_band,
+                    "reference_discharge_cfs": reference_discharge_cfs,
+                    "relative_flow": band.get("relative_flow") or intake_variant.get("relative_flow"),
+                    "season_or_context": band.get("season") or intake_variant.get("season_or_context"),
+                    "source_evidence_status": intake_variant.get("evidence_status", "not_recorded"),
+                    "visual_parameters": visual_parameters,
+                    "hydraulic_feature_expectation": intake_variant.get(
+                        "hydraulic_feature_expectation",
+                        band.get("visual_intent"),
+                    ),
+                    "promotion_decision": intake_variant.get("promotion_decision", "not_promoted"),
+                    "promotion_blockers": blockers,
+                    "required_captures": required_captures,
+                    "status": "band_named_capture_set_available_not_approved"
+                    if existing_count == len(required_captures)
+                    else "requires_band_named_unreal_capture",
+                    "current_decision": (
+                        "The current default-band capture can help orient review, but this variant still needs "
+                        "band-named Unreal evidence plus guide/geospatial, hazard/readability, rights, solver, and "
+                        "performance review before it can be promoted."
+                        if is_default_band and default_existing_count
+                        else (
+                            "Do not promote this flow variant until Unreal captures exist for both required views "
+                            "and the intake ledger promotion blockers are closed."
+                        )
+                    ),
+                }
+            )
+
+        rivers.append(
+            {
+                "river_id": river_id,
+                "display_name": river.get("display_name"),
+                "flow_presets": river.get("flow_presets"),
+                "default_preview_flow_band": default_flow_band,
+                "capture_manifest_default_flow_band": capture_manifest_river.get("flow_band_id"),
+                "source_context": river.get("source_context"),
+                "variant_count": len(variant_rows),
+                "band_named_capture_count": sum(
+                    1
+                    for variant in variant_rows
+                    for capture in variant["required_captures"]
+                    if capture["exists"]
+                ),
+                "current_default_capture_count": sum(
+                    1
+                    for variant in variant_rows
+                    for capture in variant["required_captures"]
+                    if capture["current_default_capture_exists"]
+                ),
+                "variants": variant_rows,
+            }
+        )
+
+    missing_band_named_capture_count = required_capture_count - existing_band_named_capture_count
+    return {
+        "schema": "raftsim.unreal.photoreal_flow_variant_capture_plan.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_flow_variant_unreal_captures_not_approved",
+        "source_flow_visual_bands": str(FLOW_VISUAL_BAND_MANIFEST_RELATIVE_PATH),
+        "source_flow_variant_intake": str(PRODUCTION_FLOW_VARIANT_INTAKE_RELATIVE_PATH),
+        "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
+        "policy": {
+            "default_band_captures_do_not_cover_all_seasonal_release_or_rain_variants": True,
+            "band_named_capture_required_for_each_flow_variant_and_view": True,
+            "flow_variant_visuals_must_not_hide_solver_conservation_or_forcing_failures": True,
+            "guide_geospatial_hazard_rights_and_performance_review_required_before_promotion": True,
+            "uncleared_reference_media_remains_link_only": True,
+        },
+        "required_view_ids": view_ids,
+        "summary": {
+            "river_count": len(rivers),
+            "variant_count": variant_count,
+            "default_variant_count": default_variant_count,
+            "required_capture_count": required_capture_count,
+            "existing_band_named_capture_count": existing_band_named_capture_count,
+            "missing_band_named_capture_count": missing_band_named_capture_count,
+            "current_default_capture_count": current_default_capture_count,
+            "fully_captured_variant_count": fully_captured_variant_count,
+            "approved_variant_count": 0,
+            "per_river_variant_count": {
+                river["river_id"]: river["variant_count"]
+                for river in rivers
+            },
+        },
+        "rivers": rivers,
+        "current_decision": (
+            "Use this plan to drive the next Unreal capture automation pass for seasonal, release, and rainfed "
+            "flow variants. The existing six downstream captures cover only the three default preview bands and "
+            "are not enough to review low/high water, flash response, hazard readability, swimmer drift, or "
+            "flow-dependent hydraulic behavior."
+        ),
+    }
+
+
+def write_photoreal_flow_variant_capture_plan(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> Path:
+    plan = build_photoreal_flow_variant_capture_plan(repo_root, generated_on=generated_on)
+    output_path = repo_root / FLOW_VARIANT_CAPTURE_PLAN_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(plan, indent=2) + "\n", encoding="utf-8")
     return output_path
 
 

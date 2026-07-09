@@ -7,6 +7,7 @@
   "first_party_material_swatch_manifest": "unreal/Content/RaftSim/Rendering/MaterialSwatches/first_party_material_swatch_manifest.json",
   "flow_visual_band_manifest": "unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json",
   "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
+  "photoreal_flow_variant_capture_plan": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_plan.json",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
   "generated_on": "2026-07-06",
@@ -1439,7 +1440,8 @@
       "approved_source_conditioned_normal_detail_texture_assets_and_capture_review",
       "approved_item_level_visual_source_acquisition_queue_promotions",
       "approved_visual_source_item_intake_promotions",
-      "approved_flow_variant_intake_promotions"
+      "approved_flow_variant_intake_promotions",
+      "approved_band_named_flow_variant_capture_review"
     ],
     "first_party_procedural_asset_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json",
     "first_party_procedural_material_recipe_plan": "unreal/Content/RaftSim/Rendering/first_party_procedural_material_recipes.json",
@@ -1600,6 +1602,7 @@
       "zero_blocker_capture_set_review_packet_markdown_recorded",
       "photoreal_human_lifelike_review_results_template_recorded",
       "production_flow_variant_intake_recorded",
+      "photoreal_flow_variant_capture_plan_recorded",
       "production_visual_source_acquisition_queue_recorded",
       "production_visual_source_item_intake_recorded",
       "source_conditioned_material_map_manifest_recorded",
@@ -1616,6 +1619,24 @@
     "preview_capture_root": "docs/environment-captures/photoreal_river_previews",
     "preview_map_package_root": "/Game/RaftSim/Maps/EnvironmentPreviews",
     "production_flow_variant_intake": "physics/data/real_world/production_flow_variant_intake.json",
+    "photoreal_flow_variant_capture_plan": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_plan.json",
+    "photoreal_flow_variant_capture_plan_status": "awaiting_flow_variant_unreal_captures_not_approved",
+    "photoreal_flow_variant_capture_plan_summary": {
+      "river_count": 3,
+      "variant_count": 10,
+      "default_variant_count": 3,
+      "required_capture_count": 20,
+      "existing_band_named_capture_count": 0,
+      "missing_band_named_capture_count": 20,
+      "current_default_capture_count": 6,
+      "fully_captured_variant_count": 0,
+      "approved_variant_count": 0,
+      "per_river_variant_count": {
+        "american_south_fork": 3,
+        "colorado_river": 3,
+        "pacuare": 4
+      }
+    },
     "production_visual_source_acquisition_queue": "physics/data/real_world/production_visual_source_acquisition_queue.json",
     "production_visual_source_item_intake": "physics/data/real_world/production_visual_source_item_intake.json",
     "required_editor_commands": [
@@ -1756,6 +1777,8 @@
   "first_party_material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
   "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
   "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+  "photoreal_flow_variant_capture_plan": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_plan.json",
+  "photoreal_flow_variant_capture_plan_status": "awaiting_flow_variant_unreal_captures_not_approved",
   "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
   "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
   "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
