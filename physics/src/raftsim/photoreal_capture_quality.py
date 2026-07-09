@@ -29,6 +29,16 @@ PHOTOREAL_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH = (
     CAPTURE_ROOT_RELATIVE_PATH / "photoreal_environment_performance_review.json"
 )
 FLOW_VARIANT_CAPTURE_PLAN_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "photoreal_flow_variant_capture_plan.json"
+FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH = CAPTURE_ROOT_RELATIVE_PATH / "flow_variant_capture_manifest.json"
+FLOW_VARIANT_CAPTURE_QUALITY_REVIEW_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_flow_variant_capture_quality_review.json"
+)
+FLOW_VARIANT_HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_flow_variant_human_lifelike_review_handoff.json"
+)
+FLOW_VARIANT_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH = (
+    CAPTURE_ROOT_RELATIVE_PATH / "photoreal_flow_variant_environment_performance_review.json"
+)
 RUNTIME_BUDGETS_RELATIVE_PATH = Path("physics/config/runtime_budgets.json")
 FLOW_VISUAL_BAND_MANIFEST_RELATIVE_PATH = Path("unreal/Content/RaftSim/Rendering/river_flow_visual_bands.json")
 PRODUCTION_FLOW_VARIANT_INTAKE_RELATIVE_PATH = Path("physics/data/real_world/production_flow_variant_intake.json")
@@ -461,6 +471,171 @@ def build_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-0
 def write_capture_quality_review(repo_root: Path, generated_on: str = "2026-07-08") -> Path:
     review = build_capture_quality_review(repo_root, generated_on=generated_on)
     output_path = repo_root / CAPTURE_QUALITY_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
+def _flow_variant_capture_entries(flow_variant_capture_manifest: dict) -> Iterable[tuple[dict[str, object], str, str]]:
+    for variant in flow_variant_capture_manifest.get("captures", []):
+        if not isinstance(variant, dict):
+            continue
+        for view_id, field in (
+            ("guide_seat_downstream", "guide_seat_capture"),
+            ("river_eye_downstream", "river_eye_capture"),
+        ):
+            capture_path = variant.get(field)
+            if isinstance(capture_path, str):
+                yield variant, view_id, capture_path
+
+
+def build_flow_variant_capture_quality_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> dict[str, object]:
+    """Build automated blocker review coverage for every band-named flow-variant capture."""
+
+    flow_variant_capture_manifest = _read_json_if_present(repo_root, FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH)
+    capture_manifest = _read_json_if_present(repo_root, CAPTURE_MANIFEST_RELATIVE_PATH)
+    thresholds = CaptureQualityThresholds()
+    captures: list[dict[str, object]] = []
+    for variant, view_id, capture_path in _flow_variant_capture_entries(flow_variant_capture_manifest):
+        river_id = str(variant["river_id"])
+        flow_band_id = str(variant["flow_band_id"])
+        capture_review = analyze_capture(repo_root, capture_path, river_id, view_id, thresholds)
+        capture_review.update(
+            {
+                "review_scope": "flow_variant",
+                "flow_band_id": flow_band_id,
+                "flow_band_display_name": variant.get("flow_band_display_name"),
+                "map_package": variant.get("map_package"),
+                "flow_context": {
+                    "flow_reference_discharge_cfs": variant.get("flow_reference_discharge_cfs"),
+                    "flow_visual_width_scale": variant.get("flow_visual_width_scale"),
+                    "flow_visual_foam_scale": variant.get("flow_visual_foam_scale"),
+                    "flow_visual_wet_bank_scale": variant.get("flow_visual_wet_bank_scale"),
+                    "flow_visual_current_cue_scale": variant.get("flow_visual_current_cue_scale"),
+                    "flow_visual_water_level_offset_cm": variant.get("flow_visual_water_level_offset_cm"),
+                    "flow_visual_note": variant.get("flow_visual_note"),
+                },
+            }
+        )
+        captures.append(capture_review)
+
+    renderer_proxy_blockers = _renderer_proxy_blockers(repo_root, capture_manifest)
+    if renderer_proxy_blockers:
+        for capture in captures:
+            capture["blockers"].extend(renderer_proxy_blockers)
+            capture["status"] = "preview_only_not_lifelike_quality_blockers"
+
+    blocker_counts: Counter[str] = Counter(
+        blocker["id"]
+        for capture in captures
+        for blocker in capture["blockers"]
+    )
+    per_river_status: dict[str, dict[str, object]] = {}
+    per_variant_status: dict[str, dict[str, object]] = {}
+    for capture in captures:
+        river = per_river_status.setdefault(
+            str(capture["river_id"]),
+            {"capture_count": 0, "blocking_capture_count": 0, "blockers": set(), "variants": set()},
+        )
+        river["capture_count"] = int(river["capture_count"]) + 1
+        river["variants"].add(capture["flow_band_id"])
+        if capture["blockers"]:
+            river["blocking_capture_count"] = int(river["blocking_capture_count"]) + 1
+        river["blockers"].update(blocker["id"] for blocker in capture["blockers"])
+
+        variant_key = f"{capture['river_id']}:{capture['flow_band_id']}"
+        variant_status = per_variant_status.setdefault(
+            variant_key,
+            {
+                "river_id": capture["river_id"],
+                "flow_band_id": capture["flow_band_id"],
+                "capture_count": 0,
+                "blocking_capture_count": 0,
+                "blockers": set(),
+            },
+        )
+        variant_status["capture_count"] = int(variant_status["capture_count"]) + 1
+        if capture["blockers"]:
+            variant_status["blocking_capture_count"] = int(variant_status["blocking_capture_count"]) + 1
+        variant_status["blockers"].update(blocker["id"] for blocker in capture["blockers"])
+
+    normalized_per_river = {
+        river_id: {
+            "variant_count": len(data["variants"]),
+            "capture_count": data["capture_count"],
+            "blocking_capture_count": data["blocking_capture_count"],
+            "blockers": sorted(data["blockers"]),
+            "status": "preview_only_not_lifelike_quality_blockers"
+            if data["blocking_capture_count"]
+            else "candidate_for_human_lifelike_review_not_approved",
+        }
+        for river_id, data in sorted(per_river_status.items())
+    }
+    normalized_per_variant = {
+        variant_key: {
+            "river_id": data["river_id"],
+            "flow_band_id": data["flow_band_id"],
+            "capture_count": data["capture_count"],
+            "blocking_capture_count": data["blocking_capture_count"],
+            "blockers": sorted(data["blockers"]),
+            "status": "preview_only_not_lifelike_quality_blockers"
+            if data["blocking_capture_count"]
+            else "candidate_for_human_lifelike_review_not_approved",
+        }
+        for variant_key, data in sorted(per_variant_status.items())
+    }
+    blocking_capture_count = sum(1 for capture in captures if capture["blockers"])
+    status = (
+        "flow_variant_captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded"
+        if blocking_capture_count
+        else "flow_variant_captures_reviewed_candidate_for_human_lifelike_review_not_approved"
+    )
+
+    return {
+        "schema": "raftsim.unreal.photoreal_flow_variant_capture_quality_review.v1",
+        "generated_on": generated_on,
+        "status": status,
+        "source_capture_manifest": str(CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_flow_variant_capture_manifest": str(FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_flow_variant_capture_plan": str(FLOW_VARIANT_CAPTURE_PLAN_RELATIVE_PATH),
+        "policy": {
+            "metrics_are_blockers_not_lifelike_approval": True,
+            "every_flow_variant_view_requires_automated_review_before_human_signoff": True,
+            "human_guide_geospatial_and_art_review_still_required": True,
+            "flow_variant_visuals_must_not_hide_hazards_rescue_targets_or_physics_failures": True,
+        },
+        "thresholds": thresholds.as_dict(),
+        "summary": {
+            "variant_count": len(flow_variant_capture_manifest.get("captures", [])),
+            "capture_count": len(captures),
+            "blocking_capture_count": blocking_capture_count,
+            "blocker_counts": dict(sorted(blocker_counts.items())),
+            "per_river": normalized_per_river,
+            "per_variant": normalized_per_variant,
+        },
+        "captures": captures,
+        "current_decision": (
+            "Use this automated review as the flow-variant regression gate. The current band-named captures have "
+            "no automated blocker counts and may advance to human art, guide, geospatial, rights, hazard-readability, "
+            "solver/forcing nonmasking, and measured performance review, but they are not lifelike or gameplay-approved."
+            if blocking_capture_count == 0
+            else (
+                "Use this automated review as the flow-variant regression gate. At least one band-named capture "
+                "still has automated blockers, so no flow variant can advance to lifelike or gameplay approval."
+            )
+        ),
+    }
+
+
+def write_flow_variant_capture_quality_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> Path:
+    review = build_flow_variant_capture_quality_review(repo_root, generated_on=generated_on)
+    output_path = repo_root / FLOW_VARIANT_CAPTURE_QUALITY_REVIEW_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
     return output_path
@@ -962,6 +1137,136 @@ def write_photoreal_environment_performance_review(
     return output_path
 
 
+def build_flow_variant_environment_performance_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> dict[str, object]:
+    """Build desktop/VR performance evidence slots for every band-named flow-variant map."""
+
+    flow_variant_capture_manifest = _read_json_if_present(repo_root, FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH)
+    capture_quality_review = build_flow_variant_capture_quality_review(repo_root, generated_on=generated_on)
+    runtime_budgets = _read_json_if_present(repo_root, RUNTIME_BUDGETS_RELATIVE_PATH)
+    capture_reviews = _flow_variant_capture_reviews_by_key(capture_quality_review)
+    profile_budgets = _profile_budget_rows(runtime_budgets)
+
+    variants: list[dict[str, object]] = []
+    open_profile_measurement_count = 0
+    for variant in flow_variant_capture_manifest.get("captures", []):
+        profiles = []
+        for profile in profile_budgets:
+            open_profile_measurement_count += 1
+            profiles.append(
+                {
+                    **profile,
+                    "status": "requires_measured_unreal_profile_capture_for_flow_variant",
+                    "approved": False,
+                    "evidence_attached": False,
+                    "required_measurements": {
+                        "scalability_preset": None,
+                        "resolution_or_hmd_render_target": None,
+                        "frame_time_ms_p50": None,
+                        "frame_time_ms_p95": None,
+                        "game_thread_ms_p95": None,
+                        "render_thread_ms_p95": None,
+                        "gpu_ms_p95": None,
+                        "draw_calls": None,
+                        "visible_primitives_or_triangles": None,
+                        "gpu_memory_mb": None,
+                        "vr_comfort_or_motion_readability_notes": None,
+                        "flow_specific_hazard_and_rescue_readability_notes": None,
+                    },
+                    "blocking_open_measurements": [
+                        "measured_frame_time_distribution",
+                        "game_render_gpu_thread_breakdown",
+                        "gpu_memory_and_draw_call_or_primitive_count",
+                        "scalability_settings_and_capture_hardware",
+                        "flow_specific_hazard_rescue_and_water_readability_notes",
+                        "vr_comfort_readability_notes" if profile["profile_id"] == "vr" else "desktop_readability_notes",
+                    ],
+                }
+            )
+
+        variants.append(
+            {
+                "river_id": variant["river_id"],
+                "display_name": variant["display_name"],
+                "flow_band_id": variant["flow_band_id"],
+                "flow_band_display_name": variant.get("flow_band_display_name"),
+                "status": "static_flow_variant_inventory_recorded_performance_measurement_required",
+                "approved_for_production_playable": False,
+                "flow_context": {
+                    "flow_reference_discharge_cfs": variant.get("flow_reference_discharge_cfs"),
+                    "flow_visual_width_scale": variant.get("flow_visual_width_scale"),
+                    "flow_visual_foam_scale": variant.get("flow_visual_foam_scale"),
+                    "flow_visual_wet_bank_scale": variant.get("flow_visual_wet_bank_scale"),
+                    "flow_visual_current_cue_scale": variant.get("flow_visual_current_cue_scale"),
+                    "flow_visual_water_level_offset_cm": variant.get("flow_visual_water_level_offset_cm"),
+                    "flow_visual_note": variant.get("flow_visual_note"),
+                },
+                "static_inventory": _flow_variant_static_inventory(repo_root, variant, capture_reviews),
+                "profiles": profiles,
+                "current_decision": (
+                    "Static map and capture inventory is recorded for this flow variant, but measured desktop and VR "
+                    "profile evidence is still required before the variant can be treated as playable or lifelike."
+                ),
+            }
+        )
+
+    return {
+        "schema": "raftsim.unreal.photoreal_flow_variant_environment_performance_review.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_measured_flow_variant_desktop_vr_performance_capture_not_approved",
+        "source_flow_variant_capture_manifest": str(FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_flow_variant_capture_quality_review": str(FLOW_VARIANT_CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_runtime_budgets": str(RUNTIME_BUDGETS_RELATIVE_PATH),
+        "policy": {
+            "static_inventory_is_not_performance_approval": True,
+            "desktop_and_vr_profiles_required_for_each_flow_variant_before_playable_promotion": True,
+            "performance_must_not_trade_away_hazard_rescue_or_water_readability": True,
+            "flash_or_high_water_variants_need_extra_readability_and_safety_review": True,
+        },
+        "summary": {
+            "variant_count": len(variants),
+            "capture_count": capture_quality_review["summary"]["capture_count"],
+            "profile_count": len(variants) * len(profile_budgets),
+            "profile_ids": [profile["profile_id"] for profile in profile_budgets],
+            "measured_profile_count": 0,
+            "open_profile_measurement_count": open_profile_measurement_count,
+            "automated_capture_blocking_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "approved_variant_count": 0,
+        },
+        "profiling_capture_plan": {
+            "desktop": [
+                "Open each flow-variant preview map from both guide-seat and river-eye review cameras.",
+                "Record scalability preset, resolution, frame-time distribution, game/render/GPU thread costs, draw calls/primitives, and GPU memory.",
+                "Attach notes proving flow-specific holes, laterals, boils, wave trains, wet banks, swimmer drift, and rescue targets remain readable.",
+            ],
+            "vr": [
+                "Run each variant in the OpenXR/VR profile or target HMD simulator with comfort settings recorded.",
+                "Record target render resolution, refresh rate, frame-time distribution, dropped/reprojected frames, thread/GPU costs, and GPU memory.",
+                "Attach comfort, motion readability, hazard/rescue readability, and guide-seat visibility notes per flow state.",
+            ],
+        },
+        "variants": variants,
+        "current_decision": (
+            "This artifact extends performance review coverage from the default river captures to every flow variant. "
+            "It is still an evidence scaffold only; real Unreal profiling captures must be attached before any flow "
+            "band is marked production-playable or lifelike-approved."
+        ),
+    }
+
+
+def write_flow_variant_environment_performance_review(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> Path:
+    review = build_flow_variant_environment_performance_review(repo_root, generated_on=generated_on)
+    output_path = repo_root / FLOW_VARIANT_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return output_path
+
+
 def _read_json_if_present(repo_root: Path, relative_path: Path) -> dict:
     path = repo_root / relative_path
     if not path.exists():
@@ -1012,6 +1317,63 @@ def _capture_reviews_by_key(capture_quality_review: dict) -> dict[tuple[str, str
         if isinstance(capture, dict)
         and isinstance(capture.get("river_id"), str)
         and isinstance(capture.get("view_id"), str)
+    }
+
+
+def _flow_variant_capture_reviews_by_key(
+    capture_quality_review: dict,
+) -> dict[tuple[str, str, str], dict[str, object]]:
+    return {
+        (capture["river_id"], capture["flow_band_id"], capture["view_id"]): capture
+        for capture in capture_quality_review.get("captures", [])
+        if isinstance(capture, dict)
+        and isinstance(capture.get("river_id"), str)
+        and isinstance(capture.get("flow_band_id"), str)
+        and isinstance(capture.get("view_id"), str)
+    }
+
+
+def _flow_variant_static_inventory(
+    repo_root: Path,
+    variant: dict[str, object],
+    capture_reviews: dict[tuple[str, str, str], dict[str, object]],
+) -> dict[str, object]:
+    capture_entries = []
+    total_capture_bytes = 0
+    river_id = str(variant["river_id"])
+    flow_band_id = str(variant["flow_band_id"])
+    for view_id, field in (
+        ("guide_seat_downstream", "guide_seat_capture"),
+        ("river_eye_downstream", "river_eye_capture"),
+    ):
+        capture_path = str(variant[field])
+        capture_review = capture_reviews.get((river_id, flow_band_id, view_id), {})
+        size_bytes = _path_size_bytes(repo_root, capture_path)
+        total_capture_bytes += size_bytes
+        capture_entries.append(
+            {
+                "view_id": view_id,
+                "capture": capture_path,
+                "exists": (repo_root / capture_path).exists(),
+                "sha256": capture_review.get("sha256") or _hash_if_file(repo_root, capture_path),
+                "size_bytes": size_bytes,
+                "source_size": capture_review.get("metrics", {}).get("source_size"),
+                "automated_blocker_count": len(capture_review.get("blockers", [])),
+                "automated_status": capture_review.get("status"),
+            }
+        )
+
+    map_asset_relative_path = _unreal_package_to_relative_asset_path(str(variant["map_package"]))
+    return {
+        "map_package": variant["map_package"],
+        "map_asset": {
+            "path": str(map_asset_relative_path),
+            "exists": (repo_root / map_asset_relative_path).exists(),
+            "size_bytes": _path_size_bytes(repo_root, map_asset_relative_path),
+            "sha256": _hash_if_file(repo_root, map_asset_relative_path),
+        },
+        "captures": capture_entries,
+        "total_capture_png_bytes": total_capture_bytes,
     }
 
 
@@ -1197,6 +1559,148 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
             "no river is approved as lifelike or production-playable by this artifact."
         ),
     }
+
+
+def build_flow_variant_human_lifelike_review_handoff(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> dict[str, object]:
+    """Build human-review coverage for every flow-specific visual state."""
+
+    flow_variant_capture_manifest = _read_json_if_present(repo_root, FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH)
+    capture_quality_review = build_flow_variant_capture_quality_review(repo_root, generated_on=generated_on)
+    reference_queue = _read_json_if_present(repo_root, REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH)
+    gap_register = _read_json_if_present(repo_root, PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH)
+    source_plan = _read_json_if_present(repo_root, PHOTOREAL_RIVER_ENVIRONMENT_SOURCES_RELATIVE_PATH)
+
+    capture_reviews = _flow_variant_capture_reviews_by_key(capture_quality_review)
+    reference_targets = _review_targets_by_river(reference_queue)
+    source_rivers = _source_plan_rivers_by_id(source_plan)
+    gap_rivers = _gap_register_rivers_by_id(gap_register)
+    visual_replacement_targets = _visual_replacement_targets(gap_register)
+    review_domains = [
+        {
+            **domain,
+            "status": "required_before_flow_variant_lifelike_or_gameplay_approval",
+            "approved": False,
+        }
+        for domain in HUMAN_REVIEW_DOMAINS
+    ]
+
+    variants: list[dict[str, object]] = []
+    candidate_capture_count = 0
+    for variant in flow_variant_capture_manifest.get("captures", []):
+        river_id = str(variant["river_id"])
+        flow_band_id = str(variant["flow_band_id"])
+        source_river = source_rivers.get(river_id, {})
+        gap_river = gap_rivers.get(river_id, {})
+        captures: list[dict[str, object]] = []
+        for view_id, capture_path in (
+            ("guide_seat_downstream", variant["guide_seat_capture"]),
+            ("river_eye_downstream", variant["river_eye_capture"]),
+        ):
+            capture_review = capture_reviews.get((river_id, flow_band_id, view_id), {})
+            if not capture_review.get("blockers"):
+                candidate_capture_count += 1
+            handoff_capture = _capture_handoff_entry(river_id, view_id, str(capture_path), capture_review)
+            handoff_capture["flow_band_id"] = flow_band_id
+            handoff_capture["flow_band_display_name"] = variant.get("flow_band_display_name")
+            captures.append(handoff_capture)
+
+        variants.append(
+            {
+                "river_id": river_id,
+                "display_name": variant.get("display_name") or source_river.get("display_name"),
+                "flow_band_id": flow_band_id,
+                "flow_band_display_name": variant.get("flow_band_display_name"),
+                "review_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+                "readiness": gap_river.get("readiness", "preview_only_not_lifelike"),
+                "map_package": variant.get("map_package"),
+                "source_manifest": variant.get("source_manifest") or source_river.get("source_manifest"),
+                "flow_context": {
+                    "flow_band_source": variant.get("flow_band_source"),
+                    "flow_reference_discharge_cfs": variant.get("flow_reference_discharge_cfs"),
+                    "flow_visual_width_scale": variant.get("flow_visual_width_scale"),
+                    "flow_visual_foam_scale": variant.get("flow_visual_foam_scale"),
+                    "flow_visual_wet_bank_scale": variant.get("flow_visual_wet_bank_scale"),
+                    "flow_visual_current_cue_scale": variant.get("flow_visual_current_cue_scale"),
+                    "flow_visual_water_level_offset_cm": variant.get("flow_visual_water_level_offset_cm"),
+                    "flow_visual_note": variant.get("flow_visual_note"),
+                },
+                "captures": captures,
+                "reference_media_review_targets": reference_targets.get(river_id, []),
+                "open_review_gates": _open_review_gates(),
+                "visual_replacement_targets": visual_replacement_targets,
+                "fidelity_note": variant.get("fidelity_note"),
+                "current_decision": (
+                    "Automated blockers are clear for this flow variant's guide-seat and river-eye captures, but "
+                    "the variant is not lifelike or gameplay-approved until guide/art/geospatial, rights, hazard "
+                    "and rescue readability, solver/forcing nonmasking, production-material, and performance gates pass."
+                ),
+            }
+        )
+
+    per_river: dict[str, dict[str, int | str]] = {}
+    for variant in variants:
+        row = per_river.setdefault(
+            str(variant["river_id"]),
+            {
+                "review_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+                "variant_count": 0,
+                "capture_count": 0,
+                "open_review_gate_count": 0,
+            },
+        )
+        row["variant_count"] = int(row["variant_count"]) + 1
+        row["capture_count"] = int(row["capture_count"]) + len(variant["captures"])
+        row["open_review_gate_count"] = int(row["open_review_gate_count"]) + len(variant["open_review_gates"])
+
+    blocking_gate_count = len(variants) * len(review_domains)
+    return {
+        "schema": "raftsim.unreal.photoreal_flow_variant_human_lifelike_review_handoff.v1",
+        "generated_on": generated_on,
+        "status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+        "source_flow_variant_capture_manifest": str(FLOW_VARIANT_CAPTURE_MANIFEST_RELATIVE_PATH),
+        "source_flow_variant_capture_quality_review": str(FLOW_VARIANT_CAPTURE_QUALITY_REVIEW_RELATIVE_PATH),
+        "source_flow_variant_performance_review": str(FLOW_VARIANT_ENVIRONMENT_PERFORMANCE_REVIEW_RELATIVE_PATH),
+        "source_reference_media_review_queue": str(REFERENCE_MEDIA_REVIEW_QUEUE_RELATIVE_PATH),
+        "source_gap_register": str(PRODUCTION_ENVIRONMENT_GAP_REGISTER_RELATIVE_PATH),
+        "policy": {
+            "automated_metrics_do_not_approve_lifelike_visuals": True,
+            "each_flow_variant_requires_guide_art_geospatial_hazard_rights_and_performance_review": True,
+            "flow_dependent_hydraulic_features_must_remain_readable": True,
+            "visual_forcing_must_not_hide_solver_or_conservation_failures": True,
+            "uncleared_reference_media_remains_link_only": True,
+        },
+        "summary": {
+            "river_count": len(per_river),
+            "variant_count": len(variants),
+            "capture_count": capture_quality_review["summary"]["capture_count"],
+            "candidate_capture_count": candidate_capture_count,
+            "automated_blocking_capture_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "human_approved_variant_count": 0,
+            "open_human_review_gate_count": blocking_gate_count,
+            "per_river": dict(sorted(per_river.items())),
+        },
+        "review_domains": review_domains,
+        "variants": variants,
+        "current_decision": (
+            "Use this handoff to review each flow state separately. The current band-named captures are automated "
+            "zero-blocker candidates only; no low/high/release/rain/flash variant is lifelike or gameplay-approved "
+            "until every human, rights, hazard, solver/forcing, production-material, and performance gate records accepted evidence."
+        ),
+    }
+
+
+def write_flow_variant_human_lifelike_review_handoff(
+    repo_root: Path,
+    generated_on: str = "2026-07-09",
+) -> Path:
+    handoff = build_flow_variant_human_lifelike_review_handoff(repo_root, generated_on=generated_on)
+    output_path = repo_root / FLOW_VARIANT_HUMAN_LIFELIKE_REVIEW_HANDOFF_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(handoff, indent=2) + "\n", encoding="utf-8")
+    return output_path
 
 
 def write_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "2026-07-08") -> Path:

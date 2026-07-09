@@ -10,6 +10,12 @@
   "photoreal_flow_variant_capture_plan": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_plan.json",
   "flow_variant_capture_manifest": "docs/environment-captures/photoreal_river_previews/flow_variant_capture_manifest.json",
   "flow_variant_capture_manifest_status": "all_band_named_flow_variant_previews_captured_not_lifelike_approved",
+  "flow_variant_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_quality_review.json",
+  "flow_variant_capture_quality_review_status": "flow_variant_captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+  "flow_variant_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_human_lifelike_review_handoff.json",
+  "flow_variant_human_lifelike_review_handoff_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+  "flow_variant_environment_performance_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_environment_performance_review.json",
+  "flow_variant_environment_performance_review_status": "awaiting_measured_flow_variant_desktop_vr_performance_capture_not_approved",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
   "generated_on": "2026-07-06",
@@ -1609,6 +1615,9 @@
       "production_visual_source_item_intake_recorded",
       "flow_variant_capture_manifest_recorded",
       "band_named_flow_variant_preview_captures_recorded",
+      "flow_variant_capture_quality_review_recorded",
+      "flow_variant_human_lifelike_review_handoff_recorded",
+      "flow_variant_environment_performance_review_recorded",
       "source_conditioned_material_map_manifest_recorded",
       "source_conditioned_macro_albedo_material_maps_recorded",
       "source_conditioned_material_zone_maps_recorded",
@@ -1644,6 +1653,165 @@
     "flow_variant_capture_manifest": "docs/environment-captures/photoreal_river_previews/flow_variant_capture_manifest.json",
     "flow_variant_capture_manifest_status": "all_band_named_flow_variant_previews_captured_not_lifelike_approved",
     "flow_variant_capture_manifest_capture_count": 10,
+    "flow_variant_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_quality_review.json",
+    "flow_variant_capture_quality_review_status": "flow_variant_captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+    "flow_variant_capture_quality_review_summary": {
+      "variant_count": 10,
+      "capture_count": 20,
+      "blocking_capture_count": 0,
+      "blocker_counts": {},
+      "per_river": {
+        "american_south_fork": {
+          "variant_count": 3,
+          "capture_count": 6,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "colorado_river": {
+          "variant_count": 3,
+          "capture_count": 6,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "pacuare": {
+          "variant_count": 4,
+          "capture_count": 8,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        }
+      },
+      "per_variant": {
+        "american_south_fork:high_runnable": {
+          "river_id": "american_south_fork",
+          "flow_band_id": "high_runnable",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "american_south_fork:low_runnable": {
+          "river_id": "american_south_fork",
+          "flow_band_id": "low_runnable",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "american_south_fork:median_runnable": {
+          "river_id": "american_south_fork",
+          "flow_band_id": "median_runnable",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "colorado_river:high_release_planning": {
+          "river_id": "colorado_river",
+          "flow_band_id": "high_release_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "colorado_river:low_release_planning": {
+          "river_id": "colorado_river",
+          "flow_band_id": "low_release_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "colorado_river:moderate_release_planning": {
+          "river_id": "colorado_river",
+          "flow_band_id": "moderate_release_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "pacuare:clear_season_low_planning": {
+          "river_id": "pacuare",
+          "flow_band_id": "clear_season_low_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "pacuare:flash_response_review_only": {
+          "river_id": "pacuare",
+          "flow_band_id": "flash_response_review_only",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "pacuare:rainfed_runnable_planning": {
+          "river_id": "pacuare",
+          "flow_band_id": "rainfed_runnable_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        },
+        "pacuare:rainy_season_high_planning": {
+          "river_id": "pacuare",
+          "flow_band_id": "rainy_season_high_planning",
+          "capture_count": 2,
+          "blocking_capture_count": 0,
+          "blockers": [],
+          "status": "candidate_for_human_lifelike_review_not_approved"
+        }
+      }
+    },
+    "flow_variant_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_human_lifelike_review_handoff.json",
+    "flow_variant_human_lifelike_review_handoff_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+    "flow_variant_human_lifelike_review_handoff_summary": {
+      "river_count": 3,
+      "variant_count": 10,
+      "capture_count": 20,
+      "candidate_capture_count": 20,
+      "automated_blocking_capture_count": 0,
+      "human_approved_variant_count": 0,
+      "open_human_review_gate_count": 70,
+      "per_river": {
+        "american_south_fork": {
+          "review_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+          "variant_count": 3,
+          "capture_count": 6,
+          "open_review_gate_count": 21
+        },
+        "colorado_river": {
+          "review_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+          "variant_count": 3,
+          "capture_count": 6,
+          "open_review_gate_count": 21
+        },
+        "pacuare": {
+          "review_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+          "variant_count": 4,
+          "capture_count": 8,
+          "open_review_gate_count": 28
+        }
+      }
+    },
+    "flow_variant_environment_performance_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_environment_performance_review.json",
+    "flow_variant_environment_performance_review_status": "awaiting_measured_flow_variant_desktop_vr_performance_capture_not_approved",
+    "flow_variant_environment_performance_review_summary": {
+      "variant_count": 10,
+      "capture_count": 20,
+      "profile_count": 20,
+      "profile_ids": [
+        "desktop",
+        "vr"
+      ],
+      "measured_profile_count": 0,
+      "open_profile_measurement_count": 20,
+      "automated_capture_blocking_count": 0,
+      "approved_variant_count": 0
+    },
     "production_visual_source_acquisition_queue": "physics/data/real_world/production_visual_source_acquisition_queue.json",
     "production_visual_source_item_intake": "physics/data/real_world/production_visual_source_item_intake.json",
     "required_editor_commands": [
@@ -1788,6 +1956,12 @@
   "photoreal_flow_variant_capture_plan_status": "band_named_flow_variant_captures_available_not_lifelike_approved",
   "flow_variant_capture_manifest": "docs/environment-captures/photoreal_river_previews/flow_variant_capture_manifest.json",
   "flow_variant_capture_manifest_status": "all_band_named_flow_variant_previews_captured_not_lifelike_approved",
+  "flow_variant_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_quality_review.json",
+  "flow_variant_capture_quality_review_status": "flow_variant_captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+  "flow_variant_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_human_lifelike_review_handoff.json",
+  "flow_variant_human_lifelike_review_handoff_status": "awaiting_flow_variant_human_lifelike_review_not_approved",
+  "flow_variant_environment_performance_review": "docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_environment_performance_review.json",
+  "flow_variant_environment_performance_review_status": "awaiting_measured_flow_variant_desktop_vr_performance_capture_not_approved",
   "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
   "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
   "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
