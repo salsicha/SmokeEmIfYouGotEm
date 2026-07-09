@@ -230,6 +230,11 @@ FString GetPhotorealRiverSourcePlanRelativePath()
     return TEXT("unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json");
 }
 
+FString GetPhotorealFlowVariantCapturePlanRelativePath()
+{
+    return TEXT("docs/environment-captures/photoreal_river_previews/photoreal_flow_variant_capture_plan.json");
+}
+
 FString GetFirstPartyProceduralEnvironmentAssetPlanRelativePath()
 {
     return TEXT("unreal/Content/RaftSim/Rendering/first_party_procedural_environment_assets.json");
@@ -529,6 +534,172 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Specs.Add(Pacuare);
 
     return Specs;
+}
+
+FString MakeFlowVariantPreviewMapPackagePath(const FRaftSimEnvironmentPreviewSpec& BaseSpec)
+{
+    const FString BaseDirectory = FPaths::GetPath(BaseSpec.MapPackagePath);
+    const FString BaseName = FPackageName::GetShortName(BaseSpec.MapPackagePath);
+    return FPaths::Combine(
+        BaseDirectory,
+        TEXT("FlowVariants"),
+        FString::Printf(TEXT("%s_%s"), *BaseName, *BaseSpec.FlowBandId));
+}
+
+FRaftSimEnvironmentPreviewSpec MakeFlowVariantPreviewSpec(
+    const FRaftSimEnvironmentPreviewSpec& BaseSpec,
+    const FString& FlowBandId,
+    const FString& FlowBandDisplayName,
+    const FString& FlowVisualDescription,
+    float FlowReferenceDischargeCfs,
+    float FlowWidthScale,
+    float FlowFoamScale,
+    float FlowWetBankScale,
+    float FlowCurrentCueScale,
+    float FlowWaterLevelOffsetCm)
+{
+    FRaftSimEnvironmentPreviewSpec Variant = BaseSpec;
+    Variant.FlowBandId = FlowBandId;
+    Variant.FlowBandDisplayName = FlowBandDisplayName;
+    Variant.FlowVisualDescription = FlowVisualDescription;
+    Variant.FlowReferenceDischargeCfs = FlowReferenceDischargeCfs;
+    Variant.FlowWidthScale = FlowWidthScale;
+    Variant.FlowFoamScale = FlowFoamScale;
+    Variant.FlowWetBankScale = FlowWetBankScale;
+    Variant.FlowCurrentCueScale = FlowCurrentCueScale;
+    Variant.FlowWaterLevelOffsetCm = FlowWaterLevelOffsetCm;
+    Variant.MapPackagePath = MakeFlowVariantPreviewMapPackagePath(Variant);
+    return Variant;
+}
+
+TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewFlowVariantSpecs()
+{
+    TArray<FRaftSimEnvironmentPreviewSpec> Variants;
+    const TArray<FRaftSimEnvironmentPreviewSpec> BaseSpecs = GetEnvironmentPreviewSpecs();
+    for (const FRaftSimEnvironmentPreviewSpec& BaseSpec : BaseSpecs)
+    {
+        if (BaseSpec.RiverId == TEXT("american_south_fork"))
+        {
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("low_runnable"),
+                TEXT("Low Runnable"),
+                TEXT("South Fork low-runnable review band: expose more rocks and shallows, tighten tongues, reduce foam, and preserve rescue/hazard readability before guide approval."),
+                900.0f,
+                0.92f,
+                0.75f,
+                0.85f,
+                0.82f,
+                -8.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("median_runnable"),
+                TEXT("Median Runnable / Summer Commercial"),
+                TEXT("South Fork median summer-commercial review band with readable tongues, wet rocks, eddy lines, and moderate wave trains."),
+                1600.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                1.0f,
+                0.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("high_runnable"),
+                TEXT("High Runnable"),
+                TEXT("South Fork high-water review band: raise wet banks, strengthen laterals and wave trains, and keep boulder hazards visible instead of visually washing them away."),
+                3000.0f,
+                1.12f,
+                1.25f,
+                1.25f,
+                1.25f,
+                12.0f));
+        }
+        else if (BaseSpec.RiverId == TEXT("colorado_river"))
+        {
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("low_release_planning"),
+                TEXT("Low Release Planning"),
+                TEXT("Colorado low-release planning band with more exposed bars and sharper ferry setup while preserving big-water scale and swimmer visibility."),
+                8000.0f,
+                0.96f,
+                0.85f,
+                0.88f,
+                0.90f,
+                -6.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("moderate_release_planning"),
+                TEXT("Moderate Release Planning"),
+                TEXT("Colorado moderate-release planning band with longer tongues, lateral waves, broad current streaks, and default oar-rig sightline readability."),
+                12000.0f,
+                1.08f,
+                1.15f,
+                1.10f,
+                1.15f,
+                8.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("high_release_planning"),
+                TEXT("High Release Planning"),
+                TEXT("Colorado high-release review band with faster big-water read, stronger wave trains, eddy fences, and inspectable shore/rescue cues."),
+                18000.0f,
+                1.18f,
+                1.35f,
+                1.30f,
+                1.35f,
+                18.0f));
+        }
+        else if (BaseSpec.RiverId == TEXT("pacuare"))
+        {
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("clear_season_low_planning"),
+                TEXT("Clear-Season Low Planning"),
+                TEXT("Pacuare clear-season low planning band with exposed rocks, tighter tongues, clearer shallow-water cues, and reduced bank-pressure visuals."),
+                -1.0f,
+                0.90f,
+                0.80f,
+                0.88f,
+                0.82f,
+                -9.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("rainfed_runnable_planning"),
+                TEXT("Rain-Fed Runnable Planning"),
+                TEXT("Pacuare rainfed runnable planning band with pushy tongues, active wave trains, wet banks, and vegetation pressure after rain."),
+                -1.0f,
+                1.05f,
+                1.20f,
+                1.20f,
+                1.18f,
+                7.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("rainy_season_high_planning"),
+                TEXT("Rainy-Season High Planning"),
+                TEXT("Pacuare rainy-season high planning band with faster reaction windows, larger laterals, fewer visible eddies, and stronger swimmer drift cues."),
+                -1.0f,
+                1.18f,
+                1.40f,
+                1.35f,
+                1.35f,
+                20.0f));
+            Variants.Add(MakeFlowVariantPreviewSpec(
+                BaseSpec,
+                TEXT("flash_response_review_only"),
+                TEXT("Flash Response Review Only"),
+                TEXT("Pacuare flash-response review-only band blocked from playable use until hydrology and guide review define safe visual and gameplay boundaries."),
+                -1.0f,
+                1.30f,
+                1.55f,
+                1.50f,
+                1.55f,
+                34.0f));
+        }
+    }
+
+    return Variants;
 }
 
 UStaticMesh* LoadPreviewMesh(const TCHAR* MeshPath)
@@ -12773,6 +12944,13 @@ FString GetPreviewCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec
         Spec.RiverId + TEXT("_") + CaptureId + TEXT(".png"));
 }
 
+FString GetPreviewFlowVariantCaptureRelativePath(const FRaftSimEnvironmentPreviewSpec& Spec, const FString& CaptureId)
+{
+    return FPaths::Combine(
+        TEXT("docs/environment-captures/photoreal_river_previews/flow_variants"),
+        Spec.RiverId + TEXT("_") + Spec.FlowBandId + TEXT("_") + CaptureId + TEXT(".png"));
+}
+
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
     const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
@@ -13030,9 +13208,12 @@ bool CapturePreviewImageForSpec(
     TArray64<uint8> CompressedPng;
     FImageUtils::PNGCompressImageArray(CaptureWidth, CaptureHeight, MakeArrayView(ImageData), CompressedPng);
 
-    OutRelativeCapturePath = GetPreviewCaptureRelativePath(Spec, CaptureId);
+    if (OutRelativeCapturePath.IsEmpty())
+    {
+        OutRelativeCapturePath = GetPreviewCaptureRelativePath(Spec, CaptureId);
+    }
     const FString AbsoluteCapturePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), OutRelativeCapturePath));
-    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(AbsoluteCapturePath), true);
     const bool bSaved = FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
 
     DestroyRiverEyeCenterArtifactCover();
@@ -14980,7 +15161,141 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("%s environment preview capture manifest -> %s\n"),
         bSaved ? TEXT("Saved") : TEXT("Failed"),
         *ManifestPath);
-    return bSaved && bAllCaptured;
+
+    const FString FlowVariantCapturePlanRelativePath = GetPhotorealFlowVariantCapturePlanRelativePath();
+    const FString FlowVariantCapturePlanAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), FlowVariantCapturePlanRelativePath));
+    bool bFlowVariantCapturePlanAvailable = FPaths::FileExists(FlowVariantCapturePlanAbsolutePath);
+    if (!bFlowVariantCapturePlanAvailable)
+    {
+        OutSummary += FString::Printf(TEXT("Missing flow-variant capture plan: %s\n"), *FlowVariantCapturePlanAbsolutePath);
+    }
+    else
+    {
+        OutSummary += FString::Printf(TEXT("Using photoreal flow-variant capture plan: %s\n"), *FlowVariantCapturePlanRelativePath);
+    }
+
+    FString FlowVariantEntriesJson;
+    bool bAllFlowVariantCaptured = bFlowVariantCapturePlanAvailable;
+    const TArray<FRaftSimEnvironmentPreviewSpec> FlowVariantSpecs = GetEnvironmentPreviewFlowVariantSpecs();
+    for (int32 VariantIndex = 0; VariantIndex < FlowVariantSpecs.Num(); ++VariantIndex)
+    {
+        const FRaftSimEnvironmentPreviewSpec& VariantSpec = FlowVariantSpecs[VariantIndex];
+        OutSummary += FString::Printf(
+            TEXT("Generating %s %s flow-variant preview map.\n"),
+            *VariantSpec.DisplayName,
+            *VariantSpec.FlowBandId);
+        const bool bVariantMapBuilt = BuildPreviewMapForSpec(VariantSpec, OutSummary);
+
+        FString GuideSeatVariantCapturePath =
+            GetPreviewFlowVariantCaptureRelativePath(VariantSpec, TEXT("guide_seat_downstream"));
+        FString RiverEyeVariantCapturePath =
+            GetPreviewFlowVariantCaptureRelativePath(VariantSpec, TEXT("river_eye_downstream"));
+        if (bVariantMapBuilt)
+        {
+            FString WarmupGuideSeatVariantCapturePath = GuideSeatVariantCapturePath;
+            CapturePreviewImageForSpec(
+                VariantSpec,
+                CaptureRoot,
+                WarmupGuideSeatVariantCapturePath,
+                TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+                TEXT("guide_seat_downstream"),
+                TEXT("flow-variant guide-seat downstream warm-up"),
+                false,
+                OutSummary);
+        }
+        const bool bGuideSeatVariantCaptured =
+            bVariantMapBuilt &&
+            CapturePreviewImageForSpec(
+                VariantSpec,
+                CaptureRoot,
+                GuideSeatVariantCapturePath,
+                TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+                TEXT("guide_seat_downstream"),
+                TEXT("flow-variant guide-seat downstream"),
+                false,
+                OutSummary);
+        const bool bRiverEyeVariantCaptured =
+            bVariantMapBuilt &&
+            CapturePreviewImageForSpec(
+                VariantSpec,
+                CaptureRoot,
+                RiverEyeVariantCapturePath,
+                TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+                TEXT("river_eye_downstream"),
+                TEXT("flow-variant river-eye downstream"),
+                true,
+                OutSummary);
+        bAllFlowVariantCaptured &= bGuideSeatVariantCaptured && bRiverEyeVariantCaptured;
+        const FString VariantFlowReferenceDischargeJson = VariantSpec.FlowReferenceDischargeCfs >= 0.0f
+            ? FString::Printf(TEXT("%.1f"), VariantSpec.FlowReferenceDischargeCfs)
+            : FString(TEXT("null"));
+
+        FlowVariantEntriesJson += FString::Printf(
+            TEXT("%s    {\n")
+            TEXT("      \"river_id\": \"%s\",\n")
+            TEXT("      \"display_name\": \"%s\",\n")
+            TEXT("      \"map_package\": \"%s\",\n")
+            TEXT("      \"source_manifest\": \"%s\",\n")
+            TEXT("      \"flow_band_id\": \"%s\",\n")
+            TEXT("      \"flow_band_display_name\": \"%s\",\n")
+            TEXT("      \"flow_band_source\": \"%s\",\n")
+            TEXT("      \"flow_reference_discharge_cfs\": %s,\n")
+            TEXT("      \"flow_visual_width_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_foam_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_wet_bank_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_current_cue_scale\": %.3f,\n")
+            TEXT("      \"flow_visual_water_level_offset_cm\": %.3f,\n")
+            TEXT("      \"flow_visual_note\": \"%s\",\n")
+            TEXT("      \"guide_seat_capture\": \"%s\",\n")
+            TEXT("      \"river_eye_capture\": \"%s\",\n")
+            TEXT("      \"status\": \"%s\",\n")
+            TEXT("      \"fidelity_note\": \"%s\"\n")
+            TEXT("    }"),
+            VariantIndex == 0 ? TEXT("") : TEXT(",\n"),
+            *EscapeRaftSimJsonString(VariantSpec.RiverId),
+            *EscapeRaftSimJsonString(VariantSpec.DisplayName),
+            *EscapeRaftSimJsonString(VariantSpec.MapPackagePath),
+            *EscapeRaftSimJsonString(VariantSpec.SourceManifest),
+            *EscapeRaftSimJsonString(VariantSpec.FlowBandId),
+            *EscapeRaftSimJsonString(VariantSpec.FlowBandDisplayName),
+            *EscapeRaftSimJsonString(VariantSpec.FlowBandSource),
+            *VariantFlowReferenceDischargeJson,
+            VariantSpec.FlowWidthScale,
+            VariantSpec.FlowFoamScale,
+            VariantSpec.FlowWetBankScale,
+            VariantSpec.FlowCurrentCueScale,
+            VariantSpec.FlowWaterLevelOffsetCm,
+            *EscapeRaftSimJsonString(VariantSpec.FlowVisualDescription),
+            *EscapeRaftSimJsonString(GuideSeatVariantCapturePath),
+            *EscapeRaftSimJsonString(RiverEyeVariantCapturePath),
+            bGuideSeatVariantCaptured && bRiverEyeVariantCaptured ? TEXT("captured_band_named_flow_variant_preview_renders") : TEXT("capture_failed"),
+            *EscapeRaftSimJsonString(GetPreviewFidelityNote(VariantSpec)));
+    }
+
+    const FString FlowVariantManifest = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.environment_flow_variant_capture_manifest.v1\",\n")
+        TEXT("  \"capture_type\": \"band_named_guide_seat_and_river_eye_downstream_unreal_preview\",\n")
+        TEXT("  \"source_capture_manifest\": \"docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json\",\n")
+        TEXT("  \"source_flow_variant_capture_plan\": \"%s\",\n")
+        TEXT("  \"status\": \"%s\",\n")
+        TEXT("  \"captures\": [\n")
+        TEXT("%s\n")
+        TEXT("  ]\n")
+        TEXT("}\n"),
+        *EscapeRaftSimJsonString(FlowVariantCapturePlanRelativePath),
+        bAllFlowVariantCaptured ? TEXT("all_band_named_flow_variant_previews_captured_not_lifelike_approved") : TEXT("one_or_more_flow_variant_captures_failed"),
+        *FlowVariantEntriesJson);
+
+    const FString FlowVariantManifestPath = FPaths::Combine(CaptureRoot, TEXT("flow_variant_capture_manifest.json"));
+    const bool bFlowVariantManifestSaved = FFileHelper::SaveStringToFile(FlowVariantManifest, *FlowVariantManifestPath);
+    OutSummary += FString::Printf(
+        TEXT("%s flow-variant environment preview capture manifest -> %s\n"),
+        bFlowVariantManifestSaved ? TEXT("Saved") : TEXT("Failed"),
+        *FlowVariantManifestPath);
+
+    return bSaved && bAllCaptured && bFlowVariantManifestSaved && bAllFlowVariantCaptured;
 }
 
 bool FRaftSimEditorModule::SaveWidgetScreenshot(
