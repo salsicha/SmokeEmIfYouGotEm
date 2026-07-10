@@ -1,0 +1,45 @@
+{
+  "schema": "raftsim.unreal.biome_asset_visual_comparison_review.v1",
+  "asset_id": "polyhaven_fir_tree_01_1k",
+  "river_id": "american_south_fork",
+  "status": "rights_clear_import_validated_visual_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "comparison_baseline": {
+    "commit": "1805f63e0b139809706b7afe67a2a8c62b30a205",
+    "conifer_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static",
+    "river_eye_sha256": "5839a99e799e9144e045ce685da037165a961d3a065306483f436ef14438694c",
+    "solver_rapid_river_eye_sha256": "9b72a93b685a5248ef5c0e85f6f950182fa7d94c4828304d6533d645b690d9ff"
+  },
+  "reviewed_candidate": {
+    "conifer_asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_fir_tree_01_import_report.json",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
+    "river_eye_sha256": "c2a6194e1261d2a5d758b2cbdb587b38991a0914873c26043bc9dfd3280cc9c4",
+    "solver_rapid_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_solver_rapid_river_eye_downstream.png",
+    "solver_rapid_river_eye_sha256": "556973efb437751b4ee5d835b7287489687e9324a333ede89a3366586a0ce062"
+  },
+  "validated": [
+    "manual website acquisition with CC0 source and author provenance",
+    "source bundle SHA-256 verification before import",
+    "three separate centered static meshes at plausible 14.1-18.9 m effective heights",
+    "explicit 1K bark and needle material bindings without shader fallback",
+    "Nanite enabled with recorded source and fallback triangle counts",
+    "source-mask-aware HISM placement in the isolated South Fork Landscape candidate",
+    "clean UE 5.8 three-river generation and capture exit"
+  ],
+  "visual_findings": [
+    "The reviewed fir removes the most obvious triangular PVE conifer crown silhouette.",
+    "At the active river-eye and solver-rapid camera distances, needle mass collapses into sparse or bare vertical forms.",
+    "Generic PVE broadleaf cards still dominate the canopy and retain oversized repeated leaf silhouettes.",
+    "The comparison does not improve smooth terrain, water, bank transition, rock, atmosphere, or VFX blockers."
+  ],
+  "decision": "retain_import_pipeline_and_isolated_assets_reject_visual_promotion",
+  "next_asset_requirements": [
+    "multiple Sierra foothill conifer and riparian broadleaf crown/age variants",
+    "distance-stable Nanite foliage volume or authored LOD behavior",
+    "denser realistic needle and branch silhouette at the active gameplay cameras",
+    "seasonal state and wind response",
+    "guide/ecology review and measured desktop/VR performance"
+  ]
+}
