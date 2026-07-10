@@ -255,6 +255,11 @@ FString GetSourceConditionedMaterialMapManifestRelativePath()
     return TEXT("unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/first_party_source_conditioned_material_map_manifest.json");
 }
 
+FString GetProductionDetailTextureManifestRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/ProductionDetailTextures/first_party_production_detail_texture_manifest.json");
+}
+
 FString GetFirstPartyMaterialInstanceCandidateManifestRelativePath()
 {
     return TEXT("unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json");
@@ -293,6 +298,16 @@ FString GetSourceConditionedMaterialTextureAssetRootRelativePath()
 FString GetSourceConditionedMaterialTextureAssetStatus()
 {
     return TEXT("created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike");
+}
+
+FString GetProductionDetailTextureAssetRootRelativePath()
+{
+    return TEXT("unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures");
+}
+
+FString GetProductionDetailTextureAssetStatus()
+{
+    return TEXT("created_unreal_first_party_terrain_detail_texture_candidates_bound_to_review_material_not_lifelike");
 }
 
 FString GetFirstPartyAtlasSampleReviewMaterialRelativePath()
@@ -344,6 +359,24 @@ FString GetSourceConditionedMaterialMapRelativePath(const FString& RiverId, cons
 
     return FString::Printf(
         TEXT("unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/%s_source_conditioned_%s.png"),
+        *RiverId,
+        *MapSuffix);
+}
+
+FString GetProductionDetailTextureRelativePath(const FString& RiverId, const FString& MapKey)
+{
+    FString MapSuffix = TEXT("albedo");
+    if (MapKey == TEXT("TerrainDetailNormal"))
+    {
+        MapSuffix = TEXT("normal");
+    }
+    else if (MapKey == TEXT("TerrainDetailAORoughnessHeight"))
+    {
+        MapSuffix = TEXT("ao_roughness_height");
+    }
+
+    return FString::Printf(
+        TEXT("unreal/Content/RaftSim/Rendering/ProductionDetailTextures/%s_terrain_bank_detail_v1_%s.png"),
         *RiverId,
         *MapSuffix);
 }
@@ -1444,6 +1477,63 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
     return Specs;
 }
 
+TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetProductionDetailMaterialTextureAssetSpecs()
+{
+    struct FRiverSpec
+    {
+        const TCHAR* RiverId;
+        const TCHAR* RiverAssetName;
+    };
+
+    const FRiverSpec RiverSpecs[] = {
+        {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
+        {TEXT("colorado_river"), TEXT("ColoradoRiver")},
+        {TEXT("pacuare"), TEXT("Pacuare")},
+    };
+
+    TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
+    for (const FRiverSpec& RiverSpec : RiverSpecs)
+    {
+        FRaftSimFirstPartyMaterialTextureAssetSpec Albedo;
+        Albedo.RiverId = RiverSpec.RiverId;
+        Albedo.RiverAssetName = RiverSpec.RiverAssetName;
+        Albedo.MapKey = TEXT("TerrainDetailAlbedo");
+        Albedo.MapKind = TEXT("first_party_terrain_detail_albedo");
+        Albedo.SourceRelativePath = GetProductionDetailTextureRelativePath(RiverSpec.RiverId, Albedo.MapKey);
+        Albedo.TextureAssetRootPackagePath = TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures");
+        Albedo.CompressionSettings = TC_Default;
+        Albedo.bSRGB = true;
+        Albedo.LODGroup = TEXTUREGROUP_World;
+        Specs.Add(Albedo);
+
+        FRaftSimFirstPartyMaterialTextureAssetSpec Normal;
+        Normal.RiverId = RiverSpec.RiverId;
+        Normal.RiverAssetName = RiverSpec.RiverAssetName;
+        Normal.MapKey = TEXT("TerrainDetailNormal");
+        Normal.MapKind = TEXT("first_party_terrain_detail_normal");
+        Normal.SourceRelativePath = GetProductionDetailTextureRelativePath(RiverSpec.RiverId, Normal.MapKey);
+        Normal.TextureAssetRootPackagePath = TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures");
+        Normal.CompressionSettings = TC_Normalmap;
+        Normal.bSRGB = false;
+        Normal.LODGroup = TEXTUREGROUP_WorldNormalMap;
+        Specs.Add(Normal);
+
+        FRaftSimFirstPartyMaterialTextureAssetSpec Packed;
+        Packed.RiverId = RiverSpec.RiverId;
+        Packed.RiverAssetName = RiverSpec.RiverAssetName;
+        Packed.MapKey = TEXT("TerrainDetailAORoughnessHeight");
+        Packed.MapKind = TEXT("first_party_terrain_detail_ao_roughness_height");
+        Packed.SourceRelativePath = GetProductionDetailTextureRelativePath(RiverSpec.RiverId, Packed.MapKey);
+        Packed.TextureAssetRootPackagePath = TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures");
+        Packed.CompressionSettings = TC_Masks;
+        Packed.bSRGB = false;
+        Packed.LODGroup = TEXTUREGROUP_World;
+        Specs.Add(Packed);
+    }
+
+    return Specs;
+}
+
 void ApplyFirstPartyMaterialTextureImportSettings(
     UTexture2D* Texture,
     const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec)
@@ -1618,6 +1708,26 @@ bool CreateSourceConditionedMaterialTextureAssets(
     return bAllSaved;
 }
 
+bool CreateProductionDetailMaterialTextureAssets(
+    TMap<FString, UTexture2D*>& InOutTextureAssetsByKey,
+    FString& OutSummary)
+{
+    bool bAllSaved = true;
+
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec : GetProductionDetailMaterialTextureAssetSpecs())
+    {
+        bool bSaved = false;
+        UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(Spec, OutSummary, bSaved);
+        bAllSaved &= bSaved && Texture != nullptr;
+        if (Texture)
+        {
+            InOutTextureAssetsByKey.Add(GetFirstPartyMaterialTextureAssetBindingKey(Spec.RiverId, Spec.MapKey), Texture);
+        }
+    }
+
+    return bAllSaved;
+}
+
 UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     const TMap<FString, UTexture2D*>& TextureAssetsByKey,
     FString& OutSummary)
@@ -1662,6 +1772,12 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
         GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("SourceConditionedAORoughnessHeight")));
     UTexture2D* DefaultSourceNormalDetail = TextureAssetsByKey.FindRef(
         GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("SourceConditionedNormalDetail")));
+    UTexture2D* DefaultTerrainDetailAlbedo = TextureAssetsByKey.FindRef(
+        GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("TerrainDetailAlbedo")));
+    UTexture2D* DefaultTerrainDetailNormal = TextureAssetsByKey.FindRef(
+        GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("TerrainDetailNormal")));
+    UTexture2D* DefaultTerrainDetailPacked = TextureAssetsByKey.FindRef(
+        GetFirstPartyMaterialTextureAssetBindingKey(TEXT("american_south_fork"), TEXT("TerrainDetailAORoughnessHeight")));
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
@@ -1680,22 +1796,27 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     UMaterialExpressionTextureCoordinate* TexCoord =
         AddExpression(NewObject<UMaterialExpressionTextureCoordinate>(Material), -1120, -120);
 
-    UMaterialExpressionVectorParameter* AtlasTileOriginScale =
+    UMaterialExpressionVectorParameter* AtlasTileOriginParameter =
         AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -1120, 40);
-    AtlasTileOriginScale->ParameterName = TEXT("AtlasTileOriginScale");
-    AtlasTileOriginScale->DefaultValue = FLinearColor(0.0f, 0.0f, 1.0f / 3.0f, 1.0f / 2.0f);
+    AtlasTileOriginParameter->ParameterName = TEXT("AtlasTileOrigin");
+    AtlasTileOriginParameter->DefaultValue = FLinearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    UMaterialExpressionVectorParameter* AtlasTileScaleParameter =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -1120, 180);
+    AtlasTileScaleParameter->ParameterName = TEXT("AtlasTileScale");
+    AtlasTileScaleParameter->DefaultValue = FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f);
 
     UMaterialExpressionComponentMask* AtlasOrigin =
         AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 40);
-    AtlasOrigin->Input.Expression = AtlasTileOriginScale;
+    AtlasOrigin->Input.Expression = AtlasTileOriginParameter;
     AtlasOrigin->R = 1;
     AtlasOrigin->G = 1;
 
     UMaterialExpressionComponentMask* AtlasScale =
         AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 180);
-    AtlasScale->Input.Expression = AtlasTileOriginScale;
-    AtlasScale->B = 1;
-    AtlasScale->A = 1;
+    AtlasScale->Input.Expression = AtlasTileScaleParameter;
+    AtlasScale->R = 1;
+    AtlasScale->G = 1;
 
     UMaterialExpressionMultiply* ScaledUv = AddExpression(NewObject<UMaterialExpressionMultiply>(Material), -640, -40);
     ScaledUv->A.Expression = TexCoord;
@@ -1784,6 +1905,69 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     SourceNormalDetailSample->Coordinates.Expression = TexCoord;
     SourceNormalDetailSample->Group = TEXT("SourceConditionedMaps");
     SourceNormalDetailSample->SortPriority = 95;
+
+    UMaterialExpressionVectorParameter* TerrainDetailUvScaleParameter =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -1120, 1780);
+    TerrainDetailUvScaleParameter->ParameterName = TEXT("TerrainDetailUvScale");
+    TerrainDetailUvScaleParameter->DefaultValue = FLinearColor(8.0f, 8.0f, 0.0f, 0.0f);
+    TerrainDetailUvScaleParameter->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailUvScaleParameter->SortPriority = 130;
+
+    UMaterialExpressionVectorParameter* TerrainDetailUvOffsetParameter =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -1120, 1920);
+    TerrainDetailUvOffsetParameter->ParameterName = TEXT("TerrainDetailUvOffset");
+    TerrainDetailUvOffsetParameter->DefaultValue = FLinearColor(0.17f, 0.31f, 0.0f, 0.0f);
+    TerrainDetailUvOffsetParameter->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailUvOffsetParameter->SortPriority = 135;
+
+    UMaterialExpressionComponentMask* TerrainDetailUvScale =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 1740);
+    TerrainDetailUvScale->Input.Expression = TerrainDetailUvScaleParameter;
+    TerrainDetailUvScale->R = 1;
+    TerrainDetailUvScale->G = 1;
+
+    UMaterialExpressionComponentMask* TerrainDetailUvOffset =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -880, 1880);
+    TerrainDetailUvOffset->Input.Expression = TerrainDetailUvOffsetParameter;
+    TerrainDetailUvOffset->R = 1;
+    TerrainDetailUvOffset->G = 1;
+
+    UMaterialExpressionMultiply* TerrainDetailScaledUv =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), -640, 1740);
+    TerrainDetailScaledUv->A.Expression = TexCoord;
+    TerrainDetailScaledUv->B.Expression = TerrainDetailUvScale;
+
+    UMaterialExpressionAdd* TerrainDetailUv =
+        AddExpression(NewObject<UMaterialExpressionAdd>(Material), -420, 1780);
+    TerrainDetailUv->A.Expression = TerrainDetailScaledUv;
+    TerrainDetailUv->B.Expression = TerrainDetailUvOffset;
+
+    UMaterialExpressionTextureSampleParameter2D* TerrainDetailAlbedoSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 1760);
+    TerrainDetailAlbedoSample->ParameterName = TEXT("TerrainDetailAlbedo");
+    TerrainDetailAlbedoSample->Texture = DefaultTerrainDetailAlbedo;
+    TerrainDetailAlbedoSample->SamplerType = SAMPLERTYPE_Color;
+    TerrainDetailAlbedoSample->Coordinates.Expression = TerrainDetailUv;
+    TerrainDetailAlbedoSample->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailAlbedoSample->SortPriority = 140;
+
+    UMaterialExpressionTextureSampleParameter2D* TerrainDetailNormalSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 1980);
+    TerrainDetailNormalSample->ParameterName = TEXT("TerrainDetailNormal");
+    TerrainDetailNormalSample->Texture = DefaultTerrainDetailNormal;
+    TerrainDetailNormalSample->SamplerType = SAMPLERTYPE_Normal;
+    TerrainDetailNormalSample->Coordinates.Expression = TerrainDetailUv;
+    TerrainDetailNormalSample->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailNormalSample->SortPriority = 150;
+
+    UMaterialExpressionTextureSampleParameter2D* TerrainDetailPackedSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -180, 2200);
+    TerrainDetailPackedSample->ParameterName = TEXT("TerrainDetailAORoughnessHeight");
+    TerrainDetailPackedSample->Texture = DefaultTerrainDetailPacked;
+    TerrainDetailPackedSample->SamplerType = SAMPLERTYPE_Masks;
+    TerrainDetailPackedSample->Coordinates.Expression = TerrainDetailUv;
+    TerrainDetailPackedSample->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailPackedSample->SortPriority = 160;
 
     UMaterialExpressionVectorParameter* SourceZoneWeights =
         AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -180, 700);
@@ -1929,13 +2113,26 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     SourceConditionedBaseColor->B.Expression = SourceMacroAlbedoSample;
     SourceConditionedBaseColor->Alpha.Expression = SourceConditionedMacroAlbedoAlpha;
 
+    UMaterialExpressionScalarParameter* TerrainDetailAlbedoWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 1760);
+    TerrainDetailAlbedoWeight->ParameterName = TEXT("TerrainDetailAlbedoWeight");
+    TerrainDetailAlbedoWeight->DefaultValue = 0.0f;
+    TerrainDetailAlbedoWeight->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailAlbedoWeight->SortPriority = 170;
+
+    UMaterialExpressionLinearInterpolate* ProductionDetailBaseColor =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 560, -120);
+    ProductionDetailBaseColor->A.Expression = SourceConditionedBaseColor;
+    ProductionDetailBaseColor->B.Expression = TerrainDetailAlbedoSample;
+    ProductionDetailBaseColor->Alpha.Expression = TerrainDetailAlbedoWeight;
+
     UMaterialExpressionConstant* FirstPartyAtlasReviewEmissiveFillScale =
         AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -80);
     FirstPartyAtlasReviewEmissiveFillScale->R = 0.42f;
 
     UMaterialExpressionMultiply* EmissiveColor =
         AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, -160);
-    EmissiveColor->A.Expression = SourceConditionedBaseColor;
+    EmissiveColor->A.Expression = ProductionDetailBaseColor;
     EmissiveColor->B.Expression = FirstPartyAtlasReviewEmissiveFillScale;
 
     UMaterialExpressionComponentMask* AmbientOcclusionMask =
@@ -2037,17 +2234,75 @@ UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
     SourceConditionedNormal->B.Expression = SourceNormalDetailSample;
     SourceConditionedNormal->Alpha.Expression = SourceConditionedNormalDetailAlpha;
 
+    UMaterialExpressionScalarParameter* TerrainDetailNormalWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 1980);
+    TerrainDetailNormalWeight->ParameterName = TEXT("TerrainDetailNormalWeight");
+    TerrainDetailNormalWeight->DefaultValue = 0.0f;
+    TerrainDetailNormalWeight->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailNormalWeight->SortPriority = 180;
+
+    UMaterialExpressionScalarParameter* TerrainDetailSurfaceResponseWeight =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 120, 2440);
+    TerrainDetailSurfaceResponseWeight->ParameterName = TEXT("TerrainDetailSurfaceResponseWeight");
+    TerrainDetailSurfaceResponseWeight->DefaultValue = 0.0f;
+    TerrainDetailSurfaceResponseWeight->Group = TEXT("FirstPartyProductionDetail");
+    TerrainDetailSurfaceResponseWeight->SortPriority = 190;
+
+    UMaterialExpressionComponentMask* TerrainDetailAmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 2180);
+    TerrainDetailAmbientOcclusion->Input.Expression = TerrainDetailPackedSample;
+    TerrainDetailAmbientOcclusion->R = 1;
+
+    UMaterialExpressionComponentMask* TerrainDetailRoughness =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 2280);
+    TerrainDetailRoughness->Input.Expression = TerrainDetailPackedSample;
+    TerrainDetailRoughness->G = 1;
+
+    UMaterialExpressionComponentMask* TerrainDetailHeight =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), 120, 2380);
+    TerrainDetailHeight->Input.Expression = TerrainDetailPackedSample;
+    TerrainDetailHeight->B = 1;
+
+    UMaterialExpressionMultiply* TerrainDetailHeightOffset =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, 2380);
+    TerrainDetailHeightOffset->A.Expression = TerrainDetailHeight;
+    TerrainDetailHeightOffset->B.Expression = HeightScale;
+
+    UMaterialExpressionLinearInterpolate* ProductionDetailNormal =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 1460, 80);
+    ProductionDetailNormal->A.Expression = SourceConditionedNormal;
+    ProductionDetailNormal->B.Expression = TerrainDetailNormalSample;
+    ProductionDetailNormal->Alpha.Expression = TerrainDetailNormalWeight;
+
+    UMaterialExpressionLinearInterpolate* ProductionDetailAmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 1460, 1180);
+    ProductionDetailAmbientOcclusion->A.Expression = SourceConditionedAmbientOcclusion;
+    ProductionDetailAmbientOcclusion->B.Expression = TerrainDetailAmbientOcclusion;
+    ProductionDetailAmbientOcclusion->Alpha.Expression = TerrainDetailSurfaceResponseWeight;
+
+    UMaterialExpressionLinearInterpolate* ProductionDetailRoughness =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 1460, 1320);
+    ProductionDetailRoughness->A.Expression = SourceConditionedRoughness;
+    ProductionDetailRoughness->B.Expression = TerrainDetailRoughness;
+    ProductionDetailRoughness->Alpha.Expression = TerrainDetailSurfaceResponseWeight;
+
+    UMaterialExpressionLinearInterpolate* ProductionDetailHeightOffset =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 1460, 1440);
+    ProductionDetailHeightOffset->A.Expression = SourceConditionedHeightOffset;
+    ProductionDetailHeightOffset->B.Expression = TerrainDetailHeightOffset;
+    ProductionDetailHeightOffset->Alpha.Expression = TerrainDetailSurfaceResponseWeight;
+
     UMaterialExpressionConstant* Specular = AddExpression(NewObject<UMaterialExpressionConstant>(Material), 560, 520);
     Specular->R = 0.0f;
 
     if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, SourceConditionedBaseColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ProductionDetailBaseColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, SourceConditionedNormal);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, SourceConditionedAmbientOcclusion);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, SourceConditionedRoughness);
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->PixelDepthOffset, SourceConditionedHeightOffset);
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ProductionDetailNormal);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, ProductionDetailAmbientOcclusion);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, ProductionDetailRoughness);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->PixelDepthOffset, ProductionDetailHeightOffset);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
     }
 
@@ -2089,6 +2344,10 @@ struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
     float SourceConditionedMacroAlbedoWeight = 0.0f;
     float SourceConditionedSurfaceResponseWeight = 0.0f;
     float SourceConditionedNormalDetailWeight = 0.0f;
+    FLinearColor TerrainDetailUvScaleOffset = FLinearColor(8.0f, 8.0f, 0.17f, 0.31f);
+    float TerrainDetailAlbedoWeight = 0.0f;
+    float TerrainDetailNormalWeight = 0.0f;
+    float TerrainDetailSurfaceResponseWeight = 0.0f;
 
     FString GetMaterialInstancePath() const
     {
@@ -2260,6 +2519,30 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             Spec.SourceConditionedMacroAlbedoWeight = RecipeSpec.SourceConditionedMacroAlbedoWeight;
             Spec.SourceConditionedSurfaceResponseWeight = RecipeSpec.SourceConditionedSurfaceResponseWeight;
             Spec.SourceConditionedNormalDetailWeight = RecipeSpec.SourceConditionedNormalDetailWeight;
+            if (FCString::Strcmp(RecipeSpec.RecipeId, TEXT("terrain_bank_layered_material")) == 0)
+            {
+                if (FCString::Strcmp(RiverSpec.RiverId, TEXT("colorado_river")) == 0)
+                {
+                    Spec.TerrainDetailUvScaleOffset = FLinearColor(4.5f, 4.5f, 0.41f, 0.13f);
+                    Spec.TerrainDetailAlbedoWeight = 0.76f;
+                    Spec.TerrainDetailNormalWeight = 0.22f;
+                    Spec.TerrainDetailSurfaceResponseWeight = 0.24f;
+                }
+                else if (FCString::Strcmp(RiverSpec.RiverId, TEXT("pacuare")) == 0)
+                {
+                    Spec.TerrainDetailUvScaleOffset = FLinearColor(5.0f, 5.0f, 0.29f, 0.47f);
+                    Spec.TerrainDetailAlbedoWeight = 0.74f;
+                    Spec.TerrainDetailNormalWeight = 0.18f;
+                    Spec.TerrainDetailSurfaceResponseWeight = 0.20f;
+                }
+                else
+                {
+                    Spec.TerrainDetailUvScaleOffset = FLinearColor(5.0f, 5.0f, 0.17f, 0.31f);
+                    Spec.TerrainDetailAlbedoWeight = 0.74f;
+                    Spec.TerrainDetailNormalWeight = 0.20f;
+                    Spec.TerrainDetailSurfaceResponseWeight = 0.22f;
+                }
+            }
             Specs.Add(Spec);
         }
     }
@@ -2324,11 +2607,26 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
         FMaterialParameterInfo(TEXT("AtlasTileOriginScale")),
         AtlasTileOriginScale);
     Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AtlasTileOrigin")),
+        FLinearColor(AtlasTileOriginScale.R, AtlasTileOriginScale.G, 0.0f, 0.0f));
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("AtlasTileScale")),
+        FLinearColor(AtlasTileOriginScale.B, AtlasTileOriginScale.A, 0.0f, 0.0f));
+    Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("PreviewColor")),
         Spec.PreviewColor);
     Instance->SetVectorParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("SourceConditionedZoneWeights")),
         Spec.SourceConditionedZoneWeights);
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailUvScaleOffset")),
+        Spec.TerrainDetailUvScaleOffset);
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailUvScale")),
+        FLinearColor(Spec.TerrainDetailUvScaleOffset.R, Spec.TerrainDetailUvScaleOffset.G, 0.0f, 0.0f));
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailUvOffset")),
+        FLinearColor(Spec.TerrainDetailUvScaleOffset.B, Spec.TerrainDetailUvScaleOffset.A, 0.0f, 0.0f));
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("AtlasTileIndex")),
         static_cast<float>(Spec.AtlasTileIndex));
@@ -2363,6 +2661,15 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
         FMaterialParameterInfo(TEXT("SourceConditionedNormalDetailWeight")),
         Spec.SourceConditionedNormalDetailWeight);
     Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailAlbedoWeight")),
+        Spec.TerrainDetailAlbedoWeight);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailNormalWeight")),
+        Spec.TerrainDetailNormalWeight);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("TerrainDetailSurfaceResponseWeight")),
+        Spec.TerrainDetailSurfaceResponseWeight);
+    Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("SourceConditionedMaterialAssignmentReviewOnlyNotLifelike")),
         1.0f);
 
@@ -2394,6 +2701,9 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
     BindTextureParameter(TEXT("SourceConditionedMaterialZones"), TEXT("SourceConditionedMaterialZones"));
     BindTextureParameter(TEXT("SourceConditionedAORoughnessHeight"), TEXT("SourceConditionedAORoughnessHeight"));
     BindTextureParameter(TEXT("SourceConditionedNormalDetail"), TEXT("SourceConditionedNormalDetail"));
+    BindTextureParameter(TEXT("TerrainDetailAlbedo"), TEXT("TerrainDetailAlbedo"));
+    BindTextureParameter(TEXT("TerrainDetailNormal"), TEXT("TerrainDetailNormal"));
+    BindTextureParameter(TEXT("TerrainDetailAORoughnessHeight"), TEXT("TerrainDetailAORoughnessHeight"));
     if (!bAllTexturesBound)
     {
         return false;
@@ -2431,6 +2741,7 @@ bool CreateFirstPartyMaterialInstanceCandidateAssets(FString& OutSummary)
     LoadOrCreatePreviewWaterVertexColorMaterial();
     bAllSaved &= CreateFirstPartyMaterialTextureAtlasAssets(TextureAssetsByKey, OutSummary);
     bAllSaved &= CreateSourceConditionedMaterialTextureAssets(TextureAssetsByKey, OutSummary);
+    bAllSaved &= CreateProductionDetailMaterialTextureAssets(TextureAssetsByKey, OutSummary);
     bAllSaved &= LoadOrCreateFirstPartyAtlasSampleReviewMaterial(TextureAssetsByKey, OutSummary) != nullptr;
 
     for (const FRaftSimFirstPartyMaterialInstanceCandidateSpec& Spec : GetFirstPartyMaterialInstanceCandidateSpecs())
@@ -13102,7 +13413,7 @@ FString GetPreviewFlowVariantCaptureRelativePath(const FRaftSimEnvironmentPrevie
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; first-party generated close-range terrain albedo, normal, and packed AO/roughness/height detail textures now use dedicated per-river tiled UV scale and bounded terrain-only blends beneath the corridor-scale source drape; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; all detail assets remain candidate-only until capture, art, guide/geospatial, hazard readability, rights/provenance, and desktop/VR performance review pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -13395,7 +13706,7 @@ bool CapturePreviewImageForSpec(
         return false;
     }
 
-    const bool bApplyFirstPartyCaptureFilmGrainDither = true;
+    const bool bApplyFirstPartyCaptureFilmGrainDither = false;
     const uint32 FirstPartyCaptureFilmGrainDitherSeed =
         GetTypeHash(Spec.RiverId) ^ (GetTypeHash(CaptureId) * 16777619u);
     for (int32 PixelIndex = 0; PixelIndex < ImageData.Num(); ++PixelIndex)
@@ -13552,55 +13863,92 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         MaterialAtlasAlbedoPtr,
         MaterialAtlasNormalPtr,
         MaterialAtlasPackedPtr);
-    AddPreviewAerialDrapeTiles(World, Spec, AerialDrapePtr, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
     AddPreviewRiverRibbonMesh(World, Spec, MaterialAtlasAlbedoPtr, MaterialAtlasNormalPtr, MaterialAtlasPackedPtr);
-    AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
-    AddPreviewIrregularShorelineEdgeBreakupDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
-    AddPreviewSourceAwareBankBreakupDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
-    AddPreviewTerrainMaterialLayerDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr);
-    AddPreviewLandscapeNaniteMaterialScaffoldDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
-    AddPreviewTerrainErosionRillDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
+    const bool bCreateLegacyTerrainOverlayProxyGeometry = false;
+    if (bCreateLegacyTerrainOverlayProxyGeometry)
+    {
+        AddPreviewAerialDrapeTiles(
+            World,
+            Spec,
+            AerialDrapePtr,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewWetBankDressing(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr);
+        AddPreviewIrregularShorelineEdgeBreakupDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewSourceAwareBankBreakupDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewTerrainMaterialLayerDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewLandscapeNaniteMaterialScaffoldDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewTerrainErosionRillDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewSourceMaskedBankBarMicrogeometryDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewSourceMaskedShorelineLipOverhangDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+        AddPreviewProceduralBankTextureCards(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr,
+            PlaneMesh);
+        AddPreviewNearFieldPhotorealReviewDressing(
+            World,
+            Spec,
+            AerialDrapePtr,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            VegetationMaskPtr);
+    }
+    else
+    {
+        OutSummary += FString::Printf(
+            TEXT("Skipped legacy terrain/bank overlay proxy geometry for %s; the textured terrain mesh is authoritative.\n"),
+            *Spec.RiverId);
+    }
     AddPreviewProceduralEnvironmentDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, WaterMaskPtr, VegetationMaskPtr, SphereMesh);
-    AddPreviewSourceMaskedBankBarMicrogeometryDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
-    AddPreviewSourceMaskedShorelineLipOverhangDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
-    AddPreviewProceduralBankTextureCards(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr,
-        PlaneMesh);
     AddPreviewBiomeBankEcologyDetail(
         World,
         Spec,
@@ -13645,29 +13993,31 @@ bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString&
         HeightfieldPreviewPtr,
         WaterMaskPtr,
         VegetationMaskPtr);
-    AddPreviewWaterSurfaceDetail(World, Spec);
-    AddPreviewFlowBandTextureDetail(World, Spec);
-    AddPreviewWaterSurfaceChopAndTurbidityDetail(World, Spec);
-    AddPreviewWaterShaderDepthReflectionScaffoldDetail(World, Spec);
-    AddPreviewShallowWaterClarityAndAerationDetail(World, Spec, WaterMaskPtr, PlaneMesh);
-    AddPreviewWaterMicroRippleGlintDetail(World, Spec, PlaneMesh);
-    AddPreviewNearFieldPhotorealReviewDressing(
-        World,
-        Spec,
-        AerialDrapePtr,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        VegetationMaskPtr);
-    AddPreviewFoamAndHydraulics(World, Spec);
-    AddPreviewFlowDependentHydraulicAerationAndSprayDetail(
-        World,
-        Spec,
-        TerrainReliefPtr,
-        HeightfieldPreviewPtr,
-        WaterMaskPtr,
-        PlaneMesh,
-        SphereMesh);
+    const bool bCreateLegacyWaterOverlayProxyGeometry = false;
+    if (bCreateLegacyWaterOverlayProxyGeometry)
+    {
+        AddPreviewWaterSurfaceDetail(World, Spec);
+        AddPreviewFlowBandTextureDetail(World, Spec);
+        AddPreviewWaterSurfaceChopAndTurbidityDetail(World, Spec);
+        AddPreviewWaterShaderDepthReflectionScaffoldDetail(World, Spec);
+        AddPreviewShallowWaterClarityAndAerationDetail(World, Spec, WaterMaskPtr, PlaneMesh);
+        AddPreviewWaterMicroRippleGlintDetail(World, Spec, PlaneMesh);
+        AddPreviewFoamAndHydraulics(World, Spec);
+        AddPreviewFlowDependentHydraulicAerationAndSprayDetail(
+            World,
+            Spec,
+            TerrainReliefPtr,
+            HeightfieldPreviewPtr,
+            WaterMaskPtr,
+            PlaneMesh,
+            SphereMesh);
+    }
+    else
+    {
+        OutSummary += FString::Printf(
+            TEXT("Skipped legacy water overlay proxy geometry for %s; integrated base-water relief and color remain active.\n"),
+            *Spec.RiverId);
+    }
     AddPreviewSurfaceAtmosphereAndSprayDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
     AddPreviewWaterfallAndPlungeMistDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh, CubeMesh);
     AddPreviewRiverAtmosphericBackdropDetail(World, Spec, TerrainReliefPtr, HeightfieldPreviewPtr, PlaneMesh);
@@ -15086,12 +15436,16 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     const FString SourceConditionedMaterialMapManifestRelativePath = GetSourceConditionedMaterialMapManifestRelativePath();
     const FString SourceConditionedMaterialMapManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), SourceConditionedMaterialMapManifestRelativePath));
+    const FString ProductionDetailTextureManifestRelativePath = GetProductionDetailTextureManifestRelativePath();
+    const FString ProductionDetailTextureManifestAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProductionDetailTextureManifestRelativePath));
     const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString MaterialTextureAssetRootRelativePath = GetFirstPartyMaterialTextureAssetRootRelativePath();
     const FString SourceConditionedMaterialTextureAssetRootRelativePath =
         GetSourceConditionedMaterialTextureAssetRootRelativePath();
+    const FString ProductionDetailTextureAssetRootRelativePath = GetProductionDetailTextureAssetRootRelativePath();
     const FString MaterialShaderParentRelativePath = GetFirstPartyAtlasSampleReviewMaterialRelativePath();
     const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
@@ -15125,6 +15479,13 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
             *SourceConditionedMaterialMapManifestAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(ProductionDetailTextureManifestAbsolutePath))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Missing first-party production detail texture manifest: %s\n"),
+            *ProductionDetailTextureManifestAbsolutePath);
+        return false;
+    }
     if (!FPaths::FileExists(MaterialInstanceCandidateManifestAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestAbsolutePath);
@@ -15143,11 +15504,17 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     OutSummary += FString::Printf(
         TEXT("Using source-conditioned material map manifest: %s\n"),
         *SourceConditionedMaterialMapManifestRelativePath);
+    OutSummary += FString::Printf(
+        TEXT("Using first-party production detail texture manifest: %s\n"),
+        *ProductionDetailTextureManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture asset root: %s\n"), *MaterialTextureAssetRootRelativePath);
     OutSummary += FString::Printf(
         TEXT("Using source-conditioned material texture asset root: %s\n"),
         *SourceConditionedMaterialTextureAssetRootRelativePath);
+    OutSummary += FString::Printf(
+        TEXT("Using first-party production detail texture asset root: %s\n"),
+        *ProductionDetailTextureAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party atlas sampler review material: %s\n"), *MaterialShaderParentRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
@@ -15181,12 +15548,16 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     const FString SourceConditionedMaterialMapManifestRelativePath = GetSourceConditionedMaterialMapManifestRelativePath();
     const FString SourceConditionedMaterialMapManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), SourceConditionedMaterialMapManifestRelativePath));
+    const FString ProductionDetailTextureManifestRelativePath = GetProductionDetailTextureManifestRelativePath();
+    const FString ProductionDetailTextureManifestAbsolutePath =
+        FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), ProductionDetailTextureManifestRelativePath));
     const FString MaterialInstanceCandidateManifestRelativePath = GetFirstPartyMaterialInstanceCandidateManifestRelativePath();
     const FString MaterialInstanceCandidateManifestAbsolutePath =
         FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), MaterialInstanceCandidateManifestRelativePath));
     const FString MaterialTextureAssetRootRelativePath = GetFirstPartyMaterialTextureAssetRootRelativePath();
     const FString SourceConditionedMaterialTextureAssetRootRelativePath =
         GetSourceConditionedMaterialTextureAssetRootRelativePath();
+    const FString ProductionDetailTextureAssetRootRelativePath = GetProductionDetailTextureAssetRootRelativePath();
     const FString MaterialShaderParentRelativePath = GetFirstPartyAtlasSampleReviewMaterialRelativePath();
     const FString MaterialInstanceReviewAssetRootRelativePath = GetFirstPartyMaterialInstanceReviewAssetRootRelativePath();
     const FString GeospatialAttachmentLedgerRelativePath = GetProductionGeospatialAttachmentLedgerRelativePath();
@@ -15215,6 +15586,13 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *SourceConditionedMaterialMapManifestAbsolutePath);
         return false;
     }
+    if (!FPaths::FileExists(ProductionDetailTextureManifestAbsolutePath))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Missing first-party production detail texture manifest for capture: %s\n"),
+            *ProductionDetailTextureManifestAbsolutePath);
+        return false;
+    }
     if (!FPaths::FileExists(MaterialInstanceCandidateManifestAbsolutePath))
     {
         OutSummary += FString::Printf(TEXT("Missing first-party material instance candidate manifest for capture: %s\n"), *MaterialInstanceCandidateManifestAbsolutePath);
@@ -15229,11 +15607,17 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     OutSummary += FString::Printf(
         TEXT("Using source-conditioned material map manifest: %s\n"),
         *SourceConditionedMaterialMapManifestRelativePath);
+    OutSummary += FString::Printf(
+        TEXT("Using first-party production detail texture manifest: %s\n"),
+        *ProductionDetailTextureManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance candidate manifest: %s\n"), *MaterialInstanceCandidateManifestRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material texture asset root: %s\n"), *MaterialTextureAssetRootRelativePath);
     OutSummary += FString::Printf(
         TEXT("Using source-conditioned material texture asset root: %s\n"),
         *SourceConditionedMaterialTextureAssetRootRelativePath);
+    OutSummary += FString::Printf(
+        TEXT("Using first-party production detail texture asset root: %s\n"),
+        *ProductionDetailTextureAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party atlas sampler review material: %s\n"), *MaterialShaderParentRelativePath);
     OutSummary += FString::Printf(TEXT("Using first-party material instance review asset root: %s\n"), *MaterialInstanceReviewAssetRootRelativePath);
     OutSummary += FString::Printf(TEXT("Using production geospatial attachment ledger: %s\n"), *GeospatialAttachmentLedgerRelativePath);
@@ -15309,6 +15693,9 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"source_conditioned_material_zones_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_ao_roughness_height_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_normal_detail_image\": \"%s\",\n")
+            TEXT("      \"terrain_detail_albedo_image\": \"%s\",\n")
+            TEXT("      \"terrain_detail_normal_image\": \"%s\",\n")
+            TEXT("      \"terrain_detail_ao_roughness_height_image\": \"%s\",\n")
             TEXT("      \"elevation_sample\": \"%s\",\n")
             TEXT("      \"fidelity_note\": \"%s\",\n")
             TEXT("      \"first_party_material_instance_scene_assignment_status\": \"%s\"\n")
@@ -15345,6 +15732,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
                 GetSourceConditionedMaterialMapRelativePath(Spec.RiverId, TEXT("SourceConditionedAORoughnessHeight"))),
             *EscapeRaftSimJsonString(
                 GetSourceConditionedMaterialMapRelativePath(Spec.RiverId, TEXT("SourceConditionedNormalDetail"))),
+            *EscapeRaftSimJsonString(
+                GetProductionDetailTextureRelativePath(Spec.RiverId, TEXT("TerrainDetailAlbedo"))),
+            *EscapeRaftSimJsonString(
+                GetProductionDetailTextureRelativePath(Spec.RiverId, TEXT("TerrainDetailNormal"))),
+            *EscapeRaftSimJsonString(
+                GetProductionDetailTextureRelativePath(Spec.RiverId, TEXT("TerrainDetailAORoughnessHeight"))),
             *EscapeRaftSimJsonString(Spec.ElevationSample),
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(Spec)),
             *EscapeRaftSimJsonString(GetFirstPartyMaterialInstanceSceneAssignmentStatus()));
@@ -15359,11 +15752,14 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("  \"procedural_material_recipe_plan\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_atlas_manifest\": \"%s\",\n")
         TEXT("  \"source_conditioned_material_map_manifest\": \"%s\",\n")
+        TEXT("  \"production_detail_texture_manifest\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_candidate_manifest\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_asset_root\": \"%s\",\n")
         TEXT("  \"first_party_material_texture_asset_status\": \"%s\",\n")
         TEXT("  \"source_conditioned_material_texture_asset_root\": \"%s\",\n")
         TEXT("  \"source_conditioned_material_texture_asset_status\": \"%s\",\n")
+        TEXT("  \"production_detail_texture_asset_root\": \"%s\",\n")
+        TEXT("  \"production_detail_texture_asset_status\": \"%s\",\n")
         TEXT("  \"first_party_atlas_sampler_review_material\": \"%s\",\n")
         TEXT("  \"first_party_atlas_sampler_review_material_status\": \"%s\",\n")
         TEXT("  \"first_party_material_instance_review_asset_root\": \"%s\",\n")
@@ -15380,11 +15776,14 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         *EscapeRaftSimJsonString(ProceduralMaterialRecipePlanRelativePath),
         *EscapeRaftSimJsonString(MaterialTextureAtlasManifestRelativePath),
         *EscapeRaftSimJsonString(SourceConditionedMaterialMapManifestRelativePath),
+        *EscapeRaftSimJsonString(ProductionDetailTextureManifestRelativePath),
         *EscapeRaftSimJsonString(MaterialInstanceCandidateManifestRelativePath),
         *EscapeRaftSimJsonString(MaterialTextureAssetRootRelativePath),
         *EscapeRaftSimJsonString(GetFirstPartyMaterialTextureAssetStatus()),
         *EscapeRaftSimJsonString(SourceConditionedMaterialTextureAssetRootRelativePath),
         *EscapeRaftSimJsonString(GetSourceConditionedMaterialTextureAssetStatus()),
+        *EscapeRaftSimJsonString(ProductionDetailTextureAssetRootRelativePath),
+        *EscapeRaftSimJsonString(GetProductionDetailTextureAssetStatus()),
         *EscapeRaftSimJsonString(MaterialShaderParentRelativePath),
         *EscapeRaftSimJsonString(GetFirstPartyAtlasSampleReviewMaterialStatus()),
         *EscapeRaftSimJsonString(MaterialInstanceReviewAssetRootRelativePath),
@@ -15400,6 +15799,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         TEXT("%s environment preview capture manifest -> %s\n"),
         bSaved ? TEXT("Saved") : TEXT("Failed"),
         *ManifestPath);
+
+    if (FParse::Param(FCommandLine::Get(), TEXT("RaftSimSkipPhotorealFlowVariantCaptures")))
+    {
+        OutSummary += TEXT("Skipped flow-variant environment captures for this base-capture iteration.\n");
+        return bAllCaptured && bSaved;
+    }
 
     const FString FlowVariantCapturePlanRelativePath = GetPhotorealFlowVariantCapturePlanRelativePath();
     const FString FlowVariantCapturePlanAbsolutePath =
