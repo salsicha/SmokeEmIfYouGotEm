@@ -125,6 +125,9 @@ struct FRaftSimEnvironmentPreviewSpec
     float BendAmplitudeCm = 240.0f;
     float TerrainReliefAmplitudeCm = 0.0f;
     float HeightfieldPreviewAmplitudeCm = 0.0f;
+    float HeightfieldLocalReliefAmplitudeCm = 0.0f;
+    float HeightfieldSeamFeatherUv = 0.0f;
+    float TerrainNormalSofteningBlend = 0.45f;
     int32 BoulderCount = 18;
     int32 FoliageCount = 32;
     int32 FoamTrainCount = 12;
@@ -186,6 +189,31 @@ struct FRaftSimPreviewImage
         const int32 Y = FMath::Clamp(FMath::RoundToInt((1.0f - V) * static_cast<float>(Height - 1)), 0, Height - 1);
         const FLinearColor Sampled = Pixels[Y * Width + X];
         return FMath::Clamp(Sampled.R * 0.30f + Sampled.G * 0.59f + Sampled.B * 0.11f, 0.0f, 1.0f);
+    }
+
+    float SampleLumaBilinear(float U, float V) const
+    {
+        if (!IsValid())
+        {
+            return 0.5f;
+        }
+
+        const float PixelX = FMath::Clamp(U, 0.0f, 1.0f) * static_cast<float>(Width - 1);
+        const float PixelY = (1.0f - FMath::Clamp(V, 0.0f, 1.0f)) * static_cast<float>(Height - 1);
+        const int32 X0 = FMath::Clamp(FMath::FloorToInt(PixelX), 0, Width - 1);
+        const int32 Y0 = FMath::Clamp(FMath::FloorToInt(PixelY), 0, Height - 1);
+        const int32 X1 = FMath::Min(X0 + 1, Width - 1);
+        const int32 Y1 = FMath::Min(Y0 + 1, Height - 1);
+        const float FracX = PixelX - static_cast<float>(X0);
+        const float FracY = PixelY - static_cast<float>(Y0);
+        const auto LumaAt = [this](int32 X, int32 Y)
+        {
+            const FLinearColor& Pixel = Pixels[Y * Width + X];
+            return FMath::Clamp(Pixel.R * 0.30f + Pixel.G * 0.59f + Pixel.B * 0.11f, 0.0f, 1.0f);
+        };
+        const float Top = FMath::Lerp(LumaAt(X0, Y0), LumaAt(X1, Y0), FracX);
+        const float Bottom = FMath::Lerp(LumaAt(X0, Y1), LumaAt(X1, Y1), FracX);
+        return FMath::Lerp(Top, Bottom, FracY);
     }
 };
 
@@ -469,7 +497,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     SouthFork.BankWidthCm = 720.0f;
     SouthFork.BendAmplitudeCm = 290.0f;
     SouthFork.TerrainReliefAmplitudeCm = 180.0f;
-    SouthFork.HeightfieldPreviewAmplitudeCm = 115.0f;
+    SouthFork.HeightfieldPreviewAmplitudeCm = 620.0f;
+    SouthFork.HeightfieldLocalReliefAmplitudeCm = 620.0f;
+    SouthFork.HeightfieldSeamFeatherUv = 0.030f;
+    SouthFork.TerrainNormalSofteningBlend = 0.52f;
     SouthFork.BoulderCount = 24;
     SouthFork.FoliageCount = 36;
     SouthFork.FoamTrainCount = 14;
@@ -514,7 +545,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Colorado.BankWidthCm = 1500.0f;
     Colorado.BendAmplitudeCm = 360.0f;
     Colorado.TerrainReliefAmplitudeCm = 650.0f;
-    Colorado.HeightfieldPreviewAmplitudeCm = 360.0f;
+    Colorado.HeightfieldPreviewAmplitudeCm = 2200.0f;
+    Colorado.HeightfieldLocalReliefAmplitudeCm = 1500.0f;
+    Colorado.HeightfieldSeamFeatherUv = 0.035f;
+    Colorado.TerrainNormalSofteningBlend = 0.38f;
     Colorado.BoulderCount = 20;
     Colorado.FoliageCount = 16;
     Colorado.FoamTrainCount = 9;
@@ -559,7 +593,10 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.BankWidthCm = 680.0f;
     Pacuare.BendAmplitudeCm = 340.0f;
     Pacuare.TerrainReliefAmplitudeCm = 420.0f;
-    Pacuare.HeightfieldPreviewAmplitudeCm = 260.0f;
+    Pacuare.HeightfieldPreviewAmplitudeCm = 1500.0f;
+    Pacuare.HeightfieldLocalReliefAmplitudeCm = 1050.0f;
+    Pacuare.HeightfieldSeamFeatherUv = 0.035f;
+    Pacuare.TerrainNormalSofteningBlend = 0.42f;
     Pacuare.BoulderCount = 22;
     Pacuare.FoliageCount = 62;
     Pacuare.FoamTrainCount = 16;
@@ -3589,7 +3626,7 @@ FLinearColor BlendPreviewSoftTerrainPatchColor(
 
 float GetPreviewTerrainNormalSofteningBlend(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    return Spec.bDesertCanyon ? 0.62f : (Spec.bHasWaterfalls ? 0.74f : 0.70f);
+    return Spec.TerrainNormalSofteningBlend;
 }
 
 void SoftenPreviewTerrainNormals(TArray<FVector>& Normals, float UpBlend)
@@ -3692,12 +3729,58 @@ float SamplePreviewHeightfieldCm(
     const float U = FMath::Clamp((X - MinX) / (MaxX - MinX), 0.0f, 1.0f);
     const float V = FMath::Clamp((Y + HalfWidth) / (HalfWidth * 2.0f), 0.0f, 1.0f);
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
+    const auto SampleSeamFeatheredLuma = [HeightfieldPreview, &Spec](float SampleU, float SampleV)
+    {
+        const float Feather = FMath::Clamp(Spec.HeightfieldSeamFeatherUv, 0.0f, 0.12f);
+        const auto SampleAcrossU = [HeightfieldPreview, Feather](float UValue, float VValue)
+        {
+            const float DistanceToSeam = FMath::Abs(UValue - 0.5f);
+            if (Feather <= KINDA_SMALL_NUMBER || DistanceToSeam >= Feather)
+            {
+                return HeightfieldPreview->SampleLumaBilinear(UValue, VValue);
+            }
+
+            const float Left = HeightfieldPreview->SampleLumaBilinear(0.5f - Feather, VValue);
+            const float Right = HeightfieldPreview->SampleLumaBilinear(0.5f + Feather, VValue);
+            return FMath::Lerp(Left, Right, FMath::Clamp((UValue - (0.5f - Feather)) / (2.0f * Feather), 0.0f, 1.0f));
+        };
+
+        const float DistanceToVSeam = FMath::Abs(SampleV - 0.5f);
+        if (Feather <= KINDA_SMALL_NUMBER || DistanceToVSeam >= Feather)
+        {
+            return SampleAcrossU(SampleU, SampleV);
+        }
+
+        const float Lower = SampleAcrossU(SampleU, 0.5f - Feather);
+        const float Upper = SampleAcrossU(SampleU, 0.5f + Feather);
+        return FMath::Lerp(Lower, Upper, FMath::Clamp((SampleV - (0.5f - Feather)) / (2.0f * Feather), 0.0f, 1.0f));
+    };
     const float HeightfieldMask = SmoothPreviewStep(
-        ActiveRiverHalfWidth + 180.0f,
-        ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 1450.0f : 820.0f),
+        ActiveRiverHalfWidth + 45.0f,
+        ActiveRiverHalfWidth + Spec.BankWidthCm + (Spec.bDesertCanyon ? 920.0f : 560.0f),
         ChannelOffset);
-    const float RidgePattern = (HeightfieldPreview->SampleLuma(U, V) - 0.5f) * Spec.HeightfieldPreviewAmplitudeCm;
-    return RidgePattern * HeightfieldMask;
+    const float SourceHeight = SampleSeamFeatheredLuma(U, V);
+    const float FineRadiusU = 4.0f / static_cast<float>(FMath::Max(1, HeightfieldPreview->Width - 1));
+    const float FineRadiusV = 4.0f / static_cast<float>(FMath::Max(1, HeightfieldPreview->Height - 1));
+    const float BroadRadiusU = FineRadiusU * 3.5f;
+    const float BroadRadiusV = FineRadiusV * 3.5f;
+    const float FineMean = 0.25f * (
+        SampleSeamFeatheredLuma(U - FineRadiusU, V) +
+        SampleSeamFeatheredLuma(U + FineRadiusU, V) +
+        SampleSeamFeatheredLuma(U, V - FineRadiusV) +
+        SampleSeamFeatheredLuma(U, V + FineRadiusV));
+    const float BroadMean = 0.25f * (
+        SampleSeamFeatheredLuma(U - BroadRadiusU, V) +
+        SampleSeamFeatheredLuma(U + BroadRadiusU, V) +
+        SampleSeamFeatheredLuma(U, V - BroadRadiusV) +
+        SampleSeamFeatheredLuma(U, V + BroadRadiusV));
+    const float SourceLocalRelief = FMath::Clamp(
+        (SourceHeight - FineMean) * 0.62f + (SourceHeight - BroadMean) * 0.38f,
+        -0.12f,
+        0.12f);
+    const float MacroReliefCm = (SourceHeight - 0.5f) * Spec.HeightfieldPreviewAmplitudeCm;
+    const float LocalReliefCm = SourceLocalRelief * Spec.HeightfieldLocalReliefAmplitudeCm;
+    return (MacroReliefCm + LocalReliefCm) * HeightfieldMask;
 }
 
 float SamplePreviewBankUndercutShelfReliefCm(
@@ -13413,7 +13496,7 @@ FString GetPreviewFlowVariantCaptureRelativePath(const FRaftSimEnvironmentPrevie
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; first-party generated close-range terrain albedo, normal, and packed AO/roughness/height detail textures now use dedicated per-river tiled UV scale and bounded terrain-only blends beneath the corridor-scale source drape; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; all detail assets remain candidate-only until capture, art, guide/geospatial, hazard readability, rights/provenance, and desktop/VR performance review pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; first-party generated close-range terrain albedo, normal, and packed AO/roughness/height detail textures now use dedicated per-river tiled UV scale and bounded terrain-only blends beneath the corridor-scale source drape; source DEM/heightfield geometry uses bilinear sampling, bounded center-seam feathering, meter-scale macro relief, multi-scale local erosion residuals, and reduced normal flattening as the authoritative preview terrain mesh; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; all detail assets and source-derived terrain remain candidate-only until CRS/vertical-datum conditioning, channel burning, capture, art, guide/geospatial, hazard readability, rights/provenance, and desktop/VR performance review pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -15687,6 +15770,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"aerial_drape_image\": \"%s\",\n")
             TEXT("      \"terrain_relief_image\": \"%s\",\n")
             TEXT("      \"heightfield_preview_image\": \"%s\",\n")
+            TEXT("      \"source_terrain_macro_amplitude_cm\": %.3f,\n")
+            TEXT("      \"source_terrain_local_relief_amplitude_cm\": %.3f,\n")
+            TEXT("      \"source_terrain_seam_feather_uv\": %.5f,\n")
+            TEXT("      \"source_terrain_normal_softening_blend\": %.3f,\n")
             TEXT("      \"water_mask_image\": \"%s\",\n")
             TEXT("      \"vegetation_mask_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_macro_albedo_image\": \"%s\",\n")
@@ -15722,6 +15809,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(Spec.AerialDrapeImage),
             *EscapeRaftSimJsonString(Spec.TerrainReliefImage),
             *EscapeRaftSimJsonString(Spec.HeightfieldPreviewImage),
+            Spec.HeightfieldPreviewAmplitudeCm,
+            Spec.HeightfieldLocalReliefAmplitudeCm,
+            Spec.HeightfieldSeamFeatherUv,
+            Spec.TerrainNormalSofteningBlend,
             *EscapeRaftSimJsonString(Spec.WaterMaskImage),
             *EscapeRaftSimJsonString(Spec.VegetationMaskImage),
             *EscapeRaftSimJsonString(
@@ -15895,6 +15986,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"guide_seat_capture\": \"%s\",\n")
             TEXT("      \"river_eye_capture\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
+            TEXT("      \"source_terrain_macro_amplitude_cm\": %.3f,\n")
+            TEXT("      \"source_terrain_local_relief_amplitude_cm\": %.3f,\n")
+            TEXT("      \"source_terrain_seam_feather_uv\": %.5f,\n")
+            TEXT("      \"source_terrain_normal_softening_blend\": %.3f,\n")
             TEXT("      \"fidelity_note\": \"%s\"\n")
             TEXT("    }"),
             VariantIndex == 0 ? TEXT("") : TEXT(",\n"),
@@ -15915,6 +16010,10 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             *EscapeRaftSimJsonString(GuideSeatVariantCapturePath),
             *EscapeRaftSimJsonString(RiverEyeVariantCapturePath),
             bGuideSeatVariantCaptured && bRiverEyeVariantCaptured ? TEXT("captured_band_named_flow_variant_preview_renders") : TEXT("capture_failed"),
+            VariantSpec.HeightfieldPreviewAmplitudeCm,
+            VariantSpec.HeightfieldLocalReliefAmplitudeCm,
+            VariantSpec.HeightfieldSeamFeatherUv,
+            VariantSpec.TerrainNormalSofteningBlend,
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(VariantSpec)));
     }
 
