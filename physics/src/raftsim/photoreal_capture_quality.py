@@ -1075,7 +1075,7 @@ def build_photoreal_environment_performance_review(
                 "static_inventory": _capture_static_inventory(repo_root, river, capture_reviews),
                 "profiles": profiles,
                 "current_decision": (
-                    "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture "
+                    "Use this row to attach measured desktop and VR profiling for the current capture "
                     "candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable "
                     "until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
                 ),
@@ -1432,7 +1432,7 @@ def _capture_handoff_entry(
 
 
 def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "2026-07-08") -> dict:
-    """Build the human-review handoff for zero-blocker photoreal capture candidates."""
+    """Build the human-review handoff for the current photoreal capture set."""
 
     capture_manifest = _read_json_if_present(repo_root, CAPTURE_MANIFEST_RELATIVE_PATH)
     capture_quality_review = build_capture_quality_review(repo_root, generated_on=generated_on)
@@ -1469,6 +1469,20 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
             if not capture_review.get("blockers"):
                 candidate_capture_count += 1
             captures.append(_capture_handoff_entry(river_id, view_id, capture_path, capture_review))
+        river_blocker_count = sum(1 for capture in captures if capture["automated_blockers"])
+        if river_blocker_count:
+            current_decision = (
+                "Automated capture-quality blockers remain for this river's current guide-seat and river-eye "
+                "captures, so these images are preview-only and not zero-blocker human lifelike candidates yet. "
+                "Human-review, rights, production-material, hazard-readability, geospatial, guide, and "
+                "performance gates also remain open."
+            )
+        else:
+            current_decision = (
+                "Automated blockers are clear for this river's current guide-seat and river-eye captures, "
+                "but lifelike approval is withheld until every open human-review, rights, production-material, "
+                "hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+            )
 
         rivers.append(
             {
@@ -1509,15 +1523,24 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
                 "open_review_gates": _open_review_gates(),
                 "visual_replacement_targets": visual_replacement_targets,
                 "fidelity_note": river.get("fidelity_note"),
-                "current_decision": (
-                    "Automated blockers are clear for this river's current guide-seat and river-eye captures, "
-                    "but lifelike approval is withheld until every open human-review, rights, production-material, "
-                    "hazard-readability, geospatial, guide, and performance gate records accepted evidence."
-                ),
+                "current_decision": current_decision,
             }
         )
 
     blocking_gate_count = len(rivers) * len(review_domains)
+    automated_blocking_capture_count = capture_quality_review["summary"]["blocking_capture_count"]
+    if automated_blocking_capture_count:
+        current_decision = (
+            "Use this handoff to drive automated blocker cleanup plus the next human art, guide, geospatial, "
+            "rights, hazard-readability, production-material, and performance review pass. Capture-quality "
+            "blockers remain, so no river is approved as lifelike or production-playable by this artifact."
+        )
+    else:
+        current_decision = (
+            "Use this handoff to drive the next human art, guide, geospatial, rights, hazard-readability, "
+            "production-material, and performance review pass. The zero-blocker captures are review candidates only; "
+            "no river is approved as lifelike or production-playable by this artifact."
+        )
     return {
         "schema": "raftsim.unreal.photoreal_human_lifelike_review_handoff.v1",
         "generated_on": generated_on,
@@ -1538,7 +1561,7 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
             "river_count": len(rivers),
             "capture_count": len(capture_quality_review["captures"]),
             "candidate_capture_count": candidate_capture_count,
-            "automated_blocking_capture_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "automated_blocking_capture_count": automated_blocking_capture_count,
             "human_approved_capture_count": 0,
             "open_human_review_gate_count": blocking_gate_count,
             "per_river": {
@@ -1553,11 +1576,7 @@ def build_human_lifelike_review_handoff(repo_root: Path, generated_on: str = "20
         },
         "review_domains": review_domains,
         "rivers": rivers,
-        "current_decision": (
-            "Use this handoff to drive the next human art, guide, geospatial, rights, hazard-readability, "
-            "production-material, and performance review pass. The zero-blocker captures are review candidates only; "
-            "no river is approved as lifelike or production-playable by this artifact."
-        ),
+        "current_decision": current_decision,
     }
 
 
@@ -1606,6 +1625,20 @@ def build_flow_variant_human_lifelike_review_handoff(
             handoff_capture["flow_band_id"] = flow_band_id
             handoff_capture["flow_band_display_name"] = variant.get("flow_band_display_name")
             captures.append(handoff_capture)
+        variant_blocker_count = sum(1 for capture in captures if capture["automated_blockers"])
+        if variant_blocker_count:
+            current_decision = (
+                "Automated capture-quality blockers remain for this flow variant's guide-seat and river-eye "
+                "captures, so the variant is preview-only and not a zero-blocker human lifelike candidate yet. "
+                "Guide/art/geospatial, rights, hazard and rescue readability, solver/forcing nonmasking, "
+                "production-material, and performance gates also remain open."
+            )
+        else:
+            current_decision = (
+                "Automated blockers are clear for this flow variant's guide-seat and river-eye captures, but "
+                "the variant is not lifelike or gameplay-approved until guide/art/geospatial, rights, hazard "
+                "and rescue readability, solver/forcing nonmasking, production-material, and performance gates pass."
+            )
 
         variants.append(
             {
@@ -1632,11 +1665,7 @@ def build_flow_variant_human_lifelike_review_handoff(
                 "open_review_gates": _open_review_gates(),
                 "visual_replacement_targets": visual_replacement_targets,
                 "fidelity_note": variant.get("fidelity_note"),
-                "current_decision": (
-                    "Automated blockers are clear for this flow variant's guide-seat and river-eye captures, but "
-                    "the variant is not lifelike or gameplay-approved until guide/art/geospatial, rights, hazard "
-                    "and rescue readability, solver/forcing nonmasking, production-material, and performance gates pass."
-                ),
+                "current_decision": current_decision,
             }
         )
 
@@ -1656,6 +1685,20 @@ def build_flow_variant_human_lifelike_review_handoff(
         row["open_review_gate_count"] = int(row["open_review_gate_count"]) + len(variant["open_review_gates"])
 
     blocking_gate_count = len(variants) * len(review_domains)
+    automated_blocking_capture_count = capture_quality_review["summary"]["blocking_capture_count"]
+    if automated_blocking_capture_count:
+        current_decision = (
+            "Use this handoff to clean up automated blockers and then review each flow state separately. The "
+            "current band-named captures are preview-only and not zero-blocker candidates; no low/high/release/"
+            "rain/flash variant is lifelike or gameplay-approved until every human, rights, hazard, solver/"
+            "forcing, production-material, and performance gate records accepted evidence."
+        )
+    else:
+        current_decision = (
+            "Use this handoff to review each flow state separately. The current band-named captures are automated "
+            "zero-blocker candidates only; no low/high/release/rain/flash variant is lifelike or gameplay-approved "
+            "until every human, rights, hazard, solver/forcing, production-material, and performance gate records accepted evidence."
+        )
     return {
         "schema": "raftsim.unreal.photoreal_flow_variant_human_lifelike_review_handoff.v1",
         "generated_on": generated_on,
@@ -1677,18 +1720,14 @@ def build_flow_variant_human_lifelike_review_handoff(
             "variant_count": len(variants),
             "capture_count": capture_quality_review["summary"]["capture_count"],
             "candidate_capture_count": candidate_capture_count,
-            "automated_blocking_capture_count": capture_quality_review["summary"]["blocking_capture_count"],
+            "automated_blocking_capture_count": automated_blocking_capture_count,
             "human_approved_variant_count": 0,
             "open_human_review_gate_count": blocking_gate_count,
             "per_river": dict(sorted(per_river.items())),
         },
         "review_domains": review_domains,
         "variants": variants,
-        "current_decision": (
-            "Use this handoff to review each flow state separately. The current band-named captures are automated "
-            "zero-blocker candidates only; no low/high/release/rain/flash variant is lifelike or gameplay-approved "
-            "until every human, rights, hazard, solver/forcing, production-material, and performance gate records accepted evidence."
-        ),
+        "current_decision": current_decision,
     }
 
 
@@ -1740,8 +1779,9 @@ def build_human_lifelike_review_packet_markdown(repo_root: Path, generated_on: s
         f"Status: `{handoff['status']}`",
         "",
         (
-            "This packet is for human review of the current zero-blocker Unreal capture candidates. "
-            "The images are not approved as lifelike or production-ready until every review domain below has accepted evidence."
+            "This packet is for human review of the current Unreal capture set. The images are not approved as "
+            "lifelike or production-ready until automated capture blockers are cleared and every review domain below "
+            "has accepted evidence."
         ),
         "",
         "Source artifacts:",

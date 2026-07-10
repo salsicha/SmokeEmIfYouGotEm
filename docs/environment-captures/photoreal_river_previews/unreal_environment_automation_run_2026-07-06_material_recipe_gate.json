@@ -146,6 +146,8 @@
     "first_party_photographic_water_exposure_calibration": true,
     "first_party_near_field_water_surface_grain": true,
     "first_party_near_camera_water_macro_ripple_mottle": true,
+    "first_party_near_camera_bottom_center_water_wedge_demotion": true,
+    "first_party_near_camera_upstream_water_capture_apron": true,
     "first_party_base_water_depth_current_grading": true,
     "first_party_base_water_flow_thread_texture": true,
     "first_party_base_water_center_guide_stripe_breakup": true,
@@ -328,13 +330,13 @@
     "Saved guide-seat and river-eye captures for South Fork American, Colorado River Grand Canyon, and Pacuare River Rainforest.",
     "Environment preview capture manifest saved successfully.",
     "Created 18 first-party review-only Material Instance Constant assets under unreal/Content/RaftSim/Materials/MaterialInstances from first_party_material_instance_candidates.json; production material promotion remains open.",
-    "Assigned review-only MI_RaftSim_*_AtlasCandidate material instances to saved preview-map durable terrain, water, boulder, foliage, and raft proxy surfaces; this exercises the Unreal material handoff but does not promote captures to lifelike evidence."
+    "Assigned review-only MI_RaftSim_*_AtlasCandidate material instances to saved preview-map durable terrain, water, boulder, and foliage surfaces; raft/oar proxy materials remain available for future production foreground art, but regenerated lifelike-candidate maps skip placeholder raft/oar proxy generation."
   ],
   "current_decision": "This run validates the rebuilt editor module and refreshed preview assets after the material recipe gate, including creation of nine review-only first-party atlas Texture2D assets, the M_RaftSim_AtlasSampleReview parent material with albedo/normal/AO/roughness/height sampler wiring plus PreviewColor, VertexColorWeight, and RoughnessFloor controls, 18 review-only material instance candidates parented to that graph, and saved preview-map durable surface assignment to those review MICs. The captures remain preview-only and not lifelike until production material promotion, guide/geospatial review, hazard readability, and performance gates pass.",
   "notes": [
     "Created 9 first-party review-only Texture2D atlas assets under unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures and bound them to the 18 MI_RaftSim_*_AtlasCandidate review material instances; production material promotion remains open.",
     "Created M_RaftSim_AtlasSampleReview as a review-only parent material that samples AlbedoAtlas, NormalAtlas, and AORoughnessHeightAtlas through AtlasTileOriginScale, AtlasBlendWeight, NormalIntensity, RoughnessScale, and HeightScale; production material promotion remains open.",
-    "Assigned the review-only material instances to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; this is material handoff evidence, not lifelike art approval.",
+    "Assigned the review-only material instances to durable terrain, water, boulder, and foliage surfaces in the saved preview maps; raft/oar proxy materials remain available for future production foreground art, but regenerated lifelike-candidate maps skip placeholder raft/oar proxy generation.",
     "Post-capture quality review records all six current captures as preview-only with low-detail/proxy blockers; this blocks lifelike screenshot approval until visual replacement work clears the metrics and human review."
   ],
   "post_capture_quality_review": {

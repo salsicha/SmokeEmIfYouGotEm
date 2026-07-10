@@ -17,8 +17,8 @@
   "summary": {
     "river_count": 3,
     "capture_count": 6,
-    "candidate_capture_count": 6,
-    "automated_blocking_capture_count": 0,
+    "candidate_capture_count": 0,
+    "automated_blocking_capture_count": 6,
     "human_approved_capture_count": 0,
     "open_human_review_gate_count": 21,
     "per_river": {
@@ -150,9 +150,17 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
-          "sha256": "6e8c94658e1d3d53506bc45df7d070e055047144598d1bc8d95b0f62fc806448",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "b4c5a5d79cb4de3967edd9b49248f70e391a35fac024cb171759bc58bc33651d",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.61,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -163,18 +171,18 @@
               720
             ],
             "rgb_mean": [
-              75.41,
-              121.62,
-              90.84
+              66.66,
+              119.97,
+              87.69
             ],
-            "luma_mean": 109.57,
-            "luma_std": 50.74,
-            "edge_density": 0.1235,
-            "low_gradient_fraction": 0.1807,
-            "quantized_entropy_bits": 4.72,
-            "quantized_color_count": 84,
-            "flat_blue_field_fraction": 0.0556,
-            "bottom_center_dark_fraction": 0.0019
+            "luma_mean": 106.31,
+            "luma_std": 47.56,
+            "edge_density": 0.0599,
+            "low_gradient_fraction": 0.2259,
+            "quantized_entropy_bits": 3.61,
+            "quantized_color_count": 70,
+            "flat_blue_field_fraction": 0.0553,
+            "bottom_center_dark_fraction": 0.0
           },
           "human_review_status": "not_reviewed",
           "required_capture_checks": [
@@ -190,9 +198,17 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-          "sha256": "78c9db61c02800f6be6052bdd8b58a7d5811ce0ea70eab7a7eaadfed5463e655",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "6e846309e2ba7e2ef6d45ca52c588b19c84aabca0bdcba378df7df54ace31fca",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.75,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -203,18 +219,18 @@
               720
             ],
             "rgb_mean": [
-              73.95,
-              118.49,
-              89.21
+              66.85,
+              118.17,
+              87.77
             ],
-            "luma_mean": 106.9,
-            "luma_std": 53.23,
-            "edge_density": 0.1342,
-            "low_gradient_fraction": 0.1711,
-            "quantized_entropy_bits": 4.69,
-            "quantized_color_count": 81,
-            "flat_blue_field_fraction": 0.0642,
-            "bottom_center_dark_fraction": 0.0053
+            "luma_mean": 105.06,
+            "luma_std": 49.57,
+            "edge_density": 0.0687,
+            "low_gradient_fraction": 0.2181,
+            "quantized_entropy_bits": 3.75,
+            "quantized_color_count": 74,
+            "flat_blue_field_fraction": 0.064,
+            "bottom_center_dark_fraction": 0.0
           },
           "human_review_status": "not_reviewed",
           "required_capture_checks": [
@@ -453,8 +469,8 @@
           ]
         }
       ],
-      "fidelity_note": "stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; guide-seat and river-eye capture exports cull review-only foreground raft/oar proxies until approved production foreground art exists, so lifelike-candidate screenshots judge the river corridor instead of placeholder gameplay props; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
-      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+      "fidelity_note": "stitched South Fork production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into bank and valley preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, first-party biome foliage silhouette cards, dense layered riparian canopy/understory proxy clusters, first-party instanced procedural foliage-equivalent canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, foliage, understory, mask-aware ground-cover cards, disabled guide-seat raft/oar foreground proxy hooks, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, hydrologic conditioning, channel burning, masks, and guide/geospatial approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated capture-quality blockers remain for this river's current guide-seat and river-eye captures, so these images are preview-only and not zero-blocker human lifelike candidates yet. Human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gates also remain open."
     },
     {
       "river_id": "colorado_river",
@@ -491,9 +507,17 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
-          "sha256": "5d83666d2b26bee2fac98f6f06701ba36d5d1a902d50df43f591e4a8bdbb2a95",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "f0dc2402a11b400b449b8c6755a39035d08c5847073157cc6cbf0108d3de24e1",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.16,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -504,18 +528,18 @@
               720
             ],
             "rgb_mean": [
-              133.48,
-              113.43,
-              71.47
+              131.61,
+              110.54,
+              73.5
             ],
-            "luma_mean": 114.66,
-            "luma_std": 44.5,
-            "edge_density": 0.1308,
-            "low_gradient_fraction": 0.1706,
-            "quantized_entropy_bits": 4.55,
-            "quantized_color_count": 85,
+            "luma_mean": 112.34,
+            "luma_std": 37.95,
+            "edge_density": 0.0519,
+            "low_gradient_fraction": 0.2274,
+            "quantized_entropy_bits": 3.16,
+            "quantized_color_count": 68,
             "flat_blue_field_fraction": 0.0035,
-            "bottom_center_dark_fraction": 0.0317
+            "bottom_center_dark_fraction": 0.0
           },
           "human_review_status": "not_reviewed",
           "required_capture_checks": [
@@ -531,9 +555,17 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-          "sha256": "a28dae8934610fd845360a0b9dbc66b225ff88163d1a68b43c99382a03180502",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "48f0bbe0bf402cd52f143ee81629b8bfca342e812bda5bfdb24485c7297568fc",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.83,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -544,16 +576,16 @@
               720
             ],
             "rgb_mean": [
-              132.32,
-              112.41,
-              72.16
+              129.48,
+              109.55,
+              73.08
             ],
-            "luma_mean": 113.73,
-            "luma_std": 45.85,
-            "edge_density": 0.1306,
-            "low_gradient_fraction": 0.1612,
-            "quantized_entropy_bits": 4.59,
-            "quantized_color_count": 90,
+            "luma_mean": 111.16,
+            "luma_std": 42.64,
+            "edge_density": 0.0621,
+            "low_gradient_fraction": 0.2131,
+            "quantized_entropy_bits": 3.83,
+            "quantized_color_count": 76,
             "flat_blue_field_fraction": 0.0204,
             "bottom_center_dark_fraction": 0.0
           },
@@ -797,8 +829,8 @@
           ]
         }
       ],
-      "fidelity_note": "stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, refined guide-seat raft/oar foreground proxies, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; guide-seat and river-eye capture exports cull review-only foreground raft/oar proxies until approved production foreground art exists, so lifelike-candidate screenshots judge the river corridor instead of placeholder gameplay props; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
-      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+      "fidelity_note": "stitched Colorado/Lees Ferry production-import pilot source drape generated from four official USDA/APFO NAIP 2048px tiles, plus stitched USGS 3DEP pilot DEM relief and a review-gated 2017px heightfield candidate sampled into canyon bank preview geometry; pilot source water/vegetation masks are sampled into terrain color, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/sediment facets, biome-specific sparse deadfall/grass/root ecology props, first-party sparse desert scrub silhouettes, sparse desert riparian thicket proxy clusters, first-party instanced procedural desert-thicket/trunk scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party foliage crown depth and leaflet breakup, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, deterministic wet-rock, talus, sparse scrub, boulder placement, mask-aware canyon ground-cover cards, disabled guide-seat raft/oar foreground proxy hooks, river-specific atmospheric backdrop cards, and source-aware sky-gradient/depth layers; all pilot derivatives remain review-gated until metadata review, mosaic/clip, river-mile stationing, hydrologic conditioning, release-aware masks, and guide/oarsman approval pass; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated capture-quality blockers remain for this river's current guide-seat and river-eye captures, so these images are preview-only and not zero-blocker human lifelike candidates yet. Human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gates also remain open."
     },
     {
       "river_id": "pacuare",
@@ -835,9 +867,17 @@
         {
           "view_id": "guide_seat_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
-          "sha256": "4ff47f4dacdfb45722dc66ca6fad90daa1fd4d6927beae8665f05f69c075083e",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "d5db3d779e6b06a9fb63045cc44d56aac4494c8829064e029a85f24cb82c194f",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.2,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -848,18 +888,18 @@
               720
             ],
             "rgb_mean": [
-              47.41,
-              110.21,
-              67.35
+              30.91,
+              109.73,
+              66.42
             ],
-            "luma_mean": 93.76,
-            "luma_std": 42.45,
-            "edge_density": 0.1231,
-            "low_gradient_fraction": 0.1753,
-            "quantized_entropy_bits": 4.5,
-            "quantized_color_count": 79,
-            "flat_blue_field_fraction": 0.0306,
-            "bottom_center_dark_fraction": 0.0012
+            "luma_mean": 89.84,
+            "luma_std": 37.95,
+            "edge_density": 0.0572,
+            "low_gradient_fraction": 0.2226,
+            "quantized_entropy_bits": 3.2,
+            "quantized_color_count": 68,
+            "flat_blue_field_fraction": 0.0302,
+            "bottom_center_dark_fraction": 0.0
           },
           "human_review_status": "not_reviewed",
           "required_capture_checks": [
@@ -875,9 +915,17 @@
         {
           "view_id": "river_eye_downstream",
           "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
-          "sha256": "2c84961530ee2c5f9efcb4c18763fc7ac52908f15650c47a6085897f9827166d",
-          "automated_status": "candidate_for_human_lifelike_review_not_approved",
-          "automated_blockers": [],
+          "sha256": "f292eab7d33f8c812ccb6c0239396118f9e92ab3b56285e8c1c28204517df88b",
+          "automated_status": "preview_only_not_lifelike_quality_blockers",
+          "automated_blockers": [
+            {
+              "id": "low_color_texture_entropy",
+              "metric": "quantized_entropy_bits",
+              "value": 3.35,
+              "threshold": 4.4,
+              "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+            }
+          ],
           "metrics": {
             "analysis_size": [
               320,
@@ -888,18 +936,18 @@
               720
             ],
             "rgb_mean": [
-              46.86,
-              106.69,
-              64.36
+              32.22,
+              107.58,
+              65.9
             ],
-            "luma_mean": 90.91,
-            "luma_std": 45.28,
-            "edge_density": 0.1337,
-            "low_gradient_fraction": 0.1719,
-            "quantized_entropy_bits": 4.44,
-            "quantized_color_count": 77,
-            "flat_blue_field_fraction": 0.0364,
-            "bottom_center_dark_fraction": 0.0029
+            "luma_mean": 88.55,
+            "luma_std": 40.62,
+            "edge_density": 0.0653,
+            "low_gradient_fraction": 0.2199,
+            "quantized_entropy_bits": 3.35,
+            "quantized_color_count": 66,
+            "flat_blue_field_fraction": 0.0359,
+            "bottom_center_dark_fraction": 0.0
           },
           "human_review_status": "not_reviewed",
           "required_capture_checks": [
@@ -1140,9 +1188,9 @@
           ]
         }
       ],
-      "fidelity_note": "review-gated Pacuare Sentinel-augmented preview calibration drape generated from the coarse NASA GIBS/Copernicus 4096px placeholder plus low-opacity March 20 2025 Sentinel bbox clip color/detail; this is an Unreal preview input only, not a production source-drape replacement, route imagery claim, mask source, photoreal material source, or lifelike evidence; DEM relief, heightfield, and masks remain the production-import derivative placeholders until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, refined guide-seat raft/oar foreground proxies, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, foliage, and raft/oar vertex colors, while river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are still assigned to durable terrain, water, boulder, foliage, and raft proxy surfaces in the saved preview maps; guide-seat and river-eye capture exports cull review-only foreground raft/oar proxies until approved production foreground art exists, so lifelike-candidate screenshots judge the river corridor instead of placeholder gameplay props; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
-      "current_decision": "Automated blockers are clear for this river's current guide-seat and river-eye captures, but lifelike approval is withheld until every open human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gate records accepted evidence."
+      "fidelity_note": "review-gated Pacuare Sentinel-augmented preview calibration drape generated from the coarse NASA GIBS/Copernicus 4096px placeholder plus low-opacity March 20 2025 Sentinel bbox clip color/detail; this is an Unreal preview input only, not a production source-drape replacement, route imagery claim, mask source, photoreal material source, or lifelike evidence; DEM relief, heightfield, and masks remain the production-import derivative placeholders until higher-resolution cloud-screened imagery, local hydrology/hydrography, protected-area review, and guide/outfitter validation are attached; first-party procedural rainforest leaf-litter, wet-rock, talus, mist, source-aware terrain photo mottle/microrelief, source-conditioned far-bank albedo/microrelief calibration, first-party photographic color-grade palette compression, broad-slope terrain exposure fill and relief, source-aware macro terrain ridge/facet relief, source-aware terrain slope facet texture, first-party source-aware terrain surface granularity, source-aware riparian canopy mass texture, minimized source overlay plate artifacts, graphic waterline ribbon demotion, remaining water overlay slab demotion, long dark water streak demotion, current streak and waterline rail artifact demotion, central water scaffold plate demotion, base-water center guide-stripe breakup, base-water cross-channel breakup, base-water residual center-seam erase, dark micro-ripple artifact demotion, source-aware bank breakup patches, first-party source-masked bank/bar microgeometry, first-party near-field riverbed pebble/debris dressing, first-party irregular shoreline edge breakup, first-party source-masked shoreline lip/overhang edge breakup, first-party terrain material layer facets, first-party Landscape/Nanite material scaffold microfacets/strata/slope occlusion, first-party terrain erosion-rill/bank-gully strips, source-aware boulder wetness/abrasion/moss facets, biome-specific deadfall/log/grass/root ecology props, rainforest canopy/vine silhouette cards, dense layered rainforest canopy/understory proxy clusters, first-party instanced procedural rainforest canopy/trunk/understory scaffold, first-party procedural-only foliage review path with stylized PCG sample tree meshes disabled, first-party procedural canopy height and massing profile, first-party procedural canopy tone compression and shadow profile, first-party foliage card/canopy artifact demotion, square foliage/source-card artifact demotion, remaining square card cull, first-party organic branch/frond lattice foliage, first-party fine twig canopy lace foliage, first-party foliage crown depth and leaflet breakup, waterfall curtain/plunge-mist proxy layers, lit water variation, first-party lit water normal-response scaffold, base-water flow-thread texture, flow-cued water foam/slick mottle, flow-dependent hydraulic aeration/spray mats and beads, flow-band depth texture ribbons, flow-aware surface chop/turbidity patches, turbidity-depth patch artifact demotion, first-party water shader depth/reflection/refraction scaffold, source-aware shallow-water clarity/aeration layers, dense mask-aware ground-cover/canopy cards, disabled guide-seat raft/oar foreground proxy hooks, humid atmospheric backdrop cards, and source-aware sky-gradient/depth layers remain rights-safe proxy dressing; rocks, foliage, water, foam, raft, and lighting still include first-party procedural proxy layers; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; atlas use remains preview-only until production material promotion, guide/geospatial review, hazard readability review, and desktop/VR performance evidence pass",
+      "current_decision": "Automated capture-quality blockers remain for this river's current guide-seat and river-eye captures, so these images are preview-only and not zero-blocker human lifelike candidates yet. Human-review, rights, production-material, hazard-readability, geospatial, guide, and performance gates also remain open."
     }
   ],
-  "current_decision": "Use this handoff to drive the next human art, guide, geospatial, rights, hazard-readability, production-material, and performance review pass. The zero-blocker captures are review candidates only; no river is approved as lifelike or production-playable by this artifact."
+  "current_decision": "Use this handoff to drive automated blocker cleanup plus the next human art, guide, geospatial, rights, hazard-readability, production-material, and performance review pass. Capture-quality blockers remain, so no river is approved as lifelike or production-playable by this artifact."
 }

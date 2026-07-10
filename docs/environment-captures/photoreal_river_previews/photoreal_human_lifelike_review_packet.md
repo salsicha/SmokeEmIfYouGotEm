@@ -4,7 +4,7 @@ Generated on: `2026-07-08`
 
 Status: `awaiting_human_lifelike_review_not_approved`
 
-This packet is for human review of the current zero-blocker Unreal capture candidates. The images are not approved as lifelike or production-ready until every review domain below has accepted evidence.
+This packet is for human review of the current Unreal capture set. The images are not approved as lifelike or production-ready until automated capture blockers are cleared and every review domain below has accepted evidence.
 
 Source artifacts:
 
@@ -94,8 +94,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![american_south_fork guide_seat_downstream](american_south_fork_guide_seat_downstream.png) | 4.72 | 0.1235 | 0.1807 | 50.74 | `not_reviewed` |
-| `river_eye_downstream` | ![american_south_fork river_eye_downstream](american_south_fork_river_eye_downstream.png) | 4.69 | 0.1342 | 0.1711 | 53.23 | `not_reviewed` |
+| `guide_seat_downstream` | ![american_south_fork guide_seat_downstream](american_south_fork_guide_seat_downstream.png) | 3.61 | 0.0599 | 0.2259 | 47.56 | `not_reviewed` |
+| `river_eye_downstream` | ![american_south_fork river_eye_downstream](american_south_fork_river_eye_downstream.png) | 3.75 | 0.0687 | 0.2181 | 49.57 | `not_reviewed` |
 
 Reviewer checks:
 
@@ -176,8 +176,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 4.55 | 0.1308 | 0.1706 | 44.5 | `not_reviewed` |
-| `river_eye_downstream` | ![colorado_river river_eye_downstream](colorado_river_river_eye_downstream.png) | 4.59 | 0.1306 | 0.1612 | 45.85 | `not_reviewed` |
+| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 3.16 | 0.0519 | 0.2274 | 37.95 | `not_reviewed` |
+| `river_eye_downstream` | ![colorado_river river_eye_downstream](colorado_river_river_eye_downstream.png) | 3.83 | 0.0621 | 0.2131 | 42.64 | `not_reviewed` |
 
 Reviewer checks:
 
@@ -257,8 +257,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![pacuare guide_seat_downstream](pacuare_guide_seat_downstream.png) | 4.5 | 0.1231 | 0.1753 | 42.45 | `not_reviewed` |
-| `river_eye_downstream` | ![pacuare river_eye_downstream](pacuare_river_eye_downstream.png) | 4.44 | 0.1337 | 0.1719 | 45.28 | `not_reviewed` |
+| `guide_seat_downstream` | ![pacuare guide_seat_downstream](pacuare_guide_seat_downstream.png) | 3.2 | 0.0572 | 0.2226 | 37.95 | `not_reviewed` |
+| `river_eye_downstream` | ![pacuare river_eye_downstream](pacuare_river_eye_downstream.png) | 3.35 | 0.0653 | 0.2199 | 40.62 | `not_reviewed` |
 
 Reviewer checks:
 
