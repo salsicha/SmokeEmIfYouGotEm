@@ -43,6 +43,7 @@ NORMALIZATION_CAPS = {
     "depth_m": 6.0,
     "speed_mps": 10.0,
     "froude": 7.0,
+    "surface_relief_m": 4.0,
 }
 
 
@@ -77,6 +78,7 @@ def _load_validated_source(repo_root: Path) -> tuple[np.ndarray, dict]:
         "x",
         "y",
         "h",
+        "eta",
         "u",
         "v",
         "wet",
@@ -101,7 +103,7 @@ def _load_validated_source(repo_root: Path) -> tuple[np.ndarray, dict]:
     if len(rows) != len(row_ids) * len(col_ids):
         raise ValueError("solver frame must contain exactly one cell for every row/column pair")
 
-    fields = np.zeros((len(row_ids), len(col_ids), 8), dtype=np.float32)
+    fields = np.zeros((len(row_ids), len(col_ids), 9), dtype=np.float32)
     seen: set[tuple[int, int]] = set()
     for record in rows:
         row_index = int(record["row"])
@@ -112,6 +114,7 @@ def _load_validated_source(repo_root: Path) -> tuple[np.ndarray, dict]:
         seen.add(key)
         values = (
             float(record["h"]),
+            float(record["eta"]),
             float(record["u"]),
             float(record["v"]),
             float(record["froude"]),
@@ -124,8 +127,8 @@ def _load_validated_source(repo_root: Path) -> tuple[np.ndarray, dict]:
             raise ValueError(f"non-finite solver field at {key}")
         fields[row_index, col_index, :] = values
 
-    normal_lengths = np.linalg.norm(fields[:, :, 4:7], axis=2)
-    wet = fields[:, :, 7] >= 0.5
+    normal_lengths = np.linalg.norm(fields[:, :, 5:8], axis=2)
+    wet = fields[:, :, 8] >= 0.5
     if np.any(wet & (np.abs(normal_lengths - 1.0) > 1.0e-3)):
         raise ValueError("wet-cell solver normals are not unit length")
 
@@ -194,8 +197,9 @@ def _validate_acceptance_evidence(repo_root: Path) -> dict:
     }
 
 
-def _resize_rgb(array: np.ndarray) -> Image.Image:
-    image = Image.fromarray(np.clip(np.rint(array * 255.0), 0, 255).astype(np.uint8), mode="RGB")
+def _resize_texture(array: np.ndarray) -> Image.Image:
+    mode = "RGBA" if array.shape[2] == 4 else "RGB"
+    image = Image.fromarray(np.clip(np.rint(array * 255.0), 0, 255).astype(np.uint8), mode=mode)
     return image.resize(OUTPUT_SIZE, Image.Resampling.BILINEAR)
 
 
@@ -205,18 +209,37 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
     evidence = _validate_acceptance_evidence(repo_root)
 
     depth = fields[:, :, 0]
-    speed = np.hypot(fields[:, :, 1], fields[:, :, 2])
-    froude = fields[:, :, 3]
-    normals = fields[:, :, 4:7]
-    wet = fields[:, :, 7] >= 0.5
+    eta = fields[:, :, 1]
+    speed = np.hypot(fields[:, :, 2], fields[:, :, 3])
+    froude = fields[:, :, 4]
+    normals = fields[:, :, 5:8]
+    wet = fields[:, :, 8] >= 0.5
     texture_normals = normals.copy()
     texture_normals[~wet] = (0.0, 0.0, 1.0)
     normal_encoded = np.clip(texture_normals * 0.5 + 0.5, 0.0, 1.0)
+
+    column_eta = np.zeros(eta.shape[1], dtype=np.float64)
+    for column_index in range(eta.shape[1]):
+        wet_column = eta[:, column_index][wet[:, column_index]]
+        if wet_column.size == 0:
+            raise ValueError(f"solver frame column {column_index} has no wet free-surface samples")
+        column_eta[column_index] = float(np.median(wet_column))
+    column_coordinates = np.arange(eta.shape[1], dtype=np.float64)
+    trend_slope, trend_intercept = np.polyfit(column_coordinates, column_eta, 1)
+    eta_trend = trend_slope * column_coordinates + trend_intercept
+    surface_relief = eta - eta_trend[np.newaxis, :]
+    surface_relief[~wet] = 0.0
+    surface_relief_encoded = np.clip(
+        surface_relief / (2.0 * NORMALIZATION_CAPS["surface_relief_m"]) + 0.5,
+        0.0,
+        1.0,
+    )
     packed = np.stack(
         (
             np.clip(depth / NORMALIZATION_CAPS["depth_m"], 0.0, 1.0),
             np.clip(speed / NORMALIZATION_CAPS["speed_mps"], 0.0, 1.0),
             np.clip(froude / NORMALIZATION_CAPS["froude"], 0.0, 1.0),
+            surface_relief_encoded,
         ),
         axis=2,
     )
@@ -224,13 +247,14 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
     normal_path = repo_root / NORMAL_TEXTURE_RELATIVE_PATH
     packed_path = repo_root / PACKED_TEXTURE_RELATIVE_PATH
     normal_path.parent.mkdir(parents=True, exist_ok=True)
-    _resize_rgb(normal_encoded).save(normal_path, optimize=True)
-    _resize_rgb(packed).save(packed_path, optimize=True)
+    _resize_texture(normal_encoded).save(normal_path, optimize=True)
+    _resize_texture(packed).save(packed_path, optimize=True)
 
     actual_ranges = {
         "depth_m": [float(np.min(depth)), float(np.max(depth))],
         "speed_mps": [float(np.min(speed)), float(np.max(speed))],
         "froude": [float(np.min(froude)), float(np.max(froude))],
+        "surface_relief_m": [float(np.min(surface_relief)), float(np.max(surface_relief))],
         "normal_x": [float(np.min(normals[:, :, 0])), float(np.max(normals[:, :, 0]))],
         "normal_y": [float(np.min(normals[:, :, 1])), float(np.max(normals[:, :, 1]))],
         "normal_z": [float(np.min(normals[:, :, 2])), float(np.max(normals[:, :, 2]))],
@@ -260,6 +284,19 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
             "caps": NORMALIZATION_CAPS,
             "reason": "stable cross-frame authoring scale; accepted frame extrema remain inside every cap",
         },
+        "surface_relief_derivation": {
+            "source_field": "eta",
+            "detrending": "subtract_least_squares_linear_fit_of_per_column_wet_cell_median_eta",
+            "trend_slope_m_per_column": float(trend_slope),
+            "trend_intercept_m": float(trend_intercept),
+            "dry_cell_value_m": 0.0,
+            "wet_cell_clipped_fraction": float(
+                np.count_nonzero(wet & (np.abs(surface_relief) > NORMALIZATION_CAPS["surface_relief_m"]))
+                / np.count_nonzero(wet)
+            ),
+            "render_height_scale": 0.09,
+            "render_height_cap_cm": NORMALIZATION_CAPS["surface_relief_m"] * 100.0 * 0.09,
+        },
         "textures": {
             "surface_normal": {
                 "path": str(NORMAL_TEXTURE_RELATIVE_PATH),
@@ -278,7 +315,7 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
                 "sha256": _hash_file(packed_path),
                 "width": OUTPUT_SIZE[0],
                 "height": OUTPUT_SIZE[1],
-                "channels": "R=depth_m/6 G=speed_mps/10 B=froude/7",
+                "channels": "R=depth_m/6 G=speed_mps/10 B=froude/7 A=detrended_eta_relief_m/8+0.5",
                 "unreal_texture_asset": (
                     "/Game/RaftSim/Rendering/SolverVisualizationFields/Textures/"
                     "T_RaftSim_AmericanSouthFork_CppSolverDepthSpeedFroude"
@@ -291,6 +328,13 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
             "resampling": "bilinear_56x20_to_1024x512",
             "unreal_address_mode": "clamp_xy",
             "landscape_candidate_uv_contract": "procedural_ribbon_u_times_18_is_divided_by_18_in_material; v_is_cross_channel",
+            "solver_rapid_capture": {
+                "camera_world_x_cm": 240.0,
+                "target_world_x_cm": 4740.0,
+                "camera_solver_u": (240.0 + 11600.0) / 37800.0,
+                "target_solver_u": (4740.0 + 11600.0) / 37800.0,
+                "intent": "frame the accepted median field approach spanning the strongest mean-Froude columns",
+            },
         },
         "render_binding": {
             "material_parent": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
@@ -301,15 +345,31 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
             "river_scope": [RIVER_ID],
             "other_river_status": "not_bound_until_equivalent_river_specific_validated_cpp_exports_exist",
             "feature_weights": {
-                "macro_normal": 0.55,
+                "macro_normal": 0.22,
                 "depth_color": 0.20,
                 "speed_froude_roughness": 0.10,
-                "froude_aeration": 0.18,
+                "froude_aeration": 0.34,
+                "surface_relief_geometry": 0.09,
+            },
+            "visual_decode_gains": {
+                "speed": 1.50,
+                "froude": 3.00,
+                "policy": "bounded_decode_of_fixed_physical_normalization_not_feature_forcing",
+            },
+            "foam_overlay": {
+                "material": (
+                    "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate"
+                ),
+                "mask": "decoded_speed_times_froude_hydraulic_presence_with_procedural_micro_breakup",
+                "max_opacity": 0.72,
+                "surface_offset_cm": 1.4,
+                "collision_enabled": False,
+                "policy": "procedural_breakup_is_confined_to_validated_hydraulic_aeration_mask",
             },
         },
         "authority_policy": {
             "physical_authority": "custom_cxx_shallow_water_solver",
-            "derivative_scope": "review_only_material_response_on_landscape_candidate_ribbon",
+            "derivative_scope": "review_only_noncolliding_render_geometry_and_material_response_on_landscape_candidate_ribbon",
             "feature_forcing_enabled": False,
             "changes_collision_or_raft_forces": False,
             "changes_solver_state": False,
