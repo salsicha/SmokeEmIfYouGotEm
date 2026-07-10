@@ -208,10 +208,13 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float RenderDisplacementScale = 0.42f;
     float ReflectionFillIntensity = 0.11f;
     float SolverFieldEnable = 1.0f;
-    float SolverMacroNormalWeight = 0.55f;
+    float SolverMacroNormalWeight = 0.22f;
     float SolverDepthColorWeight = 0.20f;
     float SolverFieldRoughnessWeight = 0.10f;
-    float SolverFroudeAerationWeight = 0.18f;
+    float SolverFroudeAerationWeight = 0.34f;
+    float SolverSpeedVisualGain = 1.50f;
+    float SolverFroudeVisualGain = 3.00f;
+    float SolverSurfaceReliefScale = 0.09f;
     FLinearColor SurfaceTint = FLinearColor(0.025f, 0.115f, 0.095f, 0.0f);
     FLinearColor SolverDeepWaterTint = FLinearColor(0.012f, 0.072f, 0.060f, 0.0f);
     FLinearColor SolverAerationTint = FLinearColor(0.74f, 0.82f, 0.76f, 0.0f);
@@ -243,6 +246,9 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverDepthColorWeight = 0.0f;
         Settings.SolverFieldRoughnessWeight = 0.0f;
         Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+        Settings.SolverSurfaceReliefScale = 0.0f;
         Settings.SurfaceTint = FLinearColor(0.105f, 0.090f, 0.055f, 0.0f);
         Settings.ReflectionTint = FLinearColor(0.46f, 0.58f, 0.67f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
@@ -268,6 +274,9 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverDepthColorWeight = 0.0f;
         Settings.SolverFieldRoughnessWeight = 0.0f;
         Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+        Settings.SolverSurfaceReliefScale = 0.0f;
         Settings.SurfaceTint = FLinearColor(0.018f, 0.095f, 0.065f, 0.0f);
         Settings.ReflectionTint = FLinearColor(0.32f, 0.48f, 0.54f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0008f, 0.0030f, 0.0018f, 0.0f);
@@ -342,6 +351,26 @@ struct FRaftSimPreviewImage
         FLinearColor Sampled = Pixels[Y * Width + X];
         Sampled.A = 1.0f;
         return Sampled;
+    }
+
+    FLinearColor SampleRawBilinear(float U, float V) const
+    {
+        if (!IsValid())
+        {
+            return FLinearColor::Black;
+        }
+
+        const float PixelX = FMath::Clamp(U, 0.0f, 1.0f) * static_cast<float>(Width - 1);
+        const float PixelY = (1.0f - FMath::Clamp(V, 0.0f, 1.0f)) * static_cast<float>(Height - 1);
+        const int32 X0 = FMath::Clamp(FMath::FloorToInt(PixelX), 0, Width - 1);
+        const int32 Y0 = FMath::Clamp(FMath::FloorToInt(PixelY), 0, Height - 1);
+        const int32 X1 = FMath::Min(X0 + 1, Width - 1);
+        const int32 Y1 = FMath::Min(Y0 + 1, Height - 1);
+        const float FracX = PixelX - static_cast<float>(X0);
+        const float FracY = PixelY - static_cast<float>(Y0);
+        const FLinearColor Top = FMath::Lerp(Pixels[Y0 * Width + X0], Pixels[Y0 * Width + X1], FracX);
+        const FLinearColor Bottom = FMath::Lerp(Pixels[Y1 * Width + X0], Pixels[Y1 * Width + X1], FracX);
+        return FMath::Lerp(Top, Bottom, FracY);
     }
 
     float SampleLuma(float U, float V) const
@@ -2199,6 +2228,24 @@ UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSumm
     UMaterialExpressionComponentMask* SolverDepth = AddSolverFieldMask(true, false, false);
     UMaterialExpressionComponentMask* SolverSpeed = AddSolverFieldMask(false, true, false);
     UMaterialExpressionComponentMask* SolverFroude = AddSolverFieldMask(false, false, true);
+    UMaterialExpressionScalarParameter* SolverSpeedVisualGain =
+        AddScalarParameter(TEXT("SolverSpeedVisualGain"), 0.0f);
+    UMaterialExpressionMultiply* SolverSpeedGained = NewObject<UMaterialExpressionMultiply>(Material);
+    SolverSpeedGained->A.Expression = SolverSpeed;
+    SolverSpeedGained->B.Expression = SolverSpeedVisualGain;
+    Material->GetExpressionCollection().AddExpression(SolverSpeedGained);
+    UMaterialExpressionSaturate* SolverSpeedVisual = NewObject<UMaterialExpressionSaturate>(Material);
+    SolverSpeedVisual->Input.Expression = SolverSpeedGained;
+    Material->GetExpressionCollection().AddExpression(SolverSpeedVisual);
+    UMaterialExpressionScalarParameter* SolverFroudeVisualGain =
+        AddScalarParameter(TEXT("SolverFroudeVisualGain"), 0.0f);
+    UMaterialExpressionMultiply* SolverFroudeGained = NewObject<UMaterialExpressionMultiply>(Material);
+    SolverFroudeGained->A.Expression = SolverFroude;
+    SolverFroudeGained->B.Expression = SolverFroudeVisualGain;
+    Material->GetExpressionCollection().AddExpression(SolverFroudeGained);
+    UMaterialExpressionSaturate* SolverFroudeVisual = NewObject<UMaterialExpressionSaturate>(Material);
+    SolverFroudeVisual->Input.Expression = SolverFroudeGained;
+    Material->GetExpressionCollection().AddExpression(SolverFroudeVisual);
     UMaterialExpressionScalarParameter* SolverFieldEnable =
         AddScalarParameter(TEXT("SolverFieldEnable"), 0.0f);
     UMaterialExpressionScalarParameter* SolverDepthColorWeight =
@@ -2223,7 +2270,7 @@ UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSumm
     UMaterialExpressionScalarParameter* SolverFroudeAerationWeight =
         AddScalarParameter(TEXT("SolverFroudeAerationWeight"), 0.0f);
     UMaterialExpressionMultiply* SolverFroudeEnabled = NewObject<UMaterialExpressionMultiply>(Material);
-    SolverFroudeEnabled->A.Expression = SolverFroude;
+    SolverFroudeEnabled->A.Expression = SolverFroudeVisual;
     SolverFroudeEnabled->B.Expression = SolverFieldEnable;
     Material->GetExpressionCollection().AddExpression(SolverFroudeEnabled);
     UMaterialExpressionMultiply* SolverAerationAlpha = NewObject<UMaterialExpressionMultiply>(Material);
@@ -2304,11 +2351,11 @@ UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSumm
     Material->GetExpressionCollection().AddExpression(LayeredNormal);
     UMaterialExpressionAdd* SolverHydraulicPresenceRG = NewObject<UMaterialExpressionAdd>(Material);
     SolverHydraulicPresenceRG->A.Expression = SolverDepth;
-    SolverHydraulicPresenceRG->B.Expression = SolverSpeed;
+    SolverHydraulicPresenceRG->B.Expression = SolverSpeedVisual;
     Material->GetExpressionCollection().AddExpression(SolverHydraulicPresenceRG);
     UMaterialExpressionAdd* SolverHydraulicPresenceRgb = NewObject<UMaterialExpressionAdd>(Material);
     SolverHydraulicPresenceRgb->A.Expression = SolverHydraulicPresenceRG;
-    SolverHydraulicPresenceRgb->B.Expression = SolverFroude;
+    SolverHydraulicPresenceRgb->B.Expression = SolverFroudeVisual;
     Material->GetExpressionCollection().AddExpression(SolverHydraulicPresenceRgb);
     UMaterialExpressionSaturate* SolverHydraulicPresence = NewObject<UMaterialExpressionSaturate>(Material);
     SolverHydraulicPresence->Input.Expression = SolverHydraulicPresenceRgb;
@@ -2372,8 +2419,8 @@ UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSumm
     UMaterialExpressionScalarParameter* BaseRoughness =
         AddScalarParameter(TEXT("Roughness"), 0.09f);
     UMaterialExpressionAdd* SolverRoughnessField = NewObject<UMaterialExpressionAdd>(Material);
-    SolverRoughnessField->A.Expression = SolverSpeed;
-    SolverRoughnessField->B.Expression = SolverFroude;
+    SolverRoughnessField->A.Expression = SolverSpeedVisual;
+    SolverRoughnessField->B.Expression = SolverFroudeVisual;
     Material->GetExpressionCollection().AddExpression(SolverRoughnessField);
     UMaterialExpressionSaturate* SolverRoughnessFieldSaturated =
         NewObject<UMaterialExpressionSaturate>(Material);
@@ -2454,6 +2501,97 @@ UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSumm
     if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
     {
         OutSummary += TEXT("Failed to save the Single Layer Water candidate material.\n");
+        return nullptr;
+    }
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& OutSummary)
+{
+    static const TCHAR* MaterialPackagePath =
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+             "M_RaftSim_SolverFieldFoamCandidate.M_RaftSim_SolverFieldFoamCandidate");
+
+    UPackage* Package = CreatePackage(MaterialPackagePath);
+    if (!Package)
+    {
+        OutSummary += TEXT("Failed to create the solver-field foam material package.\n");
+        return nullptr;
+    }
+    UMaterial* Material = Cast<UMaterial>(
+        StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        Material = FindObject<UMaterial>(Package, TEXT("M_RaftSim_SolverFieldFoamCandidate"));
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_SolverFieldFoamCandidate"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += TEXT("Failed to create the solver-field foam material.\n");
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Translucent;
+    Material->TwoSided = true;
+
+    UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+    Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
+    Roughness->R = 0.82f;
+    Material->GetExpressionCollection().AddExpression(Roughness);
+    UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
+    Specular->R = 0.18f;
+    Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+    EmissiveScale->R = 0.025f;
+    Material->GetExpressionCollection().AddExpression(EmissiveScale);
+    UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+    EmissiveColor->A.Expression = VertexColor;
+    EmissiveColor->B.Expression = EmissiveScale;
+    Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+    if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
+    {
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+        EditorOnlyData->Opacity.Expression = VertexColor;
+        EditorOnlyData->Opacity.OutputIndex = 4;
+        EditorOnlyData->Opacity.Mask = 1;
+        EditorOnlyData->Opacity.MaskR = 0;
+        EditorOnlyData->Opacity.MaskG = 0;
+        EditorOnlyData->Opacity.MaskB = 0;
+        EditorOnlyData->Opacity.MaskA = 1;
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    }
+
+    Material->PostEditChange();
+    Package->MarkPackageDirty();
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT("Failed to save the solver-field foam material.\n");
         return nullptr;
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
@@ -2588,6 +2726,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     SetScalar(TEXT("SolverDepthColorWeight"), Settings.SolverDepthColorWeight);
     SetScalar(TEXT("SolverFieldRoughnessWeight"), Settings.SolverFieldRoughnessWeight);
     SetScalar(TEXT("SolverFroudeAerationWeight"), Settings.SolverFroudeAerationWeight);
+    SetScalar(TEXT("SolverSpeedVisualGain"), Settings.SolverSpeedVisualGain);
+    SetScalar(TEXT("SolverFroudeVisualGain"), Settings.SolverFroudeVisualGain);
     SetVector(TEXT("SurfaceTint"), Settings.SurfaceTint);
     SetVector(TEXT("SolverDeepWaterTint"), Settings.SolverDeepWaterTint);
     SetVector(TEXT("SolverAerationTint"), Settings.SolverAerationTint);
@@ -2648,6 +2788,7 @@ struct FRaftSimFirstPartyMaterialTextureAssetSpec
     TextureGroup LODGroup = TEXTUREGROUP_World;
     TextureAddress AddressX = TA_Wrap;
     TextureAddress AddressY = TA_Wrap;
+    bool bCompressionNoAlpha = true;
 
     FString GetTextureAssetName() const
     {
@@ -2940,6 +3081,7 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSolverVisualizationFieldTe
     Packed.LODGroup = TEXTUREGROUP_World;
     Packed.AddressX = TA_Clamp;
     Packed.AddressY = TA_Clamp;
+    Packed.bCompressionNoAlpha = false;
     Specs.Add(Packed);
 
     return Specs;
@@ -2960,7 +3102,7 @@ void ApplyFirstPartyMaterialTextureImportSettings(
     Texture->LODGroup = Spec.LODGroup;
     Texture->AddressX = Spec.AddressX;
     Texture->AddressY = Spec.AddressY;
-    Texture->CompressionNoAlpha = true;
+    Texture->CompressionNoAlpha = Spec.bCompressionNoAlpha;
     Texture->DeferCompression = false;
     Texture->VirtualTextureStreaming = false;
     Texture->SetModernSettingsForNewOrChangedTexture();
@@ -2990,7 +3132,7 @@ bool UpdateFirstPartyMaterialTextureSource(
             *DestPtr++ = SrcPtr->B;
             *DestPtr++ = SrcPtr->G;
             *DestPtr++ = SrcPtr->R;
-            *DestPtr++ = 255;
+            *DestPtr++ = SrcPtr->A;
             ++SrcPtr;
         }
     }
@@ -5860,7 +6002,8 @@ AActor* AddPreviewProceduralMeshActor(
     const TArray<FVector2D>& UVs,
     const FLinearColor& Color,
     UMaterialInterface* MaterialOverride = nullptr,
-    const TArray<FLinearColor>* VertexColorOverride = nullptr)
+    const TArray<FLinearColor>* VertexColorOverride = nullptr,
+    bool bCreateCollision = true)
 {
     if (!World || Vertices.IsEmpty() || Triangles.IsEmpty())
     {
@@ -5887,7 +6030,9 @@ AActor* AddPreviewProceduralMeshActor(
     MeshComponent->RegisterComponent();
     MeshComponent->SetMobility(EComponentMobility::Static);
     MeshComponent->SetCastShadow(false);
-    MeshComponent->bUseComplexAsSimpleCollision = true;
+    MeshComponent->bUseComplexAsSimpleCollision = bCreateCollision;
+    MeshComponent->SetCollisionEnabled(
+        bCreateCollision ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 
     TArray<FLinearColor> VertexColors;
     if (VertexColorOverride && VertexColorOverride->Num() == Vertices.Num())
@@ -5901,7 +6046,15 @@ AActor* AddPreviewProceduralMeshActor(
     TArray<FProcMeshTangent> Tangents;
     Tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), Vertices.Num());
 
-    MeshComponent->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents, true);
+    MeshComponent->CreateMeshSection_LinearColor(
+        0,
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        VertexColors,
+        Tangents,
+        bCreateCollision);
     if (MaterialOverride)
     {
         MeshComponent->SetMaterial(0, MaterialOverride);
@@ -7747,7 +7900,9 @@ AActor* AddPreviewRiverRibbonMesh(
     const FRaftSimPreviewImage* MaterialAtlasAlbedo,
     const FRaftSimPreviewImage* MaterialAtlasNormal,
     const FRaftSimPreviewImage* MaterialAtlasPacked,
-    UMaterialInterface* MaterialOverride = nullptr)
+    UMaterialInterface* MaterialOverride = nullptr,
+    const FRaftSimPreviewImage* SolverVisualizationFields = nullptr,
+    UMaterialInterface* SolverFoamMaterial = nullptr)
 {
     constexpr int32 XSteps = 640;
     // Odd cross-step count avoids a persistent vertex-color row exactly on the river centerline.
@@ -7760,11 +7915,13 @@ AActor* AddPreviewRiverRibbonMesh(
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
+    TArray<FLinearColor> SolverFoamVertexColors;
     TArray<int32> Triangles;
     Vertices.Reserve((XSteps + 1) * (CrossSteps + 1));
     Normals.Reserve((XSteps + 1) * (CrossSteps + 1));
     UVs.Reserve((XSteps + 1) * (CrossSteps + 1));
     VertexColors.Reserve((XSteps + 1) * (CrossSteps + 1));
+    SolverFoamVertexColors.Reserve((XSteps + 1) * (CrossSteps + 1));
     Triangles.Reserve(XSteps * CrossSteps * 6);
 
     const FLinearColor DeepWaterBase = ScalePreviewColor(Spec.WaterColor, Spec.bDesertCanyon ? 0.98f : 1.02f);
@@ -7833,6 +7990,13 @@ AActor* AddPreviewRiverRibbonMesh(
     const bool bUsePhysicalCandidateShading = MaterialOverride != nullptr;
     const FRaftSimLandscapeCandidateWaterSettings CandidateWaterSettings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
+    const bool bUseSolverVisualizationFields =
+        bUsePhysicalCandidateShading &&
+        Spec.RiverId == TEXT("american_south_fork") &&
+        CandidateWaterSettings.SolverFieldEnable > 0.5f &&
+        SolverVisualizationFields &&
+        SolverVisualizationFields->IsValid() &&
+        SolverFoamMaterial;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -7861,6 +8025,32 @@ AActor* AddPreviewRiverRibbonMesh(
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
+            const FLinearColor SolverField = bUseSolverVisualizationFields
+                ? SolverVisualizationFields->SampleRawBilinear(U, 1.0f - V)
+                : FLinearColor::Black;
+            const float SolverSpeedVisual = FMath::Clamp(
+                SolverField.G * CandidateWaterSettings.SolverSpeedVisualGain,
+                0.0f,
+                1.0f);
+            const float SolverFroudeVisual = FMath::Clamp(
+                SolverField.B * CandidateWaterSettings.SolverFroudeVisualGain,
+                0.0f,
+                1.0f);
+            const float SolverHydraulicPresence = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(
+                      0.015f,
+                      0.12f,
+                      FMath::Clamp(SolverField.R + SolverSpeedVisual + SolverFroudeVisual, 0.0f, 1.0f))
+                : 0.0f;
+            const float SolverSurfaceReliefCm = bUseSolverVisualizationFields
+                ? (SolverField.A - 0.5f) * 8.0f * 100.0f *
+                      CandidateWaterSettings.SolverSurfaceReliefScale * SolverHydraulicPresence
+                : 0.0f;
+            const float SolverHydraulicAerationT = bUseSolverVisualizationFields
+                ? SmoothPreviewStep(0.18f, 0.88f, SolverFroudeVisual) *
+                      SmoothPreviewStep(0.12f, 0.82f, SolverSpeedVisual) *
+                      SolverHydraulicPresence
+                : 0.0f;
             const float Lateral = FMath::Lerp(-Width, Width, V);
             const float EdgeT = FMath::Pow(FMath::Abs(V - 0.5f) * 2.0f, 1.35f);
             const float CenterT = 1.0f - FMath::Clamp(EdgeT, 0.0f, 1.0f);
@@ -8450,6 +8640,33 @@ AActor* AddPreviewRiverRibbonMesh(
                     ScalePreviewColor(WaterColor, LumaScale),
                     FMath::Clamp(NearCameraBottomCenterWaterWedgeBlendT * 0.95f, 0.0f, 0.95f));
             }
+            const FLinearColor SolverHydraulicAerationColor(0.88f, 0.92f, 0.88f, 1.0f);
+            WaterColor = FMath::Lerp(
+                WaterColor,
+                SolverHydraulicAerationColor,
+                FMath::Clamp(
+                    SolverHydraulicAerationT * CandidateWaterSettings.SolverFroudeAerationWeight,
+                    0.0f,
+                    0.24f));
+            if (bUseSolverVisualizationFields)
+            {
+                const float SolverFoamNoiseA = FMath::PerlinNoise2D(FVector2D(
+                    X * 0.0065f + SolverFroudeVisual * 1.7f,
+                    Lateral * 0.0120f + SolverSpeedVisual * 2.3f)) * 0.5f + 0.5f;
+                const float SolverFoamNoiseB = FMath::PerlinNoise2D(FVector2D(
+                    X * 0.0170f - Lateral * 0.0040f + 19.7f,
+                    Lateral * 0.0290f + SolverFroudeVisual * 3.1f - 7.4f)) * 0.5f + 0.5f;
+                const float SolverFoamBreakupNoise = FMath::Clamp(
+                    SolverFoamNoiseA * 0.68f + SolverFoamNoiseB * 0.32f,
+                    0.0f,
+                    1.0f);
+                const float SolverFoamBreakupT = SmoothPreviewStep(0.38f, 0.74f, SolverFoamBreakupNoise);
+                const float SolverFoamOpacity = FMath::Clamp(
+                    SolverHydraulicAerationT * (0.16f + SolverFoamBreakupT * 0.84f) * 0.72f,
+                    0.0f,
+                    0.72f);
+                SolverFoamVertexColors.Add(FLinearColor(0.86f, 0.91f, 0.86f, SolverFoamOpacity));
+            }
             const float FineRippleWave =
                 (FineRipple - 0.5f) * NearFieldFineRippleAmplitudeCm * (0.45f + CenterT * 0.55f) * NearFieldTextureGain;
             const float FlowCuedWaterMottleRippleCm =
@@ -8516,7 +8733,9 @@ AActor* AddPreviewRiverRibbonMesh(
                     FirstPartyCaptureQualityWaterMicroReliefCm +
                     IntegratedWaterShaderChromaReliefCm +
                     FirstPartyMaterialAtlasWaterReliefCm) *
-                    (bUsePhysicalCandidateShading ? CandidateWaterSettings.RenderDisplacementScale : 1.0f)));
+                    (bUsePhysicalCandidateShading ? CandidateWaterSettings.RenderDisplacementScale : 1.0f) *
+                    (bUseSolverVisualizationFields ? 0.42f : 1.0f) +
+                    SolverSurfaceReliefCm));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -8549,7 +8768,7 @@ AActor* AddPreviewRiverRibbonMesh(
         Normal = FMath::Lerp(Normal, FVector::UpVector, MeshNormalUpBlend).GetSafeNormal();
     }
 
-    return AddPreviewProceduralMeshActor(
+    AActor* WaterActor = AddPreviewProceduralMeshActor(
         World,
         FString::Printf(TEXT("RaftSim_ProceduralRiverRibbon_%s"), *Spec.RiverId),
         Vertices,
@@ -8558,7 +8777,28 @@ AActor* AddPreviewRiverRibbonMesh(
         UVs,
         Spec.WaterColor,
         MaterialOverride ? MaterialOverride : LoadOrCreatePreviewWaterVertexColorMaterial(),
-        &VertexColors);
+        &VertexColors,
+        !bUsePhysicalCandidateShading);
+    if (bUseSolverVisualizationFields && SolverFoamVertexColors.Num() == Vertices.Num())
+    {
+        TArray<FVector> SolverFoamVertices = Vertices;
+        for (int32 VertexIndex = 0; VertexIndex < SolverFoamVertices.Num(); ++VertexIndex)
+        {
+            SolverFoamVertices[VertexIndex] += Normals[VertexIndex] * 1.4f;
+        }
+        AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(TEXT("RaftSim_SolverFieldFoam_%s"), *Spec.RiverId),
+            SolverFoamVertices,
+            Triangles,
+            Normals,
+            UVs,
+            FLinearColor(0.86f, 0.91f, 0.86f, 0.0f),
+            SolverFoamMaterial,
+            &SolverFoamVertexColors,
+            false);
+    }
+    return WaterActor;
 }
 
 void AddPreviewShoreRibbon(
@@ -14970,6 +15210,37 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         }
     }
 
+    if (Spec.RiverId == TEXT("american_south_fork"))
+    {
+        constexpr float SolverRapidCameraX = 240.0f;
+        constexpr float SolverRapidTargetX = 4740.0f;
+        const float SolverRapidCameraY = GetPreviewRiverCenterY(Spec, SolverRapidCameraX);
+        const float SolverRapidTargetY = GetPreviewRiverCenterY(Spec, SolverRapidTargetX);
+        const float SolverRapidYawDeg = FMath::RadiansToDegrees(
+            FMath::Atan2(
+                SolverRapidTargetY - SolverRapidCameraY,
+                SolverRapidTargetX - SolverRapidCameraX));
+        ACameraActor* SolverRapidCamera = Cast<ACameraActor>(
+            GEditor->AddActor(
+                World->GetCurrentLevel(),
+                ACameraActor::StaticClass(),
+                FTransform(
+                    FRotator(-9.5f, SolverRapidYawDeg, 0.0f),
+                    FVector(SolverRapidCameraX, SolverRapidCameraY, 168.0f))));
+        if (SolverRapidCamera)
+        {
+            SolverRapidCamera->SetActorLabel(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"));
+            SolverRapidCamera->GetCameraComponent()->FieldOfView = 70.0f;
+            if (RiverEyeCamera && RiverEyeCamera->GetCameraComponent())
+            {
+                SolverRapidCamera->GetCameraComponent()->PostProcessSettings =
+                    RiverEyeCamera->GetCameraComponent()->PostProcessSettings;
+                SolverRapidCamera->GetCameraComponent()->PostProcessBlendWeight =
+                    RiverEyeCamera->GetCameraComponent()->PostProcessBlendWeight;
+            }
+        }
+    }
+
     APlayerStart* PlayerStart = Cast<APlayerStart>(
         GEditor->AddActor(World->GetCurrentLevel(), APlayerStart::StaticClass(), FTransform(FRotator::ZeroRotator, FVector(-5350.0f, GetPreviewRiverCenterY(Spec, -5350.0f), 120.0f))));
     if (PlayerStart)
@@ -15974,6 +16245,30 @@ bool BuildLandscapeImportCandidateMap(
     {
         return false;
     }
+    const FRaftSimLandscapeCandidateWaterSettings CandidateWaterSettings =
+        GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+    FRaftSimPreviewImage SolverVisualizationFields;
+    const FRaftSimPreviewImage* SolverVisualizationFieldsPtr = nullptr;
+    UMaterialInterface* SolverFoamMaterial = nullptr;
+    if (CandidateWaterSettings.SolverFieldEnable > 0.5f)
+    {
+        const FString SolverFieldImage =
+            TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
+                 "american_south_fork_median_cpp_solver_depth_speed_froude_v1.png");
+        if (!LoadPreviewPngImage(SolverFieldImage, SolverVisualizationFields))
+        {
+            OutSummary += FString::Printf(
+                TEXT("Failed to load solver render-geometry fields for %s.\n"),
+                *Candidate.PreviewSpec.RiverId);
+            return false;
+        }
+        SolverVisualizationFieldsPtr = &SolverVisualizationFields;
+        SolverFoamMaterial = LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+        if (!SolverFoamMaterial)
+        {
+            return false;
+        }
+    }
     const float ScaleX = Candidate.HorizontalSpanXCm / static_cast<float>(LandscapeQuads);
     const float ScaleY = Candidate.HorizontalSpanYCm / static_cast<float>(LandscapeQuads);
     const float ScaleZ = Candidate.TargetReliefCm / 512.0f;
@@ -16087,7 +16382,9 @@ bool BuildLandscapeImportCandidateMap(
         nullptr,
         nullptr,
         nullptr,
-        CandidateWaterMaterial);
+        CandidateWaterMaterial,
+        SolverVisualizationFieldsPtr,
+        SolverFoamMaterial);
     OutResult.WaterMaterialPath = CandidateWaterMaterial->GetPathName();
     if (WaterActor)
     {
@@ -18064,8 +18361,25 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("source Landscape candidate river-eye downstream"),
             true,
             OutSummary);
+        FString SolverRapidCapturePath;
+        bool bSolverRapidCaptured = true;
+        if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+        {
+            SolverRapidCapturePath = GetLandscapeCandidateCaptureRelativePath(
+                Candidate,
+                TEXT("solver_rapid_river_eye_downstream"));
+            bSolverRapidCaptured = bMapBuilt && CapturePreviewImageForSpec(
+                Candidate.PreviewSpec,
+                CandidateCaptureRoot,
+                SolverRapidCapturePath,
+                TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"),
+                TEXT("landscape_candidate_solver_rapid_river_eye_downstream"),
+                TEXT("source Landscape candidate solver-rapid river-eye downstream"),
+                true,
+                OutSummary);
+        }
         const bool bCandidateSucceeded =
-            bSourceContractsPresent && bMapBuilt && bGuideSeatCaptured && bRiverEyeCaptured;
+            bSourceContractsPresent && bMapBuilt && bGuideSeatCaptured && bRiverEyeCaptured && bSolverRapidCaptured;
         bAllSucceeded &= bCandidateSucceeded;
         const FRaftSimLandscapeMaterialCandidateSettings MaterialSettings =
             GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
@@ -18082,6 +18396,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"map_package\": \"%s\",\n")
             TEXT("      \"guide_seat_capture\": \"%s\",\n")
             TEXT("      \"river_eye_capture\": \"%s\",\n")
+            TEXT("      \"solver_rapid_river_eye_capture\": \"%s\",\n")
+            TEXT("      \"solver_rapid_capture_status\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
             TEXT("      \"heightfield_format\": \"16-bit grayscale PNG\",\n")
             TEXT("      \"heightfield_width_px\": 1009,\n")
@@ -18153,7 +18469,17 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"water_solver_depth_color_weight\": %.6f,\n")
             TEXT("      \"water_solver_field_roughness_weight\": %.6f,\n")
             TEXT("      \"water_solver_froude_aeration_weight\": %.6f,\n")
-            TEXT("      \"water_solver_visualization_authority\": \"review_only_material_derivative_does_not_change_solver_collision_raft_forces_or_feature_forcing\",\n")
+            TEXT("      \"water_solver_speed_visual_gain\": %.6f,\n")
+            TEXT("      \"water_solver_froude_visual_gain\": %.6f,\n")
+            TEXT("      \"water_solver_surface_relief_scale\": %.6f,\n")
+            TEXT("      \"water_solver_surface_relief_cap_cm\": %.6f,\n")
+            TEXT("      \"water_solver_analytic_displacement_residual_scale\": %.6f,\n")
+            TEXT("      \"water_solver_render_geometry_collision_enabled\": false,\n")
+            TEXT("      \"water_solver_foam_status\": \"%s\",\n")
+            TEXT("      \"water_solver_foam_material\": \"/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate\",\n")
+            TEXT("      \"water_solver_foam_max_opacity\": %.6f,\n")
+            TEXT("      \"water_solver_foam_surface_offset_cm\": %.6f,\n")
+            TEXT("      \"water_solver_visualization_authority\": \"review_only_noncolliding_render_geometry_and_material_derivative_does_not_change_solver_collision_raft_forces_or_feature_forcing\",\n")
             TEXT("      \"water_material_bound_component_count\": %d,\n")
             TEXT("      \"water_base_color_scale\": %.6f,\n")
             TEXT("      \"water_surface_tint\": [%.6f, %.6f, %.6f],\n")
@@ -18198,6 +18524,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             *EscapeRaftSimJsonString(Candidate.MapPackagePath),
             *EscapeRaftSimJsonString(GuideSeatCapturePath),
             *EscapeRaftSimJsonString(RiverEyeCapturePath),
+            *EscapeRaftSimJsonString(SolverRapidCapturePath),
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+                ? (bSolverRapidCaptured
+                       ? TEXT("captured_at_validated_median_field_high_froude_approach")
+                       : TEXT("solver_rapid_capture_failed"))
+                : TEXT("not_available_without_river_specific_validated_solver_field"),
             bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
             static_cast<uint32>(Result.SourceHeightMin),
             static_cast<uint32>(Result.SourceHeightMax),
@@ -18256,6 +18588,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             WaterSettings.SolverDepthColorWeight,
             WaterSettings.SolverFieldRoughnessWeight,
             WaterSettings.SolverFroudeAerationWeight,
+            WaterSettings.SolverSpeedVisualGain,
+            WaterSettings.SolverFroudeVisualGain,
+            WaterSettings.SolverSurfaceReliefScale,
+            WaterSettings.SolverSurfaceReliefScale * 400.0f,
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 0.42f : 1.0f,
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+                ? TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound")
+                : TEXT("not_available_without_river_specific_validated_solver_field"),
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 0.72f : 0.0f,
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 1.4f : 0.0f,
             Result.WaterMaterialBoundComponentCount,
             WaterSettings.BaseColorScale,
             WaterSettings.SurfaceTint.R,

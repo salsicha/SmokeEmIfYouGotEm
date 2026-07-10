@@ -70,6 +70,10 @@
       0.0,
       6.648308753967285
     ],
+    "surface_relief_m": [
+      -3.1334740918952146,
+      3.79650950028484
+    ],
     "normal_x": [
       -0.40512704849243164,
       0.35293784737586975
@@ -88,9 +92,20 @@
     "caps": {
       "depth_m": 6.0,
       "speed_mps": 10.0,
-      "froude": 7.0
+      "froude": 7.0,
+      "surface_relief_m": 4.0
     },
     "reason": "stable cross-frame authoring scale; accepted frame extrema remain inside every cap"
+  },
+  "surface_relief_derivation": {
+    "source_field": "eta",
+    "detrending": "subtract_least_squares_linear_fit_of_per_column_wet_cell_median_eta",
+    "trend_slope_m_per_column": -0.01591909317960499,
+    "trend_intercept_m": 0.6100256483357654,
+    "dry_cell_value_m": 0.0,
+    "wet_cell_clipped_fraction": 0.0,
+    "render_height_scale": 0.09,
+    "render_height_cap_cm": 36.0
   },
   "textures": {
     "surface_normal": {
@@ -104,10 +119,10 @@
     },
     "depth_speed_froude": {
       "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/american_south_fork_median_cpp_solver_depth_speed_froude_v1.png",
-      "sha256": "c7dd2f5771a49b976c01986324116b4a9f3cdbcc08d505afb48c007b7b10fb30",
+      "sha256": "a8f00df92919f4c19929451f6dda935b3cc78ad7a1a7245812707b327beebc23",
       "width": 1024,
       "height": 512,
-      "channels": "R=depth_m/6 G=speed_mps/10 B=froude/7",
+      "channels": "R=depth_m/6 G=speed_mps/10 B=froude/7 A=detrended_eta_relief_m/8+0.5",
       "unreal_texture_asset": "/Game/RaftSim/Rendering/SolverVisualizationFields/Textures/T_RaftSim_AmericanSouthFork_CppSolverDepthSpeedFroude",
       "material_parameter": "SolverVisualizationFields"
     }
@@ -116,7 +131,14 @@
     "source_orientation": "image_x_increasing_solver_column_and_downstream_x; image_y_increasing_solver_row_and_lateral_y",
     "resampling": "bilinear_56x20_to_1024x512",
     "unreal_address_mode": "clamp_xy",
-    "landscape_candidate_uv_contract": "procedural_ribbon_u_times_18_is_divided_by_18_in_material; v_is_cross_channel"
+    "landscape_candidate_uv_contract": "procedural_ribbon_u_times_18_is_divided_by_18_in_material; v_is_cross_channel",
+    "solver_rapid_capture": {
+      "camera_world_x_cm": 240.0,
+      "target_world_x_cm": 4740.0,
+      "camera_solver_u": 0.31322751322751324,
+      "target_solver_u": 0.43227513227513226,
+      "intent": "frame the accepted median field approach spanning the strongest mean-Froude columns"
+    }
   },
   "render_binding": {
     "material_parent": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
@@ -126,15 +148,29 @@
     ],
     "other_river_status": "not_bound_until_equivalent_river_specific_validated_cpp_exports_exist",
     "feature_weights": {
-      "macro_normal": 0.55,
+      "macro_normal": 0.22,
       "depth_color": 0.2,
       "speed_froude_roughness": 0.1,
-      "froude_aeration": 0.18
+      "froude_aeration": 0.34,
+      "surface_relief_geometry": 0.09
+    },
+    "visual_decode_gains": {
+      "speed": 1.5,
+      "froude": 3.0,
+      "policy": "bounded_decode_of_fixed_physical_normalization_not_feature_forcing"
+    },
+    "foam_overlay": {
+      "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+      "mask": "decoded_speed_times_froude_hydraulic_presence_with_procedural_micro_breakup",
+      "max_opacity": 0.72,
+      "surface_offset_cm": 1.4,
+      "collision_enabled": false,
+      "policy": "procedural_breakup_is_confined_to_validated_hydraulic_aeration_mask"
     }
   },
   "authority_policy": {
     "physical_authority": "custom_cxx_shallow_water_solver",
-    "derivative_scope": "review_only_material_response_on_landscape_candidate_ribbon",
+    "derivative_scope": "review_only_noncolliding_render_geometry_and_material_response_on_landscape_candidate_ribbon",
     "feature_forcing_enabled": false,
     "changes_collision_or_raft_forces": false,
     "changes_solver_state": false,
