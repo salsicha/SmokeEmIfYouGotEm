@@ -125,6 +125,8 @@
       "first_party_photographic_color_grade_palette_compression",
       "first_party_near_field_water_surface_grain",
       "first_party_near_camera_water_macro_ripple_mottle",
+      "first_party_near_camera_bottom_center_water_wedge_demotion",
+      "first_party_near_camera_upstream_water_capture_apron",
       "first_party_base_water_depth_current_grading",
       "first_party_base_water_flow_thread_texture",
       "first_party_base_water_center_guide_stripe_breakup",
@@ -233,34 +235,42 @@
     "atlas_sampler_review_material_status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
     "photoreal_capture_quality_summary": {
       "capture_count": 6,
-      "blocking_capture_count": 0,
-      "blocker_counts": {},
+      "blocking_capture_count": 6,
+      "blocker_counts": {
+        "low_color_texture_entropy": 6
+      },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "low_color_texture_entropy"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "colorado_river": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "low_color_texture_entropy"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         },
         "pacuare": {
           "capture_count": 2,
-          "blocking_capture_count": 0,
-          "blockers": [],
-          "status": "candidate_for_human_lifelike_review_not_approved"
+          "blocking_capture_count": 2,
+          "blockers": [
+            "low_color_texture_entropy"
+          ],
+          "status": "preview_only_not_lifelike_quality_blockers"
         }
       }
     },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
+      "status": "automated_capture_quality_gate_blocked_preview_only_not_lifelike",
       "capture_quality_summary": {
         "capture_count": 6,
         "blocking_capture_count": 0,
@@ -305,15 +315,20 @@
         "rights_review_for_reference_and_material_sources",
         "desktop_and_vr_performance_capture_evidence",
         "production_material_asset_or_first_party_equivalent_promotion"
-      ]
+      ],
+      "removed_blocker_classes": [],
+      "remaining_blocker_counts": {
+        "low_color_texture_entropy": 6
+      },
+      "next_visual_art_blocker": "clear low_color_texture_entropy with higher-detail source-conditioned terrain and water materials before human art, guide, geospatial, hazard-readability, rights, production-material, and performance review can treat the captures as zero-blocker candidates"
     },
     "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
     "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
     "photoreal_human_lifelike_review_handoff_summary": {
       "river_count": 3,
       "capture_count": 6,
-      "candidate_capture_count": 6,
-      "automated_blocking_capture_count": 0,
+      "candidate_capture_count": 0,
+      "automated_blocking_capture_count": 6,
       "human_approved_capture_count": 0,
       "open_human_review_gate_count": 21,
       "per_river": {
@@ -504,7 +519,7 @@
         "river-specific weather and lighting notes",
         "capture manifest"
       ],
-      "procedural_method": "Use first-party raft/oar silhouettes and river-specific sun, skylight, fog, mist, exposure, color temperature, and photographic palette-compression presets for editor/playtest context; keep review-only raft/oar proxies in the generated maps, cull them from guide-seat and river-eye lifelike-candidate capture exports until approved production foreground art exists, and replace the proxies once production raft art is approved.",
+      "procedural_method": "Use first-party raft/oar silhouette helpers and river-specific sun, skylight, fog, mist, exposure, color temperature, and photographic palette-compression presets for editor/playtest context; skip review-only raft/oar proxy generation in lifelike-candidate maps until approved production foreground art exists, keep legacy proxy culling active for capture exports, and replace the helper path once production raft art is approved.",
       "tunable_parameters": [
         "sun_angle",
         "sky_intensity",
@@ -568,5 +583,5 @@
       ]
     }
   ],
-  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The first importable first-party texture atlas pack is recorded, imported as review-only Unreal Texture2D assets with explicit import settings, bound into review-only material instance candidates, sampled by the review-only M_RaftSim_AtlasSampleReview parent material, and assigned to durable saved-map terrain, water, boulder, foliage, and raft proxy surfaces for review captures. The automated capture-quality gate now has zero blocker counts, but that only promotes the captures to human lifelike review; it does not approve production visuals. The human lifelike review handoff now records all seven open review domains for the zero-blocker capture set so candidate screenshots cannot be promoted without reviewer evidence. The human-readable Markdown review packet now embeds the six zero-blocker capture candidates, flow/source context, reviewer prompts, and promotion rule for the same seven-domain gate. The paired review-results JSON template gives external reviewers a machine-readable place to record reviewer identity, evidence, blockers, follow-up actions, and final river decisions without defaulting any gate to approval. Source-conditioned macro albedo, material-zone, and AO/roughness/height maps now derive from the active review-gated aerial drapes, DEM relief, water masks, and vegetation masks for all three rivers; they are material replacement candidates only until in-engine assignment, capture comparison, guide/geospatial review, rights review, hazard readability, and performance evidence pass. Unreal automation now declares and imports source-conditioned Texture2D review assets from those maps and binds them to the review material instances with per-surface source zone weights; this is still pending regenerated capture review and human promotion gates."
+  "current_decision": "Use this manifest as the approved first-party procedural-equivalent plan for the next visual iteration, but keep every river at preview_only_not_lifelike until the recipes are promoted from review Texture2D/MIC/material assets into production-quality Unreal assets/materials and verified by human art, guide, geospatial, hazard-readability, rights, and performance review. The latest regenerated captures have cleared the dark foreground/proxy obstruction but still record low_color_texture_entropy blockers, so they are preview-only and not zero-blocker human lifelike candidates yet. The human lifelike review handoff and Markdown packet remain useful as review scaffolds, but they must not promote screenshots until automated blockers, seven-domain review gates, and measured performance evidence are closed."
 }

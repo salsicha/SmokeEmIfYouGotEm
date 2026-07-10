@@ -172,11 +172,15 @@
     "shader_graph_sampler_wiring_status": "review_parent_material_samples_albedo_normal_ao_roughness_height_atlases_with_preview_color_vertex_color_weight_and_roughness_floor_not_lifelike_evidence",
     "material_instance_scene_assignment_status": "assigned_review_material_instances_to_preview_map_surface_proxies_not_lifelike",
     "photoreal_capture_quality_review": "docs/environment-captures/photoreal_river_previews/photoreal_capture_quality_review.json",
-    "photoreal_capture_quality_review_status": "captures_reviewed_candidate_for_human_lifelike_review_not_approved",
-    "photoreal_capture_quality_blockers": {},
+    "photoreal_capture_quality_review_status": "captures_reviewed_preview_only_not_lifelike_quality_blockers_recorded",
+    "photoreal_capture_quality_blockers": {
+      "low_color_texture_entropy": 6
+    },
     "visual_blocker_reduction_checkpoint_2026_07_08": {
-      "status": "automated_capture_quality_gate_cleared_candidate_for_human_lifelike_review_not_approved",
-      "remaining_blocker_counts": {},
+      "status": "automated_capture_quality_gate_blocked_preview_only_not_lifelike",
+      "remaining_blocker_counts": {
+        "low_color_texture_entropy": 6
+      },
       "art_direction_note": "The July 8 integrated water, bank, terrain, and capture post-process pass cleared the automated capture-quality blocker counts across all six guide-seat/river-eye captures. The frames are now candidates for human art, guide, geospatial, rights, hazard-readability, and performance review; they are not approved as lifelike or production-ready.",
       "closed_renderer_blocker_classes": [
         "visible_proxy_water_card_geometry",
@@ -220,7 +224,7 @@
         }
       }
     },
-    "human_review_note": "The zero-blocker captures are ready for a structured human review pass using the Markdown packet and results template, but remain unapproved until all seven handoff domains record accepted evidence.",
+    "human_review_note": "The captures are ready for structured review scaffolding, but low_color_texture_entropy automated blockers must be cleared before they become zero-blocker human lifelike candidates; all seven handoff domains remain unapproved.",
     "photoreal_human_lifelike_review_packet": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_packet.md",
     "photoreal_human_lifelike_review_packet_status": "awaiting_human_lifelike_review_not_approved",
     "photoreal_human_lifelike_review_packet_summary": {

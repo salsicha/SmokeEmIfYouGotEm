@@ -20,7 +20,7 @@
     ],
     "measured_profile_count": 0,
     "open_profile_measurement_count": 6,
-    "automated_capture_blocking_count": 0,
+    "automated_capture_blocking_count": 6,
     "approved_river_count": 0
   },
   "shared_asset_inventory": {
@@ -28,7 +28,7 @@
       "root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
       "exists": true,
       "file_count": 9,
-      "total_bytes": 16155409
+      "total_bytes": 16155412
     },
     "source_conditioned_material_texture_assets": {
       "root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
@@ -74,38 +74,38 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_SouthForkAmerican_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 273117775,
-          "sha256": "f086446837fbf6a0cbbe21f5664dadbd44eb6f80f89332c68e325bd2c45b9556"
+          "size_bytes": 273094626,
+          "sha256": "b36db956bd2ae9861a6ba923f0e32427acf4ecfd2480200500050b5f97f42ca6"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "6e8c94658e1d3d53506bc45df7d070e055047144598d1bc8d95b0f62fc806448",
-            "size_bytes": 1420400,
+            "sha256": "b4c5a5d79cb4de3967edd9b49248f70e391a35fac024cb171759bc58bc33651d",
+            "size_bytes": 1240784,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           },
           {
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
             "exists": true,
-            "sha256": "78c9db61c02800f6be6052bdd8b58a7d5811ce0ea70eab7a7eaadfed5463e655",
-            "size_bytes": 1431195,
+            "sha256": "6e846309e2ba7e2ef6d45ca52c588b19c84aabca0bdcba378df7df54ace31fca",
+            "size_bytes": 1260487,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           }
         ],
-        "total_capture_png_bytes": 2851595,
+        "total_capture_png_bytes": 2501271,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/dem_relief_2048.png",
@@ -190,7 +190,7 @@
           ]
         }
       ],
-      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
     },
     {
       "river_id": "colorado_river",
@@ -210,38 +210,38 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_ColoradoGrandCanyon_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 260944296,
-          "sha256": "84f8ca3c929c08da798b83b66d905033f7dae5a3ef5cb6593ab1379fecaf2923"
+          "size_bytes": 260921251,
+          "sha256": "d88292ebdd4a201b423faf65ff47b289b0380a55e55fed87459db124bdacb284"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "5d83666d2b26bee2fac98f6f06701ba36d5d1a902d50df43f591e4a8bdbb2a95",
-            "size_bytes": 1441251,
+            "sha256": "f0dc2402a11b400b449b8c6755a39035d08c5847073157cc6cbf0108d3de24e1",
+            "size_bytes": 1253865,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           },
           {
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
             "exists": true,
-            "sha256": "a28dae8934610fd845360a0b9dbc66b225ff88163d1a68b43c99382a03180502",
-            "size_bytes": 1462651,
+            "sha256": "48f0bbe0bf402cd52f143ee81629b8bfca342e812bda5bfdb24485c7297568fc",
+            "size_bytes": 1331524,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           }
         ],
-        "total_capture_png_bytes": 2903902,
+        "total_capture_png_bytes": 2585389,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/imagery/production_import_pilot/source_drape_4096.png",
           "terrain_relief_image": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/production_import_pilot/dem_relief_2048.png",
@@ -326,7 +326,7 @@
           ]
         }
       ],
-      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
     },
     {
       "river_id": "pacuare",
@@ -346,38 +346,38 @@
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/L_PacuareRainforest_PhotorealPreview.umap",
           "exists": true,
-          "size_bytes": 309018814,
-          "sha256": "01d4ce6c9582f50acf1fdc45cd0d6bf2eac5463a241ea3bf5ea7fbd0daeb9c29"
+          "size_bytes": 308996080,
+          "sha256": "3e7f48e77c4dfde9fd171b9b936846e7689d52afa9108cde18102af340e3a777"
         },
         "captures": [
           {
             "view_id": "guide_seat_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_guide_seat_downstream.png",
             "exists": true,
-            "sha256": "4ff47f4dacdfb45722dc66ca6fad90daa1fd4d6927beae8665f05f69c075083e",
-            "size_bytes": 1475779,
+            "sha256": "d5db3d779e6b06a9fb63045cc44d56aac4494c8829064e029a85f24cb82c194f",
+            "size_bytes": 1343616,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           },
           {
             "view_id": "river_eye_downstream",
             "capture": "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png",
             "exists": true,
-            "sha256": "2c84961530ee2c5f9efcb4c18763fc7ac52908f15650c47a6085897f9827166d",
-            "size_bytes": 1496535,
+            "sha256": "f292eab7d33f8c812ccb6c0239396118f9e92ab3b56285e8c1c28204517df88b",
+            "size_bytes": 1363384,
             "source_size": [
               1280,
               720
             ],
-            "automated_blocker_count": 0,
-            "automated_status": "candidate_for_human_lifelike_review_not_approved"
+            "automated_blocker_count": 1,
+            "automated_status": "preview_only_not_lifelike_quality_blockers"
           }
         ],
-        "total_capture_png_bytes": 2972314,
+        "total_capture_png_bytes": 2707000,
         "source_inputs": {
           "aerial_drape_image": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_augmented_source_drape_preview_4096.png",
           "terrain_relief_image": "physics/data/real_world/pacuare_river_costa_rica/terrain/production_import_pilot/dem_relief_2048.png",
@@ -462,7 +462,7 @@
           ]
         }
       ],
-      "current_decision": "Use this row to attach measured desktop and VR profiling for the current zero-blocker capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
+      "current_decision": "Use this row to attach measured desktop and VR profiling for the current capture candidate. Static map/capture/asset inventory is recorded, but this river is not production-playable until every profile has measured frame-time, thread/GPU/memory, scalability, and readability evidence."
     }
   ],
   "current_decision": "This artifact closes the missing static evidence packet for desktop/VR review, but does not pass the performance gate. Real Unreal profiling captures must be attached for every river/profile before any environment is marked production-playable or lifelike-approved."
