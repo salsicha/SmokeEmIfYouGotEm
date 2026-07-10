@@ -57,6 +57,7 @@
 #include "Materials/MaterialExpressionFresnel.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionOneMinus.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
@@ -174,6 +175,11 @@ struct FRaftSimLandscapeMaterialCandidateSettings
     float DetailSurfaceResponseWeight = 0.30f;
     float EmissiveFillScale = 0.045f;
     float SpecularLevel = 0.16f;
+    float RiverbedBlendWeight = 0.82f;
+    float WetBankBlendWeight = 0.65f;
+    float RiverbedRoughness = 0.78f;
+    FLinearColor RiverbedColorScale = FLinearColor(0.22f, 0.32f, 0.28f, 0.0f);
+    FLinearColor WetBankColorScale = FLinearColor(0.52f, 0.56f, 0.50f, 0.0f);
 };
 
 struct FRaftSimPreviewWaterMaterialResponse
@@ -845,6 +851,11 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.DetailNormalWeight = 0.28f;
         Settings.EmissiveFillScale = 0.035f;
         Settings.SpecularLevel = 0.14f;
+        Settings.RiverbedBlendWeight = 0.78f;
+        Settings.WetBankBlendWeight = 0.58f;
+        Settings.RiverbedRoughness = 0.84f;
+        Settings.RiverbedColorScale = FLinearColor(0.36f, 0.28f, 0.20f, 0.0f);
+        Settings.WetBankColorScale = FLinearColor(0.58f, 0.44f, 0.34f, 0.0f);
     }
     else if (RiverId == TEXT("pacuare"))
     {
@@ -853,6 +864,11 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.DetailNormalWeight = 0.36f;
         Settings.DetailSurfaceResponseWeight = 0.32f;
         Settings.EmissiveFillScale = 0.055f;
+        Settings.RiverbedBlendWeight = 0.84f;
+        Settings.WetBankBlendWeight = 0.72f;
+        Settings.RiverbedRoughness = 0.72f;
+        Settings.RiverbedColorScale = FLinearColor(0.22f, 0.30f, 0.24f, 0.0f);
+        Settings.WetBankColorScale = FLinearColor(0.42f, 0.50f, 0.40f, 0.0f);
     }
     return Settings;
 }
@@ -1206,6 +1222,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UTexture2D* SourceNormalDetail = LoadCandidateTexture(
         TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
         TEXT("SourceConditionedNormalDetail"));
+    UTexture2D* SourceMaterialZones = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
+        TEXT("SourceConditionedMaterialZones"));
     UTexture2D* TerrainDetailAlbedo = LoadCandidateTexture(
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailAlbedo"));
@@ -1215,7 +1234,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UTexture2D* TerrainDetailNormal = LoadCandidateTexture(
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailNormal"));
-    if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail ||
+    if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail || !SourceMaterialZones ||
         !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
     {
         OutSummary += FString::Printf(
@@ -1328,6 +1347,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         TerrainDetailNormal,
         SAMPLERTYPE_Normal,
         DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* MaterialZonesSample = AddTextureSample(
+        TEXT("SourceConditionedMaterialZones"),
+        SourceMaterialZones,
+        SAMPLERTYPE_Masks,
+        MacroCoordinates);
 
     UMaterialExpressionConstant* DetailAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailAlbedoWeight->R = Settings.DetailAlbedoWeight;
@@ -1339,6 +1363,84 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     BaseColor->B.Expression = DetailAlbedoSample;
     BaseColor->Alpha.Expression = DetailAlbedoWeight;
     Material->GetExpressionCollection().AddExpression(BaseColor);
+
+    UMaterialExpressionComponentMask* MaterialWaterZone =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    MaterialWaterZone->Input.Expression = MaterialZonesSample;
+    MaterialWaterZone->B = true;
+    Material->GetExpressionCollection().AddExpression(MaterialWaterZone);
+    UMaterialExpressionConstant* RiverbedMaskGain = NewObject<UMaterialExpressionConstant>(Material);
+    RiverbedMaskGain->R = 1.15f;
+    Material->GetExpressionCollection().AddExpression(RiverbedMaskGain);
+    UMaterialExpressionMultiply* AmplifiedRiverbedMask = NewObject<UMaterialExpressionMultiply>(Material);
+    AmplifiedRiverbedMask->A.Expression = MaterialWaterZone;
+    AmplifiedRiverbedMask->B.Expression = RiverbedMaskGain;
+    Material->GetExpressionCollection().AddExpression(AmplifiedRiverbedMask);
+    UMaterialExpressionSaturate* RiverbedMask = NewObject<UMaterialExpressionSaturate>(Material);
+    RiverbedMask->Input.Expression = AmplifiedRiverbedMask;
+    Material->GetExpressionCollection().AddExpression(RiverbedMask);
+
+    UMaterialExpressionConstant* WetBankProximityGain = NewObject<UMaterialExpressionConstant>(Material);
+    WetBankProximityGain->R = 3.0f;
+    Material->GetExpressionCollection().AddExpression(WetBankProximityGain);
+    UMaterialExpressionMultiply* WetBankProximityRaw = NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankProximityRaw->A.Expression = MaterialWaterZone;
+    WetBankProximityRaw->B.Expression = WetBankProximityGain;
+    Material->GetExpressionCollection().AddExpression(WetBankProximityRaw);
+    UMaterialExpressionSaturate* WetBankProximity = NewObject<UMaterialExpressionSaturate>(Material);
+    WetBankProximity->Input.Expression = WetBankProximityRaw;
+    Material->GetExpressionCollection().AddExpression(WetBankProximity);
+    UMaterialExpressionOneMinus* DrySideOfWaterZone = NewObject<UMaterialExpressionOneMinus>(Material);
+    DrySideOfWaterZone->Input.Expression = MaterialWaterZone;
+    Material->GetExpressionCollection().AddExpression(DrySideOfWaterZone);
+    UMaterialExpressionMultiply* WetBankBand = NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankBand->A.Expression = WetBankProximity;
+    WetBankBand->B.Expression = DrySideOfWaterZone;
+    Material->GetExpressionCollection().AddExpression(WetBankBand);
+
+    UMaterialExpressionConstant* WetBankBlendWeight = NewObject<UMaterialExpressionConstant>(Material);
+    WetBankBlendWeight->R = Settings.WetBankBlendWeight;
+    Material->GetExpressionCollection().AddExpression(WetBankBlendWeight);
+    UMaterialExpressionMultiply* WetBankBlendMask = NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankBlendMask->A.Expression = WetBankBand;
+    WetBankBlendMask->B.Expression = WetBankBlendWeight;
+    Material->GetExpressionCollection().AddExpression(WetBankBlendMask);
+    UMaterialExpressionConstant3Vector* WetBankColorScale =
+        NewObject<UMaterialExpressionConstant3Vector>(Material);
+    WetBankColorScale->Constant = Settings.WetBankColorScale;
+    Material->GetExpressionCollection().AddExpression(WetBankColorScale);
+    UMaterialExpressionMultiply* WetBankColor = NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankColor->A.Expression = BaseColor;
+    WetBankColor->B.Expression = WetBankColorScale;
+    Material->GetExpressionCollection().AddExpression(WetBankColor);
+    UMaterialExpressionLinearInterpolate* BaseColorWithWetBank =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    BaseColorWithWetBank->A.Expression = BaseColor;
+    BaseColorWithWetBank->B.Expression = WetBankColor;
+    BaseColorWithWetBank->Alpha.Expression = WetBankBlendMask;
+    Material->GetExpressionCollection().AddExpression(BaseColorWithWetBank);
+
+    UMaterialExpressionConstant* RiverbedBlendWeight = NewObject<UMaterialExpressionConstant>(Material);
+    RiverbedBlendWeight->R = Settings.RiverbedBlendWeight;
+    Material->GetExpressionCollection().AddExpression(RiverbedBlendWeight);
+    UMaterialExpressionMultiply* RiverbedBlendMask = NewObject<UMaterialExpressionMultiply>(Material);
+    RiverbedBlendMask->A.Expression = RiverbedMask;
+    RiverbedBlendMask->B.Expression = RiverbedBlendWeight;
+    Material->GetExpressionCollection().AddExpression(RiverbedBlendMask);
+    UMaterialExpressionConstant3Vector* RiverbedColorScale =
+        NewObject<UMaterialExpressionConstant3Vector>(Material);
+    RiverbedColorScale->Constant = Settings.RiverbedColorScale;
+    Material->GetExpressionCollection().AddExpression(RiverbedColorScale);
+    UMaterialExpressionMultiply* RiverbedColor = NewObject<UMaterialExpressionMultiply>(Material);
+    RiverbedColor->A.Expression = BaseColor;
+    RiverbedColor->B.Expression = RiverbedColorScale;
+    Material->GetExpressionCollection().AddExpression(RiverbedColor);
+    UMaterialExpressionLinearInterpolate* ConditionedBaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ConditionedBaseColor->A.Expression = BaseColorWithWetBank;
+    ConditionedBaseColor->B.Expression = RiverbedColor;
+    ConditionedBaseColor->Alpha.Expression = RiverbedBlendMask;
+    Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailNormalWeight->R = Settings.DetailNormalWeight;
@@ -1384,12 +1486,22 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Roughness->Alpha.Expression = DetailSurfaceResponseWeight;
     Material->GetExpressionCollection().AddExpression(Roughness);
 
+    UMaterialExpressionConstant* RiverbedRoughness = NewObject<UMaterialExpressionConstant>(Material);
+    RiverbedRoughness->R = Settings.RiverbedRoughness;
+    Material->GetExpressionCollection().AddExpression(RiverbedRoughness);
+    UMaterialExpressionLinearInterpolate* ConditionedRoughness =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ConditionedRoughness->A.Expression = Roughness;
+    ConditionedRoughness->B.Expression = RiverbedRoughness;
+    ConditionedRoughness->Alpha.Expression = RiverbedBlendMask;
+    Material->GetExpressionCollection().AddExpression(ConditionedRoughness);
+
     UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
     EmissiveScale->R = Settings.EmissiveFillScale;
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
     UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    EmissiveColor->A.Expression = BaseColor;
+    EmissiveColor->A.Expression = ConditionedBaseColor;
     EmissiveColor->B.Expression = EmissiveScale;
     Material->GetExpressionCollection().AddExpression(EmissiveColor);
 
@@ -1398,11 +1510,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Material->GetExpressionCollection().AddExpression(Specular);
 
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ConditionedBaseColor);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
     ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, Normal);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, ConditionedRoughness);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
 
     Material->SetMaterialUsage(MATUSAGE_Nanite);
@@ -1424,13 +1536,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     FAssetCompilingManager::Get().FinishAllCompilation();
 
     OutSummary += FString::Printf(
-        TEXT("Built %s Landscape material from source-conditioned macro maps plus first-party terrain detail (macro scale %.2f, detail scale %.2f, albedo %.2f, normal %.2f, surface %.2f).\n"),
+        TEXT("Built %s Landscape material from source-conditioned macro/zones maps plus first-party terrain detail (macro scale %.2f, detail scale %.2f, albedo %.2f, normal %.2f, surface %.2f, riverbed %.2f, wet bank %.2f).\n"),
         *Candidate.PreviewSpec.RiverId,
         Settings.MacroMappingScale,
         Settings.DetailMappingScale,
         Settings.DetailAlbedoWeight,
         Settings.DetailNormalWeight,
-        Settings.DetailSurfaceResponseWeight);
+        Settings.DetailSurfaceResponseWeight,
+        Settings.RiverbedBlendWeight,
+        Settings.WetBankBlendWeight);
 
     return Material;
 }
@@ -17714,8 +17828,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
             TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
             TEXT("      \"target_relief_cm\": %.3f,\n")
-            TEXT("      \"landscape_material_status\": \"source_conditioned_macro_plus_first_party_close_range_detail_review_candidate\",\n")
-            TEXT("      \"landscape_material_texture_asset_count\": 6,\n")
+            TEXT("      \"landscape_material_status\": \"source_conditioned_macro_zones_plus_first_party_close_range_detail_review_candidate\",\n")
+            TEXT("      \"landscape_material_texture_asset_count\": 7,\n")
+            TEXT("      \"landscape_material_zone_parameter\": \"SourceConditionedMaterialZones\",\n")
+            TEXT("      \"landscape_material_zone_semantics\": \"rgb_r_terrain_wet_bank_g_vegetation_b_visible_water\",\n")
             TEXT("      \"landscape_material_macro_mapping_scale\": %.3f,\n")
             TEXT("      \"landscape_material_detail_mapping_scale\": %.3f,\n")
             TEXT("      \"landscape_material_detail_albedo_weight\": %.3f,\n")
@@ -17723,6 +17839,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_material_detail_surface_response_weight\": %.3f,\n")
             TEXT("      \"landscape_material_emissive_fill_scale\": %.3f,\n")
             TEXT("      \"landscape_material_specular_level\": %.3f,\n")
+            TEXT("      \"landscape_material_riverbed_blend_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_wet_bank_blend_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_riverbed_roughness\": %.3f,\n")
+            TEXT("      \"landscape_material_riverbed_color_scale\": [%.3f, %.3f, %.3f],\n")
+            TEXT("      \"landscape_material_wet_bank_color_scale\": [%.3f, %.3f, %.3f],\n")
+            TEXT("      \"landscape_material_zone_conditioning_policy\": \"source_visible_water_darkens_submerged_riverbed_and_feathered_source_water_edge_conditions_wet_bank_without_changing_landscape_geometry_or_solver_authority\",\n")
             TEXT("      \"landscape_material_promotion_status\": \"review_only_not_lifelike_not_gameplay_promoted\",\n")
             TEXT("      \"landscape_dressing_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_asset_count\": %d,\n")
@@ -17813,6 +17935,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             MaterialSettings.DetailSurfaceResponseWeight,
             MaterialSettings.EmissiveFillScale,
             MaterialSettings.SpecularLevel,
+            MaterialSettings.RiverbedBlendWeight,
+            MaterialSettings.WetBankBlendWeight,
+            MaterialSettings.RiverbedRoughness,
+            MaterialSettings.RiverbedColorScale.R,
+            MaterialSettings.RiverbedColorScale.G,
+            MaterialSettings.RiverbedColorScale.B,
+            MaterialSettings.WetBankColorScale.R,
+            MaterialSettings.WetBankColorScale.G,
+            MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
                 ? TEXT("source_mask_placed_pve_foliage_and_dense_irregular_rock_evaluation_captured")
                 : TEXT("dressing_generation_or_validation_failed"),
