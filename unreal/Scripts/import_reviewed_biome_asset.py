@@ -421,4 +421,5 @@ def main() -> None:
         raise
 
 
-main()
+if __name__ == "__main__":
+    main()

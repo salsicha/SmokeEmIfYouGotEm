@@ -14,9 +14,9 @@
     "conifer_asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
     "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
     "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_fir_tree_01_import_report.json",
-    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_fir_only_river_eye_downstream.png",
     "river_eye_sha256": "c2a6194e1261d2a5d758b2cbdb587b38991a0914873c26043bc9dfd3280cc9c4",
-    "solver_rapid_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_solver_rapid_river_eye_downstream.png",
+    "solver_rapid_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_fir_only_solver_rapid_river_eye_downstream.png",
     "solver_rapid_river_eye_sha256": "556973efb437751b4ee5d835b7287489687e9324a333ede89a3366586a0ce062"
   },
   "validated": [

@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.unreal.biome_asset_visual_comparison_review.v1",
+  "asset_id": "polyhaven_tree_small_02_1k",
+  "river_id": "american_south_fork",
+  "status": "rights_clear_import_validated_visual_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "comparison_baseline": {
+    "commit": "f99e98be5",
+    "broadleaf_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static",
+    "conifer_asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
+    "river_eye_sha256": "c2a6194e1261d2a5d758b2cbdb587b38991a0914873c26043bc9dfd3280cc9c4",
+    "solver_rapid_river_eye_sha256": "556973efb437751b4ee5d835b7287489687e9324a333ede89a3366586a0ce062"
+  },
+  "reviewed_candidate": {
+    "broadleaf_asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/SM_TreeSmall02.SM_TreeSmall02",
+    "conifer_asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_tree_small_02_import_report.json",
+    "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_guide_seat_downstream.png",
+    "guide_seat_sha256": "fc491ed98c7ba7db3cc2c27fc125f19f070a21994e1418d2411a11c758f80fe3",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
+    "river_eye_sha256": "1a175cef8b6d5616a1b9acdeeb55cefb1d920d5b17aca9f0484f8a031e2c61b5",
+    "solver_rapid_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_solver_rapid_river_eye_downstream.png",
+    "solver_rapid_river_eye_sha256": "735f2a6d4fc8be213ef6ebcddbeb4da92a324f7a62ce3a229255b96d3f150919"
+  },
+  "validated": [
+    "manual website acquisition with CC0 source, author, and species-tag provenance",
+    "eleven source-file SHA-256 checks before import",
+    "4.56 m effective height with the pivot inside the canopy footprint and within 2.5 cm of the ground plane",
+    "explicit trunk, branch, and masked two-sided leaf materials with GL-normal correction",
+    "Nanite enabled with PreserveArea, the publisher 5M label separated from the measured 3,564-triangle fallback, and no invented exact source count",
+    "source-mask-aware HISM placement beside the reviewed fir in the isolated South Fork Landscape candidate",
+    "clean UE 5.8 editor build and three-river candidate generation/capture exit"
+  ],
+  "visual_findings": [
+    "The reviewed broadleaf removes the oversized repeated triangular PVE broadleaf crown cards from the South Fork candidate.",
+    "At the active guide-seat and river-eye distances, its canopy remains too thin and pale to form a convincing Sierra foothill riparian corridor.",
+    "Single-asset repetition and regular spacing remain visible, with insufficient species, crown, age, density, and seasonal variation.",
+    "Smooth terrain, flat water, provisional bank transitions, procedural rocks, sparse understory, atmosphere, and whitewater VFX still prevent a lifelike read."
+  ],
+  "decision": "retain_import_pipeline_and_isolated_assets_reject_visual_promotion",
+  "next_asset_requirements": [
+    "multiple rights-cleared Sierra foothill riparian broadleaf and conifer species with crown and age variants",
+    "dense distance-stable foliage mass with authored wind and seasonal states",
+    "ecology and guide review of species, placement, density, and flow-season appearance",
+    "production Landscape, bank, rock, water, atmosphere, and whitewater assets",
+    "measured desktop and VR performance plus human lifelike review"
+  ]
+}

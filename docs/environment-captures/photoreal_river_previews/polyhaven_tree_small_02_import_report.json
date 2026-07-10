@@ -1,0 +1,129 @@
+{
+  "schema": "raftsim.unreal.reviewed_biome_asset_import.v1",
+  "asset_id": "polyhaven_tree_small_02_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "tree_small_02_1k.fbx",
+      "sha256": "442394b4d39dcefef6c54358becea3c86735f040f2601b2c0c082e3ecf3685c5",
+      "bytes": 75487180
+    },
+    {
+      "relative_path": "textures/tree_small_02_branch_diff_1k.png",
+      "sha256": "a93ce54213c4a98cd01cb5c5f7ab46b77defcd66e1dd082e6912f6e60632e630",
+      "bytes": 1277270
+    },
+    {
+      "relative_path": "textures/tree_small_02_branch_nor_gl_1k.png",
+      "sha256": "0338a1400391893fdf6c6cbd1c22a573d6ab2300ad771d4916184bf206e1a671",
+      "bytes": 5754879
+    },
+    {
+      "relative_path": "textures/tree_small_02_branch_rough_1k.png",
+      "sha256": "f285a54d141f30e39c7741e84a813c5cbccd9e9ee397af687176213f77d3e9a5",
+      "bytes": 421614
+    },
+    {
+      "relative_path": "textures/tree_small_02_diff_1k.jpg",
+      "sha256": "4e0093f407b3a1120a36de49a48ebe5a465a9a9b77e361c7a3e66866e115e404",
+      "bytes": 863246
+    },
+    {
+      "relative_path": "textures/tree_small_02_leaves_alpha_1k.png",
+      "sha256": "4f143e2dda8a6a572f427ac378b92255d21761e4611de0d26e21816c01aa533b",
+      "bytes": 264711
+    },
+    {
+      "relative_path": "textures/tree_small_02_leaves_diff_1k.png",
+      "sha256": "d3fc48522c76aa1f91076c6b86f302669822ebe4e2acabd67d42c4d57eaa5ba0",
+      "bytes": 2338424
+    },
+    {
+      "relative_path": "textures/tree_small_02_leaves_nor_gl_1k.png",
+      "sha256": "fa4ad390f2e68b745db8f568cad64c3272696c5e01312ae564795e37724d79b8",
+      "bytes": 4903387
+    },
+    {
+      "relative_path": "textures/tree_small_02_leaves_rough_1k.png",
+      "sha256": "f005213467e38bcb355b00c9a6eb9896b8d810ee885d5c7fa308d9f3326ef602",
+      "bytes": 1043665
+    },
+    {
+      "relative_path": "textures/tree_small_02_nor_gl_1k.exr",
+      "sha256": "cf999e30663267b55b6fab43ca97c1e96176bdc67268e6c25854d53f15267d64",
+      "bytes": 2462999
+    },
+    {
+      "relative_path": "textures/tree_small_02_rough_1k.exr",
+      "sha256": "1ed5ad24397c065beb2b2d3521470730f24e957cbd5fb323ad3f9b6d267b4585",
+      "bytes": 978557
+    }
+  ],
+  "mesh": {
+    "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/SM_TreeSmall02.SM_TreeSmall02",
+    "source_triangle_count_lod0": null,
+    "source_triangle_count_status": "not_recomputed_from_existing_nanite_asset",
+    "publisher_reported_triangle_count_label": "5M",
+    "nanite_fallback_triangle_count_lod0": 3564,
+    "effective_height_cm": 455.6740965694189,
+    "plausible_tree_height": true,
+    "canopy_center_xy_offset_from_pivot_cm": 74.90507561810324,
+    "footprint_bounds_xy_cm": [
+      -128.78578901290894,
+      -132.04493522644043,
+      158.73050689697266,
+      278.8318395614624
+    ],
+    "pivot_within_footprint": true,
+    "base_z_cm": -2.410384640097618,
+    "base_contact_tolerance_cm": 11.391852414235473,
+    "pivot_meets_ground": true,
+    "valid_for_instancing": true,
+    "lod0_build_scale": [
+      100.0,
+      100.0,
+      100.0
+    ],
+    "nanite_enabled": true,
+    "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+    "material_slots": [
+      {
+        "index": 0,
+        "slot_name": "tree_small_02_branches",
+        "role": "branches",
+        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Branches.M_TreeSmall02_Branches"
+      },
+      {
+        "index": 1,
+        "slot_name": "tree_small_02_leaves",
+        "role": "leaves",
+        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Leaves.M_TreeSmall02_Leaves"
+      },
+      {
+        "index": 2,
+        "slot_name": "tree_small_02_trunk",
+        "role": "trunk",
+        "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Trunk.M_TreeSmall02_Trunk"
+      }
+    ]
+  },
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Branch_BaseColor_1K.T_TreeSmall02_Branch_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Branch_NormalGL_1K.T_TreeSmall02_Branch_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Branch_Roughness_1K.T_TreeSmall02_Branch_Roughness_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Leaves_BaseColor_1K.T_TreeSmall02_Leaves_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Leaves_NormalGL_1K.T_TreeSmall02_Leaves_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Leaves_Opacity_1K.T_TreeSmall02_Leaves_Opacity_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Leaves_Roughness_1K.T_TreeSmall02_Leaves_Roughness_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Trunk_BaseColor_1K.T_TreeSmall02_Trunk_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Trunk_NormalGL_1K.T_TreeSmall02_Trunk_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/T_TreeSmall02_Trunk_Roughness_1K.T_TreeSmall02_Trunk_Roughness_1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Branches.M_TreeSmall02_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Leaves.M_TreeSmall02_Leaves",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/M_TreeSmall02_Trunk.M_TreeSmall02_Trunk"
+  ]
+}

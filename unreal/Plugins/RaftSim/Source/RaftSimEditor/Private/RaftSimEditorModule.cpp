@@ -15934,6 +15934,39 @@ bool ValidateLandscapeCandidateReviewedFirMaterials(UStaticMesh* Mesh)
     return bHasReviewedBark && bHasReviewedNeedles;
 }
 
+bool ValidateLandscapeCandidateReviewedBroadleafMaterials(UStaticMesh* Mesh)
+{
+    if (!Mesh)
+    {
+        return false;
+    }
+
+    bool bHasReviewedTrunk = false;
+    bool bHasReviewedBranches = false;
+    bool bHasReviewedLeaves = false;
+    const TArray<FStaticMaterial>& StaticMaterials = Mesh->GetStaticMaterials();
+    for (int32 MaterialIndex = 0; MaterialIndex < StaticMaterials.Num(); ++MaterialIndex)
+    {
+        const FString SlotName = StaticMaterials[MaterialIndex].MaterialSlotName.ToString();
+        UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+        if (!Material)
+        {
+            continue;
+        }
+
+        bHasReviewedTrunk |=
+            SlotName.Contains(TEXT("trunk"), ESearchCase::IgnoreCase) &&
+            Material->GetPathName().Contains(TEXT("M_TreeSmall02_Trunk"));
+        bHasReviewedBranches |=
+            SlotName.Contains(TEXT("branch"), ESearchCase::IgnoreCase) &&
+            Material->GetPathName().Contains(TEXT("M_TreeSmall02_Branches"));
+        bHasReviewedLeaves |=
+            SlotName.Contains(TEXT("leaves"), ESearchCase::IgnoreCase) &&
+            Material->GetPathName().Contains(TEXT("M_TreeSmall02_Leaves"));
+    }
+    return bHasReviewedTrunk && bHasReviewedBranches && bHasReviewedLeaves;
+}
+
 FBox GetLandscapeCandidateEffectiveMeshBounds(UStaticMesh* Mesh)
 {
     if (!Mesh)
@@ -16073,8 +16106,12 @@ struct FRaftSimLandscapeImportCandidateResult
     bool bDressingUnderstoryMeshNaniteEnabled = false;
     bool bDressingFoliageMaterialsValidated = false;
     int32 DressingExternalReviewAssetCount = 0;
+    bool bDressingExternalBroadleafReviewAssetLoaded = false;
+    bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;
     bool bDressingExternalConiferMaterialsValidated = false;
+    FString DressingBroadleafAssetPath =
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static");
     FString DressingConiferAssetPath =
         TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static");
     bool bDressingValidated = false;
@@ -16154,19 +16191,27 @@ bool AddLandscapeCandidateBiomeDressing(
 
     if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
     {
+        static const TCHAR* ReviewedBroadleafObjectPath =
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/SM_TreeSmall02.SM_TreeSmall02");
         static const TCHAR* ReviewedFirObjectPath =
             TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0");
-        if (UStaticMesh* ReviewedFirMesh = LoadObject<UStaticMesh>(nullptr, ReviewedFirObjectPath))
+        UStaticMesh* ReviewedBroadleafMesh =
+            LoadObject<UStaticMesh>(nullptr, ReviewedBroadleafObjectPath);
+        UStaticMesh* ReviewedFirMesh = LoadObject<UStaticMesh>(nullptr, ReviewedFirObjectPath);
+        if (ReviewedBroadleafMesh && ReviewedFirMesh)
         {
+            BroadleafTreeMesh = ReviewedBroadleafMesh;
             ConiferTreeMesh = ReviewedFirMesh;
-            OutResult.DressingExternalReviewAssetCount = 1;
+            OutResult.DressingExternalReviewAssetCount = 2;
+            OutResult.bDressingExternalBroadleafReviewAssetLoaded = true;
             OutResult.bDressingExternalConiferReviewAssetLoaded = true;
+            OutResult.DressingBroadleafAssetPath = ReviewedBroadleafObjectPath;
             OutResult.DressingConiferAssetPath = ReviewedFirObjectPath;
-            OutSummary += TEXT("South Fork biome dressing uses the rights-reviewed Poly Haven fir in the isolated visual-comparison candidate.\n");
+            OutSummary += TEXT("South Fork biome dressing uses the rights-reviewed Poly Haven broadleaf analog and fir in the isolated visual-comparison candidate.\n");
         }
         else
         {
-            OutSummary += TEXT("South Fork rights-reviewed fir asset is missing; refusing to substitute an unrecorded external conifer.\n");
+            OutSummary += TEXT("One or more South Fork rights-reviewed tree assets are missing; refusing to substitute unrecorded external vegetation.\n");
             return false;
         }
     }
@@ -16242,11 +16287,19 @@ bool AddLandscapeCandidateBiomeDressing(
             OutResult.DressingFoliageMaterialAssetCount);
         return false;
     }
+    const FString BroadleafComponentName =
+        Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+            ? FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_ReviewedBroadleaf_%s"),
+                  *Candidate.PreviewSpec.RiverId)
+            : FString::Printf(
+                  TEXT("RaftSim_LandscapeCandidate_PveWholeBroadleaf_%s"),
+                  *Candidate.PreviewSpec.RiverId);
     UHierarchicalInstancedStaticMeshComponent* BroadleafTreeInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
             BroadleafTreeMesh,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeBroadleaf_%s"), *Candidate.PreviewSpec.RiverId),
+            BroadleafComponentName,
             true);
     const FString ConiferComponentName =
         Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
@@ -16306,10 +16359,19 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingFoliageMaterialBoundSlotCount +=
             OutResult.bDressingExternalConiferMaterialsValidated ? 1 : 0;
     }
+    if (OutResult.bDressingExternalBroadleafReviewAssetLoaded)
+    {
+        OutResult.bDressingExternalBroadleafMaterialsValidated =
+            ValidateLandscapeCandidateReviewedBroadleafMaterials(BroadleafTreeMesh);
+        OutResult.DressingFoliageMaterialBoundSlotCount +=
+            OutResult.bDressingExternalBroadleafMaterialsValidated ? 1 : 0;
+    }
     OutResult.DressingNativeFoliageMaterialFallbackSlotCount =
         FMath::Max(0, 4 - OutResult.DressingFoliageMaterialBoundSlotCount);
     OutResult.bDressingFoliageMaterialsValidated =
         OutResult.DressingFoliageMaterialBoundSlotCount >= 3 &&
+        (!OutResult.bDressingExternalBroadleafReviewAssetLoaded ||
+         OutResult.bDressingExternalBroadleafMaterialsValidated) &&
         (!OutResult.bDressingExternalConiferReviewAssetLoaded ||
          OutResult.bDressingExternalConiferMaterialsValidated);
     if (!OutResult.bDressingFoliageMaterialsValidated)
@@ -18969,9 +19031,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_dressing_external_review_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_external_review_broadleaf_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/polyhaven_tree_small_02_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_external_review_conifer_asset\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_external_review_conifer_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_source_species_skeletal_assets\": [\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"],\n")
             TEXT("      \"landscape_dressing_converted_species_static_assets\": [\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"],\n")
-            TEXT("      \"landscape_dressing_broadleaf_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_conifer_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_shrub_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\",\n")
             TEXT("      \"landscape_dressing_understory_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\",\n")
@@ -19133,18 +19199,30 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.DressingSourceSkeletalMeshCount,
             Result.DressingConvertedStaticMeshCount,
             Result.DressingExternalReviewAssetCount,
-            Result.bDressingExternalConiferReviewAssetLoaded
-                ? (Result.bDressingExternalConiferMaterialsValidated
-                       ? TEXT("rights_reviewed_cc0_fir_loaded_with_explicit_bark_and_needles_for_isolated_south_fork_visual_comparison")
-                       : TEXT("rights_reviewed_cc0_fir_loaded_but_material_validation_failed"))
+            Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                    Result.bDressingExternalConiferReviewAssetLoaded
+                ? (Result.bDressingExternalBroadleafMaterialsValidated &&
+                           Result.bDressingExternalConiferMaterialsValidated
+                       ? TEXT("rights_reviewed_cc0_broadleaf_analog_and_fir_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
+                       : TEXT("rights_reviewed_cc0_tree_assets_loaded_but_material_validation_failed"))
                 : TEXT("no_external_review_asset_selected_for_this_river"),
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
                     : FString()),
+            *EscapeRaftSimJsonString(
+                Result.bDressingExternalBroadleafReviewAssetLoaded
+                    ? Result.DressingBroadleafAssetPath
+                    : FString()),
+            *EscapeRaftSimJsonString(
+                Result.bDressingExternalConiferReviewAssetLoaded
+                    ? Result.DressingConiferAssetPath
+                    : FString()),
+            *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
-            Result.bDressingExternalConiferReviewAssetLoaded
-                ? TEXT("complete_pve_species_plus_rights_reviewed_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
+            Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                    Result.bDressingExternalConiferReviewAssetLoaded
+                ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
                 : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"),
             Result.DressingBoulderInstanceCount,
             Result.DressingFoliageInstanceCount,
@@ -19187,8 +19265,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
-            Result.bDressingExternalConiferReviewAssetLoaded
-                ? TEXT("rights_reviewed_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
+            Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                    Result.bDressingExternalConiferReviewAssetLoaded
+                ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
                 : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"),
             Result.bSolverSurfaceWaterMaterialBound
                 ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
