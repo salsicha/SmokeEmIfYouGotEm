@@ -26,7 +26,8 @@ ART_RESEARCH_PATH = Path("unreal/Content/RaftSim/Rendering/art_asset_source_rese
 GAP_REGISTER_PATH = Path("physics/data/real_world/production_environment_gap_register.json")
 
 PRODUCTION_DETAIL_CHECKPOINT_ID = "production_detail_material_checkpoint_2026_07_09"
-CHECKPOINT_ID = "source_terrain_geometry_checkpoint_2026_07_09"
+SOURCE_TERRAIN_CHECKPOINT_ID = "source_terrain_geometry_checkpoint_2026_07_09"
+CHECKPOINT_ID = "water_light_response_checkpoint_2026_07_09"
 GENERATED_ON = "2026-07-09"
 
 
@@ -40,7 +41,7 @@ def _write_json(repo_root: Path, relative_path: Path, payload: dict) -> None:
 
 def _checkpoint(base_review: dict, flow_review: dict) -> dict:
     return {
-        "status": "source_terrain_geometry_rendered_with_production_detail_materials_gate_blocked_not_lifelike",
+        "status": "source_terrain_and_dedicated_water_light_response_rendered_gate_blocked_not_lifelike",
         "production_detail_texture_manifest": str(PRODUCTION_DETAIL_MANIFEST_RELATIVE_PATH),
         "production_detail_texture_asset_root": str(PRODUCTION_DETAIL_ASSET_ROOT_RELATIVE_PATH),
         "production_detail_texture_asset_status": PRODUCTION_DETAIL_ASSET_STATUS,
@@ -53,6 +54,12 @@ def _checkpoint(base_review: dict, flow_review: dict) -> dict:
             "source_heightfield_bilinear_sampling_and_center_seam_feathering",
             "source_heightfield_meter_scale_macro_relief_and_multiscale_local_erosion_residual",
             "river_specific_source_terrain_normal_flattening_reduced",
+            "dedicated_default_lit_water_parent_isolated_from_atlas_terrain_parent",
+            "flow_dependent_river_ribbon_mesh_normals_preserved",
+            "tile_safe_first_party_water_normal_atlas_sampling",
+            "river_specific_bounded_water_emissive_roughness_specular_and_normal_response",
+            "near_camera_water_color_and_relief_suppression_reduced_with_luminance_floor_retained",
+            "source_baked_terrain_vertex_color_material_retained_after_atlas_parent_loaded_black",
         ],
         "base_capture_quality_summary": base_review["summary"],
         "flow_variant_capture_quality_summary": flow_review["summary"],
@@ -81,10 +88,34 @@ def _checkpoint(base_review: dict, flow_review: dict) -> dict:
                 ),
             },
         },
+        "comparison_to_source_terrain_checkpoint": {
+            "checkpoint": SOURCE_TERRAIN_CHECKPOINT_ID,
+            "prior_base_blocker_counts": {
+                "excess_low_gradient_area": 5,
+                "low_color_texture_entropy": 6,
+                "low_edge_density": 6,
+                "low_luma_variation": 2,
+            },
+            "current_base_blocker_counts": base_review["summary"]["blocker_counts"],
+            "prior_flow_variant_blocker_counts": {
+                "excess_low_gradient_area": 18,
+                "low_color_texture_entropy": 20,
+                "low_edge_density": 20,
+                "low_luma_variation": 6,
+            },
+            "current_flow_variant_blocker_counts": flow_review["summary"]["blocker_counts"],
+            "excess_low_gradient_area_delta": {
+                "base": base_review["summary"]["blocker_counts"].get("excess_low_gradient_area", 0) - 5,
+                "flow_variant": (
+                    flow_review["summary"]["blocker_counts"].get("excess_low_gradient_area", 0) - 18
+                ),
+            },
+        },
         "next_visual_art_blocker": (
-            "Promote conditioned source terrain into production Landscape/Nanite assets and replace the dominant "
-            "smooth water surface, proxy rocks/foliage, and placeholder atmosphere/VFX until edge density, broad "
-            "smooth area, color entropy, and Colorado luminance blockers clear without synthetic grain or overlay cards."
+            "Promote conditioned source terrain into production Landscape/Nanite assets and replace the dedicated "
+            "review water parent with production WaterBody/custom shading, reflection/refraction, solver-driven foam, "
+            "and spray; then replace proxy rocks/foliage and placeholder atmosphere/VFX until edge density, broad smooth "
+            "area, color entropy, and Colorado luminance blockers clear without synthetic grain or overlay cards."
         ),
     }
 
@@ -116,13 +147,16 @@ def sync_photoreal_environment_review_rollups(repo_root: Path) -> list[Path]:
     integration["visual_blocker_reduction_checkpoint_2026_07_08"]["superseded_by"] = CHECKPOINT_ID
     if PRODUCTION_DETAIL_CHECKPOINT_ID in integration:
         integration[PRODUCTION_DETAIL_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
+    if SOURCE_TERRAIN_CHECKPOINT_ID in integration:
+        integration[SOURCE_TERRAIN_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
     asset_plan["current_decision"] = (
         "Use the first-party procedural plan and production-detail textures as traceable Unreal inputs, but keep "
         "all rivers preview_only_not_lifelike. The corrected material graph now renders real close-range terrain "
         "detail without legacy overlay geometry or synthetic film grain. Bilinear seam-feathered source heightfields "
-        "now provide meter-scale macro terrain and local erosion relief, but the current reviews still record "
-        "smooth-water, edge-density, entropy, and Colorado luminance blockers. Human review and measured desktop/VR "
-        "performance remain open after those visual blockers clear."
+        "provide meter-scale macro terrain and local erosion relief. A dedicated DefaultLit water parent now preserves "
+        "flow mesh normals, samples the tile-safe first-party water normal atlas, and exposes bounded per-river light "
+        "response without destabilizing terrain. The current reviews still record smooth-water, edge-density, entropy, "
+        "and Colorado luminance blockers; human review and measured desktop/VR performance remain open after those clear."
     )
     _write_json(repo_root, ASSET_PLAN_PATH, asset_plan)
 
@@ -145,6 +179,8 @@ def sync_photoreal_environment_review_rollups(repo_root: Path) -> list[Path]:
     generation["visual_blocker_reduction_checkpoint_2026_07_08"]["superseded_by"] = CHECKPOINT_ID
     if PRODUCTION_DETAIL_CHECKPOINT_ID in generation:
         generation[PRODUCTION_DETAIL_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
+    if SOURCE_TERRAIN_CHECKPOINT_ID in generation:
+        generation[SOURCE_TERRAIN_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
     _write_json(repo_root, SOURCE_PLAN_PATH, source_plan)
 
     art_research = _read_json(repo_root, ART_RESEARCH_PATH)
@@ -159,6 +195,8 @@ def sync_photoreal_environment_review_rollups(repo_root: Path) -> list[Path]:
     art_decision["visual_blocker_reduction_checkpoint_2026_07_08"]["superseded_by"] = CHECKPOINT_ID
     if PRODUCTION_DETAIL_CHECKPOINT_ID in art_decision:
         art_decision[PRODUCTION_DETAIL_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
+    if SOURCE_TERRAIN_CHECKPOINT_ID in art_decision:
+        art_decision[SOURCE_TERRAIN_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
     art_decision["human_review_note"] = (
         "Human review scaffolding is synchronized, but every current capture remains automatically blocked. "
         "Do not request lifelike approval until the current smoothness, edge-density, entropy, and Colorado "
@@ -169,14 +207,17 @@ def sync_photoreal_environment_review_rollups(repo_root: Path) -> list[Path]:
     gap_register = _read_json(repo_root, GAP_REGISTER_PATH)
     gap_register["generated_on"] = GENERATED_ON
     gap_register["next_checkpoint_order"][0] = (
-        "Promote conditioned source terrain into production Landscape/Nanite assets and replace the smooth preview "
-        "water, proxy rocks/foliage, and placeholder atmosphere/VFX until the current edge-density, low-gradient, "
+        "Promote conditioned source terrain into production Landscape/Nanite assets; replace the dedicated review "
+        "water parent with production WaterBody/custom reflection, refraction, solver-driven foam, and spray; then "
+        "replace proxy rocks/foliage and placeholder atmosphere/VFX until the current edge-density, low-gradient, "
         "entropy, and Colorado luminance blockers clear without synthetic grain or overlay cards."
     )
     gap_register[CHECKPOINT_ID] = checkpoint
     gap_register["visual_blocker_reduction_checkpoint_2026_07_08"]["superseded_by"] = CHECKPOINT_ID
     if PRODUCTION_DETAIL_CHECKPOINT_ID in gap_register:
         gap_register[PRODUCTION_DETAIL_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
+    if SOURCE_TERRAIN_CHECKPOINT_ID in gap_register:
+        gap_register[SOURCE_TERRAIN_CHECKPOINT_ID]["superseded_by"] = CHECKPOINT_ID
     _write_json(repo_root, GAP_REGISTER_PATH, gap_register)
 
     return [ASSET_PLAN_PATH, SOURCE_PLAN_PATH, ART_RESEARCH_PATH, GAP_REGISTER_PATH]

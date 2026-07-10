@@ -72,6 +72,66 @@ SOURCE_CONDITIONED_TEXTURE_PARAMETERS = {
     spec["parameter"]: map_id for map_id, spec in UNREAL_TEXTURE_ASSET_BY_MAP_ID.items()
 }
 
+MATERIAL_RESPONSE_BY_RECIPE = {
+    "terrain_bank_layered_material": {
+        "RoughnessScale": 0.92,
+        "RoughnessFloor": 0.72,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0,
+    },
+    "wet_boulder_contact_material_set": {
+        "RoughnessScale": 0.64,
+        "RoughnessFloor": 0.66,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0,
+    },
+    "biome_foliage_groundcover_materials": {
+        "RoughnessScale": 0.78,
+        "RoughnessFloor": 0.68,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0,
+    },
+    "foam_spray_mist_atmosphere_materials": {
+        "RoughnessScale": 0.40,
+        "RoughnessFloor": 0.74,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0,
+    },
+    "raft_foreground_review_materials": {
+        "RoughnessScale": 0.56,
+        "RoughnessFloor": 0.70,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0,
+    },
+}
+
+WATER_MATERIAL_RESPONSE_BY_RIVER = {
+    "american_south_fork": {
+        "RoughnessScale": 0.18,
+        "RoughnessFloor": 0.28,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22,
+        "MeshNormalUpBlend": 0.15,
+        "NormalIntensity": 0.32,
+    },
+    "colorado_river": {
+        "RoughnessScale": 0.22,
+        "RoughnessFloor": 0.34,
+        "EmissiveFillScale": 0.28,
+        "SpecularLevel": 0.18,
+        "MeshNormalUpBlend": 0.18,
+        "NormalIntensity": 0.22,
+    },
+    "pacuare": {
+        "RoughnessScale": 0.18,
+        "RoughnessFloor": 0.30,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22,
+        "MeshNormalUpBlend": 0.12,
+        "NormalIntensity": 0.36,
+    },
+}
+
 
 @dataclass(frozen=True)
 class SourceConditionedMaterialMapRecord:
@@ -490,6 +550,19 @@ def refresh_source_conditioned_material_instance_candidate_bindings(repo_root: P
     candidate_manifest = json.loads(candidate_manifest_path.read_text(encoding="utf-8"))
     source_maps_by_river = {river["river_id"]: river["maps"] for river in source_map_manifest["rivers"]}
 
+    candidate_manifest["map_bindings"].update(
+        {
+            "EmissiveFillScale": (
+                "Per-instance DefaultLit emissive fill; water keeps this low so mesh normals and scene lighting "
+                "remain visible."
+            ),
+            "SpecularLevel": (
+                "Per-instance DefaultLit dielectric specular response; bounded by river and review-only until "
+                "production water shading is approved."
+            ),
+        }
+    )
+
     for candidate in candidate_manifest["candidates"]:
         source_maps = source_maps_by_river[candidate["river_id"]]
         candidate["source_conditioned_texture_bindings"] = {
@@ -503,6 +576,66 @@ def refresh_source_conditioned_material_instance_candidate_bindings(repo_root: P
             parameter: source_maps[map_id]["unreal_texture_asset"]
             for parameter, map_id in SOURCE_CONDITIONED_TEXTURE_PARAMETERS.items()
         }
+
+        recipe_id = candidate["recipe_id"]
+        is_water = recipe_id == "flow_dependent_water_surface_material"
+        if is_water:
+            material_response = WATER_MATERIAL_RESPONSE_BY_RIVER[candidate["river_id"]]
+        else:
+            material_response = MATERIAL_RESPONSE_BY_RECIPE[recipe_id]
+        candidate["material_response_parameters"] = material_response
+        review_parameters = candidate["review_asset_parameters"]
+        review_parameters["RoughnessFloor"] = material_response["RoughnessFloor"]
+        review_parameters["RoughnessScaleValue"] = material_response["RoughnessScale"]
+        atlas_sampler_parent = candidate["atlas_sampler_review_material"]
+        atlas_sampler_parent["tuning_parameters"] = [
+            parameter_name
+            for parameter_name in atlas_sampler_parent["tuning_parameters"]
+            if parameter_name not in {"EmissiveFillScale", "SpecularLevel"}
+        ]
+        atlas_sampler_parent["output_wiring"].pop("EmissiveColor", None)
+        atlas_sampler_parent["output_wiring"].pop("Specular", None)
+        if is_water:
+            review_parameters["EmissiveFillScale"] = material_response["EmissiveFillScale"]
+            review_parameters["SpecularLevel"] = material_response["SpecularLevel"]
+            review_parameters["NormalIntensity"] = material_response["NormalIntensity"]
+            candidate["expected_parameters"]["EmissiveFillScale"] = (
+                "river_specific_default_lit_emissive_fill_bounded_to_preserve_mesh_light_response"
+            )
+            candidate["expected_parameters"]["SpecularLevel"] = (
+                "river_specific_bounded_default_lit_dielectric_specular_response"
+            )
+            candidate["parent_preview_material"] = "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview"
+            candidate["review_parent_material"] = {
+                "path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+                "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.uasset",
+                "status": "created_unreal_default_lit_water_review_parent_material_not_lifelike",
+                "sampled_parameters": ["NormalAtlas"],
+                "tuning_parameters": [
+                    "AtlasTileOrigin",
+                    "AtlasTileScale",
+                    "NormalIntensity",
+                    "RoughnessScale",
+                    "RoughnessFloor",
+                    "EmissiveFillScale",
+                    "SpecularLevel",
+                ],
+                "output_wiring": {
+                    "BaseColor": "flow-aware river-ribbon vertex color",
+                    "EmissiveColor": "bounded vertex-color fill scaled per river material instance",
+                    "Roughness": "bounded sum of per-river RoughnessScale and RoughnessFloor",
+                    "Specular": "bounded per-river DefaultLit dielectric response",
+                    "Normal": (
+                        "tile-safe first-party water normal atlas blended over the procedural river-ribbon mesh normal"
+                    ),
+                },
+            }
+        else:
+            review_parameters.pop("EmissiveFillScale", None)
+            review_parameters.pop("SpecularLevel", None)
+            candidate["expected_parameters"].pop("EmissiveFillScale", None)
+            candidate["expected_parameters"].pop("SpecularLevel", None)
+            candidate["review_parent_material"] = candidate["atlas_sampler_review_material"]
 
     candidate_manifest["generated_on"] = "2026-07-09"
     candidate_manifest["source_conditioned_material_map_manifest"] = str(
