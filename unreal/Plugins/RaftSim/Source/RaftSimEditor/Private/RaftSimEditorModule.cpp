@@ -2,6 +2,7 @@
 
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetCompilingManager.h"
+#include "Animation/SkeletalMeshActor.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
@@ -12,6 +13,7 @@
 #include "Components/MeshComponent.h"
 #include "Components/ReflectionCaptureComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Components/SkyLightComponent.h"
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -22,6 +24,7 @@
 #include "Engine/ExponentialHeightFog.h"
 #include "Engine/PointLight.h"
 #include "Engine/SceneCapture2D.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/SkyLight.h"
 #include "Engine/SphereReflectionCapture.h"
 #include "Engine/StaticMesh.h"
@@ -69,6 +72,7 @@
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "MeshUtilities.h"
 #include "Misc/CommandLine.h"
 #include "Misc/CoreDelegates.h"
 #include "Misc/FileHelper.h"
@@ -15901,6 +15905,96 @@ int32 BindLandscapeCandidateFoliageMaterial(
     return BoundSlotCount;
 }
 
+UStaticMesh* LoadOrCreateLandscapeCandidatePveStaticMesh(
+    UWorld* World,
+    const TCHAR* SourceSkeletalMeshPath,
+    const TCHAR* OutputPackagePath,
+    FString& OutSummary)
+{
+    if (!World)
+    {
+        return nullptr;
+    }
+
+    const FString AssetName = FPackageName::GetLongPackageAssetName(OutputPackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), OutputPackagePath, *AssetName);
+    if (UStaticMesh* ExistingMesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+    {
+        return ExistingMesh;
+    }
+
+    USkeletalMesh* SourceMesh = LoadObject<USkeletalMesh>(nullptr, SourceSkeletalMeshPath);
+    if (!SourceMesh)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not load complete PVE source species mesh %s.\n"),
+            SourceSkeletalMeshPath);
+        return nullptr;
+    }
+
+    ASkeletalMeshActor* ConversionActor = World->SpawnActor<ASkeletalMeshActor>(
+        ASkeletalMeshActor::StaticClass(),
+        FTransform::Identity);
+    if (!ConversionActor)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create the PVE static-mesh conversion actor for %s.\n"),
+            SourceSkeletalMeshPath);
+        return nullptr;
+    }
+
+    USkeletalMeshComponent* SourceComponent = ConversionActor->GetSkeletalMeshComponent();
+    SourceComponent->SetSkeletalMeshAsset(SourceMesh);
+    SourceComponent->SetWorldTransform(FTransform::Identity);
+    SourceComponent->RefreshBoneTransforms();
+    SourceComponent->UpdateComponentToWorld();
+    SourceComponent->MarkRenderStateDirty();
+    FlushRenderingCommands();
+
+    IMeshUtilities& MeshUtilities =
+        FModuleManager::Get().LoadModuleChecked<IMeshUtilities>(TEXT("MeshUtilities"));
+    TArray<UMeshComponent*> ComponentsToConvert;
+    ComponentsToConvert.Add(SourceComponent);
+    UStaticMesh* ConvertedMesh = MeshUtilities.ConvertMeshesToStaticMesh(
+        ComponentsToConvert,
+        FTransform::Identity,
+        OutputPackagePath);
+    ConversionActor->Destroy();
+    if (!ConvertedMesh)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to convert complete PVE source species mesh %s.\n"),
+            SourceSkeletalMeshPath);
+        return nullptr;
+    }
+
+    ConvertedMesh->Modify();
+    ConvertedMesh->GetNaniteSettings().bEnabled = true;
+    ConvertedMesh->Build(false);
+    ConvertedMesh->PostEditChange();
+    ConvertedMesh->MarkPackageDirty();
+
+    UPackage* Package = ConvertedMesh->GetOutermost();
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(OutputPackagePath, FPackageName::GetAssetPackageExtension());
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, ConvertedMesh, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to save converted PVE species mesh %s.\n"),
+            OutputPackagePath);
+        return nullptr;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Converted complete PVE source species %s -> %s with Nanite enabled.\n"),
+        SourceSkeletalMeshPath,
+        OutputPackagePath);
+    return ConvertedMesh;
+}
+
 struct FRaftSimLandscapeImportCandidateResult
 {
     uint16 SourceHeightMin = 0;
@@ -15918,13 +16012,19 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingBoulderInstanceCount = 0;
     int32 DressingFoliageInstanceCount = 0;
     int32 DressingTrunkInstanceCount = 0;
+    int32 DressingCanopyTreeInstanceCount = 0;
+    int32 DressingUnderstoryInstanceCount = 0;
+    int32 DressingSourceSkeletalMeshCount = 0;
+    int32 DressingConvertedStaticMeshCount = 0;
     int32 DressingFoliageMaterialAssetCount = 0;
     int32 DressingFoliageMaterialBoundSlotCount = 0;
+    int32 DressingNativeFoliageMaterialFallbackSlotCount = 0;
     bool bDressingAssetsLoaded = false;
     bool bDressingSourceMasksLoaded = false;
     bool bDressingBoulderMeshNaniteEnabled = false;
     bool bDressingBroadleafMeshNaniteEnabled = false;
     bool bDressingConiferMeshNaniteEnabled = false;
+    bool bDressingUnderstoryMeshNaniteEnabled = false;
     bool bDressingFoliageMaterialsValidated = false;
     bool bDressingValidated = false;
     FString WaterMaterialPath;
@@ -15947,36 +16047,65 @@ bool AddLandscapeCandidateBiomeDressing(
         return false;
     }
 
-    static const TCHAR* BroadleafMeshAPath =
-        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_01.Leaf_Twig_01");
-    static const TCHAR* BroadleafMeshBPath =
-        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_03.Leaf_Twig_03");
-    static const TCHAR* ConiferMeshPath =
-        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/Instances/Conifer_Twig_01.Conifer_Twig_01");
-    static const TCHAR* TrunkMeshPath = TEXT("/Engine/BasicShapes/Cylinder.Cylinder");
+    static const TCHAR* BroadleafSourcePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01.PVE_Deciduous_Tree_01");
+    static const TCHAR* ConiferSourcePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01.PVE_Conifer_01");
+    static const TCHAR* ShrubSourcePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01.PVE_Deciduous_Shrub_01");
+    static const TCHAR* UnderstorySourcePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01.PVE_Plant_01");
 
-    UStaticMesh* BroadleafMeshA = LoadPreviewMesh(BroadleafMeshAPath);
-    UStaticMesh* BroadleafMeshB = LoadPreviewMesh(BroadleafMeshBPath);
-    UStaticMesh* ConiferMesh = LoadPreviewMesh(ConiferMeshPath);
-    UStaticMesh* TrunkMesh = LoadPreviewMesh(TrunkMeshPath);
-    for (UStaticMesh* Mesh : {BroadleafMeshA, BroadleafMeshB, ConiferMesh, TrunkMesh})
+    for (const TCHAR* SourcePath :
+         {BroadleafSourcePath, ConiferSourcePath, ShrubSourcePath, UnderstorySourcePath})
+    {
+        OutResult.DressingSourceSkeletalMeshCount +=
+            LoadObject<USkeletalMesh>(nullptr, SourcePath) ? 1 : 0;
+    }
+
+    UStaticMesh* BroadleafTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+        World,
+        BroadleafSourcePath,
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static"),
+        OutSummary);
+    UStaticMesh* ConiferTreeMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+        World,
+        ConiferSourcePath,
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static"),
+        OutSummary);
+    UStaticMesh* ShrubMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+        World,
+        ShrubSourcePath,
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static"),
+        OutSummary);
+    UStaticMesh* UnderstoryMesh = LoadOrCreateLandscapeCandidatePveStaticMesh(
+        World,
+        UnderstorySourcePath,
+        TEXT("/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static"),
+        OutSummary);
+    for (UStaticMesh* Mesh : {BroadleafTreeMesh, ConiferTreeMesh, ShrubMesh, UnderstoryMesh})
     {
         OutResult.DressingAssetCount += Mesh ? 1 : 0;
+        OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
-    OutResult.bDressingAssetsLoaded = OutResult.DressingAssetCount == 4;
+    OutResult.bDressingAssetsLoaded =
+        OutResult.DressingSourceSkeletalMeshCount == 4 &&
+        OutResult.DressingConvertedStaticMeshCount == 4;
     if (!OutResult.bDressingAssetsLoaded)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s loaded %d/4 required meshes.\n"),
+            TEXT("Landscape biome dressing for %s loaded %d/4 source and %d/4 converted species meshes.\n"),
             *Candidate.PreviewSpec.RiverId,
-            OutResult.DressingAssetCount);
+            OutResult.DressingSourceSkeletalMeshCount,
+            OutResult.DressingConvertedStaticMeshCount);
         return false;
     }
 
     OutResult.bDressingBoulderMeshNaniteEnabled = false;
     OutResult.bDressingBroadleafMeshNaniteEnabled =
-        BroadleafMeshA->IsNaniteEnabled() && BroadleafMeshB->IsNaniteEnabled();
-    OutResult.bDressingConiferMeshNaniteEnabled = ConiferMesh->IsNaniteEnabled();
+        BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled();
+    OutResult.bDressingConiferMeshNaniteEnabled = ConiferTreeMesh->IsNaniteEnabled();
+    OutResult.bDressingUnderstoryMeshNaniteEnabled = UnderstoryMesh->IsNaniteEnabled();
 
     FRaftSimPreviewImage WaterMask;
     FRaftSimPreviewImage VegetationMask;
@@ -15996,9 +16125,6 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const FRaftSimEnvironmentPreviewSpec& Spec = Candidate.PreviewSpec;
-    UMaterialInterface* BarkMaterial = LoadObject<UMaterialInterface>(
-        nullptr,
-        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Materials/MI_LeafTree_01_Bark.MI_LeafTree_01_Bark"));
     const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
         GetLandscapeCandidateFoliageSettings(Spec.RiverId);
     UMaterialInstanceConstant* BroadleafFoliageMaterial =
@@ -16023,43 +16149,55 @@ bool AddLandscapeCandidateBiomeDressing(
             FoliageSettings.RoughnessStrength,
             FoliageSettings.NormalStrength,
             OutSummary);
+    UMaterialInstanceConstant* UnderstoryFoliageMaterial =
+        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+            Spec,
+            TEXT("Understory"),
+            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/Materials/MI_PVE_Plant_01.MI_PVE_Plant_01"),
+            FoliageSettings.BroadleafFrontTint,
+            FoliageSettings.BroadleafBackTint,
+            FoliageSettings.BroadleafTransmissionTint,
+            FoliageSettings.RoughnessStrength,
+            FoliageSettings.NormalStrength,
+            OutSummary);
     OutResult.DressingFoliageMaterialAssetCount =
-        (BroadleafFoliageMaterial ? 1 : 0) + (ConiferFoliageMaterial ? 1 : 0);
-    if (OutResult.DressingFoliageMaterialAssetCount != 2)
+        (BroadleafFoliageMaterial ? 1 : 0) +
+        (ConiferFoliageMaterial ? 1 : 0) +
+        (UnderstoryFoliageMaterial ? 1 : 0);
+    if (OutResult.DressingFoliageMaterialAssetCount != 3)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s loaded %d/2 required foliage materials.\n"),
+            TEXT("Landscape biome dressing for %s loaded %d/3 required foliage materials.\n"),
             *Spec.RiverId,
             OutResult.DressingFoliageMaterialAssetCount);
         return false;
     }
-    UHierarchicalInstancedStaticMeshComponent* BroadleafInstancesA =
+    UHierarchicalInstancedStaticMeshComponent* BroadleafTreeInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
-            BroadleafMeshA,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveBroadleafA_%s"), *Candidate.PreviewSpec.RiverId),
+            BroadleafTreeMesh,
+            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeBroadleaf_%s"), *Candidate.PreviewSpec.RiverId),
             true);
-    UHierarchicalInstancedStaticMeshComponent* BroadleafInstancesB =
+    UHierarchicalInstancedStaticMeshComponent* ConiferTreeInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
-            BroadleafMeshB,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveBroadleafB_%s"), *Candidate.PreviewSpec.RiverId),
+            ConiferTreeMesh,
+            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeConifer_%s"), *Candidate.PreviewSpec.RiverId),
             true);
-    UHierarchicalInstancedStaticMeshComponent* ConiferInstances =
+    UHierarchicalInstancedStaticMeshComponent* ShrubInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
-            ConiferMesh,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveConifer_%s"), *Candidate.PreviewSpec.RiverId),
+            ShrubMesh,
+            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeShrub_%s"), *Candidate.PreviewSpec.RiverId),
             true);
-    UHierarchicalInstancedStaticMeshComponent* TrunkInstances =
+    UHierarchicalInstancedStaticMeshComponent* UnderstoryInstances =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
-            TrunkMesh,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_Trunks_%s"), *Candidate.PreviewSpec.RiverId),
-            true,
-            BarkMaterial);
-    if (!BroadleafInstancesA || !BroadleafInstancesB ||
-        !ConiferInstances || !TrunkInstances)
+            UnderstoryMesh,
+            FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeUnderstory_%s"), *Candidate.PreviewSpec.RiverId),
+            true);
+    if (!BroadleafTreeInstances || !ConiferTreeInstances ||
+        !ShrubInstances || !UnderstoryInstances)
     {
         OutSummary += FString::Printf(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
@@ -16068,23 +16206,29 @@ bool AddLandscapeCandidateBiomeDressing(
     }
     OutResult.DressingFoliageMaterialBoundSlotCount =
         BindLandscapeCandidateFoliageMaterial(
-            BroadleafInstancesA,
-            BroadleafMeshA,
+            BroadleafTreeInstances,
+            BroadleafTreeMesh,
             BroadleafFoliageMaterial) +
         BindLandscapeCandidateFoliageMaterial(
-            BroadleafInstancesB,
-            BroadleafMeshB,
+            ConiferTreeInstances,
+            ConiferTreeMesh,
+            ConiferFoliageMaterial) +
+        BindLandscapeCandidateFoliageMaterial(
+            ShrubInstances,
+            ShrubMesh,
             BroadleafFoliageMaterial) +
         BindLandscapeCandidateFoliageMaterial(
-            ConiferInstances,
-            ConiferMesh,
-            ConiferFoliageMaterial);
+            UnderstoryInstances,
+            UnderstoryMesh,
+            UnderstoryFoliageMaterial);
+    OutResult.DressingNativeFoliageMaterialFallbackSlotCount =
+        FMath::Max(0, 4 - OutResult.DressingFoliageMaterialBoundSlotCount);
     OutResult.bDressingFoliageMaterialsValidated =
-        OutResult.DressingFoliageMaterialBoundSlotCount == 3;
+        OutResult.DressingFoliageMaterialBoundSlotCount >= 3;
     if (!OutResult.bDressingFoliageMaterialsValidated)
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape biome dressing for %s bound %d/3 required foliage material slots.\n"),
+            TEXT("Landscape biome dressing for %s bound %d foliage slots; expected at least three complete-species leaf slots.\n"),
             *Spec.RiverId,
             OutResult.DressingFoliageMaterialBoundSlotCount);
         return false;
@@ -16192,11 +16336,7 @@ bool AddLandscapeCandidateBiomeDressing(
         ++OutResult.DressingBoulderInstanceCount;
     }
 
-    const int32 FoliageClusterCount = Spec.bDesertCanyon ? 32 : (bRainforest ? 320 : 180);
-    const int32 BranchesPerCluster = Spec.bDesertCanyon ? 5 : (bRainforest ? 16 : 12);
-    const int32 UnderstoryBranchesPerCluster = Spec.bDesertCanyon ? 2 : (bRainforest ? 6 : 3);
-    const FBox TrunkBounds = TrunkMesh->GetBoundingBox();
-    const FVector TrunkSize = TrunkBounds.GetSize();
+    const int32 FoliageClusterCount = Spec.bDesertCanyon ? 110 : (bRainforest ? 420 : 260);
     for (int32 ClusterIndex = 0; ClusterIndex < FoliageClusterCount; ++ClusterIndex)
     {
         const float T = (static_cast<float>(ClusterIndex) + 0.5f) /
@@ -16237,132 +16377,132 @@ bool AddLandscapeCandidateBiomeDressing(
             }
         }
 
-        const float TerrainZ = GetLandscapeHeight(BestX, BestY);
-        const float TrunkHeightCm = Spec.bDesertCanyon
-            ? 64.0f + 12.0f * static_cast<float>(ClusterIndex % 4)
-            : (bRainforest ? 460.0f + 44.0f * static_cast<float>(ClusterIndex % 6)
-                           : 330.0f + 34.0f * static_cast<float>(ClusterIndex % 5));
-        const float TrunkRadiusCm = Spec.bDesertCanyon
-            ? 4.0f
-            : (bRainforest ? 12.0f + 1.5f * static_cast<float>(ClusterIndex % 4)
-                           : 8.0f + 1.2f * static_cast<float>(ClusterIndex % 4));
-        if (!Spec.bDesertCanyon || ClusterIndex % 4 == 0)
+        UStaticMesh* SpeciesMesh = UnderstoryMesh;
+        UHierarchicalInstancedStaticMeshComponent* SpeciesInstances = UnderstoryInstances;
+        bool bCanopyTree = false;
+        float TargetHeightCm = 100.0f;
+        const bool bNearEvidenceCamera = BestX < 3800.0f;
+        if (bNearEvidenceCamera && !Spec.bDesertCanyon)
         {
-            const FVector TrunkScale(
-                (TrunkRadiusCm * 2.0f) / FMath::Max(1.0f, TrunkSize.X),
-                (TrunkRadiusCm * 2.0f) / FMath::Max(1.0f, TrunkSize.Y),
-                TrunkHeightCm / FMath::Max(1.0f, TrunkSize.Z));
-            AddGroundedInstance(
-                TrunkInstances,
-                TrunkMesh,
-                FVector2D(BestX, BestY),
-                TerrainZ,
-                FRotator(
-                    2.5f * FMath::Sin(Phase),
-                    static_cast<float>((ClusterIndex * 31) % 360),
-                    2.0f * FMath::Cos(Phase * 0.73f)),
-                TrunkScale);
-            ++OutResult.DressingTrunkInstanceCount;
+            if (ClusterIndex % 2 == 0)
+            {
+                SpeciesMesh = ShrubMesh;
+                SpeciesInstances = ShrubInstances;
+                TargetHeightCm = bRainforest
+                    ? 220.0f + 28.0f * static_cast<float>(ClusterIndex % 5)
+                    : 185.0f + 24.0f * static_cast<float>(ClusterIndex % 5);
+            }
+            else
+            {
+                TargetHeightCm = bRainforest
+                    ? 128.0f + 18.0f * static_cast<float>(ClusterIndex % 5)
+                    : 104.0f + 15.0f * static_cast<float>(ClusterIndex % 5);
+            }
+        }
+        else if (Spec.bDesertCanyon)
+        {
+            if (ClusterIndex % 3 == 0)
+            {
+                SpeciesMesh = ShrubMesh;
+                SpeciesInstances = ShrubInstances;
+                TargetHeightCm = 165.0f + 24.0f * static_cast<float>(ClusterIndex % 6);
+            }
+            else
+            {
+                TargetHeightCm = 88.0f + 13.0f * static_cast<float>(ClusterIndex % 5);
+            }
+        }
+        else if (bRainforest)
+        {
+            const int32 SpeciesSelector = ClusterIndex % 5;
+            if (SpeciesSelector <= 2)
+            {
+                SpeciesMesh = BroadleafTreeMesh;
+                SpeciesInstances = BroadleafTreeInstances;
+                TargetHeightCm = 980.0f + 105.0f * static_cast<float>(ClusterIndex % 7);
+                bCanopyTree = true;
+            }
+            else if (SpeciesSelector == 3)
+            {
+                SpeciesMesh = ShrubMesh;
+                SpeciesInstances = ShrubInstances;
+                TargetHeightCm = 260.0f + 38.0f * static_cast<float>(ClusterIndex % 6);
+            }
+            else
+            {
+                TargetHeightCm = 145.0f + 22.0f * static_cast<float>(ClusterIndex % 6);
+            }
+        }
+        else
+        {
+            const int32 SpeciesSelector = ClusterIndex % 5;
+            if (SpeciesSelector == 0)
+            {
+                SpeciesMesh = ConiferTreeMesh;
+                SpeciesInstances = ConiferTreeInstances;
+                TargetHeightCm = 940.0f + 92.0f * static_cast<float>(ClusterIndex % 6);
+                bCanopyTree = true;
+            }
+            else if (SpeciesSelector == 4)
+            {
+                SpeciesMesh = ShrubMesh;
+                SpeciesInstances = ShrubInstances;
+                TargetHeightCm = 225.0f + 32.0f * static_cast<float>(ClusterIndex % 6);
+            }
+            else
+            {
+                SpeciesMesh = BroadleafTreeMesh;
+                SpeciesInstances = BroadleafTreeInstances;
+                TargetHeightCm = 690.0f + 68.0f * static_cast<float>(ClusterIndex % 6);
+                bCanopyTree = true;
+            }
         }
 
-        UStaticMesh* FoliageMesh = BroadleafMeshA;
-        UHierarchicalInstancedStaticMeshComponent* FoliageInstances = BroadleafInstancesA;
-        if (!Spec.bDesertCanyon && !bRainforest && ClusterIndex % 4 == 0)
+        const float MeshHeightCm = FMath::Max(1.0f, SpeciesMesh->GetBoundingBox().GetSize().Z);
+        const float UniformScale = TargetHeightCm / MeshHeightCm;
+        const FVector SpeciesScale(
+            UniformScale * (0.88f + 0.04f * static_cast<float>(ClusterIndex % 5)),
+            UniformScale * (0.90f + 0.035f * static_cast<float>((ClusterIndex + 2) % 5)),
+            UniformScale);
+        AddGroundedInstance(
+            SpeciesInstances,
+            SpeciesMesh,
+            FVector2D(BestX, BestY),
+            GetLandscapeHeight(BestX, BestY),
+            FRotator(
+                1.4f * FMath::Sin(Phase * 0.73f),
+                static_cast<float>((ClusterIndex * 137) % 360),
+                1.2f * FMath::Cos(Phase * 0.61f)),
+            SpeciesScale);
+        ++OutResult.DressingFoliageInstanceCount;
+        if (bCanopyTree)
         {
-            FoliageMesh = ConiferMesh;
-            FoliageInstances = ConiferInstances;
+            ++OutResult.DressingCanopyTreeInstanceCount;
         }
-        else if (ClusterIndex % 2 == 1)
+        else
         {
-            FoliageMesh = BroadleafMeshB;
-            FoliageInstances = BroadleafInstancesB;
-        }
-        const float FoliageMeshSpanCm = FMath::Max(1.0f, FoliageMesh->GetBoundingBox().GetSize().GetMax());
-        const float BranchTargetSpanCm = Spec.bDesertCanyon
-            ? 78.0f + 12.0f * static_cast<float>(ClusterIndex % 4)
-            : (bRainforest ? 190.0f + 26.0f * static_cast<float>(ClusterIndex % 5)
-                           : 145.0f + 20.0f * static_cast<float>(ClusterIndex % 4));
-        const float BranchScale = BranchTargetSpanCm / FoliageMeshSpanCm;
-        const float CrownBaseZ = TerrainZ + TrunkHeightCm * (Spec.bDesertCanyon ? 0.22f : 0.46f);
-        const float CrownRadiusCm = Spec.bDesertCanyon ? 72.0f : (bRainforest ? 165.0f : 126.0f);
-        for (int32 BranchIndex = 0; BranchIndex < BranchesPerCluster; ++BranchIndex)
-        {
-            const float BranchPhase = Phase + static_cast<float>(BranchIndex) * 2.3999632f;
-            const float RadialT = BranchIndex == 0
-                ? 0.0f
-                : 0.45f + 0.12f * static_cast<float>(BranchIndex % 4);
-            const FVector BranchLocation(
-                BestX + FMath::Cos(BranchPhase) * CrownRadiusCm * RadialT,
-                BestY + FMath::Sin(BranchPhase) * CrownRadiusCm * RadialT,
-                CrownBaseZ +
-                    (Spec.bDesertCanyon ? 32.0f : (bRainforest ? 78.0f : 55.0f)) *
-                        FMath::Sin(BranchPhase * 0.83f) +
-                    static_cast<float>(BranchIndex % 3) * (Spec.bDesertCanyon ? 18.0f : 34.0f));
-            FoliageInstances->AddInstance(
-                FTransform(
-                    FRotator(
-                        -18.0f + 8.0f * static_cast<float>(BranchIndex % 5),
-                        FMath::RadiansToDegrees(BranchPhase),
-                        11.0f * FMath::Sin(BranchPhase * 0.61f)),
-                    BranchLocation,
-                    FVector(
-                        BranchScale * (0.88f + 0.06f * static_cast<float>(BranchIndex % 4)),
-                        BranchScale * (0.82f + 0.07f * static_cast<float>((BranchIndex + 2) % 4)),
-                        BranchScale)),
-                true);
-            ++OutResult.DressingFoliageInstanceCount;
-        }
-
-        const float BroadleafSpanCm = FMath::Max(
-            1.0f,
-            BroadleafMeshA->GetBoundingBox().GetSize().GetMax());
-        const float UnderstoryTargetSpanCm = Spec.bDesertCanyon
-            ? 54.0f + 8.0f * static_cast<float>(ClusterIndex % 4)
-            : (bRainforest ? 92.0f + 14.0f * static_cast<float>(ClusterIndex % 5)
-                           : 72.0f + 10.0f * static_cast<float>(ClusterIndex % 4));
-        const float UnderstoryScale = UnderstoryTargetSpanCm / BroadleafSpanCm;
-        for (int32 UnderstoryIndex = 0; UnderstoryIndex < UnderstoryBranchesPerCluster; ++UnderstoryIndex)
-        {
-            const float UnderstoryPhase =
-                Phase * 0.83f + static_cast<float>(UnderstoryIndex) * 2.3999632f;
-            const float UnderstoryRadiusCm = Spec.bDesertCanyon ? 76.0f : (bRainforest ? 150.0f : 112.0f);
-            BroadleafInstancesA->AddInstance(
-                FTransform(
-                    FRotator(
-                        -24.0f + 9.0f * static_cast<float>(UnderstoryIndex % 5),
-                        FMath::RadiansToDegrees(UnderstoryPhase),
-                        14.0f * FMath::Sin(UnderstoryPhase)),
-                    FVector(
-                        BestX + FMath::Cos(UnderstoryPhase) * UnderstoryRadiusCm,
-                        BestY + FMath::Sin(UnderstoryPhase) * UnderstoryRadiusCm,
-                        TerrainZ +
-                            (Spec.bDesertCanyon ? 28.0f : (bRainforest ? 68.0f : 48.0f)) +
-                            14.0f * static_cast<float>(UnderstoryIndex % 3)),
-                    FVector(
-                        UnderstoryScale * (0.82f + 0.06f * static_cast<float>(UnderstoryIndex % 4)),
-                        UnderstoryScale * (0.78f + 0.05f * static_cast<float>((UnderstoryIndex + 1) % 4)),
-                        UnderstoryScale)),
-                true);
-            ++OutResult.DressingFoliageInstanceCount;
+            ++OutResult.DressingUnderstoryInstanceCount;
         }
     }
 
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount == BoulderCount &&
-        OutResult.DressingFoliageInstanceCount ==
-            FoliageClusterCount * (BranchesPerCluster + UnderstoryBranchesPerCluster) &&
-        OutResult.DressingTrunkInstanceCount > 0 &&
+        OutResult.DressingFoliageInstanceCount == FoliageClusterCount &&
+        (Spec.bDesertCanyon || OutResult.DressingCanopyTreeInstanceCount > 0) &&
+        OutResult.DressingUnderstoryInstanceCount > 0 &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
-        TEXT("Landscape biome dressing for %s: %d dense irregular procedural boulders, %d PVE twig instances, %d bark-material trunks, %d/3 river-specific foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d.\n"),
+        TEXT("Landscape biome dressing for %s: %d dense irregular procedural boulders, %d complete PVE species instances (%d canopy, %d understory), %d river-specific foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),
         *Spec.RiverId,
         OutResult.DressingBoulderInstanceCount,
         OutResult.DressingFoliageInstanceCount,
-        OutResult.DressingTrunkInstanceCount,
+        OutResult.DressingCanopyTreeInstanceCount,
+        OutResult.DressingUnderstoryInstanceCount,
         OutResult.DressingFoliageMaterialBoundSlotCount,
         OutResult.bDressingBoulderMeshNaniteEnabled,
         OutResult.bDressingBroadleafMeshNaniteEnabled,
-        OutResult.bDressingConiferMeshNaniteEnabled);
+        OutResult.bDressingConiferMeshNaniteEnabled,
+        OutResult.bDressingUnderstoryMeshNaniteEnabled);
     return OutResult.bDressingValidated;
 }
 
@@ -18734,19 +18874,29 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_dressing_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_asset_count\": %d,\n")
             TEXT("      \"landscape_dressing_boulder_asset\": \"first_party_8_ring_20_segment_irregular_procedural_mesh_with_river_specific_lit_color\",\n")
-            TEXT("      \"landscape_dressing_broadleaf_assets\": [\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_03\"],\n")
-            TEXT("      \"landscape_dressing_conifer_asset\": \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/Instances/Conifer_Twig_01\",\n")
-            TEXT("      \"landscape_dressing_trunk_asset\": \"/Engine/BasicShapes/Cylinder\",\n")
-            TEXT("      \"landscape_dressing_instance_implementation\": \"pve_hierarchical_instancing_plus_dense_irregular_procedural_boulder_meshes\",\n")
+            TEXT("      \"landscape_dressing_source_species_skeletal_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_converted_species_static_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_source_species_skeletal_assets\": [\"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01\", \"/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01\"],\n")
+            TEXT("      \"landscape_dressing_converted_species_static_assets\": [\"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\", \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\"],\n")
+            TEXT("      \"landscape_dressing_broadleaf_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static\",\n")
+            TEXT("      \"landscape_dressing_conifer_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static\",\n")
+            TEXT("      \"landscape_dressing_shrub_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static\",\n")
+            TEXT("      \"landscape_dressing_understory_asset\": \"/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static\",\n")
+            TEXT("      \"landscape_dressing_trunk_asset\": null,\n")
+            TEXT("      \"landscape_dressing_instance_implementation\": \"complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders\",\n")
             TEXT("      \"landscape_dressing_boulder_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_foliage_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_canopy_tree_instance_count\": %d,\n")
+            TEXT("      \"landscape_dressing_understory_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_trunk_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_source_mask_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_foliage_material_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_foliage_material_asset_count\": %d,\n")
             TEXT("      \"landscape_dressing_foliage_material_bound_slot_count\": %d,\n")
+            TEXT("      \"landscape_dressing_native_foliage_material_fallback_slot_count\": %d,\n")
             TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate\",\n")
             TEXT("      \"landscape_dressing_conifer_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate\",\n")
+            TEXT("      \"landscape_dressing_understory_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate\",\n")
             TEXT("      \"landscape_dressing_broadleaf_front_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_back_tint\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_dressing_broadleaf_transmission_tint\": [%.6f, %.6f, %.6f],\n")
@@ -18760,7 +18910,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_dressing_boulder_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_broadleaf_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_conifer_mesh_nanite_enabled\": %s,\n")
-            TEXT("      \"landscape_dressing_promotion_status\": \"pve_engine_sample_and_first_party_procedural_rock_evaluation_only_requires_exported_species_production_rock_asset_guide_and_performance_review\",\n")
+            TEXT("      \"landscape_dressing_understory_mesh_nanite_enabled\": %s,\n")
+            TEXT("      \"landscape_dressing_promotion_status\": \"complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review\",\n")
             TEXT("      \"water_material_status\": \"%s\",\n")
             TEXT("      \"water_material_asset\": \"%s\",\n")
             TEXT("      \"water_material_parent\": \"/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate\",\n")
@@ -18883,20 +19034,26 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             MaterialSettings.WetBankColorScale.G,
             MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
-                ? TEXT("source_mask_placed_pve_foliage_and_dense_irregular_rock_evaluation_captured")
+                ? TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured")
                 : TEXT("dressing_generation_or_validation_failed"),
             Result.DressingAssetCount,
+            Result.DressingSourceSkeletalMeshCount,
+            Result.DressingConvertedStaticMeshCount,
             Result.DressingBoulderInstanceCount,
             Result.DressingFoliageInstanceCount,
+            Result.DressingCanopyTreeInstanceCount,
+            Result.DressingUnderstoryInstanceCount,
             Result.DressingTrunkInstanceCount,
             Result.bDressingSourceMasksLoaded
                 ? TEXT("water_and_vegetation_masks_loaded_and_used_for_candidate_selection")
                 : TEXT("required_source_masks_missing"),
             Result.bDressingFoliageMaterialsValidated
-                ? TEXT("river_specific_texture_preserving_two_sided_foliage_material_instances_bound")
+                ? TEXT("three_river_specific_texture_preserving_two_sided_foliage_slots_bound_one_complete_species_native_material_retained")
                 : TEXT("foliage_material_generation_or_binding_failed"),
             Result.DressingFoliageMaterialAssetCount,
             Result.DressingFoliageMaterialBoundSlotCount,
+            Result.DressingNativeFoliageMaterialFallbackSlotCount,
+            *RiverAssetName,
             *RiverAssetName,
             *RiverAssetName,
             FoliageSettings.BroadleafFrontTint.R,
@@ -18922,6 +19079,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.bDressingBoulderMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
+            Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bSolverSurfaceWaterMaterialBound
                 ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
                 : TEXT("solver_surface_water_generation_or_binding_failed"),

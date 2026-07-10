@@ -1,0 +1,48 @@
+{
+  "schema": "raftsim.unreal.pve_species_conversion_manifest.v1",
+  "generated_on": "2026-07-10",
+  "status": "complete_engine_sample_species_converted_for_isolated_landscape_evaluation",
+  "source_plugin": "ProceduralVegetationEditor",
+  "source_engine_version": "UE 5.8",
+  "source_owner": "Epic Games",
+  "source_distribution": "installed_engine_plugin_sample_content",
+  "rights_policy": "unreal_project_evaluation_only_pending_production_asset_and_license_review",
+  "external_asset_downloaded": false,
+  "conversion_method": "MeshUtilities.ConvertMeshesToStaticMesh_from_reference_pose_then_enable_nanite_and_save_project_asset",
+  "collision_policy": "converted_species_are_noncolliding_environment_review_hism_instances",
+  "source_authority_policy": "source_water_and_vegetation_masks_choose_placement_but_do_not_promote_species_identity_or_ecological_accuracy",
+  "conversions": [
+    {
+      "role": "broadleaf_canopy",
+      "source_skeletal_asset": "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Deciduous_Tree_01",
+      "converted_static_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousTree01_Static"
+    },
+    {
+      "role": "conifer_canopy",
+      "source_skeletal_asset": "/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Conifer_01",
+      "converted_static_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Conifer01_Static"
+    },
+    {
+      "role": "deciduous_shrub",
+      "source_skeletal_asset": "/ProceduralVegetationEditor/SampleAssets/StarterContent/Deciduous_Shrub_01/PVE_Deciduous_Shrub_01",
+      "converted_static_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_DeciduousShrub01_Static"
+    },
+    {
+      "role": "understory_plant",
+      "source_skeletal_asset": "/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01",
+      "converted_static_asset": "/Game/RaftSim/Environment/BiomeSpecies/SM_RaftSim_PVE_Plant01_Static"
+    }
+  ],
+  "evaluation_maps": [
+    "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_SouthForkAmerican_SourceLandscapeCandidate",
+    "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_SourceLandscapeCandidate",
+    "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_Pacuare_SourceLandscapeCandidate"
+  ],
+  "promotion_blockers": [
+    "generic_sample_species_are_not_river_specific",
+    "oversized_repeated_leaf_forms_remain_visible",
+    "no_age_crown_or_seasonal_species_variants",
+    "no_production_wind_or_desktop_vr_performance_evidence",
+    "guide_art_ecology_and_rights_review_not_complete"
+  ]
+}
