@@ -1,0 +1,61 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_fir_tree_01_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American conifer analog and external biome import pipeline proof",
+  "source": {
+    "title": "Fir Tree 01",
+    "publisher": "Poly Haven",
+    "authors": [
+      "Rico Cilliers",
+      "Rob Tuytel"
+    ],
+    "asset_url": "https://polyhaven.com/a/fir_tree_01",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "manual download from the asset website",
+    "public_api_used": false,
+    "downloaded_package": "1K FBX",
+    "archive_bytes": 270836541,
+    "archive_sha256": "40bebd20a2542ca7fc5f025918af7e11abcd27fc810e0ddc4685750f1d053f17",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "ecological_species_approval": "not_reviewed",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "seasonal_state_approval": "not_reviewed",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material and Nanite validation",
+      "South Fork visual comparison captures"
+    ],
+    "blocked_now": [
+      "automatic replacement of production foliage",
+      "claiming exact South Fork species identity",
+      "claiming lifelike environment completion",
+      "shipping before performance and guide review"
+    ]
+  },
+  "expected_source_files": {
+    "fir_tree_01_1k.fbx": "281d26c46e97df3fa803f8ef0fc17c6bccf8b6f6868c093a62e032f259a16438",
+    "textures/fir_tree_01_bark_diff_1k.png": "508ca0a40d118beec98e8375b4611e8a16123eec94b5d2b4870617cf4d24e6fa",
+    "textures/fir_tree_01_bark_disp_1k.png": "ab08f400d208487b7bfd5d9cd4386456ed8e5fbcfdd045eca1705e3ed4b3dab8",
+    "textures/fir_tree_01_bark_nor_gl_1k.png": "b889e7080d6efb0592f83e64cc5a5afa5fb7787b4b7d1ae13a65602689e793e8",
+    "textures/fir_tree_01_bark_rough_1k.png": "b198105d3022db6c459ae9c307ecdb7b644832ee20bcbfd89c3741cecc77881f",
+    "textures/fir_tree_01_twig_alpha_1k.png": "3f399629337e7ac3af27a01b08ffb9c0d60224a9dd374a1427761a5c2eea9d6e",
+    "textures/fir_tree_01_twig_diff_1k.png": "76f6d0c0044d76bac08fbbd3d2ac1c9b66bb046de7d0b1a22aa9b319308f3833",
+    "textures/fir_tree_01_twig_nor_gl_1k.png": "cbb6b8179a9f7f6e84fd15d1f422bc342841d20845b2bad437612f03fb0067de",
+    "textures/fir_tree_01_twig_rough_1k.png": "a4f0a4c8bc93946dea229def779ffe5d32c555c717e4bf7b0e4b4d86bc21987a"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_BIOME_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K",
+    "mesh_policy": "three source trees imported separately as static meshes",
+    "material_policy": "textures imported explicitly; GL normals flip green for Unreal; masked two-sided foliage and opaque bark materials authored locally",
+    "nanite_policy": "enabled on every isolated static mesh",
+    "promotion_policy": "manual after visual, ecological, performance, and guide review"
+  }
+}

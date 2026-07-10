@@ -1,0 +1,239 @@
+{
+  "schema": "raftsim.unreal.reviewed_biome_asset_import.v1",
+  "asset_id": "polyhaven_fir_tree_01_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "fir_tree_01_1k.fbx",
+      "sha256": "281d26c46e97df3fa803f8ef0fc17c6bccf8b6f6868c093a62e032f259a16438",
+      "bytes": 249300492
+    },
+    {
+      "relative_path": "textures/fir_tree_01_bark_diff_1k.png",
+      "sha256": "508ca0a40d118beec98e8375b4611e8a16123eec94b5d2b4870617cf4d24e6fa",
+      "bytes": 5652976
+    },
+    {
+      "relative_path": "textures/fir_tree_01_bark_disp_1k.png",
+      "sha256": "ab08f400d208487b7bfd5d9cd4386456ed8e5fbcfdd045eca1705e3ed4b3dab8",
+      "bytes": 1561378
+    },
+    {
+      "relative_path": "textures/fir_tree_01_bark_nor_gl_1k.png",
+      "sha256": "b889e7080d6efb0592f83e64cc5a5afa5fb7787b4b7d1ae13a65602689e793e8",
+      "bytes": 5778805
+    },
+    {
+      "relative_path": "textures/fir_tree_01_bark_rough_1k.png",
+      "sha256": "b198105d3022db6c459ae9c307ecdb7b644832ee20bcbfd89c3741cecc77881f",
+      "bytes": 1778413
+    },
+    {
+      "relative_path": "textures/fir_tree_01_twig_alpha_1k.png",
+      "sha256": "3f399629337e7ac3af27a01b08ffb9c0d60224a9dd374a1427761a5c2eea9d6e",
+      "bytes": 371026
+    },
+    {
+      "relative_path": "textures/fir_tree_01_twig_diff_1k.png",
+      "sha256": "76f6d0c0044d76bac08fbbd3d2ac1c9b66bb046de7d0b1a22aa9b319308f3833",
+      "bytes": 3411459
+    },
+    {
+      "relative_path": "textures/fir_tree_01_twig_nor_gl_1k.png",
+      "sha256": "cbb6b8179a9f7f6e84fd15d1f422bc342841d20845b2bad437612f03fb0067de",
+      "bytes": 1825146
+    },
+    {
+      "relative_path": "textures/fir_tree_01_twig_rough_1k.png",
+      "sha256": "a4f0a4c8bc93946dea229def779ffe5d32c555c717e4bf7b0e4b4d86bc21987a",
+      "bytes": 1155354
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
+      "source_triangle_count_lod0": 4176819,
+      "nanite_fallback_triangle_count_lod0": 1306,
+      "bounds_cm": {
+        "min": [
+          -321.91364765167236,
+          -354.0762424468994,
+          -8.020533621311188
+        ],
+        "max": [
+          331.4642906188965,
+          288.60607147216797,
+          1884.4903945922852
+        ]
+      },
+      "raw_bounds_to_effective_scale": 100.0,
+      "instance_pivot": {
+        "xy_offset_cm": 33.08155856571738,
+        "tolerance_cm": 65.33779382705688,
+        "centered_for_instancing": true
+      },
+      "physical_scale": {
+        "height_cm": 1892.5109282135963,
+        "plausible_tree_height": true,
+        "lod0_build_scale_applied": false,
+        "lod0_build_scale": [
+          100.0,
+          100.0,
+          100.0
+        ]
+      },
+      "nanite_enabled": true,
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_tree_01_bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_tree_01_trunk_a",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_tree_01_twig",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+        },
+        {
+          "index": 3,
+          "slot_name": "fir_tree_01_dead_branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_b_LOD0.SM_FirTree01_fir_tree_01_b_LOD0",
+      "source_triangle_count_lod0": 2300624,
+      "nanite_fallback_triangle_count_lod0": 1623,
+      "bounds_cm": {
+        "min": [
+          -256.43720626831055,
+          -313.95397186279297,
+          -8.676454424858093
+        ],
+        "max": [
+          304.821515083313,
+          291.7130947113037,
+          1396.8441009521484
+        ]
+      },
+      "raw_bounds_to_effective_scale": 100.0,
+      "instance_pivot": {
+        "xy_offset_cm": 26.62563593594132,
+        "tolerance_cm": 60.56670665740967,
+        "centered_for_instancing": true
+      },
+      "physical_scale": {
+        "height_cm": 1405.5205553770065,
+        "plausible_tree_height": true,
+        "lod0_build_scale_applied": false,
+        "lod0_build_scale": [
+          100.0,
+          100.0,
+          100.0
+        ]
+      },
+      "nanite_enabled": true,
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_tree_01_bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_tree_01_twig",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_tree_01_dead_branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 3,
+          "slot_name": "fir_tree_01_trunk_b",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_c_LOD0.SM_FirTree01_fir_tree_01_c_LOD0",
+      "source_triangle_count_lod0": 505494,
+      "nanite_fallback_triangle_count_lod0": 1033,
+      "bounds_cm": {
+        "min": [
+          -274.7030735015869,
+          -299.6272802352905,
+          -9.382282942533493
+        ],
+        "max": [
+          355.8908462524414,
+          296.99645042419434,
+          1442.6758766174316
+        ]
+      },
+      "raw_bounds_to_effective_scale": 100.0,
+      "instance_pivot": {
+        "xy_offset_cm": 40.615193307860004,
+        "tolerance_cm": 63.05939197540283,
+        "centered_for_instancing": true
+      },
+      "physical_scale": {
+        "height_cm": 1452.0581595599651,
+        "plausible_tree_height": true,
+        "lod0_build_scale_applied": false,
+        "lod0_build_scale": [
+          100.0,
+          100.0,
+          100.0
+        ]
+      },
+      "nanite_enabled": true,
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_tree_01_bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_tree_01_twig",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_tree_01_dead_branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        },
+        {
+          "index": 3,
+          "slot_name": "fir_tree_01_trunk_c",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Bark_BaseColor_1K.T_FirTree01_Bark_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Bark_Displacement_1K.T_FirTree01_Bark_Displacement_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Bark_NormalGL_1K.T_FirTree01_Bark_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Bark_Roughness_1K.T_FirTree01_Bark_Roughness_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Twig_BaseColor_1K.T_FirTree01_Twig_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Twig_NormalGL_1K.T_FirTree01_Twig_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Twig_Opacity_1K.T_FirTree01_Twig_Opacity_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/T_FirTree01_Twig_Roughness_1K.T_FirTree01_Twig_Roughness_1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+  ],
+  "selection_for_first_visual_review": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0"
+}
