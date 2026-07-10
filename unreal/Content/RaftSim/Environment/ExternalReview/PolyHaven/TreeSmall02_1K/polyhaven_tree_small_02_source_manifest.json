@@ -1,0 +1,61 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_tree_small_02_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American dense riparian broadleaf silhouette and distance-stability comparison",
+  "source": {
+    "title": "Tree Small 02",
+    "publisher": "Poly Haven",
+    "authors": ["Rico Cilliers"],
+    "asset_url": "https://polyhaven.com/a/tree_small_02",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "manual download from the asset website",
+    "public_api_used": false,
+    "downloaded_package": "1K FBX",
+    "archive_bytes": 95797804,
+    "archive_sha256": "17c1f13524fa1166d14a75bd0dfff334b8323dc1fdf6f130e3baff468992f111",
+    "publisher_height_m": 4.6,
+    "publisher_triangle_count_label": "5M",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "publisher_species_tags": ["burkea africana", "wild syringa"],
+    "south_fork_exact_species_approval": "not_approved_use_as_visual_structure_analog_only",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material, pivot, scale, Nanite, and distance-stability validation",
+      "South Fork broadleaf visual comparison captures"
+    ],
+    "blocked_now": [
+      "claiming exact South Fork species identity",
+      "automatic production foliage replacement",
+      "claiming lifelike environment completion",
+      "shipping before ecology, guide, art, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "tree_small_02_1k.fbx": "442394b4d39dcefef6c54358becea3c86735f040f2601b2c0c082e3ecf3685c5",
+    "textures/tree_small_02_branch_diff_1k.png": "a93ce54213c4a98cd01cb5c5f7ab46b77defcd66e1dd082e6912f6e60632e630",
+    "textures/tree_small_02_branch_nor_gl_1k.png": "0338a1400391893fdf6c6cbd1c22a573d6ab2300ad771d4916184bf206e1a671",
+    "textures/tree_small_02_branch_rough_1k.png": "f285a54d141f30e39c7741e84a813c5cbccd9e9ee397af687176213f77d3e9a5",
+    "textures/tree_small_02_diff_1k.jpg": "4e0093f407b3a1120a36de49a48ebe5a465a9a9b77e361c7a3e66866e115e404",
+    "textures/tree_small_02_leaves_alpha_1k.png": "4f143e2dda8a6a572f427ac378b92255d21761e4611de0d26e21816c01aa533b",
+    "textures/tree_small_02_leaves_diff_1k.png": "d3fc48522c76aa1f91076c6b86f302669822ebe4e2acabd67d42c4d57eaa5ba0",
+    "textures/tree_small_02_leaves_nor_gl_1k.png": "fa4ad390f2e68b745db8f568cad64c3272696c5e01312ae564795e37724d79b8",
+    "textures/tree_small_02_leaves_rough_1k.png": "f005213467e38bcb355b00c9a6eb9896b8d810ee885d5c7fa308d9f3326ef602",
+    "textures/tree_small_02_nor_gl_1k.exr": "cf999e30663267b55b6fab43ca97c1e96176bdc67268e6c25854d53f15267d64",
+    "textures/tree_small_02_rough_1k.exr": "1ed5ad24397c065beb2b2d3521470730f24e957cbd5fb323ad3f9b6d267b4585"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_broadleaf_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_BROADLEAF_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K",
+    "material_policy": "explicit trunk, branch, and low-clip masked two-sided leaf materials with GL normal correction",
+    "nanite_policy": "enabled with PreserveArea shape preservation",
+    "promotion_policy": "manual only after distance-stability, ecology, guide, art, and performance review"
+  }
+}
