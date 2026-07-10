@@ -43,6 +43,7 @@
 #include "LandscapeFileFormatInterface.h"
 #include "LandscapeNaniteComponent.h"
 #include "LandscapeProxy.h"
+#include "Materials/MaterialExpressionLandscapeLayerCoords.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAdd.h"
 #include "Materials/MaterialExpressionComponentMask.h"
@@ -156,6 +157,17 @@ struct FRaftSimLandscapeImportCandidateSpec
     float HorizontalSpanXCm = 32300.0f;
     float HorizontalSpanYCm = 5500.0f;
     float TargetReliefCm = 1000.0f;
+};
+
+struct FRaftSimLandscapeMaterialCandidateSettings
+{
+    float MacroMappingScale = 1008.0f;
+    float DetailMappingScale = 128.0f;
+    float DetailAlbedoWeight = 0.18f;
+    float DetailNormalWeight = 0.32f;
+    float DetailSurfaceResponseWeight = 0.30f;
+    float EmissiveFillScale = 0.045f;
+    float SpecularLevel = 0.16f;
 };
 
 struct FRaftSimPreviewWaterMaterialResponse
@@ -717,6 +729,32 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
     return Candidates;
 }
 
+FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings(const FString& RiverId)
+{
+    FRaftSimLandscapeMaterialCandidateSettings Settings;
+    if (RiverId == TEXT("american_south_fork"))
+    {
+        Settings.DetailMappingScale = 128.0f;
+    }
+    else if (RiverId == TEXT("colorado_river"))
+    {
+        Settings.DetailMappingScale = 144.0f;
+        Settings.DetailAlbedoWeight = 0.16f;
+        Settings.DetailNormalWeight = 0.28f;
+        Settings.EmissiveFillScale = 0.035f;
+        Settings.SpecularLevel = 0.14f;
+    }
+    else if (RiverId == TEXT("pacuare"))
+    {
+        Settings.DetailMappingScale = 112.0f;
+        Settings.DetailAlbedoWeight = 0.20f;
+        Settings.DetailNormalWeight = 0.36f;
+        Settings.DetailSurfaceResponseWeight = 0.32f;
+        Settings.EmissiveFillScale = 0.055f;
+    }
+    return Settings;
+}
+
 FString MakeFlowVariantPreviewMapPackagePath(const FRaftSimEnvironmentPreviewSpec& BaseSpec)
 {
     const FString BaseDirectory = FPaths::GetPath(BaseSpec.MapPackagePath);
@@ -1022,6 +1060,70 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FString& OutSummary)
 {
+    FString RiverAssetName;
+    if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+    {
+        RiverAssetName = TEXT("AmericanSouthFork");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        RiverAssetName = TEXT("ColoradoRiver");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("pacuare"))
+    {
+        RiverAssetName = TEXT("Pacuare");
+    }
+    if (RiverAssetName.IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("No Landscape material texture asset token exists for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return nullptr;
+    }
+
+    auto LoadCandidateTexture = [&RiverAssetName](const TCHAR* AssetRoot, const TCHAR* MapSuffix)
+    {
+        const FString AssetName = FString::Printf(
+            TEXT("T_RaftSim_%s_%s"),
+            *RiverAssetName,
+            MapSuffix);
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s/%s.%s"),
+            AssetRoot,
+            *AssetName,
+            *AssetName);
+        return LoadObject<UTexture2D>(nullptr, *ObjectPath);
+    };
+
+    UTexture2D* SourceMacroAlbedo = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
+        TEXT("SourceConditionedMacroAlbedo"));
+    UTexture2D* SourcePackedSurface = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
+        TEXT("SourceConditionedAORoughnessHeight"));
+    UTexture2D* SourceNormalDetail = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
+        TEXT("SourceConditionedNormalDetail"));
+    UTexture2D* TerrainDetailAlbedo = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
+        TEXT("TerrainDetailAlbedo"));
+    UTexture2D* TerrainDetailPackedSurface = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
+        TEXT("TerrainDetailAORoughnessHeight"));
+    UTexture2D* TerrainDetailNormal = LoadCandidateTexture(
+        TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
+        TEXT("TerrainDetailNormal"));
+    if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail ||
+        !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Missing one or more source-conditioned/detail Texture2D assets for %s Landscape material.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return nullptr;
+    }
+
+    const FRaftSimLandscapeMaterialCandidateSettings Settings =
+        GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
     FString AssetToken = Candidate.PreviewSpec.RiverId;
     AssetToken.ReplaceInline(TEXT("_"), TEXT(""));
     const FString AssetName = FString::Printf(TEXT("M_RaftSim_%s_SourceLandscapeCandidate"), *AssetToken);
@@ -1050,31 +1152,6 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         if (Material)
         {
             FAssetRegistryModule::AssetCreated(Material);
-            Material->SetShadingModel(MSM_DefaultLit);
-            Material->BlendMode = BLEND_Opaque;
-
-            UMaterialExpressionConstant3Vector* TerrainColor =
-                NewObject<UMaterialExpressionConstant3Vector>(Material);
-            TerrainColor->Constant = Candidate.PreviewSpec.TerrainColor;
-            Material->GetExpressionCollection().AddExpression(TerrainColor);
-
-            UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
-            EmissiveScale->R = 0.16f;
-            Material->GetExpressionCollection().AddExpression(EmissiveScale);
-
-            UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-            EmissiveColor->A.Expression = TerrainColor;
-            EmissiveColor->B.Expression = EmissiveScale;
-            Material->GetExpressionCollection().AddExpression(EmissiveColor);
-
-            UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
-            Roughness->R = 0.82f;
-            Material->GetExpressionCollection().AddExpression(Roughness);
-
-            UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-            ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, TerrainColor);
-            ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-            ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         }
     }
     if (!Material)
@@ -1084,15 +1161,148 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     }
 
     Material->Modify();
-    for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = false;
+    Material->bTangentSpaceNormal = true;
+
+    UMaterialExpressionLandscapeLayerCoords* MacroCoordinates =
+        NewObject<UMaterialExpressionLandscapeLayerCoords>(Material);
+    MacroCoordinates->MappingType = TCMT_XY;
+    MacroCoordinates->MappingScale = Settings.MacroMappingScale;
+    Material->GetExpressionCollection().AddExpression(MacroCoordinates);
+
+    UMaterialExpressionLandscapeLayerCoords* DetailCoordinates =
+        NewObject<UMaterialExpressionLandscapeLayerCoords>(Material);
+    DetailCoordinates->MappingType = TCMT_XY;
+    DetailCoordinates->MappingScale = Settings.DetailMappingScale;
+    Material->GetExpressionCollection().AddExpression(DetailCoordinates);
+
+    auto AddTextureSample = [Material](
+                                const TCHAR* ParameterName,
+                                UTexture2D* Texture,
+                                EMaterialSamplerType SamplerType,
+                                UMaterialExpression* Coordinates)
     {
-        if (UMaterialExpressionConstant3Vector* TerrainColor =
-                Cast<UMaterialExpressionConstant3Vector>(Expression.Get()))
-        {
-            TerrainColor->Constant = Candidate.PreviewSpec.TerrainColor;
-            break;
-        }
-    }
+        UMaterialExpressionTextureSampleParameter2D* Sample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        Sample->ParameterName = ParameterName;
+        Sample->Texture = Texture;
+        Sample->SamplerType = SamplerType;
+        Sample->Coordinates.Expression = Coordinates;
+        Sample->Group = TEXT("RaftSimLandscapeCandidate");
+        Material->GetExpressionCollection().AddExpression(Sample);
+        return Sample;
+    };
+
+    UMaterialExpressionTextureSampleParameter2D* MacroAlbedoSample = AddTextureSample(
+        TEXT("SourceConditionedMacroAlbedo"),
+        SourceMacroAlbedo,
+        SAMPLERTYPE_Color,
+        MacroCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* DetailAlbedoSample = AddTextureSample(
+        TEXT("TerrainDetailAlbedo"),
+        TerrainDetailAlbedo,
+        SAMPLERTYPE_Color,
+        DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* MacroPackedSample = AddTextureSample(
+        TEXT("SourceConditionedAORoughnessHeight"),
+        SourcePackedSurface,
+        SAMPLERTYPE_Masks,
+        MacroCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* DetailPackedSample = AddTextureSample(
+        TEXT("TerrainDetailAORoughnessHeight"),
+        TerrainDetailPackedSurface,
+        SAMPLERTYPE_Masks,
+        DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* MacroNormalSample = AddTextureSample(
+        TEXT("SourceConditionedNormalDetail"),
+        SourceNormalDetail,
+        SAMPLERTYPE_Normal,
+        MacroCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* DetailNormalSample = AddTextureSample(
+        TEXT("TerrainDetailNormal"),
+        TerrainDetailNormal,
+        SAMPLERTYPE_Normal,
+        DetailCoordinates);
+
+    UMaterialExpressionConstant* DetailAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
+    DetailAlbedoWeight->R = Settings.DetailAlbedoWeight;
+    Material->GetExpressionCollection().AddExpression(DetailAlbedoWeight);
+
+    UMaterialExpressionLinearInterpolate* BaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    BaseColor->A.Expression = MacroAlbedoSample;
+    BaseColor->B.Expression = DetailAlbedoSample;
+    BaseColor->Alpha.Expression = DetailAlbedoWeight;
+    Material->GetExpressionCollection().AddExpression(BaseColor);
+
+    UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
+    DetailNormalWeight->R = Settings.DetailNormalWeight;
+    Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
+
+    UMaterialExpressionLinearInterpolate* Normal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    Normal->A.Expression = MacroNormalSample;
+    Normal->B.Expression = DetailNormalSample;
+    Normal->Alpha.Expression = DetailNormalWeight;
+    Material->GetExpressionCollection().AddExpression(Normal);
+
+    auto AddChannelMask = [Material](UMaterialExpression* Input, bool bRed, bool bGreen)
+    {
+        UMaterialExpressionComponentMask* Mask = NewObject<UMaterialExpressionComponentMask>(Material);
+        Mask->Input.Expression = Input;
+        Mask->R = bRed;
+        Mask->G = bGreen;
+        Material->GetExpressionCollection().AddExpression(Mask);
+        return Mask;
+    };
+    UMaterialExpressionComponentMask* MacroAo = AddChannelMask(MacroPackedSample, true, false);
+    UMaterialExpressionComponentMask* DetailAo = AddChannelMask(DetailPackedSample, true, false);
+    UMaterialExpressionComponentMask* MacroRoughness = AddChannelMask(MacroPackedSample, false, true);
+    UMaterialExpressionComponentMask* DetailRoughness = AddChannelMask(DetailPackedSample, false, true);
+
+    UMaterialExpressionConstant* DetailSurfaceResponseWeight =
+        NewObject<UMaterialExpressionConstant>(Material);
+    DetailSurfaceResponseWeight->R = Settings.DetailSurfaceResponseWeight;
+    Material->GetExpressionCollection().AddExpression(DetailSurfaceResponseWeight);
+
+    UMaterialExpressionLinearInterpolate* AmbientOcclusion =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    AmbientOcclusion->A.Expression = MacroAo;
+    AmbientOcclusion->B.Expression = DetailAo;
+    AmbientOcclusion->Alpha.Expression = DetailSurfaceResponseWeight;
+    Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
+
+    UMaterialExpressionLinearInterpolate* Roughness =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    Roughness->A.Expression = MacroRoughness;
+    Roughness->B.Expression = DetailRoughness;
+    Roughness->Alpha.Expression = DetailSurfaceResponseWeight;
+    Material->GetExpressionCollection().AddExpression(Roughness);
+
+    UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+    EmissiveScale->R = Settings.EmissiveFillScale;
+    Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+    UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+    EmissiveColor->A.Expression = BaseColor;
+    EmissiveColor->B.Expression = EmissiveScale;
+    Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+    UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
+    Specular->R = Settings.SpecularLevel;
+    Material->GetExpressionCollection().AddExpression(Specular);
+
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+    ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, Normal);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+
     Material->SetMaterialUsage(MATUSAGE_Nanite);
     Material->SetMaterialUsage(MATUSAGE_StaticLighting);
     Material->PostEditChange();
@@ -1110,6 +1320,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         return nullptr;
     }
     FAssetCompilingManager::Get().FinishAllCompilation();
+
+    OutSummary += FString::Printf(
+        TEXT("Built %s Landscape material from source-conditioned macro maps plus first-party terrain detail (macro scale %.2f, detail scale %.2f, albedo %.2f, normal %.2f, surface %.2f).\n"),
+        *Candidate.PreviewSpec.RiverId,
+        Settings.MacroMappingScale,
+        Settings.DetailMappingScale,
+        Settings.DetailAlbedoWeight,
+        Settings.DetailNormalWeight,
+        Settings.DetailSurfaceResponseWeight);
 
     return Material;
 }
@@ -16440,6 +16659,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         const bool bCandidateSucceeded =
             bSourceContractsPresent && bMapBuilt && bGuideSeatCaptured && bRiverEyeCaptured;
         bAllSucceeded &= bCandidateSucceeded;
+        const FRaftSimLandscapeMaterialCandidateSettings MaterialSettings =
+            GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -16471,6 +16692,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
             TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
             TEXT("      \"target_relief_cm\": %.3f,\n")
+            TEXT("      \"landscape_material_status\": \"source_conditioned_macro_plus_first_party_close_range_detail_review_candidate\",\n")
+            TEXT("      \"landscape_material_texture_asset_count\": 6,\n")
+            TEXT("      \"landscape_material_macro_mapping_scale\": %.3f,\n")
+            TEXT("      \"landscape_material_detail_mapping_scale\": %.3f,\n")
+            TEXT("      \"landscape_material_detail_albedo_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_detail_normal_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_detail_surface_response_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_emissive_fill_scale\": %.3f,\n")
+            TEXT("      \"landscape_material_specular_level\": %.3f,\n")
+            TEXT("      \"landscape_material_promotion_status\": \"review_only_not_lifelike_not_gameplay_promoted\",\n")
             TEXT("      \"material_usage_contract\": \"nanite_and_static_lighting\",\n")
             TEXT("      \"material_bound_component_count\": %d,\n")
             TEXT("      \"material_binding_status\": \"%s\",\n")
@@ -16506,6 +16737,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Candidate.HorizontalSpanXCm,
             Candidate.HorizontalSpanYCm,
             Candidate.TargetReliefCm,
+            MaterialSettings.MacroMappingScale,
+            MaterialSettings.DetailMappingScale,
+            MaterialSettings.DetailAlbedoWeight,
+            MaterialSettings.DetailNormalWeight,
+            MaterialSettings.DetailSurfaceResponseWeight,
+            MaterialSettings.EmissiveFillScale,
+            MaterialSettings.SpecularLevel,
             Result.MaterialBoundComponentCount,
             Result.bMaterialBindingsValidated ? TEXT("all_source_components_bound") : TEXT("source_component_binding_failed"),
             Result.NaniteComponentCount,
