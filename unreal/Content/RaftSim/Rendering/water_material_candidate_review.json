@@ -1,8 +1,8 @@
 {
   "schema": "raftsim.unreal.water_material_candidate_review.v1",
-  "generated_on": "2026-07-06",
-  "status": "engine_water_plugin_candidate_rejected_for_generated_preview_river_ribbon",
-  "goal": "Evaluate whether installed Unreal Water/WaterAdvanced plugin materials can improve the generated downstream river-eye preview captures before custom production water shaders are built.",
+  "generated_on": "2026-07-10",
+  "status": "custom_single_layer_water_landscape_candidate_captured_review_only",
+  "goal": "Evaluate a purpose-built Single Layer Water material on the custom C++ solver-owned procedural river ribbon without requiring WaterBody or WaterZone authority.",
   "candidate_materials": [
     {
       "material": "/WaterAdvanced/Materials/Water_Material_Simple.Water_Material_Simple",
@@ -22,11 +22,11 @@
   ],
   "test_run": {
     "build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with UE_5.8",
-    "capture_command": "UnrealEditor SmokeEmIfYouGotEm.uproject -RaftSimCreatePhotorealEnvironmentPreviewMaps -RaftSimCapturePhotorealEnvironmentPreviews -RaftSimExitAfterEnvironmentAutomation -unattended -nop4 -nosplash",
+    "capture_command": "UnrealEditor-Cmd SmokeEmIfYouGotEm.uproject -RaftSimCreateLandscapeImportCandidateMaps -RaftSimExitAfterEnvironmentAutomation -RenderOffscreen -unattended -nop4 -nosplash",
     "captures_regenerated": [
-      "docs/environment-captures/photoreal_river_previews/american_south_fork_river_eye_downstream.png",
-      "docs/environment-captures/photoreal_river_previews/colorado_river_river_eye_downstream.png",
-      "docs/environment-captures/photoreal_river_previews/pacuare_river_eye_downstream.png"
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
+      "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png"
     ]
   },
   "observed_failure": {
@@ -44,13 +44,18 @@
   },
   "active_decision": {
     "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-    "decision": "Keep the first-party lit vertex-color water preview material active until a custom water shader or true WaterBody integration is implemented and visually verified.",
-    "normal_response_scaffold": "The active preview material now uses bounded DefaultLit vertex-color shading with low emissive fill, roughness, and specular constants so generated river-ribbon relief can catch sun/skylight without using the rejected engine water plugin material.",
-    "promotion_gate": "Any future Water plugin material attempt must be captured for all three rivers and visually checked for nonblack water, readable waves/foam, hazard visibility, and no masking of swimmer/rescue targets before it replaces the active preview material."
+    "landscape_candidate_material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
+    "decision": "Keep the DefaultLit parent on legacy/base preview maps while the isolated Landscape candidates evaluate the custom Single Layer Water parent and three river-specific material instances.",
+    "single_layer_water_contract": "Opaque SingleLayerWater shading uses river-specific scattering, absorption, phase g, behind-water color scale, two-scale first-party normal-atlas sampling, bounded surface/vertex tint, roughness, specular, refraction IOR, and a bounded Fresnel sky-fill fallback. A movable skylight and runtime corridor reflection capture are present; offscreen evidence capture temporarily forces the reflection-cubemap technique without changing saved game settings.",
+    "geometry_authority": "The custom C++ water simulation and generated ribbon geometry remain authoritative. The material, render-normal smoothing, render-only width overlap, and Fresnel fallback cannot add forcing or hide conservation failures.",
+    "observed_result": "All three material instances compile and bind to the generated procedural ribbons with clean map checks and nonblack captures. The water is more physically structured than the old painted review material, but still reads as a smooth review ribbon because riverbed, banks, solver-derived displacement, foam, spray, and atmosphere are not production quality.",
+    "promotion_gate": "Do not promote the candidate until live-editor and packaged captures show credible reflection/refraction, solver-aligned flow detail, bank/riverbed transitions, foam and spray, hazard and swimmer/rescue readability, guide review, and measured desktop/VR performance for every seasonal flow band."
   },
   "next_actions": [
-    "Continue the purpose-built preview water material toward normal/foam texture inputs rather than direct Water plugin material reuse.",
-    "Evaluate true WaterBodyRiver or WaterMesh integration only after terrain, channel, and spline geometry are production-shaped.",
-    "Keep regenerated captures honest: mark current water as readable proxy material, not production photoreal water."
+    "Replace analytic review displacement with solver-sampled normals, depth, velocity, and feature masks while keeping forcing disabled by default.",
+    "Build production riverbed and wet-bank material transitions so shallow refraction does not expose coarse Landscape channel-burn geometry.",
+    "Add solver-aligned foam, spray, mist, and whitewater VFX for holes, wave trains, laterals, eddy lines, shelves, and boulder interactions.",
+    "Capture the same material in the live editor and packaged game because commandlet SceneCapture reflection behavior is not sufficient evidence for promotion.",
+    "Keep regenerated captures honest: this is a review candidate, not lifelike or production-approved water."
   ]
 }

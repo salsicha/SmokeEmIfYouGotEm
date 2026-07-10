@@ -10,8 +10,10 @@
 #include "Components/InstancedStaticMeshComponent.h"
 #include "Components/LightComponent.h"
 #include "Components/MeshComponent.h"
+#include "Components/ReflectionCaptureComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkyLightComponent.h"
+#include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Editor.h"
@@ -21,6 +23,7 @@
 #include "Engine/PointLight.h"
 #include "Engine/SceneCapture2D.h"
 #include "Engine/SkyLight.h"
+#include "Engine/SphereReflectionCapture.h"
 #include "Engine/StaticMesh.h"
 #include "Engine/StaticMeshActor.h"
 #include "Engine/Texture2D.h"
@@ -51,10 +54,12 @@
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
 #include "Materials/MaterialExpressionFrac.h"
+#include "Materials/MaterialExpressionFresnel.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
+#include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionVertexColor.h"
@@ -180,6 +185,74 @@ struct FRaftSimPreviewWaterMaterialResponse
     float MeshNormalUpBlend = 0.15f;
     float NormalIntensity = 0.32f;
 };
+
+struct FRaftSimLandscapeCandidateWaterSettings
+{
+    float BaseColorScale = 0.78f;
+    float EmissiveFillScale = 0.004f;
+    float Roughness = 0.09f;
+    float Specular = 0.52f;
+    float Opacity = 0.30f;
+    float NormalIntensity = 0.48f;
+    float RefractionIor = 1.333f;
+    float PhaseG = 0.15f;
+    float VertexTintWeight = 0.12f;
+    float RenderWidthScale = 1.20f;
+    float RenderNormalUpBlend = 0.78f;
+    float RenderDisplacementScale = 0.42f;
+    float ReflectionFillIntensity = 0.11f;
+    FLinearColor SurfaceTint = FLinearColor(0.025f, 0.115f, 0.095f, 0.0f);
+    FLinearColor ReflectionTint = FLinearColor(0.38f, 0.55f, 0.62f, 0.0f);
+    FLinearColor ScatteringCoefficients = FLinearColor(0.0012f, 0.0025f, 0.0018f, 0.0f);
+    FLinearColor AbsorptionCoefficients = FLinearColor(0.0045f, 0.0018f, 0.0013f, 0.0f);
+    FLinearColor ColorScaleBehindWater = FLinearColor(0.90f, 0.96f, 0.92f, 0.0f);
+};
+
+FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const FString& RiverId)
+{
+    FRaftSimLandscapeCandidateWaterSettings Settings;
+    if (RiverId == TEXT("colorado_river"))
+    {
+        Settings.BaseColorScale = 0.62f;
+        Settings.EmissiveFillScale = 0.003f;
+        Settings.Roughness = 0.18f;
+        Settings.Specular = 0.42f;
+        Settings.Opacity = 0.55f;
+        Settings.NormalIntensity = 0.28f;
+        Settings.PhaseG = 0.05f;
+        Settings.VertexTintWeight = 0.16f;
+        Settings.RenderWidthScale = 1.17f;
+        Settings.RenderNormalUpBlend = 0.84f;
+        Settings.RenderDisplacementScale = 0.30f;
+        Settings.ReflectionFillIntensity = 0.085f;
+        Settings.SurfaceTint = FLinearColor(0.105f, 0.090f, 0.055f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.46f, 0.58f, 0.67f, 0.0f);
+        Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
+        Settings.AbsorptionCoefficients = FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f);
+        Settings.ColorScaleBehindWater = FLinearColor(0.84f, 0.76f, 0.62f, 0.0f);
+    }
+    else if (RiverId == TEXT("pacuare"))
+    {
+        Settings.BaseColorScale = 0.74f;
+        Settings.EmissiveFillScale = 0.004f;
+        Settings.Roughness = 0.11f;
+        Settings.Specular = 0.50f;
+        Settings.Opacity = 0.40f;
+        Settings.NormalIntensity = 0.55f;
+        Settings.PhaseG = 0.25f;
+        Settings.VertexTintWeight = 0.10f;
+        Settings.RenderWidthScale = 1.22f;
+        Settings.RenderNormalUpBlend = 0.76f;
+        Settings.RenderDisplacementScale = 0.48f;
+        Settings.ReflectionFillIntensity = 0.095f;
+        Settings.SurfaceTint = FLinearColor(0.018f, 0.095f, 0.065f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.32f, 0.48f, 0.54f, 0.0f);
+        Settings.ScatteringCoefficients = FLinearColor(0.0008f, 0.0030f, 0.0018f, 0.0f);
+        Settings.AbsorptionCoefficients = FLinearColor(0.0050f, 0.0012f, 0.0022f, 0.0f);
+        Settings.ColorScaleBehindWater = FLinearColor(0.82f, 0.94f, 0.84f, 0.0f);
+    }
+    return Settings;
+}
 
 FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
 {
@@ -517,6 +590,34 @@ public:
 private:
     IConsoleVariable* WorldGcLeakFatalCVar = nullptr;
     bool bPreviousValue = false;
+    bool bChanged = false;
+};
+
+class FScopedSingleLayerWaterCaptureReflectionOverride
+{
+public:
+    FScopedSingleLayerWaterCaptureReflectionOverride()
+    {
+        ReflectionCVar = IConsoleManager::Get().FindConsoleVariable(TEXT("r.Water.SingleLayer.Reflection"));
+        if (ReflectionCVar)
+        {
+            PreviousValue = ReflectionCVar->GetInt();
+            ReflectionCVar->Set(2, ECVF_SetByCode);
+            bChanged = PreviousValue != 2;
+        }
+    }
+
+    ~FScopedSingleLayerWaterCaptureReflectionOverride()
+    {
+        if (bChanged && ReflectionCVar)
+        {
+            ReflectionCVar->Set(PreviousValue, ECVF_SetByCode);
+        }
+    }
+
+private:
+    IConsoleVariable* ReflectionCVar = nullptr;
+    int32 PreviousValue = 1;
     bool bChanged = false;
 };
 
@@ -1826,6 +1927,397 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     }
 
     return Material;
+}
+
+UMaterial* LoadOrCreateLandscapeCandidateSingleLayerWaterParent(FString& OutSummary)
+{
+    static const TCHAR* MaterialPackagePath =
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate");
+    static const TCHAR* MaterialObjectPath =
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate.M_RaftSim_SingleLayerWaterCandidate");
+
+    UPackage* Package = CreatePackage(MaterialPackagePath);
+    if (!Package)
+    {
+        OutSummary += TEXT("Failed to create the Single Layer Water candidate material package.\n");
+        return nullptr;
+    }
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, MaterialObjectPath));
+    if (!Material)
+    {
+        Material = FindObject<UMaterial>(Package, TEXT("M_RaftSim_SingleLayerWaterCandidate"));
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            TEXT("M_RaftSim_SingleLayerWaterCandidate"),
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += TEXT("Failed to create the Single Layer Water candidate material.\n");
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_SingleLayerWater);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = true;
+    Material->bTangentSpaceNormal = true;
+    Material->RefractionMethod = RM_IndexOfRefraction;
+
+    auto AddScalarParameter = [Material](const TCHAR* Name, float DefaultValue)
+    {
+        UMaterialExpressionScalarParameter* Parameter =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        Parameter->ParameterName = Name;
+        Parameter->DefaultValue = DefaultValue;
+        Parameter->Group = TEXT("RaftSimSingleLayerWater");
+        Material->GetExpressionCollection().AddExpression(Parameter);
+        return Parameter;
+    };
+    auto AddVectorParameter = [Material](const TCHAR* Name, const FLinearColor& DefaultValue)
+    {
+        UMaterialExpressionVectorParameter* Parameter =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        Parameter->ParameterName = Name;
+        Parameter->DefaultValue = DefaultValue;
+        Parameter->Group = TEXT("RaftSimSingleLayerWater");
+        Material->GetExpressionCollection().AddExpression(Parameter);
+        return Parameter;
+    };
+
+    UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+    Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpressionVectorParameter* SurfaceTint =
+        AddVectorParameter(TEXT("SurfaceTint"), FLinearColor(0.025f, 0.115f, 0.095f, 0.0f));
+    UMaterialExpressionScalarParameter* VertexTintWeight =
+        AddScalarParameter(TEXT("VertexTintWeight"), 0.12f);
+    UMaterialExpressionLinearInterpolate* PhysicalSurfaceTint =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    PhysicalSurfaceTint->A.Expression = SurfaceTint;
+    PhysicalSurfaceTint->B.Expression = VertexColor;
+    PhysicalSurfaceTint->Alpha.Expression = VertexTintWeight;
+    Material->GetExpressionCollection().AddExpression(PhysicalSurfaceTint);
+    UMaterialExpressionScalarParameter* BaseColorScale =
+        AddScalarParameter(TEXT("BaseColorScale"), 0.78f);
+    UMaterialExpressionMultiply* BaseColor = NewObject<UMaterialExpressionMultiply>(Material);
+    BaseColor->A.Expression = PhysicalSurfaceTint;
+    BaseColor->B.Expression = BaseColorScale;
+    Material->GetExpressionCollection().AddExpression(BaseColor);
+
+    UMaterialExpressionVectorParameter* AtlasTileOriginParameter =
+        AddVectorParameter(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+    UMaterialExpressionVectorParameter* AtlasTileScaleParameter =
+        AddVectorParameter(TEXT("AtlasTileScale"), FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+    UMaterialExpressionComponentMask* AtlasTileOrigin = NewObject<UMaterialExpressionComponentMask>(Material);
+    AtlasTileOrigin->Input.Expression = AtlasTileOriginParameter;
+    AtlasTileOrigin->R = true;
+    AtlasTileOrigin->G = true;
+    Material->GetExpressionCollection().AddExpression(AtlasTileOrigin);
+    UMaterialExpressionComponentMask* AtlasTileScale = NewObject<UMaterialExpressionComponentMask>(Material);
+    AtlasTileScale->Input.Expression = AtlasTileScaleParameter;
+    AtlasTileScale->R = true;
+    AtlasTileScale->G = true;
+    Material->GetExpressionCollection().AddExpression(AtlasTileScale);
+
+    UTexture2D* DefaultNormalTexture = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Engine/EngineMaterials/DefaultNormal.DefaultNormal"));
+    if (!DefaultNormalTexture)
+    {
+        OutSummary += TEXT("Failed to load the engine flat-normal texture for Single Layer Water.\n");
+        return nullptr;
+    }
+
+    auto AddWaterNormalSample =
+        [Material, AtlasTileOrigin, AtlasTileScale, DefaultNormalTexture](float UTiling, float VTiling)
+    {
+        UMaterialExpressionTextureCoordinate* TexCoord =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        TexCoord->UTiling = UTiling;
+        TexCoord->VTiling = VTiling;
+        Material->GetExpressionCollection().AddExpression(TexCoord);
+        UMaterialExpressionFrac* WrappedUv = NewObject<UMaterialExpressionFrac>(Material);
+        WrappedUv->Input.Expression = TexCoord;
+        Material->GetExpressionCollection().AddExpression(WrappedUv);
+        UMaterialExpressionMultiply* ScaledUv = NewObject<UMaterialExpressionMultiply>(Material);
+        ScaledUv->A.Expression = WrappedUv;
+        ScaledUv->B.Expression = AtlasTileScale;
+        Material->GetExpressionCollection().AddExpression(ScaledUv);
+        UMaterialExpressionAdd* AtlasUv = NewObject<UMaterialExpressionAdd>(Material);
+        AtlasUv->A.Expression = ScaledUv;
+        AtlasUv->B.Expression = AtlasTileOrigin;
+        Material->GetExpressionCollection().AddExpression(AtlasUv);
+        UMaterialExpressionTextureSampleParameter2D* NormalSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        NormalSample->ParameterName = TEXT("WaterNormalAtlas");
+        NormalSample->Texture = DefaultNormalTexture;
+        NormalSample->SamplerType = SAMPLERTYPE_Normal;
+        NormalSample->Coordinates.Expression = AtlasUv;
+        NormalSample->Group = TEXT("RaftSimSingleLayerWater");
+        Material->GetExpressionCollection().AddExpression(NormalSample);
+        return NormalSample;
+    };
+
+    UMaterialExpressionTextureSampleParameter2D* NormalSampleA = AddWaterNormalSample(0.73f, 2.15f);
+    UMaterialExpressionTextureSampleParameter2D* NormalSampleB = AddWaterNormalSample(1.11f, 3.30f);
+    UMaterialExpressionConstant* NormalLayerBlend = NewObject<UMaterialExpressionConstant>(Material);
+    NormalLayerBlend->R = 0.46f;
+    Material->GetExpressionCollection().AddExpression(NormalLayerBlend);
+    UMaterialExpressionLinearInterpolate* LayeredNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    LayeredNormal->A.Expression = NormalSampleA;
+    LayeredNormal->B.Expression = NormalSampleB;
+    LayeredNormal->Alpha.Expression = NormalLayerBlend;
+    Material->GetExpressionCollection().AddExpression(LayeredNormal);
+    UMaterialExpressionConstant3Vector* FlatNormal =
+        NewObject<UMaterialExpressionConstant3Vector>(Material);
+    FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
+    Material->GetExpressionCollection().AddExpression(FlatNormal);
+    UMaterialExpressionScalarParameter* NormalIntensity =
+        AddScalarParameter(TEXT("NormalIntensity"), 0.48f);
+    UMaterialExpressionLinearInterpolate* WaterNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    WaterNormal->A.Expression = FlatNormal;
+    WaterNormal->B.Expression = LayeredNormal;
+    WaterNormal->Alpha.Expression = NormalIntensity;
+    Material->GetExpressionCollection().AddExpression(WaterNormal);
+
+    UMaterialExpressionScalarParameter* EmissiveFillScale =
+        AddScalarParameter(TEXT("EmissiveFillScale"), 0.004f);
+    UMaterialExpressionMultiply* BaseEmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+    BaseEmissiveColor->A.Expression = BaseColor;
+    BaseEmissiveColor->B.Expression = EmissiveFillScale;
+    Material->GetExpressionCollection().AddExpression(BaseEmissiveColor);
+    UMaterialExpressionFresnel* ReflectionFresnel = NewObject<UMaterialExpressionFresnel>(Material);
+    ReflectionFresnel->Exponent = 5.0f;
+    ReflectionFresnel->BaseReflectFraction = 0.02f;
+    Material->GetExpressionCollection().AddExpression(ReflectionFresnel);
+    UMaterialExpressionVectorParameter* ReflectionTint = AddVectorParameter(
+        TEXT("ReflectionTint"),
+        FLinearColor(0.38f, 0.55f, 0.62f, 0.0f));
+    UMaterialExpressionScalarParameter* ReflectionFillIntensity =
+        AddScalarParameter(TEXT("ReflectionFillIntensity"), 0.11f);
+    UMaterialExpressionMultiply* ReflectionFillMask = NewObject<UMaterialExpressionMultiply>(Material);
+    ReflectionFillMask->A.Expression = ReflectionFresnel;
+    ReflectionFillMask->B.Expression = ReflectionFillIntensity;
+    Material->GetExpressionCollection().AddExpression(ReflectionFillMask);
+    UMaterialExpressionMultiply* ReflectionFill = NewObject<UMaterialExpressionMultiply>(Material);
+    ReflectionFill->A.Expression = ReflectionTint;
+    ReflectionFill->B.Expression = ReflectionFillMask;
+    Material->GetExpressionCollection().AddExpression(ReflectionFill);
+    UMaterialExpressionAdd* EmissiveColor = NewObject<UMaterialExpressionAdd>(Material);
+    EmissiveColor->A.Expression = BaseEmissiveColor;
+    EmissiveColor->B.Expression = ReflectionFill;
+    Material->GetExpressionCollection().AddExpression(EmissiveColor);
+    UMaterialExpressionScalarParameter* Roughness =
+        AddScalarParameter(TEXT("Roughness"), 0.09f);
+    UMaterialExpressionScalarParameter* Specular =
+        AddScalarParameter(TEXT("Specular"), 0.52f);
+    UMaterialExpressionScalarParameter* Opacity =
+        AddScalarParameter(TEXT("WaterOpacity"), 0.30f);
+    UMaterialExpressionScalarParameter* RefractionIor =
+        AddScalarParameter(TEXT("RefractionIor"), 1.333f);
+
+    UMaterialExpressionVectorParameter* ScatteringCoefficients = AddVectorParameter(
+        TEXT("ScatteringCoefficients"),
+        FLinearColor(0.0012f, 0.0025f, 0.0018f, 0.0f));
+    UMaterialExpressionVectorParameter* AbsorptionCoefficients = AddVectorParameter(
+        TEXT("AbsorptionCoefficients"),
+        FLinearColor(0.0045f, 0.0018f, 0.0013f, 0.0f));
+    UMaterialExpressionScalarParameter* PhaseG = AddScalarParameter(TEXT("PhaseG"), 0.15f);
+    UMaterialExpressionVectorParameter* ColorScaleBehindWater = AddVectorParameter(
+        TEXT("ColorScaleBehindWater"),
+        FLinearColor(0.90f, 0.96f, 0.92f, 0.0f));
+    UMaterialExpressionSingleLayerWaterMaterialOutput* WaterOutput =
+        NewObject<UMaterialExpressionSingleLayerWaterMaterialOutput>(Material);
+    WaterOutput->ScatteringCoefficients.Expression = ScatteringCoefficients;
+    WaterOutput->AbsorptionCoefficients.Expression = AbsorptionCoefficients;
+    WaterOutput->PhaseG.Expression = PhaseG;
+    WaterOutput->ColorScaleBehindWater.Expression = ColorScaleBehindWater;
+    Material->GetExpressionCollection().AddExpression(WaterOutput);
+
+    if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
+    {
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Opacity, Opacity);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Refraction, RefractionIor);
+    }
+
+    // SetMaterialUsage compiles immediately. Refresh cached expression data first so
+    // refraction and default textures match the newly generated graph during that compile.
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (!Material->SetMaterialUsage(MATUSAGE_Water))
+    {
+        OutSummary += TEXT("Failed to enable Water material usage for Single Layer Water.\n");
+        return nullptr;
+    }
+    Material->PostEditChange();
+    Package->MarkPackageDirty();
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(MaterialPackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += TEXT("Failed to save the Single Layer Water candidate material.\n");
+        return nullptr;
+    }
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    FString& OutSummary)
+{
+    FString RiverAssetName;
+    if (Spec.RiverId == TEXT("american_south_fork"))
+    {
+        RiverAssetName = TEXT("AmericanSouthFork");
+    }
+    else if (Spec.RiverId == TEXT("colorado_river"))
+    {
+        RiverAssetName = TEXT("ColoradoRiver");
+    }
+    else if (Spec.RiverId == TEXT("pacuare"))
+    {
+        RiverAssetName = TEXT("Pacuare");
+    }
+    if (RiverAssetName.IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("No Single Layer Water asset token exists for %s.\n"),
+            *Spec.RiverId);
+        return nullptr;
+    }
+
+    UMaterial* Parent = LoadOrCreateLandscapeCandidateSingleLayerWaterParent(OutSummary);
+    if (!Parent)
+    {
+        return nullptr;
+    }
+    const FString NormalAtlasName = FString::Printf(
+        TEXT("T_RaftSim_%s_NormalAtlas"),
+        *RiverAssetName);
+    const FString NormalAtlasObjectPath = FString::Printf(
+        TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
+        *NormalAtlasName,
+        *NormalAtlasName);
+    UTexture2D* WaterNormalAtlas = LoadObject<UTexture2D>(nullptr, *NormalAtlasObjectPath);
+    if (!WaterNormalAtlas)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Missing water normal atlas %s for %s.\n"),
+            *NormalAtlasObjectPath,
+            *Spec.RiverId);
+        return nullptr;
+    }
+
+    const FString AssetName = FString::Printf(
+        TEXT("MI_RaftSim_%s_SingleLayerWaterCandidate"),
+        *RiverAssetName);
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UPackage* Package = CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+    UMaterialInstanceConstant* Instance = Cast<UMaterialInstanceConstant>(
+        StaticLoadObject(UMaterialInstanceConstant::StaticClass(), nullptr, *ObjectPath));
+    if (!Instance)
+    {
+        Instance = FindObject<UMaterialInstanceConstant>(Package, *AssetName);
+    }
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        return nullptr;
+    }
+
+    const FRaftSimLandscapeCandidateWaterSettings Settings =
+        GetLandscapeCandidateWaterSettings(Spec.RiverId);
+    Instance->Modify();
+    Instance->SetParentEditorOnly(Parent);
+    auto SetScalar = [Instance](const TCHAR* Name, float Value)
+    {
+        Instance->SetScalarParameterValueEditorOnly(FMaterialParameterInfo(Name), Value);
+    };
+    auto SetVector = [Instance](const TCHAR* Name, const FLinearColor& Value)
+    {
+        Instance->SetVectorParameterValueEditorOnly(FMaterialParameterInfo(Name), Value);
+    };
+    SetScalar(TEXT("BaseColorScale"), Settings.BaseColorScale);
+    SetScalar(TEXT("VertexTintWeight"), Settings.VertexTintWeight);
+    SetScalar(TEXT("EmissiveFillScale"), Settings.EmissiveFillScale);
+    SetScalar(TEXT("ReflectionFillIntensity"), Settings.ReflectionFillIntensity);
+    SetScalar(TEXT("Roughness"), Settings.Roughness);
+    SetScalar(TEXT("Specular"), Settings.Specular);
+    SetScalar(TEXT("WaterOpacity"), Settings.Opacity);
+    SetScalar(TEXT("NormalIntensity"), Settings.NormalIntensity);
+    SetScalar(TEXT("RefractionIor"), Settings.RefractionIor);
+    SetScalar(TEXT("PhaseG"), Settings.PhaseG);
+    SetVector(TEXT("SurfaceTint"), Settings.SurfaceTint);
+    SetVector(TEXT("ReflectionTint"), Settings.ReflectionTint);
+    SetVector(TEXT("ScatteringCoefficients"), Settings.ScatteringCoefficients);
+    SetVector(TEXT("AbsorptionCoefficients"), Settings.AbsorptionCoefficients);
+    SetVector(TEXT("ColorScaleBehindWater"), Settings.ColorScaleBehindWater);
+    SetVector(TEXT("AtlasTileOrigin"), FLinearColor(0.0f, 0.5f, 0.0f, 0.0f));
+    SetVector(TEXT("AtlasTileScale"), FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f));
+    Instance->SetTextureParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("WaterNormalAtlas")),
+        WaterNormalAtlas);
+    Instance->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Failed to save %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    OutSummary += FString::Printf(
+        TEXT("Built %s Single Layer Water candidate (opacity %.3f, roughness %.3f, normal %.3f, phase g %.3f).\n"),
+        *Spec.RiverId,
+        Settings.Opacity,
+        Settings.Roughness,
+        Settings.NormalIntensity,
+        Settings.PhaseG);
+    return Instance;
 }
 
 struct FRaftSimFirstPartyMaterialTextureAssetSpec
@@ -6879,12 +7371,13 @@ void AddPreviewAerialDrapeTiles(
     }
 }
 
-void AddPreviewRiverRibbonMesh(
+AActor* AddPreviewRiverRibbonMesh(
     UWorld* World,
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FRaftSimPreviewImage* MaterialAtlasAlbedo,
     const FRaftSimPreviewImage* MaterialAtlasNormal,
-    const FRaftSimPreviewImage* MaterialAtlasPacked)
+    const FRaftSimPreviewImage* MaterialAtlasPacked,
+    UMaterialInterface* MaterialOverride = nullptr)
 {
     constexpr int32 XSteps = 640;
     // Odd cross-step count avoids a persistent vertex-color row exactly on the river centerline.
@@ -6967,6 +7460,9 @@ void AddPreviewRiverRibbonMesh(
         ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.54f, 0.47f, 0.330f), 0.26f)
         : (Spec.bHasWaterfalls ? FMath::Lerp(Spec.WaterColor, FLinearColor(0.140f, 0.460f, 0.270f), 0.28f)
                                 : FMath::Lerp(Spec.WaterColor, FLinearColor(0.150f, 0.480f, 0.300f), 0.24f));
+    const bool bUsePhysicalCandidateShading = MaterialOverride != nullptr;
+    const FRaftSimLandscapeCandidateWaterSettings CandidateWaterSettings =
+        GetLandscapeCandidateWaterSettings(Spec.RiverId);
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float WaterBaseZ = GetPreviewWaterSurfaceBaseZCm(Spec);
     const float FlowEnergy = FMath::Clamp(Spec.FlowCurrentCueScale, 0.65f, 1.60f);
@@ -6989,7 +7485,9 @@ void AddPreviewRiverRibbonMesh(
         const float X = FMath::Lerp(MinX, MaxX, U);
         const float CenterY = GetPreviewRiverCenterY(Spec, X);
         const float Width =
-            ActiveRiverHalfWidth * (1.0f + 0.10f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.18f : 0.05f));
+            ActiveRiverHalfWidth *
+            (1.0f + 0.10f * FMath::Sin(X * 0.0012f) + (Spec.bDesertCanyon ? 0.18f : 0.05f)) *
+            (bUsePhysicalCandidateShading ? CandidateWaterSettings.RenderWidthScale : 1.0f);
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
@@ -7633,7 +8131,7 @@ void AddPreviewRiverRibbonMesh(
             Vertices.Add(FVector(
                 X,
                 CenterY + Lateral,
-                WaterBaseZ + Wave * FirstPartyWaterBaseWaveGain +
+                WaterBaseZ + (Wave * FirstPartyWaterBaseWaveGain +
                     FineRippleWave * FirstPartyWaterMicroReliefGain *
                         (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.26f) +
                     FlowCuedWaterMottleRippleCm * FirstPartyWaterMicroReliefGain *
@@ -7647,7 +8145,8 @@ void AddPreviewRiverRibbonMesh(
                         (1.0f - BaseWaterResidualCenterSeamReliefDampingT * 0.18f) +
                     FirstPartyCaptureQualityWaterMicroReliefCm +
                     IntegratedWaterShaderChromaReliefCm +
-                    FirstPartyMaterialAtlasWaterReliefCm));
+                    FirstPartyMaterialAtlasWaterReliefCm) *
+                    (bUsePhysicalCandidateShading ? CandidateWaterSettings.RenderDisplacementScale : 1.0f)));
             UVs.Add(FVector2D(U * 18.0f, V));
             VertexColors.Add(ClampPreviewColor(WaterColor));
         }
@@ -7672,12 +8171,15 @@ void AddPreviewRiverRibbonMesh(
     }
     Normals = ComputePreviewMeshNormals(Vertices, Triangles);
     const FRaftSimPreviewWaterMaterialResponse WaterResponse = GetPreviewWaterMaterialResponse(Spec.RiverId);
+    const float MeshNormalUpBlend = bUsePhysicalCandidateShading
+        ? CandidateWaterSettings.RenderNormalUpBlend
+        : WaterResponse.MeshNormalUpBlend;
     for (FVector& Normal : Normals)
     {
-        Normal = FMath::Lerp(Normal, FVector::UpVector, WaterResponse.MeshNormalUpBlend).GetSafeNormal();
+        Normal = FMath::Lerp(Normal, FVector::UpVector, MeshNormalUpBlend).GetSafeNormal();
     }
 
-    AddPreviewProceduralMeshActor(
+    return AddPreviewProceduralMeshActor(
         World,
         FString::Printf(TEXT("RaftSim_ProceduralRiverRibbon_%s"), *Spec.RiverId),
         Vertices,
@@ -7685,7 +8187,7 @@ void AddPreviewRiverRibbonMesh(
         Normals,
         UVs,
         Spec.WaterColor,
-        LoadOrCreatePreviewWaterVertexColorMaterial(),
+        MaterialOverride ? MaterialOverride : LoadOrCreatePreviewWaterVertexColorMaterial(),
         &VertexColors);
 }
 
@@ -13939,6 +14441,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (SkyLight)
     {
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
+        SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+        SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
         SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 0.98f : (Spec.bHasWaterfalls ? 0.74f : 0.68f));
     }
 
@@ -13959,6 +14463,36 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
             Spec.bDesertCanyon ? FLinearColor(0.62f, 0.53f, 0.40f)
                                 : (Spec.bHasWaterfalls ? FLinearColor(0.42f, 0.54f, 0.42f)
                                                        : FLinearColor(0.50f, 0.54f, 0.45f)));
+    }
+
+    if (SkyLight && SkyLight->GetLightComponent())
+    {
+        SkyLight->GetLightComponent()->RecaptureSky();
+    }
+
+    ASphereReflectionCapture* RiverReflectionCapture = Cast<ASphereReflectionCapture>(
+        GEditor->AddActor(
+            World->GetCurrentLevel(),
+            ASphereReflectionCapture::StaticClass(),
+            FTransform(
+                FRotator::ZeroRotator,
+                FVector(4200.0f, GetPreviewRiverCenterY(Spec, 4200.0f), 520.0f))));
+    if (RiverReflectionCapture)
+    {
+        RiverReflectionCapture->SetActorLabel(TEXT("RaftSim_RiverCorridorReflectionCapture"));
+        if (USphereReflectionCaptureComponent* ReflectionComponent =
+                Cast<USphereReflectionCaptureComponent>(RiverReflectionCapture->GetCaptureComponent()))
+        {
+            ReflectionComponent->InfluenceRadius = 42000.0f;
+            ReflectionComponent->Brightness = 1.0f;
+            ReflectionComponent->ReflectionSourceType = EReflectionSourceType::CapturedScene;
+            ReflectionComponent->bRuntimeCapture = true;
+            ReflectionComponent->MarkDirtyForRecapture();
+            World->SendAllEndOfFrameUpdates();
+            UReflectionCaptureComponent::UpdateReflectionCaptureContents(
+                World,
+                TEXT("RaftSim photoreal river corridor"));
+        }
     }
 }
 
@@ -14147,6 +14681,8 @@ bool CapturePreviewImageForSpec(
     bool bHideForegroundRaftProxies,
     FString& OutSummary)
 {
+    FScopedSingleLayerWaterCaptureReflectionOverride WaterReflectionOverride;
+
     const FString MapFilename =
         FPackageName::LongPackageNameToFilename(Spec.MapPackagePath, FPackageName::GetMapPackageExtension());
     if (!FPaths::FileExists(MapFilename))
@@ -14219,11 +14755,20 @@ bool CapturePreviewImageForSpec(
     Camera->GetCameraComponent()->GetCameraView(0.0f, CameraView);
     CaptureComponent->SetCameraView(CameraView);
     CaptureComponent->PostProcessSettings = Camera->GetCameraComponent()->PostProcessSettings;
+    CaptureComponent->PostProcessSettings.bOverride_ScreenSpaceReflectionIntensity = true;
+    CaptureComponent->PostProcessSettings.ScreenSpaceReflectionIntensity = 100.0f;
+    CaptureComponent->PostProcessSettings.bOverride_ScreenSpaceReflectionQuality = true;
+    CaptureComponent->PostProcessSettings.ScreenSpaceReflectionQuality = 100.0f;
+    CaptureComponent->PostProcessSettings.bOverride_ScreenSpaceReflectionMaxRoughness = true;
+    CaptureComponent->PostProcessSettings.ScreenSpaceReflectionMaxRoughness = 0.85f;
     CaptureComponent->PostProcessBlendWeight = 1.0f;
     CaptureComponent->TextureTarget = RenderTarget;
     CaptureComponent->CaptureSource = SCS_FinalColorLDR;
     CaptureComponent->bCaptureEveryFrame = false;
     CaptureComponent->bCaptureOnMovement = false;
+    CaptureComponent->bAlwaysPersistRenderingState = true;
+    CaptureComponent->ShowFlags.SetScreenSpaceReflections(true);
+    CaptureComponent->ShowFlags.SetReflectionEnvironment(true);
     CaptureComponent->ShowFlags.SetSelection(false);
     CaptureComponent->ShowFlags.SetModeWidgets(false);
     CaptureComponent->ShowFlags.SetCompositeEditorPrimitives(false);
@@ -14523,6 +15068,9 @@ struct FRaftSimLandscapeImportCandidateResult
     bool bDressingBroadleafMeshNaniteEnabled = false;
     bool bDressingConiferMeshNaniteEnabled = false;
     bool bDressingValidated = false;
+    FString WaterMaterialPath;
+    int32 WaterMaterialBoundComponentCount = 0;
+    bool bSingleLayerWaterMaterialBound = false;
     bool bNaniteRepresentationBuilt = false;
     bool bMaterialBindingsValidated = false;
     bool bNaniteMaterialBindingsValidated = false;
@@ -15050,6 +15598,12 @@ bool BuildLandscapeImportCandidateMap(
     {
         return false;
     }
+    UMaterialInterface* CandidateWaterMaterial =
+        LoadOrCreateLandscapeCandidateWaterMaterial(Candidate.PreviewSpec, OutSummary);
+    if (!CandidateWaterMaterial)
+    {
+        return false;
+    }
     const float ScaleX = Candidate.HorizontalSpanXCm / static_cast<float>(LandscapeQuads);
     const float ScaleY = Candidate.HorizontalSpanYCm / static_cast<float>(LandscapeQuads);
     const float ScaleZ = Candidate.TargetReliefCm / 512.0f;
@@ -15157,7 +15711,35 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
-    AddPreviewRiverRibbonMesh(World, Candidate.PreviewSpec, nullptr, nullptr, nullptr);
+    AActor* WaterActor = AddPreviewRiverRibbonMesh(
+        World,
+        Candidate.PreviewSpec,
+        nullptr,
+        nullptr,
+        nullptr,
+        CandidateWaterMaterial);
+    OutResult.WaterMaterialPath = CandidateWaterMaterial->GetPathName();
+    if (WaterActor)
+    {
+        if (UProceduralMeshComponent* WaterComponent =
+                WaterActor->FindComponentByClass<UProceduralMeshComponent>())
+        {
+            if (WaterComponent->GetMaterial(0) == CandidateWaterMaterial)
+            {
+                OutResult.WaterMaterialBoundComponentCount = 1;
+            }
+        }
+    }
+    OutResult.bSingleLayerWaterMaterialBound =
+        OutResult.WaterMaterialBoundComponentCount == 1 &&
+        CandidateWaterMaterial->GetShadingModels().HasShadingModel(MSM_SingleLayerWater);
+    if (!OutResult.bSingleLayerWaterMaterialBound)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Single Layer Water material binding failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
     AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
 
     OutSummary += FString::Printf(
@@ -15240,7 +15822,7 @@ bool BuildLandscapeImportCandidateMap(
             OutResult.NaniteComponentCount);
     }
     return bSaved && OutResult.bNaniteRepresentationBuilt && OutResult.bMaterialBindingsValidated &&
-        OutResult.bDressingValidated &&
+        OutResult.bDressingValidated && OutResult.bSingleLayerWaterMaterialBound &&
         OutResult.bNaniteMaterialBindingsValidated;
 }
 
@@ -17099,6 +17681,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         bAllSucceeded &= bCandidateSucceeded;
         const FRaftSimLandscapeMaterialCandidateSettings MaterialSettings =
             GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
+        const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+            GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -17157,6 +17741,36 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_dressing_broadleaf_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_conifer_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_promotion_status\": \"pve_engine_sample_and_first_party_procedural_rock_evaluation_only_requires_exported_species_production_rock_asset_guide_and_performance_review\",\n")
+            TEXT("      \"water_material_status\": \"%s\",\n")
+            TEXT("      \"water_material_asset\": \"%s\",\n")
+            TEXT("      \"water_material_parent\": \"/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate\",\n")
+            TEXT("      \"water_shading_model\": \"SingleLayerWater\",\n")
+            TEXT("      \"water_blend_mode\": \"Opaque\",\n")
+            TEXT("      \"water_custom_output\": \"scattering_absorption_phase_g_color_scale_behind_water\",\n")
+            TEXT("      \"water_normal_source\": \"river_specific_first_party_normal_atlas_water_tile_two_scale_layered_sampling\",\n")
+            TEXT("      \"water_material_bound_component_count\": %d,\n")
+            TEXT("      \"water_base_color_scale\": %.6f,\n")
+            TEXT("      \"water_surface_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_vertex_tint_weight\": %.6f,\n")
+            TEXT("      \"water_emissive_fill_scale\": %.6f,\n")
+            TEXT("      \"water_reflection_fill_intensity\": %.6f,\n")
+            TEXT("      \"water_reflection_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_roughness\": %.6f,\n")
+            TEXT("      \"water_specular\": %.6f,\n")
+            TEXT("      \"water_opacity\": %.6f,\n")
+            TEXT("      \"water_normal_intensity\": %.6f,\n")
+            TEXT("      \"water_refraction_ior\": %.6f,\n")
+            TEXT("      \"water_phase_g\": %.6f,\n")
+            TEXT("      \"water_scattering_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_absorption_coefficients_per_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_color_scale_behind_water\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"water_render_width_scale\": %.6f,\n")
+            TEXT("      \"water_render_normal_up_blend\": %.6f,\n")
+            TEXT("      \"water_render_displacement_scale\": %.6f,\n")
+            TEXT("      \"water_geometry_authority\": \"custom_cpp_solver_informed_ribbon_geometry_and_vertex_flow_cues_no_visual_forcing_authority\",\n")
+            TEXT("      \"waterbody_dependency\": \"none_single_layer_water_runs_on_generated_procedural_mesh_ribbon\",\n")
+            TEXT("      \"water_reflection_capture_policy\": \"movable_skylight_plus_runtime_corridor_sphere_capture_real_editor_reflections_with_capture_scoped_reflection_cubemap_mode_and_bounded_fresnel_sky_fill_fallback\",\n")
+            TEXT("      \"water_material_promotion_status\": \"review_only_requires_visual_guide_solver_hazard_and_performance_validation\",\n")
             TEXT("      \"material_usage_contract\": \"nanite_and_static_lighting\",\n")
             TEXT("      \"material_bound_component_count\": %d,\n")
             TEXT("      \"material_binding_status\": \"%s\",\n")
@@ -17212,6 +17826,39 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.bDressingBoulderMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
+            Result.bSingleLayerWaterMaterialBound
+                ? TEXT("single_layer_water_candidate_bound_and_captured")
+                : TEXT("single_layer_water_generation_or_binding_failed"),
+            *EscapeRaftSimJsonString(Result.WaterMaterialPath),
+            Result.WaterMaterialBoundComponentCount,
+            WaterSettings.BaseColorScale,
+            WaterSettings.SurfaceTint.R,
+            WaterSettings.SurfaceTint.G,
+            WaterSettings.SurfaceTint.B,
+            WaterSettings.VertexTintWeight,
+            WaterSettings.EmissiveFillScale,
+            WaterSettings.ReflectionFillIntensity,
+            WaterSettings.ReflectionTint.R,
+            WaterSettings.ReflectionTint.G,
+            WaterSettings.ReflectionTint.B,
+            WaterSettings.Roughness,
+            WaterSettings.Specular,
+            WaterSettings.Opacity,
+            WaterSettings.NormalIntensity,
+            WaterSettings.RefractionIor,
+            WaterSettings.PhaseG,
+            WaterSettings.ScatteringCoefficients.R,
+            WaterSettings.ScatteringCoefficients.G,
+            WaterSettings.ScatteringCoefficients.B,
+            WaterSettings.AbsorptionCoefficients.R,
+            WaterSettings.AbsorptionCoefficients.G,
+            WaterSettings.AbsorptionCoefficients.B,
+            WaterSettings.ColorScaleBehindWater.R,
+            WaterSettings.ColorScaleBehindWater.G,
+            WaterSettings.ColorScaleBehindWater.B,
+            WaterSettings.RenderWidthScale,
+            WaterSettings.RenderNormalUpBlend,
+            WaterSettings.RenderDisplacementScale,
             Result.MaterialBoundComponentCount,
             Result.bMaterialBindingsValidated ? TEXT("all_source_components_bound") : TEXT("source_component_binding_failed"),
             Result.NaniteComponentCount,
