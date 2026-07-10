@@ -205,7 +205,7 @@ struct FRaftSimLandscapeCandidateWaterSettings
     float RefractionIor = 1.333f;
     float PhaseG = 0.15f;
     float VertexTintWeight = 0.65f;
-    float RenderWidthScale = 1.20f;
+    float RenderWidthScale = 1.35f;
     float RenderNormalUpBlend = 0.52f;
     float RenderDisplacementScale = 0.70f;
     float ReflectionFillIntensity = 0.16f;
@@ -267,7 +267,7 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.NormalIntensity = 0.68f;
         Settings.PhaseG = 0.25f;
         Settings.VertexTintWeight = 0.62f;
-        Settings.RenderWidthScale = 1.22f;
+        Settings.RenderWidthScale = 1.45f;
         Settings.RenderNormalUpBlend = 0.48f;
         Settings.RenderDisplacementScale = 0.78f;
         Settings.ReflectionFillIntensity = 0.15f;
@@ -1518,9 +1518,21 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UMaterialExpressionConstant* WetBankBlendWeight = NewObject<UMaterialExpressionConstant>(Material);
     WetBankBlendWeight->R = Settings.WetBankBlendWeight;
     Material->GetExpressionCollection().AddExpression(WetBankBlendWeight);
-    UMaterialExpressionMultiply* WetBankBlendMask = NewObject<UMaterialExpressionMultiply>(Material);
-    WetBankBlendMask->A.Expression = WetBankBand;
-    WetBankBlendMask->B.Expression = WetBankBlendWeight;
+    UMaterialExpressionMultiply* WetBankBlendMaskRaw = NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankBlendMaskRaw->A.Expression = WetBankBand;
+    WetBankBlendMaskRaw->B.Expression = WetBankBlendWeight;
+    Material->GetExpressionCollection().AddExpression(WetBankBlendMaskRaw);
+    UMaterialExpressionConstant* WetBankArtifactSuppressionGain =
+        NewObject<UMaterialExpressionConstant>(Material);
+    WetBankArtifactSuppressionGain->R = 2.4f;
+    Material->GetExpressionCollection().AddExpression(WetBankArtifactSuppressionGain);
+    UMaterialExpressionMultiply* WetBankBlendMaskAmplified =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    WetBankBlendMaskAmplified->A.Expression = WetBankBlendMaskRaw;
+    WetBankBlendMaskAmplified->B.Expression = WetBankArtifactSuppressionGain;
+    Material->GetExpressionCollection().AddExpression(WetBankBlendMaskAmplified);
+    UMaterialExpressionSaturate* WetBankBlendMask = NewObject<UMaterialExpressionSaturate>(Material);
+    WetBankBlendMask->Input.Expression = WetBankBlendMaskAmplified;
     Material->GetExpressionCollection().AddExpression(WetBankBlendMask);
     UMaterialExpressionConstant3Vector* WetBankColorScale =
         NewObject<UMaterialExpressionConstant3Vector>(Material);
@@ -18712,10 +18724,12 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_material_specular_level\": %.3f,\n")
             TEXT("      \"landscape_material_riverbed_blend_weight\": %.3f,\n")
             TEXT("      \"landscape_material_wet_bank_blend_weight\": %.3f,\n")
+            TEXT("      \"landscape_material_wet_bank_artifact_suppression_gain\": 2.400,\n")
             TEXT("      \"landscape_material_riverbed_roughness\": %.3f,\n")
             TEXT("      \"landscape_material_riverbed_color_scale\": [%.3f, %.3f, %.3f],\n")
             TEXT("      \"landscape_material_wet_bank_color_scale\": [%.3f, %.3f, %.3f],\n")
             TEXT("      \"landscape_material_zone_conditioning_policy\": \"source_visible_water_darkens_submerged_riverbed_and_feathered_source_water_edge_conditions_wet_bank_without_changing_landscape_geometry_or_solver_authority\",\n")
+            TEXT("      \"landscape_material_wet_bank_artifact_policy\": \"saturate_existing_source_feather_band_to_suppress_bright_albedo_rails_without_widening_water_mask_or_adding_geometry\",\n")
             TEXT("      \"landscape_material_promotion_status\": \"review_only_not_lifelike_not_gameplay_promoted\",\n")
             TEXT("      \"landscape_dressing_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_asset_count\": %d,\n")
