@@ -1,0 +1,336 @@
+{
+  "schema": "raftsim.unreal.first_party_production_detail_textures.v1",
+  "generated_on": "2026-07-09",
+  "status": "first_party_terrain_detail_candidates_generated_and_unreal_bound_not_lifelike",
+  "unreal_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures",
+  "material_instance_candidate_manifest": "unreal/Content/RaftSim/Rendering/first_party_material_instance_candidates.json",
+  "unreal_integration": {
+    "asset_root": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures",
+    "asset_status": "created_unreal_first_party_terrain_detail_texture_candidates_bound_to_review_material_not_lifelike",
+    "asset_count": 9,
+    "material_parent": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+    "material_binding_scope": "terrain_bank_layered_material_candidates_only"
+  },
+  "policy": {
+    "first_party_generated_sources_only": true,
+    "third_party_photos_or_social_media_used": false,
+    "source_prompts_and_hashes_recorded": true,
+    "terrain_detail_does_not_drive_water_or_hydraulic_geometry": true,
+    "textures_must_not_hide_hazards_or_rescue_targets": true,
+    "capture_human_review_and_performance_gates_remain_required": true
+  },
+  "derivation": {
+    "albedo": "bounded opposite-edge feathering with exact periodic edge matching and no mirrored center seam",
+    "normal": "deterministic wrapped-gradient tangent-space normal derived from periodic albedo luma",
+    "ao_roughness_height": "deterministic wrapped local-relief response packed as R=AO G=roughness B=height"
+  },
+  "rivers": [
+    {
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "status": "first_party_generated_close_range_terrain_detail_candidate_not_lifelike",
+      "target_read": "weathered Sierra granite gravel, compacted bank soil, pine needles, and restrained lichen",
+      "source": {
+        "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Sources/american_south_fork_terrain_bank_detail_source_v1.png",
+        "sha256": "55fc5533d23167f34a8d7f6c166eaa128330acb29943c01547ad2eec8f8d884d",
+        "generator": "OpenAI built-in image generation",
+        "generated_on": "2026-07-09",
+        "input_images_used": false,
+        "prompt_summary": "Photorealistic seamless straight-down terrain scan combining weathered Sierra Nevada granite fragments, compacted warm gray-brown riverbank soil, rounded gravel, sparse dry pine needles, tiny lichen traces, and darker damp seams; neutral diffuse scan lighting; base-color only."
+      },
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_albedo.png",
+          "sha256": "b6373da57ee9d6e5f77334df29ef1afb3a08958166bbd35301d85dff9163de47",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB base color",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailAlbedo",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailAlbedo.uasset",
+            "parameter": "TerrainDetailAlbedo",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_albedo.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_normal.png",
+          "sha256": "c19e16d1af87c5e6fa537465bbc8e01490905b5245a1057eff4d29f578448d14",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB tangent-space normal",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailNormal",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailNormal.uasset",
+            "parameter": "TerrainDetailNormal",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_normal.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_ao_roughness_height.png",
+          "sha256": "31de99ac8a42b97fe639d049a694f69daff3a7cdff46b8ef2a0c20befac6dc32",
+          "width": 1024,
+          "height": 1024,
+          "channels": "R=AO G=roughness B=height",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailAORoughnessHeight",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_AmericanSouthFork_TerrainDetailAORoughnessHeight.uasset",
+            "parameter": "TerrainDetailAORoughnessHeight",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/american_south_fork_terrain_bank_detail_v1_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        }
+      },
+      "material_parameters": {
+        "TerrainDetailUvScaleOffset": [
+          5.0,
+          5.0,
+          0.17,
+          0.31
+        ],
+        "TerrainDetailAlbedoWeight": 0.74,
+        "TerrainDetailNormalWeight": 0.2,
+        "TerrainDetailSurfaceResponseWeight": 0.22
+      }
+    },
+    {
+      "river_id": "colorado_river",
+      "display_name": "Colorado River, Grand Canyon",
+      "status": "first_party_generated_close_range_terrain_detail_candidate_not_lifelike",
+      "target_read": "fractured red-brown sandstone, limestone chips, canyon silt, and rounded river gravel",
+      "source": {
+        "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Sources/colorado_river_terrain_bank_detail_source_v1.png",
+        "sha256": "bf33d96ac88bc92733b81b02f8d54f1d26e79787b90cba67f21c166d672b47f1",
+        "generator": "OpenAI built-in image generation",
+        "generated_on": "2026-07-09",
+        "input_images_used": false,
+        "prompt_summary": "Photorealistic seamless straight-down canyon ground scan combining fractured red-brown and buff sandstone, weathered limestone fragments, compacted silt, rounded river gravel, mineral dust, and darker damp seams; neutral diffuse scan lighting; base-color only."
+      },
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_albedo.png",
+          "sha256": "282347828833f48dec3bc888a531d6eb6c35d419dc96b44a94ec6fa093378c85",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB base color",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailAlbedo",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailAlbedo.uasset",
+            "parameter": "TerrainDetailAlbedo",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_albedo.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_normal.png",
+          "sha256": "d4bb7d2fde175ead672de792f8c792559db4d6c3e6fb9332af8834b5d88bd942",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB tangent-space normal",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailNormal",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailNormal.uasset",
+            "parameter": "TerrainDetailNormal",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_normal.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_ao_roughness_height.png",
+          "sha256": "e198d7bbecc0bdfaa046e8f22345435f3ab3043922896671a212ba15a4dd15bc",
+          "width": 1024,
+          "height": 1024,
+          "channels": "R=AO G=roughness B=height",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailAORoughnessHeight",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_ColoradoRiver_TerrainDetailAORoughnessHeight.uasset",
+            "parameter": "TerrainDetailAORoughnessHeight",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/colorado_river_terrain_bank_detail_v1_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        }
+      },
+      "material_parameters": {
+        "TerrainDetailUvScaleOffset": [
+          4.5,
+          4.5,
+          0.41,
+          0.13
+        ],
+        "TerrainDetailAlbedoWeight": 0.76,
+        "TerrainDetailNormalWeight": 0.22,
+        "TerrainDetailSurfaceResponseWeight": 0.24
+      }
+    },
+    {
+      "river_id": "pacuare",
+      "display_name": "Pacuare River",
+      "status": "first_party_generated_close_range_terrain_detail_candidate_not_lifelike",
+      "target_read": "dark volcanic gravel, humid soil, leaf litter, moss, roots, and wet mineral staining",
+      "source": {
+        "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Sources/pacuare_terrain_bank_detail_source_v1.png",
+        "sha256": "d5b4dc0662609d67c04a8301f628c7711f8ad96b20f187adaf4dfcf71d188d10",
+        "generator": "OpenAI built-in image generation",
+        "generated_on": "2026-07-09",
+        "input_images_used": false,
+        "prompt_summary": "Photorealistic seamless straight-down rainforest ground scan combining dark volcanic river gravel, wet brown-black soil, rounded stones, decomposed leaf litter, tiny moss patches, fine roots, and humid mineral staining; neutral diffuse scan lighting; base-color only."
+      },
+      "maps": {
+        "albedo": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_albedo.png",
+          "sha256": "cfcfed32c631fa748d242f4f774059e158c23300a935b0a026e1466d913d53b1",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB base color",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailAlbedo",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailAlbedo.uasset",
+            "parameter": "TerrainDetailAlbedo",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_albedo.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": true,
+              "compression_settings": "TC_Default",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "normal": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_normal.png",
+          "sha256": "e7659d743b8f53bd3d9f99dd5b4b786b4d5857f890ff5101d3d763a4fe576864",
+          "width": 1024,
+          "height": 1024,
+          "channels": "RGB tangent-space normal",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailNormal",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailNormal.uasset",
+            "parameter": "TerrainDetailNormal",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_normal.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Normalmap",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_WorldNormalMap",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        },
+        "ao_roughness_height": {
+          "path": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_ao_roughness_height.png",
+          "sha256": "4b76f6804de8b63b4b462b3ecc5ae9b3f10e18563e1e9d42258ae930199855ff",
+          "width": 1024,
+          "height": 1024,
+          "channels": "R=AO G=roughness B=height",
+          "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges",
+          "unreal_texture_asset": {
+            "path": "/Game/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailAORoughnessHeight",
+            "asset_file": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures/T_RaftSim_Pacuare_TerrainDetailAORoughnessHeight.uasset",
+            "parameter": "TerrainDetailAORoughnessHeight",
+            "source_png": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/pacuare_terrain_bank_detail_v1_ao_roughness_height.png",
+            "status": "created_unreal_texture2d_first_party_detail_candidate_not_lifelike",
+            "import_settings": {
+              "source_pixel_format": "TSF_BGRA8",
+              "source_png_mode": "RGB",
+              "srgb": false,
+              "compression_settings": "TC_Masks",
+              "mip_gen_settings": "TMGS_FromTextureGroup",
+              "lod_group": "TEXTUREGROUP_World",
+              "compression_no_alpha": true,
+              "virtual_texture_streaming": false
+            }
+          }
+        }
+      },
+      "material_parameters": {
+        "TerrainDetailUvScaleOffset": [
+          5.0,
+          5.0,
+          0.29,
+          0.47
+        ],
+        "TerrainDetailAlbedoWeight": 0.74,
+        "TerrainDetailNormalWeight": 0.18,
+        "TerrainDetailSurfaceResponseWeight": 0.2
+      }
+    }
+  ],
+  "current_decision": "Use these assets as a close-range terrain/bank detail layer below the corridor-scale source drape. They replace flat proxy material response but do not establish geospatial, guide, art, rights, hazard-readability, performance, or lifelike approval."
+}

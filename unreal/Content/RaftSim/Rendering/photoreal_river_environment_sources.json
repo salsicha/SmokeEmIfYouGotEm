@@ -18,7 +18,7 @@
   "flow_variant_environment_performance_review_status": "awaiting_measured_flow_variant_desktop_vr_performance_capture_not_approved",
   "geospatial_attachment_ledger": "physics/data/real_world/production_geospatial_attachment_ledger.json",
   "geospatial_source_attachment_audit": "physics/data/real_world/production_geospatial_source_attachment_audit.json",
-  "generated_on": "2026-07-06",
+  "generated_on": "2026-07-09",
   "global_sources": [
     {
       "category": "terrain",
@@ -1665,7 +1665,10 @@
       "capture_count": 20,
       "blocking_capture_count": 20,
       "blocker_counts": {
-        "low_color_texture_entropy": 20
+        "excess_low_gradient_area": 19,
+        "low_color_texture_entropy": 20,
+        "low_edge_density": 20,
+        "low_luma_variation": 6
       },
       "per_river": {
         "american_south_fork": {
@@ -1673,7 +1676,9 @@
           "capture_count": 6,
           "blocking_capture_count": 6,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1682,7 +1687,10 @@
           "capture_count": 6,
           "blocking_capture_count": 6,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1691,7 +1699,9 @@
           "capture_count": 8,
           "blocking_capture_count": 8,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -1703,7 +1713,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1713,7 +1725,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1723,7 +1737,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1733,7 +1749,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1743,7 +1762,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1753,7 +1775,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1763,7 +1788,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1773,7 +1800,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1783,7 +1812,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1793,7 +1824,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -1867,14 +1900,19 @@
       "capture_count": 6,
       "blocking_capture_count": 6,
       "blocker_counts": {
-        "low_color_texture_entropy": 6
+        "excess_low_gradient_area": 6,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 6,
+        "low_luma_variation": 2
       },
       "per_river": {
         "american_south_fork": {
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1882,7 +1920,10 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density",
+            "low_luma_variation"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         },
@@ -1890,7 +1931,9 @@
           "capture_count": 2,
           "blocking_capture_count": 2,
           "blockers": [
-            "low_color_texture_entropy"
+            "excess_low_gradient_area",
+            "low_color_texture_entropy",
+            "low_edge_density"
           ],
           "status": "preview_only_not_lifelike_quality_blockers"
         }
@@ -1919,7 +1962,8 @@
         "rights_review_for_reference_and_material_sources",
         "desktop_and_vr_performance_capture_evidence",
         "production_material_asset_or_first_party_equivalent_promotion"
-      ]
+      ],
+      "superseded_by": "production_detail_material_checkpoint_2026_07_09"
     },
     "photoreal_human_lifelike_review_handoff": "docs/environment-captures/photoreal_river_previews/photoreal_human_lifelike_review_handoff.json",
     "photoreal_human_lifelike_review_handoff_status": "awaiting_human_lifelike_review_not_approved",
@@ -1995,6 +2039,250 @@
       "open_profile_measurement_count": 6,
       "automated_capture_blocking_count": 6,
       "approved_river_count": 0
+    },
+    "production_detail_texture_manifest": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/first_party_production_detail_texture_manifest.json",
+    "production_detail_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures",
+    "production_detail_texture_asset_status": "created_unreal_first_party_terrain_detail_texture_candidates_bound_to_review_material_not_lifelike",
+    "production_detail_material_checkpoint_2026_07_09": {
+      "status": "production_detail_materials_rendered_legacy_overlays_retired_gate_blocked_not_lifelike",
+      "production_detail_texture_manifest": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/first_party_production_detail_texture_manifest.json",
+      "production_detail_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures",
+      "production_detail_texture_asset_status": "created_unreal_first_party_terrain_detail_texture_candidates_bound_to_review_material_not_lifelike",
+      "renderer_corrections": [
+        "metal_safe_split_rg_atlas_and_detail_uv_parameters",
+        "first_party_close_range_terrain_detail_albedo_normal_and_ao_roughness_height",
+        "legacy_terrain_overlay_proxy_geometry_disabled",
+        "legacy_water_overlay_proxy_geometry_disabled",
+        "synthetic_capture_film_grain_disabled"
+      ],
+      "base_capture_quality_summary": {
+        "capture_count": 6,
+        "blocking_capture_count": 6,
+        "blocker_counts": {
+          "excess_low_gradient_area": 6,
+          "low_color_texture_entropy": 6,
+          "low_edge_density": 6,
+          "low_luma_variation": 2
+        },
+        "per_river": {
+          "american_south_fork": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare": {
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          }
+        }
+      },
+      "flow_variant_capture_quality_summary": {
+        "variant_count": 10,
+        "capture_count": 20,
+        "blocking_capture_count": 20,
+        "blocker_counts": {
+          "excess_low_gradient_area": 19,
+          "low_color_texture_entropy": 20,
+          "low_edge_density": 20,
+          "low_luma_variation": 6
+        },
+        "per_river": {
+          "american_south_fork": {
+            "variant_count": 3,
+            "capture_count": 6,
+            "blocking_capture_count": 6,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river": {
+            "variant_count": 3,
+            "capture_count": 6,
+            "blocking_capture_count": 6,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare": {
+            "variant_count": 4,
+            "capture_count": 8,
+            "blocking_capture_count": 8,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          }
+        },
+        "per_variant": {
+          "american_south_fork:high_runnable": {
+            "river_id": "american_south_fork",
+            "flow_band_id": "high_runnable",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "american_south_fork:low_runnable": {
+            "river_id": "american_south_fork",
+            "flow_band_id": "low_runnable",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "american_south_fork:median_runnable": {
+            "river_id": "american_south_fork",
+            "flow_band_id": "median_runnable",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river:high_release_planning": {
+            "river_id": "colorado_river",
+            "flow_band_id": "high_release_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river:low_release_planning": {
+            "river_id": "colorado_river",
+            "flow_band_id": "low_release_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "colorado_river:moderate_release_planning": {
+            "river_id": "colorado_river",
+            "flow_band_id": "moderate_release_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density",
+              "low_luma_variation"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare:clear_season_low_planning": {
+            "river_id": "pacuare",
+            "flow_band_id": "clear_season_low_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare:flash_response_review_only": {
+            "river_id": "pacuare",
+            "flow_band_id": "flash_response_review_only",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare:rainfed_runnable_planning": {
+            "river_id": "pacuare",
+            "flow_band_id": "rainfed_runnable_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          },
+          "pacuare:rainy_season_high_planning": {
+            "river_id": "pacuare",
+            "flow_band_id": "rainy_season_high_planning",
+            "capture_count": 2,
+            "blocking_capture_count": 2,
+            "blockers": [
+              "excess_low_gradient_area",
+              "low_color_texture_entropy",
+              "low_edge_density"
+            ],
+            "status": "preview_only_not_lifelike_quality_blockers"
+          }
+        }
+      },
+      "remaining_base_blocker_counts": {
+        "excess_low_gradient_area": 6,
+        "low_color_texture_entropy": 6,
+        "low_edge_density": 6,
+        "low_luma_variation": 2
+      },
+      "remaining_flow_variant_blocker_counts": {
+        "excess_low_gradient_area": 19,
+        "low_color_texture_entropy": 20,
+        "low_edge_density": 20,
+        "low_luma_variation": 6
+      },
+      "next_visual_art_blocker": "Replace smooth preview terrain/water geometry and proxy rocks/foliage with production Landscape or Nanite geometry, biome-specific foliage, production water shading, and reviewed atmospheric/VFX layers until edge density, broad smooth area, color entropy, and Colorado luminance blockers clear without synthetic grain or overlay cards."
     }
   },
   "first_party_material_texture_atlas_manifest": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/first_party_material_texture_atlas_manifest.json",
@@ -2028,5 +2316,8 @@
   },
   "source_conditioned_material_texture_asset_root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
   "source_conditioned_material_texture_asset_status": "created_unreal_texture2d_review_assets_bound_to_source_conditioned_material_instances_not_lifelike",
-  "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike"
+  "source_conditioned_material_instance_binding_status": "bound_to_review_material_instance_parameters_with_regenerated_capture_review_not_lifelike",
+  "production_detail_texture_manifest": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/first_party_production_detail_texture_manifest.json",
+  "production_detail_texture_asset_root": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Textures",
+  "production_detail_texture_asset_status": "created_unreal_first_party_terrain_detail_texture_candidates_bound_to_review_material_not_lifelike"
 }
