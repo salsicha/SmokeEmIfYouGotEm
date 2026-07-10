@@ -24,10 +24,10 @@
     "capture_count": 20,
     "blocking_capture_count": 20,
     "blocker_counts": {
-      "excess_low_gradient_area": 18,
+      "excess_low_gradient_area": 17,
       "low_color_texture_entropy": 20,
       "low_edge_density": 20,
-      "low_luma_variation": 6
+      "low_luma_variation": 3
     },
     "per_river": {
       "american_south_fork": {
@@ -196,7 +196,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_guide_seat_downstream.png",
-      "sha256": "81bd309421eab19c82b8d42c452010664f0d84aed3451a4a84b28b6c34960570",
+      "sha256": "c02db42b01efe17f83ad5767d2078cc27c554f8de683681fd57a4f9dac4af2dc",
       "metrics": {
         "analysis_size": [
           320,
@@ -207,24 +207,24 @@
           720
         ],
         "rgb_mean": [
-          55.39,
-          98.09,
-          75.63
+          49.33,
+          83.94,
+          64.57
         ],
-        "luma_mean": 87.39,
-        "luma_std": 41.28,
-        "edge_density": 0.0249,
+        "luma_mean": 75.18,
+        "luma_std": 43.0,
+        "edge_density": 0.0192,
         "low_gradient_fraction": 0.9036,
-        "quantized_entropy_bits": 2.52,
-        "quantized_color_count": 40,
-        "flat_blue_field_fraction": 0.0717,
+        "quantized_entropy_bits": 2.37,
+        "quantized_color_count": 39,
+        "flat_blue_field_fraction": 0.0716,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0249,
+          "value": 0.0192,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
@@ -238,7 +238,7 @@
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.52,
+          "value": 2.37,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -262,7 +262,7 @@
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_low_runnable_river_eye_downstream.png",
-      "sha256": "ed0a7615e6631f45f8c9cdb1db3bd69721b31ca8c9ce1429e2856ab819bdb6e6",
+      "sha256": "72fd7e822b727f3a9d5d7240c9b44a2489e3745fac70c2563907b5dde8ceb3b8",
       "metrics": {
         "analysis_size": [
           320,
@@ -273,38 +273,38 @@
           720
         ],
         "rgb_mean": [
-          57.51,
-          98.25,
-          76.84
+          51.8,
+          85.07,
+          66.42
         ],
-        "luma_mean": 88.04,
-        "luma_std": 43.53,
-        "edge_density": 0.0262,
-        "low_gradient_fraction": 0.8971,
-        "quantized_entropy_bits": 2.63,
-        "quantized_color_count": 38,
-        "flat_blue_field_fraction": 0.0765,
+        "luma_mean": 76.65,
+        "luma_std": 45.42,
+        "edge_density": 0.0204,
+        "low_gradient_fraction": 0.8966,
+        "quantized_entropy_bits": 2.45,
+        "quantized_color_count": 34,
+        "flat_blue_field_fraction": 0.0767,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0262,
+          "value": 0.0204,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.8971,
+          "value": 0.8966,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.63,
+          "value": 2.45,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -328,7 +328,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_guide_seat_downstream.png",
-      "sha256": "993a4aa2ab430e348bc5b5ffc70de36d891346036733aade2dc6243e03cf2324",
+      "sha256": "db707553154887b66203248287854d9f17d75af3465f7d096f7293d9e6da65bb",
       "metrics": {
         "analysis_size": [
           320,
@@ -339,16 +339,16 @@
           720
         ],
         "rgb_mean": [
-          55.6,
-          99.84,
-          76.84
+          49.39,
+          84.85,
+          65.38
         ],
-        "luma_mean": 88.77,
-        "luma_std": 40.81,
-        "edge_density": 0.0244,
-        "low_gradient_fraction": 0.9067,
-        "quantized_entropy_bits": 2.4,
-        "quantized_color_count": 40,
+        "luma_mean": 75.91,
+        "luma_std": 42.96,
+        "edge_density": 0.019,
+        "low_gradient_fraction": 0.9057,
+        "quantized_entropy_bits": 2.36,
+        "quantized_color_count": 37,
         "flat_blue_field_fraction": 0.0719,
         "bottom_center_dark_fraction": 0.0
       },
@@ -356,21 +356,21 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0244,
+          "value": 0.019,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9067,
+          "value": 0.9057,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.4,
+          "value": 2.36,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -394,7 +394,7 @@
       "river_id": "american_south_fork",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_median_runnable_river_eye_downstream.png",
-      "sha256": "3bbf0a94ab38d29e4de79e2c46d3bd7a21277f417be657022a7033d8df08f87d",
+      "sha256": "95bedcd47a398b4af9c4826d6bf047f95cd2fd99dcb39925cdba1693e2c5302e",
       "metrics": {
         "analysis_size": [
           320,
@@ -405,38 +405,38 @@
           720
         ],
         "rgb_mean": [
-          57.71,
-          100.12,
-          78.13
+          51.71,
+          86.04,
+          67.23
         ],
-        "luma_mean": 89.51,
-        "luma_std": 42.98,
-        "edge_density": 0.0253,
-        "low_gradient_fraction": 0.9022,
-        "quantized_entropy_bits": 2.5,
-        "quantized_color_count": 40,
-        "flat_blue_field_fraction": 0.0765,
+        "luma_mean": 77.38,
+        "luma_std": 45.31,
+        "edge_density": 0.0196,
+        "low_gradient_fraction": 0.8974,
+        "quantized_entropy_bits": 2.45,
+        "quantized_color_count": 36,
+        "flat_blue_field_fraction": 0.0766,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0253,
+          "value": 0.0196,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9022,
+          "value": 0.8974,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.5,
+          "value": 2.45,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -460,7 +460,7 @@
       "river_id": "american_south_fork",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_guide_seat_downstream.png",
-      "sha256": "094eab4149f60cd074bfe9141dda1933697194a45a7a41d0e65167fba5c0db7e",
+      "sha256": "4dc13c58039da5aa9be8e80e9beb9c24b7bc5bbd97753de0ac304e9c92c0c43c",
       "metrics": {
         "analysis_size": [
           320,
@@ -471,16 +471,16 @@
           720
         ],
         "rgb_mean": [
-          55.81,
-          102.02,
-          78.34
+          49.42,
+          85.97,
+          66.34
         ],
-        "luma_mean": 90.49,
-        "luma_std": 40.23,
-        "edge_density": 0.0239,
-        "low_gradient_fraction": 0.9174,
-        "quantized_entropy_bits": 2.27,
-        "quantized_color_count": 40,
+        "luma_mean": 76.78,
+        "luma_std": 42.97,
+        "edge_density": 0.0185,
+        "low_gradient_fraction": 0.9073,
+        "quantized_entropy_bits": 2.35,
+        "quantized_color_count": 35,
         "flat_blue_field_fraction": 0.072,
         "bottom_center_dark_fraction": 0.0
       },
@@ -488,80 +488,14 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0239,
+          "value": 0.0185,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9174,
-          "threshold": 0.8,
-          "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
-        },
-        {
-          "id": "low_color_texture_entropy",
-          "metric": "quantized_entropy_bits",
-          "value": 2.27,
-          "threshold": 4.4,
-          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        }
-      ],
-      "status": "preview_only_not_lifelike_quality_blockers",
-      "review_scope": "flow_variant",
-      "flow_band_id": "high_runnable",
-      "flow_band_display_name": "High Runnable",
-      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_high_runnable",
-      "flow_context": {
-        "flow_reference_discharge_cfs": 3000.0,
-        "flow_visual_width_scale": 1.12,
-        "flow_visual_foam_scale": 1.25,
-        "flow_visual_wet_bank_scale": 1.25,
-        "flow_visual_current_cue_scale": 1.25,
-        "flow_visual_water_level_offset_cm": 12.0,
-        "flow_visual_note": "South Fork high-water review band: raise wet banks, strengthen laterals and wave trains, and keep boulder hazards visible instead of visually washing them away."
-      }
-    },
-    {
-      "river_id": "american_south_fork",
-      "view_id": "river_eye_downstream",
-      "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_river_eye_downstream.png",
-      "sha256": "2673e42b1ab53afec34b2cc911d01bab60d4161af6ba6956095f7284b3f808da",
-      "metrics": {
-        "analysis_size": [
-          320,
-          180
-        ],
-        "source_size": [
-          1280,
-          720
-        ],
-        "rgb_mean": [
-          57.9,
-          102.39,
-          79.67
-        ],
-        "luma_mean": 91.29,
-        "luma_std": 42.27,
-        "edge_density": 0.0252,
-        "low_gradient_fraction": 0.9093,
-        "quantized_entropy_bits": 2.35,
-        "quantized_color_count": 39,
-        "flat_blue_field_fraction": 0.0765,
-        "bottom_center_dark_fraction": 0.0
-      },
-      "blockers": [
-        {
-          "id": "low_edge_density",
-          "metric": "edge_density",
-          "value": 0.0252,
-          "threshold": 0.045,
-          "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
-        },
-        {
-          "id": "excess_low_gradient_area",
-          "metric": "low_gradient_fraction",
-          "value": 0.9093,
+          "value": 0.9073,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
@@ -589,10 +523,10 @@
       }
     },
     {
-      "river_id": "colorado_river",
-      "view_id": "guide_seat_downstream",
-      "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
-      "sha256": "4bf73380077da46921a23ed55e80216d2f4a19de5c21d1fb30275e81184ed6e4",
+      "river_id": "american_south_fork",
+      "view_id": "river_eye_downstream",
+      "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/american_south_fork_high_runnable_river_eye_downstream.png",
+      "sha256": "3644a1b1fe5cf9c299a9fa0b5c919ee85cedf75a1f51255d9b57a7a48c86895a",
       "metrics": {
         "analysis_size": [
           320,
@@ -603,16 +537,82 @@
           720
         ],
         "rgb_mean": [
-          112.63,
-          93.44,
-          65.75
+          51.68,
+          87.21,
+          68.21
         ],
-        "luma_mean": 95.52,
-        "luma_std": 28.06,
-        "edge_density": 0.0174,
-        "low_gradient_fraction": 0.8512,
-        "quantized_entropy_bits": 1.97,
+        "luma_mean": 78.28,
+        "luma_std": 45.18,
+        "edge_density": 0.0196,
+        "low_gradient_fraction": 0.8999,
+        "quantized_entropy_bits": 2.44,
         "quantized_color_count": 37,
+        "flat_blue_field_fraction": 0.0765,
+        "bottom_center_dark_fraction": 0.0
+      },
+      "blockers": [
+        {
+          "id": "low_edge_density",
+          "metric": "edge_density",
+          "value": 0.0196,
+          "threshold": 0.045,
+          "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
+        },
+        {
+          "id": "excess_low_gradient_area",
+          "metric": "low_gradient_fraction",
+          "value": 0.8999,
+          "threshold": 0.8,
+          "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
+        },
+        {
+          "id": "low_color_texture_entropy",
+          "metric": "quantized_entropy_bits",
+          "value": 2.44,
+          "threshold": 4.4,
+          "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
+        }
+      ],
+      "status": "preview_only_not_lifelike_quality_blockers",
+      "review_scope": "flow_variant",
+      "flow_band_id": "high_runnable",
+      "flow_band_display_name": "High Runnable",
+      "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_high_runnable",
+      "flow_context": {
+        "flow_reference_discharge_cfs": 3000.0,
+        "flow_visual_width_scale": 1.12,
+        "flow_visual_foam_scale": 1.25,
+        "flow_visual_wet_bank_scale": 1.25,
+        "flow_visual_current_cue_scale": 1.25,
+        "flow_visual_water_level_offset_cm": 12.0,
+        "flow_visual_note": "South Fork high-water review band: raise wet banks, strengthen laterals and wave trains, and keep boulder hazards visible instead of visually washing them away."
+      }
+    },
+    {
+      "river_id": "colorado_river",
+      "view_id": "guide_seat_downstream",
+      "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_guide_seat_downstream.png",
+      "sha256": "520c27257a1951ee0a5b34c21497bad354bf91ec22618d1f9966c8f4784f717b",
+      "metrics": {
+        "analysis_size": [
+          320,
+          180
+        ],
+        "source_size": [
+          1280,
+          720
+        ],
+        "rgb_mean": [
+          84.56,
+          72.21,
+          50.48
+        ],
+        "luma_mean": 73.27,
+        "luma_std": 24.3,
+        "edge_density": 0.013,
+        "low_gradient_fraction": 0.8356,
+        "quantized_entropy_bits": 1.47,
+        "quantized_color_count": 36,
         "flat_blue_field_fraction": 0.0,
         "bottom_center_dark_fraction": 0.0
       },
@@ -620,28 +620,28 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0174,
+          "value": 0.013,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.8512,
+          "value": 0.8356,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 1.97,
+          "value": 1.47,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         },
         {
           "id": "low_luma_variation",
           "metric": "luma_std",
-          "value": 28.06,
+          "value": 24.3,
           "threshold": 32.0,
           "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
@@ -665,7 +665,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_low_release_planning_river_eye_downstream.png",
-      "sha256": "65be8e2ed29765456295c6fa7a3195597a266e0dd3b4146fe552fc98e3f4b471",
+      "sha256": "fdca41c6b33c8edc8d56e46c251dc428dffcde37a9a5ffd7973efc5b0ffeac90",
       "metrics": {
         "analysis_size": [
           320,
@@ -676,40 +676,33 @@
           720
         ],
         "rgb_mean": [
-          103.03,
-          87.88,
-          65.64
+          85.33,
+          74.56,
+          55.37
         ],
-        "luma_mean": 89.5,
-        "luma_std": 31.78,
-        "edge_density": 0.0234,
-        "low_gradient_fraction": 0.7874,
-        "quantized_entropy_bits": 2.99,
-        "quantized_color_count": 45,
-        "flat_blue_field_fraction": 0.0282,
+        "luma_mean": 75.46,
+        "luma_std": 32.34,
+        "edge_density": 0.0231,
+        "low_gradient_fraction": 0.7542,
+        "quantized_entropy_bits": 2.18,
+        "quantized_color_count": 44,
+        "flat_blue_field_fraction": 0.0281,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0234,
+          "value": 0.0231,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.99,
+          "value": 2.18,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        },
-        {
-          "id": "low_luma_variation",
-          "metric": "luma_std",
-          "value": 31.78,
-          "threshold": 32.0,
-          "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers",
@@ -731,7 +724,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_guide_seat_downstream.png",
-      "sha256": "380d86115201b3584c3201c1ee6c53aef91fa59f574fa148d6001fc582832ae5",
+      "sha256": "30204609e168edc95a5dfc7c50b641526cc0a63ef3cd106f20cd1d3fc9387ca3",
       "metrics": {
         "analysis_size": [
           320,
@@ -742,15 +735,15 @@
           720
         ],
         "rgb_mean": [
-          113.76,
-          94.83,
-          66.82
+          85.05,
+          72.98,
+          51.3
         ],
-        "luma_mean": 96.83,
-        "luma_std": 27.74,
-        "edge_density": 0.016,
-        "low_gradient_fraction": 0.8655,
-        "quantized_entropy_bits": 1.92,
+        "luma_mean": 73.98,
+        "luma_std": 24.41,
+        "edge_density": 0.0123,
+        "low_gradient_fraction": 0.8432,
+        "quantized_entropy_bits": 1.4,
         "quantized_color_count": 35,
         "flat_blue_field_fraction": 0.0,
         "bottom_center_dark_fraction": 0.0
@@ -759,28 +752,28 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.016,
+          "value": 0.0123,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.8655,
+          "value": 0.8432,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 1.92,
+          "value": 1.4,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         },
         {
           "id": "low_luma_variation",
           "metric": "luma_std",
-          "value": 27.74,
+          "value": 24.41,
           "threshold": 32.0,
           "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
@@ -804,7 +797,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_moderate_release_planning_river_eye_downstream.png",
-      "sha256": "5987749e3bc45996d97c99fa91cff702dada6a7b2d6e0497470778eb233c6a63",
+      "sha256": "a454de8afd7a69bfecbb40a1308ed7d761255aab1446e9f40a305f4af246b55d",
       "metrics": {
         "analysis_size": [
           320,
@@ -815,16 +808,16 @@
           720
         ],
         "rgb_mean": [
-          104.08,
-          89.45,
-          67.15
+          85.63,
+          75.37,
+          56.56
         ],
-        "luma_mean": 90.95,
-        "luma_std": 31.62,
-        "edge_density": 0.0236,
-        "low_gradient_fraction": 0.8,
-        "quantized_entropy_bits": 2.95,
-        "quantized_color_count": 48,
+        "luma_mean": 76.2,
+        "luma_std": 32.61,
+        "edge_density": 0.0231,
+        "low_gradient_fraction": 0.7574,
+        "quantized_entropy_bits": 2.16,
+        "quantized_color_count": 44,
         "flat_blue_field_fraction": 0.0292,
         "bottom_center_dark_fraction": 0.0
       },
@@ -832,23 +825,16 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0236,
+          "value": 0.0231,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.95,
+          "value": 2.16,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        },
-        {
-          "id": "low_luma_variation",
-          "metric": "luma_std",
-          "value": 31.62,
-          "threshold": 32.0,
-          "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers",
@@ -870,7 +856,7 @@
       "river_id": "colorado_river",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_guide_seat_downstream.png",
-      "sha256": "6bc9af1435f40c0a4557a466897dd8c74108a243fe6cd79f6c9b4f81cddd3a57",
+      "sha256": "54c8272e8096abbdf850fdca65d8dfe692c737486a9f476c690c630e0771648f",
       "metrics": {
         "analysis_size": [
           320,
@@ -881,16 +867,16 @@
           720
         ],
         "rgb_mean": [
-          114.55,
-          95.78,
-          67.57
+          85.23,
+          73.55,
+          52.05
         ],
-        "luma_mean": 97.73,
-        "luma_std": 27.49,
-        "edge_density": 0.0156,
-        "low_gradient_fraction": 0.8728,
-        "quantized_entropy_bits": 1.88,
-        "quantized_color_count": 36,
+        "luma_mean": 74.48,
+        "luma_std": 24.42,
+        "edge_density": 0.0118,
+        "low_gradient_fraction": 0.8491,
+        "quantized_entropy_bits": 1.34,
+        "quantized_color_count": 33,
         "flat_blue_field_fraction": 0.0,
         "bottom_center_dark_fraction": 0.0
       },
@@ -898,28 +884,28 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0156,
+          "value": 0.0118,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.8728,
+          "value": 0.8491,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 1.88,
+          "value": 1.34,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         },
         {
           "id": "low_luma_variation",
           "metric": "luma_std",
-          "value": 27.49,
+          "value": 24.42,
           "threshold": 32.0,
           "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
@@ -943,7 +929,7 @@
       "river_id": "colorado_river",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/colorado_river_high_release_planning_river_eye_downstream.png",
-      "sha256": "c885036a431930c85939e6e7485956672b5b7aa64d24cfd2a92e03594dda0654",
+      "sha256": "b9091472d0cf634c7b2b49707f80e16e0645969d99b01de7db8df9b61e329135",
       "metrics": {
         "analysis_size": [
           320,
@@ -954,16 +940,16 @@
           720
         ],
         "rgb_mean": [
-          104.69,
-          90.54,
-          68.4
+          85.56,
+          75.88,
+          57.52
         ],
-        "luma_mean": 91.95,
-        "luma_std": 31.52,
-        "edge_density": 0.0209,
-        "low_gradient_fraction": 0.8092,
-        "quantized_entropy_bits": 2.89,
-        "quantized_color_count": 46,
+        "luma_mean": 76.62,
+        "luma_std": 32.65,
+        "edge_density": 0.0213,
+        "low_gradient_fraction": 0.7633,
+        "quantized_entropy_bits": 2.16,
+        "quantized_color_count": 40,
         "flat_blue_field_fraction": 0.0301,
         "bottom_center_dark_fraction": 0.0
       },
@@ -971,30 +957,16 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0209,
+          "value": 0.0213,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
-          "id": "excess_low_gradient_area",
-          "metric": "low_gradient_fraction",
-          "value": 0.8092,
-          "threshold": 0.8,
-          "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
-        },
-        {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.89,
+          "value": 2.16,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
-        },
-        {
-          "id": "low_luma_variation",
-          "metric": "luma_std",
-          "value": 31.52,
-          "threshold": 32.0,
-          "why_it_blocks_lifelike_review": "Lighting and material variation are not strong enough for a lifelike review frame."
         }
       ],
       "status": "preview_only_not_lifelike_quality_blockers",
@@ -1016,7 +988,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_guide_seat_downstream.png",
-      "sha256": "b6263a29eb1c5ddf8f5fc6e675edfce8d7e4c767c4cf51b4efd94a597895210b",
+      "sha256": "f9666dcc8bbbcc1908672615470a7a0644496024bf1a5f110e50b872abbc8f16",
       "metrics": {
         "analysis_size": [
           320,
@@ -1027,38 +999,38 @@
           720
         ],
         "rgb_mean": [
-          69.04,
-          121.62,
-          97.65
+          27.46,
+          75.42,
+          50.51
         ],
-        "luma_mean": 108.71,
-        "luma_std": 40.88,
-        "edge_density": 0.0287,
-        "low_gradient_fraction": 0.9227,
-        "quantized_entropy_bits": 2.2,
-        "quantized_color_count": 34,
-        "flat_blue_field_fraction": 0.0462,
-        "bottom_center_dark_fraction": 0.0
+        "luma_mean": 63.42,
+        "luma_std": 39.94,
+        "edge_density": 0.0206,
+        "low_gradient_fraction": 0.9291,
+        "quantized_entropy_bits": 1.82,
+        "quantized_color_count": 33,
+        "flat_blue_field_fraction": 0.0461,
+        "bottom_center_dark_fraction": 0.0022
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0287,
+          "value": 0.0206,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9227,
+          "value": 0.9291,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.2,
+          "value": 1.82,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1082,7 +1054,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_clear_season_low_planning_river_eye_downstream.png",
-      "sha256": "154ad94dbeb6f60ccf22be98bf944dd25c79cb2c79390e795196d39878272e85",
+      "sha256": "706c372380a75813e03ece06de548d4b2e9e7c82e85b70a8a735aa6b960b56b3",
       "metrics": {
         "analysis_size": [
           320,
@@ -1093,38 +1065,38 @@
           720
         ],
         "rgb_mean": [
-          73.81,
-          123.54,
-          101.09
+          29.28,
+          75.92,
+          51.65
         ],
-        "luma_mean": 111.35,
-        "luma_std": 41.85,
-        "edge_density": 0.0301,
-        "low_gradient_fraction": 0.9188,
-        "quantized_entropy_bits": 2.26,
+        "luma_mean": 64.26,
+        "luma_std": 41.93,
+        "edge_density": 0.0223,
+        "low_gradient_fraction": 0.9272,
+        "quantized_entropy_bits": 1.91,
         "quantized_color_count": 34,
-        "flat_blue_field_fraction": 0.0503,
+        "flat_blue_field_fraction": 0.0504,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0301,
+          "value": 0.0223,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9188,
+          "value": 0.9272,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.26,
+          "value": 1.91,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1148,7 +1120,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_guide_seat_downstream.png",
-      "sha256": "fbb06024e2a1e5eccb9b9807a655d6d5c71acebb90b0957d61968d0ef101fdb9",
+      "sha256": "72305a84acc8e61f504072df885bc1f8aaec4b4a80b70f1ae06f8e101b41e2a1",
       "metrics": {
         "analysis_size": [
           320,
@@ -1159,38 +1131,38 @@
           720
         ],
         "rgb_mean": [
-          62.72,
-          119.3,
-          93.24
+          27.88,
+          77.34,
+          52.09
         ],
-        "luma_mean": 105.39,
-        "luma_std": 39.96,
-        "edge_density": 0.0271,
-        "low_gradient_fraction": 0.9222,
-        "quantized_entropy_bits": 2.12,
-        "quantized_color_count": 33,
-        "flat_blue_field_fraction": 0.0462,
-        "bottom_center_dark_fraction": 0.0
+        "luma_mean": 65.0,
+        "luma_std": 39.63,
+        "edge_density": 0.02,
+        "low_gradient_fraction": 0.9269,
+        "quantized_entropy_bits": 1.77,
+        "quantized_color_count": 32,
+        "flat_blue_field_fraction": 0.0461,
+        "bottom_center_dark_fraction": 0.0001
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0271,
+          "value": 0.02,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9222,
+          "value": 0.9269,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.12,
+          "value": 1.77,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1214,7 +1186,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainfed_runnable_planning_river_eye_downstream.png",
-      "sha256": "d0ab02e03aa65000a8de60df08b27c6a207517961546beba2fa07ba5b3fc702c",
+      "sha256": "c23fea51195981c09b79a9974ea2e3ca5eb8d55c18c317c358ec08f924693806",
       "metrics": {
         "analysis_size": [
           320,
@@ -1225,38 +1197,38 @@
           720
         ],
         "rgb_mean": [
-          67.11,
-          121.1,
-          96.48
+          29.58,
+          77.96,
+          53.31
         ],
-        "luma_mean": 107.85,
-        "luma_std": 41.16,
-        "edge_density": 0.0281,
-        "low_gradient_fraction": 0.9206,
-        "quantized_entropy_bits": 2.2,
-        "quantized_color_count": 33,
-        "flat_blue_field_fraction": 0.0503,
-        "bottom_center_dark_fraction": 0.0
+        "luma_mean": 65.89,
+        "luma_std": 41.58,
+        "edge_density": 0.0212,
+        "low_gradient_fraction": 0.9241,
+        "quantized_entropy_bits": 1.86,
+        "quantized_color_count": 36,
+        "flat_blue_field_fraction": 0.0504,
+        "bottom_center_dark_fraction": 0.0001
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0281,
+          "value": 0.0212,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9206,
+          "value": 0.9241,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.2,
+          "value": 1.86,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1280,7 +1252,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_guide_seat_downstream.png",
-      "sha256": "d7dfdb23ae3bf367f4315f71a95846c800aa0e94286d44765a7d06f767ed86f7",
+      "sha256": "47bebd25e4adba3f8753e032a98993ae892e1e25f48d5ee5152d83f8ce5335ac",
       "metrics": {
         "analysis_size": [
           320,
@@ -1291,38 +1263,38 @@
           720
         ],
         "rgb_mean": [
-          58.59,
-          117.86,
-          90.41
+          28.36,
+          78.61,
+          53.16
         ],
-        "luma_mean": 103.28,
-        "luma_std": 39.33,
-        "edge_density": 0.0262,
-        "low_gradient_fraction": 0.925,
-        "quantized_entropy_bits": 2.06,
-        "quantized_color_count": 34,
-        "flat_blue_field_fraction": 0.0464,
+        "luma_mean": 66.09,
+        "luma_std": 39.36,
+        "edge_density": 0.0188,
+        "low_gradient_fraction": 0.9282,
+        "quantized_entropy_bits": 1.7,
+        "quantized_color_count": 32,
+        "flat_blue_field_fraction": 0.0461,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0262,
+          "value": 0.0188,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.925,
+          "value": 0.9282,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.06,
+          "value": 1.7,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1346,7 +1318,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_rainy_season_high_planning_river_eye_downstream.png",
-      "sha256": "13786469a9772fcbdcde6994a0f0347642e869ef066630140de0730b4dedd985",
+      "sha256": "f49c98ee3845aea9148c35da8034cefc8484dadf0e0a433d526f5fc9616a0eee",
       "metrics": {
         "analysis_size": [
           320,
@@ -1357,38 +1329,38 @@
           720
         ],
         "rgb_mean": [
-          62.7,
-          119.55,
-          93.47
+          29.92,
+          79.27,
+          54.39
         ],
-        "luma_mean": 105.58,
-        "luma_std": 40.62,
-        "edge_density": 0.0276,
-        "low_gradient_fraction": 0.9226,
-        "quantized_entropy_bits": 2.16,
-        "quantized_color_count": 30,
+        "luma_mean": 66.98,
+        "luma_std": 41.26,
+        "edge_density": 0.0205,
+        "low_gradient_fraction": 0.9236,
+        "quantized_entropy_bits": 1.8,
+        "quantized_color_count": 28,
         "flat_blue_field_fraction": 0.0504,
-        "bottom_center_dark_fraction": 0.0
+        "bottom_center_dark_fraction": 0.0003
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0276,
+          "value": 0.0205,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9226,
+          "value": 0.9236,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.16,
+          "value": 1.8,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1412,7 +1384,7 @@
       "river_id": "pacuare",
       "view_id": "guide_seat_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_guide_seat_downstream.png",
-      "sha256": "84bb56bee72be9d702835139e3ee8451e0afad66d87a4638df219210536eedc9",
+      "sha256": "878fa204782d2ba2689161fb730c8ba0eedcb0dfbf425feb1a0579bd8eaab645",
       "metrics": {
         "analysis_size": [
           320,
@@ -1423,38 +1395,38 @@
           720
         ],
         "rgb_mean": [
-          55.36,
-          116.67,
-          88.09
+          28.45,
+          79.52,
+          53.8
         ],
-        "luma_mean": 101.57,
-        "luma_std": 38.63,
-        "edge_density": 0.0258,
-        "low_gradient_fraction": 0.9284,
-        "quantized_entropy_bits": 1.98,
-        "quantized_color_count": 33,
-        "flat_blue_field_fraction": 0.0464,
+        "luma_mean": 66.81,
+        "luma_std": 39.14,
+        "edge_density": 0.0184,
+        "low_gradient_fraction": 0.9281,
+        "quantized_entropy_bits": 1.68,
+        "quantized_color_count": 32,
+        "flat_blue_field_fraction": 0.0462,
         "bottom_center_dark_fraction": 0.0
       },
       "blockers": [
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0258,
+          "value": 0.0184,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.9284,
+          "value": 0.9281,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 1.98,
+          "value": 1.68,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }
@@ -1478,7 +1450,7 @@
       "river_id": "pacuare",
       "view_id": "river_eye_downstream",
       "capture": "docs/environment-captures/photoreal_river_previews/flow_variants/pacuare_flash_response_review_only_river_eye_downstream.png",
-      "sha256": "cfc5fcaeb09376e70ad8040812e96b84b521db28f3ea94b7bbc73f9229d2e94b",
+      "sha256": "cb20f72b13ae930428b6fc0e638b12ad692f7d131a52ede71e84c83369cba4af",
       "metrics": {
         "analysis_size": [
           320,
@@ -1489,16 +1461,16 @@
           720
         ],
         "rgb_mean": [
-          59.23,
-          118.31,
-          91.03
+          30.26,
+          80.26,
+          55.14
         ],
-        "luma_mean": 103.78,
-        "luma_std": 39.99,
-        "edge_density": 0.0268,
-        "low_gradient_fraction": 0.926,
-        "quantized_entropy_bits": 2.09,
-        "quantized_color_count": 31,
+        "luma_mean": 67.82,
+        "luma_std": 41.01,
+        "edge_density": 0.0195,
+        "low_gradient_fraction": 0.9229,
+        "quantized_entropy_bits": 1.76,
+        "quantized_color_count": 32,
         "flat_blue_field_fraction": 0.0505,
         "bottom_center_dark_fraction": 0.0
       },
@@ -1506,21 +1478,21 @@
         {
           "id": "low_edge_density",
           "metric": "edge_density",
-          "value": 0.0268,
+          "value": 0.0195,
           "threshold": 0.045,
           "why_it_blocks_lifelike_review": "Screenshots still read as broad smooth proxy fields instead of textured river corridor detail."
         },
         {
           "id": "excess_low_gradient_area",
           "metric": "low_gradient_fraction",
-          "value": 0.926,
+          "value": 0.9229,
           "threshold": 0.8,
           "why_it_blocks_lifelike_review": "Large low-gradient regions indicate flat water, sky, or terrain proxy surfaces that need production material and geometry detail."
         },
         {
           "id": "low_color_texture_entropy",
           "metric": "quantized_entropy_bits",
-          "value": 2.09,
+          "value": 1.76,
           "threshold": 4.4,
           "why_it_blocks_lifelike_review": "The rendered palette is still too compressed for a photoreal river environment."
         }

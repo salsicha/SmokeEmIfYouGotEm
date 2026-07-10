@@ -41,6 +41,7 @@
 #include "Materials/MaterialExpressionComponentMask.h"
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionFrac.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionSaturate.h"
@@ -134,6 +135,40 @@ struct FRaftSimEnvironmentPreviewSpec
     bool bHasWaterfalls = false;
     bool bDesertCanyon = false;
 };
+
+struct FRaftSimPreviewWaterMaterialResponse
+{
+    float EmissiveFillScale = 0.26f;
+    float RoughnessScale = 0.18f;
+    float RoughnessFloor = 0.28f;
+    float SpecularLevel = 0.22f;
+    float MeshNormalUpBlend = 0.15f;
+    float NormalIntensity = 0.32f;
+};
+
+FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
+{
+    FRaftSimPreviewWaterMaterialResponse Response;
+    if (RiverId == TEXT("colorado_river"))
+    {
+        Response.EmissiveFillScale = 0.28f;
+        Response.RoughnessScale = 0.22f;
+        Response.RoughnessFloor = 0.34f;
+        Response.SpecularLevel = 0.18f;
+        Response.MeshNormalUpBlend = 0.18f;
+        Response.NormalIntensity = 0.22f;
+    }
+    else if (RiverId == TEXT("pacuare"))
+    {
+        Response.EmissiveFillScale = 0.26f;
+        Response.RoughnessScale = 0.18f;
+        Response.RoughnessFloor = 0.30f;
+        Response.SpecularLevel = 0.22f;
+        Response.MeshNormalUpBlend = 0.12f;
+        Response.NormalIntensity = 0.36f;
+    }
+    return Response;
+}
 
 struct FRaftSimPreviewImage
 {
@@ -1259,30 +1294,129 @@ UMaterialInterface* LoadOrCreatePreviewWaterVertexColorMaterial()
     if (Material && !bWaterMaterialConfigured)
     {
         Material->Modify();
+        Material->GetExpressionCollection().Empty();
         Material->SetShadingModel(MSM_DefaultLit);
         Material->BlendMode = BLEND_Opaque;
         Material->TwoSided = true;
-        TArray<UMaterialExpressionConstant*> WaterConstants;
-        for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
-        {
-            if (UMaterialExpressionConstant* Constant = Cast<UMaterialExpressionConstant>(Expression.Get()))
-            {
-                WaterConstants.Add(Constant);
-            }
-        }
-        while (WaterConstants.Num() < 3)
-        {
-            UMaterialExpressionConstant* Constant = NewObject<UMaterialExpressionConstant>(Material);
-            Material->GetExpressionCollection().AddExpression(Constant);
-            WaterConstants.Add(Constant);
-        }
-        WaterConstants[0]->R = FirstPartyLitWaterNormalResponseEmissiveFill;
-        WaterConstants[1]->R = FirstPartyLitWaterNormalResponseRoughness;
-        WaterConstants[2]->R = FirstPartyLitWaterNormalResponseSpecular;
+
+        UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexColor);
+
+        UMaterialExpressionTextureCoordinate* TexCoord = NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        Material->GetExpressionCollection().AddExpression(TexCoord);
+
+        UMaterialExpressionFrac* WrappedUv = NewObject<UMaterialExpressionFrac>(Material);
+        WrappedUv->Input.Expression = TexCoord;
+        Material->GetExpressionCollection().AddExpression(WrappedUv);
+
+        UMaterialExpressionVectorParameter* AtlasTileOriginParameter =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        AtlasTileOriginParameter->ParameterName = TEXT("AtlasTileOrigin");
+        AtlasTileOriginParameter->DefaultValue = FLinearColor(0.0f, 0.5f, 0.0f, 0.0f);
+        AtlasTileOriginParameter->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(AtlasTileOriginParameter);
+
+        UMaterialExpressionVectorParameter* AtlasTileScaleParameter =
+            NewObject<UMaterialExpressionVectorParameter>(Material);
+        AtlasTileScaleParameter->ParameterName = TEXT("AtlasTileScale");
+        AtlasTileScaleParameter->DefaultValue = FLinearColor(1.0f / 3.0f, 1.0f / 2.0f, 0.0f, 0.0f);
+        AtlasTileScaleParameter->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(AtlasTileScaleParameter);
+
+        UMaterialExpressionComponentMask* AtlasTileOrigin = NewObject<UMaterialExpressionComponentMask>(Material);
+        AtlasTileOrigin->Input.Expression = AtlasTileOriginParameter;
+        AtlasTileOrigin->R = 1;
+        AtlasTileOrigin->G = 1;
+        Material->GetExpressionCollection().AddExpression(AtlasTileOrigin);
+
+        UMaterialExpressionComponentMask* AtlasTileScale = NewObject<UMaterialExpressionComponentMask>(Material);
+        AtlasTileScale->Input.Expression = AtlasTileScaleParameter;
+        AtlasTileScale->R = 1;
+        AtlasTileScale->G = 1;
+        Material->GetExpressionCollection().AddExpression(AtlasTileScale);
+
+        UMaterialExpressionMultiply* AtlasScaledUv = NewObject<UMaterialExpressionMultiply>(Material);
+        AtlasScaledUv->A.Expression = WrappedUv;
+        AtlasScaledUv->B.Expression = AtlasTileScale;
+        Material->GetExpressionCollection().AddExpression(AtlasScaledUv);
+
+        UMaterialExpressionAdd* AtlasUv = NewObject<UMaterialExpressionAdd>(Material);
+        AtlasUv->A.Expression = AtlasScaledUv;
+        AtlasUv->B.Expression = AtlasTileOrigin;
+        Material->GetExpressionCollection().AddExpression(AtlasUv);
+
+        UMaterialExpressionTextureSampleParameter2D* NormalSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        NormalSample->ParameterName = TEXT("NormalAtlas");
+        NormalSample->Texture = LoadObject<UTexture2D>(nullptr, TEXT("/Engine/EngineMaterials/DefaultNormal.DefaultNormal"));
+        NormalSample->SamplerType = SAMPLERTYPE_Normal;
+        NormalSample->Coordinates.Expression = AtlasUv;
+        NormalSample->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(NormalSample);
+
+        UMaterialExpressionConstant3Vector* FlatNormal = NewObject<UMaterialExpressionConstant3Vector>(Material);
+        FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(FlatNormal);
+
+        UMaterialExpressionScalarParameter* NormalIntensity =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        NormalIntensity->ParameterName = TEXT("NormalIntensity");
+        NormalIntensity->DefaultValue = 0.32f;
+        NormalIntensity->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(NormalIntensity);
+
+        UMaterialExpressionLinearInterpolate* WaterNormal =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        WaterNormal->A.Expression = FlatNormal;
+        WaterNormal->B.Expression = NormalSample;
+        WaterNormal->Alpha.Expression = NormalIntensity;
+        Material->GetExpressionCollection().AddExpression(WaterNormal);
+
+        UMaterialExpressionScalarParameter* EmissiveFillScale =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        EmissiveFillScale->ParameterName = TEXT("EmissiveFillScale");
+        EmissiveFillScale->DefaultValue = 0.26f;
+        EmissiveFillScale->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(EmissiveFillScale);
+
+        UMaterialExpressionScalarParameter* RoughnessScale =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        RoughnessScale->ParameterName = TEXT("RoughnessScale");
+        RoughnessScale->DefaultValue = 0.18f;
+        RoughnessScale->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(RoughnessScale);
+
+        UMaterialExpressionScalarParameter* RoughnessFloor =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        RoughnessFloor->ParameterName = TEXT("RoughnessFloor");
+        RoughnessFloor->DefaultValue = 0.28f;
+        RoughnessFloor->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(RoughnessFloor);
+
+        UMaterialExpressionAdd* Roughness = NewObject<UMaterialExpressionAdd>(Material);
+        Roughness->A.Expression = RoughnessScale;
+        Roughness->B.Expression = RoughnessFloor;
+        Material->GetExpressionCollection().AddExpression(Roughness);
+
+        UMaterialExpressionScalarParameter* SpecularLevel =
+            NewObject<UMaterialExpressionScalarParameter>(Material);
+        SpecularLevel->ParameterName = TEXT("SpecularLevel");
+        SpecularLevel->DefaultValue = 0.22f;
+        SpecularLevel->Group = TEXT("RaftSimWaterReview");
+        Material->GetExpressionCollection().AddExpression(SpecularLevel);
+
+        UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+        EmissiveColor->A.Expression = VertexColor;
+        EmissiveColor->B.Expression = EmissiveFillScale;
+        Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
         if (UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData())
         {
-            ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, WaterConstants[1]);
-            ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, WaterConstants[2]);
+            ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+            ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+            ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, WaterNormal);
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, SpecularLevel);
         }
         Material->PostEditChange();
         UPackage* Package = Material->GetOutermost();
@@ -2377,6 +2511,8 @@ struct FRaftSimFirstPartyMaterialInstanceCandidateSpec
     FLinearColor PreviewColor = FLinearColor(0.30f, 0.31f, 0.27f);
     float VertexColorWeight = 1.0f;
     float RoughnessFloor = 0.62f;
+    float EmissiveFillScale = 0.42f;
+    float SpecularLevel = 0.0f;
     FLinearColor SourceConditionedZoneWeights = FLinearColor(1.0f, 0.0f, 0.0f, 0.0f);
     float SourceConditionedMacroAlbedoWeight = 0.0f;
     float SourceConditionedSurfaceResponseWeight = 0.0f;
@@ -2410,6 +2546,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         FLinearColor PreviewColor;
         float VertexColorWeight;
         float RoughnessFloor;
+        float EmissiveFillScale;
+        float SpecularLevel;
         FLinearColor SourceConditionedZoneWeights;
         float SourceConditionedMacroAlbedoWeight;
         float SourceConditionedSurfaceResponseWeight;
@@ -2429,6 +2567,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.34f, 0.32f, 0.24f),
             1.0f,
             0.72f,
+            0.42f,
+            0.0f,
             FLinearColor(1.0f, 0.0f, 0.0f, 0.0f),
             0.28f,
             0.22f,
@@ -2446,6 +2586,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.24f, 0.23f, 0.20f),
             1.0f,
             0.66f,
+            0.42f,
+            0.0f,
             FLinearColor(1.0f, 0.0f, 0.0f, 0.0f),
             0.08f,
             0.10f,
@@ -2463,6 +2605,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.055f, 0.15f, 0.055f),
             0.72f,
             0.68f,
+            0.42f,
+            0.0f,
             FLinearColor(0.0f, 1.0f, 0.0f, 0.0f),
             0.20f,
             0.12f,
@@ -2471,15 +2615,17 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {
             TEXT("flow_dependent_water_surface_material"),
             TEXT("FlowDependentWaterSurface"),
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview.M_RaftSim_AtlasSampleReview"),
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.M_RaftSim_VertexColorWaterPreview"),
             3,
             0.0f,
-            0.0f,
-            0.72f,
+            0.32f,
+            0.18f,
             0.0f,
             FLinearColor(0.095f, 0.300f, 0.170f),
             1.0f,
-            0.90f,
+            0.28f,
+            0.26f,
+            0.22f,
             FLinearColor(0.0f, 0.0f, 1.0f, 0.0f),
             0.0f,
             0.0f,
@@ -2497,6 +2643,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.78f, 0.84f, 0.75f),
             0.0f,
             0.74f,
+            0.42f,
+            0.0f,
             FLinearColor(0.0f, 0.0f, 1.0f, 0.0f),
             0.04f,
             0.04f,
@@ -2514,6 +2662,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             FLinearColor(0.680f, 0.220f, 0.080f),
             1.0f,
             0.70f,
+            0.42f,
+            0.0f,
             FLinearColor(0.0f, 0.0f, 0.0f, 0.0f),
             0.0f,
             0.0f,
@@ -2552,6 +2702,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
             Spec.PreviewColor = RecipeSpec.PreviewColor;
             Spec.VertexColorWeight = RecipeSpec.VertexColorWeight;
             Spec.RoughnessFloor = RecipeSpec.RoughnessFloor;
+            Spec.EmissiveFillScale = RecipeSpec.EmissiveFillScale;
+            Spec.SpecularLevel = RecipeSpec.SpecularLevel;
             Spec.SourceConditionedZoneWeights = RecipeSpec.SourceConditionedZoneWeights;
             Spec.SourceConditionedMacroAlbedoWeight = RecipeSpec.SourceConditionedMacroAlbedoWeight;
             Spec.SourceConditionedSurfaceResponseWeight = RecipeSpec.SourceConditionedSurfaceResponseWeight;
@@ -2579,6 +2731,16 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
                     Spec.TerrainDetailNormalWeight = 0.20f;
                     Spec.TerrainDetailSurfaceResponseWeight = 0.22f;
                 }
+            }
+            else if (FCString::Strcmp(RecipeSpec.RecipeId, TEXT("flow_dependent_water_surface_material")) == 0)
+            {
+                const FRaftSimPreviewWaterMaterialResponse WaterResponse =
+                    GetPreviewWaterMaterialResponse(RiverSpec.RiverId);
+                Spec.RoughnessScale = WaterResponse.RoughnessScale;
+                Spec.RoughnessFloor = WaterResponse.RoughnessFloor;
+                Spec.EmissiveFillScale = WaterResponse.EmissiveFillScale;
+                Spec.SpecularLevel = WaterResponse.SpecularLevel;
+                Spec.NormalIntensity = WaterResponse.NormalIntensity;
             }
             Specs.Add(Spec);
         }
@@ -2679,6 +2841,15 @@ bool CreateOrUpdateFirstPartyMaterialInstanceCandidateAsset(
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("RoughnessFloor")),
         Spec.RoughnessFloor);
+    if (Spec.RecipeId == TEXT("flow_dependent_water_surface_material"))
+    {
+        Instance->SetScalarParameterValueEditorOnly(
+            FMaterialParameterInfo(TEXT("EmissiveFillScale")),
+            Spec.EmissiveFillScale);
+        Instance->SetScalarParameterValueEditorOnly(
+            FMaterialParameterInfo(TEXT("SpecularLevel")),
+            Spec.SpecularLevel);
+    }
     Instance->SetScalarParameterValueEditorOnly(
         FMaterialParameterInfo(TEXT("HeightScale")),
         Spec.HeightScale);
@@ -2865,7 +3036,7 @@ UMaterialInterface* SelectFirstPartyMaterialForPreviewActor(
     if (ActorLabel.StartsWith(TEXT("RaftSim_ProceduralValleyTerrain_")) ||
         ActorLabel.StartsWith(TEXT("RaftSim_SourceAerialDrapeMicroTile_")))
     {
-        return Assignments.TerrainBank;
+        return nullptr;
     }
 
     if (ActorLabel.StartsWith(TEXT("RaftSim_ProceduralRiverRibbon_")))
@@ -6402,13 +6573,13 @@ void AddPreviewRiverRibbonMesh(
             const float FirstPartyWaterCellularFacetGain =
                 FMath::Lerp(0.18f, 0.025f, NearFieldFacetedWaterSmoothingT);
             const float FirstPartyWaterBaseWaveGain =
-                FMath::Lerp(0.78f, 0.18f, NearFieldFacetedWaterSmoothingT);
+                FMath::Lerp(0.78f, 0.38f, NearFieldFacetedWaterSmoothingT);
             const float FirstPartyWaterColorFacetGain =
-                FMath::Lerp(0.74f, 0.34f, NearFieldFacetedWaterSmoothingT);
+                FMath::Lerp(0.74f, 0.58f, NearFieldFacetedWaterSmoothingT);
             const float FirstPartyWaterMicroReliefGain =
-                FMath::Lerp(0.28f, 0.045f, NearFieldFacetedWaterSmoothingT);
+                FMath::Lerp(0.28f, 0.12f, NearFieldFacetedWaterSmoothingT);
             const float FirstPartyWaterLargeReliefGain =
-                FMath::Lerp(0.62f, 0.14f, NearFieldFacetedWaterSmoothingT);
+                FMath::Lerp(0.62f, 0.24f, NearFieldFacetedWaterSmoothingT);
             const float FineRipple =
                 FMath::Clamp(
                     0.50f +
@@ -6946,7 +7117,7 @@ void AddPreviewRiverRibbonMesh(
             WaterColor.R = FMath::Max(WaterColor.R, BaseWaterResidualDarkStreakLumaFloor.R);
             WaterColor.G = FMath::Max(WaterColor.G, BaseWaterResidualDarkStreakLumaFloor.G);
             WaterColor.B = FMath::Max(WaterColor.B, BaseWaterResidualDarkStreakLumaFloor.B);
-            const float NearCameraBottomCenterWaterWedgeArtifactDemotion = 0.98f;
+            const float NearCameraBottomCenterWaterWedgeArtifactDemotion = 0.48f;
             const FLinearColor NearCameraBottomCenterWaterWedgeReviewFill = Spec.bDesertCanyon
                 ? FLinearColor(0.560f, 0.455f, 0.300f, 1.0f)
                 : (Spec.bHasWaterfalls ? FLinearColor(0.155f, 0.420f, 0.230f, 1.0f)
@@ -7060,10 +7231,11 @@ void AddPreviewRiverRibbonMesh(
             Triangles.Add(D);
         }
     }
-    Normals.SetNum(Vertices.Num());
+    Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    const FRaftSimPreviewWaterMaterialResponse WaterResponse = GetPreviewWaterMaterialResponse(Spec.RiverId);
     for (FVector& Normal : Normals)
     {
-        Normal = FVector::UpVector;
+        Normal = FMath::Lerp(Normal, FVector::UpVector, WaterResponse.MeshNormalUpBlend).GetSafeNormal();
     }
 
     AddPreviewProceduralMeshActor(
@@ -13496,7 +13668,7 @@ FString GetPreviewFlowVariantCaptureRelativePath(const FRaftSimEnvironmentPrevie
 
 FString GetPreviewFidelityNote(const FRaftSimEnvironmentPreviewSpec& Spec)
 {
-    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; first-party generated close-range terrain albedo, normal, and packed AO/roughness/height detail textures now use dedicated per-river tiled UV scale and bounded terrain-only blends beneath the corridor-scale source drape; source DEM/heightfield geometry uses bilinear sampling, bounded center-seam feathering, meter-scale macro relief, multi-scale local erosion residuals, and reduced normal flattening as the authoritative preview terrain mesh; review-only MI_RaftSim_*_AtlasCandidate material instances are assigned to durable terrain, water, boulder, and foliage surfaces in the saved preview maps, while lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; all detail assets and source-derived terrain remain candidate-only until CRS/vertical-datum conditioning, channel burning, capture, art, guide/geospatial, hazard readability, rights/provenance, and desktop/VR performance review pass");
+    const FString AtlasApplicationNote = TEXT("; first-party material texture atlas albedo tiles are sampled into terrain, primary boulder, and foliage vertex colors, while raft/oar atlas materials remain available for future foreground-art approval and river water keeps generated vertex-current color with review-material atlas/source texture weights culled to avoid repeated corridor-map tile artifacts; normal plus packed AO/roughness/height atlases drive bounded preview material response for non-water surfaces; first-party generated close-range terrain albedo, normal, and packed AO/roughness/height detail textures now use dedicated per-river tiled UV scale and bounded terrain-only blends beneath the corridor-scale source drape; source DEM/heightfield geometry uses bilinear sampling, bounded center-seam feathering, meter-scale macro relief, multi-scale local erosion residuals, and reduced normal flattening as the authoritative preview terrain mesh; the authoritative river ribbon preserves normals from its flow-dependent wave geometry, samples tile-safe first-party water normal detail, and uses river-specific bounded emissive, roughness, specular, and normal response instead of a flat up-normal high-roughness surface; water, boulder, foliage, and raft review material instances remain assigned, while source-baked terrain stays on its proven lit vertex-color material after the loaded atlas terrain candidate rendered black; lifelike-candidate maps skip placeholder raft/oar proxy generation and capture exports still cull any legacy foreground raft/oar proxies until approved production foreground art exists; all detail assets, source-derived terrain, and water light-response values remain candidate-only until Landscape/Nanite and WaterBody/custom shader promotion, reflection/refraction, capture, art, guide/geospatial, hazard readability, rights/provenance, and desktop/VR performance review pass");
     if (!Spec.SourceDrapeDescription.IsEmpty())
     {
         return Spec.SourceDrapeDescription + AtlasApplicationNote;
@@ -15712,6 +15884,7 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     for (int32 Index = 0; Index < Specs.Num(); ++Index)
     {
         const FRaftSimEnvironmentPreviewSpec& Spec = Specs[Index];
+        const FRaftSimPreviewWaterMaterialResponse WaterResponse = GetPreviewWaterMaterialResponse(Spec.RiverId);
         FString GuideSeatCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("guide_seat_downstream"));
         FString RiverEyeCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("river_eye_downstream"));
         FString WarmupGuideSeatCapturePath = GuideSeatCapturePath;
@@ -15774,6 +15947,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"source_terrain_local_relief_amplitude_cm\": %.3f,\n")
             TEXT("      \"source_terrain_seam_feather_uv\": %.5f,\n")
             TEXT("      \"source_terrain_normal_softening_blend\": %.3f,\n")
+            TEXT("      \"water_material_emissive_fill_scale\": %.3f,\n")
+            TEXT("      \"water_material_roughness_scale\": %.3f,\n")
+            TEXT("      \"water_material_roughness_floor\": %.3f,\n")
+            TEXT("      \"water_material_specular_level\": %.3f,\n")
+            TEXT("      \"water_material_normal_intensity\": %.3f,\n")
+            TEXT("      \"water_mesh_normal_up_blend\": %.3f,\n")
             TEXT("      \"water_mask_image\": \"%s\",\n")
             TEXT("      \"vegetation_mask_image\": \"%s\",\n")
             TEXT("      \"source_conditioned_macro_albedo_image\": \"%s\",\n")
@@ -15813,6 +15992,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             Spec.HeightfieldLocalReliefAmplitudeCm,
             Spec.HeightfieldSeamFeatherUv,
             Spec.TerrainNormalSofteningBlend,
+            WaterResponse.EmissiveFillScale,
+            WaterResponse.RoughnessScale,
+            WaterResponse.RoughnessFloor,
+            WaterResponse.SpecularLevel,
+            WaterResponse.NormalIntensity,
+            WaterResponse.MeshNormalUpBlend,
             *EscapeRaftSimJsonString(Spec.WaterMaskImage),
             *EscapeRaftSimJsonString(Spec.VegetationMaskImage),
             *EscapeRaftSimJsonString(
@@ -15917,6 +16102,8 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
     for (int32 VariantIndex = 0; VariantIndex < FlowVariantSpecs.Num(); ++VariantIndex)
     {
         const FRaftSimEnvironmentPreviewSpec& VariantSpec = FlowVariantSpecs[VariantIndex];
+        const FRaftSimPreviewWaterMaterialResponse VariantWaterResponse =
+            GetPreviewWaterMaterialResponse(VariantSpec.RiverId);
         OutSummary += FString::Printf(
             TEXT("Generating %s %s flow-variant preview map.\n"),
             *VariantSpec.DisplayName,
@@ -15990,6 +16177,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             TEXT("      \"source_terrain_local_relief_amplitude_cm\": %.3f,\n")
             TEXT("      \"source_terrain_seam_feather_uv\": %.5f,\n")
             TEXT("      \"source_terrain_normal_softening_blend\": %.3f,\n")
+            TEXT("      \"water_material_emissive_fill_scale\": %.3f,\n")
+            TEXT("      \"water_material_roughness_scale\": %.3f,\n")
+            TEXT("      \"water_material_roughness_floor\": %.3f,\n")
+            TEXT("      \"water_material_specular_level\": %.3f,\n")
+            TEXT("      \"water_material_normal_intensity\": %.3f,\n")
+            TEXT("      \"water_mesh_normal_up_blend\": %.3f,\n")
             TEXT("      \"fidelity_note\": \"%s\"\n")
             TEXT("    }"),
             VariantIndex == 0 ? TEXT("") : TEXT(",\n"),
@@ -16014,6 +16207,12 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             VariantSpec.HeightfieldLocalReliefAmplitudeCm,
             VariantSpec.HeightfieldSeamFeatherUv,
             VariantSpec.TerrainNormalSofteningBlend,
+            VariantWaterResponse.EmissiveFillScale,
+            VariantWaterResponse.RoughnessScale,
+            VariantWaterResponse.RoughnessFloor,
+            VariantWaterResponse.SpecularLevel,
+            VariantWaterResponse.NormalIntensity,
+            VariantWaterResponse.MeshNormalUpBlend,
             *EscapeRaftSimJsonString(GetPreviewFidelityNote(VariantSpec)));
     }
 

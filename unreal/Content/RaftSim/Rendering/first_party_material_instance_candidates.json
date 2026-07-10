@@ -40,7 +40,9 @@
     "AtlasTileOrigin": "RG atlas-tile origin split from scale so Metal never needs an unavailable vector alpha component.",
     "AtlasTileScale": "RG atlas-tile scale split from origin for Metal-safe material compilation.",
     "TerrainDetailUvScale": "RG terrain-detail tiling split from offset for Metal-safe material compilation.",
-    "TerrainDetailUvOffset": "RG terrain-detail phase offset split from scale for Metal-safe material compilation."
+    "TerrainDetailUvOffset": "RG terrain-detail phase offset split from scale for Metal-safe material compilation.",
+    "EmissiveFillScale": "Per-instance DefaultLit emissive fill; water keeps this low so mesh normals and scene lighting remain visible.",
+    "SpecularLevel": "Per-instance DefaultLit dielectric specular response; bounded by river and review-only until production water shading is approved."
   },
   "candidates": [
     {
@@ -158,7 +160,8 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.92
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -422,6 +425,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.92,
+        "RoughnessFloor": 0.72,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -540,7 +595,8 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.64
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -804,6 +860,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.64,
+        "RoughnessFloor": 0.66,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -922,7 +1030,8 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.78
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1187,6 +1296,58 @@
             "virtual_texture_streaming": false
           }
         }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.78,
+        "RoughnessFloor": 0.68,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
+        }
       }
     },
     {
@@ -1194,7 +1355,7 @@
       "recipe_id": "flow_dependent_water_surface_material",
       "status": "created_unreal_material_instance_review_asset_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FlowDependentWaterSurface_AtlasCandidate",
-      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
       "atlas_tile_rect_px": {
         "x": 0,
@@ -1243,7 +1404,9 @@
         "AtlasTileOrigin": "metal_safe_rg_origin_split_from_legacy_combined_parameter",
         "AtlasTileScale": "metal_safe_rg_scale_split_from_legacy_combined_parameter",
         "TerrainDetailUvScale": "metal_safe_rg_detail_tiling_split",
-        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split"
+        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split",
+        "EmissiveFillScale": "river_specific_default_lit_emissive_fill_bounded_to_preserve_mesh_light_response",
+        "SpecularLevel": "river_specific_bounded_default_lit_dielectric_specular_response"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_AmericanSouthFork_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -1255,7 +1418,7 @@
           0.5
         ],
         "AtlasBlendWeight": "wired_to_atlas_sampler_review_material_base_color_lerp_conservative_preview_weight",
-        "NormalIntensity": "wired_to_atlas_sampler_review_material_normal_blend",
+        "NormalIntensity": 0.32,
         "RoughnessScale": "wired_to_atlas_sampler_review_material_packed_green_channel_with_roughness_floor",
         "HeightScale": "wired_to_atlas_sampler_review_material_packed_blue_channel_preview_pixel_depth_offset",
         "ReviewAssetOnlyNotLifelike": 1.0,
@@ -1268,7 +1431,7 @@
           1.0
         ],
         "VertexColorWeight": 1.0,
-        "RoughnessFloor": 0.7,
+        "RoughnessFloor": 0.28,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -1304,7 +1467,10 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.18,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1568,6 +1734,38 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.18,
+        "RoughnessFloor": 0.28,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22,
+        "MeshNormalUpBlend": 0.15,
+        "NormalIntensity": 0.32
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.uasset",
+        "status": "created_unreal_default_lit_water_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "NormalAtlas"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "NormalIntensity",
+          "RoughnessScale",
+          "RoughnessFloor",
+          "EmissiveFillScale",
+          "SpecularLevel"
+        ],
+        "output_wiring": {
+          "BaseColor": "flow-aware river-ribbon vertex color",
+          "EmissiveColor": "bounded vertex-color fill scaled per river material instance",
+          "Roughness": "bounded sum of per-river RoughnessScale and RoughnessFloor",
+          "Specular": "bounded per-river DefaultLit dielectric response",
+          "Normal": "tile-safe first-party water normal atlas blended over the procedural river-ribbon mesh normal"
         }
       }
     },
@@ -1686,7 +1884,8 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.4
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -1950,6 +2149,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.4,
+        "RoughnessFloor": 0.74,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -2032,7 +2283,7 @@
           1.0
         ],
         "VertexColorWeight": 0.0,
-        "RoughnessFloor": 0.64,
+        "RoughnessFloor": 0.7,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -2068,7 +2319,8 @@
         "TerrainDetailUvOffset": [
           0.17,
           0.31
-        ]
+        ],
+        "RoughnessScaleValue": 0.56
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2332,6 +2584,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.56,
+        "RoughnessFloor": 0.7,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -2450,7 +2754,8 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.92
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -2714,6 +3019,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.92,
+        "RoughnessFloor": 0.72,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -2832,7 +3189,8 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.64
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3096,6 +3454,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.64,
+        "RoughnessFloor": 0.66,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -3214,7 +3624,8 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.78
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3479,6 +3890,58 @@
             "virtual_texture_streaming": false
           }
         }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.78,
+        "RoughnessFloor": 0.68,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
+        }
       }
     },
     {
@@ -3486,7 +3949,7 @@
       "recipe_id": "flow_dependent_water_surface_material",
       "status": "created_unreal_material_instance_review_asset_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FlowDependentWaterSurface_AtlasCandidate",
-      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
       "atlas_tile_rect_px": {
         "x": 0,
@@ -3535,7 +3998,9 @@
         "AtlasTileOrigin": "metal_safe_rg_origin_split_from_legacy_combined_parameter",
         "AtlasTileScale": "metal_safe_rg_scale_split_from_legacy_combined_parameter",
         "TerrainDetailUvScale": "metal_safe_rg_detail_tiling_split",
-        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split"
+        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split",
+        "EmissiveFillScale": "river_specific_default_lit_emissive_fill_bounded_to_preserve_mesh_light_response",
+        "SpecularLevel": "river_specific_bounded_default_lit_dielectric_specular_response"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_ColoradoRiver_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -3547,7 +4012,7 @@
           0.5
         ],
         "AtlasBlendWeight": "wired_to_atlas_sampler_review_material_base_color_lerp_conservative_preview_weight",
-        "NormalIntensity": "wired_to_atlas_sampler_review_material_normal_blend",
+        "NormalIntensity": 0.22,
         "RoughnessScale": "wired_to_atlas_sampler_review_material_packed_green_channel_with_roughness_floor",
         "HeightScale": "wired_to_atlas_sampler_review_material_packed_blue_channel_preview_pixel_depth_offset",
         "ReviewAssetOnlyNotLifelike": 1.0,
@@ -3560,7 +4025,7 @@
           1.0
         ],
         "VertexColorWeight": 1.0,
-        "RoughnessFloor": 0.7,
+        "RoughnessFloor": 0.34,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -3596,7 +4061,10 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.22,
+        "EmissiveFillScale": 0.28,
+        "SpecularLevel": 0.18
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -3860,6 +4328,38 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.22,
+        "RoughnessFloor": 0.34,
+        "EmissiveFillScale": 0.28,
+        "SpecularLevel": 0.18,
+        "MeshNormalUpBlend": 0.18,
+        "NormalIntensity": 0.22
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.uasset",
+        "status": "created_unreal_default_lit_water_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "NormalAtlas"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "NormalIntensity",
+          "RoughnessScale",
+          "RoughnessFloor",
+          "EmissiveFillScale",
+          "SpecularLevel"
+        ],
+        "output_wiring": {
+          "BaseColor": "flow-aware river-ribbon vertex color",
+          "EmissiveColor": "bounded vertex-color fill scaled per river material instance",
+          "Roughness": "bounded sum of per-river RoughnessScale and RoughnessFloor",
+          "Specular": "bounded per-river DefaultLit dielectric response",
+          "Normal": "tile-safe first-party water normal atlas blended over the procedural river-ribbon mesh normal"
         }
       }
     },
@@ -3978,7 +4478,8 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.4
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -4242,6 +4743,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.4,
+        "RoughnessFloor": 0.74,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -4324,7 +4877,7 @@
           1.0
         ],
         "VertexColorWeight": 0.0,
-        "RoughnessFloor": 0.64,
+        "RoughnessFloor": 0.7,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -4360,7 +4913,8 @@
         "TerrainDetailUvOffset": [
           0.41,
           0.13
-        ]
+        ],
+        "RoughnessScaleValue": 0.56
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -4624,6 +5178,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.56,
+        "RoughnessFloor": 0.7,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -4742,7 +5348,8 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.92
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -5006,6 +5613,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.92,
+        "RoughnessFloor": 0.72,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -5124,7 +5783,8 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.64
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -5388,6 +6048,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.64,
+        "RoughnessFloor": 0.66,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -5506,7 +6218,8 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.78
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -5771,6 +6484,58 @@
             "virtual_texture_streaming": false
           }
         }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.78,
+        "RoughnessFloor": 0.68,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
+        }
       }
     },
     {
@@ -5778,7 +6543,7 @@
       "recipe_id": "flow_dependent_water_surface_material",
       "status": "created_unreal_material_instance_review_asset_with_texture_bindings_sampler_parent_and_scene_assignment_not_lifelike",
       "material_instance_path": "/Game/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FlowDependentWaterSurface_AtlasCandidate",
-      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+      "parent_preview_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
       "atlas_tile_index": 3,
       "atlas_tile_rect_px": {
         "x": 0,
@@ -5827,7 +6592,9 @@
         "AtlasTileOrigin": "metal_safe_rg_origin_split_from_legacy_combined_parameter",
         "AtlasTileScale": "metal_safe_rg_scale_split_from_legacy_combined_parameter",
         "TerrainDetailUvScale": "metal_safe_rg_detail_tiling_split",
-        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split"
+        "TerrainDetailUvOffset": "metal_safe_rg_detail_phase_split",
+        "EmissiveFillScale": "river_specific_default_lit_emissive_fill_bounded_to_preserve_mesh_light_response",
+        "SpecularLevel": "river_specific_bounded_default_lit_dielectric_specular_response"
       },
       "created_asset_file": "unreal/Content/RaftSim/Materials/MaterialInstances/MI_RaftSim_Pacuare_FlowDependentWaterSurface_AtlasCandidate.uasset",
       "review_asset_parameters": {
@@ -5839,7 +6606,7 @@
           0.5
         ],
         "AtlasBlendWeight": "wired_to_atlas_sampler_review_material_base_color_lerp_conservative_preview_weight",
-        "NormalIntensity": "wired_to_atlas_sampler_review_material_normal_blend",
+        "NormalIntensity": 0.36,
         "RoughnessScale": "wired_to_atlas_sampler_review_material_packed_green_channel_with_roughness_floor",
         "HeightScale": "wired_to_atlas_sampler_review_material_packed_blue_channel_preview_pixel_depth_offset",
         "ReviewAssetOnlyNotLifelike": 1.0,
@@ -5852,7 +6619,7 @@
           1.0
         ],
         "VertexColorWeight": 1.0,
-        "RoughnessFloor": 0.7,
+        "RoughnessFloor": 0.3,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -5888,7 +6655,10 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.18,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -6152,6 +6922,38 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.18,
+        "RoughnessFloor": 0.3,
+        "EmissiveFillScale": 0.26,
+        "SpecularLevel": 0.22,
+        "MeshNormalUpBlend": 0.12,
+        "NormalIntensity": 0.36
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview.uasset",
+        "status": "created_unreal_default_lit_water_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "NormalAtlas"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "NormalIntensity",
+          "RoughnessScale",
+          "RoughnessFloor",
+          "EmissiveFillScale",
+          "SpecularLevel"
+        ],
+        "output_wiring": {
+          "BaseColor": "flow-aware river-ribbon vertex color",
+          "EmissiveColor": "bounded vertex-color fill scaled per river material instance",
+          "Roughness": "bounded sum of per-river RoughnessScale and RoughnessFloor",
+          "Specular": "bounded per-river DefaultLit dielectric response",
+          "Normal": "tile-safe first-party water normal atlas blended over the procedural river-ribbon mesh normal"
         }
       }
     },
@@ -6270,7 +7072,8 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.4
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -6534,6 +7337,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.4,
+        "RoughnessFloor": 0.74,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     },
@@ -6616,7 +7471,7 @@
           1.0
         ],
         "VertexColorWeight": 0.0,
-        "RoughnessFloor": 0.64,
+        "RoughnessFloor": 0.7,
         "SceneAssignmentReviewOnlyNotLifelike": 1.0,
         "SourceConditionedZoneWeights": [
           0.0,
@@ -6652,7 +7507,8 @@
         "TerrainDetailUvOffset": [
           0.29,
           0.47
-        ]
+        ],
+        "RoughnessScaleValue": 0.56
       },
       "texture_asset_bindings": {
         "AlbedoAtlas": {
@@ -6916,6 +7772,58 @@
             "compression_no_alpha": true,
             "virtual_texture_streaming": false
           }
+        }
+      },
+      "material_response_parameters": {
+        "RoughnessScale": 0.56,
+        "RoughnessFloor": 0.7,
+        "EmissiveFillScale": 0.42,
+        "SpecularLevel": 0.0
+      },
+      "review_parent_material": {
+        "path": "/Game/RaftSim/Materials/M_RaftSim_AtlasSampleReview",
+        "asset_file": "unreal/Content/RaftSim/Materials/M_RaftSim_AtlasSampleReview.uasset",
+        "status": "created_unreal_atlas_sampler_review_parent_material_not_lifelike",
+        "sampled_parameters": [
+          "AlbedoAtlas",
+          "NormalAtlas",
+          "AORoughnessHeightAtlas",
+          "SourceConditionedMacroAlbedo",
+          "SourceConditionedMaterialZones",
+          "SourceConditionedAORoughnessHeight",
+          "SourceConditionedNormalDetail",
+          "TerrainDetailAlbedo",
+          "TerrainDetailNormal",
+          "TerrainDetailAORoughnessHeight"
+        ],
+        "tuning_parameters": [
+          "AtlasTileOriginScale",
+          "AtlasBlendWeight",
+          "NormalIntensity",
+          "RoughnessScale",
+          "HeightScale",
+          "PreviewColor",
+          "VertexColorWeight",
+          "RoughnessFloor",
+          "SourceConditionedZoneWeights",
+          "SourceConditionedMacroAlbedoWeight",
+          "SourceConditionedSurfaceResponseWeight",
+          "SourceConditionedNormalDetailWeight",
+          "AtlasTileOrigin",
+          "AtlasTileScale",
+          "TerrainDetailUvScale",
+          "TerrainDetailUvOffset",
+          "TerrainDetailAlbedoWeight",
+          "TerrainDetailNormalWeight",
+          "TerrainDetailSurfaceResponseWeight"
+        ],
+        "output_wiring": {
+          "BaseColor": "source-conditioned corridor macro color blended with terrain-only first-party close-range albedo on dedicated tiled UVs",
+          "Normal": "atlas/source normal response blended with terrain-only first-party close-range tangent normal",
+          "AmbientOcclusion": "atlas/source AO blended with terrain-only packed detail red channel",
+          "Roughness": "atlas/source roughness blended with terrain-only packed detail green channel",
+          "PixelDepthOffset": "bounded atlas/source height blended with terrain-only packed detail blue channel",
+          "uv_compile_policy": "atlas and terrain-detail scale/offset use separate RG vector parameters; no material graph component mask reads vector alpha on Metal"
         }
       }
     }

@@ -94,8 +94,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![american_south_fork guide_seat_downstream](american_south_fork_guide_seat_downstream.png) | 2.4 | 0.0244 | 0.9067 | 40.81 | `not_reviewed` |
-| `river_eye_downstream` | ![american_south_fork river_eye_downstream](american_south_fork_river_eye_downstream.png) | 2.5 | 0.0253 | 0.9022 | 42.98 | `not_reviewed` |
+| `guide_seat_downstream` | ![american_south_fork guide_seat_downstream](american_south_fork_guide_seat_downstream.png) | 2.36 | 0.019 | 0.9057 | 42.96 | `not_reviewed` |
+| `river_eye_downstream` | ![american_south_fork river_eye_downstream](american_south_fork_river_eye_downstream.png) | 2.45 | 0.0196 | 0.8974 | 45.31 | `not_reviewed` |
 
 Reviewer checks:
 
@@ -176,8 +176,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 1.92 | 0.016 | 0.8655 | 27.74 | `not_reviewed` |
-| `river_eye_downstream` | ![colorado_river river_eye_downstream](colorado_river_river_eye_downstream.png) | 2.95 | 0.0236 | 0.8 | 31.62 | `not_reviewed` |
+| `guide_seat_downstream` | ![colorado_river guide_seat_downstream](colorado_river_guide_seat_downstream.png) | 1.4 | 0.0123 | 0.8432 | 24.41 | `not_reviewed` |
+| `river_eye_downstream` | ![colorado_river river_eye_downstream](colorado_river_river_eye_downstream.png) | 2.16 | 0.0231 | 0.7574 | 32.61 | `not_reviewed` |
 
 Reviewer checks:
 
@@ -257,8 +257,8 @@ Captures:
 
 | View | Image | Entropy | Edge | Low-gradient | Luma std | Human status |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| `guide_seat_downstream` | ![pacuare guide_seat_downstream](pacuare_guide_seat_downstream.png) | 2.12 | 0.0271 | 0.9222 | 39.96 | `not_reviewed` |
-| `river_eye_downstream` | ![pacuare river_eye_downstream](pacuare_river_eye_downstream.png) | 2.2 | 0.0281 | 0.9206 | 41.16 | `not_reviewed` |
+| `guide_seat_downstream` | ![pacuare guide_seat_downstream](pacuare_guide_seat_downstream.png) | 1.77 | 0.02 | 0.9269 | 39.63 | `not_reviewed` |
+| `river_eye_downstream` | ![pacuare river_eye_downstream](pacuare_river_eye_downstream.png) | 1.86 | 0.0212 | 0.9241 | 41.58 | `not_reviewed` |
 
 Reviewer checks:
 
