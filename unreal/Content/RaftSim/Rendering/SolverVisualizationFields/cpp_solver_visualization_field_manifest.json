@@ -1,0 +1,144 @@
+{
+  "schema": "raftsim.unreal.cpp_solver_visualization_fields.v1",
+  "generated_on": "2026-07-10",
+  "status": "validated_cpp_solver_visualization_fields_generated_for_south_fork_review",
+  "river_id": "american_south_fork",
+  "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
+  "flow_band": "median",
+  "solver": "raftsim_water_cpp_v1",
+  "solver_mode": "finite_volume",
+  "source_frame_index": 8,
+  "source_grid": {
+    "row_count": 20,
+    "column_count": 56,
+    "cell_count": 1120,
+    "x_extent_m": [
+      0.0,
+      220.0
+    ],
+    "y_extent_m": [
+      -19.0,
+      19.0
+    ],
+    "wet_cell_count": 863
+  },
+  "source_artifacts": {
+    "frame": {
+      "path": "physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/frames/frame_0008.csv",
+      "sha256": "60c8f2fd44bba6780c4aea7477e3b1fd325551a6f36bb9dbf759cf836f23e60f",
+      "size_bytes": 213797
+    },
+    "run_manifest": {
+      "path": "physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/manifest.json",
+      "sha256": "5699739661357f0887f42a2aac606024eedccf1f696ec6447d7e4b5896edd471",
+      "size_bytes": 218438
+    },
+    "geoclaw_cpp_parity": {
+      "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
+      "sha256": "487e569864a0db35c53d34939eff835027c9b66a9f61367c29659ba39fa2c22a",
+      "size_bytes": 129862
+    },
+    "full_cpp_validation_gate": {
+      "path": "physics/reports/milestone16/full_cpp_validation_gate.json",
+      "sha256": "485e113704cb8f3f07a9f4cf922377b491f0f21a4cfa6369f606b0aa8a0b2db0",
+      "size_bytes": 3017
+    },
+    "accepted_report_set_lock": {
+      "path": "physics/reports/milestone20/report_set_lock.json",
+      "sha256": "a1dbe30b42d9167a068398dfe7395aea4b60f79aec39c6bf756970ffb51ba97e",
+      "size_bytes": 10508
+    }
+  },
+  "acceptance_evidence": {
+    "feature_strength_scale": 0,
+    "boundary_mode": "scenario",
+    "flux_scheme": "hll",
+    "threshold_tier": "unreal_prototype",
+    "threshold_report": "outputs/m16cmp/cg_med/finite_volume/threshold_evaluation.json",
+    "report_set_lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627"
+  },
+  "field_ranges": {
+    "depth_m": [
+      0.0,
+      5.832081317901611
+    ],
+    "speed_mps": [
+      0.0,
+      9.255412101745605
+    ],
+    "froude": [
+      0.0,
+      6.648308753967285
+    ],
+    "normal_x": [
+      -0.40512704849243164,
+      0.35293784737586975
+    ],
+    "normal_y": [
+      -0.5887748599052429,
+      0.6449381709098816
+    ],
+    "normal_z": [
+      0.7628366351127625,
+      0.9999997615814209
+    ]
+  },
+  "normalization": {
+    "policy": "fixed_physical_caps_clamp_to_unit_interval",
+    "caps": {
+      "depth_m": 6.0,
+      "speed_mps": 10.0,
+      "froude": 7.0
+    },
+    "reason": "stable cross-frame authoring scale; accepted frame extrema remain inside every cap"
+  },
+  "textures": {
+    "surface_normal": {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/american_south_fork_median_cpp_solver_surface_normal_v1.png",
+      "sha256": "992cf223a86aba6d00fec6bd0e101c2a2498c03ba8e19b58192eb8dde32bf767",
+      "width": 1024,
+      "height": 512,
+      "channels": "RGB=(normal_xyz*0.5)+0.5; dry cells use flat-up (0,0,1)",
+      "unreal_texture_asset": "/Game/RaftSim/Rendering/SolverVisualizationFields/Textures/T_RaftSim_AmericanSouthFork_CppSolverSurfaceNormal",
+      "material_parameter": "SolverVisualizationNormal"
+    },
+    "depth_speed_froude": {
+      "path": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/american_south_fork_median_cpp_solver_depth_speed_froude_v1.png",
+      "sha256": "c7dd2f5771a49b976c01986324116b4a9f3cdbcc08d505afb48c007b7b10fb30",
+      "width": 1024,
+      "height": 512,
+      "channels": "R=depth_m/6 G=speed_mps/10 B=froude/7",
+      "unreal_texture_asset": "/Game/RaftSim/Rendering/SolverVisualizationFields/Textures/T_RaftSim_AmericanSouthFork_CppSolverDepthSpeedFroude",
+      "material_parameter": "SolverVisualizationFields"
+    }
+  },
+  "sampling": {
+    "source_orientation": "image_x_increasing_solver_column_and_downstream_x; image_y_increasing_solver_row_and_lateral_y",
+    "resampling": "bilinear_56x20_to_1024x512",
+    "unreal_address_mode": "clamp_xy",
+    "landscape_candidate_uv_contract": "procedural_ribbon_u_times_18_is_divided_by_18_in_material; v_is_cross_channel"
+  },
+  "render_binding": {
+    "material_parent": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_AmericanSouthFork_SingleLayerWaterCandidate",
+    "river_scope": [
+      "american_south_fork"
+    ],
+    "other_river_status": "not_bound_until_equivalent_river_specific_validated_cpp_exports_exist",
+    "feature_weights": {
+      "macro_normal": 0.55,
+      "depth_color": 0.2,
+      "speed_froude_roughness": 0.1,
+      "froude_aeration": 0.18
+    }
+  },
+  "authority_policy": {
+    "physical_authority": "custom_cxx_shallow_water_solver",
+    "derivative_scope": "review_only_material_response_on_landscape_candidate_ribbon",
+    "feature_forcing_enabled": false,
+    "changes_collision_or_raft_forces": false,
+    "changes_solver_state": false,
+    "may_hide_conservation_or_parity_failures": false,
+    "promotion_requires_river_specific_live_bridge_alignment": true
+  }
+}
