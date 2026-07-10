@@ -23,6 +23,9 @@
   "test_run": {
     "build": "SmokeEmIfYouGotEmEditor Mac Development succeeded with UE_5.8",
     "capture_command": "UnrealEditor-Cmd SmokeEmIfYouGotEm.uproject -RaftSimCreateLandscapeImportCandidateMaps -RaftSimExitAfterEnvironmentAutomation -RenderOffscreen -unattended -nop4 -nosplash",
+    "solver_visualization_manifest": "unreal/Content/RaftSim/Rendering/SolverVisualizationFields/cpp_solver_visualization_field_manifest.json",
+    "clean_start_material_compile_failures": 0,
+    "photoreal_asset_tests": "26 passed",
     "captures_regenerated": [
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/american_south_fork_river_eye_downstream.png",
       "docs/environment-captures/photoreal_river_previews/landscape_candidates/colorado_river_river_eye_downstream.png",
@@ -46,13 +49,14 @@
     "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
     "landscape_candidate_material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
     "decision": "Keep the DefaultLit parent on legacy/base preview maps while the isolated Landscape candidates evaluate the custom Single Layer Water parent and three river-specific material instances.",
-    "single_layer_water_contract": "Opaque SingleLayerWater shading uses river-specific scattering, absorption, phase g, behind-water color scale, two-scale first-party normal-atlas sampling, bounded surface/vertex tint, roughness, specular, refraction IOR, and a bounded Fresnel sky-fill fallback. A movable skylight and runtime corridor reflection capture are present; offscreen evidence capture temporarily forces the reflection-cubemap technique without changing saved game settings.",
-    "geometry_authority": "The custom C++ water simulation and generated ribbon geometry remain authoritative. The material, render-normal smoothing, render-only width overlap, and Fresnel fallback cannot add forcing or hide conservation failures.",
-    "observed_result": "All three material instances compile and bind to the generated procedural ribbons with clean map checks and nonblack captures. The water is more physically structured than the old painted review material, but still reads as a smooth review ribbon because riverbed, banks, solver-derived displacement, foam, spray, and atmosphere are not production quality.",
+    "single_layer_water_contract": "Opaque SingleLayerWater shading uses river-specific scattering, absorption, phase g, behind-water color scale, two-scale first-party normal-atlas sampling, bounded surface/vertex tint, roughness, specular, refraction IOR, and a bounded Fresnel sky-fill fallback. South Fork additionally samples clamped macro normals and packed depth/speed/Froude generated from its accepted whole-window median finite-volume C++ frame. A movable skylight and runtime corridor reflection capture are present; offscreen evidence capture temporarily forces the reflection-cubemap technique without changing saved game settings.",
+    "geometry_authority": "The custom C++ water simulation and generated ribbon geometry remain authoritative. The solver visualization derivative is material-only, feature forcing remains disabled, and neither it nor render-normal smoothing, render-only width overlap, or Fresnel fallback can change solver state, collision, raft forces, or conservation evidence.",
+    "observed_result": "All three material instances compile and bind to the generated procedural ribbons with clean map checks and nonblack captures. South Fork now carries broad macro-normal, depth, speed, and Froude variation from a GeoClaw-compared C++ frame; Colorado and Pacuare explicitly do not reuse those fields. The low-resolution derivative adds physically grounded variation but does not make the synthetic ribbon lifelike because riverbed/bank geometry, live displacement, foam, spray, atmosphere, and biome assets are not production quality.",
     "promotion_gate": "Do not promote the candidate until live-editor and packaged captures show credible reflection/refraction, solver-aligned flow detail, bank/riverbed transitions, foam and spray, hazard and swimmer/rescue readability, guide review, and measured desktop/VR performance for every seasonal flow band."
   },
   "next_actions": [
-    "Replace analytic review displacement with solver-sampled normals, depth, velocity, and feature masks while keeping forcing disabled by default.",
+    "Extend the static South Fork review derivative to live per-frame solver displacement, velocity-aligned micro-normal advection, wet/dry transitions, and aeration masks while keeping feature forcing disabled by default.",
+    "Generate Colorado and Pacuare fields only from their own accepted C++/GeoClaw scenarios; never reuse South Fork hydraulic textures across rivers.",
     "Build production riverbed and wet-bank material transitions so shallow refraction does not expose coarse Landscape channel-burn geometry.",
     "Add solver-aligned foam, spray, mist, and whitewater VFX for holes, wave trains, laterals, eddy lines, shelves, and boulder interactions.",
     "Capture the same material in the live editor and packaged game because commandlet SceneCapture reflection behavior is not sufficient evidence for promotion.",
