@@ -286,6 +286,52 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     return Settings;
 }
 
+struct FRaftSimPhotographicCaptureSettings
+{
+    float SunIntensity = 5.20f;
+    float SkyLightIntensity = 1.25f;
+    float FogDensity = 0.0025f;
+    float ExposureBias = -0.32f;
+    float Saturation = 1.06f;
+    float Contrast = 1.04f;
+    float Sharpen = 0.24f;
+    float Vignette = 0.06f;
+    float FilmGrainIntensity = 0.0f;
+    FLinearColor SunColor = FLinearColor(0.98f, 0.965f, 0.91f);
+    FLinearColor FogColor = FLinearColor(0.52f, 0.57f, 0.50f);
+};
+
+FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString& RiverId)
+{
+    FRaftSimPhotographicCaptureSettings Settings;
+    if (RiverId == TEXT("colorado_river"))
+    {
+        Settings.SunIntensity = 6.40f;
+        Settings.SkyLightIntensity = 1.05f;
+        Settings.FogDensity = 0.0016f;
+        Settings.ExposureBias = -0.38f;
+        Settings.Saturation = 1.10f;
+        Settings.Contrast = 1.07f;
+        Settings.Sharpen = 0.26f;
+        Settings.SunColor = FLinearColor(1.0f, 0.88f, 0.72f);
+        Settings.FogColor = FLinearColor(0.64f, 0.57f, 0.47f);
+    }
+    else if (RiverId == TEXT("pacuare"))
+    {
+        Settings.SunIntensity = 4.60f;
+        Settings.SkyLightIntensity = 1.45f;
+        Settings.FogDensity = 0.0075f;
+        Settings.ExposureBias = -0.18f;
+        Settings.Saturation = 1.04f;
+        Settings.Contrast = 1.03f;
+        Settings.Sharpen = 0.22f;
+        Settings.Vignette = 0.05f;
+        Settings.SunColor = FLinearColor(0.90f, 0.97f, 0.91f);
+        Settings.FogColor = FLinearColor(0.43f, 0.57f, 0.46f);
+    }
+    return Settings;
+}
+
 FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
 {
     FRaftSimPreviewWaterMaterialResponse Response;
@@ -15033,17 +15079,16 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     {
         return;
     }
+    const FRaftSimPhotographicCaptureSettings CaptureSettings =
+        GetPhotographicCaptureSettings(Spec.RiverId);
 
     ADirectionalLight* Sun = Cast<ADirectionalLight>(
         GEditor->AddActor(World->GetCurrentLevel(), ADirectionalLight::StaticClass(), FTransform(FRotator(-58.0f, -30.0f, 0.0f))));
     if (Sun)
     {
         Sun->SetActorLabel(TEXT("RaftSim_Sun_LumenPreview"));
-        Sun->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 6.8f : (Spec.bHasWaterfalls ? 5.4f : 5.8f));
-        Sun->GetLightComponent()->SetLightColor(
-            Spec.bDesertCanyon ? FLinearColor(1.0f, 0.84f, 0.66f)
-                                : (Spec.bHasWaterfalls ? FLinearColor(0.88f, 0.96f, 0.90f)
-                                                       : FLinearColor(0.98f, 0.96f, 0.88f)));
+        Sun->GetLightComponent()->SetIntensity(CaptureSettings.SunIntensity);
+        Sun->GetLightComponent()->SetLightColor(CaptureSettings.SunColor);
     }
 
     ASkyLight* SkyLight = Cast<ASkyLight>(
@@ -15053,7 +15098,7 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
         SkyLight->SetActorLabel(TEXT("RaftSim_SkyLight_PhotorealPreview"));
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         SkyLight->GetLightComponent()->SourceType = SLS_CapturedScene;
-        SkyLight->GetLightComponent()->SetIntensity(Spec.bDesertCanyon ? 0.98f : (Spec.bHasWaterfalls ? 0.74f : 0.68f));
+        SkyLight->GetLightComponent()->SetIntensity(CaptureSettings.SkyLightIntensity);
     }
 
     ASkyAtmosphere* Atmosphere = Cast<ASkyAtmosphere>(
@@ -15068,11 +15113,8 @@ void AddPreviewLightRig(UWorld* World, const FRaftSimEnvironmentPreviewSpec& Spe
     if (Fog)
     {
         Fog->SetActorLabel(Spec.bHasWaterfalls ? TEXT("RaftSim_RainforestMist") : TEXT("RaftSim_CanyonAtmosphere"));
-        Fog->GetComponent()->SetFogDensity(Spec.bHasWaterfalls ? 0.007f : (Spec.bDesertCanyon ? 0.002f : 0.003f));
-        Fog->GetComponent()->SetFogInscatteringColor(
-            Spec.bDesertCanyon ? FLinearColor(0.62f, 0.53f, 0.40f)
-                                : (Spec.bHasWaterfalls ? FLinearColor(0.42f, 0.54f, 0.42f)
-                                                       : FLinearColor(0.50f, 0.54f, 0.45f)));
+        Fog->GetComponent()->SetFogDensity(CaptureSettings.FogDensity);
+        Fog->GetComponent()->SetFogInscatteringColor(CaptureSettings.FogColor);
     }
 
     if (SkyLight && SkyLight->GetLightComponent())
@@ -15112,6 +15154,8 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
     {
         return;
     }
+    const FRaftSimPhotographicCaptureSettings CaptureSettings =
+        GetPhotographicCaptureSettings(Spec.RiverId);
 
     ACameraActor* Camera = Cast<ACameraActor>(
         GEditor->AddActor(World->GetCurrentLevel(), ACameraActor::StaticClass(), FTransform(FRotator(-13.5f, 0.0f, 0.0f), FVector(-5250.0f, GetPreviewRiverCenterY(Spec, -5250.0f), 140.0f))));
@@ -15120,63 +15164,41 @@ void AddPreviewCameraAndStart(UWorld* World, const FRaftSimEnvironmentPreviewSpe
         Camera->SetActorLabel(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"));
         Camera->GetCameraComponent()->FieldOfView = Spec.bDesertCanyon ? 66.0f : 68.0f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_VignetteIntensity = true;
-        Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = 0.10f;
+        Camera->GetCameraComponent()->PostProcessSettings.VignetteIntensity = CaptureSettings.Vignette;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_Sharpen = true;
-        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = 0.34f;
-        const float FirstPartyPhotographicPaletteCompressionSaturation =
-            Spec.bDesertCanyon ? 1.24f : 1.12f;
-        const float FirstPartyPhotographicPaletteCompressionContrast =
-            Spec.bDesertCanyon ? 1.15f : 1.08f;
+        Camera->GetCameraComponent()->PostProcessSettings.Sharpen = CaptureSettings.Sharpen;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_ColorSaturation = true;
         Camera->GetCameraComponent()->PostProcessSettings.ColorSaturation =
             FVector4(
-                FirstPartyPhotographicPaletteCompressionSaturation,
-                FirstPartyPhotographicPaletteCompressionSaturation,
-                FirstPartyPhotographicPaletteCompressionSaturation,
+                CaptureSettings.Saturation,
+                CaptureSettings.Saturation,
+                CaptureSettings.Saturation,
                 1.0f);
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_ColorContrast = true;
         Camera->GetCameraComponent()->PostProcessSettings.ColorContrast =
             FVector4(
-                FirstPartyPhotographicPaletteCompressionContrast,
-                FirstPartyPhotographicPaletteCompressionContrast,
-                FirstPartyPhotographicPaletteCompressionContrast,
+                CaptureSettings.Contrast,
+                CaptureSettings.Contrast,
+                CaptureSettings.Contrast,
                 1.0f);
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureMethod = true;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureMethod = AEM_Manual;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureBias = true;
-        const float FirstPartyPhotographicPaletteCompressionExposureBias =
-            Spec.bDesertCanyon ? -0.48f : -0.72f;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureBias =
-            FirstPartyPhotographicPaletteCompressionExposureBias;
+            CaptureSettings.ExposureBias;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
         Camera->GetCameraComponent()->PostProcessSettings.AutoExposureApplyPhysicalCameraExposure = 0;
-        const float FirstPartyPhotographicPaletteCompressionFilmGrainIntensity =
-            Spec.bDesertCanyon ? 0.18f : (Spec.bHasWaterfalls ? 0.28f : 0.15f);
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainIntensity = true;
         Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensity =
-            FirstPartyPhotographicPaletteCompressionFilmGrainIntensity;
+            CaptureSettings.FilmGrainIntensity;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainIntensityShadows = true;
-        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityShadows = 0.82f;
+        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityShadows = 0.0f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainIntensityMidtones = true;
-        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityMidtones = 0.68f;
+        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityMidtones = 0.0f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainIntensityHighlights = true;
-        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityHighlights = 0.34f;
+        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainIntensityHighlights = 0.0f;
         Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainScale = true;
-        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainScale = FVector2f(1.15f, 1.15f);
-        if (Spec.bHasWaterfalls)
-        {
-            Camera->GetCameraComponent()->PostProcessSettings.FilmGrainScale = FVector2f(0.82f, 0.82f);
-        }
-        if (GEngine)
-        {
-            GEngine->LoadDefaultFilmGrainTexture();
-            if (GEngine->DefaultFilmGrainTexture)
-            {
-                Camera->GetCameraComponent()->PostProcessSettings.bOverride_FilmGrainTexture = true;
-                Camera->GetCameraComponent()->PostProcessSettings.FilmGrainTexture =
-                    GEngine->DefaultFilmGrainTexture;
-            }
-        }
+        Camera->GetCameraComponent()->PostProcessSettings.FilmGrainScale = FVector2f(1.0f, 1.0f);
         GEditor->SelectActor(Camera, true, false, true);
     }
 
@@ -18385,6 +18407,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
         const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+        const FRaftSimPhotographicCaptureSettings CaptureSettings =
+            GetPhotographicCaptureSettings(Candidate.PreviewSpec.RiverId);
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -18399,6 +18423,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"solver_rapid_river_eye_capture\": \"%s\",\n")
             TEXT("      \"solver_rapid_capture_status\": \"%s\",\n")
             TEXT("      \"status\": \"%s\",\n")
+            TEXT("      \"photographic_capture_status\": \"river_specific_recorded_capture_photometry_no_camera_film_grain\",\n")
+            TEXT("      \"photographic_sun_intensity\": %.6f,\n")
+            TEXT("      \"photographic_skylight_intensity\": %.6f,\n")
+            TEXT("      \"photographic_fog_density\": %.6f,\n")
+            TEXT("      \"photographic_exposure_bias\": %.6f,\n")
+            TEXT("      \"photographic_saturation\": %.6f,\n")
+            TEXT("      \"photographic_contrast\": %.6f,\n")
+            TEXT("      \"photographic_sharpen\": %.6f,\n")
+            TEXT("      \"photographic_vignette\": %.6f,\n")
+            TEXT("      \"photographic_film_grain_intensity\": %.6f,\n")
             TEXT("      \"heightfield_format\": \"16-bit grayscale PNG\",\n")
             TEXT("      \"heightfield_width_px\": 1009,\n")
             TEXT("      \"heightfield_height_px\": 1009,\n")
@@ -18531,6 +18565,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
                        : TEXT("solver_rapid_capture_failed"))
                 : TEXT("not_available_without_river_specific_validated_solver_field"),
             bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
+            CaptureSettings.SunIntensity,
+            CaptureSettings.SkyLightIntensity,
+            CaptureSettings.FogDensity,
+            CaptureSettings.ExposureBias,
+            CaptureSettings.Saturation,
+            CaptureSettings.Contrast,
+            CaptureSettings.Sharpen,
+            CaptureSettings.Vignette,
+            CaptureSettings.FilmGrainIntensity,
             static_cast<uint32>(Result.SourceHeightMin),
             static_cast<uint32>(Result.SourceHeightMax),
             static_cast<uint32>(Result.ChannelFloor),
