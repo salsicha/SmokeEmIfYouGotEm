@@ -1,6 +1,7 @@
 #include "RaftSimEditorModule.h"
 
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetCompilingManager.h"
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
@@ -36,6 +37,12 @@
 #include "ImageUtils.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
+#include "Landscape.h"
+#include "LandscapeComponent.h"
+#include "LandscapeEditorModule.h"
+#include "LandscapeFileFormatInterface.h"
+#include "LandscapeNaniteComponent.h"
+#include "LandscapeProxy.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAdd.h"
 #include "Materials/MaterialExpressionComponentMask.h"
@@ -59,6 +66,7 @@
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
+#include "NaniteSceneProxy.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimEditorToolRegistry.h"
 #include "RaftSimFeatureTuningEditorShell.h"
@@ -68,7 +76,9 @@
 #include "Styling/CoreStyle.h"
 #include "ToolMenus.h"
 #include "UObject/SavePackage.h"
+#include "UObject/UnrealType.h"
 #include "RenderingThread.h"
+#include "ShaderCompiler.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Input/SButton.h"
@@ -134,6 +144,18 @@ struct FRaftSimEnvironmentPreviewSpec
     int32 FoamTrainCount = 12;
     bool bHasWaterfalls = false;
     bool bDesertCanyon = false;
+};
+
+struct FRaftSimLandscapeImportCandidateSpec
+{
+    FRaftSimEnvironmentPreviewSpec PreviewSpec;
+    FString HeightfieldRelativePath;
+    FString HeightfieldManifestRelativePath;
+    FString ImportContractRelativePath;
+    FString MapPackagePath;
+    float HorizontalSpanXCm = 32300.0f;
+    float HorizontalSpanYCm = 5500.0f;
+    float TargetReliefCm = 1000.0f;
 };
 
 struct FRaftSimPreviewWaterMaterialResponse
@@ -641,6 +663,60 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     return Specs;
 }
 
+TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
+{
+    TArray<FRaftSimLandscapeImportCandidateSpec> Candidates;
+    for (const FRaftSimEnvironmentPreviewSpec& PreviewSpec : GetEnvironmentPreviewSpecs())
+    {
+        FRaftSimLandscapeImportCandidateSpec Candidate;
+        Candidate.PreviewSpec = PreviewSpec;
+        Candidate.HorizontalSpanYCm = PreviewSpec.bDesertCanyon ? 8600.0f : 5500.0f;
+        Candidate.TargetReliefCm = PreviewSpec.HeightfieldPreviewAmplitudeCm;
+
+        if (PreviewSpec.RiverId == TEXT("american_south_fork"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json");
+            Candidate.ImportContractRelativePath =
+                TEXT("unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_SouthForkAmerican_SourceLandscapeCandidate");
+        }
+        else if (PreviewSpec.RiverId == TEXT("colorado_river"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json");
+            Candidate.ImportContractRelativePath =
+                TEXT("unreal/Content/RaftSim/River/colorado_heightfield_import_test.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_SourceLandscapeCandidate");
+        }
+        else if (PreviewSpec.RiverId == TEXT("pacuare"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath =
+                TEXT("physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json");
+            Candidate.ImportContractRelativePath =
+                TEXT("unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_Pacuare_SourceLandscapeCandidate");
+        }
+        else
+        {
+            continue;
+        }
+
+        Candidate.PreviewSpec.MapPackagePath = Candidate.MapPackagePath;
+        Candidates.Add(MoveTemp(Candidate));
+    }
+    return Candidates;
+}
+
 FString MakeFlowVariantPreviewMapPackagePath(const FRaftSimEnvironmentPreviewSpec& BaseSpec)
 {
     const FString BaseDirectory = FPaths::GetPath(BaseSpec.MapPackagePath);
@@ -938,6 +1014,102 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
         }
         bLitColorMaterialConfigured = true;
     }
+
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    FString AssetToken = Candidate.PreviewSpec.RiverId;
+    AssetToken.ReplaceInline(TEXT("_"), TEXT(""));
+    const FString AssetName = FString::Printf(TEXT("M_RaftSim_%s_SourceLandscapeCandidate"), *AssetToken);
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UPackage* Package = CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create Landscape material package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+
+    UMaterial* Material = Cast<UMaterial>(StaticLoadObject(UMaterial::StaticClass(), nullptr, *ObjectPath));
+    if (!Material)
+    {
+        Material = FindObject<UMaterial>(Package, *AssetName);
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+            Material->SetShadingModel(MSM_DefaultLit);
+            Material->BlendMode = BLEND_Opaque;
+
+            UMaterialExpressionConstant3Vector* TerrainColor =
+                NewObject<UMaterialExpressionConstant3Vector>(Material);
+            TerrainColor->Constant = Candidate.PreviewSpec.TerrainColor;
+            Material->GetExpressionCollection().AddExpression(TerrainColor);
+
+            UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+            EmissiveScale->R = 0.16f;
+            Material->GetExpressionCollection().AddExpression(EmissiveScale);
+
+            UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
+            EmissiveColor->A.Expression = TerrainColor;
+            EmissiveColor->B.Expression = EmissiveScale;
+            Material->GetExpressionCollection().AddExpression(EmissiveColor);
+
+            UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
+            Roughness->R = 0.82f;
+            Material->GetExpressionCollection().AddExpression(Roughness);
+
+            UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+            ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, TerrainColor);
+            ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create Landscape material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    Material->Modify();
+    for (TObjectPtr<UMaterialExpression>& Expression : Material->GetExpressionCollection().Expressions)
+    {
+        if (UMaterialExpressionConstant3Vector* TerrainColor =
+                Cast<UMaterialExpressionConstant3Vector>(Expression.Get()))
+        {
+            TerrainColor->Constant = Candidate.PreviewSpec.TerrainColor;
+            break;
+        }
+    }
+    Material->SetMaterialUsage(MATUSAGE_Nanite);
+    Material->SetMaterialUsage(MATUSAGE_StaticLighting);
+    Material->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Failed to save Landscape material %s.\n"), *Filename);
+        return nullptr;
+    }
+    FAssetCompilingManager::Get().FinishAllCompilation();
 
     return Material;
 }
@@ -13725,6 +13897,25 @@ bool CapturePreviewImageForSpec(
 
     FlushAsyncLoading();
     World->FlushLevelStreaming(EFlushLevelStreamingType::Full);
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    for (TActorIterator<ALandscapeProxy> It(World); It; ++It)
+    {
+        ALandscapeProxy* LandscapeProxy = *It;
+        if (LandscapeProxy)
+        {
+            LandscapeProxy->RecreateComponentsState();
+        }
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+    if (GEditor)
+    {
+        GEditor->SelectNone(false, true, false);
+    }
 
     ACameraActor* Camera = FindPreviewCaptureCamera(World, CameraLabel);
     if (!Camera || !Camera->GetCameraComponent())
@@ -13766,6 +13957,9 @@ bool CapturePreviewImageForSpec(
     CaptureComponent->CaptureSource = SCS_FinalColorLDR;
     CaptureComponent->bCaptureEveryFrame = false;
     CaptureComponent->bCaptureOnMovement = false;
+    CaptureComponent->ShowFlags.SetSelection(false);
+    CaptureComponent->ShowFlags.SetModeWidgets(false);
+    CaptureComponent->ShowFlags.SetCompositeEditorPrimitives(false);
 
     struct FForegroundRaftProxyHiddenState
     {
@@ -13944,7 +14138,22 @@ bool CapturePreviewImageForSpec(
     };
     CaptureComponent->CaptureScene();
     FlushRenderingCommands();
-    FPlatformProcess::Sleep(0.06f);
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    for (TActorIterator<ALandscapeProxy> It(World); It; ++It)
+    {
+        ALandscapeProxy* LandscapeProxy = *It;
+        if (LandscapeProxy)
+        {
+            LandscapeProxy->RecreateComponentsState();
+        }
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+    FPlatformProcess::Sleep(0.03f);
     CaptureComponent->CaptureScene();
     FlushRenderingCommands();
 
@@ -14022,6 +14231,360 @@ bool CapturePreviewImageForSpec(
         *Spec.DisplayName,
         *AbsoluteCapturePath);
     return bSaved;
+}
+
+struct FRaftSimLandscapeImportCandidateResult
+{
+    uint16 SourceHeightMin = 0;
+    uint16 SourceHeightMax = 0;
+    uint16 ChannelFloor = 0;
+    int32 ChannelModifiedSampleCount = 0;
+    FVector LandscapeLocation = FVector::ZeroVector;
+    FVector LandscapeScale = FVector::OneVector;
+    int32 MaterialBoundComponentCount = 0;
+    int32 NaniteComponentCount = 0;
+    int32 NaniteMaterialSlotCount = 0;
+    int32 NaniteMaterialBoundSlotCount = 0;
+    int32 NaniteMaterialAuditErrorCount = 0;
+    bool bNaniteRepresentationBuilt = false;
+    bool bMaterialBindingsValidated = false;
+    bool bNaniteMaterialBindingsValidated = false;
+};
+
+FString GetLandscapeCandidateCaptureRelativePath(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    const FString& CaptureId)
+{
+    return FPaths::Combine(
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates"),
+        Candidate.PreviewSpec.RiverId + TEXT("_") + CaptureId + TEXT(".png"));
+}
+
+void ApplyPreviewOnlyLandscapeChannelBurn(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    uint16 ChannelFloor,
+    TArray<uint16>& HeightData,
+    int32& OutModifiedSampleCount)
+{
+    constexpr int32 LandscapeSize = 1009;
+    constexpr float MinX = -5800.0f;
+    const float MaxX = MinX + Candidate.HorizontalSpanXCm;
+    const float HalfSpanY = Candidate.HorizontalSpanYCm * 0.5f;
+    const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec);
+    const float BurnFeatherWidth = FMath::Max(260.0f, Candidate.PreviewSpec.BankWidthCm * 0.72f);
+
+    OutModifiedSampleCount = 0;
+    for (int32 YIndex = 0; YIndex < LandscapeSize; ++YIndex)
+    {
+        const float V = static_cast<float>(YIndex) / static_cast<float>(LandscapeSize - 1);
+        const float WorldY = FMath::Lerp(-HalfSpanY, HalfSpanY, V);
+        for (int32 XIndex = 0; XIndex < LandscapeSize; ++XIndex)
+        {
+            const float U = static_cast<float>(XIndex) / static_cast<float>(LandscapeSize - 1);
+            const float WorldX = FMath::Lerp(MinX, MaxX, U);
+            const float CenterY = GetPreviewRiverCenterY(Candidate.PreviewSpec, WorldX);
+            const float DistanceFromCenterline = FMath::Abs(WorldY - CenterY);
+            if (DistanceFromCenterline >= ActiveRiverHalfWidth + BurnFeatherWidth)
+            {
+                continue;
+            }
+
+            const int32 SampleIndex = YIndex * LandscapeSize + XIndex;
+            const uint16 SourceHeight = HeightData[SampleIndex];
+            const float SourceBlend = SmoothPreviewStep(
+                ActiveRiverHalfWidth * 0.82f,
+                ActiveRiverHalfWidth + BurnFeatherWidth,
+                DistanceFromCenterline);
+            const uint16 BurnedHeight = static_cast<uint16>(FMath::Clamp(
+                FMath::RoundToInt(FMath::Lerp(static_cast<float>(ChannelFloor), static_cast<float>(SourceHeight), SourceBlend)),
+                0,
+                65535));
+            const uint16 ConditionedHeight = FMath::Min(SourceHeight, BurnedHeight);
+            if (ConditionedHeight != SourceHeight)
+            {
+                HeightData[SampleIndex] = ConditionedHeight;
+                ++OutModifiedSampleCount;
+            }
+        }
+    }
+}
+
+bool BuildLandscapeImportCandidateMap(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FRaftSimLandscapeImportCandidateResult& OutResult,
+    FString& OutSummary)
+{
+    constexpr int32 LandscapeSize = 1009;
+    constexpr int32 LandscapeQuads = LandscapeSize - 1;
+    constexpr int32 NumSubsections = 1;
+    constexpr int32 SubsectionSizeQuads = 63;
+    constexpr float MinX = -5800.0f;
+
+    const FString HeightfieldAbsolutePath = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), Candidate.HeightfieldRelativePath));
+    if (!FPaths::FileExists(HeightfieldAbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Missing Landscape heightfield: %s\n"), *HeightfieldAbsolutePath);
+        return false;
+    }
+
+    ILandscapeEditorModule& LandscapeEditorModule =
+        FModuleManager::LoadModuleChecked<ILandscapeEditorModule>(TEXT("LandscapeEditor"));
+    const ILandscapeHeightmapFileFormat* HeightmapFormat =
+        LandscapeEditorModule.GetHeightmapFormatByExtension(TEXT(".png"));
+    if (!HeightmapFormat)
+    {
+        OutSummary += TEXT("Unreal LandscapeEditor did not register a PNG heightmap importer.\n");
+        return false;
+    }
+
+    const FLandscapeHeightmapInfo HeightmapInfo = HeightmapFormat->Validate(*HeightfieldAbsolutePath);
+    if (HeightmapInfo.ResultCode == ELandscapeImportResult::Error)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape heightfield validation failed for %s: %s\n"),
+            *Candidate.PreviewSpec.RiverId,
+            *HeightmapInfo.ErrorMessage.ToString());
+        return false;
+    }
+
+    const FLandscapeFileResolution ExpectedResolution(LandscapeSize, LandscapeSize);
+    if (!HeightmapInfo.PossibleResolutions.Contains(ExpectedResolution))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape heightfield %s does not advertise the required 1009x1009 resolution.\n"),
+            *Candidate.HeightfieldRelativePath);
+        return false;
+    }
+
+    FLandscapeHeightmapImportData ImportedHeightmap =
+        HeightmapFormat->Import(*HeightfieldAbsolutePath, ExpectedResolution);
+    if (ImportedHeightmap.ResultCode == ELandscapeImportResult::Error ||
+        ImportedHeightmap.Data.Num() != LandscapeSize * LandscapeSize)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape heightfield import failed for %s: %s (%d samples).\n"),
+            *Candidate.PreviewSpec.RiverId,
+            *ImportedHeightmap.ErrorMessage.ToString(),
+            ImportedHeightmap.Data.Num());
+        return false;
+    }
+
+    OutResult.SourceHeightMin = MAX_uint16;
+    OutResult.SourceHeightMax = 0;
+    for (uint16 Height : ImportedHeightmap.Data)
+    {
+        OutResult.SourceHeightMin = FMath::Min(OutResult.SourceHeightMin, Height);
+        OutResult.SourceHeightMax = FMath::Max(OutResult.SourceHeightMax, Height);
+    }
+    const int32 SourceRange = static_cast<int32>(OutResult.SourceHeightMax) -
+        static_cast<int32>(OutResult.SourceHeightMin);
+    OutResult.ChannelFloor = static_cast<uint16>(FMath::Clamp(
+        static_cast<int32>(OutResult.SourceHeightMin) + FMath::RoundToInt(static_cast<float>(SourceRange) * 0.12f),
+        0,
+        65535));
+    ApplyPreviewOnlyLandscapeChannelBurn(
+        Candidate,
+        OutResult.ChannelFloor,
+        ImportedHeightmap.Data,
+        OutResult.ChannelModifiedSampleCount);
+
+    UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    if (!World)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to create Landscape candidate map for %s.\n"), *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+
+    UMaterialInterface* LandscapeMaterial = LoadOrCreateLandscapeCandidateMaterial(Candidate, OutSummary);
+    if (!LandscapeMaterial)
+    {
+        return false;
+    }
+    const float ScaleX = Candidate.HorizontalSpanXCm / static_cast<float>(LandscapeQuads);
+    const float ScaleY = Candidate.HorizontalSpanYCm / static_cast<float>(LandscapeQuads);
+    const float ScaleZ = Candidate.TargetReliefCm / 512.0f;
+    const float EncodedChannelFloorCm =
+        (static_cast<float>(OutResult.ChannelFloor) - 32768.0f) / 128.0f * ScaleZ;
+    const float ChannelBedWorldZ = Candidate.PreviewSpec.FlowWaterLevelOffsetCm - 24.0f;
+    OutResult.LandscapeLocation = FVector(
+        MinX,
+        -Candidate.HorizontalSpanYCm * 0.5f,
+        ChannelBedWorldZ - EncodedChannelFloorCm);
+    OutResult.LandscapeScale = FVector(ScaleX, ScaleY, ScaleZ);
+
+    ALandscape* Landscape = World->SpawnActor<ALandscape>(
+        OutResult.LandscapeLocation,
+        FRotator::ZeroRotator);
+    if (!Landscape)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to spawn ALandscape for %s.\n"), *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+
+    Landscape->SetActorScale3D(OutResult.LandscapeScale);
+    Landscape->LandscapeMaterial = LandscapeMaterial;
+    if (FBoolProperty* EnableNaniteProperty =
+            FindFProperty<FBoolProperty>(ALandscapeProxy::StaticClass(), TEXT("bEnableNanite")))
+    {
+        EnableNaniteProperty->SetPropertyValue_InContainer(Landscape, true);
+    }
+    else
+    {
+        OutSummary += TEXT("Unable to find the reflected Landscape Nanite setting.\n");
+        return false;
+    }
+    Landscape->StaticLightingLOD = 0;
+    Landscape->SetActorLabel(FString::Printf(
+        TEXT("RaftSim_SourceLandscapeCandidate_%s"),
+        *Candidate.PreviewSpec.RiverId));
+
+    TMap<FGuid, TArray<uint16>> HeightDataPerLayers;
+    HeightDataPerLayers.Add(FGuid(), MoveTemp(ImportedHeightmap.Data));
+    TMap<FGuid, TArray<FLandscapeImportLayerInfo>> MaterialLayerDataPerLayers;
+    MaterialLayerDataPerLayers.Add(FGuid(), TArray<FLandscapeImportLayerInfo>());
+    Landscape->Import(
+        FGuid::NewGuid(),
+        0,
+        0,
+        LandscapeQuads,
+        LandscapeQuads,
+        NumSubsections,
+        SubsectionSizeQuads,
+        HeightDataPerLayers,
+        *HeightfieldAbsolutePath,
+        MaterialLayerDataPerLayers,
+        ELandscapeImportAlphamapType::Additive,
+        TArrayView<const FLandscapeLayer>());
+    Landscape->LandscapeMaterial = LandscapeMaterial;
+    for (ULandscapeComponent* LandscapeComponent : Landscape->LandscapeComponents)
+    {
+        if (LandscapeComponent)
+        {
+            LandscapeComponent->OverrideMaterial = LandscapeMaterial;
+            LandscapeComponent->MarkRenderStateDirty();
+        }
+    }
+    Landscape->UpdateAllComponentMaterialInstances(true);
+    Landscape->RecreateComponentsState();
+    Landscape->PostEditChange();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+
+    OutResult.MaterialBoundComponentCount = 0;
+    for (ULandscapeComponent* LandscapeComponent : Landscape->LandscapeComponents)
+    {
+        if (!LandscapeComponent || LandscapeComponent->GetLandscapeMaterial() != LandscapeMaterial ||
+            LandscapeComponent->GetMaterialInstanceCount() < 1)
+        {
+            continue;
+        }
+
+        UMaterialInstance* ComponentMaterial = LandscapeComponent->GetMaterialInstance(0);
+        if (ComponentMaterial && ComponentMaterial->IsChildOf(LandscapeMaterial))
+        {
+            ++OutResult.MaterialBoundComponentCount;
+        }
+    }
+    OutResult.bMaterialBindingsValidated =
+        OutResult.MaterialBoundComponentCount == Landscape->LandscapeComponents.Num();
+    if (!OutResult.bMaterialBindingsValidated)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape material binding validation failed for %s: %d/%d components use %s.\n"),
+            *Candidate.PreviewSpec.RiverId,
+            OutResult.MaterialBoundComponentCount,
+            Landscape->LandscapeComponents.Num(),
+            *LandscapeMaterial->GetPathName());
+        return false;
+    }
+    AddPreviewLightRig(World, Candidate.PreviewSpec);
+    AddPreviewRiverRibbonMesh(World, Candidate.PreviewSpec, nullptr, nullptr, nullptr);
+    AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
+
+    OutSummary += FString::Printf(
+        TEXT("Imported %s as a 16x16-component ALandscape candidate; preview channel burn modified %d samples.\n"),
+        *Candidate.HeightfieldRelativePath,
+        OutResult.ChannelModifiedSampleCount);
+    const bool bSaved = SavePreviewWorld(World, Candidate.MapPackagePath, OutSummary);
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    OutResult.bNaniteRepresentationBuilt = Landscape->IsNaniteMeshUpToDate();
+    if (!OutResult.bNaniteRepresentationBuilt)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape Nanite representation is not up to date for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+    }
+
+    OutResult.NaniteComponentCount = Landscape->NaniteComponents.Num();
+    for (ULandscapeNaniteComponent* NaniteComponent : Landscape->NaniteComponents)
+    {
+        UStaticMesh* NaniteMesh = NaniteComponent ? NaniteComponent->GetStaticMesh() : nullptr;
+        if (!NaniteMesh)
+        {
+            continue;
+        }
+
+        for (const FStaticMaterial& StaticMaterial : NaniteMesh->GetStaticMaterials())
+        {
+            ++OutResult.NaniteMaterialSlotCount;
+            UMaterialInterface* SlotMaterial = StaticMaterial.MaterialInterface;
+            UMaterialInstance* SlotMaterialInstance = Cast<UMaterialInstance>(SlotMaterial);
+            if (SlotMaterial == LandscapeMaterial ||
+                (SlotMaterialInstance && SlotMaterialInstance->IsChildOf(LandscapeMaterial)))
+            {
+                ++OutResult.NaniteMaterialBoundSlotCount;
+            }
+        }
+
+        Nanite::FMaterialAudit MaterialAudit;
+        Nanite::AuditMaterials(NaniteComponent, MaterialAudit, false);
+        for (const Nanite::FMaterialAuditEntry& Entry : MaterialAudit.Entries)
+        {
+            if (Entry.bHasAnyError)
+            {
+                ++OutResult.NaniteMaterialAuditErrorCount;
+                OutSummary += FString::Printf(
+                    TEXT("Nanite material audit rejected %s slot %d for %s: null=%d blend=%d shading=%d usage=%d.\n"),
+                    Entry.Material ? *Entry.Material->GetPathName() : TEXT("<null>"),
+                    Entry.MaterialIndex,
+                    *Candidate.PreviewSpec.RiverId,
+                    Entry.bHasNullMaterial,
+                    Entry.bHasUnsupportedBlendMode,
+                    Entry.bHasUnsupportedShadingModel,
+                    Entry.bHasInvalidUsage);
+            }
+        }
+    }
+    OutResult.bNaniteMaterialBindingsValidated =
+        OutResult.NaniteComponentCount > 0 &&
+        OutResult.NaniteMaterialSlotCount > 0 &&
+        OutResult.NaniteMaterialBoundSlotCount == OutResult.NaniteMaterialSlotCount &&
+        OutResult.NaniteMaterialAuditErrorCount == 0;
+    OutSummary += FString::Printf(
+        TEXT("Landscape material audit for %s: %d/%d source components and %d/%d Nanite slots use %s; %d Nanite audit errors.\n"),
+        *Candidate.PreviewSpec.RiverId,
+        OutResult.MaterialBoundComponentCount,
+        Landscape->LandscapeComponents.Num(),
+        OutResult.NaniteMaterialBoundSlotCount,
+        OutResult.NaniteMaterialSlotCount,
+        *LandscapeMaterial->GetPathName(),
+        OutResult.NaniteMaterialAuditErrorCount);
+    if (!OutResult.bNaniteMaterialBindingsValidated)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape Nanite material binding validation failed for %s across %d Nanite components.\n"),
+            *Candidate.PreviewSpec.RiverId,
+            OutResult.NaniteComponentCount);
+    }
+    return bSaved && OutResult.bNaniteRepresentationBuilt && OutResult.bMaterialBindingsValidated &&
+        OutResult.bNaniteMaterialBindingsValidated;
 }
 
 bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString& OutSummary)
@@ -14904,15 +15467,23 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("RaftSim.CapturePhotorealEnvironmentPreviews"),
         TEXT("Record the river environment preview capture manifest placeholder."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand));
+    CreateLandscapeImportCandidateMapsConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CreateLandscapeImportCandidateMaps"),
+        TEXT("Import review-gated source DEMs as isolated Unreal Landscape candidate maps and capture them."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand));
 
     bCreatePhotorealEnvironmentPreviewMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealEnvironmentPreviewMaps"));
     bCapturePhotorealEnvironmentPreviewsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
+    bCreateLandscapeImportCandidateMapsOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLandscapeImportCandidateMaps"));
     bExitAfterPhotorealEnvironmentAutomation =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterEnvironmentAutomation"));
 
-    if (bCreatePhotorealEnvironmentPreviewMapsOnStartup || bCapturePhotorealEnvironmentPreviewsOnStartup)
+    if (bCreatePhotorealEnvironmentPreviewMapsOnStartup ||
+        bCapturePhotorealEnvironmentPreviewsOnStartup ||
+        bCreateLandscapeImportCandidateMapsOnStartup)
     {
         PhotorealEnvironmentAutomationPostEngineInitHandle =
             FCoreDelegates::GetOnPostEngineInit().AddRaw(this, &FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup);
@@ -14941,6 +15512,7 @@ void FRaftSimEditorModule::ShutdownModule()
     CaptureToolEvidenceConsoleCommand.Reset();
     CreatePhotorealEnvironmentPreviewMapsConsoleCommand.Reset();
     CapturePhotorealEnvironmentPreviewsConsoleCommand.Reset();
+    CreateLandscapeImportCandidateMapsConsoleCommand.Reset();
     UnregisterToolTabs();
 
     if (UObjectInitialized())
@@ -15066,6 +15638,18 @@ void FRaftSimEditorModule::PopulateRaftSimToolsMenu(UToolMenu* Menu)
                 CapturePhotorealEnvironmentPreviews(Summary);
                 UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
             })));
+    UtilitySection.AddMenuEntry(
+        TEXT("CreateLandscapeImportCandidateMaps"),
+        LOCTEXT("CreateLandscapeImportCandidateMaps", "Create Source Landscape Candidates"),
+        LOCTEXT("CreateLandscapeImportCandidateMapsTooltip", "Import the review-gated source DEMs into isolated Landscape candidate maps and capture geometry-review evidence."),
+        FSlateIcon(),
+        FUIAction(FExecuteAction::CreateLambda(
+            [this]()
+            {
+                FString Summary;
+                CreateLandscapeImportCandidateMaps(Summary);
+                UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+            })));
 }
 
 void FRaftSimEditorModule::LaunchTool(FName ToolId)
@@ -15132,6 +15716,13 @@ void FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand(cons
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
 }
 
+void FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand(const TArray<FString>&)
+{
+    FString Summary;
+    CreateLandscapeImportCandidateMaps(Summary);
+    UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+}
+
 void FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup()
 {
     if (PhotorealEnvironmentAutomationPostEngineInitHandle.IsValid())
@@ -15176,6 +15767,11 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
     if (bCapturePhotorealEnvironmentPreviewsOnStartup)
     {
         bSucceeded &= CapturePhotorealEnvironmentPreviews(Summary);
+    }
+
+    if (bCreateLandscapeImportCandidateMapsOnStartup)
+    {
+        bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
     }
 
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
@@ -15784,6 +16380,163 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     return bAllSaved;
 }
 
+bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummary)
+{
+    FScopedPhotorealPreviewWorldGcLeakFatalOverride WorldGcLeakFatalOverride;
+
+    const FString CandidateCaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CandidateCaptureRoot = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), CandidateCaptureRelativeRoot));
+    IFileManager::Get().MakeDirectory(*CandidateCaptureRoot, true);
+
+    FString EntriesJson;
+    bool bAllSucceeded = true;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (int32 Index = 0; Index < Candidates.Num(); ++Index)
+    {
+        const FRaftSimLandscapeImportCandidateSpec& Candidate = Candidates[Index];
+        const FString HeightfieldManifestAbsolutePath = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(GetRepoRoot(), Candidate.HeightfieldManifestRelativePath));
+        const FString ImportContractAbsolutePath = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(GetRepoRoot(), Candidate.ImportContractRelativePath));
+        const bool bSourceContractsPresent =
+            FPaths::FileExists(HeightfieldManifestAbsolutePath) && FPaths::FileExists(ImportContractAbsolutePath);
+        if (!bSourceContractsPresent)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Missing source Landscape manifest or import contract for %s.\n"),
+                *Candidate.PreviewSpec.RiverId);
+        }
+
+        FRaftSimLandscapeImportCandidateResult Result;
+        const bool bMapBuilt = bSourceContractsPresent &&
+            BuildLandscapeImportCandidateMap(Candidate, Result, OutSummary);
+
+        FString GuideSeatCapturePath = GetLandscapeCandidateCaptureRelativePath(
+            Candidate,
+            TEXT("guide_seat_downstream"));
+        FString RiverEyeCapturePath = GetLandscapeCandidateCaptureRelativePath(
+            Candidate,
+            TEXT("river_eye_downstream"));
+        const bool bGuideSeatCaptured = bMapBuilt && CapturePreviewImageForSpec(
+            Candidate.PreviewSpec,
+            CandidateCaptureRoot,
+            GuideSeatCapturePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            TEXT("landscape_candidate_guide_seat_downstream"),
+            TEXT("source Landscape candidate guide-seat downstream"),
+            true,
+            OutSummary);
+        const bool bRiverEyeCaptured = bMapBuilt && CapturePreviewImageForSpec(
+            Candidate.PreviewSpec,
+            CandidateCaptureRoot,
+            RiverEyeCapturePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            TEXT("landscape_candidate_river_eye_downstream"),
+            TEXT("source Landscape candidate river-eye downstream"),
+            true,
+            OutSummary);
+        const bool bCandidateSucceeded =
+            bSourceContractsPresent && bMapBuilt && bGuideSeatCaptured && bRiverEyeCaptured;
+        bAllSucceeded &= bCandidateSucceeded;
+
+        EntriesJson += FString::Printf(
+            TEXT("%s    {\n")
+            TEXT("      \"river_id\": \"%s\",\n")
+            TEXT("      \"display_name\": \"%s\",\n")
+            TEXT("      \"source_heightfield\": \"%s\",\n")
+            TEXT("      \"source_heightfield_manifest\": \"%s\",\n")
+            TEXT("      \"unreal_import_contract\": \"%s\",\n")
+            TEXT("      \"map_package\": \"%s\",\n")
+            TEXT("      \"guide_seat_capture\": \"%s\",\n")
+            TEXT("      \"river_eye_capture\": \"%s\",\n")
+            TEXT("      \"status\": \"%s\",\n")
+            TEXT("      \"heightfield_format\": \"16-bit grayscale PNG\",\n")
+            TEXT("      \"heightfield_width_px\": 1009,\n")
+            TEXT("      \"heightfield_height_px\": 1009,\n")
+            TEXT("      \"component_count_x\": 16,\n")
+            TEXT("      \"component_count_y\": 16,\n")
+            TEXT("      \"component_count_total\": 256,\n")
+            TEXT("      \"num_subsections\": 1,\n")
+            TEXT("      \"subsection_size_quads\": 63,\n")
+            TEXT("      \"source_height_min_uint16\": %u,\n")
+            TEXT("      \"source_height_max_uint16\": %u,\n")
+            TEXT("      \"preview_channel_floor_uint16\": %u,\n")
+            TEXT("      \"preview_channel_modified_sample_count\": %d,\n")
+            TEXT("      \"channel_burn_policy\": \"preview_only_analytic_channel_burn_for_landscape_import_validation\",\n")
+            TEXT("      \"channel_burn_promotion_status\": \"not_solver_geometry_not_geospatially_approved_not_for_gameplay\",\n")
+            TEXT("      \"landscape_location_cm\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_scale\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
+            TEXT("      \"horizontal_span_y_cm\": %.3f,\n")
+            TEXT("      \"target_relief_cm\": %.3f,\n")
+            TEXT("      \"material_usage_contract\": \"nanite_and_static_lighting\",\n")
+            TEXT("      \"material_bound_component_count\": %d,\n")
+            TEXT("      \"material_binding_status\": \"%s\",\n")
+            TEXT("      \"nanite_enabled\": true,\n")
+            TEXT("      \"nanite_component_count\": %d,\n")
+            TEXT("      \"nanite_material_slot_count\": %d,\n")
+            TEXT("      \"nanite_material_bound_slot_count\": %d,\n")
+            TEXT("      \"nanite_material_audit_error_count\": %d,\n")
+            TEXT("      \"nanite_representation_status\": \"%s\",\n")
+            TEXT("      \"capture_shader_warmup_policy\": \"render_then_finish_compilation_recreate_landscape_components_render_again\",\n")
+            TEXT("      \"promotion_status\": \"review_gated_isolated_candidate_not_enabled_for_gameplay_or_active_previews\"\n")
+            TEXT("    }"),
+            Index == 0 ? TEXT("") : TEXT(",\n"),
+            *EscapeRaftSimJsonString(Candidate.PreviewSpec.RiverId),
+            *EscapeRaftSimJsonString(Candidate.PreviewSpec.DisplayName),
+            *EscapeRaftSimJsonString(Candidate.HeightfieldRelativePath),
+            *EscapeRaftSimJsonString(Candidate.HeightfieldManifestRelativePath),
+            *EscapeRaftSimJsonString(Candidate.ImportContractRelativePath),
+            *EscapeRaftSimJsonString(Candidate.MapPackagePath),
+            *EscapeRaftSimJsonString(GuideSeatCapturePath),
+            *EscapeRaftSimJsonString(RiverEyeCapturePath),
+            bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
+            static_cast<uint32>(Result.SourceHeightMin),
+            static_cast<uint32>(Result.SourceHeightMax),
+            static_cast<uint32>(Result.ChannelFloor),
+            Result.ChannelModifiedSampleCount,
+            Result.LandscapeLocation.X,
+            Result.LandscapeLocation.Y,
+            Result.LandscapeLocation.Z,
+            Result.LandscapeScale.X,
+            Result.LandscapeScale.Y,
+            Result.LandscapeScale.Z,
+            Candidate.HorizontalSpanXCm,
+            Candidate.HorizontalSpanYCm,
+            Candidate.TargetReliefCm,
+            Result.MaterialBoundComponentCount,
+            Result.bMaterialBindingsValidated ? TEXT("all_source_components_bound") : TEXT("source_component_binding_failed"),
+            Result.NaniteComponentCount,
+            Result.NaniteMaterialSlotCount,
+            Result.NaniteMaterialBoundSlotCount,
+            Result.NaniteMaterialAuditErrorCount,
+            Result.bNaniteRepresentationBuilt ? TEXT("enabled_and_built_up_to_date") : TEXT("enabled_candidate_build_failed_or_stale"));
+    }
+
+    const FString Manifest = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.landscape_import_candidate_manifest.v1\",\n")
+        TEXT("  \"capture_type\": \"isolated_source_landscape_import_geometry_review\",\n")
+        TEXT("  \"status\": \"%s\",\n")
+        TEXT("  \"canonical_importer\": \"Unreal LandscapeEditor PNG heightmap file format\",\n")
+        TEXT("  \"candidate_policy\": \"Source DEM values remain authoritative outside a bounded preview-only analytic channel burn; candidates cannot replace gameplay or active preview terrain until CRS, vertical datum, hydrologic conditioning, guide, solver, capture, Nanite-build, and performance gates pass.\",\n")
+        TEXT("  \"candidates\": [\n")
+        TEXT("%s\n")
+        TEXT("  ]\n")
+        TEXT("}\n"),
+        bAllSucceeded ? TEXT("three_source_landscape_candidates_captured_review_gated") : TEXT("one_or_more_landscape_candidates_failed"),
+        *EntriesJson);
+    const FString ManifestPath = FPaths::Combine(CandidateCaptureRoot, TEXT("landscape_candidate_manifest.json"));
+    const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestPath);
+    OutSummary += FString::Printf(
+        TEXT("%s source Landscape candidate manifest -> %s\n"),
+        bManifestSaved ? TEXT("Saved") : TEXT("Failed"),
+        *ManifestPath);
+    return bAllSucceeded && bManifestSaved;
+}
+
 bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSummary)
 {
     FScopedPhotorealPreviewWorldGcLeakFatalOverride WorldGcLeakFatalOverride;
@@ -15887,16 +16640,6 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
         const FRaftSimPreviewWaterMaterialResponse WaterResponse = GetPreviewWaterMaterialResponse(Spec.RiverId);
         FString GuideSeatCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("guide_seat_downstream"));
         FString RiverEyeCapturePath = GetPreviewCaptureRelativePath(Spec, TEXT("river_eye_downstream"));
-        FString WarmupGuideSeatCapturePath = GuideSeatCapturePath;
-        CapturePreviewImageForSpec(
-            Spec,
-            CaptureRoot,
-            WarmupGuideSeatCapturePath,
-            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
-            TEXT("guide_seat_downstream"),
-            TEXT("guide-seat downstream warm-up"),
-            bCullReviewOnlyForegroundRaftForGuideSeatCaptures,
-            OutSummary);
         const bool bGuideSeatCaptured = CapturePreviewImageForSpec(
             Spec,
             CaptureRoot,
@@ -16114,19 +16857,6 @@ bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSumma
             GetPreviewFlowVariantCaptureRelativePath(VariantSpec, TEXT("guide_seat_downstream"));
         FString RiverEyeVariantCapturePath =
             GetPreviewFlowVariantCaptureRelativePath(VariantSpec, TEXT("river_eye_downstream"));
-        if (bVariantMapBuilt)
-        {
-            FString WarmupGuideSeatVariantCapturePath = GuideSeatVariantCapturePath;
-            CapturePreviewImageForSpec(
-                VariantSpec,
-                CaptureRoot,
-                WarmupGuideSeatVariantCapturePath,
-                TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
-                TEXT("guide_seat_downstream"),
-                TEXT("flow-variant guide-seat downstream warm-up"),
-                bCullReviewOnlyForegroundRaftForFlowVariantGuideSeatCaptures,
-                OutSummary);
-        }
         const bool bGuideSeatVariantCaptured =
             bVariantMapBuilt &&
             CapturePreviewImageForSpec(

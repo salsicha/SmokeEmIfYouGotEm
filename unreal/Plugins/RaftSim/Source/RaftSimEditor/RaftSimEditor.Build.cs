@@ -25,6 +25,8 @@ public class RaftSimEditor : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new[]
         {
+            "Landscape",
+            "LandscapeEditor",
             "LevelEditor",
             "Json",
             "ImageWrapper",

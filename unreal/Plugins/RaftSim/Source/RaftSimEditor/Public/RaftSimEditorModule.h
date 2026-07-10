@@ -28,6 +28,7 @@ private:
     void HandleCaptureToolEvidenceCommand(const TArray<FString>& Args);
     void HandleCreatePhotorealEnvironmentPreviewMapsCommand(const TArray<FString>& Args);
     void HandleCapturePhotorealEnvironmentPreviewsCommand(const TArray<FString>& Args);
+    void HandleCreateLandscapeImportCandidateMapsCommand(const TArray<FString>& Args);
     void HandlePhotorealEnvironmentAutomationStartup();
     bool TickPhotorealEnvironmentAutomationStartup(float DeltaSeconds);
     void ExecuteValidationAction(FName ActionId);
@@ -42,6 +43,7 @@ private:
     bool SaveWidgetScreenshot(const TSharedRef<SWidget>& Widget, const FString& BaseFileName, FString& OutPath) const;
     bool CreatePhotorealEnvironmentPreviewMaps(FString& OutSummary);
     bool CapturePhotorealEnvironmentPreviews(FString& OutSummary);
+    bool CreateLandscapeImportCandidateMaps(FString& OutSummary);
 
     TArray<FRaftSimEditorToolDescriptor> ToolDescriptors;
     TMap<FName, TWeakPtr<SDockTab>> OpenedToolTabs;
@@ -52,10 +54,12 @@ private:
     TUniquePtr<FAutoConsoleCommand> CaptureToolEvidenceConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreatePhotorealEnvironmentPreviewMapsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CapturePhotorealEnvironmentPreviewsConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreateLandscapeImportCandidateMapsConsoleCommand;
     FDelegateHandle PhotorealEnvironmentAutomationPostEngineInitHandle;
     FTSTicker::FDelegateHandle PhotorealEnvironmentAutomationTickerHandle;
     bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
     bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
+    bool bCreateLandscapeImportCandidateMapsOnStartup = false;
     bool bExitAfterPhotorealEnvironmentAutomation = false;
     int32 PhotorealEnvironmentAutomationStartupAttempts = 0;
 };
