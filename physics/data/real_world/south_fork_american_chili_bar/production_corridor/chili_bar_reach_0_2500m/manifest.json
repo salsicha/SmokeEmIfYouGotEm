@@ -1,0 +1,150 @@
+{
+  "schema": "raftsim.south_fork_production_corridor.v1",
+  "river_id": "american_south_fork",
+  "reach_id": "chili_bar_0_2500m",
+  "status": "official_source_attached_physical_landscape_inputs_generated_review_gated",
+  "production_promoted": false,
+  "bounds_epsg3857": [
+    -13440966.690560449,
+    4688433.364095909,
+    -13437882.594484959,
+    4690610.71422138
+  ],
+  "ground_span_m_approx": [
+    2404.295011095484,
+    1697.4153579980261
+  ],
+  "unreal_landscape": {
+    "heightfield": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_heightfield_2017.png",
+    "heightfield_size_px": [
+      2017,
+      2017
+    ],
+    "horizontal_span_cm": [
+      240429.50110954838,
+      169741.5357998026
+    ],
+    "xy_scale_cm_per_quad": [
+      119.2606652329109,
+      84.19719037688621
+    ],
+    "elevation_min_m_navd88": 408.636962890625,
+    "elevation_max_m_navd88": 789.825927734375,
+    "relief_m": 381.18896484375,
+    "z_scale_cm": 74.45096969604492
+  },
+  "source_artifacts": {
+    "dem": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/source/usgs_1m_ca_sierranevada_b22_object_131308.tif",
+      "sha256": "d360aff16cfa1e404a69dc45f9a47248be36aa9351a7ed39449625a891e933d2",
+      "dimensions": [
+        2048,
+        1445
+      ],
+      "catalog_object_id": 131308,
+      "title": "USGS 1 Meter 10 x69y430 CA_SierraNevada_B22",
+      "acquisition_range": [
+        "2021-11-03",
+        "2022-09-23"
+      ],
+      "vertical_datum": "NAVD 88",
+      "rights": "U.S. Public Domain; credit U.S. Geological Survey",
+      "rights_url": "https://www.usgs.gov/faqs/what-are-terms-uselicensing-map-services-and-data-national-map",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer",
+      "export_request": {
+        "bbox": [
+          -13440966.690560449,
+          4688433.364095909,
+          -13437882.594484959,
+          4690610.71422138
+        ],
+        "bbox_sr": 3857,
+        "image_sr": 3857,
+        "size": [
+          2048,
+          1445
+        ],
+        "format": "tiff",
+        "pixel_type": "F32",
+        "interpolation": "RSP_BilinearInterpolation",
+        "mosaic_method": "esriMosaicLockRaster",
+        "lock_raster_ids": [
+          131308
+        ]
+      }
+    },
+    "aerial": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/source/usda_naip_20220720_object_1828092.png",
+      "sha256": "7c1d03f3bcf300a87f4077821f8d4fbf984fbd2c36b847af7419252aafe82cb2",
+      "dimensions": [
+        4096,
+        2890
+      ],
+      "catalog_object_id": 1828092,
+      "name": "m_3812011_sw_10_060_20220720",
+      "acquisition_date": "2022-07-20",
+      "rights": "U.S. Public Domain; credit USDA/FSA/APFO NAIP",
+      "rights_url": "https://agdatacommons.nal.usda.gov/articles/dataset/NAIP_Digital_Ortho_Photo_Image_Geospatial_Data_Presentation_Form_remote-sensing_image/24664908",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer",
+      "export_request": {
+        "bbox": [
+          -13440966.690560449,
+          4688433.364095909,
+          -13437882.594484959,
+          4690610.71422138
+        ],
+        "bbox_sr": 3857,
+        "image_sr": 3857,
+        "size": [
+          4096,
+          2890
+        ],
+        "format": "png",
+        "interpolation": "RSP_BilinearInterpolation",
+        "mosaic_method": "esriMosaicLockRaster",
+        "lock_raster_ids": [
+          1828092
+        ]
+      }
+    }
+  },
+  "derived_artifacts": {
+    "heightfield": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_heightfield_2017.png",
+      "sha256": "68cda75c7be73070902ba12940978be1f5bf2a387fa75abe2bca6b1f90c76114",
+      "dimensions": [
+        2017,
+        2017
+      ],
+      "pixel_format": "16_bit_grayscale_png"
+    },
+    "hillshade": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_hillshade_2048.png",
+      "sha256": "dc31736ef1ac99b6516fecfd8f7a5b531bc67ff9c81634ad93238373234db888",
+      "dimensions": [
+        2048,
+        1445
+      ]
+    },
+    "centerline_alignment_preview": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_naip_centerline_2048.png",
+      "sha256": "3a7619fff9521a309c000427f89505d6ba9f8e9a118a5cdaf58e25531efd0e7a",
+      "dimensions": [
+        2048,
+        1445
+      ]
+    },
+    "local_centerline": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/centerline_local.json",
+      "sha256": "82a4b5a844e6941bf0d3cf69b76c9e63a83c6ecb52fddf6816e46b1ea08f0dfd",
+      "point_count": 43
+    }
+  },
+  "review_gates": [
+    "Visually review NHD centerline alignment against the locked 2022 NAIP image.",
+    "Confirm horizontal transform, NAVD88 conversion, channel conditioning, banks, and stationing with a geospatial reviewer.",
+    "Build a physical-scale Unreal Landscape and source-aligned river spline before replacing the validation diorama.",
+    "Attach guide-reviewed rapid, eddy, access, swimmer, rescue, and sensitive-location annotations.",
+    "Pass art, hazard readability, seasonal flow, desktop, and VR review before production promotion."
+  ]
+}
