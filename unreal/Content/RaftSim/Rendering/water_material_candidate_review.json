@@ -1,8 +1,8 @@
 {
   "schema": "raftsim.unreal.water_material_candidate_review.v1",
   "generated_on": "2026-07-10",
-  "status": "custom_single_layer_water_landscape_candidate_captured_review_only",
-  "goal": "Evaluate a purpose-built Single Layer Water material on the custom C++ solver-owned procedural river ribbon without requiring WaterBody or WaterZone authority.",
+  "status": "solver_surface_default_lit_landscape_candidate_captured_review_only",
+  "goal": "Render solver-conditioned river surfaces continuously on the custom C++ solver-owned procedural ribbon while retaining failed Single Layer Water candidates as review evidence.",
   "candidate_materials": [
     {
       "material": "/WaterAdvanced/Materials/Water_Material_Simple.Water_Material_Simple",
@@ -18,6 +18,11 @@
       "material": "/Water/Materials/WaterSurface/Water_Material_River.Water_Material_River",
       "source": "Unreal Engine Water plugin content",
       "result": "retained_as_future_manual_candidate_not_active"
+    },
+    {
+      "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
+      "source": "RaftSim purpose-built Single Layer Water evaluation parent",
+      "result": "inactive_after_depth_dependent_foreground_split_over_provisional_bathymetry"
     }
   ],
   "test_run": {
@@ -49,18 +54,29 @@
   },
   "active_decision": {
     "active_material": "/Game/RaftSim/Materials/M_RaftSim_VertexColorWaterPreview",
-    "landscape_candidate_material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate",
-    "decision": "Keep the DefaultLit parent on legacy/base preview maps while the isolated Landscape candidates evaluate the custom Single Layer Water parent and three river-specific material instances.",
-    "single_layer_water_contract": "Opaque SingleLayerWater shading uses river-specific scattering, absorption, phase g, behind-water color scale, two-scale first-party normal-atlas sampling, bounded surface/vertex tint, roughness, specular, refraction IOR, and a bounded Fresnel sky-fill fallback. South Fork additionally samples clamped macro normals and packed RGBA depth/speed/Froude/detrended-eta generated from its accepted whole-window median finite-volume C++ frame. The same packed field drives noncolliding render-only surface relief and a separate noncolliding DefaultLit foam sheet with procedural breakup confined to the decoded hydraulic aeration mask. A movable skylight and runtime corridor reflection capture are present; offscreen evidence capture temporarily forces the reflection-cubemap technique without changing saved game settings.",
+    "landscape_candidate_material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate",
+    "decision": "Use the opaque DefaultLit solver-surface parent and three river-specific instances on isolated Landscape candidates; retain the former Single Layer Water parent and instances as inactive evaluation evidence until production bathymetry and live-editor/package rendering can be revalidated.",
+    "solver_surface_water_contract": "Opaque DefaultLit surface shading uses river-specific surface/vertex tint, roughness, specular, seam-continuous dual-sampled first-party normal-atlas detail, and bounded Fresnel reflection fill. South Fork additionally samples clamped macro normals and packed RGBA depth/speed/Froude/detrended-eta generated from its accepted whole-window median finite-volume C++ frame. The same packed field drives noncolliding render-only surface relief and a separate noncolliding DefaultLit foam sheet with procedural breakup confined to the decoded hydraulic aeration mask. A movable skylight, runtime corridor reflection capture, and screen-space reflections serve the surface path without WaterBody authority or depth-dependent Single Layer volume composition.",
     "photographic_capture_contract": "River-specific sun, skylight, fog, manual exposure, saturation, contrast, sharpening, and vignette values come from FRaftSimPhotographicCaptureSettings and are recorded per candidate. Camera film grain and engine-side capture dithering are both zero or disabled so capture detail must originate in rendered scene content.",
     "geometry_authority": "The custom C++ water simulation remains authoritative. The solver visualization derivative changes only noncolliding review render geometry and material response under a 36 cm relief ceiling, feature forcing remains disabled, and neither it nor render-normal smoothing, render-only width overlap, foam opacity, or Fresnel fallback can change solver state, collision, raft forces, or conservation evidence.",
-    "observed_result": "All three water material instances plus the South Fork solver-foam material compile and bind with clean map checks and nonblack captures. South Fork now carries broad macro-normal, depth, speed, Froude, and detrended free-surface variation from a GeoClaw-compared C++ frame; a dedicated rapid camera shows a field-confined foamy supercritical tongue while the ordinary upstream capture remains calm. Colorado and Pacuare explicitly do not reuse those fields. Recorded photometry removes camera grain, and six river/type foliage material instances now preserve visibly greener front/back/transmitted leaf response across all 3/3 audited twig slots per river. Repeated twig geometry, coarse terrain plates, and a flat overlapping foreground water/bank ribbon remain visible. The result is provisional because a 20x56 validation frame cannot supply live crest-scale turbulence, spray, production riverbed/bank geometry, atmosphere, or biome assets.",
+    "observed_result": "Direct isolation captures proved that the procedural ribbon mesh is continuous and the lower-frame split came from Single Layer Water depth composition over provisional bathymetry: hiding the ribbon removed both zones, and swapping the same mesh to DefaultLit removed the split while preserving wave geometry. The active solver-surface material keeps that continuous response while retaining South Fork macro-normal, depth, speed, Froude, detrended free-surface relief, and field-confined foam; Colorado and Pacuare explicitly do not reuse those fields. Recorded photometry removes camera grain, and six river/type foliage material instances preserve visibly greener front/back/transmitted leaf response across all 3/3 audited twig slots per river. The result remains provisional because it lacks production reflections/refraction, live crest-scale turbulence, spray, validated bathymetry, bank transitions, atmosphere, and biome assets.",
     "promotion_gate": "Do not promote the candidate until live-editor and packaged captures show credible reflection/refraction, solver-aligned flow detail, bank/riverbed transitions, foam and spray, hazard and swimmer/rescue readability, guide review, and measured desktop/VR performance for every seasonal flow band."
+  },
+  "single_layer_depth_split_failure": {
+    "summary": "The purpose-built Single Layer Water candidate rendered two depth-dependent foreground zones over the provisional Landscape channel burn even though the procedural ribbon mesh itself was continuous.",
+    "isolation_evidence": [
+      "hiding only RaftSim_ProceduralRiverRibbon removed both foreground zones",
+      "swapping the same ribbon to DefaultLit removed the split and preserved continuous wave geometry",
+      "normal-atlas seam crossfading and non-tiled composition did not move the split",
+      "changing preview channel depth moved the split, tying it to provisional bathymetry and volume composition"
+    ],
+    "decision": "Keep Single Layer Water assets inactive until conditioned bathymetry and live-editor/package captures can prove continuous depth response."
   },
   "next_actions": [
     "Extend the static South Fork review derivative to live per-frame solver displacement, velocity-aligned micro-normal advection, wet/dry transitions, crest-scale foam, and spray while keeping feature forcing disabled by default.",
     "Generate Colorado and Pacuare fields only from their own accepted C++/GeoClaw scenarios; never reuse South Fork hydraulic textures across rivers.",
     "Build production riverbed and wet-bank material transitions so shallow refraction does not expose coarse Landscape channel-burn geometry.",
+    "Re-evaluate Single Layer Water only after conditioned bathymetry removes abrupt depth transitions; compare against the active solver-surface material in live editor and packaged builds.",
     "Replace the now color-calibrated repeated PVE twig assemblies with biome-specific species geometry, age and crown diversity, seasonal state, and wind response while preserving the recorded leaf-color and transmission contract.",
     "Replace the validation-grid foam sheet with solver-aligned crest-scale foam, spray, mist, and whitewater VFX for holes, wave trains, laterals, eddy lines, shelves, and boulder interactions.",
     "Capture the same material in the live editor and packaged game because commandlet SceneCapture reflection behavior is not sufficient evidence for promotion.",
