@@ -332,6 +332,47 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     return Settings;
 }
 
+struct FRaftSimLandscapeCandidateFoliageSettings
+{
+    FLinearColor BroadleafFrontTint = FLinearColor(0.86f, 1.18f, 0.72f);
+    FLinearColor BroadleafBackTint = FLinearColor(0.62f, 0.91f, 0.48f);
+    FLinearColor BroadleafTransmissionTint = FLinearColor(0.48f, 0.80f, 0.36f);
+    FLinearColor ConiferFrontTint = FLinearColor(0.72f, 1.00f, 0.52f);
+    FLinearColor ConiferBackTint = FLinearColor(0.48f, 0.74f, 0.32f);
+    FLinearColor ConiferTransmissionTint = FLinearColor(0.36f, 0.62f, 0.24f);
+    float RoughnessStrength = 0.68f;
+    float NormalStrength = 0.65f;
+};
+
+FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
+    const FString& RiverId)
+{
+    FRaftSimLandscapeCandidateFoliageSettings Settings;
+    if (RiverId == TEXT("colorado_river"))
+    {
+        Settings.BroadleafFrontTint = FLinearColor(0.96f, 1.04f, 0.58f);
+        Settings.BroadleafBackTint = FLinearColor(0.74f, 0.82f, 0.40f);
+        Settings.BroadleafTransmissionTint = FLinearColor(0.62f, 0.72f, 0.34f);
+        Settings.ConiferFrontTint = FLinearColor(0.82f, 0.90f, 0.48f);
+        Settings.ConiferBackTint = FLinearColor(0.64f, 0.72f, 0.34f);
+        Settings.ConiferTransmissionTint = FLinearColor(0.54f, 0.62f, 0.30f);
+        Settings.RoughnessStrength = 0.82f;
+        Settings.NormalStrength = 0.52f;
+    }
+    else if (RiverId == TEXT("pacuare"))
+    {
+        Settings.BroadleafFrontTint = FLinearColor(0.70f, 1.15f, 0.62f);
+        Settings.BroadleafBackTint = FLinearColor(0.46f, 0.86f, 0.42f);
+        Settings.BroadleafTransmissionTint = FLinearColor(0.34f, 0.72f, 0.30f);
+        Settings.ConiferFrontTint = FLinearColor(0.60f, 1.00f, 0.50f);
+        Settings.ConiferBackTint = FLinearColor(0.40f, 0.76f, 0.34f);
+        Settings.ConiferTransmissionTint = FLinearColor(0.30f, 0.64f, 0.26f);
+        Settings.RoughnessStrength = 0.74f;
+        Settings.NormalStrength = 0.58f;
+    }
+    return Settings;
+}
+
 FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FString& RiverId)
 {
     FRaftSimPreviewWaterMaterialResponse Response;
@@ -15708,6 +15749,150 @@ bool CapturePreviewImageForSpec(
     return bSaved;
 }
 
+UMaterialInstanceConstant* LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const TCHAR* FoliageType,
+    const TCHAR* SourceParentObjectPath,
+    const FLinearColor& FrontTint,
+    const FLinearColor& BackTint,
+    const FLinearColor& TransmissionTint,
+    float RoughnessStrength,
+    float NormalStrength,
+    FString& OutSummary)
+{
+    UMaterialInterface* SourceParent = LoadObject<UMaterialInterface>(nullptr, SourceParentObjectPath);
+    const FString RiverAssetName = GetFirstPartyMaterialRiverAssetName(Spec.RiverId);
+    if (!SourceParent || RiverAssetName.IsEmpty())
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to load %s foliage parent for %s.\n"),
+            FoliageType,
+            *Spec.RiverId);
+        return nullptr;
+    }
+
+    const FString AssetName = FString::Printf(
+        TEXT("MI_RaftSim_%s_%s_BiomeFoliageCandidate"),
+        *RiverAssetName,
+        FoliageType);
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UPackage* Package = CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+
+    UMaterialInstanceConstant* Instance = Cast<UMaterialInstanceConstant>(
+        StaticLoadObject(UMaterialInstanceConstant::StaticClass(), nullptr, *ObjectPath));
+    if (!Instance)
+    {
+        Instance = FindObject<UMaterialInstanceConstant>(Package, *AssetName);
+    }
+    if (!Instance)
+    {
+        Instance = NewObject<UMaterialInstanceConstant>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Instance)
+        {
+            FAssetRegistryModule::AssetCreated(Instance);
+        }
+    }
+    if (!Instance)
+    {
+        return nullptr;
+    }
+
+    Instance->Modify();
+    Instance->SetParentEditorOnly(SourceParent);
+    Instance->SetVectorParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("BaseColor Tint Leaves")),
+        FrontTint);
+    for (const TCHAR* ParameterName : {
+             TEXT("BaseColor Tint Leaf Backside"),
+             TEXT("Tint Leaf Backside")})
+    {
+        Instance->SetVectorParameterValueEditorOnly(
+            FMaterialParameterInfo(ParameterName),
+            BackTint);
+    }
+    for (const TCHAR* ParameterName : {
+             TEXT("Translucency Tint Leaves"),
+             TEXT("Translucency Tint"),
+             TEXT("Tint Translucency")})
+    {
+        Instance->SetVectorParameterValueEditorOnly(
+            FMaterialParameterInfo(ParameterName),
+            TransmissionTint);
+    }
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("Roughness Leaves Strength")),
+        RoughnessStrength);
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("Roughness Leaf Backside")),
+        FMath::Clamp(RoughnessStrength + 0.06f, 0.0f, 1.0f));
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("Roughness Min")),
+        FMath::Clamp(RoughnessStrength - 0.12f, 0.0f, 1.0f));
+    Instance->SetScalarParameterValueEditorOnly(
+        FMaterialParameterInfo(TEXT("Normal Strength")),
+        NormalStrength);
+    Instance->PostEditChange();
+    Package->MarkPackageDirty();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Failed to save %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Built %s %s texture-preserving foliage candidate (roughness %.3f, normal %.3f).\n"),
+        *Spec.RiverId,
+        FoliageType,
+        RoughnessStrength,
+        NormalStrength);
+    return Instance;
+}
+
+int32 BindLandscapeCandidateFoliageMaterial(
+    UHierarchicalInstancedStaticMeshComponent* Component,
+    UStaticMesh* Mesh,
+    UMaterialInterface* FoliageMaterial)
+{
+    if (!Component || !Mesh || !FoliageMaterial)
+    {
+        return 0;
+    }
+
+    int32 BoundSlotCount = 0;
+    const TArray<FStaticMaterial>& StaticMaterials = Mesh->GetStaticMaterials();
+    for (int32 MaterialIndex = 0; MaterialIndex < StaticMaterials.Num(); ++MaterialIndex)
+    {
+        const FString SlotName = StaticMaterials[MaterialIndex].MaterialSlotName.ToString();
+        UMaterialInterface* SourceMaterial = Mesh->GetMaterial(MaterialIndex);
+        const bool bIsFoliageSlot =
+            SlotName.Equals(TEXT("TwoSided"), ESearchCase::IgnoreCase) ||
+            (SourceMaterial && SourceMaterial->GetName().Contains(TEXT("Foliage"), ESearchCase::IgnoreCase));
+        if (bIsFoliageSlot)
+        {
+            Component->SetMaterial(MaterialIndex, FoliageMaterial);
+            ++BoundSlotCount;
+        }
+    }
+    return BoundSlotCount;
+}
+
 struct FRaftSimLandscapeImportCandidateResult
 {
     uint16 SourceHeightMin = 0;
@@ -15725,11 +15910,14 @@ struct FRaftSimLandscapeImportCandidateResult
     int32 DressingBoulderInstanceCount = 0;
     int32 DressingFoliageInstanceCount = 0;
     int32 DressingTrunkInstanceCount = 0;
+    int32 DressingFoliageMaterialAssetCount = 0;
+    int32 DressingFoliageMaterialBoundSlotCount = 0;
     bool bDressingAssetsLoaded = false;
     bool bDressingSourceMasksLoaded = false;
     bool bDressingBoulderMeshNaniteEnabled = false;
     bool bDressingBroadleafMeshNaniteEnabled = false;
     bool bDressingConiferMeshNaniteEnabled = false;
+    bool bDressingFoliageMaterialsValidated = false;
     bool bDressingValidated = false;
     FString WaterMaterialPath;
     int32 WaterMaterialBoundComponentCount = 0;
@@ -15803,6 +15991,40 @@ bool AddLandscapeCandidateBiomeDressing(
     UMaterialInterface* BarkMaterial = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Materials/MI_LeafTree_01_Bark.MI_LeafTree_01_Bark"));
+    const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
+        GetLandscapeCandidateFoliageSettings(Spec.RiverId);
+    UMaterialInstanceConstant* BroadleafFoliageMaterial =
+        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+            Spec,
+            TEXT("Broadleaf"),
+            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Materials/MI_LeafTree_01_Foliage.MI_LeafTree_01_Foliage"),
+            FoliageSettings.BroadleafFrontTint,
+            FoliageSettings.BroadleafBackTint,
+            FoliageSettings.BroadleafTransmissionTint,
+            FoliageSettings.RoughnessStrength,
+            FoliageSettings.NormalStrength,
+            OutSummary);
+    UMaterialInstanceConstant* ConiferFoliageMaterial =
+        LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
+            Spec,
+            TEXT("Conifer"),
+            TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/Materials/MI_Conifer_Foliage_01.MI_Conifer_Foliage_01"),
+            FoliageSettings.ConiferFrontTint,
+            FoliageSettings.ConiferBackTint,
+            FoliageSettings.ConiferTransmissionTint,
+            FoliageSettings.RoughnessStrength,
+            FoliageSettings.NormalStrength,
+            OutSummary);
+    OutResult.DressingFoliageMaterialAssetCount =
+        (BroadleafFoliageMaterial ? 1 : 0) + (ConiferFoliageMaterial ? 1 : 0);
+    if (OutResult.DressingFoliageMaterialAssetCount != 2)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape biome dressing for %s loaded %d/2 required foliage materials.\n"),
+            *Spec.RiverId,
+            OutResult.DressingFoliageMaterialAssetCount);
+        return false;
+    }
     UHierarchicalInstancedStaticMeshComponent* BroadleafInstancesA =
         AddLandscapeCandidateInstancedMeshComponent(
             World,
@@ -15834,6 +16056,29 @@ bool AddLandscapeCandidateBiomeDressing(
         OutSummary += FString::Printf(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+    OutResult.DressingFoliageMaterialBoundSlotCount =
+        BindLandscapeCandidateFoliageMaterial(
+            BroadleafInstancesA,
+            BroadleafMeshA,
+            BroadleafFoliageMaterial) +
+        BindLandscapeCandidateFoliageMaterial(
+            BroadleafInstancesB,
+            BroadleafMeshB,
+            BroadleafFoliageMaterial) +
+        BindLandscapeCandidateFoliageMaterial(
+            ConiferInstances,
+            ConiferMesh,
+            ConiferFoliageMaterial);
+    OutResult.bDressingFoliageMaterialsValidated =
+        OutResult.DressingFoliageMaterialBoundSlotCount == 3;
+    if (!OutResult.bDressingFoliageMaterialsValidated)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Landscape biome dressing for %s bound %d/3 required foliage material slots.\n"),
+            *Spec.RiverId,
+            OutResult.DressingFoliageMaterialBoundSlotCount);
         return false;
     }
 
@@ -16098,13 +16343,15 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingBoulderInstanceCount == BoulderCount &&
         OutResult.DressingFoliageInstanceCount ==
             FoliageClusterCount * (BranchesPerCluster + UnderstoryBranchesPerCluster) &&
-        OutResult.DressingTrunkInstanceCount > 0;
+        OutResult.DressingTrunkInstanceCount > 0 &&
+        OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
-        TEXT("Landscape biome dressing for %s: %d dense irregular procedural boulders, %d PVE twig instances, %d bark-material trunks; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d.\n"),
+        TEXT("Landscape biome dressing for %s: %d dense irregular procedural boulders, %d PVE twig instances, %d bark-material trunks, %d/3 river-specific foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d.\n"),
         *Spec.RiverId,
         OutResult.DressingBoulderInstanceCount,
         OutResult.DressingFoliageInstanceCount,
         OutResult.DressingTrunkInstanceCount,
+        OutResult.DressingFoliageMaterialBoundSlotCount,
         OutResult.bDressingBoulderMeshNaniteEnabled,
         OutResult.bDressingBroadleafMeshNaniteEnabled,
         OutResult.bDressingConiferMeshNaniteEnabled);
@@ -18409,6 +18656,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
         const FRaftSimPhotographicCaptureSettings CaptureSettings =
             GetPhotographicCaptureSettings(Candidate.PreviewSpec.RiverId);
+        const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
+            GetLandscapeCandidateFoliageSettings(Candidate.PreviewSpec.RiverId);
+        const FString RiverAssetName =
+            GetFirstPartyMaterialRiverAssetName(Candidate.PreviewSpec.RiverId);
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -18481,6 +18732,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_dressing_foliage_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_trunk_instance_count\": %d,\n")
             TEXT("      \"landscape_dressing_source_mask_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_foliage_material_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_foliage_material_asset_count\": %d,\n")
+            TEXT("      \"landscape_dressing_foliage_material_bound_slot_count\": %d,\n")
+            TEXT("      \"landscape_dressing_broadleaf_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Broadleaf_BiomeFoliageCandidate\",\n")
+            TEXT("      \"landscape_dressing_conifer_material_asset\": \"/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Conifer_BiomeFoliageCandidate\",\n")
+            TEXT("      \"landscape_dressing_broadleaf_front_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_broadleaf_back_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_broadleaf_transmission_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_conifer_front_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_conifer_back_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_conifer_transmission_tint\": [%.6f, %.6f, %.6f],\n")
+            TEXT("      \"landscape_dressing_foliage_roughness_strength\": %.6f,\n")
+            TEXT("      \"landscape_dressing_foliage_normal_strength\": %.6f,\n")
             TEXT("      \"procedural_vegetation_editor_plugin_enabled\": true,\n")
             TEXT("      \"nanite_foliage_project_setting_enabled\": true,\n")
             TEXT("      \"landscape_dressing_boulder_mesh_nanite_enabled\": %s,\n")
@@ -18613,6 +18877,33 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.bDressingSourceMasksLoaded
                 ? TEXT("water_and_vegetation_masks_loaded_and_used_for_candidate_selection")
                 : TEXT("required_source_masks_missing"),
+            Result.bDressingFoliageMaterialsValidated
+                ? TEXT("river_specific_texture_preserving_two_sided_foliage_material_instances_bound")
+                : TEXT("foliage_material_generation_or_binding_failed"),
+            Result.DressingFoliageMaterialAssetCount,
+            Result.DressingFoliageMaterialBoundSlotCount,
+            *RiverAssetName,
+            *RiverAssetName,
+            FoliageSettings.BroadleafFrontTint.R,
+            FoliageSettings.BroadleafFrontTint.G,
+            FoliageSettings.BroadleafFrontTint.B,
+            FoliageSettings.BroadleafBackTint.R,
+            FoliageSettings.BroadleafBackTint.G,
+            FoliageSettings.BroadleafBackTint.B,
+            FoliageSettings.BroadleafTransmissionTint.R,
+            FoliageSettings.BroadleafTransmissionTint.G,
+            FoliageSettings.BroadleafTransmissionTint.B,
+            FoliageSettings.ConiferFrontTint.R,
+            FoliageSettings.ConiferFrontTint.G,
+            FoliageSettings.ConiferFrontTint.B,
+            FoliageSettings.ConiferBackTint.R,
+            FoliageSettings.ConiferBackTint.G,
+            FoliageSettings.ConiferBackTint.B,
+            FoliageSettings.ConiferTransmissionTint.R,
+            FoliageSettings.ConiferTransmissionTint.G,
+            FoliageSettings.ConiferTransmissionTint.B,
+            FoliageSettings.RoughnessStrength,
+            FoliageSettings.NormalStrength,
             Result.bDressingBoulderMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
