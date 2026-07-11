@@ -18,6 +18,7 @@
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
+#include "Dom/JsonObject.h"
 #include "Editor.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/Engine.h"
@@ -92,6 +93,8 @@
 #include "UObject/SavePackage.h"
 #include "UObject/UnrealType.h"
 #include "RenderingThread.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "ShaderCompiler.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Docking/SDockTab.h"
@@ -166,11 +169,19 @@ struct FRaftSimLandscapeImportCandidateSpec
     FString HeightfieldRelativePath;
     FString HeightfieldManifestRelativePath;
     FString ImportContractRelativePath;
+    FString LocalCenterlineRelativePath;
     FString MapPackagePath;
+    int32 LandscapeSize = 1009;
     float HorizontalSpanXCm = 32300.0f;
     float HorizontalSpanYCm = 5500.0f;
     float TargetReliefCm = 1000.0f;
+    bool bApplyPreviewAnalyticChannelBurn = true;
+    bool bUseSolverVisualizationFields = true;
+    bool bPhysicalScaleSourceCorridor = false;
+    bool bEnableLandscapeNanite = true;
 };
+
+float GetPreviewRiverCenterY(const FRaftSimEnvironmentPreviewSpec& Spec, float X);
 
 struct FRaftSimLandscapeMaterialCandidateSettings
 {
@@ -757,6 +768,119 @@ FString EscapeRaftSimJsonString(const FString& Value)
     return Escaped;
 }
 
+struct FRaftSimLandscapeCandidateCenterlinePoint
+{
+    float StationMeters = 0.0f;
+    FVector2D LocalCm = FVector2D::ZeroVector;
+};
+
+bool LoadLandscapeCandidateLocalCenterline(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint>& OutPoints,
+    FString& OutSummary)
+{
+    OutPoints.Reset();
+    if (Candidate.LocalCenterlineRelativePath.IsEmpty())
+    {
+        return true;
+    }
+
+    const FString AbsolutePath = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), Candidate.LocalCenterlineRelativePath));
+    FString JsonText;
+    if (!FFileHelper::LoadFileToString(JsonText, *AbsolutePath))
+    {
+        OutSummary += FString::Printf(TEXT("Could not read physical corridor centerline %s.\n"), *AbsolutePath);
+        return false;
+    }
+    TSharedPtr<FJsonObject> Root;
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonText);
+    if (!FJsonSerializer::Deserialize(Reader, Root) || !Root.IsValid())
+    {
+        OutSummary += FString::Printf(TEXT("Could not parse physical corridor centerline %s.\n"), *AbsolutePath);
+        return false;
+    }
+
+    const TArray<TSharedPtr<FJsonValue>>* PointValues = nullptr;
+    if (!Root->TryGetArrayField(TEXT("points"), PointValues) || !PointValues)
+    {
+        OutSummary += TEXT("Physical corridor centerline has no points array.\n");
+        return false;
+    }
+    for (const TSharedPtr<FJsonValue>& PointValue : *PointValues)
+    {
+        const TSharedPtr<FJsonObject> PointObject = PointValue ? PointValue->AsObject() : nullptr;
+        const TArray<TSharedPtr<FJsonValue>>* LocalValues = nullptr;
+        if (!PointObject.IsValid() ||
+            !PointObject->TryGetArrayField(TEXT("unreal_local_cm"), LocalValues) ||
+            !LocalValues || LocalValues->Num() != 2)
+        {
+            continue;
+        }
+        FRaftSimLandscapeCandidateCenterlinePoint Point;
+        Point.StationMeters = static_cast<float>(PointObject->GetNumberField(TEXT("station_m")));
+        Point.LocalCm = FVector2D(
+            static_cast<float>((*LocalValues)[0]->AsNumber()),
+            static_cast<float>((*LocalValues)[1]->AsNumber()));
+        OutPoints.Add(Point);
+    }
+    if (OutPoints.Num() < 2)
+    {
+        OutSummary += TEXT("Physical corridor centerline has fewer than two usable points.\n");
+        return false;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Loaded %d source-aligned physical corridor centerline points from %s.\n"),
+        OutPoints.Num(),
+        *Candidate.LocalCenterlineRelativePath);
+    return true;
+}
+
+FVector2D SampleLandscapeCandidateCenterlineWorld(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
+    float Progress,
+    FVector2D* OutTangent = nullptr)
+{
+    constexpr float LandscapeMinX = -5800.0f;
+    if (Points.Num() < 2)
+    {
+        const float X = FMath::Lerp(
+            LandscapeMinX,
+            LandscapeMinX + Candidate.HorizontalSpanXCm,
+            FMath::Clamp(Progress, 0.0f, 1.0f));
+        if (OutTangent)
+        {
+            *OutTangent = FVector2D(1.0f, 0.0f);
+        }
+        return FVector2D(X, GetPreviewRiverCenterY(Candidate.PreviewSpec, X));
+    }
+
+    const float TargetStation = FMath::Lerp(
+        Points[0].StationMeters,
+        Points.Last().StationMeters,
+        FMath::Clamp(Progress, 0.0f, 1.0f));
+    int32 SegmentIndex = 0;
+    while (SegmentIndex + 1 < Points.Num() - 1 &&
+           Points[SegmentIndex + 1].StationMeters < TargetStation)
+    {
+        ++SegmentIndex;
+    }
+    const FRaftSimLandscapeCandidateCenterlinePoint& A = Points[SegmentIndex];
+    const FRaftSimLandscapeCandidateCenterlinePoint& B = Points[SegmentIndex + 1];
+    const float SegmentLength = FMath::Max(0.001f, B.StationMeters - A.StationMeters);
+    const float T = FMath::Clamp((TargetStation - A.StationMeters) / SegmentLength, 0.0f, 1.0f);
+    const FVector2D Local = FMath::Lerp(A.LocalCm, B.LocalCm, T);
+    const FVector2D Tangent = (B.LocalCm - A.LocalCm).GetSafeNormal();
+    if (OutTangent)
+    {
+        *OutTangent = Tangent;
+    }
+    return FVector2D(
+        LandscapeMinX + Local.X,
+        -Candidate.HorizontalSpanYCm * 0.5f + Local.Y);
+}
+
 TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
 {
     TArray<FRaftSimEnvironmentPreviewSpec> Specs;
@@ -917,13 +1041,25 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
         if (PreviewSpec.RiverId == TEXT("american_south_fork"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png");
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_manifest.json");
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json");
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json");
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/centerline_local.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_SouthForkAmerican_SourceLandscapeCandidate");
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_SouthForkAmerican_PhysicalCorridorCandidate");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 240429.501f;
+            Candidate.HorizontalSpanYCm = 169741.536f;
+            Candidate.TargetReliefCm = 38118.896f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bEnableLandscapeNanite = false;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1400.0f;
+            Candidate.PreviewSpec.BankWidthCm = 5200.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("colorado_river"))
         {
@@ -1355,6 +1491,21 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UTexture2D* TerrainDetailNormal = LoadCandidateTexture(
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailNormal"));
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        SourceMacroAlbedo = LoadCandidateTexture(
+            TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
+            TEXT("PhysicalCorridorSourceAlbedo"));
+        SourcePackedSurface = LoadCandidateTexture(
+            TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
+            TEXT("PhysicalCorridorAORoughnessHeight"));
+        SourceNormalDetail = LoadCandidateTexture(
+            TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
+            TEXT("PhysicalCorridorNormal"));
+        SourceMaterialZones = LoadCandidateTexture(
+            TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures"),
+            TEXT("PhysicalCorridorMaterialZones"));
+    }
     if (!SourceMacroAlbedo || !SourcePackedSurface || !SourceNormalDetail || !SourceMaterialZones ||
         !TerrainDetailAlbedo || !TerrainDetailPackedSurface || !TerrainDetailNormal)
     {
@@ -1364,10 +1515,24 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         return nullptr;
     }
 
-    const FRaftSimLandscapeMaterialCandidateSettings Settings =
+    FRaftSimLandscapeMaterialCandidateSettings Settings =
         GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        Settings.MacroMappingScale = static_cast<float>(Candidate.LandscapeSize - 1);
+        Settings.DetailMappingScale = 96.0f;
+        Settings.DetailAlbedoWeight = 0.10f;
+        Settings.DetailNormalWeight = 0.22f;
+        Settings.DetailSurfaceResponseWeight = 0.18f;
+        Settings.RiverbedBlendWeight = 0.18f;
+        Settings.WetBankBlendWeight = 0.24f;
+    }
     FString AssetToken = Candidate.PreviewSpec.RiverId;
     AssetToken.ReplaceInline(TEXT("_"), TEXT(""));
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        AssetToken += TEXT("_physicalcorridor");
+    }
     const FString AssetName = FString::Printf(TEXT("M_RaftSim_%s_SourceLandscapeCandidate"), *AssetToken);
     const FString PackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
@@ -2708,7 +2873,8 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
 
 UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     const FRaftSimEnvironmentPreviewSpec& Spec,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bDisableSolverVisualizationFields = false)
 {
     FString RiverAssetName;
     if (Spec.RiverId == TEXT("american_south_fork"))
@@ -2773,9 +2939,13 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         }
     }
 
-    const FString AssetName = FString::Printf(
-        TEXT("MI_RaftSim_%s_SolverSurfaceWaterCandidate"),
-        *RiverAssetName);
+    const FString AssetName = bDisableSolverVisualizationFields
+        ? FString::Printf(
+              TEXT("MI_RaftSim_%s_PhysicalCorridorWaterCandidate"),
+              *RiverAssetName)
+        : FString::Printf(
+              TEXT("MI_RaftSim_%s_SolverSurfaceWaterCandidate"),
+              *RiverAssetName);
     const FString PackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
         *AssetName);
@@ -2807,8 +2977,16 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    const FRaftSimLandscapeCandidateWaterSettings Settings =
+    FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
+    if (bDisableSolverVisualizationFields)
+    {
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+    }
     Instance->Modify();
     Instance->SetParentEditorOnly(Parent);
     auto SetScalar = [Instance](const TCHAR* Name, float Value)
@@ -3086,6 +3264,57 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
         Packed.LODGroup = TEXTUREGROUP_World;
         Specs.Add(Packed);
     }
+
+    const FString PhysicalSourceRoot =
+        TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+             "chili_bar_reach_0_2500m/derived");
+    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalAlbedo;
+    PhysicalAlbedo.RiverId = TEXT("american_south_fork");
+    PhysicalAlbedo.RiverAssetName = TEXT("AmericanSouthFork");
+    PhysicalAlbedo.MapKey = TEXT("PhysicalCorridorSourceAlbedo");
+    PhysicalAlbedo.MapKind = TEXT("physical_corridor_source_albedo");
+    PhysicalAlbedo.SourceRelativePath = FPaths::Combine(
+        PhysicalSourceRoot,
+        TEXT("south_fork_chili_bar_reach_source_albedo_2048.png"));
+    PhysicalAlbedo.TextureAssetRootPackagePath =
+        TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures");
+    PhysicalAlbedo.CompressionSettings = TC_Default;
+    PhysicalAlbedo.bSRGB = true;
+    PhysicalAlbedo.LODGroup = TEXTUREGROUP_World;
+    PhysicalAlbedo.AddressX = TA_Clamp;
+    PhysicalAlbedo.AddressY = TA_Clamp;
+    Specs.Add(PhysicalAlbedo);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalZones = PhysicalAlbedo;
+    PhysicalZones.MapKey = TEXT("PhysicalCorridorMaterialZones");
+    PhysicalZones.MapKind = TEXT("physical_corridor_material_zones");
+    PhysicalZones.SourceRelativePath = FPaths::Combine(
+        PhysicalSourceRoot,
+        TEXT("south_fork_chili_bar_reach_material_zones_2048.png"));
+    PhysicalZones.CompressionSettings = TC_Masks;
+    PhysicalZones.bSRGB = false;
+    Specs.Add(PhysicalZones);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalNormal = PhysicalAlbedo;
+    PhysicalNormal.MapKey = TEXT("PhysicalCorridorNormal");
+    PhysicalNormal.MapKind = TEXT("physical_corridor_normal");
+    PhysicalNormal.SourceRelativePath = FPaths::Combine(
+        PhysicalSourceRoot,
+        TEXT("south_fork_chili_bar_reach_normal_2048.png"));
+    PhysicalNormal.CompressionSettings = TC_Normalmap;
+    PhysicalNormal.bSRGB = false;
+    PhysicalNormal.LODGroup = TEXTUREGROUP_WorldNormalMap;
+    Specs.Add(PhysicalNormal);
+
+    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalPacked = PhysicalAlbedo;
+    PhysicalPacked.MapKey = TEXT("PhysicalCorridorAORoughnessHeight");
+    PhysicalPacked.MapKind = TEXT("physical_corridor_ao_roughness_height");
+    PhysicalPacked.SourceRelativePath = FPaths::Combine(
+        PhysicalSourceRoot,
+        TEXT("south_fork_chili_bar_reach_ao_roughness_height_2048.png"));
+    PhysicalPacked.CompressionSettings = TC_Masks;
+    PhysicalPacked.bSRGB = false;
+    Specs.Add(PhysicalPacked);
 
     return Specs;
 }
@@ -16191,29 +16420,10 @@ bool AddLandscapeCandidateBiomeDressing(
 
     if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
     {
-        static const TCHAR* ReviewedBroadleafObjectPath =
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/SM_TreeSmall02.SM_TreeSmall02");
-        static const TCHAR* ReviewedFirObjectPath =
-            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0");
-        UStaticMesh* ReviewedBroadleafMesh =
-            LoadObject<UStaticMesh>(nullptr, ReviewedBroadleafObjectPath);
-        UStaticMesh* ReviewedFirMesh = LoadObject<UStaticMesh>(nullptr, ReviewedFirObjectPath);
-        if (ReviewedBroadleafMesh && ReviewedFirMesh)
-        {
-            BroadleafTreeMesh = ReviewedBroadleafMesh;
-            ConiferTreeMesh = ReviewedFirMesh;
-            OutResult.DressingExternalReviewAssetCount = 2;
-            OutResult.bDressingExternalBroadleafReviewAssetLoaded = true;
-            OutResult.bDressingExternalConiferReviewAssetLoaded = true;
-            OutResult.DressingBroadleafAssetPath = ReviewedBroadleafObjectPath;
-            OutResult.DressingConiferAssetPath = ReviewedFirObjectPath;
-            OutSummary += TEXT("South Fork biome dressing uses the rights-reviewed Poly Haven broadleaf analog and fir in the isolated visual-comparison candidate.\n");
-        }
-        else
-        {
-            OutSummary += TEXT("One or more South Fork rights-reviewed tree assets are missing; refusing to substitute unrecorded external vegetation.\n");
-            return false;
-        }
+        OutSummary += TEXT(
+            "South Fork physical corridor excludes the rights-reviewed Poly Haven tree candidates "
+            "after their recorded not-lifelike visual rejection; converted PVE species remain the "
+            "temporary non-production fallback.\n");
     }
 
     OutResult.bDressingBoulderMeshNaniteEnabled = false;
@@ -16384,11 +16594,36 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const bool bRainforest = Spec.bHasWaterfalls;
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> PhysicalCenterline;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, PhysicalCenterline, OutSummary))
+    {
+        return false;
+    }
+    const bool bPhysicalCorridor = Candidate.bPhysicalScaleSourceCorridor && PhysicalCenterline.Num() >= 2;
     const float ActiveRiverHalfWidth = GetPreviewActiveRiverHalfWidthCm(Spec);
     const float LandscapeHalfWidth = Candidate.HorizontalSpanYCm * 0.5f;
-    const float MaxBankOffset = FMath::Max(
-        ActiveRiverHalfWidth + 300.0f,
-        LandscapeHalfWidth - 220.0f);
+    const float MaxBankOffset = bPhysicalCorridor
+        ? FMath::Min(18000.0f, LandscapeHalfWidth - 220.0f)
+        : FMath::Max(ActiveRiverHalfWidth + 300.0f, LandscapeHalfWidth - 220.0f);
+    auto ResolveLogicalRiverPoint =
+        [&Candidate, &PhysicalCenterline, bPhysicalCorridor](float LogicalX, float LateralOffset)
+    {
+        if (!bPhysicalCorridor)
+        {
+            return FVector2D(
+                LogicalX,
+                GetPreviewRiverCenterY(Candidate.PreviewSpec, LogicalX) + LateralOffset);
+        }
+        const float Progress = FMath::Clamp((LogicalX + 2500.0f) / 27900.0f, 0.0f, 1.0f);
+        FVector2D Tangent;
+        const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
+            Candidate,
+            PhysicalCenterline,
+            Progress,
+            &Tangent);
+        const FVector2D Normal(-Tangent.Y, Tangent.X);
+        return Center + Normal * LateralOffset;
+    };
     auto GetLandscapeHeight = [Landscape, &Spec](float X, float Y)
     {
         return Landscape->GetHeightAtLocation(FVector(X, Y, 0.0f), EHeightfieldSource::Editor)
@@ -16411,7 +16646,9 @@ bool AddLandscapeCandidateBiomeDressing(
             true);
     };
 
-    const int32 BoulderCount = Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44);
+    const int32 BoulderCount = bPhysicalCorridor
+        ? 180
+        : (Spec.bDesertCanyon ? 62 : (bRainforest ? 48 : 44));
     for (int32 BoulderIndex = 0; BoulderIndex < BoulderCount; ++BoulderIndex)
     {
         const float T = (static_cast<float>(BoulderIndex) + 0.5f) / static_cast<float>(BoulderCount);
@@ -16426,8 +16663,9 @@ bool AddLandscapeCandidateBiomeDressing(
                   MaxBankOffset * 0.78f,
                   FMath::Pow(FMath::Abs(FMath::Sin(Phase * 0.43f)), 0.72f));
 
-        float BestX = BaseX;
-        float BestY = GetPreviewRiverCenterY(Spec, BaseX) + Side * BaseOffset;
+        const FVector2D BasePoint = ResolveLogicalRiverPoint(BaseX, Side * BaseOffset);
+        float BestX = BasePoint.X;
+        float BestY = BasePoint.Y;
         float BestScore = -1000.0f;
         for (int32 CandidateIndex = 0; CandidateIndex < 7; ++CandidateIndex)
         {
@@ -16437,9 +16675,17 @@ bool AddLandscapeCandidateBiomeDressing(
                 BaseOffset + 135.0f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.93f),
                 ActiveRiverHalfWidth * 0.20f,
                 MaxBankOffset);
-            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
-            const float WaterT = SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateX, CandidateY);
-            const float VegetationT = SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateX, CandidateY);
+            const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                CandidateX,
+                Side * CandidateOffset);
+            const float CandidateWorldX = CandidatePoint.X;
+            const float CandidateWorldY = CandidatePoint.Y;
+            const float WaterT = bPhysicalCorridor
+                ? FMath::Clamp(1.0f - CandidateOffset / FMath::Max(1.0f, ActiveRiverHalfWidth), 0.0f, 1.0f)
+                : SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateWorldX, CandidateWorldY);
+            const float VegetationT = bPhysicalCorridor
+                ? SmoothPreviewStep(ActiveRiverHalfWidth + 400.0f, MaxBankOffset, CandidateOffset)
+                : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
             const float TargetWaterT = bChannelRock ? 0.68f : 0.20f;
             const float Score = 1.0f - FMath::Abs(WaterT - TargetWaterT) -
                 VegetationT * (bChannelRock ? 0.12f : 0.34f) +
@@ -16447,8 +16693,8 @@ bool AddLandscapeCandidateBiomeDressing(
             if (Score > BestScore)
             {
                 BestScore = Score;
-                BestX = CandidateX;
-                BestY = CandidateY;
+                BestX = CandidateWorldX;
+                BestY = CandidateWorldY;
             }
         }
 
@@ -16485,7 +16731,9 @@ bool AddLandscapeCandidateBiomeDressing(
         ++OutResult.DressingBoulderInstanceCount;
     }
 
-    const int32 FoliageClusterCount = Spec.bDesertCanyon ? 110 : (bRainforest ? 420 : 260);
+    const int32 FoliageClusterCount = bPhysicalCorridor
+        ? 12000
+        : (Spec.bDesertCanyon ? 110 : (bRainforest ? 420 : 260));
     for (int32 ClusterIndex = 0; ClusterIndex < FoliageClusterCount; ++ClusterIndex)
     {
         const float T = (static_cast<float>(ClusterIndex) + 0.5f) /
@@ -16498,8 +16746,9 @@ bool AddLandscapeCandidateBiomeDressing(
             MaxBankOffset,
             FMath::Pow(FMath::Abs(FMath::Sin(Phase * 0.47f)), bRainforest ? 0.42f : 0.66f));
 
-        float BestX = BaseX;
-        float BestY = GetPreviewRiverCenterY(Spec, BaseX) + Side * BaseOffset;
+        const FVector2D BasePoint = ResolveLogicalRiverPoint(BaseX, Side * BaseOffset);
+        float BestX = BasePoint.X;
+        float BestY = BasePoint.Y;
         float BestScore = -1000.0f;
         for (int32 CandidateIndex = 0; CandidateIndex < 8; ++CandidateIndex)
         {
@@ -16512,17 +16761,25 @@ bool AddLandscapeCandidateBiomeDressing(
                 BaseOffset + 210.0f * FMath::Sin(Phase * 0.69f + static_cast<float>(CandidateIndex) * 0.89f),
                 NearCameraMinimumOffset,
                 MaxBankOffset);
-            const float CandidateY = GetPreviewRiverCenterY(Spec, CandidateX) + Side * CandidateOffset;
-            const float WaterT = SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateX, CandidateY);
-            const float VegetationT = SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateX, CandidateY);
+            const FVector2D CandidatePoint = ResolveLogicalRiverPoint(
+                CandidateX,
+                Side * CandidateOffset);
+            const float CandidateWorldX = CandidatePoint.X;
+            const float CandidateWorldY = CandidatePoint.Y;
+            const float WaterT = bPhysicalCorridor
+                ? FMath::Clamp(1.0f - CandidateOffset / FMath::Max(1.0f, ActiveRiverHalfWidth), 0.0f, 1.0f)
+                : SamplePreviewMaskAtWorld(Spec, &WaterMask, CandidateWorldX, CandidateWorldY);
+            const float VegetationT = bPhysicalCorridor
+                ? SmoothPreviewStep(ActiveRiverHalfWidth + 500.0f, MaxBankOffset, CandidateOffset)
+                : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
             const float Score = VegetationT * (bRainforest ? 1.85f : (Spec.bDesertCanyon ? 0.58f : 1.34f)) -
                 WaterT * 1.18f +
                 0.07f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.83f);
             if (Score > BestScore)
             {
                 BestScore = Score;
-                BestX = CandidateX;
-                BestY = CandidateY;
+                BestX = CandidateWorldX;
+                BestY = CandidateWorldY;
             }
         }
 
@@ -16530,7 +16787,7 @@ bool AddLandscapeCandidateBiomeDressing(
         UHierarchicalInstancedStaticMeshComponent* SpeciesInstances = UnderstoryInstances;
         bool bCanopyTree = false;
         float TargetHeightCm = 100.0f;
-        const bool bNearEvidenceCamera = BestX < 3800.0f;
+        const bool bNearEvidenceCamera = !bPhysicalCorridor && BaseX < 3800.0f;
         if (bNearEvidenceCamera && !Spec.bDesertCanyon)
         {
             if (ClusterIndex % 2 == 0)
@@ -16672,7 +16929,7 @@ void ApplyPreviewOnlyLandscapeChannelBurn(
     TArray<uint16>& HeightData,
     int32& OutModifiedSampleCount)
 {
-    constexpr int32 LandscapeSize = 1009;
+    const int32 LandscapeSize = Candidate.LandscapeSize;
     constexpr float MinX = -5800.0f;
     const float MaxX = MinX + Candidate.HorizontalSpanXCm;
     const float HalfSpanY = Candidate.HorizontalSpanYCm * 0.5f;
@@ -16715,14 +16972,197 @@ void ApplyPreviewOnlyLandscapeChannelBurn(
     }
 }
 
+AActor* AddLandscapeCandidatePhysicalRiverRibbon(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    UMaterialInterface* WaterMaterial,
+    FString& OutSummary)
+{
+    if (!World || !Landscape || !WaterMaterial)
+    {
+        return nullptr;
+    }
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> SourcePoints;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, SourcePoints, OutSummary) ||
+        SourcePoints.Num() < 2)
+    {
+        return nullptr;
+    }
+
+    TArray<FVector2D> Centers;
+    TArray<float> StationsCm;
+    for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
+    {
+        const FRaftSimLandscapeCandidateCenterlinePoint& A = SourcePoints[SegmentIndex];
+        const FRaftSimLandscapeCandidateCenterlinePoint& B = SourcePoints[SegmentIndex + 1];
+        const float SegmentLengthCm = (B.LocalCm - A.LocalCm).Size();
+        const int32 Steps = FMath::Max(1, FMath::CeilToInt(SegmentLengthCm / 800.0f));
+        for (int32 Step = 0; Step < Steps; ++Step)
+        {
+            const float T = static_cast<float>(Step) / static_cast<float>(Steps);
+            const FVector2D Local = FMath::Lerp(A.LocalCm, B.LocalCm, T);
+            Centers.Add(FVector2D(
+                -5800.0f + Local.X,
+                -Candidate.HorizontalSpanYCm * 0.5f + Local.Y));
+            StationsCm.Add(FMath::Lerp(A.StationMeters, B.StationMeters, T) * 100.0f);
+        }
+    }
+    const FRaftSimLandscapeCandidateCenterlinePoint& Last = SourcePoints.Last();
+    Centers.Add(FVector2D(
+        -5800.0f + Last.LocalCm.X,
+        -Candidate.HorizontalSpanYCm * 0.5f + Last.LocalCm.Y));
+    StationsCm.Add(Last.StationMeters * 100.0f);
+
+    constexpr int32 CrossSteps = 12;
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<int32> Triangles;
+    Vertices.Reserve(Centers.Num() * (CrossSteps + 1));
+    UVs.Reserve(Centers.Num() * (CrossSteps + 1));
+    VertexColors.Reserve(Centers.Num() * (CrossSteps + 1));
+    for (int32 CenterIndex = 0; CenterIndex < Centers.Num(); ++CenterIndex)
+    {
+        const FVector2D Previous = Centers[FMath::Max(0, CenterIndex - 1)];
+        const FVector2D Next = Centers[FMath::Min(Centers.Num() - 1, CenterIndex + 1)];
+        const FVector2D Tangent = (Next - Previous).GetSafeNormal();
+        const FVector2D Normal(-Tangent.Y, Tangent.X);
+        const float HalfWidth = GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec) *
+            (0.92f + 0.10f * FMath::Sin(StationsCm[CenterIndex] * 0.00031f));
+        const float TerrainZ = Landscape->GetHeightAtLocation(
+            FVector(Centers[CenterIndex].X, Centers[CenterIndex].Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f);
+        const float SurfaceZ = TerrainZ + 140.0f + Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
+        for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
+        {
+            const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
+            const float Lateral = FMath::Lerp(-HalfWidth, HalfWidth, V);
+            const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
+            const float Wave =
+                3.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) *
+                (1.0f - EdgeT * 0.65f);
+            Vertices.Add(FVector(
+                Centers[CenterIndex].X + Normal.X * Lateral,
+                Centers[CenterIndex].Y + Normal.Y * Lateral,
+                SurfaceZ + Wave));
+            UVs.Add(FVector2D(StationsCm[CenterIndex] / 8000.0f, V));
+            const FLinearColor Deep = FMath::Lerp(
+                Candidate.PreviewSpec.WaterColor,
+                FLinearColor(0.018f, 0.115f, 0.085f),
+                0.38f);
+            const FLinearColor Shallow(0.085f, 0.255f, 0.145f);
+            VertexColors.Add(FMath::Lerp(Deep, Shallow, FMath::Pow(EdgeT, 1.7f)));
+        }
+    }
+    const int32 RowSize = CrossSteps + 1;
+    for (int32 CenterIndex = 0; CenterIndex + 1 < Centers.Num(); ++CenterIndex)
+    {
+        for (int32 CrossIndex = 0; CrossIndex < CrossSteps; ++CrossIndex)
+        {
+            const int32 A = CenterIndex * RowSize + CrossIndex;
+            const int32 B = A + 1;
+            const int32 C = (CenterIndex + 1) * RowSize + CrossIndex;
+            const int32 D = C + 1;
+            Triangles.Add(A);
+            Triangles.Add(C);
+            Triangles.Add(B);
+            Triangles.Add(B);
+            Triangles.Add(C);
+            Triangles.Add(D);
+        }
+    }
+    TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+    for (FVector& Normal : Normals)
+    {
+        Normal = FMath::Lerp(Normal, FVector::UpVector, 0.72f).GetSafeNormal();
+    }
+    OutSummary += FString::Printf(
+        TEXT("Built source-aligned physical river ribbon with %d center samples across %.1f m.\n"),
+        Centers.Num(),
+        Last.StationMeters);
+    return AddPreviewProceduralMeshActor(
+        World,
+        TEXT("RaftSim_PhysicalCorridorRiverRibbon_american_south_fork"),
+        Vertices,
+        Triangles,
+        Normals,
+        UVs,
+        Candidate.PreviewSpec.WaterColor,
+        WaterMaterial,
+        &VertexColors,
+        false);
+}
+
+void RepositionLandscapeCandidatePhysicalCameras(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (!World || !Landscape || !Candidate.bPhysicalScaleSourceCorridor)
+    {
+        return;
+    }
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Points;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Points, OutSummary) || Points.Num() < 2)
+    {
+        return;
+    }
+    auto RiverLocation = [&Candidate, &Points, Landscape](float Progress, float HeightAboveTerrain)
+    {
+        const FVector2D XY = SampleLandscapeCandidateCenterlineWorld(Candidate, Points, Progress);
+        const float TerrainZ = Landscape->GetHeightAtLocation(
+            FVector(XY.X, XY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f);
+        return FVector(XY.X, XY.Y, TerrainZ + HeightAboveTerrain);
+    };
+    auto SetCamera = [World, &RiverLocation](
+                         const TCHAR* Label,
+                         float Progress,
+                         float TargetProgress,
+                         float Height,
+                         float TargetHeight)
+    {
+        for (TActorIterator<ACameraActor> It(World); It; ++It)
+        {
+            if (It->GetActorLabel() != Label)
+            {
+                continue;
+            }
+            const FVector Location = RiverLocation(Progress, Height);
+            const FVector Target = RiverLocation(TargetProgress, TargetHeight);
+            It->SetActorLocationAndRotation(Location, (Target - Location).Rotation());
+            return;
+        }
+    };
+    SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.035f, 0.135f, 330.0f, 170.0f);
+    SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.050f, 0.155f, 260.0f, 155.0f);
+    SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.43f, 0.56f, 260.0f, 155.0f);
+    for (TActorIterator<APlayerStart> It(World); It; ++It)
+    {
+        if (It->GetActorLabel() == TEXT("RaftSim_GuideSeat_PlayerStart"))
+        {
+            It->SetActorLocation(RiverLocation(0.032f, 120.0f));
+        }
+    }
+    for (TActorIterator<ASphereReflectionCapture> It(World); It; ++It)
+    {
+        if (It->GetActorLabel() == TEXT("RaftSim_RiverCorridorReflectionCapture"))
+        {
+            It->SetActorLocation(RiverLocation(0.09f, 520.0f));
+        }
+    }
+}
+
 bool BuildLandscapeImportCandidateMap(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     FRaftSimLandscapeImportCandidateResult& OutResult,
     FString& OutSummary)
 {
-    constexpr int32 LandscapeSize = 1009;
-    constexpr int32 LandscapeQuads = LandscapeSize - 1;
-    constexpr int32 NumSubsections = 1;
+    const int32 LandscapeSize = Candidate.LandscapeSize;
+    const int32 LandscapeQuads = LandscapeSize - 1;
+    const int32 NumSubsections = Candidate.bPhysicalScaleSourceCorridor ? 2 : 1;
     constexpr int32 SubsectionSizeQuads = 63;
     constexpr float MinX = -5800.0f;
 
@@ -16758,8 +17198,10 @@ bool BuildLandscapeImportCandidateMap(
     if (!HeightmapInfo.PossibleResolutions.Contains(ExpectedResolution))
     {
         OutSummary += FString::Printf(
-            TEXT("Landscape heightfield %s does not advertise the required 1009x1009 resolution.\n"),
-            *Candidate.HeightfieldRelativePath);
+            TEXT("Landscape heightfield %s does not advertise the required %dx%d resolution.\n"),
+            *Candidate.HeightfieldRelativePath,
+            LandscapeSize,
+            LandscapeSize);
         return false;
     }
 
@@ -16785,15 +17227,24 @@ bool BuildLandscapeImportCandidateMap(
     }
     const int32 SourceRange = static_cast<int32>(OutResult.SourceHeightMax) -
         static_cast<int32>(OutResult.SourceHeightMin);
-    OutResult.ChannelFloor = static_cast<uint16>(FMath::Clamp(
-        static_cast<int32>(OutResult.SourceHeightMin) + FMath::RoundToInt(static_cast<float>(SourceRange) * 0.12f),
-        0,
-        65535));
-    ApplyPreviewOnlyLandscapeChannelBurn(
-        Candidate,
-        OutResult.ChannelFloor,
-        ImportedHeightmap.Data,
-        OutResult.ChannelModifiedSampleCount);
+    if (Candidate.bApplyPreviewAnalyticChannelBurn)
+    {
+        OutResult.ChannelFloor = static_cast<uint16>(FMath::Clamp(
+            static_cast<int32>(OutResult.SourceHeightMin) +
+                FMath::RoundToInt(static_cast<float>(SourceRange) * 0.12f),
+            0,
+            65535));
+        ApplyPreviewOnlyLandscapeChannelBurn(
+            Candidate,
+            OutResult.ChannelFloor,
+            ImportedHeightmap.Data,
+            OutResult.ChannelModifiedSampleCount);
+    }
+    else
+    {
+        OutResult.ChannelFloor = OutResult.SourceHeightMin;
+        OutResult.ChannelModifiedSampleCount = 0;
+    }
 
     UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
     if (!World)
@@ -16808,7 +17259,10 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     UMaterialInterface* CandidateWaterMaterial =
-        LoadOrCreateLandscapeCandidateWaterMaterial(Candidate.PreviewSpec, OutSummary);
+        LoadOrCreateLandscapeCandidateWaterMaterial(
+            Candidate.PreviewSpec,
+            OutSummary,
+            !Candidate.bUseSolverVisualizationFields);
     if (!CandidateWaterMaterial)
     {
         return false;
@@ -16818,7 +17272,7 @@ bool BuildLandscapeImportCandidateMap(
     FRaftSimPreviewImage SolverVisualizationFields;
     const FRaftSimPreviewImage* SolverVisualizationFieldsPtr = nullptr;
     UMaterialInterface* SolverFoamMaterial = nullptr;
-    if (CandidateWaterSettings.SolverFieldEnable > 0.5f)
+    if (Candidate.bUseSolverVisualizationFields && CandidateWaterSettings.SolverFieldEnable > 0.5f)
     {
         const FString SolverFieldImage =
             TEXT("unreal/Content/RaftSim/Rendering/SolverVisualizationFields/"
@@ -16842,7 +17296,9 @@ bool BuildLandscapeImportCandidateMap(
     const float ScaleZ = Candidate.TargetReliefCm / 512.0f;
     const float EncodedChannelFloorCm =
         (static_cast<float>(OutResult.ChannelFloor) - 32768.0f) / 128.0f * ScaleZ;
-    const float ChannelBedWorldZ = Candidate.PreviewSpec.FlowWaterLevelOffsetCm - 24.0f;
+    const float ChannelBedWorldZ = Candidate.bPhysicalScaleSourceCorridor
+        ? 0.0f
+        : Candidate.PreviewSpec.FlowWaterLevelOffsetCm - 24.0f;
     OutResult.LandscapeLocation = FVector(
         MinX,
         -Candidate.HorizontalSpanYCm * 0.5f,
@@ -16860,10 +17316,16 @@ bool BuildLandscapeImportCandidateMap(
 
     Landscape->SetActorScale3D(OutResult.LandscapeScale);
     Landscape->LandscapeMaterial = LandscapeMaterial;
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        Landscape->MaxLODLevel = 0;
+    }
     if (FBoolProperty* EnableNaniteProperty =
             FindFProperty<FBoolProperty>(ALandscapeProxy::StaticClass(), TEXT("bEnableNanite")))
     {
-        EnableNaniteProperty->SetPropertyValue_InContainer(Landscape, true);
+        EnableNaniteProperty->SetPropertyValue_InContainer(
+            Landscape,
+            Candidate.bEnableLandscapeNanite);
     }
     else
     {
@@ -16898,6 +17360,10 @@ bool BuildLandscapeImportCandidateMap(
         if (LandscapeComponent)
         {
             LandscapeComponent->OverrideMaterial = LandscapeMaterial;
+            if (Candidate.bPhysicalScaleSourceCorridor)
+            {
+                LandscapeComponent->SetForcedLOD(0);
+            }
             LandscapeComponent->MarkRenderStateDirty();
         }
     }
@@ -16944,15 +17410,22 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
-    AActor* WaterActor = AddPreviewRiverRibbonMesh(
-        World,
-        Candidate.PreviewSpec,
-        nullptr,
-        nullptr,
-        nullptr,
-        CandidateWaterMaterial,
-        SolverVisualizationFieldsPtr,
-        SolverFoamMaterial);
+    AActor* WaterActor = Candidate.bPhysicalScaleSourceCorridor
+        ? AddLandscapeCandidatePhysicalRiverRibbon(
+              World,
+              Landscape,
+              Candidate,
+              CandidateWaterMaterial,
+              OutSummary)
+        : AddPreviewRiverRibbonMesh(
+              World,
+              Candidate.PreviewSpec,
+              nullptr,
+              nullptr,
+              nullptr,
+              CandidateWaterMaterial,
+              SolverVisualizationFieldsPtr,
+              SolverFoamMaterial);
     OutResult.WaterMaterialPath = CandidateWaterMaterial->GetPathName();
     if (WaterActor)
     {
@@ -16976,10 +17449,12 @@ bool BuildLandscapeImportCandidateMap(
         return false;
     }
     AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
+    RepositionLandscapeCandidatePhysicalCameras(World, Landscape, Candidate, OutSummary);
 
     OutSummary += FString::Printf(
-        TEXT("Imported %s as a 16x16-component ALandscape candidate; preview channel burn modified %d samples.\n"),
+        TEXT("Imported %s as a %d-component ALandscape candidate; preview channel burn modified %d samples.\n"),
         *Candidate.HeightfieldRelativePath,
+        Landscape->LandscapeComponents.Num(),
         OutResult.ChannelModifiedSampleCount);
     const bool bSaved = SavePreviewWorld(World, Candidate.MapPackagePath, OutSummary);
     FAssetCompilingManager::Get().FinishAllCompilation();
@@ -16987,8 +17462,9 @@ bool BuildLandscapeImportCandidateMap(
     {
         GShaderCompilingManager->FinishAllCompilation();
     }
-    OutResult.bNaniteRepresentationBuilt = Landscape->IsNaniteMeshUpToDate();
-    if (!OutResult.bNaniteRepresentationBuilt)
+    OutResult.bNaniteRepresentationBuilt = !Candidate.bEnableLandscapeNanite ||
+        Landscape->IsNaniteMeshUpToDate();
+    if (Candidate.bEnableLandscapeNanite && !OutResult.bNaniteRepresentationBuilt)
     {
         OutSummary += FString::Printf(
             TEXT("Landscape Nanite representation is not up to date for %s.\n"),
@@ -17035,11 +17511,11 @@ bool BuildLandscapeImportCandidateMap(
             }
         }
     }
-    OutResult.bNaniteMaterialBindingsValidated =
-        OutResult.NaniteComponentCount > 0 &&
-        OutResult.NaniteMaterialSlotCount > 0 &&
-        OutResult.NaniteMaterialBoundSlotCount == OutResult.NaniteMaterialSlotCount &&
-        OutResult.NaniteMaterialAuditErrorCount == 0;
+    OutResult.bNaniteMaterialBindingsValidated = !Candidate.bEnableLandscapeNanite ||
+        (OutResult.NaniteComponentCount > 0 &&
+         OutResult.NaniteMaterialSlotCount > 0 &&
+         OutResult.NaniteMaterialBoundSlotCount == OutResult.NaniteMaterialSlotCount &&
+         OutResult.NaniteMaterialAuditErrorCount == 0);
     OutSummary += FString::Printf(
         TEXT("Landscape material audit for %s: %d/%d source components and %d/%d Nanite slots use %s; %d Nanite audit errors.\n"),
         *Candidate.PreviewSpec.RiverId,
@@ -17049,7 +17525,7 @@ bool BuildLandscapeImportCandidateMap(
         OutResult.NaniteMaterialSlotCount,
         *LandscapeMaterial->GetPathName(),
         OutResult.NaniteMaterialAuditErrorCount);
-    if (!OutResult.bNaniteMaterialBindingsValidated)
+    if (Candidate.bEnableLandscapeNanite && !OutResult.bNaniteMaterialBindingsValidated)
     {
         OutSummary += FString::Printf(
             TEXT("Landscape Nanite material binding validation failed for %s across %d Nanite components.\n"),
@@ -18883,7 +19359,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         *GetSolverVisualizationFieldTextureAssetRootRelativePath());
 
     FString EntriesJson;
-    bool bAllSucceeded = CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    TMap<FString, UTexture2D*> SourceTextureAssetsByKey;
+    bool bAllSucceeded =
+        CreateSourceConditionedMaterialTextureAssets(SourceTextureAssetsByKey, OutSummary);
+    bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
     const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
     for (int32 Index = 0; Index < Candidates.Num(); ++Index)
     {
@@ -18949,16 +19433,42 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         const bool bCandidateSucceeded =
             bSourceContractsPresent && bMapBuilt && bGuideSeatCaptured && bRiverEyeCaptured && bSolverRapidCaptured;
         bAllSucceeded &= bCandidateSucceeded;
-        const FRaftSimLandscapeMaterialCandidateSettings MaterialSettings =
+        FRaftSimLandscapeMaterialCandidateSettings MaterialSettings =
             GetLandscapeMaterialCandidateSettings(Candidate.PreviewSpec.RiverId);
-        const FRaftSimLandscapeCandidateWaterSettings WaterSettings =
+        if (Candidate.bPhysicalScaleSourceCorridor)
+        {
+            MaterialSettings.MacroMappingScale = static_cast<float>(Candidate.LandscapeSize - 1);
+            MaterialSettings.DetailMappingScale = 96.0f;
+            MaterialSettings.DetailAlbedoWeight = 0.10f;
+            MaterialSettings.DetailNormalWeight = 0.22f;
+            MaterialSettings.DetailSurfaceResponseWeight = 0.18f;
+            MaterialSettings.RiverbedBlendWeight = 0.18f;
+            MaterialSettings.WetBankBlendWeight = 0.24f;
+        }
+        FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
+        if (!Candidate.bUseSolverVisualizationFields)
+        {
+            WaterSettings.SolverFieldEnable = 0.0f;
+            WaterSettings.SolverMacroNormalWeight = 0.0f;
+            WaterSettings.SolverDepthColorWeight = 0.0f;
+            WaterSettings.SolverFieldRoughnessWeight = 0.0f;
+            WaterSettings.SolverFroudeAerationWeight = 0.0f;
+        }
         const FRaftSimPhotographicCaptureSettings CaptureSettings =
             GetPhotographicCaptureSettings(Candidate.PreviewSpec.RiverId);
         const FRaftSimLandscapeCandidateFoliageSettings FoliageSettings =
             GetLandscapeCandidateFoliageSettings(Candidate.PreviewSpec.RiverId);
         const FString RiverAssetName =
             GetFirstPartyMaterialRiverAssetName(Candidate.PreviewSpec.RiverId);
+        const int32 CandidateNumSubsections = Candidate.bPhysicalScaleSourceCorridor ? 2 : 1;
+        constexpr int32 CandidateSubsectionSizeQuads = 63;
+        const int32 CandidateComponentCountAxis =
+            (Candidate.LandscapeSize - 1) /
+            (CandidateNumSubsections * CandidateSubsectionSizeQuads);
+        const bool bHasSolverVisualizationFields =
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") &&
+            Candidate.bUseSolverVisualizationFields;
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -18984,19 +19494,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"photographic_vignette\": %.6f,\n")
             TEXT("      \"photographic_film_grain_intensity\": %.6f,\n")
             TEXT("      \"heightfield_format\": \"16-bit grayscale PNG\",\n")
-            TEXT("      \"heightfield_width_px\": 1009,\n")
-            TEXT("      \"heightfield_height_px\": 1009,\n")
-            TEXT("      \"component_count_x\": 16,\n")
-            TEXT("      \"component_count_y\": 16,\n")
-            TEXT("      \"component_count_total\": 256,\n")
-            TEXT("      \"num_subsections\": 1,\n")
+            TEXT("      \"heightfield_width_px\": %d,\n")
+            TEXT("      \"heightfield_height_px\": %d,\n")
+            TEXT("      \"component_count_x\": %d,\n")
+            TEXT("      \"component_count_y\": %d,\n")
+            TEXT("      \"component_count_total\": %d,\n")
+            TEXT("      \"num_subsections\": %d,\n")
             TEXT("      \"subsection_size_quads\": 63,\n")
             TEXT("      \"source_height_min_uint16\": %u,\n")
             TEXT("      \"source_height_max_uint16\": %u,\n")
             TEXT("      \"preview_channel_floor_uint16\": %u,\n")
             TEXT("      \"preview_channel_modified_sample_count\": %d,\n")
-            TEXT("      \"channel_burn_policy\": \"preview_only_analytic_channel_burn_for_landscape_import_validation\",\n")
-            TEXT("      \"channel_burn_promotion_status\": \"not_solver_geometry_not_geospatially_approved_not_for_gameplay\",\n")
+            TEXT("      \"channel_burn_policy\": \"%s\",\n")
+            TEXT("      \"channel_burn_promotion_status\": \"%s\",\n")
             TEXT("      \"landscape_location_cm\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"landscape_scale\": [%.6f, %.6f, %.6f],\n")
             TEXT("      \"horizontal_span_x_cm\": %.3f,\n")
@@ -19126,10 +19636,10 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"waterbody_dependency\": \"none_default_lit_solver_surface_runs_on_generated_procedural_mesh_ribbon\",\n")
             TEXT("      \"water_reflection_capture_policy\": \"default_lit_surface_uses_movable_skylight_runtime_corridor_sphere_capture_screen_space_reflections_and_bounded_fresnel_sky_fill\",\n")
             TEXT("      \"water_material_promotion_status\": \"review_only_requires_visual_guide_solver_hazard_and_performance_validation\",\n")
-            TEXT("      \"material_usage_contract\": \"nanite_and_static_lighting\",\n")
+            TEXT("      \"material_usage_contract\": \"%s\",\n")
             TEXT("      \"material_bound_component_count\": %d,\n")
             TEXT("      \"material_binding_status\": \"%s\",\n")
-            TEXT("      \"nanite_enabled\": true,\n")
+            TEXT("      \"nanite_enabled\": %s,\n")
             TEXT("      \"nanite_component_count\": %d,\n")
             TEXT("      \"nanite_material_slot_count\": %d,\n")
             TEXT("      \"nanite_material_bound_slot_count\": %d,\n")
@@ -19150,7 +19660,9 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             *EscapeRaftSimJsonString(SolverRapidCapturePath),
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
                 ? (bSolverRapidCaptured
-                       ? TEXT("captured_at_validated_median_field_high_froude_approach")
+                       ? (bHasSolverVisualizationFields
+                              ? TEXT("captured_at_validated_median_field_high_froude_approach")
+                              : TEXT("captured_physical_corridor_midreach_geometry_review_without_solver_field"))
                        : TEXT("solver_rapid_capture_failed"))
                 : TEXT("not_available_without_river_specific_validated_solver_field"),
             bCandidateSucceeded ? TEXT("captured_source_landscape_import_candidate") : TEXT("candidate_generation_or_capture_failed"),
@@ -19163,10 +19675,22 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             CaptureSettings.Sharpen,
             CaptureSettings.Vignette,
             CaptureSettings.FilmGrainIntensity,
+            Candidate.LandscapeSize,
+            Candidate.LandscapeSize,
+            CandidateComponentCountAxis,
+            CandidateComponentCountAxis,
+            CandidateComponentCountAxis * CandidateComponentCountAxis,
+            CandidateNumSubsections,
             static_cast<uint32>(Result.SourceHeightMin),
             static_cast<uint32>(Result.SourceHeightMax),
             static_cast<uint32>(Result.ChannelFloor),
             Result.ChannelModifiedSampleCount,
+            Candidate.bPhysicalScaleSourceCorridor
+                ? TEXT("source_manifest_recorded_bounded_hydrologic_channel_conditioning")
+                : TEXT("preview_only_analytic_channel_burn_for_landscape_import_validation"),
+            Candidate.bPhysicalScaleSourceCorridor
+                ? TEXT("review_gated_derived_geometry_not_solver_or_surveyed_bathymetry")
+                : TEXT("not_solver_geometry_not_geospatially_approved_not_for_gameplay"),
             Result.LandscapeLocation.X,
             Result.LandscapeLocation.Y,
             Result.LandscapeLocation.Z,
@@ -19273,12 +19797,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
                 ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+            bHasSolverVisualizationFields
                 ? TEXT("validated_cpp_solver_visualization_fields_bound_review_only")
-                : TEXT("not_available_for_river_no_cross_river_field_reuse"),
+                : (Candidate.bPhysicalScaleSourceCorridor
+                       ? TEXT("disabled_for_physical_corridor_until_solver_grid_georeferencing_is_validated")
+                       : TEXT("not_available_for_river_no_cross_river_field_reuse")),
             *EscapeRaftSimJsonString(GetSolverVisualizationFieldManifestRelativePath()),
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 2 : 0,
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? TEXT("0") : TEXT("null"),
+            bHasSolverVisualizationFields ? 2 : 0,
+            bHasSolverVisualizationFields ? TEXT("0") : TEXT("null"),
             WaterSettings.SolverFieldEnable,
             WaterSettings.SolverMacroNormalWeight,
             WaterSettings.SolverDepthColorWeight,
@@ -19288,12 +19814,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             WaterSettings.SolverFroudeVisualGain,
             WaterSettings.SolverSurfaceReliefScale,
             WaterSettings.SolverSurfaceReliefScale * 400.0f,
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 0.42f : 1.0f,
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork")
+            bHasSolverVisualizationFields ? 0.42f : 1.0f,
+            bHasSolverVisualizationFields
                 ? TEXT("validated_speed_froude_masked_noncolliding_translucent_surface_bound")
-                : TEXT("not_available_without_river_specific_validated_solver_field"),
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 0.72f : 0.0f,
-            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") ? 1.4f : 0.0f,
+                : (Candidate.bPhysicalScaleSourceCorridor
+                       ? TEXT("disabled_until_physical_corridor_solver_grid_georeferencing_is_validated")
+                       : TEXT("not_available_without_river_specific_validated_solver_field")),
+            bHasSolverVisualizationFields ? 0.72f : 0.0f,
+            bHasSolverVisualizationFields ? 1.4f : 0.0f,
             Result.WaterMaterialBoundComponentCount,
             WaterSettings.BaseColorScale,
             WaterSettings.SurfaceTint.R,
@@ -19323,13 +19851,21 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             WaterSettings.RenderWidthScale,
             WaterSettings.RenderNormalUpBlend,
             WaterSettings.RenderDisplacementScale,
+            Candidate.bEnableLandscapeNanite
+                ? TEXT("nanite_and_static_lighting")
+                : TEXT("static_lighting_non_nanite_physical_corridor_review"),
             Result.MaterialBoundComponentCount,
             Result.bMaterialBindingsValidated ? TEXT("all_source_components_bound") : TEXT("source_component_binding_failed"),
+            Candidate.bEnableLandscapeNanite ? TEXT("true") : TEXT("false"),
             Result.NaniteComponentCount,
             Result.NaniteMaterialSlotCount,
             Result.NaniteMaterialBoundSlotCount,
             Result.NaniteMaterialAuditErrorCount,
-            Result.bNaniteRepresentationBuilt ? TEXT("enabled_and_built_up_to_date") : TEXT("enabled_candidate_build_failed_or_stale"));
+            Candidate.bEnableLandscapeNanite
+                ? (Result.bNaniteRepresentationBuilt
+                       ? TEXT("enabled_and_built_up_to_date")
+                       : TEXT("enabled_candidate_build_failed_or_stale"))
+                : TEXT("disabled_for_physical_corridor_after_captured_nanite_hole_regression"));
     }
 
     const FString Manifest = FString::Printf(
@@ -19338,7 +19874,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         TEXT("  \"capture_type\": \"isolated_source_landscape_import_geometry_review\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"canonical_importer\": \"Unreal LandscapeEditor PNG heightmap file format\",\n")
-        TEXT("  \"candidate_policy\": \"Source DEM values remain authoritative outside a bounded preview-only analytic channel burn; candidates cannot replace gameplay or active preview terrain until CRS, vertical datum, hydrologic conditioning, guide, solver, capture, Nanite-build, and performance gates pass.\",\n")
+        TEXT("  \"candidate_policy\": \"Source DEM values remain authoritative outside explicitly manifest-recorded bounded channel conditioning; candidates cannot replace gameplay or active preview terrain until CRS, vertical datum, hydrologic conditioning, guide, solver, capture, representation, and performance gates pass.\",\n")
         TEXT("  \"candidates\": [\n")
         TEXT("%s\n")
         TEXT("  ]\n")
