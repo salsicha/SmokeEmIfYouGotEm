@@ -1,5 +1,7 @@
 #include "RaftSimEditorModule.h"
 
+#include "Algo/AllOf.h"
+#include "Algo/AnyOf.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetCompilingManager.h"
 #include "Animation/SkeletalMeshActor.h"
@@ -12,6 +14,7 @@
 #include "Components/LightComponent.h"
 #include "Components/MeshComponent.h"
 #include "Components/ReflectionCaptureComponent.h"
+#include "Components/SceneComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/SkyLightComponent.h"
@@ -19,6 +22,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Dom/JsonObject.h"
+#include "UDynamicMesh.h"
 #include "Editor.h"
 #include "Engine/DirectionalLight.h"
 #include "Engine/Engine.h"
@@ -51,6 +55,7 @@
 #include "LandscapeFileFormatInterface.h"
 #include "LandscapeNaniteComponent.h"
 #include "LandscapeProxy.h"
+#include "GeometryScript/MeshAssetFunctions.h"
 #include "Materials/MaterialExpressionLandscapeLayerCoords.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAbs.h"
@@ -62,6 +67,7 @@
 #include "Materials/MaterialExpressionFrac.h"
 #include "Materials/MaterialExpressionFresnel.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
+#include "Materials/MaterialExpressionMaterialFunctionCall.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionOneMinus.h"
 #include "Materials/MaterialExpressionSaturate.h"
@@ -69,11 +75,15 @@
 #include "Materials/MaterialExpressionSubtract.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2D.h"
+#include "Materials/MaterialExpressionTwoSidedSign.h"
 #include "Materials/MaterialExpressionVertexColor.h"
+#include "Materials/MaterialExpressionVertexNormalWS.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialFunctionInterface.h"
 #include "MeshUtilities.h"
+#include "MeshDescription.h"
 #include "Misc/CommandLine.h"
 #include "Misc/CoreDelegates.h"
 #include "Misc/FileHelper.h"
@@ -82,29 +92,51 @@
 #include "Misc/Paths.h"
 #include "Modules/ModuleManager.h"
 #include "NaniteSceneProxy.h"
+#include "PlanarCut.h"
+#include "PCGGraph.h"
+#include "PCGDefaultExecutionSource.h"
+#include "PCGData.h"
+#include "PCGEdge.h"
+#include "PCGNode.h"
+#include "PCGPin.h"
+#include "PCGSettings.h"
 #include "ProceduralMeshComponent.h"
+#include "ProceduralMeshConversion.h"
+#include "ProceduralVegetation.h"
+#include "DataTypes/PVMeshData.h"
+#include "Facades/PVFoliageFacade.h"
+#include "GeometryCollection/GeometryCollection.h"
 #include "RaftSimEditorToolRegistry.h"
 #include "RaftSimFeatureTuningEditorShell.h"
 #include "RaftSimRapidRiverEditorShell.h"
 #include "RaftSimReplayDebugViewer.h"
 #include "RaftSimToolValidationActions.h"
 #include "Styling/CoreStyle.h"
+#include "Subsystems/IPCGBaseSubsystem.h"
 #include "ToolMenus.h"
+#include "TextureCompiler.h"
 #include "UObject/SavePackage.h"
 #include "UObject/UnrealType.h"
 #include "RenderingThread.h"
+#include "RenderTimer.h"
+#include "DynamicRHI.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
+#include "Serialization/JsonWriter.h"
 #include "ShaderCompiler.h"
 #include "Widgets/SBoxPanel.h"
 #include "Widgets/Docking/SDockTab.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Input/SCheckBox.h"
+#include "Widgets/Input/SComboBox.h"
+#include "Widgets/Input/SSearchBox.h"
 #include "Widgets/Layout/SBorder.h"
+#include "Widgets/Layout/SBox.h"
 #include "Widgets/Layout/SScrollBox.h"
 #include "Widgets/Layout/SSeparator.h"
 #include "Widgets/Layout/SUniformGridPanel.h"
 #include "Widgets/Text/STextBlock.h"
+#include "Widgets/Views/SListView.h"
 #include "Widgets/SWindow.h"
 
 #define LOCTEXT_NAMESPACE "FRaftSimEditorModule"
@@ -246,18 +278,18 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     FRaftSimLandscapeCandidateWaterSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
-        Settings.BaseColorScale = 0.88f;
-        Settings.EmissiveFillScale = 0.065f;
-        Settings.Roughness = 0.38f;
-        Settings.Specular = 0.38f;
+        Settings.BaseColorScale = 1.20f;
+        Settings.EmissiveFillScale = 0.100f;
+        Settings.Roughness = 0.40f;
+        Settings.Specular = 0.30f;
         Settings.Opacity = 0.55f;
-        Settings.NormalIntensity = 0.45f;
+        Settings.NormalIntensity = 0.40f;
         Settings.PhaseG = 0.05f;
-        Settings.VertexTintWeight = 0.58f;
+        Settings.VertexTintWeight = 0.55f;
         Settings.RenderWidthScale = 1.17f;
         Settings.RenderNormalUpBlend = 0.60f;
         Settings.RenderDisplacementScale = 0.55f;
-        Settings.ReflectionFillIntensity = 0.14f;
+        Settings.ReflectionFillIntensity = 0.10f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -266,8 +298,8 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SolverSpeedVisualGain = 0.0f;
         Settings.SolverFroudeVisualGain = 0.0f;
         Settings.SolverSurfaceReliefScale = 0.0f;
-        Settings.SurfaceTint = FLinearColor(0.105f, 0.090f, 0.055f, 0.0f);
-        Settings.ReflectionTint = FLinearColor(0.46f, 0.58f, 0.67f, 0.0f);
+        Settings.SurfaceTint = FLinearColor(0.220f, 0.240f, 0.150f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.38f, 0.44f, 0.46f, 0.0f);
         Settings.ScatteringCoefficients = FLinearColor(0.0042f, 0.0023f, 0.0007f, 0.0f);
         Settings.AbsorptionCoefficients = FLinearColor(0.0014f, 0.0022f, 0.0040f, 0.0f);
         Settings.ColorScaleBehindWater = FLinearColor(0.84f, 0.76f, 0.62f, 0.0f);
@@ -300,6 +332,48 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.AbsorptionCoefficients = FLinearColor(0.0050f, 0.0012f, 0.0022f, 0.0f);
         Settings.ColorScaleBehindWater = FLinearColor(0.82f, 0.94f, 0.84f, 0.0f);
     }
+    else if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        Settings.BaseColorScale = 1.10f;
+        Settings.EmissiveFillScale = 0.085f;
+        Settings.Roughness = 0.38f;
+        Settings.Specular = 0.34f;
+        Settings.Opacity = 0.52f;
+        Settings.NormalIntensity = 0.58f;
+        Settings.VertexTintWeight = 0.58f;
+        Settings.RenderWidthScale = 1.24f;
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+        Settings.SolverSurfaceReliefScale = 0.0f;
+        Settings.SurfaceTint = FLinearColor(0.13f, 0.16f, 0.065f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.40f, 0.46f, 0.39f, 0.0f);
+    }
+    else if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        Settings.BaseColorScale = 1.08f;
+        Settings.EmissiveFillScale = 0.090f;
+        Settings.Roughness = 0.27f;
+        Settings.Specular = 0.50f;
+        Settings.Opacity = 0.34f;
+        Settings.NormalIntensity = 0.74f;
+        Settings.VertexTintWeight = 0.66f;
+        Settings.RenderWidthScale = 1.30f;
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+        Settings.SolverSurfaceReliefScale = 0.0f;
+        Settings.SurfaceTint = FLinearColor(0.012f, 0.20f, 0.24f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.40f, 0.60f, 0.68f, 0.0f);
+    }
     return Settings;
 }
 
@@ -323,14 +397,14 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
     FRaftSimPhotographicCaptureSettings Settings;
     if (RiverId == TEXT("colorado_river"))
     {
-        Settings.SunIntensity = 6.40f;
-        Settings.SkyLightIntensity = 1.05f;
+        Settings.SunIntensity = 5.40f;
+        Settings.SkyLightIntensity = 2.10f;
         Settings.FogDensity = 0.0016f;
-        Settings.ExposureBias = -0.38f;
-        Settings.Saturation = 1.10f;
-        Settings.Contrast = 1.07f;
+        Settings.ExposureBias = -0.12f;
+        Settings.Saturation = 1.04f;
+        Settings.Contrast = 1.03f;
         Settings.Sharpen = 0.26f;
-        Settings.SunColor = FLinearColor(1.0f, 0.88f, 0.72f);
+        Settings.SunColor = FLinearColor(1.0f, 0.95f, 0.86f);
         Settings.FogColor = FLinearColor(0.64f, 0.57f, 0.47f);
     }
     else if (RiverId == TEXT("pacuare"))
@@ -345,6 +419,26 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
         Settings.Vignette = 0.05f;
         Settings.SunColor = FLinearColor(0.90f, 0.97f, 0.91f);
         Settings.FogColor = FLinearColor(0.43f, 0.57f, 0.46f);
+    }
+    else if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        Settings.SunIntensity = 5.30f;
+        Settings.SkyLightIntensity = 1.65f;
+        Settings.FogDensity = 0.0038f;
+        Settings.ExposureBias = -0.18f;
+        Settings.Saturation = 1.04f;
+        Settings.SunColor = FLinearColor(1.0f, 0.91f, 0.78f);
+        Settings.FogColor = FLinearColor(0.58f, 0.50f, 0.39f);
+    }
+    else if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        Settings.SunIntensity = 4.75f;
+        Settings.SkyLightIntensity = 1.55f;
+        Settings.FogDensity = 0.0055f;
+        Settings.ExposureBias = -0.16f;
+        Settings.Saturation = 1.05f;
+        Settings.SunColor = FLinearColor(0.91f, 0.96f, 1.0f);
+        Settings.FogColor = FLinearColor(0.46f, 0.58f, 0.60f);
     }
     return Settings;
 }
@@ -387,6 +481,24 @@ FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
         Settings.RoughnessStrength = 0.74f;
         Settings.NormalStrength = 0.58f;
     }
+    else if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        Settings.BroadleafFrontTint = FLinearColor(0.92f, 1.02f, 0.48f);
+        Settings.BroadleafBackTint = FLinearColor(0.66f, 0.76f, 0.30f);
+        Settings.BroadleafTransmissionTint = FLinearColor(0.56f, 0.68f, 0.24f);
+        Settings.RoughnessStrength = 0.82f;
+        Settings.NormalStrength = 0.50f;
+    }
+    else if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        Settings.BroadleafFrontTint = FLinearColor(0.66f, 1.10f, 0.56f);
+        Settings.BroadleafBackTint = FLinearColor(0.42f, 0.78f, 0.38f);
+        Settings.BroadleafTransmissionTint = FLinearColor(0.32f, 0.66f, 0.30f);
+        Settings.ConiferFrontTint = FLinearColor(0.54f, 0.92f, 0.48f);
+        Settings.ConiferBackTint = FLinearColor(0.34f, 0.68f, 0.30f);
+        Settings.RoughnessStrength = 0.76f;
+        Settings.NormalStrength = 0.60f;
+    }
     return Settings;
 }
 
@@ -410,6 +522,22 @@ FRaftSimPreviewWaterMaterialResponse GetPreviewWaterMaterialResponse(const FStri
         Response.SpecularLevel = 0.22f;
         Response.MeshNormalUpBlend = 0.12f;
         Response.NormalIntensity = 0.36f;
+    }
+    else if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        Response.EmissiveFillScale = 0.28f;
+        Response.RoughnessScale = 0.22f;
+        Response.RoughnessFloor = 0.34f;
+        Response.SpecularLevel = 0.20f;
+        Response.NormalIntensity = 0.30f;
+    }
+    else if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        Response.EmissiveFillScale = 0.25f;
+        Response.RoughnessScale = 0.16f;
+        Response.RoughnessFloor = 0.26f;
+        Response.SpecularLevel = 0.27f;
+        Response.NormalIntensity = 0.42f;
     }
     return Response;
 }
@@ -772,6 +900,8 @@ struct FRaftSimLandscapeCandidateCenterlinePoint
 {
     float StationMeters = 0.0f;
     FVector2D LocalCm = FVector2D::ZeroVector;
+    float ConditionedVisualSurfaceNormalized = 0.0f;
+    bool bHasConditionedVisualSurface = false;
 };
 
 bool LoadLandscapeCandidateLocalCenterline(
@@ -822,6 +952,15 @@ bool LoadLandscapeCandidateLocalCenterline(
         Point.LocalCm = FVector2D(
             static_cast<float>((*LocalValues)[0]->AsNumber()),
             static_cast<float>((*LocalValues)[1]->AsNumber()));
+        double ConditionedVisualSurfaceNormalized = 0.0;
+        if (PointObject->TryGetNumberField(
+                TEXT("conditioned_visual_surface_normalized"),
+                ConditionedVisualSurfaceNormalized))
+        {
+            Point.ConditionedVisualSurfaceNormalized = static_cast<float>(
+                ConditionedVisualSurfaceNormalized);
+            Point.bHasConditionedVisualSurface = true;
+        }
         OutPoints.Add(Point);
     }
     if (OutPoints.Num() < 2)
@@ -879,6 +1018,41 @@ FVector2D SampleLandscapeCandidateCenterlineWorld(
     return FVector2D(
         LandscapeMinX + Local.X,
         -Candidate.HorizontalSpanYCm * 0.5f + Local.Y);
+}
+
+bool SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    const TArray<FRaftSimLandscapeCandidateCenterlinePoint>& Points,
+    float Progress,
+    float& OutWorldZ)
+{
+    if (Points.Num() < 2)
+    {
+        return false;
+    }
+    const float TargetStation = FMath::Lerp(
+        Points[0].StationMeters,
+        Points.Last().StationMeters,
+        FMath::Clamp(Progress, 0.0f, 1.0f));
+    int32 SegmentIndex = 0;
+    while (SegmentIndex + 1 < Points.Num() - 1 &&
+           Points[SegmentIndex + 1].StationMeters < TargetStation)
+    {
+        ++SegmentIndex;
+    }
+    const FRaftSimLandscapeCandidateCenterlinePoint& A = Points[SegmentIndex];
+    const FRaftSimLandscapeCandidateCenterlinePoint& B = Points[SegmentIndex + 1];
+    if (!A.bHasConditionedVisualSurface || !B.bHasConditionedVisualSurface)
+    {
+        return false;
+    }
+    const float SegmentLength = FMath::Max(0.001f, B.StationMeters - A.StationMeters);
+    const float T = FMath::Clamp((TargetStation - A.StationMeters) / SegmentLength, 0.0f, 1.0f);
+    OutWorldZ = FMath::Lerp(
+        A.ConditionedVisualSurfaceNormalized,
+        B.ConditionedVisualSurfaceNormalized,
+        T) * Candidate.TargetReliefCm;
+    return true;
 }
 
 TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
@@ -1025,6 +1199,105 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Pacuare.bHasWaterfalls = true;
     Specs.Add(Pacuare);
 
+    FRaftSimEnvironmentPreviewSpec Zambezi;
+    Zambezi.RiverId = TEXT("zambezi_batoka_gorge");
+    Zambezi.DisplayName = TEXT("Zambezi River Batoka Gorge");
+    Zambezi.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_ZambeziBatokaGorge_PhotorealPreview");
+    Zambezi.SourceManifest =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/manifest.json");
+    Zambezi.AerialDrapeImage =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/source_albedo_2048.png");
+    Zambezi.TerrainReliefImage =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/dem_relief_2048.png");
+    Zambezi.HeightfieldPreviewImage =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/heightfield_2017.png");
+    Zambezi.WaterMaskImage =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/water_mask_2048.png");
+    Zambezi.VegetationMaskImage =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/vegetation_mask_2048.png");
+    Zambezi.ElevationSample =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/terrain/source/copernicus_dem_glo30_S18_E025.tif");
+    Zambezi.SourceDrapeDescription =
+        TEXT("Route-clipped 10 m Copernicus Sentinel-2 visual mosaic and 30 m Copernicus DEM GLO-30 terrain for the published 30 km Boiling Pot-to-Mukuni Beach Batoka Gorge corridor; source geometry and exact bank access remain guide/geospatial review-gated, while first-party basalt, gorge woodland, foam, spray, mist, and water materials remain technical candidates until lifelike approval.");
+    Zambezi.FlowBandId = TEXT("normal_big_water");
+    Zambezi.FlowBandDisplayName = TEXT("Normal Big Water Planning");
+    Zambezi.FlowBandSource =
+        TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrology/seasonal_flow_context.json");
+    Zambezi.FlowVisualDescription =
+        TEXT("Victoria Falls Nana's Farm planning context drives a bounded normal-big-water visual candidate; rapid-specific hole washout, closure seasons, and station lag require local guide review.");
+    Zambezi.FlowWidthScale = 1.20f;
+    Zambezi.FlowFoamScale = 1.35f;
+    Zambezi.FlowWetBankScale = 1.18f;
+    Zambezi.FlowCurrentCueScale = 1.35f;
+    Zambezi.FlowWaterLevelOffsetCm = 12.0f;
+    Zambezi.WaterColor = FLinearColor(0.20f, 0.23f, 0.105f);
+    Zambezi.TerrainColor = FLinearColor(0.30f, 0.22f, 0.15f);
+    Zambezi.RockColor = FLinearColor(0.18f, 0.17f, 0.15f);
+    Zambezi.FoliageColor = FLinearColor(0.19f, 0.25f, 0.10f);
+    Zambezi.CanyonHeightCm = 3000.0f;
+    Zambezi.RiverHalfWidthCm = 6000.0f;
+    Zambezi.BankWidthCm = 22000.0f;
+    Zambezi.BendAmplitudeCm = 600.0f;
+    Zambezi.TerrainReliefAmplitudeCm = 1600.0f;
+    Zambezi.HeightfieldPreviewAmplitudeCm = 37353.0f;
+    Zambezi.HeightfieldLocalReliefAmplitudeCm = 16000.0f;
+    Zambezi.HeightfieldSeamFeatherUv = 0.025f;
+    Zambezi.TerrainNormalSofteningBlend = 0.32f;
+    Zambezi.BoulderCount = 120;
+    Zambezi.FoliageCount = 220;
+    Zambezi.FoamTrainCount = 36;
+    Zambezi.bDesertCanyon = true;
+    Specs.Add(Zambezi);
+
+    FRaftSimEnvironmentPreviewSpec Futaleufu;
+    Futaleufu.RiverId = TEXT("futaleufu_terminator");
+    Futaleufu.DisplayName = TEXT("Futaleufu Terminator Section");
+    Futaleufu.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_FutaleufuTerminator_PhotorealPreview");
+    Futaleufu.SourceManifest =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json");
+    Futaleufu.AerialDrapeImage =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/source_albedo_2048.png");
+    Futaleufu.TerrainReliefImage =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/dem_relief_2048.png");
+    Futaleufu.HeightfieldPreviewImage =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png");
+    Futaleufu.WaterMaskImage =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/water_mask_2048.png");
+    Futaleufu.VegetationMaskImage =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/vegetation_mask_2048.png");
+    Futaleufu.ElevationSample =
+        TEXT("physics/data/real_world/futaleufu_river_chile/terrain/source/copernicus_dem_glo30_S44_W073.tif");
+    Futaleufu.SourceDrapeDescription =
+        TEXT("Route-clipped near-cloud-free 10 m Copernicus Sentinel-2 visual mosaic and 30 m Copernicus DEM GLO-30 terrain from the Rio Azul track bridge through the confluence to the downstream Pasarela bridge; exact access and line stations remain guide/geospatial review-gated, while first-party granite, temperate rainforest, turquoise water, foam, and spray materials remain technical candidates until lifelike approval.");
+    Futaleufu.FlowBandId = TEXT("normal_runnable");
+    Futaleufu.FlowBandDisplayName = TEXT("Normal Runnable Planning");
+    Futaleufu.FlowBandSource =
+        TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json");
+    Futaleufu.FlowVisualDescription =
+        TEXT("DGA monthly flow context drives a bounded normal-runnable visual candidate; time-series acquisition, upstream translation, snowmelt/rain interpretation, and guide validation remain required.");
+    Futaleufu.FlowWidthScale = 1.12f;
+    Futaleufu.FlowFoamScale = 1.32f;
+    Futaleufu.FlowWetBankScale = 1.22f;
+    Futaleufu.FlowCurrentCueScale = 1.38f;
+    Futaleufu.FlowWaterLevelOffsetCm = 10.0f;
+    Futaleufu.WaterColor = FLinearColor(0.025f, 0.31f, 0.34f);
+    Futaleufu.TerrainColor = FLinearColor(0.16f, 0.23f, 0.16f);
+    Futaleufu.RockColor = FLinearColor(0.37f, 0.39f, 0.38f);
+    Futaleufu.FoliageColor = FLinearColor(0.055f, 0.25f, 0.105f);
+    Futaleufu.CanyonHeightCm = 4200.0f;
+    Futaleufu.RiverHalfWidthCm = 4800.0f;
+    Futaleufu.BankWidthCm = 18000.0f;
+    Futaleufu.BendAmplitudeCm = 650.0f;
+    Futaleufu.TerrainReliefAmplitudeCm = 2200.0f;
+    Futaleufu.HeightfieldPreviewAmplitudeCm = 167895.0f;
+    Futaleufu.HeightfieldLocalReliefAmplitudeCm = 24000.0f;
+    Futaleufu.HeightfieldSeamFeatherUv = 0.025f;
+    Futaleufu.TerrainNormalSofteningBlend = 0.28f;
+    Futaleufu.BoulderCount = 160;
+    Futaleufu.FoliageCount = 520;
+    Futaleufu.FoamTrainCount = 32;
+    Specs.Add(Futaleufu);
+
     return Specs;
 }
 
@@ -1058,19 +1331,31 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.bUseSolverVisualizationFields = false;
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bEnableLandscapeNanite = false;
-            Candidate.PreviewSpec.RiverHalfWidthCm = 1400.0f;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 1100.0f;
             Candidate.PreviewSpec.BankWidthCm = 5200.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("colorado_river"))
         {
             Candidate.HeightfieldRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png");
             Candidate.HeightfieldManifestRelativePath =
-                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_manifest.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
             Candidate.ImportContractRelativePath =
-                TEXT("unreal/Content/RaftSim/River/colorado_heightfield_import_test.json");
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json");
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/centerline_local.json");
             Candidate.MapPackagePath =
-                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_SourceLandscapeCandidate");
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ColoradoGrandCanyon_PhysicalCorridorCandidate");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 296889.772f;
+            Candidate.HorizontalSpanYCm = 203765.214f;
+            Candidate.TargetReliefCm = 49316.565f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bEnableLandscapeNanite = false;
+            Candidate.PreviewSpec.RiverHalfWidthCm = 6000.0f;
+            Candidate.PreviewSpec.BankWidthCm = 24000.0f;
         }
         else if (PreviewSpec.RiverId == TEXT("pacuare"))
         {
@@ -1082,6 +1367,44 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
                 TEXT("unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_Pacuare_SourceLandscapeCandidate");
+        }
+        else if (PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/heightfield_2017.png");
+            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
+            Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/centerline_local.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 2025477.591f;
+            Candidate.HorizontalSpanYCm = 1252708.111f;
+            Candidate.TargetReliefCm = 37353.015f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bEnableLandscapeNanite = false;
+        }
+        else if (PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png");
+            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
+            Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate");
+            Candidate.LandscapeSize = 2017;
+            Candidate.HorizontalSpanXCm = 1006390.921f;
+            Candidate.HorizontalSpanYCm = 836476.459f;
+            Candidate.TargetReliefCm = 167894.690f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bEnableLandscapeNanite = false;
         }
         else
         {
@@ -1126,6 +1449,32 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.RiverbedRoughness = 0.72f;
         Settings.RiverbedColorScale = FLinearColor(0.22f, 0.30f, 0.24f, 0.0f);
         Settings.WetBankColorScale = FLinearColor(0.42f, 0.50f, 0.40f, 0.0f);
+    }
+    else if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        Settings.DetailMappingScale = 152.0f;
+        Settings.DetailAlbedoWeight = 0.14f;
+        Settings.DetailNormalWeight = 0.30f;
+        Settings.EmissiveFillScale = 0.040f;
+        Settings.SpecularLevel = 0.13f;
+        Settings.RiverbedBlendWeight = 0.74f;
+        Settings.WetBankBlendWeight = 0.62f;
+        Settings.RiverbedRoughness = 0.86f;
+        Settings.RiverbedColorScale = FLinearColor(0.20f, 0.20f, 0.16f, 0.0f);
+        Settings.WetBankColorScale = FLinearColor(0.36f, 0.38f, 0.30f, 0.0f);
+    }
+    else if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        Settings.DetailMappingScale = 116.0f;
+        Settings.DetailAlbedoWeight = 0.18f;
+        Settings.DetailNormalWeight = 0.38f;
+        Settings.DetailSurfaceResponseWeight = 0.34f;
+        Settings.EmissiveFillScale = 0.050f;
+        Settings.RiverbedBlendWeight = 0.86f;
+        Settings.WetBankBlendWeight = 0.74f;
+        Settings.RiverbedRoughness = 0.74f;
+        Settings.RiverbedColorScale = FLinearColor(0.28f, 0.34f, 0.32f, 0.0f);
+        Settings.WetBankColorScale = FLinearColor(0.44f, 0.52f, 0.48f, 0.0f);
     }
     return Settings;
 }
@@ -1414,7 +1763,16 @@ UMaterialInterface* LoadOrCreatePreviewColorMaterial()
                 ++ConstantIndex;
             }
         }
+        if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
+        {
+            return nullptr;
+        }
         Material->PostEditChange();
+        FAssetCompilingManager::Get().FinishAllCompilation();
+        if (GShaderCompilingManager)
+        {
+            GShaderCompilingManager->FinishAllCompilation();
+        }
         if (UPackage* Package = Material->GetOutermost())
         {
             Package->MarkPackageDirty();
@@ -1448,6 +1806,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     {
         RiverAssetName = TEXT("Pacuare");
     }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        RiverAssetName = TEXT("Zambezi");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        RiverAssetName = TEXT("Futaleufu");
+    }
     if (RiverAssetName.IsEmpty())
     {
         OutSummary += FString::Printf(
@@ -1456,11 +1822,11 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
         return nullptr;
     }
 
-    auto LoadCandidateTexture = [&RiverAssetName](const TCHAR* AssetRoot, const TCHAR* MapSuffix)
+    auto LoadCandidateTextureForAsset = [](const FString& AssetToken, const TCHAR* AssetRoot, const TCHAR* MapSuffix)
     {
         const FString AssetName = FString::Printf(
             TEXT("T_RaftSim_%s_%s"),
-            *RiverAssetName,
+            *AssetToken,
             MapSuffix);
         const FString ObjectPath = FString::Printf(
             TEXT("%s/%s.%s"),
@@ -1468,6 +1834,12 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
             *AssetName,
             *AssetName);
         return LoadObject<UTexture2D>(nullptr, *ObjectPath);
+    };
+    auto LoadCandidateTexture = [&LoadCandidateTextureForAsset, &RiverAssetName](
+        const TCHAR* AssetRoot,
+        const TCHAR* MapSuffix)
+    {
+        return LoadCandidateTextureForAsset(RiverAssetName, AssetRoot, MapSuffix);
     };
 
     UTexture2D* SourceMacroAlbedo = LoadCandidateTexture(
@@ -1482,13 +1854,25 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     UTexture2D* SourceMaterialZones = LoadCandidateTexture(
         TEXT("/Game/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures"),
         TEXT("SourceConditionedMaterialZones"));
-    UTexture2D* TerrainDetailAlbedo = LoadCandidateTexture(
+    FString DetailAssetName = RiverAssetName;
+    if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        DetailAssetName = TEXT("ColoradoRiver");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        DetailAssetName = TEXT("Pacuare");
+    }
+    UTexture2D* TerrainDetailAlbedo = LoadCandidateTextureForAsset(
+        DetailAssetName,
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailAlbedo"));
-    UTexture2D* TerrainDetailPackedSurface = LoadCandidateTexture(
+    UTexture2D* TerrainDetailPackedSurface = LoadCandidateTextureForAsset(
+        DetailAssetName,
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailAORoughnessHeight"));
-    UTexture2D* TerrainDetailNormal = LoadCandidateTexture(
+    UTexture2D* TerrainDetailNormal = LoadCandidateTextureForAsset(
+        DetailAssetName,
         TEXT("/Game/RaftSim/Rendering/ProductionDetailTextures/Textures"),
         TEXT("TerrainDetailNormal"));
     if (Candidate.bPhysicalScaleSourceCorridor)
@@ -1520,12 +1904,15 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     if (Candidate.bPhysicalScaleSourceCorridor)
     {
         Settings.MacroMappingScale = static_cast<float>(Candidate.LandscapeSize - 1);
-        Settings.DetailMappingScale = 96.0f;
-        Settings.DetailAlbedoWeight = 0.10f;
-        Settings.DetailNormalWeight = 0.22f;
-        Settings.DetailSurfaceResponseWeight = 0.18f;
-        Settings.RiverbedBlendWeight = 0.18f;
-        Settings.WetBankBlendWeight = 0.24f;
+        if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+        {
+            Settings.DetailMappingScale = 96.0f;
+            Settings.DetailAlbedoWeight = 0.10f;
+            Settings.DetailNormalWeight = 0.22f;
+            Settings.DetailSurfaceResponseWeight = 0.18f;
+            Settings.RiverbedBlendWeight = 0.18f;
+            Settings.WetBankBlendWeight = 0.24f;
+        }
     }
     FString AssetToken = Candidate.PreviewSpec.RiverId;
     AssetToken.ReplaceInline(TEXT("_"), TEXT(""));
@@ -1740,6 +2127,52 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     ConditionedBaseColor->Alpha.Expression = RiverbedBlendMask;
     Material->GetExpressionCollection().AddExpression(ConditionedBaseColor);
 
+    UMaterialExpression* FinalBaseColor = ConditionedBaseColor;
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        UMaterialExpressionVertexNormalWS* VertexNormalWs =
+            NewObject<UMaterialExpressionVertexNormalWS>(Material);
+        Material->GetExpressionCollection().AddExpression(VertexNormalWs);
+        UMaterialExpressionComponentMask* VertexNormalZ =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        VertexNormalZ->Input.Expression = VertexNormalWs;
+        VertexNormalZ->B = true;
+        Material->GetExpressionCollection().AddExpression(VertexNormalZ);
+        UMaterialExpressionOneMinus* RawSlope = NewObject<UMaterialExpressionOneMinus>(Material);
+        RawSlope->Input.Expression = VertexNormalZ;
+        Material->GetExpressionCollection().AddExpression(RawSlope);
+        UMaterialExpressionConstant* RockSlopeStart = NewObject<UMaterialExpressionConstant>(Material);
+        RockSlopeStart->R = 0.22f;
+        Material->GetExpressionCollection().AddExpression(RockSlopeStart);
+        UMaterialExpressionSubtract* RockSlopeAboveThreshold =
+            NewObject<UMaterialExpressionSubtract>(Material);
+        RockSlopeAboveThreshold->A.Expression = RawSlope;
+        RockSlopeAboveThreshold->B.Expression = RockSlopeStart;
+        Material->GetExpressionCollection().AddExpression(RockSlopeAboveThreshold);
+        UMaterialExpressionConstant* RockSlopeGain = NewObject<UMaterialExpressionConstant>(Material);
+        RockSlopeGain->R = 2.6f;
+        Material->GetExpressionCollection().AddExpression(RockSlopeGain);
+        UMaterialExpressionMultiply* AmplifiedRockSlope =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        AmplifiedRockSlope->A.Expression = RockSlopeAboveThreshold;
+        AmplifiedRockSlope->B.Expression = RockSlopeGain;
+        Material->GetExpressionCollection().AddExpression(AmplifiedRockSlope);
+        UMaterialExpressionSaturate* RockSlopeMask = NewObject<UMaterialExpressionSaturate>(Material);
+        RockSlopeMask->Input.Expression = AmplifiedRockSlope;
+        Material->GetExpressionCollection().AddExpression(RockSlopeMask);
+        UMaterialExpressionConstant3Vector* RockColor =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        RockColor->Constant = FLinearColor(0.30f, 0.29f, 0.25f);
+        Material->GetExpressionCollection().AddExpression(RockColor);
+        UMaterialExpressionLinearInterpolate* SlopeConditionedBaseColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        SlopeConditionedBaseColor->A.Expression = ConditionedBaseColor;
+        SlopeConditionedBaseColor->B.Expression = RockColor;
+        SlopeConditionedBaseColor->Alpha.Expression = RockSlopeMask;
+        Material->GetExpressionCollection().AddExpression(SlopeConditionedBaseColor);
+        FinalBaseColor = SlopeConditionedBaseColor;
+    }
+
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
     DetailNormalWeight->R = Settings.DetailNormalWeight;
     Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
@@ -1799,7 +2232,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Material->GetExpressionCollection().AddExpression(EmissiveScale);
 
     UMaterialExpressionMultiply* EmissiveColor = NewObject<UMaterialExpressionMultiply>(Material);
-    EmissiveColor->A.Expression = ConditionedBaseColor;
+    EmissiveColor->A.Expression = FinalBaseColor;
     EmissiveColor->B.Expression = EmissiveScale;
     Material->GetExpressionCollection().AddExpression(EmissiveColor);
 
@@ -1808,14 +2241,19 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     Material->GetExpressionCollection().AddExpression(Specular);
 
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ConditionedBaseColor);
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, FinalBaseColor);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
     ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, Normal);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, ConditionedRoughness);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
 
-    Material->SetMaterialUsage(MATUSAGE_Nanite);
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (Candidate.bEnableLandscapeNanite)
+    {
+        Material->SetMaterialUsage(MATUSAGE_Nanite);
+    }
     Material->SetMaterialUsage(MATUSAGE_StaticLighting);
     Material->PostEditChange();
     Package->MarkPackageDirty();
@@ -2050,6 +2488,392 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
         bTerrainMaterialConfigured = true;
     }
 
+    return Material;
+}
+
+UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
+    const FRaftSimLandscapeImportCandidateSpec& Candidate)
+{
+    const bool bColorado = Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bRockCanyon = bColorado || bZambezi;
+    FString RiverAssetName = TEXT("AmericanSouthFork");
+    if (bColorado)
+    {
+        RiverAssetName = TEXT("ColoradoRiver");
+    }
+    else if (bZambezi)
+    {
+        RiverAssetName = TEXT("Zambezi");
+    }
+    else if (bFutaleufu)
+    {
+        RiverAssetName = TEXT("Futaleufu");
+    }
+    const FString MaterialAssetName = FString::Printf(
+        TEXT("M_RaftSim_%s_PhysicalSourceTerrainRender"),
+        *RiverAssetName);
+    const FString MaterialPackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
+        *MaterialAssetName);
+    const FString MaterialObjectPath = FString::Printf(
+        TEXT("%s.%s"),
+        *MaterialPackagePath,
+        *MaterialAssetName);
+    UMaterial* Material = Cast<UMaterial>(
+        StaticLoadObject(UMaterial::StaticClass(), nullptr, *MaterialObjectPath));
+
+    const FString SourceTextureRoot =
+        TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures");
+    const FString SourceTexturePrefix = FString::Printf(
+        TEXT("T_RaftSim_%s_PhysicalCorridor"),
+        *RiverAssetName);
+    auto LoadSourceTexture = [&SourceTextureRoot, &SourceTexturePrefix](const FString& Token)
+    {
+        const FString AssetName = SourceTexturePrefix + Token;
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s/%s.%s"),
+            *SourceTextureRoot,
+            *AssetName,
+            *AssetName);
+        return LoadObject<UTexture2D>(nullptr, *ObjectPath);
+    };
+    UTexture2D* SourceAlbedo = LoadSourceTexture(TEXT("SourceAlbedo"));
+    UTexture2D* SourceNormal = LoadSourceTexture(TEXT("Normal"));
+    UTexture2D* SourcePacked = LoadSourceTexture(TEXT("AORoughnessHeight"));
+    UTexture2D* ForestFloorAlbedo = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
+             "T_ForestGround03_BaseColor_4K.T_ForestGround03_BaseColor_4K"));
+    UTexture2D* ForestFloorNormal = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
+             "T_ForestGround03_NormalGL_4K.T_ForestGround03_NormalGL_4K"));
+    UTexture2D* ForestFloorRoughness = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/"
+             "T_ForestGround03_Roughness_4K.T_ForestGround03_Roughness_4K"));
+    UTexture2D* RockGroundAlbedo = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
+             "T_RockGround_BaseColor_4K.T_RockGround_BaseColor_4K"));
+    UTexture2D* RockGroundNormal = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
+             "T_RockGround_NormalGL_4K.T_RockGround_NormalGL_4K"));
+    UTexture2D* RockGroundRoughness = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
+             "T_RockGround_Roughness_4K.T_RockGround_Roughness_4K"));
+    if (bColorado || bZambezi)
+    {
+        ForestFloorAlbedo = RockGroundAlbedo;
+        ForestFloorNormal = RockGroundNormal;
+        ForestFloorRoughness = RockGroundRoughness;
+    }
+    if (!SourceAlbedo || !SourceNormal || !SourcePacked || !ForestFloorAlbedo ||
+        !ForestFloorNormal || !ForestFloorRoughness || !RockGroundAlbedo ||
+        !RockGroundNormal || !RockGroundRoughness)
+    {
+        return nullptr;
+    }
+
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*MaterialPackagePath);
+    if (!Package)
+    {
+        return nullptr;
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            *MaterialAssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (!Material)
+        {
+            return nullptr;
+        }
+        FAssetRegistryModule::AssetCreated(Material);
+    }
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = true;
+
+    UMaterialExpressionTextureCoordinate* Coordinates =
+        NewObject<UMaterialExpressionTextureCoordinate>(Material);
+    Material->GetExpressionCollection().AddExpression(Coordinates);
+    const float DetailTileSizeCm = bZambezi ? 1800.0f : (bFutaleufu ? 1400.0f : 200.0f);
+    const float RockTileSizeCm = bZambezi ? 1200.0f : (bFutaleufu ? 900.0f : 150.0f);
+    UMaterialExpressionTextureCoordinate* DetailCoordinates =
+        NewObject<UMaterialExpressionTextureCoordinate>(Material);
+    DetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / DetailTileSizeCm;
+    DetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / DetailTileSizeCm;
+    Material->GetExpressionCollection().AddExpression(DetailCoordinates);
+    UMaterialExpressionTextureCoordinate* RockCoordinates =
+        NewObject<UMaterialExpressionTextureCoordinate>(Material);
+    RockCoordinates->UTiling = Candidate.HorizontalSpanXCm / RockTileSizeCm;
+    RockCoordinates->VTiling = Candidate.HorizontalSpanYCm / RockTileSizeCm;
+    Material->GetExpressionCollection().AddExpression(RockCoordinates);
+
+    auto AddTextureSample = [Material](
+                                const TCHAR* ParameterName,
+                                UTexture2D* Texture,
+                                EMaterialSamplerType SamplerType,
+                                UMaterialExpressionTextureCoordinate* TextureCoordinates)
+    {
+        UMaterialExpressionTextureSampleParameter2D* Sample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        Sample->ParameterName = ParameterName;
+        Sample->Texture = Texture;
+        Sample->SamplerType = SamplerType;
+        Sample->Coordinates.Expression = TextureCoordinates;
+        Sample->Group = TEXT("RaftSimPhysicalSourceTerrain");
+        Material->GetExpressionCollection().AddExpression(Sample);
+        return Sample;
+    };
+    UMaterialExpressionTextureSampleParameter2D* AlbedoSample = AddTextureSample(
+        TEXT("PhysicalSourceAlbedo"),
+        SourceAlbedo,
+        SAMPLERTYPE_Color,
+        Coordinates);
+    UMaterialExpressionTextureSampleParameter2D* NormalSample = AddTextureSample(
+        TEXT("PhysicalSourceNormal"),
+        SourceNormal,
+        SAMPLERTYPE_Normal,
+        Coordinates);
+    UMaterialExpressionTextureSampleParameter2D* PackedSample = AddTextureSample(
+        TEXT("PhysicalSourceAORoughnessHeight"),
+        SourcePacked,
+        SAMPLERTYPE_Masks,
+        Coordinates);
+    UMaterialExpressionTextureSampleParameter2D* ForestFloorAlbedoSample = AddTextureSample(
+        TEXT("ForestFloorDetailAlbedo"),
+        ForestFloorAlbedo,
+        SAMPLERTYPE_Color,
+        DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* ForestFloorNormalSample = AddTextureSample(
+        TEXT("ForestFloorDetailNormal"),
+        ForestFloorNormal,
+        SAMPLERTYPE_Normal,
+        DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* ForestFloorRoughnessSample = AddTextureSample(
+        TEXT("ForestFloorDetailRoughness"),
+        ForestFloorRoughness,
+        SAMPLERTYPE_Masks,
+        DetailCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* RockGroundAlbedoSample = AddTextureSample(
+        TEXT("RockGroundDetailAlbedo"),
+        RockGroundAlbedo,
+        SAMPLERTYPE_Color,
+        RockCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* RockGroundNormalSample = AddTextureSample(
+        TEXT("RockGroundDetailNormal"),
+        RockGroundNormal,
+        SAMPLERTYPE_Normal,
+        RockCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* RockGroundRoughnessSample = AddTextureSample(
+        TEXT("RockGroundDetailRoughness"),
+        RockGroundRoughness,
+        SAMPLERTYPE_Masks,
+        RockCoordinates);
+
+    UMaterialExpressionVertexNormalWS* VertexNormalWs =
+        NewObject<UMaterialExpressionVertexNormalWS>(Material);
+    Material->GetExpressionCollection().AddExpression(VertexNormalWs);
+    UMaterialExpressionComponentMask* VertexNormalZ =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    VertexNormalZ->Input.Expression = VertexNormalWs;
+    VertexNormalZ->B = true;
+    Material->GetExpressionCollection().AddExpression(VertexNormalZ);
+    UMaterialExpressionOneMinus* RawSlope = NewObject<UMaterialExpressionOneMinus>(Material);
+    RawSlope->Input.Expression = VertexNormalZ;
+    Material->GetExpressionCollection().AddExpression(RawSlope);
+    UMaterialExpressionConstant* RockSlopeStart = NewObject<UMaterialExpressionConstant>(Material);
+    RockSlopeStart->R = bRockCanyon ? 0.10f : 0.16f;
+    Material->GetExpressionCollection().AddExpression(RockSlopeStart);
+    UMaterialExpressionSubtract* RockSlopeAboveThreshold =
+        NewObject<UMaterialExpressionSubtract>(Material);
+    RockSlopeAboveThreshold->A.Expression = RawSlope;
+    RockSlopeAboveThreshold->B.Expression = RockSlopeStart;
+    Material->GetExpressionCollection().AddExpression(RockSlopeAboveThreshold);
+    UMaterialExpressionConstant* RockSlopeGain = NewObject<UMaterialExpressionConstant>(Material);
+    RockSlopeGain->R = 3.3f;
+    Material->GetExpressionCollection().AddExpression(RockSlopeGain);
+    UMaterialExpressionMultiply* AmplifiedRockSlope = NewObject<UMaterialExpressionMultiply>(Material);
+    AmplifiedRockSlope->A.Expression = RockSlopeAboveThreshold;
+    AmplifiedRockSlope->B.Expression = RockSlopeGain;
+    Material->GetExpressionCollection().AddExpression(AmplifiedRockSlope);
+    UMaterialExpressionSaturate* RockSlopeMask = NewObject<UMaterialExpressionSaturate>(Material);
+    RockSlopeMask->Input.Expression = AmplifiedRockSlope;
+    Material->GetExpressionCollection().AddExpression(RockSlopeMask);
+
+    UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
+    Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpressionConstant* VertexColorWeight = NewObject<UMaterialExpressionConstant>(Material);
+    VertexColorWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.12f : (bRockCanyon ? 1.0f : 0.68f));
+    Material->GetExpressionCollection().AddExpression(VertexColorWeight);
+    UMaterialExpressionLinearInterpolate* BaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    BaseColor->A.Expression = AlbedoSample;
+    BaseColor->B.Expression = VertexColor;
+    BaseColor->Alpha.Expression = VertexColorWeight;
+    Material->GetExpressionCollection().AddExpression(BaseColor);
+    UMaterialExpressionConstant* DetailAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
+    DetailAlbedoWeight->R = bZambezi ? 0.16f : (bFutaleufu ? 0.18f : (bRockCanyon ? 0.08f : 0.24f));
+    Material->GetExpressionCollection().AddExpression(DetailAlbedoWeight);
+    UMaterialExpressionLinearInterpolate* ForestDetailedBaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ForestDetailedBaseColor->A.Expression = BaseColor;
+    ForestDetailedBaseColor->B.Expression = ForestFloorAlbedoSample;
+    ForestDetailedBaseColor->Alpha.Expression = DetailAlbedoWeight;
+    Material->GetExpressionCollection().AddExpression(ForestDetailedBaseColor);
+    UMaterialExpressionConstant* RockAlbedoWeight = NewObject<UMaterialExpressionConstant>(Material);
+    RockAlbedoWeight->R = bZambezi ? 0.20f : (bFutaleufu ? 0.24f : (bRockCanyon ? 0.12f : 0.30f));
+    Material->GetExpressionCollection().AddExpression(RockAlbedoWeight);
+    UMaterialExpressionLinearInterpolate* RockDetailedBaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    RockDetailedBaseColor->A.Expression = BaseColor;
+    RockDetailedBaseColor->B.Expression = RockGroundAlbedoSample;
+    RockDetailedBaseColor->Alpha.Expression = RockAlbedoWeight;
+    Material->GetExpressionCollection().AddExpression(RockDetailedBaseColor);
+    UMaterialExpressionLinearInterpolate* DetailedBaseColor =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    DetailedBaseColor->A.Expression = ForestDetailedBaseColor;
+    DetailedBaseColor->B.Expression = RockDetailedBaseColor;
+    DetailedBaseColor->Alpha.Expression = RockSlopeMask;
+    Material->GetExpressionCollection().AddExpression(DetailedBaseColor);
+
+    UMaterialExpressionComponentMask* AmbientOcclusion =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    AmbientOcclusion->Input.Expression = PackedSample;
+    AmbientOcclusion->R = true;
+    Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
+    UMaterialExpressionComponentMask* Roughness =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    Roughness->Input.Expression = PackedSample;
+    Roughness->G = true;
+    Material->GetExpressionCollection().AddExpression(Roughness);
+    UMaterialExpressionComponentMask* ForestFloorRoughnessMask =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    ForestFloorRoughnessMask->Input.Expression = ForestFloorRoughnessSample;
+    ForestFloorRoughnessMask->R = true;
+    Material->GetExpressionCollection().AddExpression(ForestFloorRoughnessMask);
+    UMaterialExpressionComponentMask* RockGroundRoughnessMask =
+        NewObject<UMaterialExpressionComponentMask>(Material);
+    RockGroundRoughnessMask->Input.Expression = RockGroundRoughnessSample;
+    RockGroundRoughnessMask->R = true;
+    Material->GetExpressionCollection().AddExpression(RockGroundRoughnessMask);
+    UMaterialExpressionConstant* DetailRoughnessWeight = NewObject<UMaterialExpressionConstant>(Material);
+    DetailRoughnessWeight->R = 0.38f;
+    Material->GetExpressionCollection().AddExpression(DetailRoughnessWeight);
+    UMaterialExpressionLinearInterpolate* ForestDetailedRoughness =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ForestDetailedRoughness->A.Expression = Roughness;
+    ForestDetailedRoughness->B.Expression = ForestFloorRoughnessMask;
+    ForestDetailedRoughness->Alpha.Expression = DetailRoughnessWeight;
+    Material->GetExpressionCollection().AddExpression(ForestDetailedRoughness);
+    UMaterialExpressionConstant* RockRoughnessWeight = NewObject<UMaterialExpressionConstant>(Material);
+    RockRoughnessWeight->R = 0.44f;
+    Material->GetExpressionCollection().AddExpression(RockRoughnessWeight);
+    UMaterialExpressionLinearInterpolate* RockDetailedRoughness =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    RockDetailedRoughness->A.Expression = Roughness;
+    RockDetailedRoughness->B.Expression = RockGroundRoughnessMask;
+    RockDetailedRoughness->Alpha.Expression = RockRoughnessWeight;
+    Material->GetExpressionCollection().AddExpression(RockDetailedRoughness);
+    UMaterialExpressionLinearInterpolate* DetailedRoughness =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    DetailedRoughness->A.Expression = ForestDetailedRoughness;
+    DetailedRoughness->B.Expression = RockDetailedRoughness;
+    DetailedRoughness->Alpha.Expression = RockSlopeMask;
+    Material->GetExpressionCollection().AddExpression(DetailedRoughness);
+
+    UMaterialExpressionConstant3Vector* FlatNormal =
+        NewObject<UMaterialExpressionConstant3Vector>(Material);
+    FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
+    Material->GetExpressionCollection().AddExpression(FlatNormal);
+    UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
+    DetailNormalWeight->R = bZambezi ? 0.30f : (bFutaleufu ? 0.34f : 0.34f);
+    Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
+    UMaterialExpressionLinearInterpolate* ForestDetailedNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ForestDetailedNormal->A.Expression = FlatNormal;
+    ForestDetailedNormal->B.Expression = ForestFloorNormalSample;
+    ForestDetailedNormal->Alpha.Expression = DetailNormalWeight;
+    Material->GetExpressionCollection().AddExpression(ForestDetailedNormal);
+    UMaterialExpressionConstant* RockNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
+    RockNormalWeight->R = bZambezi ? 0.38f : (bFutaleufu ? 0.42f : 0.42f);
+    Material->GetExpressionCollection().AddExpression(RockNormalWeight);
+    UMaterialExpressionLinearInterpolate* RockDetailedNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    RockDetailedNormal->A.Expression = FlatNormal;
+    RockDetailedNormal->B.Expression = RockGroundNormalSample;
+    RockDetailedNormal->Alpha.Expression = RockNormalWeight;
+    Material->GetExpressionCollection().AddExpression(RockDetailedNormal);
+    UMaterialExpressionLinearInterpolate* DetailedNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    DetailedNormal->A.Expression = ForestDetailedNormal;
+    DetailedNormal->B.Expression = RockDetailedNormal;
+    DetailedNormal->Alpha.Expression = RockSlopeMask;
+    Material->GetExpressionCollection().AddExpression(DetailedNormal);
+    UMaterialExpressionConstant* SourceNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
+    SourceNormalWeight->R = 0.0f;
+    Material->GetExpressionCollection().AddExpression(SourceNormalWeight);
+    UMaterialExpressionLinearInterpolate* ValidatedNormal =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ValidatedNormal->A.Expression = DetailedNormal;
+    ValidatedNormal->B.Expression = NormalSample;
+    ValidatedNormal->Alpha.Expression = SourceNormalWeight;
+    Material->GetExpressionCollection().AddExpression(ValidatedNormal);
+
+    UMaterialExpressionConstant* FullAmbientOcclusion = NewObject<UMaterialExpressionConstant>(Material);
+    FullAmbientOcclusion->R = 1.0f;
+    Material->GetExpressionCollection().AddExpression(FullAmbientOcclusion);
+    UMaterialExpressionConstant* SourceAoWeight = NewObject<UMaterialExpressionConstant>(Material);
+    SourceAoWeight->R = (bZambezi || bFutaleufu) ? 0.18f : 0.0f;
+    Material->GetExpressionCollection().AddExpression(SourceAoWeight);
+    UMaterialExpressionLinearInterpolate* ValidatedAmbientOcclusion =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    ValidatedAmbientOcclusion->A.Expression = FullAmbientOcclusion;
+    ValidatedAmbientOcclusion->B.Expression = AmbientOcclusion;
+    ValidatedAmbientOcclusion->Alpha.Expression = SourceAoWeight;
+    Material->GetExpressionCollection().AddExpression(ValidatedAmbientOcclusion);
+
+    UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
+    Specular->R = bRockCanyon ? 0.10f : 0.16f;
+    Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpressionConstant* EmissiveScale = NewObject<UMaterialExpressionConstant>(Material);
+    EmissiveScale->R = bRockCanyon ? 0.008f : 0.025f;
+    Material->GetExpressionCollection().AddExpression(EmissiveScale);
+    UMaterialExpressionMultiply* Emissive = NewObject<UMaterialExpressionMultiply>(Material);
+    Emissive->A.Expression = DetailedBaseColor;
+    Emissive->B.Expression = EmissiveScale;
+    Material->GetExpressionCollection().AddExpression(Emissive);
+
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, DetailedBaseColor);
+    ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ValidatedNormal);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, DetailedRoughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, ValidatedAmbientOcclusion);
+    ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, Emissive);
+
+    Material->PostEditChange();
+    Package->MarkPackageDirty();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        MaterialPackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        return nullptr;
+    }
     return Material;
 }
 
@@ -2889,6 +3713,14 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         RiverAssetName = TEXT("Pacuare");
     }
+    else if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        RiverAssetName = TEXT("Zambezi");
+    }
+    else if (Spec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        RiverAssetName = TEXT("Futaleufu");
+    }
     if (RiverAssetName.IsEmpty())
     {
         OutSummary += FString::Printf(
@@ -2902,9 +3734,18 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         return nullptr;
     }
+    FString WaterNormalAssetName = RiverAssetName;
+    if (Spec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        WaterNormalAssetName = TEXT("ColoradoRiver");
+    }
+    else if (Spec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        WaterNormalAssetName = TEXT("Pacuare");
+    }
     const FString NormalAtlasName = FString::Printf(
         TEXT("T_RaftSim_%s_NormalAtlas"),
-        *RiverAssetName);
+        *WaterNormalAssetName);
     const FString NormalAtlasObjectPath = FString::Printf(
         TEXT("/Game/RaftSim/Rendering/ProceduralTextureAtlases/Textures/%s.%s"),
         *NormalAtlasName,
@@ -2979,8 +3820,17 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
 
     FRaftSimLandscapeCandidateWaterSettings Settings =
         GetLandscapeCandidateWaterSettings(Spec.RiverId);
-    if (bDisableSolverVisualizationFields)
+    if (bDisableSolverVisualizationFields && Spec.RiverId == TEXT("american_south_fork"))
     {
+        Settings.BaseColorScale = 1.00f;
+        Settings.SurfaceTint = FLinearColor(0.025f, 0.120f, 0.100f);
+        Settings.VertexTintWeight = 0.72f;
+        Settings.EmissiveFillScale = 0.080f;
+        Settings.ReflectionFillIntensity = 0.26f;
+        Settings.ReflectionTint = FLinearColor(0.36f, 0.52f, 0.60f);
+        Settings.Roughness = 0.14f;
+        Settings.Specular = 0.65f;
+        Settings.NormalIntensity = 0.60f;
         Settings.SolverFieldEnable = 0.0f;
         Settings.SolverMacroNormalWeight = 0.0f;
         Settings.SolverDepthColorWeight = 0.0f;
@@ -3155,6 +4005,8 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFirstPartyMaterialTextureA
         {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
         {TEXT("colorado_river"), TEXT("ColoradoRiver")},
         {TEXT("pacuare"), TEXT("Pacuare")},
+        {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
+        {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -3222,6 +4074,8 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
         {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
         {TEXT("colorado_river"), TEXT("ColoradoRiver")},
         {TEXT("pacuare"), TEXT("Pacuare")},
+        {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
+        {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -3265,56 +4119,98 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
         Specs.Add(Packed);
     }
 
-    const FString PhysicalSourceRoot =
-        TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
-             "chili_bar_reach_0_2500m/derived");
-    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalAlbedo;
-    PhysicalAlbedo.RiverId = TEXT("american_south_fork");
-    PhysicalAlbedo.RiverAssetName = TEXT("AmericanSouthFork");
-    PhysicalAlbedo.MapKey = TEXT("PhysicalCorridorSourceAlbedo");
-    PhysicalAlbedo.MapKind = TEXT("physical_corridor_source_albedo");
-    PhysicalAlbedo.SourceRelativePath = FPaths::Combine(
-        PhysicalSourceRoot,
-        TEXT("south_fork_chili_bar_reach_source_albedo_2048.png"));
-    PhysicalAlbedo.TextureAssetRootPackagePath =
-        TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures");
-    PhysicalAlbedo.CompressionSettings = TC_Default;
-    PhysicalAlbedo.bSRGB = true;
-    PhysicalAlbedo.LODGroup = TEXTUREGROUP_World;
-    PhysicalAlbedo.AddressX = TA_Clamp;
-    PhysicalAlbedo.AddressY = TA_Clamp;
-    Specs.Add(PhysicalAlbedo);
+    struct FPhysicalCorridorTextureSpec
+    {
+        const TCHAR* RiverId;
+        const TCHAR* RiverAssetName;
+        const TCHAR* SourceRoot;
+        const TCHAR* FilenamePrefix;
+        const TCHAR* AlbedoSuffix;
+    };
+    const FPhysicalCorridorTextureSpec PhysicalCorridors[] = {
+        {
+            TEXT("american_south_fork"),
+            TEXT("AmericanSouthFork"),
+            TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+                 "chili_bar_reach_0_2500m/derived"),
+            TEXT("south_fork_chili_bar_reach"),
+            TEXT("source_albedo_2048.png")
+        },
+        {
+            TEXT("colorado_river"),
+            TEXT("ColoradoRiver"),
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/"
+                 "lees_ferry_reach_2200_4700m/derived"),
+            TEXT("colorado_lees_ferry_reach"),
+            TEXT("terrain_albedo_2048.png")
+        },
+        {
+            TEXT("zambezi_batoka_gorge"),
+            TEXT("Zambezi"),
+            TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/"
+                 "boiling_pot_to_mukuni_beach/derived"),
+            TEXT("zambezi_batoka_gorge"),
+            TEXT("source_albedo_2048.png")
+        },
+        {
+            TEXT("futaleufu_terminator"),
+            TEXT("Futaleufu"),
+            TEXT("physics/data/real_world/futaleufu_river_chile/production_corridor/"
+                 "rio_azul_swinging_bridge_to_pasarela/derived"),
+            TEXT("futaleufu_terminator"),
+            TEXT("source_albedo_2048.png")
+        }
+    };
+    for (const FPhysicalCorridorTextureSpec& Corridor : PhysicalCorridors)
+    {
+        FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalAlbedo;
+        PhysicalAlbedo.RiverId = Corridor.RiverId;
+        PhysicalAlbedo.RiverAssetName = Corridor.RiverAssetName;
+        PhysicalAlbedo.MapKey = TEXT("PhysicalCorridorSourceAlbedo");
+        PhysicalAlbedo.MapKind = TEXT("physical_corridor_source_albedo");
+        PhysicalAlbedo.SourceRelativePath = FPaths::Combine(
+            Corridor.SourceRoot,
+            FString::Printf(TEXT("%s_%s"), Corridor.FilenamePrefix, Corridor.AlbedoSuffix));
+        PhysicalAlbedo.TextureAssetRootPackagePath =
+            TEXT("/Game/RaftSim/Rendering/PhysicalCorridor/Textures");
+        PhysicalAlbedo.CompressionSettings = TC_Default;
+        PhysicalAlbedo.bSRGB = true;
+        PhysicalAlbedo.LODGroup = TEXTUREGROUP_World;
+        PhysicalAlbedo.AddressX = TA_Clamp;
+        PhysicalAlbedo.AddressY = TA_Clamp;
+        Specs.Add(PhysicalAlbedo);
 
-    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalZones = PhysicalAlbedo;
-    PhysicalZones.MapKey = TEXT("PhysicalCorridorMaterialZones");
-    PhysicalZones.MapKind = TEXT("physical_corridor_material_zones");
-    PhysicalZones.SourceRelativePath = FPaths::Combine(
-        PhysicalSourceRoot,
-        TEXT("south_fork_chili_bar_reach_material_zones_2048.png"));
-    PhysicalZones.CompressionSettings = TC_Masks;
-    PhysicalZones.bSRGB = false;
-    Specs.Add(PhysicalZones);
+        FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalZones = PhysicalAlbedo;
+        PhysicalZones.MapKey = TEXT("PhysicalCorridorMaterialZones");
+        PhysicalZones.MapKind = TEXT("physical_corridor_material_zones");
+        PhysicalZones.SourceRelativePath = FPaths::Combine(
+            Corridor.SourceRoot,
+            FString::Printf(TEXT("%s_material_zones_2048.png"), Corridor.FilenamePrefix));
+        PhysicalZones.CompressionSettings = TC_Masks;
+        PhysicalZones.bSRGB = false;
+        Specs.Add(PhysicalZones);
 
-    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalNormal = PhysicalAlbedo;
-    PhysicalNormal.MapKey = TEXT("PhysicalCorridorNormal");
-    PhysicalNormal.MapKind = TEXT("physical_corridor_normal");
-    PhysicalNormal.SourceRelativePath = FPaths::Combine(
-        PhysicalSourceRoot,
-        TEXT("south_fork_chili_bar_reach_normal_2048.png"));
-    PhysicalNormal.CompressionSettings = TC_Normalmap;
-    PhysicalNormal.bSRGB = false;
-    PhysicalNormal.LODGroup = TEXTUREGROUP_WorldNormalMap;
-    Specs.Add(PhysicalNormal);
+        FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalNormal = PhysicalAlbedo;
+        PhysicalNormal.MapKey = TEXT("PhysicalCorridorNormal");
+        PhysicalNormal.MapKind = TEXT("physical_corridor_normal");
+        PhysicalNormal.SourceRelativePath = FPaths::Combine(
+            Corridor.SourceRoot,
+            FString::Printf(TEXT("%s_normal_2048.png"), Corridor.FilenamePrefix));
+        PhysicalNormal.CompressionSettings = TC_Normalmap;
+        PhysicalNormal.bSRGB = false;
+        PhysicalNormal.LODGroup = TEXTUREGROUP_WorldNormalMap;
+        Specs.Add(PhysicalNormal);
 
-    FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalPacked = PhysicalAlbedo;
-    PhysicalPacked.MapKey = TEXT("PhysicalCorridorAORoughnessHeight");
-    PhysicalPacked.MapKind = TEXT("physical_corridor_ao_roughness_height");
-    PhysicalPacked.SourceRelativePath = FPaths::Combine(
-        PhysicalSourceRoot,
-        TEXT("south_fork_chili_bar_reach_ao_roughness_height_2048.png"));
-    PhysicalPacked.CompressionSettings = TC_Masks;
-    PhysicalPacked.bSRGB = false;
-    Specs.Add(PhysicalPacked);
+        FRaftSimFirstPartyMaterialTextureAssetSpec PhysicalPacked = PhysicalAlbedo;
+        PhysicalPacked.MapKey = TEXT("PhysicalCorridorAORoughnessHeight");
+        PhysicalPacked.MapKind = TEXT("physical_corridor_ao_roughness_height");
+        PhysicalPacked.SourceRelativePath = FPaths::Combine(
+            Corridor.SourceRoot,
+            FString::Printf(TEXT("%s_ao_roughness_height_2048.png"), Corridor.FilenamePrefix));
+        PhysicalPacked.CompressionSettings = TC_Masks;
+        PhysicalPacked.bSRGB = false;
+        Specs.Add(PhysicalPacked);
+    }
 
     return Specs;
 }
@@ -3331,6 +4227,8 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetProductionDetailMaterialTe
         {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
         {TEXT("colorado_river"), TEXT("ColoradoRiver")},
         {TEXT("pacuare"), TEXT("Pacuare")},
+        {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
+        {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -3416,6 +4314,174 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSolverVisualizationFieldTe
     return Specs;
 }
 
+TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFutaleufuNativeCanopyTextureAssetSpecs()
+{
+    static const TCHAR* SourceRoot =
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures");
+    static const TCHAR* AssetRoot =
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures");
+
+    TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
+    auto AddSpec = [&Specs](
+                       const TCHAR* MapKey,
+                       const TCHAR* MapKind,
+                       const TCHAR* Filename,
+                       TextureCompressionSettings Compression,
+                       bool bSRGB,
+                       TextureGroup LODGroup,
+                       TextureAddress Address,
+                       bool bPreserveAlpha)
+    {
+        FRaftSimFirstPartyMaterialTextureAssetSpec Spec;
+        Spec.RiverId = TEXT("futaleufu_native_canopy");
+        Spec.RiverAssetName = TEXT("FutaleufuCoigue");
+        Spec.MapKey = MapKey;
+        Spec.MapKind = MapKind;
+        Spec.SourceRelativePath = FPaths::Combine(SourceRoot, Filename);
+        Spec.TextureAssetRootPackagePath = AssetRoot;
+        Spec.CompressionSettings = Compression;
+        Spec.bSRGB = bSRGB;
+        Spec.LODGroup = LODGroup;
+        Spec.AddressX = Address;
+        Spec.AddressY = Address;
+        Spec.bCompressionNoAlpha = !bPreserveAlpha;
+        Specs.Add(Spec);
+    };
+
+    AddSpec(
+        TEXT("BarkAlbedo"),
+        TEXT("coigue_bark_albedo"),
+        TEXT("coigue_bark_v1_albedo.png"),
+        TC_Default,
+        true,
+        TEXTUREGROUP_World,
+        TA_Wrap,
+        false);
+    AddSpec(
+        TEXT("BarkNormal"),
+        TEXT("coigue_bark_normal"),
+        TEXT("coigue_bark_v1_normal.png"),
+        TC_Normalmap,
+        false,
+        TEXTUREGROUP_WorldNormalMap,
+        TA_Wrap,
+        false);
+    AddSpec(
+        TEXT("BarkAORoughnessHeight"),
+        TEXT("coigue_bark_ao_roughness_height"),
+        TEXT("coigue_bark_v1_ao_roughness_height.png"),
+        TC_Masks,
+        false,
+        TEXTUREGROUP_World,
+        TA_Wrap,
+        false);
+    AddSpec(
+        TEXT("LeafAlbedoOpacity"),
+        TEXT("coigue_leaf_albedo_opacity"),
+        TEXT("coigue_leaf_atlas_v2_albedo_opacity.png"),
+        TC_Default,
+        true,
+        TEXTUREGROUP_World,
+        TA_Clamp,
+        true);
+    AddSpec(
+        TEXT("LeafNormal"),
+        TEXT("coigue_leaf_normal"),
+        TEXT("coigue_leaf_atlas_v2_normal.png"),
+        TC_Normalmap,
+        false,
+        TEXTUREGROUP_WorldNormalMap,
+        TA_Clamp,
+        false);
+    AddSpec(
+        TEXT("LeafAORoughnessSubsurface"),
+        TEXT("coigue_leaf_ao_roughness_subsurface"),
+        TEXT("coigue_leaf_atlas_v2_ao_roughness_subsurface.png"),
+        TC_Masks,
+        false,
+        TEXTUREGROUP_World,
+        TA_Clamp,
+        false);
+    return Specs;
+}
+
+TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFutaleufuCordilleraCypressTextureAssetSpecs()
+{
+    static const TCHAR* SourceRoot =
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+             "CordilleraCypress/Textures");
+    static const TCHAR* AssetRoot =
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+             "CordilleraCypress/Textures");
+
+    TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
+    auto AddSpec = [&Specs](
+                       const TCHAR* MapKey,
+                       const TCHAR* MapKind,
+                       const TCHAR* Filename,
+                       TextureCompressionSettings Compression,
+                       bool bSRGB,
+                       TextureGroup LODGroup,
+                       TextureAddress Address,
+                       bool bPreserveAlpha)
+    {
+        FRaftSimFirstPartyMaterialTextureAssetSpec Spec;
+        Spec.RiverId = TEXT("futaleufu_native_canopy_cypress");
+        Spec.RiverAssetName = TEXT("FutaleufuCordilleraCypress");
+        Spec.MapKey = MapKey;
+        Spec.MapKind = MapKind;
+        Spec.SourceRelativePath = FPaths::Combine(SourceRoot, Filename);
+        Spec.TextureAssetRootPackagePath = AssetRoot;
+        Spec.CompressionSettings = Compression;
+        Spec.bSRGB = bSRGB;
+        Spec.LODGroup = LODGroup;
+        Spec.AddressX = Address;
+        Spec.AddressY = Address;
+        Spec.bCompressionNoAlpha = !bPreserveAlpha;
+        Specs.Add(Spec);
+    };
+
+    AddSpec(
+        TEXT("BarkAlbedo"), TEXT("cordillera_cypress_bark_albedo"),
+        TEXT("cordillera_cypress_bark_v3_albedo.png"),
+        TC_Default, true, TEXTUREGROUP_World, TA_Wrap, false);
+    AddSpec(
+        TEXT("BarkNormal"), TEXT("cordillera_cypress_bark_normal"),
+        TEXT("cordillera_cypress_bark_v3_normal.png"),
+        TC_Normalmap, false, TEXTUREGROUP_WorldNormalMap, TA_Wrap, false);
+    AddSpec(
+        TEXT("BarkAORoughnessHeight"), TEXT("cordillera_cypress_bark_ao_roughness_height"),
+        TEXT("cordillera_cypress_bark_v3_ao_roughness_height.png"),
+        TC_Masks, false, TEXTUREGROUP_World, TA_Wrap, false);
+    AddSpec(
+        TEXT("FarLeafAlbedoOpacity"), TEXT("cordillera_cypress_far_spray_albedo_opacity"),
+        TEXT("cordillera_cypress_spray_v3_albedo_opacity.png"),
+        TC_Default, true, TEXTUREGROUP_World, TA_Clamp, true);
+    AddSpec(
+        TEXT("FarLeafNormal"), TEXT("cordillera_cypress_far_spray_normal"),
+        TEXT("cordillera_cypress_spray_v3_normal.png"),
+        TC_Normalmap, false, TEXTUREGROUP_WorldNormalMap, TA_Clamp, false);
+    AddSpec(
+        TEXT("FarLeafAORoughnessSubsurface"),
+        TEXT("cordillera_cypress_far_spray_ao_roughness_subsurface"),
+        TEXT("cordillera_cypress_spray_v3_ao_roughness_subsurface.png"),
+        TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
+    AddSpec(
+        TEXT("NearLeafAlbedoOpacity"), TEXT("cordillera_cypress_near_spray_albedo_opacity"),
+        TEXT("cordillera_cypress_spray_v10_albedo_opacity.png"),
+        TC_Default, true, TEXTUREGROUP_World, TA_Clamp, true);
+    AddSpec(
+        TEXT("NearLeafNormal"), TEXT("cordillera_cypress_near_spray_normal"),
+        TEXT("cordillera_cypress_spray_v10_normal.png"),
+        TC_Normalmap, false, TEXTUREGROUP_WorldNormalMap, TA_Clamp, false);
+    AddSpec(
+        TEXT("NearLeafAORoughnessSubsurface"),
+        TEXT("cordillera_cypress_near_spray_ao_roughness_subsurface"),
+        TEXT("cordillera_cypress_spray_v10_ao_roughness_subsurface.png"),
+        TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
+    return Specs;
+}
+
 void ApplyFirstPartyMaterialTextureImportSettings(
     UTexture2D* Texture,
     const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec)
@@ -3427,13 +4493,22 @@ void ApplyFirstPartyMaterialTextureImportSettings(
 
     Texture->SRGB = Spec.bSRGB;
     Texture->CompressionSettings = Spec.CompressionSettings;
-    Texture->MipGenSettings = TMGS_FromTextureGroup;
+    const bool bNativeCanopyLeafTexture =
+        Spec.RiverId.StartsWith(TEXT("futaleufu_native_canopy")) &&
+        Spec.MapKey.Contains(TEXT("Leaf"));
+    Texture->MipGenSettings = bNativeCanopyLeafTexture ? TMGS_Sharpen5 : TMGS_FromTextureGroup;
     Texture->LODGroup = Spec.LODGroup;
     Texture->AddressX = Spec.AddressX;
     Texture->AddressY = Spec.AddressY;
     Texture->CompressionNoAlpha = Spec.bCompressionNoAlpha;
     Texture->DeferCompression = false;
     Texture->VirtualTextureStreaming = false;
+    Texture->NeverStream = bNativeCanopyLeafTexture;
+    const bool bMaskedLeafAlbedo =
+        bNativeCanopyLeafTexture && Spec.MapKey.EndsWith(TEXT("LeafAlbedoOpacity"));
+    Texture->bDoScaleMipsForAlphaCoverage = bMaskedLeafAlbedo;
+    Texture->AlphaCoverageThresholds =
+        bMaskedLeafAlbedo ? FVector4(0.0f, 0.0f, 0.0f, 0.50f) : FVector4(0.0f, 0.0f, 0.0f, 0.0f);
     Texture->SetModernSettingsForNewOrChangedTexture();
 }
 
@@ -3529,6 +4604,12 @@ UTexture2D* CreateOrUpdateFirstPartyMaterialTextureAsset(
         OutSummary += FString::Printf(TEXT("Failed to update first-party material texture source %s\n"), *ObjectPath);
         return nullptr;
     }
+    if (Spec.RiverId.StartsWith(TEXT("futaleufu_native_canopy")))
+    {
+        FTextureCompilingManager::Get().FinishCompilation({Texture});
+        Texture->UpdateResource();
+        FlushRenderingCommands();
+    }
 
     Package->MarkPackageDirty();
     const FString Filename =
@@ -3622,6 +4703,524 @@ bool CreateSolverVisualizationFieldTextureAssets(FString& OutSummary)
         bAllSaved &= bSaved && Texture != nullptr;
     }
     return bAllSaved;
+}
+
+bool CreateFutaleufuNativeCanopyTextureAssets(
+    TMap<FString, UTexture2D*>& OutTextureAssetsByKey,
+    FString& OutSummary)
+{
+    bool bAllSaved = true;
+    OutTextureAssetsByKey.Reset();
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec : GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        bool bSaved = false;
+        UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(Spec, OutSummary, bSaved);
+        bAllSaved &= bSaved && Texture != nullptr;
+        if (Texture)
+        {
+            OutTextureAssetsByKey.Add(Spec.MapKey, Texture);
+        }
+    }
+    TArray<UTexture*> NativeCanopyTextures;
+    for (const TPair<FString, UTexture2D*>& Pair : OutTextureAssetsByKey)
+    {
+        if (Pair.Value)
+        {
+            NativeCanopyTextures.Add(Pair.Value);
+        }
+    }
+    FTextureCompilingManager::Get().FinishCompilation(NativeCanopyTextures);
+    for (UTexture* Texture : NativeCanopyTextures)
+    {
+        Texture->UpdateResource();
+        Texture->SetForceMipLevelsToBeResident(120.0f);
+    }
+    FlushRenderingCommands();
+    OutSummary += FString::Printf(
+        TEXT("Finished compilation and forced residency for %d native-canopy textures before material build.\n"),
+        NativeCanopyTextures.Num());
+    return bAllSaved;
+}
+
+bool CreateFutaleufuCordilleraCypressTextureAssets(
+    TMap<FString, UTexture2D*>& OutTextureAssetsByKey,
+    FString& OutSummary)
+{
+    bool bAllSaved = true;
+    OutTextureAssetsByKey.Reset();
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuCordilleraCypressTextureAssetSpecs())
+    {
+        bool bSaved = false;
+        UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(
+            Spec, OutSummary, bSaved);
+        bAllSaved &= bSaved && Texture != nullptr;
+        if (Texture)
+        {
+            OutTextureAssetsByKey.Add(Spec.MapKey, Texture);
+        }
+    }
+    TArray<UTexture*> NativeCanopyTextures;
+    for (const TPair<FString, UTexture2D*>& Pair : OutTextureAssetsByKey)
+    {
+        if (Pair.Value)
+        {
+            NativeCanopyTextures.Add(Pair.Value);
+        }
+    }
+    FTextureCompilingManager::Get().FinishCompilation(NativeCanopyTextures);
+    for (UTexture* Texture : NativeCanopyTextures)
+    {
+        Texture->UpdateResource();
+        Texture->SetForceMipLevelsToBeResident(120.0f);
+    }
+    FlushRenderingCommands();
+    OutSummary += FString::Printf(
+        TEXT("Finished compilation and forced residency for %d cordilleran-cypress textures.\n"),
+        NativeCanopyTextures.Num());
+    return bAllSaved;
+}
+
+UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
+    const FString& AssetName,
+    bool bLeafMaterial,
+    const TMap<FString, UTexture2D*>& Textures,
+    FString& OutSummary,
+    bool bDefaultLitLeafDiagnostic = false,
+    const FString& LeafTextureKeyPrefix = FString())
+{
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, *ObjectPath);
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create native-canopy material package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(Package, *AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create native-canopy material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    const FString LeafAlbedoKey = LeafTextureKeyPrefix + TEXT("LeafAlbedoOpacity");
+    const FString LeafNormalKey = LeafTextureKeyPrefix + TEXT("LeafNormal");
+    const FString LeafPackedKey = LeafTextureKeyPrefix + TEXT("LeafAORoughnessSubsurface");
+    const bool bNearCordilleraCypress =
+        bLeafMaterial && LeafTextureKeyPrefix.Equals(TEXT("Near"), ESearchCase::CaseSensitive);
+    const bool bFarCordilleraCypress =
+        bLeafMaterial && LeafTextureKeyPrefix.Equals(TEXT("Far"), ESearchCase::CaseSensitive);
+    UTexture2D* Albedo = Textures.FindRef(bLeafMaterial ? LeafAlbedoKey : TEXT("BarkAlbedo"));
+    UTexture2D* Normal = Textures.FindRef(bLeafMaterial ? LeafNormalKey : TEXT("BarkNormal"));
+    UTexture2D* Packed = Textures.FindRef(
+        bLeafMaterial ? LeafPackedKey : TEXT("BarkAORoughnessHeight"));
+    if (!Albedo || !Normal || !Packed)
+    {
+        OutSummary += FString::Printf(TEXT("Native-canopy material %s is missing one or more textures.\n"), *AssetName);
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(
+        bLeafMaterial && !bDefaultLitLeafDiagnostic
+            ? MSM_TwoSidedFoliage
+            : MSM_DefaultLit);
+    Material->BlendMode = bLeafMaterial ? BLEND_Masked : BLEND_Opaque;
+    Material->TwoSided = bLeafMaterial;
+    Material->OpacityMaskClipValue = bLeafMaterial ? 0.50f : 0.3333f;
+    Material->DitheredLODTransition = bLeafMaterial;
+
+    auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
+    {
+        Expression->MaterialExpressionEditorX = EditorX;
+        Expression->MaterialExpressionEditorY = EditorY;
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    UMaterialExpressionTextureCoordinate* TexCoord =
+        AddExpression(NewObject<UMaterialExpressionTextureCoordinate>(Material), -720, -120);
+    UMaterialExpressionTextureSampleParameter2D* AlbedoSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -440, -260);
+    AlbedoSample->ParameterName = bLeafMaterial ? TEXT("LeafAlbedoOpacity") : TEXT("BarkAlbedo");
+    AlbedoSample->Texture = Albedo;
+    AlbedoSample->SamplerType = SAMPLERTYPE_Color;
+    AlbedoSample->Coordinates.Expression = TexCoord;
+    UMaterialExpressionTextureSampleParameter2D* NormalSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -440, 20);
+    NormalSample->ParameterName = bLeafMaterial ? TEXT("LeafNormal") : TEXT("BarkNormal");
+    NormalSample->Texture = Normal;
+    NormalSample->SamplerType = SAMPLERTYPE_Normal;
+    NormalSample->Coordinates.Expression = TexCoord;
+    UMaterialExpressionTextureSampleParameter2D* PackedSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -440, 280);
+    PackedSample->ParameterName =
+        bLeafMaterial ? TEXT("LeafAORoughnessSubsurface") : TEXT("BarkAORoughnessHeight");
+    PackedSample->Texture = Packed;
+    PackedSample->SamplerType = SAMPLERTYPE_Masks;
+    PackedSample->Coordinates.Expression = TexCoord;
+
+    UMaterialExpressionComponentMask* PackedAmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -120, 260);
+    PackedAmbientOcclusion->Input.Expression = PackedSample;
+    PackedAmbientOcclusion->R = 1;
+    UMaterialExpressionConstant* FullAmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionConstant>(Material), 100, 280);
+    FullAmbientOcclusion->R = 1.0f;
+    UMaterialExpressionScalarParameter* AmbientOcclusionInfluence =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 100, 380);
+    AmbientOcclusionInfluence->ParameterName =
+        bLeafMaterial ? TEXT("LeafAOInfluence") : TEXT("BarkAOInfluence");
+    AmbientOcclusionInfluence->DefaultValue = bNearCordilleraCypress
+        ? 0.20f
+        : (bFarCordilleraCypress ? 0.45f : (bLeafMaterial ? 0.55f : 0.28f));
+    UMaterialExpressionLinearInterpolate* ConditionedAmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 340, 300);
+    ConditionedAmbientOcclusion->A.Expression = FullAmbientOcclusion;
+    ConditionedAmbientOcclusion->B.Expression = PackedAmbientOcclusion;
+    ConditionedAmbientOcclusion->Alpha.Expression = AmbientOcclusionInfluence;
+    UMaterialExpressionComponentMask* Roughness =
+        AddExpression(NewObject<UMaterialExpressionComponentMask>(Material), -120, 380);
+    Roughness->Input.Expression = PackedSample;
+    Roughness->G = 1;
+    UMaterialExpressionConstant* Specular =
+        AddExpression(NewObject<UMaterialExpressionConstant>(Material), -120, 520);
+    Specular->R = bLeafMaterial ? 0.18f : 0.12f;
+
+    UMaterialExpressionScalarParameter* BaseColorScale =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -120, -240);
+    BaseColorScale->ParameterName =
+        bLeafMaterial ? TEXT("LeafBaseColorScale") : TEXT("BarkBaseColorScale");
+    BaseColorScale->DefaultValue = bNearCordilleraCypress
+        ? 1.42f
+        : (bFarCordilleraCypress ? 0.88f : (bLeafMaterial ? 1.18f : 1.72f));
+    UMaterialExpressionMultiply* ConditionedBaseColor =
+        AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 120, -240);
+    ConditionedBaseColor->A.Expression = AlbedoSample;
+    ConditionedBaseColor->B.Expression = BaseColorScale;
+
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ConditionedBaseColor);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, ConditionedAmbientOcclusion);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    if (bLeafMaterial)
+    {
+        UMaterialExpressionScalarParameter* OpacityScale =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -120, -420);
+        OpacityScale->ParameterName = TEXT("LeafOpacityScale");
+        OpacityScale->DefaultValue = 1.0f;
+        OpacityScale->SliderMin = 1.0f;
+        OpacityScale->SliderMax = 4.0f;
+        UMaterialExpressionMultiply* ScaledOpacity =
+            AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 120, -420);
+        ScaledOpacity->A.Expression = AlbedoSample;
+        ScaledOpacity->A.OutputIndex = 4;
+        ScaledOpacity->B.Expression = OpacityScale;
+        UMaterialExpressionScalarParameter* OpacityOverride =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -120, -500);
+        OpacityOverride->ParameterName = TEXT("LeafOpacityOverride");
+        OpacityOverride->DefaultValue = 0.0f;
+        OpacityOverride->SliderMin = 0.0f;
+        OpacityOverride->SliderMax = 1.0f;
+        UMaterialExpressionConstant* FullOpacity =
+            AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -520);
+        FullOpacity->R = 1.0f;
+        UMaterialExpressionLinearInterpolate* DiagnosticOpacity =
+            AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 360, -440);
+        DiagnosticOpacity->A.Expression = ScaledOpacity;
+        DiagnosticOpacity->B.Expression = FullOpacity;
+        DiagnosticOpacity->Alpha.Expression = OpacityOverride;
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, DiagnosticOpacity);
+
+        UMaterialExpressionScalarParameter* NormalStrength =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -120, 60);
+        NormalStrength->ParameterName = TEXT("LeafNormalStrength");
+        NormalStrength->DefaultValue = 1.0f;
+        NormalStrength->SliderMin = 0.0f;
+        NormalStrength->SliderMax = 1.0f;
+        UMaterialExpressionConstant3Vector* FlatNormal =
+            AddExpression(NewObject<UMaterialExpressionConstant3Vector>(Material), -120, 140);
+        FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
+        UMaterialExpressionLinearInterpolate* ConditionedNormal =
+            AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 120, 40);
+        ConditionedNormal->A.Expression = FlatNormal;
+        ConditionedNormal->B.Expression = NormalSample;
+        ConditionedNormal->Alpha.Expression = NormalStrength;
+        UMaterialExpressionTwoSidedSign* TwoSidedSign =
+            AddExpression(NewObject<UMaterialExpressionTwoSidedSign>(Material), 120, 140);
+        UMaterialExpressionMultiply* TwoSidedNormal =
+            AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 360, 80);
+        TwoSidedNormal->A.Expression = ConditionedNormal;
+        TwoSidedNormal->B.Expression = TwoSidedSign;
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, TwoSidedNormal);
+
+        UMaterialExpressionVectorParameter* TransmissionTint =
+            AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -120, -80);
+        TransmissionTint->ParameterName = TEXT("LeafTransmissionTint");
+        TransmissionTint->DefaultValue = bNearCordilleraCypress
+            ? FLinearColor(0.68f, 0.88f, 0.46f)
+            : (bFarCordilleraCypress
+                   ? FLinearColor(0.48f, 0.72f, 0.30f)
+                   : FLinearColor(0.55f, 0.78f, 0.36f));
+        UMaterialExpressionMultiply* SubsurfaceColor =
+            AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 120, -120);
+        SubsurfaceColor->A.Expression = ConditionedBaseColor;
+        SubsurfaceColor->B.Expression = TransmissionTint;
+        if (!bDefaultLitLeafDiagnostic)
+        {
+            ConnectPreviewMaterialColorInput(EditorOnlyData->SubsurfaceColor, SubsurfaceColor);
+        }
+
+        UMaterialExpressionScalarParameter* DiagnosticEmissive =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 360, -220);
+        DiagnosticEmissive->ParameterName = TEXT("LeafDiagnosticEmissive");
+        DiagnosticEmissive->DefaultValue = bNearCordilleraCypress
+            ? 0.05f
+            : (bFarCordilleraCypress ? 0.018f : 0.0f);
+        DiagnosticEmissive->SliderMin = 0.0f;
+        DiagnosticEmissive->SliderMax = 0.35f;
+        UMaterialExpressionMultiply* DiagnosticEmissiveColor =
+            AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 600, -220);
+        DiagnosticEmissiveColor->A.Expression = ConditionedBaseColor;
+        DiagnosticEmissiveColor->B.Expression = DiagnosticEmissive;
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, DiagnosticEmissiveColor);
+
+        UMaterialExpressionScalarParameter* WindIntensity =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -440, 620);
+        WindIntensity->ParameterName = TEXT("WindIntensity");
+        WindIntensity->DefaultValue = 0.16f;
+        UMaterialExpressionScalarParameter* WindWeight =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -440, 700);
+        WindWeight->ParameterName = TEXT("WindWeight");
+        WindWeight->DefaultValue = 0.28f;
+        UMaterialExpressionScalarParameter* WindSpeed =
+            AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -440, 780);
+        WindSpeed->ParameterName = TEXT("WindSpeed");
+        WindSpeed->DefaultValue = 0.42f;
+        UMaterialExpressionConstant3Vector* AdditionalWindOffset =
+            AddExpression(NewObject<UMaterialExpressionConstant3Vector>(Material), -440, 860);
+        AdditionalWindOffset->Constant = FLinearColor::Black;
+        UMaterialFunctionInterface* SimpleGrassWind = LoadObject<UMaterialFunctionInterface>(
+            nullptr,
+            TEXT("/Engine/Functions/Engine_MaterialFunctions01/WorldPositionOffset/"
+                 "SimpleGrassWind.SimpleGrassWind"));
+        UMaterialExpressionMaterialFunctionCall* LeafWind =
+            AddExpression(NewObject<UMaterialExpressionMaterialFunctionCall>(Material), -80, 700);
+        if (SimpleGrassWind && LeafWind->SetMaterialFunction(SimpleGrassWind))
+        {
+            for (int32 InputIndex = 0; InputIndex < LeafWind->FunctionInputs.Num(); ++InputIndex)
+            {
+                const FString InputName = LeafWind->GetInputName(InputIndex).ToString();
+                FExpressionInput& Input = LeafWind->FunctionInputs[InputIndex].Input;
+                if (InputName.Contains(TEXT("WindIntensity"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = WindIntensity;
+                }
+                else if (InputName.Contains(TEXT("WindWeight"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = WindWeight;
+                }
+                else if (InputName.Contains(TEXT("WindSpeed"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = WindSpeed;
+                }
+                else if (InputName.Contains(TEXT("AdditionalWPO"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = AdditionalWindOffset;
+                }
+            }
+            EditorOnlyData->WorldPositionOffset.Expression = LeafWind;
+        }
+    }
+    else
+    {
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, NormalSample);
+    }
+
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to enable InstancedStaticMeshes material usage for %s.\n"),
+            *ObjectPath);
+        return nullptr;
+    }
+    Material->PostEditChange();
+    Material->MarkPackageDirty();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Failed to save native-canopy material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Saved %s native-canopy material %s.\n"),
+        bLeafMaterial
+            ? (bDefaultLitLeafDiagnostic
+                   ? TEXT("masked DefaultLit diagnostic")
+                   : TEXT("masked TwoSidedFoliage"))
+            : TEXT("opaque DefaultLit bark"),
+        *ObjectPath);
+    return Material;
+}
+
+UMaterial* CreateOrUpdateFutaleufuCypressNearSprayMaterial(
+    const FString& AssetName,
+    FString& OutSummary)
+{
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, *ObjectPath);
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create cypress near-spray material package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package, *AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create cypress near-spray material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = false;
+    Material->DitheredLODTransition = true;
+    auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
+    {
+        Expression->MaterialExpressionEditorX = EditorX;
+        Expression->MaterialExpressionEditorY = EditorY;
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    UMaterialExpressionVectorParameter* BaseColor =
+        AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -300, -120);
+    BaseColor->ParameterName = TEXT("NearSprayBaseColor");
+    BaseColor->DefaultValue = FLinearColor(0.095f, 0.255f, 0.055f);
+    UMaterialExpressionScalarParameter* Roughness =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -300, 20);
+    Roughness->ParameterName = TEXT("NearSprayRoughness");
+    Roughness->DefaultValue = 0.78f;
+    UMaterialExpressionScalarParameter* Specular =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -300, 120);
+    Specular->ParameterName = TEXT("NearSpraySpecular");
+    Specular->DefaultValue = 0.14f;
+    UMaterialExpressionConstant* AmbientOcclusion =
+        AddExpression(NewObject<UMaterialExpressionConstant>(Material), -300, 220);
+    AmbientOcclusion->R = 0.92f;
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
+
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    Material->MarkPackageDirty();
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to save cypress near-spray material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Saved opaque geometric cypress near-spray material %s.\n"), *ObjectPath);
+    return Material;
+}
+
+bool EnsureFutaleufuNativeCanopyInstancedMaterialUsage(
+    UMaterial* Material,
+    FString& OutSummary)
+{
+    if (!Material)
+    {
+        return false;
+    }
+    Material->Modify();
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not enable InstancedStaticMeshes usage for native-canopy material %s.\n"),
+            *Material->GetPathName());
+        return false;
+    }
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    UPackage* Package = Material->GetOutermost();
+    Package->MarkPackageDirty();
+    const FString PackagePath = Package->GetName();
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath,
+        FPackageName::GetAssetPackageExtension());
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    const bool bSaved = UPackage::SavePackage(Package, Material, *Filename, SaveArgs);
+    OutSummary += FString::Printf(
+        TEXT("%s native-canopy InstancedStaticMeshes material usage %s -> %s.\n"),
+        bSaved ? TEXT("Persisted") : TEXT("Failed to persist"),
+        *Material->GetPathName(),
+        *Filename);
+    return bSaved;
 }
 
 UMaterialInterface* LoadOrCreateFirstPartyAtlasSampleReviewMaterial(
@@ -4406,6 +6005,8 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {TEXT("american_south_fork"), TEXT("AmericanSouthFork")},
         {TEXT("colorado_river"), TEXT("ColoradoRiver")},
         {TEXT("pacuare"), TEXT("Pacuare")},
+        {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
+        {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
     };
 
     TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> Specs;
@@ -4698,6 +6299,14 @@ FString GetFirstPartyMaterialRiverAssetName(const FString& RiverId)
     if (RiverId == TEXT("pacuare"))
     {
         return TEXT("Pacuare");
+    }
+    if (RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        return TEXT("Zambezi");
+    }
+    if (RiverId == TEXT("futaleufu_terminator"))
+    {
+        return TEXT("Futaleufu");
     }
 
     return FString();
@@ -6394,6 +8003,1467 @@ AActor* AddPreviewProceduralMeshActor(
     }
 
     return Actor;
+}
+
+void AppendNativeCanopyTaperedSegment(
+    const FVector& Start,
+    const FVector& End,
+    float StartRadius,
+    float EndRadius,
+    int32 SegmentCount,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs)
+{
+    const FVector Axis = End - Start;
+    const float Length = Axis.Size();
+    if (Length < 1.0f || SegmentCount < 3)
+    {
+        return;
+    }
+    const FVector Direction = Axis / Length;
+    FVector BasisX = FVector::CrossProduct(Direction, FVector::UpVector).GetSafeNormal();
+    if (BasisX.IsNearlyZero())
+    {
+        BasisX = FVector::RightVector;
+    }
+    const FVector BasisY = FVector::CrossProduct(Direction, BasisX).GetSafeNormal();
+    const int32 BaseIndex = Vertices.Num();
+    for (int32 Ring = 0; Ring < 2; ++Ring)
+    {
+        const FVector Center = Ring == 0 ? Start : End;
+        const float Radius = Ring == 0 ? StartRadius : EndRadius;
+        for (int32 Index = 0; Index < SegmentCount; ++Index)
+        {
+            const float U = static_cast<float>(Index) / static_cast<float>(SegmentCount);
+            const float Angle = U * 2.0f * PI;
+            const FVector Radial = BasisX * FMath::Cos(Angle) + BasisY * FMath::Sin(Angle);
+            Vertices.Add(Center + Radial * Radius);
+            Normals.Add(Radial);
+            UVs.Add(FVector2D(U, Ring == 0 ? 0.0f : Length / 320.0f));
+        }
+    }
+    for (int32 Index = 0; Index < SegmentCount; ++Index)
+    {
+        const int32 Next = (Index + 1) % SegmentCount;
+        const int32 A = BaseIndex + Index;
+        const int32 B = BaseIndex + Next;
+        const int32 C = BaseIndex + SegmentCount + Index;
+        const int32 D = BaseIndex + SegmentCount + Next;
+        Triangles.Append({A, C, B, B, C, D});
+    }
+}
+
+void AppendNativeCanopyLeafCard(
+    const FVector& Center,
+    const FVector& Right,
+    const FVector& Up,
+    float Width,
+    float Height,
+    int32 AtlasTile,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs)
+{
+    const FVector CardRight = Right.GetSafeNormal() * Width * 0.5f;
+    const FVector CardUp = Up.GetSafeNormal() * Height * 0.5f;
+    const FVector Normal = FVector::CrossProduct(CardRight, CardUp).GetSafeNormal();
+    const int32 BaseIndex = Vertices.Num();
+    Vertices.Append({
+        Center - CardRight - CardUp,
+        Center + CardRight - CardUp,
+        Center + CardRight + CardUp,
+        Center - CardRight + CardUp});
+    Normals.Append({Normal, Normal, Normal, Normal});
+
+    const int32 Tile = FMath::Abs(AtlasTile) % 16;
+    const int32 Column = Tile % 4;
+    const int32 Row = Tile / 4;
+    constexpr float Inset = 0.012f;
+    const float MinU = (static_cast<float>(Column) + Inset) / 4.0f;
+    const float MaxU = (static_cast<float>(Column + 1) - Inset) / 4.0f;
+    const float MinV = (static_cast<float>(Row) + Inset) / 4.0f;
+    const float MaxV = (static_cast<float>(Row + 1) - Inset) / 4.0f;
+    UVs.Append({
+        FVector2D(MinU, MaxV),
+        FVector2D(MaxU, MaxV),
+        FVector2D(MaxU, MinV),
+        FVector2D(MinU, MinV)});
+    Triangles.Append({BaseIndex, BaseIndex + 2, BaseIndex + 1, BaseIndex, BaseIndex + 3, BaseIndex + 2});
+}
+
+void AppendNativeCanopyCurvedSprayRibbon(
+    const FVector& Start,
+    const FVector& Control,
+    const FVector& End,
+    const FVector& NormalHint,
+    float StartHalfWidth,
+    float EndHalfWidth,
+    float HalfThickness,
+    int32 SegmentCount,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs)
+{
+    if (SegmentCount < 2 || FVector::Distance(Start, End) < 1.0f)
+    {
+        return;
+    }
+    const int32 BaseIndex = Vertices.Num();
+    for (int32 SegmentIndex = 0; SegmentIndex <= SegmentCount; ++SegmentIndex)
+    {
+        const float T = static_cast<float>(SegmentIndex) / SegmentCount;
+        const float OneMinusT = 1.0f - T;
+        const FVector Center =
+            Start * (OneMinusT * OneMinusT) + Control * (2.0f * OneMinusT * T) + End * (T * T);
+        const FVector Tangent =
+            ((Control - Start) * (2.0f * OneMinusT) + (End - Control) * (2.0f * T))
+                .GetSafeNormal();
+        FVector SurfaceNormal =
+            (NormalHint - Tangent * FVector::DotProduct(NormalHint, Tangent)).GetSafeNormal();
+        if (SurfaceNormal.IsNearlyZero())
+        {
+            SurfaceNormal = FVector::UpVector;
+        }
+        const FVector Side = FVector::CrossProduct(Tangent, SurfaceNormal).GetSafeNormal();
+        const float HalfWidth = FMath::Lerp(StartHalfWidth, EndHalfWidth, T);
+        const FVector SideOffset = Side * HalfWidth;
+        const FVector ThicknessOffset = SurfaceNormal * HalfThickness;
+        Vertices.Append({
+            Center - SideOffset + ThicknessOffset,
+            Center + SideOffset + ThicknessOffset,
+            Center + SideOffset - ThicknessOffset,
+            Center - SideOffset - ThicknessOffset});
+        Normals.Append({SurfaceNormal, SurfaceNormal, -SurfaceNormal, -SurfaceNormal});
+        UVs.Append({
+            FVector2D(0.0f, T), FVector2D(1.0f, T),
+            FVector2D(1.0f, T), FVector2D(0.0f, T)});
+    }
+    for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+    {
+        const int32 A = BaseIndex + SegmentIndex * 4;
+        const int32 B = A + 4;
+        Triangles.Append({
+            A, B, A + 1, A + 1, B, B + 1,
+            A + 3, A + 2, B + 3, A + 2, B + 2, B + 3,
+            A + 1, B + 1, A + 2, A + 2, B + 1, B + 2,
+            A, A + 3, B, A + 3, B + 3, B});
+    }
+}
+
+struct FFutaleufuCoigueCrownForm
+{
+    FString Id;
+    FString DisplayName;
+    FString AssetToken;
+    FString LifeStage;
+    int32 SeedOffset = 0;
+    int32 MainBranchCount = 26;
+    int32 FarCrownVolumeAnchorCount = 370;
+    float TrunkHeightScale = 1.0f;
+    float TrunkRadiusScale = 1.0f;
+    float CrownBaseZCm = 950.0f;
+    float CrownSpanZCm = 1560.0f;
+    float CrownWidthScale = 1.0f;
+    float BranchUpliftScale = 1.0f;
+    float AsymmetryScale = 1.0f;
+    FVector2D TrunkLeanTopCm = FVector2D::ZeroVector;
+    float SuppressedSectorCenterDegrees = 0.0f;
+    float SuppressedSectorHalfWidthDegrees = 0.0f;
+    float SuppressedSectorLengthScale = 1.0f;
+    float CrownGapCenterT = -1.0f;
+    float CrownGapHalfWidthT = 0.0f;
+    float CrownGapLengthScale = 1.0f;
+    int32 DamageModulo = 0;
+    int32 DamageRemainder = 0;
+    float DamagedBranchLengthScale = 1.0f;
+};
+
+constexpr int32 FutaleufuCoigueBranchletsPerParentShoot = 8;
+constexpr int32 FutaleufuCoigueMainLeavesPerBranchlet = 10;
+constexpr int32 FutaleufuCoigueTertiaryBranchesPerBranchlet = 3;
+constexpr int32 FutaleufuCoigueLeavesPerTertiaryBranch = 4;
+constexpr int32 FutaleufuCoigueAttachedLeavesPerBranchlet =
+    FutaleufuCoigueMainLeavesPerBranchlet +
+    FutaleufuCoigueTertiaryBranchesPerBranchlet * FutaleufuCoigueLeavesPerTertiaryBranch;
+
+struct FFutaleufuCoigueRoutingMetrics
+{
+    float MinNearBranchletClearanceCm = TNumericLimits<float>::Max();
+    float MinNearTertiaryClearanceCm = TNumericLimits<float>::Max();
+    int32 ReroutedBranchletCount = 0;
+    int32 ReroutedTertiaryCount = 0;
+    int32 UnresolvedBranchletClearanceCount = 0;
+    int32 UnresolvedTertiaryClearanceCount = 0;
+};
+
+float NativeCanopySegmentDistance(
+    const FVector& A1,
+    const FVector& B1,
+    const FVector& A2,
+    const FVector& B2)
+{
+    FVector Closest1;
+    FVector Closest2;
+    FMath::SegmentDistToSegmentSafe(A1, B1, A2, B2, Closest1, Closest2);
+    return FVector::Distance(Closest1, Closest2);
+}
+
+void BuildFutaleufuCoiguePrototypeGeometry(
+    const FFutaleufuCoigueCrownForm& Form,
+    TArray<FVector>& TrunkVertices,
+    TArray<int32>& TrunkTriangles,
+    TArray<FVector>& TrunkNormals,
+    TArray<FVector2D>& TrunkUVs,
+    TArray<FVector>& BranchletVertices,
+    TArray<int32>& BranchletTriangles,
+    TArray<FVector>& BranchletNormals,
+    TArray<FVector2D>& BranchletUVs,
+    TArray<FVector>& LeafVertices,
+    TArray<int32>& LeafTriangles,
+    TArray<FVector>& LeafNormals,
+    TArray<FVector2D>& LeafUVs,
+    TArray<FVector>& FarLeafVertices,
+    TArray<int32>& FarLeafTriangles,
+    TArray<FVector>& FarLeafNormals,
+    TArray<FVector2D>& FarLeafUVs,
+    FVector& OutCloseupCamera,
+    FVector& OutCloseupTarget,
+    FFutaleufuCoigueRoutingMetrics& OutRoutingMetrics)
+{
+    OutRoutingMetrics = FFutaleufuCoigueRoutingMetrics();
+    const float TrunkTopZ = 2920.0f * Form.TrunkHeightScale;
+    auto TrunkLeanAtZ = [&Form, TrunkTopZ](float Z)
+    {
+        const float T = FMath::Clamp(Z / FMath::Max(TrunkTopZ, 1.0f), 0.0f, 1.0f);
+        return FVector(Form.TrunkLeanTopCm.X * T, Form.TrunkLeanTopCm.Y * T, 0.0f);
+    };
+    OutCloseupCamera = FVector(1110.0f, -330.0f, 1210.0f * Form.TrunkHeightScale);
+    OutCloseupTarget = FVector(760.0f, -5.0f, 1150.0f * Form.TrunkHeightScale);
+    const float LowerTrunkZ = 1150.0f * Form.TrunkHeightScale;
+    AppendNativeCanopyTaperedSegment(
+        FVector(0.0f, 0.0f, 0.0f), TrunkLeanAtZ(LowerTrunkZ) + FVector(0.0f, 0.0f, LowerTrunkZ),
+        105.0f * Form.TrunkRadiusScale, 76.0f * Form.TrunkRadiusScale, 18,
+        TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+    const float MidTrunkStartZ = 1080.0f * Form.TrunkHeightScale;
+    const float MidTrunkEndZ = 2180.0f * Form.TrunkHeightScale;
+    AppendNativeCanopyTaperedSegment(
+        TrunkLeanAtZ(MidTrunkStartZ) + FVector(0.0f, 0.0f, MidTrunkStartZ),
+        TrunkLeanAtZ(MidTrunkEndZ) + FVector(18.0f, -12.0f, MidTrunkEndZ),
+        80.0f * Form.TrunkRadiusScale, 38.0f * Form.TrunkRadiusScale, 16,
+        TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+    const float UpperTrunkStartZ = 2110.0f * Form.TrunkHeightScale;
+    AppendNativeCanopyTaperedSegment(
+        TrunkLeanAtZ(UpperTrunkStartZ) + FVector(18.0f, -12.0f, UpperTrunkStartZ),
+        TrunkLeanAtZ(TrunkTopZ) + FVector(-18.0f, 16.0f, TrunkTopZ),
+        40.0f * Form.TrunkRadiusScale, 9.0f * Form.TrunkRadiusScale, 12,
+        TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+
+    for (int32 RootIndex = 0; RootIndex < 7; ++RootIndex)
+    {
+        const float Angle = 2.0f * PI * static_cast<float>(RootIndex) / 7.0f + 0.21f;
+        const FVector End(
+            FMath::Cos(Angle) * (185.0f + 20.0f * (RootIndex % 3)),
+            FMath::Sin(Angle) * (185.0f + 20.0f * (RootIndex % 3)),
+            4.0f);
+        AppendNativeCanopyTaperedSegment(
+            FVector(0.0f, 0.0f, 72.0f * Form.TrunkHeightScale), End,
+            42.0f * Form.TrunkRadiusScale, 8.0f * Form.TrunkRadiusScale, 10,
+            TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+    }
+
+    struct FNativeCanopyLeafSpray
+    {
+        FVector Center;
+        FVector Direction;
+        float Scale = 1.0f;
+        bool bNearDetail = true;
+    };
+    TArray<FNativeCanopyLeafSpray> LeafSprays;
+    auto AddLeafSpray = [&LeafSprays](
+                            const FVector& Center,
+                            const FVector& Direction,
+                            float Scale)
+    {
+        FNativeCanopyLeafSpray Spray;
+        Spray.Center = Center;
+        Spray.Direction = Direction.GetSafeNormal();
+        Spray.Scale = Scale;
+        LeafSprays.Add(Spray);
+    };
+    auto AddFarLeafSpray = [&LeafSprays](
+                               const FVector& Center,
+                               const FVector& Direction,
+                               float Scale)
+    {
+        FNativeCanopyLeafSpray Spray;
+        Spray.Center = Center;
+        Spray.Direction = Direction.GetSafeNormal();
+        Spray.Scale = Scale;
+        Spray.bNearDetail = false;
+        LeafSprays.Add(Spray);
+    };
+    auto EvaluateSuppressedSectorScale = [&Form](float AngleDegrees)
+    {
+        if (Form.SuppressedSectorHalfWidthDegrees <= KINDA_SMALL_NUMBER)
+        {
+            return 1.0f;
+        }
+        const float SectorDistance = FMath::Abs(FMath::FindDeltaAngleDegrees(
+            AngleDegrees, Form.SuppressedSectorCenterDegrees));
+        if (SectorDistance >= Form.SuppressedSectorHalfWidthDegrees)
+        {
+            return 1.0f;
+        }
+        const float EdgeT = SectorDistance / Form.SuppressedSectorHalfWidthDegrees;
+        return FMath::Lerp(
+            Form.SuppressedSectorLengthScale,
+            1.0f,
+            EdgeT * EdgeT * (3.0f - 2.0f * EdgeT));
+    };
+    const int32 MainBranchCount = Form.MainBranchCount;
+    for (int32 BranchIndex = 0; BranchIndex < MainBranchCount; ++BranchIndex)
+    {
+        const float HeightNoise = FMath::Abs(FMath::Frac(
+            FMath::Sin(static_cast<float>(BranchIndex + 17 + Form.SeedOffset) * 12.9898f) * 43758.5453f));
+        const float BranchT = static_cast<float>(BranchIndex) / static_cast<float>(MainBranchCount - 1);
+        const float StartZ =
+            Form.CrownBaseZCm + BranchT * Form.CrownSpanZCm + (HeightNoise - 0.5f) * 238.0f;
+        const float Angle = FMath::DegreesToRadians(
+            FMath::Fmod(
+                static_cast<float>(BranchIndex + Form.SeedOffset) * 137.50776f +
+                    (HeightNoise - 0.5f) * 31.0f * Form.AsymmetryScale,
+                360.0f));
+        const float AngleDegrees = FMath::RadiansToDegrees(Angle);
+        const float SuppressedSectorScale = EvaluateSuppressedSectorScale(AngleDegrees);
+        const bool bInCrownGap =
+            Form.CrownGapCenterT >= 0.0f &&
+            FMath::Abs(BranchT - Form.CrownGapCenterT) < Form.CrownGapHalfWidthT;
+        const bool bStormDamaged =
+            Form.DamageModulo > 0 &&
+            (BranchIndex + Form.SeedOffset) % Form.DamageModulo == Form.DamageRemainder;
+        const float StructuralLengthScale = FMath::Clamp(
+            SuppressedSectorScale *
+                (bInCrownGap ? Form.CrownGapLengthScale : 1.0f) *
+                (bStormDamaged ? Form.DamagedBranchLengthScale : 1.0f),
+            0.16f,
+            1.0f);
+        const float CrownProfile = FMath::Sin(PI * FMath::Clamp(BranchT, 0.0f, 1.0f));
+        const float SideBias = (BranchIndex % 5 == 0) ? 1.13f : ((BranchIndex % 7 == 0) ? 0.88f : 1.0f);
+        const float Length =
+            (610.0f + CrownProfile * 390.0f +
+             (HeightNoise - 0.5f) * 148.0f * Form.AsymmetryScale) *
+            SideBias * Form.CrownWidthScale * StructuralLengthScale;
+        const FVector Start = TrunkLeanAtZ(StartZ) + FVector(
+            8.0f * FMath::Sin(Angle * 2.0f), 8.0f * FMath::Cos(Angle), StartZ);
+        const FVector Horizontal(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+        const FVector Side(-Horizontal.Y, Horizontal.X, 0.0f);
+        const float LateralBend = (HeightNoise - 0.5f) * 112.0f * Form.AsymmetryScale;
+        const FVector Mid =
+            Start + Horizontal * Length * 0.53f + Side * LateralBend +
+            FVector(0.0f, 0.0f, Length * 0.11f * Form.BranchUpliftScale);
+        const FVector End = Start + Horizontal * Length + FVector(
+            Side.X * LateralBend * 0.42f,
+            Side.Y * LateralBend * 0.42f,
+            Length * FMath::Lerp(0.13f, 0.42f, BranchT) * Form.BranchUpliftScale);
+        const float BaseRadius = FMath::Lerp(37.0f, 16.0f, BranchT);
+        AppendNativeCanopyTaperedSegment(
+            Start, Mid, BaseRadius, BaseRadius * 0.58f, 12,
+            TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+        AppendNativeCanopyTaperedSegment(
+            Mid - Horizontal * 12.0f, End, BaseRadius * 0.62f, 7.0f, 10,
+            TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+
+        const FVector BranchDirection = (End - Mid).GetSafeNormal();
+        const float FirstTipLength = bStormDamaged ? 24.0f : 60.0f;
+        const float SecondTipLength = bStormDamaged ? 18.0f : 72.0f;
+        const float FirstTipRise = bStormDamaged ? -7.0f : 18.0f;
+        const float SecondTipRise = bStormDamaged ? -11.0f : 28.0f;
+        const FVector BranchTipMid =
+            End + BranchDirection * FirstTipLength + FVector::UpVector * FirstTipRise;
+        const FVector BranchTipEnd =
+            BranchTipMid + BranchDirection * SecondTipLength + FVector::UpVector * SecondTipRise;
+        AppendNativeCanopyTaperedSegment(
+            End, BranchTipMid, 7.0f, 3.2f, 8,
+            TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+        AppendNativeCanopyTaperedSegment(
+            BranchTipMid, BranchTipEnd, 3.2f, 0.8f, 6,
+            TrunkVertices, TrunkTriangles, TrunkNormals, TrunkUVs);
+        const int32 MainSprayCount = bStormDamaged ? 1 : (bInCrownGap ? 2 : 3);
+        for (int32 MainSprayIndex = 0; MainSprayIndex < MainSprayCount; ++MainSprayIndex)
+        {
+            const float SprayT = MainSprayCount == 1
+                ? 0.48f
+                : FMath::Lerp(0.28f, 0.88f, static_cast<float>(MainSprayIndex) / (MainSprayCount - 1));
+            AddLeafSpray(
+                FMath::Lerp(Mid, End, SprayT),
+                BranchDirection,
+                FMath::Lerp(1.06f, 0.88f, SprayT));
+        }
+
+        const int32 TwigCount = bStormDamaged ? 1 : (bInCrownGap ? 2 : 3);
+        for (int32 TwigIndex = 0; TwigIndex < TwigCount; ++TwigIndex)
+        {
+            const float TwigT = 0.36f + TwigIndex * 0.21f;
+            const FVector TwigStart = FMath::Lerp(Mid, End, TwigT);
+            const float SideSign = ((BranchIndex + TwigIndex) % 2 == 0) ? 1.0f : -1.0f;
+            const FVector TwigEnd = TwigStart +
+                Side * SideSign * FMath::Lerp(165.0f, 225.0f, BranchT) * Form.CrownWidthScale +
+                Horizontal * 92.0f * Form.CrownWidthScale +
+                FVector(0.0f, 0.0f, (58.0f + TwigIndex * 21.0f) * Form.BranchUpliftScale);
+            AppendNativeCanopyTaperedSegment(
+                TwigStart, TwigEnd, 10.0f, 3.2f, 8,
+                BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+            const FVector TwigDirection = (TwigEnd - TwigStart).GetSafeNormal();
+            const FVector TwigCollarMid = TwigEnd + TwigDirection * 20.0f + FVector::UpVector * 3.0f;
+            const FVector TwigCollarEnd = TwigCollarMid + TwigDirection * 28.0f + FVector::UpVector * 4.0f;
+            AppendNativeCanopyTaperedSegment(
+                TwigEnd, TwigCollarMid, 3.2f, 1.4f, 6,
+                BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+            AppendNativeCanopyTaperedSegment(
+                TwigCollarMid, TwigCollarEnd, 1.4f, 0.72f, 5,
+                BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+            AddLeafSpray(FMath::Lerp(TwigStart, TwigEnd, 0.58f), TwigDirection, 0.86f);
+            AddLeafSpray(TwigCollarEnd + TwigDirection * 12.0f, TwigDirection, 0.80f);
+        }
+    }
+    constexpr int32 CrownAnchorCount = 24;
+    for (int32 CrownIndex = 0; CrownIndex < CrownAnchorCount; ++CrownIndex)
+    {
+        const float Angle = 2.0f * PI * CrownIndex / static_cast<float>(CrownAnchorCount);
+        const float DirectionScale = EvaluateSuppressedSectorScale(FMath::RadiansToDegrees(Angle));
+        const float CrownZ =
+            Form.CrownBaseZCm + Form.CrownSpanZCm * 0.93f + 22.0f * CrownIndex;
+        const FVector CrownDirection(
+            FMath::Cos(Angle),
+            FMath::Sin(Angle),
+            0.34f + 0.05f * (CrownIndex % 3));
+        AddFarLeafSpray(
+            TrunkLeanAtZ(CrownZ) + FVector(
+                FMath::Cos(Angle) * (175.0f + 48.0f * (CrownIndex % 5)) *
+                    Form.CrownWidthScale * DirectionScale,
+                FMath::Sin(Angle) * (175.0f + 48.0f * (CrownIndex % 5)) *
+                    Form.CrownWidthScale * DirectionScale,
+                CrownZ),
+            CrownDirection,
+            0.84f * FMath::Lerp(0.72f, 1.0f, DirectionScale));
+    }
+
+    auto Noise01 = [](int32 Seed)
+    {
+        return FMath::Abs(FMath::Frac(
+            FMath::Sin(static_cast<float>(Seed) * 12.9898f + 0.917f) * 43758.5453f));
+    };
+    const int32 FarCrownVolumeAnchorCount = Form.FarCrownVolumeAnchorCount;
+    for (int32 CrownIndex = 0; CrownIndex < FarCrownVolumeAnchorCount; ++CrownIndex)
+    {
+        const int32 Seed = 7103 + Form.SeedOffset * 37 + CrownIndex * 293;
+        const float HeightT =
+            (static_cast<float>(CrownIndex) + 0.5f) / static_cast<float>(FarCrownVolumeAnchorCount);
+        const float Angle =
+            FMath::DegreesToRadians(FMath::Fmod(CrownIndex * 137.50776f + Noise01(Seed) * 47.0f, 360.0f));
+        const float DirectionScale = EvaluateSuppressedSectorScale(FMath::RadiansToDegrees(Angle));
+        const bool bInCrownGap =
+            Form.CrownGapCenterT >= 0.0f &&
+            FMath::Abs(HeightT - Form.CrownGapCenterT) < Form.CrownGapHalfWidthT;
+        const float GapScale = bInCrownGap ? Form.CrownGapLengthScale : 1.0f;
+        const float CrownProfile = 0.36f + 0.64f * FMath::Sin(PI * HeightT);
+        const float Radius =
+            CrownProfile * FMath::Lerp(80.0f, 1060.0f, FMath::Pow(Noise01(Seed + 1), 0.72f)) *
+            Form.CrownWidthScale * DirectionScale * GapScale;
+        const float CenterZ =
+            Form.CrownBaseZCm + 130.0f + HeightT * (Form.CrownSpanZCm + 210.0f) +
+            (Noise01(Seed + 4) - 0.5f) * 118.0f;
+        const FVector Center = TrunkLeanAtZ(CenterZ) + FVector(
+            FMath::Cos(Angle) * Radius *
+                FMath::Lerp(0.82f, 1.10f, Noise01(Seed + 2)) * Form.AsymmetryScale,
+            FMath::Sin(Angle) * Radius * FMath::Lerp(0.82f, 1.10f, Noise01(Seed + 3)),
+            CenterZ);
+        AddFarLeafSpray(
+            Center,
+            FVector(FMath::Cos(Angle), FMath::Sin(Angle), FMath::Lerp(0.12f, 0.46f, HeightT)),
+            FMath::Lerp(1.08f, 0.82f, HeightT) *
+                FMath::Lerp(0.66f, 1.0f, DirectionScale * GapScale));
+    }
+    TArray<TPair<FVector, FVector>> AuthoredNearBranchletSegments;
+    TArray<TPair<FVector, FVector>> AuthoredNearTertiarySegments;
+    for (int32 SprayIndex = 0; SprayIndex < LeafSprays.Num(); ++SprayIndex)
+    {
+        const FNativeCanopyLeafSpray& Spray = LeafSprays[SprayIndex];
+        const FVector Direction = Spray.Direction.IsNearlyZero() ? FVector::ForwardVector : Spray.Direction;
+        FVector BaseUp = (FVector::UpVector - Direction * FVector::DotProduct(FVector::UpVector, Direction)).GetSafeNormal();
+        if (BaseUp.IsNearlyZero())
+        {
+            BaseUp = FVector::RightVector;
+        }
+        const FVector BaseNormal = FVector::CrossProduct(Direction, BaseUp).GetSafeNormal();
+        if (Spray.bNearDetail)
+        {
+        const FVector ParentShootStart = Spray.Center - Direction * 12.0f;
+        const FVector ParentShootMid = Spray.Center + Direction * 16.0f + BaseUp * 2.5f;
+        const FVector ParentShootEnd = Spray.Center + Direction * 44.0f + BaseUp * 5.0f;
+        AppendNativeCanopyTaperedSegment(
+            ParentShootStart, ParentShootMid, 0.74f, 0.46f, 6,
+            BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+        AppendNativeCanopyTaperedSegment(
+            ParentShootMid, ParentShootEnd, 0.48f, 0.20f, 5,
+            BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+        for (int32 BranchletIndex = 0;
+             BranchletIndex < FutaleufuCoigueBranchletsPerParentShoot;
+             ++BranchletIndex)
+        {
+            const int32 BranchletSeed =
+                Form.SeedOffset * 100003 + SprayIndex * 4099 + BranchletIndex * 307;
+            const float BranchletAngle =
+                static_cast<float>(BranchletIndex) * 2.39996323f +
+                (Noise01(BranchletSeed + 1) - 0.5f) * 0.36f;
+            const float BaseParentT = 0.08f +
+                static_cast<float>(BranchletIndex) *
+                    (0.84f / static_cast<float>(FutaleufuCoigueBranchletsPerParentShoot - 1));
+            const float BranchletLength =
+                FMath::Lerp(24.0f, 40.0f, Noise01(BranchletSeed + 4)) * Spray.Scale;
+            const float CandidateOffsetsDegrees[] = {0.0f, 28.0f, -28.0f, 52.0f, -52.0f};
+            const float CandidateAttachmentOffsets[] = {0.0f, 0.03f, -0.03f, 0.06f, -0.06f};
+            constexpr float RequiredBranchletClearanceCm = 1.2f;
+            FVector BranchletStart =
+                FMath::Lerp(ParentShootStart, ParentShootEnd, BaseParentT);
+            FVector Radial = FVector::ZeroVector;
+            FVector BranchletDirection = FVector::ZeroVector;
+            FVector BranchletMid = FVector::ZeroVector;
+            FVector BranchletEnd = FVector::ZeroVector;
+            float SelectedClearance = -1.0f;
+            int32 SelectedCandidateIndex = 0;
+            bool bBranchletRouteFound = false;
+            int32 CandidateOrdinal = 0;
+            for (int32 AttachmentIndex = 0;
+                 AttachmentIndex < UE_ARRAY_COUNT(CandidateAttachmentOffsets) && !bBranchletRouteFound;
+                 ++AttachmentIndex)
+            {
+                const float CandidateParentT = FMath::Clamp(
+                    BaseParentT + CandidateAttachmentOffsets[AttachmentIndex], 0.04f, 0.96f);
+                const FVector CandidateStart =
+                    FMath::Lerp(ParentShootStart, ParentShootEnd, CandidateParentT);
+                for (int32 CandidateIndex = 0;
+                     CandidateIndex < UE_ARRAY_COUNT(CandidateOffsetsDegrees);
+                     ++CandidateIndex, ++CandidateOrdinal)
+                {
+                    const float CandidateAngle = BranchletAngle +
+                        FMath::DegreesToRadians(CandidateOffsetsDegrees[CandidateIndex]);
+                    const FVector CandidateRadial =
+                        BaseNormal * FMath::Cos(CandidateAngle) + BaseUp * FMath::Sin(CandidateAngle);
+                    const FVector CandidateDirection =
+                        (Direction * 0.48f + CandidateRadial * 0.84f + FVector::UpVector * 0.18f).GetSafeNormal();
+                    const FVector CandidateMid =
+                        CandidateStart + CandidateDirection * BranchletLength * 0.52f +
+                        BaseUp * ((Noise01(BranchletSeed + 5) - 0.5f) * 7.0f);
+                    const FVector CandidateEnd =
+                        CandidateStart + CandidateDirection * BranchletLength +
+                        BaseNormal * ((Noise01(BranchletSeed + 6) - 0.5f) * 9.0f);
+                    float CandidateClearance = TNumericLimits<float>::Max();
+                    const FVector CandidateCenter = (CandidateStart + CandidateEnd) * 0.5f;
+                    for (const TPair<FVector, FVector>& Segment : AuthoredNearBranchletSegments)
+                    {
+                        if (FVector::DistSquared(
+                                CandidateCenter,
+                                (Segment.Key + Segment.Value) * 0.5f) > FMath::Square(100.0f))
+                        {
+                            continue;
+                        }
+                        CandidateClearance = FMath::Min(
+                            CandidateClearance,
+                            NativeCanopySegmentDistance(
+                                CandidateStart, CandidateEnd, Segment.Key, Segment.Value));
+                    }
+                    if (CandidateClearance > SelectedClearance)
+                    {
+                        SelectedClearance = CandidateClearance;
+                        SelectedCandidateIndex = CandidateOrdinal;
+                        BranchletStart = CandidateStart;
+                        Radial = CandidateRadial;
+                        BranchletDirection = CandidateDirection;
+                        BranchletMid = CandidateMid;
+                        BranchletEnd = CandidateEnd;
+                    }
+                    if (AuthoredNearBranchletSegments.IsEmpty() ||
+                        CandidateClearance >= RequiredBranchletClearanceCm)
+                    {
+                        SelectedCandidateIndex = CandidateOrdinal;
+                        SelectedClearance = CandidateClearance;
+                        BranchletStart = CandidateStart;
+                        Radial = CandidateRadial;
+                        BranchletDirection = CandidateDirection;
+                        BranchletMid = CandidateMid;
+                        BranchletEnd = CandidateEnd;
+                        bBranchletRouteFound = true;
+                        break;
+                    }
+                }
+            }
+            if (!AuthoredNearBranchletSegments.IsEmpty())
+            {
+                OutRoutingMetrics.MinNearBranchletClearanceCm = FMath::Min(
+                    OutRoutingMetrics.MinNearBranchletClearanceCm,
+                    SelectedClearance);
+                OutRoutingMetrics.ReroutedBranchletCount += SelectedCandidateIndex > 0 ? 1 : 0;
+                OutRoutingMetrics.UnresolvedBranchletClearanceCount +=
+                    SelectedClearance < RequiredBranchletClearanceCm ? 1 : 0;
+            }
+            AuthoredNearBranchletSegments.Emplace(BranchletStart, BranchletEnd);
+            if (SprayIndex == 89 && BranchletIndex == 0)
+            {
+                OutCloseupTarget = FMath::Lerp(BranchletStart, BranchletEnd, 0.58f);
+                FVector Outward(Spray.Center.X, Spray.Center.Y, 0.0f);
+                Outward = Outward.GetSafeNormal();
+                if (Outward.IsNearlyZero())
+                {
+                    Outward = BaseNormal;
+                }
+                FVector Tangent = FVector::CrossProduct(FVector::UpVector, Outward).GetSafeNormal();
+                if (Tangent.IsNearlyZero())
+                {
+                    Tangent = BaseNormal;
+                }
+                OutCloseupCamera =
+                    OutCloseupTarget + Tangent * 118.0f + Outward * 16.0f + FVector::UpVector * 22.0f;
+            }
+            AppendNativeCanopyTaperedSegment(
+                BranchletStart, BranchletMid, 0.42f, 0.20f, 5,
+                BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+            AppendNativeCanopyTaperedSegment(
+                BranchletMid, BranchletEnd, 0.22f, 0.08f, 4,
+                BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+
+            TArray<TPair<FVector, FVector>> LeafAttachmentAxes;
+            for (int32 LeafIndex = 0; LeafIndex < FutaleufuCoigueMainLeavesPerBranchlet; ++LeafIndex)
+            {
+                const float LeafT = 0.10f +
+                    static_cast<float>(LeafIndex) *
+                        (0.82f / static_cast<float>(FutaleufuCoigueMainLeavesPerBranchlet - 1));
+                const FVector Attachment =
+                    LeafT < 0.52f
+                    ? FMath::Lerp(BranchletStart, BranchletMid, LeafT / 0.52f)
+                    : FMath::Lerp(BranchletMid, BranchletEnd, (LeafT - 0.52f) / 0.48f);
+                const float SideSign = (LeafIndex % 2 == 0) ? 1.0f : -1.0f;
+                const FVector LeafAxis =
+                    (BranchletDirection * 0.34f + Radial * SideSign * 0.88f + BaseUp * 0.24f).GetSafeNormal();
+                LeafAttachmentAxes.Emplace(Attachment, LeafAxis);
+            }
+            for (int32 TertiaryIndex = 0;
+                 TertiaryIndex < FutaleufuCoigueTertiaryBranchesPerBranchlet;
+                 ++TertiaryIndex)
+            {
+                const float BaseTertiaryT =
+                    0.30f + static_cast<float>(TertiaryIndex) * 0.23f;
+                const float SideSign = TertiaryIndex % 2 == 0 ? -1.0f : 1.0f;
+                const FVector BaseTertiaryDirection =
+                    (BranchletDirection * 0.54f + Radial * SideSign * 0.76f +
+                     BaseUp * (0.14f + TertiaryIndex * 0.04f)).GetSafeNormal();
+                const float TertiaryLength =
+                    FMath::Lerp(10.0f, 18.0f, Noise01(BranchletSeed + 20 + TertiaryIndex));
+                const float TertiaryCandidateOffsetsDegrees[] = {0.0f, 32.0f, -32.0f, 58.0f, -58.0f};
+                const float TertiaryAttachmentOffsets[] = {
+                    0.0f, 0.025f, -0.025f, 0.05f, -0.05f, 0.075f, -0.075f, 0.10f, -0.10f};
+                constexpr float RequiredTertiaryClearanceCm = 0.6f;
+                FVector TertiaryStart =
+                    FMath::Lerp(BranchletStart, BranchletEnd, BaseTertiaryT);
+                FVector TertiaryDirection = BaseTertiaryDirection;
+                FVector TertiaryEnd = TertiaryStart + TertiaryDirection * TertiaryLength;
+                float SelectedTertiaryClearance = -1.0f;
+                int32 SelectedTertiaryCandidateIndex = 0;
+                bool bTertiaryRouteFound = false;
+                int32 TertiaryCandidateOrdinal = 0;
+                for (int32 AttachmentIndex = 0;
+                     AttachmentIndex < UE_ARRAY_COUNT(TertiaryAttachmentOffsets) && !bTertiaryRouteFound;
+                     ++AttachmentIndex)
+                {
+                    const float CandidateTertiaryT = FMath::Clamp(
+                        BaseTertiaryT + TertiaryAttachmentOffsets[AttachmentIndex], 0.12f, 0.90f);
+                    const FVector CandidateStart =
+                        FMath::Lerp(BranchletStart, BranchletEnd, CandidateTertiaryT);
+                    for (int32 CandidateIndex = 0;
+                         CandidateIndex < UE_ARRAY_COUNT(TertiaryCandidateOffsetsDegrees);
+                         ++CandidateIndex, ++TertiaryCandidateOrdinal)
+                    {
+                        const FVector CandidateDirection = BaseTertiaryDirection.RotateAngleAxis(
+                            TertiaryCandidateOffsetsDegrees[CandidateIndex], BranchletDirection).GetSafeNormal();
+                        const FVector CandidateEnd = CandidateStart + CandidateDirection * TertiaryLength;
+                        float CandidateClearance = TNumericLimits<float>::Max();
+                        const FVector CandidateCenter = (CandidateStart + CandidateEnd) * 0.5f;
+                        for (const TPair<FVector, FVector>& Segment : AuthoredNearTertiarySegments)
+                        {
+                            if (FVector::DistSquared(
+                                    CandidateCenter,
+                                    (Segment.Key + Segment.Value) * 0.5f) > FMath::Square(50.0f))
+                            {
+                                continue;
+                            }
+                            CandidateClearance = FMath::Min(
+                                CandidateClearance,
+                                NativeCanopySegmentDistance(
+                                    CandidateStart, CandidateEnd, Segment.Key, Segment.Value));
+                        }
+                        if (CandidateClearance > SelectedTertiaryClearance)
+                        {
+                            SelectedTertiaryClearance = CandidateClearance;
+                            SelectedTertiaryCandidateIndex = TertiaryCandidateOrdinal;
+                            TertiaryStart = CandidateStart;
+                            TertiaryDirection = CandidateDirection;
+                            TertiaryEnd = CandidateEnd;
+                        }
+                        if (AuthoredNearTertiarySegments.IsEmpty() ||
+                            CandidateClearance >= RequiredTertiaryClearanceCm)
+                        {
+                            SelectedTertiaryCandidateIndex = TertiaryCandidateOrdinal;
+                            SelectedTertiaryClearance = CandidateClearance;
+                            TertiaryStart = CandidateStart;
+                            TertiaryDirection = CandidateDirection;
+                            TertiaryEnd = CandidateEnd;
+                            bTertiaryRouteFound = true;
+                            break;
+                        }
+                    }
+                }
+                if (!AuthoredNearTertiarySegments.IsEmpty())
+                {
+                    OutRoutingMetrics.MinNearTertiaryClearanceCm = FMath::Min(
+                        OutRoutingMetrics.MinNearTertiaryClearanceCm,
+                        SelectedTertiaryClearance);
+                    OutRoutingMetrics.ReroutedTertiaryCount +=
+                        SelectedTertiaryCandidateIndex > 0 ? 1 : 0;
+                    OutRoutingMetrics.UnresolvedTertiaryClearanceCount +=
+                        SelectedTertiaryClearance < RequiredTertiaryClearanceCm ? 1 : 0;
+                }
+                AuthoredNearTertiarySegments.Emplace(TertiaryStart, TertiaryEnd);
+                AppendNativeCanopyTaperedSegment(
+                    TertiaryStart, TertiaryEnd, 0.16f, 0.045f, 3,
+                    BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+                for (int32 LeafIndex = 0;
+                     LeafIndex < FutaleufuCoigueLeavesPerTertiaryBranch;
+                     ++LeafIndex)
+                {
+                    const float LeafT = 0.22f +
+                        static_cast<float>(LeafIndex) *
+                            (0.68f / static_cast<float>(FutaleufuCoigueLeavesPerTertiaryBranch - 1));
+                    const float LeafSideSign = (LeafIndex % 2 == 0) ? 1.0f : -1.0f;
+                    const FVector Attachment = FMath::Lerp(TertiaryStart, TertiaryEnd, LeafT);
+                    const FVector LeafAxis =
+                        (TertiaryDirection * 0.38f + Radial * LeafSideSign * 0.78f + BaseUp * 0.28f).GetSafeNormal();
+                    LeafAttachmentAxes.Emplace(Attachment, LeafAxis);
+                }
+            }
+
+            for (int32 LeafIndex = 0; LeafIndex < LeafAttachmentAxes.Num(); ++LeafIndex)
+            {
+                const int32 Seed = BranchletSeed * 17 + LeafIndex * 131;
+                const FVector Attachment = LeafAttachmentAxes[LeafIndex].Key;
+                const FVector LeafAxis = LeafAttachmentAxes[LeafIndex].Value;
+                const float PetioleLength = FMath::Lerp(0.8f, 2.2f, Noise01(Seed + 1));
+                const FVector PetioleEnd = Attachment + LeafAxis * PetioleLength;
+                AppendNativeCanopyTaperedSegment(
+                    Attachment, PetioleEnd, 0.075f, 0.025f, 3,
+                    BranchletVertices, BranchletTriangles, BranchletNormals, BranchletUVs);
+                const float LeafWidth = FMath::Lerp(2.8f, 4.2f, Noise01(Seed + 2));
+                const float LeafHeight = FMath::Lerp(4.0f, 5.8f, Noise01(Seed + 3));
+                FVector CardRight = FVector::CrossProduct(LeafAxis, Direction).GetSafeNormal();
+                if (CardRight.IsNearlyZero())
+                {
+                    CardRight = BaseNormal;
+                }
+                const FVector CardCenter = PetioleEnd + LeafAxis * LeafHeight * 0.48f;
+                AppendNativeCanopyLeafCard(
+                    CardCenter,
+                    CardRight,
+                    LeafAxis,
+                    LeafWidth,
+                    LeafHeight,
+                    Seed % 12,
+                    LeafVertices,
+                    LeafTriangles,
+                    LeafNormals,
+                    LeafUVs);
+            }
+        }
+        }
+
+        for (int32 ClusterIndex = 0; ClusterIndex < 24; ++ClusterIndex)
+        {
+            const int32 ClusterSeed =
+                Form.SeedOffset * 130003 + SprayIndex * 3253 + ClusterIndex * 211 + 31;
+            const float ClusterAngle = Noise01(ClusterSeed + 1) * 2.0f * PI;
+            const float ClusterRadius = ClusterIndex == 0
+                ? 0.0f
+                : FMath::Lerp(28.0f, 64.0f, Noise01(ClusterSeed + 2));
+            const FVector ClusterRadial =
+                BaseUp * FMath::Cos(ClusterAngle) + BaseNormal * FMath::Sin(ClusterAngle);
+            const FVector ClusterCenter =
+                Spray.Center + ClusterRadial * ClusterRadius +
+                Direction * (Noise01(ClusterSeed + 3) * 2.0f - 1.0f) * 82.0f;
+            for (int32 CardIndex = 0; CardIndex < 6; ++CardIndex)
+            {
+                const int32 Seed = ClusterSeed * 13 + CardIndex * 79;
+                const FVector CardRight =
+                    (Direction + BaseNormal * (Noise01(Seed + 1) * 0.80f - 0.40f) +
+                     BaseUp * (Noise01(Seed + 2) * 0.32f - 0.16f)).GetSafeNormal();
+                const FVector CardUp =
+                    BaseUp.RotateAngleAxis(Noise01(Seed + 3) * 170.0f, CardRight).GetSafeNormal();
+                AppendNativeCanopyLeafCard(
+                    ClusterCenter + BaseNormal * (Noise01(Seed + 4) * 34.0f - 17.0f),
+                    CardRight,
+                    CardUp,
+                    FMath::Lerp(44.0f, 80.0f, Noise01(Seed + 5)) * Spray.Scale,
+                    FMath::Lerp(36.0f, 60.0f, Noise01(Seed + 6)) * Spray.Scale,
+                    12 + (Seed % 4),
+                    FarLeafVertices,
+                    FarLeafTriangles,
+                    FarLeafNormals,
+                    FarLeafUVs);
+            }
+        }
+    }
+    if (OutRoutingMetrics.MinNearBranchletClearanceCm == TNumericLimits<float>::Max())
+    {
+        OutRoutingMetrics.MinNearBranchletClearanceCm = 0.0f;
+    }
+    if (OutRoutingMetrics.MinNearTertiaryClearanceCm == TNumericLimits<float>::Max())
+    {
+        OutRoutingMetrics.MinNearTertiaryClearanceCm = 0.0f;
+    }
+}
+
+struct FFutaleufuCordilleraCypressForm
+{
+    FString Id;
+    FString DisplayName;
+    FString AssetToken;
+    FString LifeStage;
+    int32 SeedOffset = 0;
+    int32 BranchCount = 38;
+    float HeightCm = 2200.0f;
+    float BaseRadiusCm = 72.0f;
+    float CrownBaseCm = 420.0f;
+    float CrownRadiusCm = 520.0f;
+    float BranchUplift = 1.0f;
+    float Asymmetry = 1.0f;
+    FVector2D TrunkLeanTopCm = FVector2D::ZeroVector;
+    float SuppressedSectorCenterDegrees = 0.0f;
+    float SuppressedSectorHalfWidthDegrees = 0.0f;
+    float SuppressedSectorLengthScale = 1.0f;
+    float CrownGapCenterT = -1.0f;
+    float CrownGapHalfWidthT = 0.0f;
+    float CrownGapLengthScale = 1.0f;
+    int32 DamageModulo = 0;
+    int32 DamageRemainder = 0;
+    float DamagedBranchLengthScale = 1.0f;
+};
+
+void BuildFutaleufuCordilleraCypressGeometry(
+    const FFutaleufuCordilleraCypressForm& Form,
+    TArray<FVector>& WoodyVertices,
+    TArray<int32>& WoodyTriangles,
+    TArray<FVector>& WoodyNormals,
+    TArray<FVector2D>& WoodyUVs,
+    TArray<FVector>& NearSprayVertices,
+    TArray<int32>& NearSprayTriangles,
+    TArray<FVector>& NearSprayNormals,
+    TArray<FVector2D>& NearSprayUVs,
+    TArray<FVector>& SprayVertices,
+    TArray<int32>& SprayTriangles,
+    TArray<FVector>& SprayNormals,
+    TArray<FVector2D>& SprayUVs,
+    FVector& OutCloseupCamera,
+    FVector& OutCloseupTarget)
+{
+    WoodyVertices.Reset();
+    WoodyTriangles.Reset();
+    WoodyNormals.Reset();
+    WoodyUVs.Reset();
+    NearSprayVertices.Reset();
+    NearSprayTriangles.Reset();
+    NearSprayNormals.Reset();
+    NearSprayUVs.Reset();
+    SprayVertices.Reset();
+    SprayTriangles.Reset();
+    SprayNormals.Reset();
+    SprayUVs.Reset();
+
+    auto Noise01 = [](int32 Seed)
+    {
+        return FMath::Abs(FMath::Frac(
+            FMath::Sin(static_cast<float>(Seed) * 12.9898f + 78.233f) * 43758.5453f));
+    };
+    auto LeanAtZ = [&Form](float Z)
+    {
+        const float T = FMath::Clamp(Z / FMath::Max(Form.HeightCm, 1.0f), 0.0f, 1.0f);
+        return FVector(Form.TrunkLeanTopCm.X * T, Form.TrunkLeanTopCm.Y * T, 0.0f);
+    };
+    auto SectorScale = [&Form](float AngleDegrees)
+    {
+        if (Form.SuppressedSectorHalfWidthDegrees <= KINDA_SMALL_NUMBER)
+        {
+            return 1.0f;
+        }
+        const float Distance = FMath::Abs(FMath::FindDeltaAngleDegrees(
+            AngleDegrees, Form.SuppressedSectorCenterDegrees));
+        if (Distance >= Form.SuppressedSectorHalfWidthDegrees)
+        {
+            return 1.0f;
+        }
+        const float EdgeT = Distance / Form.SuppressedSectorHalfWidthDegrees;
+        return FMath::Lerp(
+            Form.SuppressedSectorLengthScale,
+            1.0f,
+            EdgeT * EdgeT * (3.0f - 2.0f * EdgeT));
+    };
+
+    const int32 TrunkSegmentCount = 5;
+    for (int32 SegmentIndex = 0; SegmentIndex < TrunkSegmentCount; ++SegmentIndex)
+    {
+        const float T0 = static_cast<float>(SegmentIndex) / TrunkSegmentCount;
+        const float T1 = static_cast<float>(SegmentIndex + 1) / TrunkSegmentCount;
+        const float Z0 = Form.HeightCm * T0;
+        const float Z1 = Form.HeightCm * T1;
+        const float Radius0 = FMath::Lerp(Form.BaseRadiusCm, 5.0f, FMath::Pow(T0, 0.78f));
+        const float Radius1 = FMath::Lerp(Form.BaseRadiusCm, 5.0f, FMath::Pow(T1, 0.78f));
+        const FVector WindCrook(
+            (Noise01(Form.SeedOffset + SegmentIndex * 31) - 0.5f) * 22.0f * T1,
+            (Noise01(Form.SeedOffset + SegmentIndex * 47) - 0.5f) * 22.0f * T1,
+            0.0f);
+        AppendNativeCanopyTaperedSegment(
+            LeanAtZ(Z0) + FVector(0.0f, 0.0f, Z0),
+            LeanAtZ(Z1) + WindCrook + FVector(0.0f, 0.0f, Z1),
+            Radius0,
+            Radius1,
+            SegmentIndex < 2 ? 16 : 12,
+            WoodyVertices,
+            WoodyTriangles,
+            WoodyNormals,
+            WoodyUVs);
+    }
+    for (int32 RootIndex = 0; RootIndex < 6; ++RootIndex)
+    {
+        const float Angle = 2.0f * PI * RootIndex / 6.0f + Form.SeedOffset * 0.001f;
+        AppendNativeCanopyTaperedSegment(
+            FVector(0.0f, 0.0f, 40.0f),
+            FVector(FMath::Cos(Angle) * 145.0f, FMath::Sin(Angle) * 145.0f, 3.0f),
+            Form.BaseRadiusCm * 0.42f,
+            6.0f,
+            9,
+            WoodyVertices,
+            WoodyTriangles,
+            WoodyNormals,
+            WoodyUVs);
+    }
+
+    auto AddSpray = [&](const FVector& Center,
+                        const FVector& Direction,
+                        float WidthCm,
+                        float LengthCm,
+                        int32 AtlasTile,
+                        float RollDegrees)
+    {
+        const FVector SprayDirection = Direction.GetSafeNormal();
+        FVector CardRight = FVector::CrossProduct(SprayDirection, FVector::UpVector).GetSafeNormal();
+        if (CardRight.IsNearlyZero())
+        {
+            CardRight = FVector::RightVector;
+        }
+        CardRight = CardRight.RotateAngleAxis(RollDegrees, SprayDirection).GetSafeNormal();
+        AppendNativeCanopyLeafCard(
+            Center,
+            CardRight,
+            SprayDirection,
+            WidthCm,
+            LengthCm,
+            AtlasTile,
+            SprayVertices,
+            SprayTriangles,
+            SprayNormals,
+            SprayUVs);
+    };
+    auto AddNearSpray = [&](const FVector& Base,
+                            const FVector& Direction,
+                            float WidthCm,
+                            float LengthCm,
+                            int32 AtlasTile,
+                            float RollDegrees)
+    {
+        const FVector SprayDirection = Direction.GetSafeNormal();
+        FVector CardRight = FVector::CrossProduct(SprayDirection, FVector::UpVector).GetSafeNormal();
+        if (CardRight.IsNearlyZero())
+        {
+            CardRight = FVector::RightVector;
+        }
+        CardRight = CardRight.RotateAngleAxis(RollDegrees, SprayDirection).GetSafeNormal();
+        AppendNativeCanopyLeafCard(
+            Base + SprayDirection * LengthCm * 0.5f,
+            CardRight,
+            SprayDirection,
+            WidthCm,
+            LengthCm,
+            AtlasTile,
+            NearSprayVertices,
+            NearSprayTriangles,
+            NearSprayNormals,
+            NearSprayUVs);
+    };
+    auto AddTerminalCluster = [&](const FVector& Center,
+                                  const FVector& Direction,
+                                  float WidthCm,
+                                  float LengthCm,
+                                  int32 Seed)
+    {
+        const FVector Axis = Direction.GetSafeNormal();
+        FVector AxisA = FVector::CrossProduct(Axis, FVector::UpVector).GetSafeNormal();
+        if (AxisA.IsNearlyZero())
+        {
+            AxisA = FVector::RightVector;
+        }
+        const FVector AxisB = FVector::CrossProduct(Axis, AxisA).GetSafeNormal();
+        const float FrondRollDegrees =
+            (Noise01(Seed + 2) - 0.5f) * 38.0f;
+        const float FrondRoll = FMath::DegreesToRadians(FrondRollDegrees);
+        const FVector FrondNormal =
+            (AxisA * FMath::Cos(FrondRoll) + AxisB * FMath::Sin(FrondRoll)).GetSafeNormal();
+        const FVector FrondSide = FVector::CrossProduct(Axis, FrondNormal).GetSafeNormal();
+        const FVector FrondStart = Center - Axis * LengthCm * 0.31f;
+        AddNearSpray(
+            FrondStart,
+            Axis,
+            WidthCm * FMath::Lerp(1.02f, 1.16f, Noise01(Seed + 4)),
+            LengthCm * FMath::Lerp(0.86f, 0.98f, Noise01(Seed + 6)),
+            Seed,
+            FrondRollDegrees);
+        const float SideSign = Noise01(Seed + 8) < 0.5f ? -1.0f : 1.0f;
+        const FVector SideStart = FrondStart + Axis * LengthCm * FMath::Lerp(
+            0.24f, 0.38f, Noise01(Seed + 10));
+        const FVector SideDirection =
+            (Axis * 0.58f + FrondSide * SideSign * 0.74f + FVector::UpVector * 0.08f)
+                .GetSafeNormal();
+        AddNearSpray(
+            SideStart,
+            SideDirection,
+            WidthCm * FMath::Lerp(0.72f, 0.88f, Noise01(Seed + 12)),
+            LengthCm * FMath::Lerp(0.52f, 0.66f, Noise01(Seed + 14)),
+            Seed + 3,
+            FrondRollDegrees + SideSign * 14.0f);
+        constexpr int32 ShootCount = 5;
+        for (int32 ShootIndex = 0; ShootIndex < ShootCount; ++ShootIndex)
+        {
+            const float Angle =
+                2.0f * PI * static_cast<float>(ShootIndex) / ShootCount +
+                (Noise01(Seed + ShootIndex * 29) - 0.5f) * 0.42f;
+            const FVector Radial =
+                (AxisA * FMath::Cos(Angle) + AxisB * FMath::Sin(Angle)).GetSafeNormal();
+            const FVector ShootStart =
+                Center - Axis * LengthCm * FMath::Lerp(
+                    0.18f, 0.27f, Noise01(Seed + ShootIndex * 31 + 3)) +
+                Radial * WidthCm * FMath::Lerp(
+                    0.015f, 0.075f, Noise01(Seed + ShootIndex * 31 + 5));
+            const FVector ShootDirection = (
+                Axis * FMath::Lerp(0.68f, 0.80f, Noise01(Seed + ShootIndex * 31 + 7)) +
+                Radial * FMath::Lerp(0.42f, 0.62f, Noise01(Seed + ShootIndex * 31 + 11)) +
+                FVector::UpVector *
+                    ((Noise01(Seed + ShootIndex * 31 + 13) - 0.5f) * 0.18f))
+                                                     .GetSafeNormal();
+            const float ShootLength = LengthCm * FMath::Lerp(
+                0.27f, 0.40f, Noise01(Seed + ShootIndex * 31 + 17));
+            const FVector ShootEnd = ShootStart + ShootDirection * ShootLength;
+            if (ShootIndex == 0 || ShootIndex == 2 || ShootIndex == 4)
+            {
+                const FVector SprayDirection = (
+                    ShootDirection * 0.82f +
+                    Radial * (ShootIndex == 2 ? -0.18f : 0.24f) +
+                    AxisB * ((Noise01(Seed + ShootIndex * 41) - 0.5f) * 0.22f))
+                                                        .GetSafeNormal();
+                const float Scale = FMath::Lerp(
+                    0.86f,
+                    1.12f,
+                    Noise01(Seed + ShootIndex * 43 + 19));
+                AddSpray(
+                    FMath::Lerp(ShootStart, ShootEnd, 0.76f),
+                    SprayDirection,
+                    WidthCm * 0.86f * Scale,
+                    LengthCm * 0.90f * Scale,
+                    Seed + ShootIndex * 5,
+                    FMath::RadiansToDegrees(Angle) +
+                        (Noise01(Seed + ShootIndex * 47 + 23) - 0.5f) * 76.0f);
+            }
+        }
+    };
+
+    OutCloseupTarget = FVector(0.0f, 0.0f, Form.CrownBaseCm + 240.0f);
+    OutCloseupCamera = OutCloseupTarget + FVector(520.0f, -420.0f, 90.0f);
+    const float CrownSpan = FMath::Max(Form.HeightCm - Form.CrownBaseCm - 70.0f, 100.0f);
+    const int32 BranchGroupSize = 3;
+    const int32 BranchGroupCount = FMath::DivideAndRoundUp(
+        Form.BranchCount, BranchGroupSize);
+    for (int32 BranchIndex = 0; BranchIndex < Form.BranchCount; ++BranchIndex)
+    {
+        const int32 BranchGroupIndex = BranchIndex / BranchGroupSize;
+        const int32 BranchWithinGroup = BranchIndex % BranchGroupSize;
+        const int32 Seed = Form.SeedOffset + BranchIndex * 193;
+        const float GroupT = (static_cast<float>(BranchGroupIndex) + 0.42f) /
+            static_cast<float>(BranchGroupCount);
+        const float BranchT = FMath::Clamp(
+            GroupT + (static_cast<float>(BranchWithinGroup) - 1.0f) * 0.015f +
+                (Noise01(Seed + 1) - 0.5f) * 0.020f,
+            0.015f,
+            0.985f);
+        const float StartZ = Form.CrownBaseCm + CrownSpan * BranchT +
+            (Noise01(Seed + 5) - 0.5f) * 135.0f;
+        const float GroupAngleDegrees = FMath::Fmod(
+            static_cast<float>(Form.SeedOffset) * 0.37f +
+                static_cast<float>(BranchGroupIndex) * 137.50776f,
+            360.0f);
+        const float AngleDegrees = FMath::Fmod(
+            GroupAngleDegrees +
+                (static_cast<float>(BranchWithinGroup) - 1.0f) *
+                    FMath::Lerp(21.0f, 34.0f, Noise01(Seed + 2)) +
+                (Noise01(Seed + 3) - 0.5f) * 15.0f * Form.Asymmetry,
+            360.0f);
+        const float Angle = FMath::DegreesToRadians(AngleDegrees);
+        const FVector Horizontal(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+        const FVector Side(-Horizontal.Y, Horizontal.X, 0.0f);
+        const bool bInGap = Form.CrownGapCenterT >= 0.0f &&
+            FMath::Abs(BranchT - Form.CrownGapCenterT) < Form.CrownGapHalfWidthT;
+        const bool bDamaged = Form.DamageModulo > 0 &&
+            (BranchIndex + Form.SeedOffset) % Form.DamageModulo == Form.DamageRemainder;
+        const float LengthScale = FMath::Clamp(
+            SectorScale(AngleDegrees) *
+                (bInGap ? Form.CrownGapLengthScale : 1.0f) *
+                (bDamaged ? Form.DamagedBranchLengthScale : 1.0f),
+            0.16f,
+            1.0f);
+        const float CrownProfile = FMath::Pow(1.0f - BranchT, 0.62f);
+        const float BranchLength = Form.CrownRadiusCm *
+            (0.22f + CrownProfile * 0.78f) *
+            FMath::Lerp(0.80f, 1.14f, Noise01(Seed + 3)) * LengthScale;
+        const FVector Start = LeanAtZ(StartZ) + Horizontal * 12.0f + FVector(0.0f, 0.0f, StartZ);
+        const float SideBend = (Noise01(Seed + 4) - 0.5f) * 58.0f * Form.Asymmetry;
+        const float BranchPitch = FMath::Lerp(-0.08f, 0.30f, BranchT) +
+            (Noise01(Seed + 6) - 0.5f) * 0.20f;
+        const FVector Mid = Start + Horizontal * BranchLength * 0.55f + Side * SideBend +
+            FVector::UpVector * BranchLength *
+                (BranchPitch * 0.42f + 0.035f) * Form.BranchUplift;
+        const FVector End = Start + Horizontal * BranchLength + Side * SideBend * 0.45f +
+            FVector::UpVector * BranchLength *
+                (BranchPitch + FMath::Lerp(-0.04f, 0.12f, BranchT)) *
+                    Form.BranchUplift;
+        const float BaseRadius = FMath::Lerp(18.0f, 5.0f, BranchT) *
+            FMath::Clamp(Form.BaseRadiusCm / 72.0f, 0.55f, 1.25f);
+        const FVector CollarEnd = FMath::Lerp(Start, Mid, 0.18f);
+        AppendNativeCanopyTaperedSegment(
+            Start, CollarEnd, BaseRadius * 1.28f, BaseRadius * 0.82f, 10,
+            WoodyVertices, WoodyTriangles, WoodyNormals, WoodyUVs);
+        AppendNativeCanopyTaperedSegment(
+            FMath::Lerp(Start, Mid, 0.12f), Mid, BaseRadius * 0.88f, BaseRadius * 0.58f, 9,
+            WoodyVertices, WoodyTriangles, WoodyNormals, WoodyUVs);
+        AppendNativeCanopyTaperedSegment(
+            Mid, End, BaseRadius * 0.62f, bDamaged ? 2.4f : 1.1f, 7,
+            WoodyVertices, WoodyTriangles, WoodyNormals, WoodyUVs);
+
+        const FVector MainDirection = (End - Mid).GetSafeNormal();
+        const int32 MainSprayCount = bDamaged ? 6 : (bInGap ? 9 : 13);
+        for (int32 SprayIndex = 0; SprayIndex < MainSprayCount; ++SprayIndex)
+        {
+            const float SprayT = FMath::Lerp(
+                0.12f,
+                0.93f,
+                MainSprayCount == 1
+                    ? 0.5f
+                    : static_cast<float>(SprayIndex) / (MainSprayCount - 1));
+            const FVector SprayCenter =
+                SprayT < 0.50f
+                    ? FMath::Lerp(Start, Mid, SprayT * 2.0f)
+                    : FMath::Lerp(Mid, End, (SprayT - 0.50f) * 2.0f);
+            const FVector LocalSprayDirection =
+                SprayT < 0.50f ? (Mid - Start).GetSafeNormal() : MainDirection;
+            const float SprayScale = FMath::Lerp(1.0f, 0.66f, SprayT) *
+                FMath::Lerp(0.88f, 1.12f, Noise01(Seed + 20 + SprayIndex));
+            AddTerminalCluster(
+                SprayCenter,
+                LocalSprayDirection,
+                102.0f * SprayScale,
+                176.0f * SprayScale,
+                Seed + SprayIndex * 3);
+        }
+
+        const int32 SecondaryCount = bDamaged ? 3 : 6;
+        for (int32 SecondaryIndex = 0; SecondaryIndex < SecondaryCount; ++SecondaryIndex)
+        {
+            const float SecondaryT = 0.24f + SecondaryIndex * 0.145f;
+            const float SideSign = (BranchIndex + SecondaryIndex) % 2 == 0 ? 1.0f : -1.0f;
+            const FVector SecondaryStart = FMath::Lerp(Mid, End, SecondaryT);
+            const FVector SecondaryDirection = (
+                MainDirection * 0.46f + Side * SideSign * 0.82f + FVector::UpVector * 0.12f)
+                                                    .GetSafeNormal();
+            const float SecondaryLength = BranchLength *
+                FMath::Lerp(0.15f, 0.22f, Noise01(Seed + 40 + SecondaryIndex));
+            const FVector SecondaryEnd = SecondaryStart + SecondaryDirection * SecondaryLength;
+            AppendNativeCanopyTaperedSegment(
+                SecondaryStart, SecondaryEnd, 3.0f, 0.40f, 6,
+                WoodyVertices, WoodyTriangles, WoodyNormals, WoodyUVs);
+            for (int32 SecondarySprayIndex = 0; SecondarySprayIndex < 3; ++SecondarySprayIndex)
+            {
+                const float SecondarySprayT = 0.40f + SecondarySprayIndex * 0.25f;
+                AddTerminalCluster(
+                    FMath::Lerp(SecondaryStart, SecondaryEnd, SecondarySprayT),
+                    SecondaryDirection,
+                    FMath::Lerp(78.0f, 104.0f, Noise01(Seed + 50 + SecondaryIndex * 7 + SecondarySprayIndex)),
+                    FMath::Lerp(124.0f, 164.0f, Noise01(Seed + 60 + SecondaryIndex * 7 + SecondarySprayIndex)),
+                    Seed + SecondaryIndex * 11 + SecondarySprayIndex * 5 + 11);
+            }
+
+            const FVector SecondarySide =
+                FVector::CrossProduct(SecondaryDirection, FVector::UpVector).GetSafeNormal();
+            for (int32 TertiaryIndex = 0; TertiaryIndex < 3; ++TertiaryIndex)
+            {
+                const float TertiaryT = 0.30f + TertiaryIndex * 0.22f;
+                const float TertiarySign =
+                    (BranchIndex + SecondaryIndex + TertiaryIndex) % 2 == 0 ? 1.0f : -1.0f;
+                const FVector TertiaryStart =
+                    FMath::Lerp(SecondaryStart, SecondaryEnd, TertiaryT);
+                const FVector TertiaryDirection = (
+                    SecondaryDirection * 0.54f +
+                    SecondarySide * TertiarySign * 0.76f +
+                    FVector::UpVector * (0.12f + TertiaryIndex * 0.04f))
+                                                        .GetSafeNormal();
+                const float TertiaryLength = FMath::Lerp(
+                    38.0f,
+                    68.0f,
+                    Noise01(Seed + 90 + SecondaryIndex * 13 + TertiaryIndex));
+                const FVector TertiaryEnd = TertiaryStart + TertiaryDirection * TertiaryLength;
+                AppendNativeCanopyTaperedSegment(
+                    TertiaryStart,
+                    TertiaryEnd,
+                    0.95f,
+                    0.12f,
+                    5,
+                    WoodyVertices,
+                    WoodyTriangles,
+                    WoodyNormals,
+                    WoodyUVs);
+                AddTerminalCluster(
+                    FMath::Lerp(TertiaryStart, TertiaryEnd, 0.70f),
+                    TertiaryDirection,
+                    FMath::Lerp(62.0f, 82.0f, Noise01(Seed + 110 + TertiaryIndex)),
+                    FMath::Lerp(94.0f, 128.0f, Noise01(Seed + 120 + TertiaryIndex)),
+                    Seed + SecondaryIndex * 17 + TertiaryIndex * 7 + 29);
+            }
+        }
+
+        const int32 InteriorShootCount = bDamaged ? 2 : 5;
+        for (int32 InteriorIndex = 0; InteriorIndex < InteriorShootCount; ++InteriorIndex)
+        {
+            const float InteriorT = 0.26f + InteriorIndex * 0.13f;
+            const float InteriorSign = InteriorIndex % 2 == 0 ? 1.0f : -1.0f;
+            const FVector InteriorStart = FMath::Lerp(Start, End, InteriorT);
+            const FVector InteriorDirection = (
+                MainDirection * 0.52f + Side * InteriorSign * 0.56f +
+                FVector::UpVector * FMath::Lerp(0.20f, 0.46f, BranchT))
+                                                    .GetSafeNormal();
+            const float InteriorLength = FMath::Lerp(
+                46.0f,
+                84.0f,
+                Noise01(Seed + 140 + InteriorIndex));
+            const FVector InteriorEnd = InteriorStart + InteriorDirection * InteriorLength;
+            AppendNativeCanopyTaperedSegment(
+                InteriorStart,
+                InteriorEnd,
+                1.15f,
+                0.16f,
+                5,
+                WoodyVertices,
+                WoodyTriangles,
+                WoodyNormals,
+                WoodyUVs);
+            AddTerminalCluster(
+                FMath::Lerp(InteriorStart, InteriorEnd, 0.68f),
+                InteriorDirection,
+                FMath::Lerp(68.0f, 92.0f, Noise01(Seed + 150 + InteriorIndex)),
+                FMath::Lerp(108.0f, 148.0f, Noise01(Seed + 160 + InteriorIndex)),
+                Seed + InteriorIndex * 19 + 53);
+        }
+
+        if (BranchT < 0.72f && BranchIndex % 2 == 0)
+        {
+            const FVector InnerDirection = (
+                MainDirection * 0.46f +
+                Side * ((BranchIndex % 4 == 0) ? 0.38f : -0.38f) +
+                FVector::UpVector * FMath::Lerp(0.48f, 0.72f, BranchT))
+                                                    .GetSafeNormal();
+            AddTerminalCluster(
+                FMath::Lerp(Start, Mid, 0.26f),
+                InnerDirection,
+                FMath::Lerp(72.0f, 94.0f, Noise01(Seed + 173)),
+                FMath::Lerp(118.0f, 154.0f, Noise01(Seed + 179)),
+                Seed + 181);
+        }
+
+        if (BranchIndex == FMath::Clamp(Form.BranchCount / 5, 0, Form.BranchCount - 1))
+        {
+            OutCloseupTarget = FMath::Lerp(Mid, End, 0.80f);
+            OutCloseupCamera = OutCloseupTarget + Side * 320.0f + Horizontal * 140.0f +
+                FVector::UpVector * 100.0f;
+        }
+    }
+
+    for (int32 LeaderIndex = 0; LeaderIndex < 14; ++LeaderIndex)
+    {
+        const float Angle = 2.0f * PI * LeaderIndex / 14.0f;
+        const float T = static_cast<float>(LeaderIndex) / 13.0f;
+        const FVector Radial(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f);
+        const FVector Direction = (FVector::UpVector * 0.84f + Radial * 0.54f).GetSafeNormal();
+        const FVector Center = LeanAtZ(Form.HeightCm * (0.78f + T * 0.18f)) +
+            FVector(0.0f, 0.0f, Form.HeightCm * (0.78f + T * 0.18f)) +
+            Radial * Form.CrownRadiusCm * FMath::Lerp(0.24f, 0.05f, T);
+        AddTerminalCluster(
+            Center,
+            Direction,
+            FMath::Lerp(108.0f, 68.0f, T),
+            FMath::Lerp(188.0f, 118.0f, T),
+            Form.SeedOffset + LeaderIndex * 13);
+    }
+}
+
+void BuildReducedNativeCanopyCardGeometry(
+    const TArray<FVector>& SourceVertices,
+    const TArray<int32>& SourceTriangles,
+    const TArray<FVector>& SourceNormals,
+    const TArray<FVector2D>& SourceUVs,
+    int32 CardStride,
+    float CardScale,
+    TArray<FVector>& OutVertices,
+    TArray<int32>& OutTriangles,
+    TArray<FVector>& OutNormals,
+    TArray<FVector2D>& OutUVs)
+{
+    check(CardStride > 0);
+    check(SourceVertices.Num() % 4 == 0);
+    check(SourceTriangles.Num() % 6 == 0);
+    check(SourceNormals.Num() == SourceVertices.Num());
+    check(SourceUVs.Num() == SourceVertices.Num());
+    const int32 SourceCardCount = SourceVertices.Num() / 4;
+    OutVertices.Reset();
+    OutTriangles.Reset();
+    OutNormals.Reset();
+    OutUVs.Reset();
+    OutVertices.Reserve(FMath::DivideAndRoundUp(SourceCardCount, CardStride) * 4);
+    OutTriangles.Reserve(FMath::DivideAndRoundUp(SourceCardCount, CardStride) * 6);
+    for (int32 SourceCardIndex = 0;
+         SourceCardIndex < SourceCardCount;
+         SourceCardIndex += CardStride)
+    {
+        const int32 SourceVertexStart = SourceCardIndex * 4;
+        const FVector Center =
+            (SourceVertices[SourceVertexStart] + SourceVertices[SourceVertexStart + 1] +
+             SourceVertices[SourceVertexStart + 2] + SourceVertices[SourceVertexStart + 3]) * 0.25f;
+        const int32 OutputVertexStart = OutVertices.Num();
+        for (int32 Corner = 0; Corner < 4; ++Corner)
+        {
+            const int32 SourceVertexIndex = SourceVertexStart + Corner;
+            OutVertices.Add(
+                Center + (SourceVertices[SourceVertexIndex] - Center) * CardScale);
+            OutNormals.Add(SourceNormals[SourceVertexIndex]);
+            OutUVs.Add(SourceUVs[SourceVertexIndex]);
+        }
+        OutTriangles.Append({
+            OutputVertexStart,
+            OutputVertexStart + 2,
+            OutputVertexStart + 1,
+            OutputVertexStart,
+            OutputVertexStart + 3,
+            OutputVertexStart + 2});
+    }
+}
+
+UStaticMesh* ConvertNativeCanopyProceduralActorToStaticMesh(
+    AActor* Actor,
+    const FString& PackagePath,
+    UMaterialInterface* Material,
+    bool bEnableNanite,
+    ENaniteShapePreservation ShapePreservation,
+    FString& OutSummary)
+{
+    const FString AssetName = FPackageName::GetLongPackageAssetName(PackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UStaticMesh* ExistingMesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+    UProceduralMeshComponent* Component = Actor ? Actor->FindComponentByClass<UProceduralMeshComponent>() : nullptr;
+    if (!Component)
+    {
+        OutSummary += FString::Printf(TEXT("No procedural component available for %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    FMeshDescription MeshDescription = BuildMeshDescription(Component);
+    if (MeshDescription.Polygons().Num() == 0)
+    {
+        OutSummary += FString::Printf(TEXT("Native-canopy mesh description is empty for %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    UPackage* Package = ExistingMesh ? ExistingMesh->GetOutermost() : CreatePackage(*PackagePath);
+    UStaticMesh* Mesh = ExistingMesh ? ExistingMesh : (Package
+        ? NewObject<UStaticMesh>(Package, *AssetName, RF_Public | RF_Standalone | RF_Transactional)
+        : nullptr);
+    if (!Mesh)
+    {
+        OutSummary += FString::Printf(TEXT("Failed to allocate native-canopy static mesh %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    Mesh->Modify();
+    if (!ExistingMesh)
+    {
+        Mesh->InitResources();
+    }
+    Mesh->SetLightingGuid();
+    Mesh->SetNumSourceModels(1);
+    FStaticMeshSourceModel& SourceModel = Mesh->GetSourceModel(0);
+    SourceModel.BuildSettings.bRecomputeNormals = false;
+    SourceModel.BuildSettings.bRecomputeTangents = true;
+    SourceModel.BuildSettings.bRemoveDegenerates = true;
+    SourceModel.BuildSettings.bUseHighPrecisionTangentBasis = false;
+    SourceModel.BuildSettings.bUseFullPrecisionUVs = false;
+    SourceModel.BuildSettings.bGenerateLightmapUVs = true;
+    SourceModel.BuildSettings.SrcLightmapIndex = 0;
+    SourceModel.BuildSettings.DstLightmapIndex = 1;
+    Mesh->CreateMeshDescription(0, MoveTemp(MeshDescription));
+    Mesh->CommitMeshDescription(0);
+    Mesh->GetStaticMaterials().Empty();
+    Mesh->GetStaticMaterials().Add(FStaticMaterial(Material));
+    Mesh->SetImportVersion(EImportStaticMeshVersion::LastVersion);
+    Mesh->SetLightMapCoordinateIndex(1);
+    Mesh->GetNaniteSettings().bEnabled = bEnableNanite;
+    Mesh->GetNaniteSettings().ShapePreservation = ShapePreservation;
+    Mesh->Build(false);
+    Mesh->PostEditChange();
+    Mesh->MarkPackageDirty();
+    if (!ExistingMesh)
+    {
+        FAssetRegistryModule::AssetCreated(Mesh);
+    }
+    FAssetCompilingManager::Get().FinishAllCompilation();
+
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Mesh->GetOutermost(), Mesh, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Failed to save native-canopy mesh %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Saved native-canopy mesh %s (Nanite %s, shape preservation %s, %d vertices, %d triangles).\n"),
+        *ObjectPath,
+        bEnableNanite ? TEXT("enabled") : TEXT("disabled"),
+        ShapePreservation == ENaniteShapePreservation::PreserveArea ? TEXT("PreserveArea") : TEXT("None"),
+        Mesh->GetNumVertices(0),
+        Mesh->GetNumTriangles(0));
+    return Mesh;
 }
 
 AActor* AddPreviewIrregularRockActor(
@@ -15626,7 +18696,8 @@ bool CapturePreviewImageForSpec(
     const FString& CaptureId,
     const FString& CaptureDescription,
     bool bHideForegroundRaftProxies,
-    FString& OutSummary)
+    FString& OutSummary,
+    const TFunction<bool(UWorld*, ACameraActor*, FString&)>& WorldSetup = {})
 {
     const FString MapFilename =
         FPackageName::LongPackageNameToFilename(Spec.MapPackagePath, FPackageName::GetMapPackageExtension());
@@ -15671,6 +18742,16 @@ bool CapturePreviewImageForSpec(
         OutSummary += FString::Printf(TEXT("No %s capture camera found in %s\n"), *CaptureDescription, *Spec.MapPackagePath);
         return false;
     }
+
+    if (WorldSetup && !WorldSetup(World, Camera, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Capture world setup failed for %s.\n"),
+            *CaptureDescription);
+        return false;
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
 
     UTextureRenderTarget2D* RenderTarget =
         NewObject<UTextureRenderTarget2D>(GetTransientPackage(), NAME_None, RF_Transient);
@@ -15990,6 +19071,857 @@ bool CapturePreviewImageForSpec(
     return bSaved;
 }
 
+FBox GetZambeziCliffComparisonEffectiveBounds(UStaticMesh* Mesh)
+{
+    if (!Mesh)
+    {
+        return FBox(EForceInit::ForceInit);
+    }
+
+    const FBox RawBounds = Mesh->GetBoundingBox();
+    if (RawBounds.GetSize().Z >= 100.0f || Mesh->GetNumSourceModels() == 0)
+    {
+        return RawBounds;
+    }
+    const FVector BuildScale = Mesh->GetSourceModel(0).BuildSettings.BuildScale3D;
+    return FBox(RawBounds.Min * BuildScale, RawBounds.Max * BuildScale);
+}
+
+struct FZambeziCliffComparisonPlacement
+{
+    FVector Location = FVector::ZeroVector;
+    FRotator Rotation = FRotator::ZeroRotator;
+    FVector Scale = FVector::OneVector;
+};
+
+bool AddZambeziCliffComparisonInstances(
+    UWorld* World,
+    ACameraActor* Camera,
+    UStaticMesh* CliffMesh,
+    TArray<FZambeziCliffComparisonPlacement>& OutPlacements,
+    FString& OutSummary)
+{
+    if (!World || !Camera || !CliffMesh)
+    {
+        return false;
+    }
+
+    TActorIterator<ALandscape> LandscapeIt(World);
+    ALandscape* Landscape = LandscapeIt ? *LandscapeIt : nullptr;
+    if (!Landscape)
+    {
+        OutSummary += TEXT("Zambezi cliff comparison could not find the source Landscape height authority.\n");
+        return false;
+    }
+
+    const FVector CameraLocation = Camera->GetActorLocation();
+    const FBox EffectiveCliffBounds = GetZambeziCliffComparisonEffectiveBounds(CliffMesh);
+    FVector Forward = Camera->GetActorForwardVector();
+    Forward.Z = 0.0f;
+    Forward.Normalize();
+    const FVector Right(-Forward.Y, Forward.X, 0.0f);
+    const float ForwardDistancesCm[] = {
+        16500.0f, 22500.0f, 29500.0f, 36500.0f,
+        45500.0f, 55500.0f, 67500.0f, 80500.0f};
+    const float SideSigns[] = {-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f};
+    const float LateralOffsetsCm[] = {
+        8600.0f, 9800.0f, 11200.0f, 9400.0f,
+        12600.0f, 10800.0f, 13800.0f, 11800.0f};
+    const float UniformScales[] = {1.08f, 0.94f, 1.34f, 1.16f, 1.48f, 1.24f, 1.58f, 1.38f};
+    const float YawOffsetsDeg[] = {-8.0f, 11.0f, 7.0f, -13.0f, 15.0f, -6.0f, -17.0f, 9.0f};
+
+    OutPlacements.Reset();
+    for (int32 Index = 0; Index < UE_ARRAY_COUNT(ForwardDistancesCm); ++Index)
+    {
+        const FVector CandidateLocation =
+            CameraLocation + Forward * ForwardDistancesCm[Index] +
+            Right * SideSigns[Index] * LateralOffsetsCm[Index];
+        const float GroundZ = Landscape->GetHeightAtLocation(
+            FVector(CandidateLocation.X, CandidateLocation.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(TNumericLimits<float>::Lowest());
+        if (!FMath::IsFinite(GroundZ))
+        {
+            OutSummary += FString::Printf(
+                TEXT("Zambezi cliff comparison could not resolve ground height for placement %d.\n"),
+                Index);
+            return false;
+        }
+
+        FActorSpawnParameters SpawnParameters;
+        SpawnParameters.ObjectFlags = RF_Transient;
+        AStaticMeshActor* CliffActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(),
+            FTransform::Identity,
+            SpawnParameters);
+        if (!CliffActor || !CliffActor->GetStaticMeshComponent())
+        {
+            OutSummary += FString::Printf(
+                TEXT("Zambezi cliff comparison failed to spawn placement %d.\n"),
+                Index);
+            return false;
+        }
+
+        const float UniformScale = UniformScales[Index];
+        const FRotator Rotation(0.0f, Camera->GetActorRotation().Yaw + YawOffsetsDeg[Index], 0.0f);
+        const FVector Location(
+            CandidateLocation.X,
+            CandidateLocation.Y,
+            GroundZ - EffectiveCliffBounds.Min.Z * UniformScale + 4.0f);
+        CliffActor->SetActorLabel(FString::Printf(TEXT("RaftSim_ZambeziCliffReview_%02d"), Index));
+        CliffActor->Tags.Add(TEXT("RaftSim_ExternalReviewOnly"));
+        CliffActor->SetActorLocationAndRotation(Location, Rotation);
+        CliffActor->SetActorScale3D(FVector(UniformScale));
+        UStaticMeshComponent* MeshComponent = CliffActor->GetStaticMeshComponent();
+        MeshComponent->SetStaticMesh(CliffMesh);
+        MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        MeshComponent->SetGenerateOverlapEvents(false);
+        MeshComponent->SetCastShadow(true);
+        MeshComponent->SetMobility(EComponentMobility::Static);
+        MeshComponent->MarkRenderStateDirty();
+
+        FZambeziCliffComparisonPlacement& Placement = OutPlacements.AddDefaulted_GetRef();
+        Placement.Location = Location;
+        Placement.Rotation = Rotation;
+        Placement.Scale = FVector(UniformScale);
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Placed %d transient, non-colliding Namaqualand cliff analog instances at bounded 0.94-1.58x scale for the Zambezi comparison capture.\n"),
+        OutPlacements.Num());
+    return OutPlacements.Num() == UE_ARRAY_COUNT(ForwardDistancesCm);
+}
+
+struct FFutaleufuCanopyCorridorComparisonStats
+{
+    int32 CandidateCount = 0;
+    int32 AcceptedTreeCount = 0;
+    int32 NearTreeCount = 0;
+    int32 MidTreeCount = 0;
+    int32 FarTreeCount = 0;
+    int32 HiddenFallbackActorCount = 0;
+    int32 RejectedNaturalGapCount = 0;
+    int32 RejectedVegetationMaskCount = 0;
+    int32 RejectedWaterMaskCount = 0;
+    int32 RejectedElevationCount = 0;
+    int32 RejectedSlopeCount = 0;
+    int32 RejectedDryAspectCount = 0;
+    int32 RejectedSpacingCount = 0;
+    float MinimumAcceptedSlopeDegrees = TNumericLimits<float>::Max();
+    float MaximumAcceptedSlopeDegrees = TNumericLimits<float>::Lowest();
+    float MinimumAcceptedElevationCm = TNumericLimits<float>::Max();
+    float MaximumAcceptedElevationCm = TNumericLimits<float>::Lowest();
+    double AcceptedVegetationMaskSum = 0.0;
+    double AcceptedWaterMaskSum = 0.0;
+};
+
+struct FFutaleufuCanopyCorridorVariant
+{
+    FString AssetToken;
+    UStaticMesh* TrunkMesh = nullptr;
+    UStaticMesh* BranchletMesh = nullptr;
+    UStaticMesh* NearLeafMesh = nullptr;
+    UStaticMesh* MidLeafMesh = nullptr;
+    UStaticMesh* FarLeafMesh = nullptr;
+    UHierarchicalInstancedStaticMeshComponent* TrunkInstances = nullptr;
+    UHierarchicalInstancedStaticMeshComponent* BranchletInstances = nullptr;
+    UHierarchicalInstancedStaticMeshComponent* NearLeafInstances = nullptr;
+    UHierarchicalInstancedStaticMeshComponent* MidLeafInstances = nullptr;
+    UHierarchicalInstancedStaticMeshComponent* FarLeafInstances = nullptr;
+};
+
+enum class EFutaleufuCanopyCorridorRenderMode : uint8
+{
+    Native,
+    NativeLeavesNoShadow,
+    OpaqueLeavesNoShadow,
+    NativeAlphaScaleFourNoShadow,
+    NativeAlphaScaleTwoNoShadow,
+    NativeAlphaScaleThreeNoShadow,
+    NativeAlphaScaleTwoBoundedShadow,
+    NativeConstantOpacityNoShadow,
+    NativeAlphaScaleFourAoOffNoShadow,
+    NativeAlphaScaleFourFlatNormalNoShadow,
+    NativeAlphaScaleFourEmissiveNoShadow,
+    NativeAlphaScaleFourBaseColorDoubleNoShadow,
+    NativeAlphaScaleFourTransmissionWhiteNoShadow,
+    NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow,
+    DefaultLitAlphaScaleFourNoShadow,
+    DefaultLitAlphaScaleFourBaseColorDoubleNoShadow,
+};
+
+enum class EFutaleufuCanopyCorridorLightingTreatment : uint8
+{
+    Baseline,
+    IsolatedReviewFill,
+    SkyLightDouble,
+};
+
+bool ApplyFutaleufuCanopyCorridorLightingTreatment(
+    UWorld* World,
+    EFutaleufuCanopyCorridorLightingTreatment Treatment,
+    FString& OutSummary)
+{
+    if (!World)
+    {
+        return false;
+    }
+    if (Treatment == EFutaleufuCanopyCorridorLightingTreatment::Baseline)
+    {
+        OutSummary += TEXT("Retained the saved Futaleufu corridor light rig for the V18 baseline.\n");
+        return true;
+    }
+
+    ASkyLight* CorridorSkyLight = nullptr;
+    for (TActorIterator<ASkyLight> It(World); It; ++It)
+    {
+        ASkyLight* Candidate = *It;
+        if (!CorridorSkyLight ||
+            (Candidate && Candidate->GetActorLabel() == TEXT("RaftSim_SkyLight_PhotorealPreview")))
+        {
+            CorridorSkyLight = Candidate;
+        }
+        if (Candidate && Candidate->GetActorLabel() == TEXT("RaftSim_SkyLight_PhotorealPreview"))
+        {
+            break;
+        }
+    }
+    if (!CorridorSkyLight || !CorridorSkyLight->GetLightComponent())
+    {
+        OutSummary += TEXT("Futaleufu V18 lighting treatment could not find the corridor skylight.\n");
+        return false;
+    }
+
+    const float SkyLightIntensity =
+        Treatment == EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill
+        ? 1.65f
+        : 3.10f;
+    CorridorSkyLight->GetLightComponent()->SetIntensity(SkyLightIntensity);
+    CorridorSkyLight->GetLightComponent()->RecaptureSky();
+
+    if (Treatment == EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill)
+    {
+        ADirectionalLight* FrontFill = World->SpawnActor<ADirectionalLight>(
+            ADirectionalLight::StaticClass(),
+            FTransform(FRotator(-32.0f, 42.0f, 0.0f)));
+        ADirectionalLight* BackFill = World->SpawnActor<ADirectionalLight>(
+            ADirectionalLight::StaticClass(),
+            FTransform(FRotator(-28.0f, -138.0f, 0.0f)));
+        if (!FrontFill || !FrontFill->GetLightComponent() ||
+            !BackFill || !BackFill->GetLightComponent())
+        {
+            OutSummary += TEXT("Futaleufu V18 lighting treatment could not create both transient fill lights.\n");
+            return false;
+        }
+        FrontFill->SetFlags(RF_Transient);
+        FrontFill->SetActorLabel(TEXT("RaftSim_V18_Coigue_TransientFrontFill"));
+        FrontFill->GetLightComponent()->SetIntensity(0.75f);
+        FrontFill->GetLightComponent()->SetLightColor(FLinearColor(0.94f, 0.98f, 1.0f));
+        FrontFill->GetLightComponent()->SetCastShadows(false);
+        BackFill->SetFlags(RF_Transient);
+        BackFill->SetActorLabel(TEXT("RaftSim_V18_Coigue_TransientBackFill"));
+        BackFill->GetLightComponent()->SetIntensity(0.38f);
+        BackFill->GetLightComponent()->SetLightColor(FLinearColor(1.0f, 0.96f, 0.90f));
+        BackFill->GetLightComponent()->SetCastShadows(false);
+        OutSummary += TEXT("Applied the transient isolated-review front/back fill and 1.65 skylight treatment.\n");
+    }
+    else
+    {
+        OutSummary += TEXT("Applied the transient 3.10 skylight-only treatment and recaptured the sky.\n");
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+    return true;
+}
+
+const TCHAR* GetFutaleufuCanopyCorridorRenderModeToken(
+    EFutaleufuCanopyCorridorRenderMode RenderMode)
+{
+    switch (RenderMode)
+    {
+    case EFutaleufuCanopyCorridorRenderMode::NativeLeavesNoShadow:
+        return TEXT("NativeLeavesNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::OpaqueLeavesNoShadow:
+        return TEXT("OpaqueLeavesNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow:
+        return TEXT("NativeAlphaScaleFourNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow:
+        return TEXT("NativeAlphaScaleTwoNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleThreeNoShadow:
+        return TEXT("NativeAlphaScaleThreeNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoBoundedShadow:
+        return TEXT("NativeAlphaScaleTwoBoundedShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow:
+        return TEXT("NativeConstantOpacityNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow:
+        return TEXT("NativeAlphaScaleFourAoOffNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourFlatNormalNoShadow:
+        return TEXT("NativeAlphaScaleFourFlatNormalNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow:
+        return TEXT("NativeAlphaScaleFourEmissiveNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow:
+        return TEXT("NativeAlphaScaleFourBaseColorDoubleNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourTransmissionWhiteNoShadow:
+        return TEXT("NativeAlphaScaleFourTransmissionWhiteNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow:
+        return TEXT("NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourNoShadow:
+        return TEXT("DefaultLitAlphaScaleFourNoShadow");
+    case EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourBaseColorDoubleNoShadow:
+        return TEXT("DefaultLitAlphaScaleFourBaseColorDoubleNoShadow");
+    default:
+        return TEXT("Native");
+    }
+}
+
+bool AddFutaleufuCanopyCorridorComparisonInstances(
+    UWorld* World,
+    ACameraActor* Camera,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    EFutaleufuCanopyCorridorRenderMode RenderMode,
+    FFutaleufuCanopyCorridorComparisonStats& OutStats,
+    FString& OutSummary)
+{
+    OutStats = FFutaleufuCanopyCorridorComparisonStats();
+    if (!World || !Camera || Candidate.PreviewSpec.RiverId != TEXT("futaleufu_terminator"))
+    {
+        return false;
+    }
+
+    TActorIterator<ALandscape> LandscapeIt(World);
+    ALandscape* Landscape = LandscapeIt ? *LandscapeIt : nullptr;
+    if (!Landscape)
+    {
+        OutSummary += TEXT("Futaleufu canopy comparison could not find the source Landscape height authority.\n");
+        return false;
+    }
+
+    FRaftSimPreviewImage VegetationMask;
+    FRaftSimPreviewImage WaterMask;
+    if (!LoadPreviewPngImage(Candidate.PreviewSpec.VegetationMaskImage, VegetationMask) ||
+        !LoadPreviewPngImage(Candidate.PreviewSpec.WaterMaskImage, WaterMask))
+    {
+        OutSummary += TEXT("Futaleufu canopy comparison requires the source vegetation and water masks.\n");
+        return false;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> Centerline;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, Centerline, OutSummary) || Centerline.Num() < 2)
+    {
+        return false;
+    }
+
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor || !Actor->GetActorLabel().Contains(TEXT("LandscapeCandidate_PveWhole")))
+        {
+            continue;
+        }
+        TArray<UPrimitiveComponent*> Components;
+        Actor->GetComponents<UPrimitiveComponent>(Components);
+        for (UPrimitiveComponent* Component : Components)
+        {
+            if (Component)
+            {
+                Component->SetVisibility(false, true);
+                Component->SetHiddenInGame(true, true);
+            }
+        }
+        Actor->SetActorHiddenInGame(true);
+        Actor->SetIsTemporarilyHiddenInEditor(true);
+        ++OutStats.HiddenFallbackActorCount;
+    }
+
+    static const TCHAR* VariantTokens[] = {
+        TEXT("AdultPrototype"),
+        TEXT("ForestGrownAdultPrototype"),
+        TEXT("StormDamagedAdultPrototype"),
+        TEXT("CompetitionLeanAdultPrototype"),
+        TEXT("CrownGapAdultPrototype"),
+        TEXT("IntermediatePrototype"),
+        TEXT("SuppressedIntermediatePrototype"),
+        TEXT("ReleasedIntermediatePrototype")};
+    static const FString MeshRoot =
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/");
+    UMaterial* BarkMaterial = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/"
+             "M_RaftSim_FutaleufuCoigue_Bark.M_RaftSim_FutaleufuCoigue_Bark"));
+    UMaterial* LeafMaterial = LoadObject<UMaterial>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/"
+             "M_RaftSim_FutaleufuCoigue_Leaves.M_RaftSim_FutaleufuCoigue_Leaves"));
+    if (!BarkMaterial || !LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu canopy comparison could not load the project-owned bark/leaf materials.\n");
+        return false;
+    }
+    if (!EnsureFutaleufuNativeCanopyInstancedMaterialUsage(BarkMaterial, OutSummary) ||
+        !EnsureFutaleufuNativeCanopyInstancedMaterialUsage(LeafMaterial, OutSummary))
+    {
+        return false;
+    }
+    const bool bDefaultLitDiagnostic =
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourBaseColorDoubleNoShadow;
+    UMaterial* SourceLeafMaterial = LeafMaterial;
+    if (bDefaultLitDiagnostic)
+    {
+        SourceLeafMaterial = LoadObject<UMaterial>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/"
+                 "M_RaftSim_FutaleufuCoigue_Leaves_DefaultLitDiagnostic."
+                 "M_RaftSim_FutaleufuCoigue_Leaves_DefaultLitDiagnostic"));
+        if (!SourceLeafMaterial ||
+            !EnsureFutaleufuNativeCanopyInstancedMaterialUsage(SourceLeafMaterial, OutSummary))
+        {
+            OutSummary += TEXT("Futaleufu canopy comparison could not load the masked DefaultLit diagnostic material.\n");
+            return false;
+        }
+    }
+    UMaterialInterface* CorridorLeafMaterial = SourceLeafMaterial;
+    const bool bBoundedLeafShadow =
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoBoundedShadow;
+    const bool bLeafCastShadow =
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::Native || bBoundedLeafShadow;
+    if (RenderMode == EFutaleufuCanopyCorridorRenderMode::OpaqueLeavesNoShadow)
+    {
+        CorridorLeafMaterial = CreatePreviewColorMaterial(
+            World,
+            FLinearColor(0.045f, 0.31f, 0.065f, 1.0f));
+        if (!CorridorLeafMaterial)
+        {
+            OutSummary += TEXT("Futaleufu canopy diagnostic could not create the opaque leaf material.\n");
+            return false;
+        }
+    }
+    else if (
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleThreeNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoBoundedShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourFlatNormalNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourTransmissionWhiteNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourNoShadow ||
+        RenderMode == EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourBaseColorDoubleNoShadow)
+    {
+        UMaterialInstanceDynamic* DiagnosticLeafMaterial =
+            UMaterialInstanceDynamic::Create(SourceLeafMaterial, World);
+        if (!DiagnosticLeafMaterial)
+        {
+            OutSummary += TEXT("Futaleufu canopy diagnostic could not create the native leaf material override.\n");
+            return false;
+        }
+        float OpacityScale = 4.0f;
+        if (RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow)
+        {
+            OpacityScale = 1.0f;
+        }
+        else if (
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow ||
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoBoundedShadow)
+        {
+            OpacityScale = 2.0f;
+        }
+        else if (RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleThreeNoShadow)
+        {
+            OpacityScale = 3.0f;
+        }
+        DiagnosticLeafMaterial->SetScalarParameterValue(TEXT("LeafOpacityScale"), OpacityScale);
+        DiagnosticLeafMaterial->SetScalarParameterValue(
+            TEXT("LeafOpacityOverride"),
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow
+                ? 1.0f
+                : 0.0f);
+        DiagnosticLeafMaterial->SetScalarParameterValue(
+            TEXT("LeafAOInfluence"),
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow
+                ? 0.0f
+                : 0.55f);
+        DiagnosticLeafMaterial->SetScalarParameterValue(
+            TEXT("LeafNormalStrength"),
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourFlatNormalNoShadow
+                ? 0.0f
+                : 1.0f);
+        DiagnosticLeafMaterial->SetScalarParameterValue(
+            TEXT("LeafDiagnosticEmissive"),
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow
+                ? 0.35f
+                : 0.0f);
+        const bool bDoubleBaseColor =
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow ||
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow ||
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourBaseColorDoubleNoShadow;
+        const bool bWhiteTransmission =
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourTransmissionWhiteNoShadow ||
+            RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow;
+        DiagnosticLeafMaterial->SetScalarParameterValue(
+            TEXT("LeafBaseColorScale"),
+            bDoubleBaseColor ? 2.36f : 1.18f);
+        DiagnosticLeafMaterial->SetVectorParameterValue(
+            TEXT("LeafTransmissionTint"),
+            bWhiteTransmission
+                ? FLinearColor::White
+                : FLinearColor(0.55f, 0.78f, 0.36f));
+        CorridorLeafMaterial = DiagnosticLeafMaterial;
+    }
+
+    auto LoadVariantMesh = [](const FString& AssetToken, const TCHAR* Suffix)
+    {
+        const FString AssetName = FString::Printf(
+            TEXT("SM_RaftSim_FutaleufuCoigue_%s_%s"),
+            *AssetToken,
+            Suffix);
+        const FString ObjectPath = MeshRoot + AssetName + TEXT(".") + AssetName;
+        return LoadObject<UStaticMesh>(nullptr, *ObjectPath);
+    };
+    auto MarkTransientReviewComponent = [](UHierarchicalInstancedStaticMeshComponent* Component)
+    {
+        if (!Component)
+        {
+            return;
+        }
+        Component->SetFlags(RF_Transient);
+        Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        Component->SetGenerateOverlapEvents(false);
+        if (AActor* Owner = Component->GetOwner())
+        {
+            Owner->SetFlags(RF_Transient);
+            Owner->Tags.Add(TEXT("RaftSim_ExternalReviewOnly"));
+        }
+    };
+
+    TArray<FFutaleufuCanopyCorridorVariant> Variants;
+    Variants.SetNum(UE_ARRAY_COUNT(VariantTokens));
+    bool bAssetsAndComponentsComplete = true;
+    for (int32 VariantIndex = 0; VariantIndex < Variants.Num(); ++VariantIndex)
+    {
+        FFutaleufuCanopyCorridorVariant& Variant = Variants[VariantIndex];
+        Variant.AssetToken = VariantTokens[VariantIndex];
+        Variant.TrunkMesh = LoadVariantMesh(Variant.AssetToken, TEXT("Trunk"));
+        Variant.BranchletMesh = LoadVariantMesh(Variant.AssetToken, TEXT("Branchlets"));
+        Variant.NearLeafMesh = LoadVariantMesh(Variant.AssetToken, TEXT("Leaves"));
+        Variant.MidLeafMesh = LoadVariantMesh(Variant.AssetToken, TEXT("LeavesFar"));
+        Variant.FarLeafMesh = LoadVariantMesh(Variant.AssetToken, TEXT("LeavesFarRuntime"));
+        bAssetsAndComponentsComplete &= Variant.TrunkMesh && Variant.BranchletMesh &&
+            Variant.NearLeafMesh && Variant.MidLeafMesh && Variant.FarLeafMesh;
+        if (!bAssetsAndComponentsComplete)
+        {
+            continue;
+        }
+        const FString LabelStem = FString::Printf(
+            TEXT("RaftSim_FutaleufuCoigueCorridorReview_%s_%s"),
+            GetFutaleufuCanopyCorridorRenderModeToken(RenderMode),
+            *Variant.AssetToken);
+        Variant.TrunkInstances = AddLandscapeCandidateInstancedMeshComponent(
+            World, Variant.TrunkMesh, LabelStem + TEXT("_Trunks"), true, BarkMaterial);
+        Variant.BranchletInstances = AddLandscapeCandidateInstancedMeshComponent(
+            World, Variant.BranchletMesh, LabelStem + TEXT("_NearBranchlets"), true, BarkMaterial);
+        Variant.NearLeafInstances = AddLandscapeCandidateInstancedMeshComponent(
+            World,
+            Variant.NearLeafMesh,
+            LabelStem + TEXT("_NearLeaves"),
+            bLeafCastShadow,
+            CorridorLeafMaterial);
+        Variant.MidLeafInstances = AddLandscapeCandidateInstancedMeshComponent(
+            World,
+            Variant.MidLeafMesh,
+            LabelStem + TEXT("_MidLeaves"),
+            bLeafCastShadow && !bBoundedLeafShadow,
+            CorridorLeafMaterial);
+        Variant.FarLeafInstances = AddLandscapeCandidateInstancedMeshComponent(
+            World,
+            Variant.FarLeafMesh,
+            LabelStem + TEXT("_FarRuntimeLeaves"),
+            bLeafCastShadow && !bBoundedLeafShadow,
+            CorridorLeafMaterial);
+        if (bBoundedLeafShadow)
+        {
+            for (UHierarchicalInstancedStaticMeshComponent* LeafComponent : {
+                     Variant.NearLeafInstances,
+                     Variant.MidLeafInstances,
+                     Variant.FarLeafInstances})
+            {
+                if (!LeafComponent)
+                {
+                    continue;
+                }
+                const bool bNearRepresentation = LeafComponent == Variant.NearLeafInstances;
+                LeafComponent->SetCastShadow(bNearRepresentation);
+                LeafComponent->bCastStaticShadow = false;
+                LeafComponent->bCastDynamicShadow = bNearRepresentation;
+                LeafComponent->SetCastContactShadow(false);
+                LeafComponent->SetAffectDistanceFieldLighting(false);
+                LeafComponent->SetAffectDynamicIndirectLighting(false);
+            }
+        }
+        for (UHierarchicalInstancedStaticMeshComponent* Component : {
+                 Variant.TrunkInstances,
+                 Variant.BranchletInstances,
+                 Variant.NearLeafInstances,
+                 Variant.MidLeafInstances,
+                 Variant.FarLeafInstances})
+        {
+            bAssetsAndComponentsComplete &= Component != nullptr;
+            MarkTransientReviewComponent(Component);
+        }
+        if (Variant.BranchletInstances)
+        {
+            Variant.BranchletInstances->SetCullDistances(0, 38000);
+        }
+        if (Variant.NearLeafInstances)
+        {
+            Variant.NearLeafInstances->SetCullDistances(0, 38000);
+        }
+        if (Variant.MidLeafInstances)
+        {
+            Variant.MidLeafInstances->SetCullDistances(0, 62000);
+        }
+        if (Variant.FarLeafInstances)
+        {
+            Variant.FarLeafInstances->SetCullDistances(0, 120000);
+        }
+    }
+    if (!bAssetsAndComponentsComplete)
+    {
+        OutSummary += TEXT("Futaleufu canopy comparison could not load or instance all eight retained coigue forms.\n");
+        return false;
+    }
+
+    auto Halton = [](int32 Index, int32 Base)
+    {
+        float Result = 0.0f;
+        float Fraction = 1.0f / static_cast<float>(Base);
+        int32 Value = Index + 1;
+        while (Value > 0)
+        {
+            Result += Fraction * static_cast<float>(Value % Base);
+            Value /= Base;
+            Fraction /= static_cast<float>(Base);
+        }
+        return Result;
+    };
+    auto SampleSourceMask = [&Candidate](const FRaftSimPreviewImage& Mask, const FVector2D& WorldXY)
+    {
+        constexpr float LandscapeMinX = -5800.0f;
+        const float U = FMath::Clamp(
+            (WorldXY.X - LandscapeMinX) / Candidate.HorizontalSpanXCm,
+            0.0f,
+            1.0f);
+        const float V = FMath::Clamp(
+            (WorldXY.Y + Candidate.HorizontalSpanYCm * 0.5f) / Candidate.HorizontalSpanYCm,
+            0.0f,
+            1.0f);
+        return Mask.SampleLuma(U, V);
+    };
+    auto LandscapeHeight = [Landscape](const FVector2D& WorldXY)
+    {
+        return Landscape->GetHeightAtLocation(
+            FVector(WorldXY.X, WorldXY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(TNumericLimits<float>::Lowest());
+    };
+
+    constexpr int32 TargetTreeCount = 1200;
+    constexpr int32 MaximumCandidateCount = 60000;
+    constexpr float MinimumSpacingCm = 1500.0f;
+    constexpr float RiverSetbackCm = 6500.0f;
+    constexpr float MaximumLateralOffsetCm = 30000.0f;
+    constexpr float MinimumElevationCm = 10000.0f;
+    constexpr float MaximumElevationCm = 90000.0f;
+    constexpr float MaximumSlopeDegrees = 39.0f;
+    constexpr float NearDistanceCm = 30000.0f;
+    constexpr float MidDistanceCm = 50000.0f;
+    constexpr float SlopeSampleOffsetCm = 1500.0f;
+    TMap<FIntPoint, TArray<FVector2D>> SpatialBuckets;
+    const FVector CameraLocation = Camera->GetActorLocation();
+
+    for (int32 CandidateIndex = 0;
+         CandidateIndex < MaximumCandidateCount && OutStats.AcceptedTreeCount < TargetTreeCount;
+         ++CandidateIndex)
+    {
+        ++OutStats.CandidateCount;
+        const float Progress = FMath::Lerp(0.55f, 0.91f, Halton(CandidateIndex, 2));
+        const bool bMacroGap =
+            (Progress > 0.675f && Progress < 0.692f) ||
+            (Progress > 0.752f && Progress < 0.770f) ||
+            (Progress > 0.842f && Progress < 0.854f);
+        const bool bMicroGap = FMath::Frac(Halton(CandidateIndex, 7) + Progress * 11.0f) < 0.075f;
+        if (bMacroGap || bMicroGap)
+        {
+            ++OutStats.RejectedNaturalGapCount;
+            continue;
+        }
+
+        FVector2D Tangent;
+        const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
+            Candidate,
+            Centerline,
+            Progress,
+            &Tangent);
+        const FVector2D Normal(-Tangent.Y, Tangent.X);
+        const float Side = Halton(CandidateIndex, 3) < 0.5f ? -1.0f : 1.0f;
+        const float LateralT = FMath::Pow(Halton(CandidateIndex, 5), 0.72f);
+        const float LateralOffset = FMath::Lerp(
+            RiverSetbackCm,
+            MaximumLateralOffsetCm,
+            LateralT);
+        const FVector2D WorldXY = Center + Normal * Side * LateralOffset;
+        const float VegetationT = SampleSourceMask(VegetationMask, WorldXY);
+        if (VegetationT < 0.34f)
+        {
+            ++OutStats.RejectedVegetationMaskCount;
+            continue;
+        }
+        const float WaterT = SampleSourceMask(WaterMask, WorldXY);
+        if (WaterT > 0.28f)
+        {
+            ++OutStats.RejectedWaterMaskCount;
+            continue;
+        }
+
+        const float GroundZ = LandscapeHeight(WorldXY);
+        if (!FMath::IsFinite(GroundZ) || GroundZ < MinimumElevationCm || GroundZ > MaximumElevationCm)
+        {
+            ++OutStats.RejectedElevationCount;
+            continue;
+        }
+        const float HeightMinusX = LandscapeHeight(WorldXY - FVector2D(SlopeSampleOffsetCm, 0.0f));
+        const float HeightPlusX = LandscapeHeight(WorldXY + FVector2D(SlopeSampleOffsetCm, 0.0f));
+        const float HeightMinusY = LandscapeHeight(WorldXY - FVector2D(0.0f, SlopeSampleOffsetCm));
+        const float HeightPlusY = LandscapeHeight(WorldXY + FVector2D(0.0f, SlopeSampleOffsetCm));
+        if (!FMath::IsFinite(HeightMinusX) || !FMath::IsFinite(HeightPlusX) ||
+            !FMath::IsFinite(HeightMinusY) || !FMath::IsFinite(HeightPlusY))
+        {
+            ++OutStats.RejectedSlopeCount;
+            continue;
+        }
+        const FVector2D Gradient(
+            (HeightPlusX - HeightMinusX) / (2.0f * SlopeSampleOffsetCm),
+            (HeightPlusY - HeightMinusY) / (2.0f * SlopeSampleOffsetCm));
+        const float SlopeDegrees = FMath::RadiansToDegrees(FMath::Atan(Gradient.Size()));
+        if (SlopeDegrees > MaximumSlopeDegrees)
+        {
+            ++OutStats.RejectedSlopeCount;
+            continue;
+        }
+        const FVector2D Downhill = (-Gradient).GetSafeNormal();
+        const FVector2D MoistAspect(-0.5f, -0.8660254f);
+        const float MoistAspectT = Downhill.IsNearlyZero()
+            ? 0.5f
+            : 0.5f + 0.5f * FVector2D::DotProduct(Downhill, MoistAspect);
+        if (MoistAspectT < 0.28f && Halton(CandidateIndex, 11) < 0.52f)
+        {
+            ++OutStats.RejectedDryAspectCount;
+            continue;
+        }
+
+        const FIntPoint Bucket(
+            FMath::FloorToInt(WorldXY.X / MinimumSpacingCm),
+            FMath::FloorToInt(WorldXY.Y / MinimumSpacingCm));
+        bool bSpacingRejected = false;
+        for (int32 OffsetX = -1; OffsetX <= 1 && !bSpacingRejected; ++OffsetX)
+        {
+            for (int32 OffsetY = -1; OffsetY <= 1 && !bSpacingRejected; ++OffsetY)
+            {
+                if (const TArray<FVector2D>* Existing = SpatialBuckets.Find(
+                        Bucket + FIntPoint(OffsetX, OffsetY)))
+                {
+                    for (const FVector2D& ExistingXY : *Existing)
+                    {
+                        if (FVector2D::Distance(WorldXY, ExistingXY) < MinimumSpacingCm)
+                        {
+                            bSpacingRejected = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (bSpacingRejected)
+        {
+            ++OutStats.RejectedSpacingCount;
+            continue;
+        }
+        SpatialBuckets.FindOrAdd(Bucket).Add(WorldXY);
+
+        const int32 VariantIndex = FMath::Clamp(
+            FMath::FloorToInt(Halton(CandidateIndex, 13) * static_cast<float>(Variants.Num())),
+            0,
+            Variants.Num() - 1);
+        FFutaleufuCanopyCorridorVariant& Variant = Variants[VariantIndex];
+        const float UniformScale = 0.72f + Halton(CandidateIndex, 17) * 0.31f;
+        const FRotator Rotation(
+            0.0f,
+            FMath::Fmod(Halton(CandidateIndex, 19) * 360.0f + Progress * 137.5f, 360.0f),
+            0.0f);
+        const FBox TrunkBounds = Variant.TrunkMesh->GetBoundingBox();
+        const FVector Location(
+            WorldXY.X,
+            WorldXY.Y,
+            GroundZ - TrunkBounds.Min.Z * UniformScale);
+        const FTransform Transform(Rotation, Location, FVector(UniformScale));
+        Variant.TrunkInstances->AddInstance(Transform, true);
+        const float CameraDistance2D = FVector2D::Distance(
+            WorldXY,
+            FVector2D(CameraLocation.X, CameraLocation.Y));
+        if (CameraDistance2D <= NearDistanceCm)
+        {
+            Variant.BranchletInstances->AddInstance(Transform, true);
+            Variant.NearLeafInstances->AddInstance(Transform, true);
+            ++OutStats.NearTreeCount;
+        }
+        else if (CameraDistance2D <= MidDistanceCm)
+        {
+            Variant.MidLeafInstances->AddInstance(Transform, true);
+            ++OutStats.MidTreeCount;
+        }
+        else
+        {
+            Variant.FarLeafInstances->AddInstance(Transform, true);
+            ++OutStats.FarTreeCount;
+        }
+        ++OutStats.AcceptedTreeCount;
+        OutStats.MinimumAcceptedSlopeDegrees = FMath::Min(
+            OutStats.MinimumAcceptedSlopeDegrees,
+            SlopeDegrees);
+        OutStats.MaximumAcceptedSlopeDegrees = FMath::Max(
+            OutStats.MaximumAcceptedSlopeDegrees,
+            SlopeDegrees);
+        OutStats.MinimumAcceptedElevationCm = FMath::Min(
+            OutStats.MinimumAcceptedElevationCm,
+            GroundZ);
+        OutStats.MaximumAcceptedElevationCm = FMath::Max(
+            OutStats.MaximumAcceptedElevationCm,
+            GroundZ);
+        OutStats.AcceptedVegetationMaskSum += VegetationT;
+        OutStats.AcceptedWaterMaskSum += WaterT;
+    }
+
+    const bool bComplete =
+        OutStats.AcceptedTreeCount == TargetTreeCount &&
+        OutStats.NearTreeCount > 0 &&
+        OutStats.MidTreeCount > 0 &&
+        OutStats.FarTreeCount > 0 &&
+        OutStats.HiddenFallbackActorCount >= 4;
+    OutSummary += FString::Printf(
+        TEXT("Futaleufu source-masked canopy comparison placed %d/%d transient non-colliding trees "
+             "(%d near full, %d mid, %d runtime far) in %s render mode, hid %d fallback PVE actors, and evaluated %d candidates.\n"),
+        OutStats.AcceptedTreeCount,
+        TargetTreeCount,
+        OutStats.NearTreeCount,
+        OutStats.MidTreeCount,
+        OutStats.FarTreeCount,
+        GetFutaleufuCanopyCorridorRenderModeToken(RenderMode),
+        OutStats.HiddenFallbackActorCount,
+        OutStats.CandidateCount);
+    return bComplete;
+}
+
 UMaterialInstanceConstant* LoadOrCreateLandscapeCandidateFoliageMaterialInstance(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const TCHAR* FoliageType,
@@ -16196,6 +20128,41 @@ bool ValidateLandscapeCandidateReviewedBroadleafMaterials(UStaticMesh* Mesh)
     return bHasReviewedTrunk && bHasReviewedBranches && bHasReviewedLeaves;
 }
 
+bool ValidateLandscapeCandidateReviewedRockMaterial(UStaticMesh* Mesh)
+{
+    if (!Mesh || Mesh->GetStaticMaterials().Num() < 1)
+    {
+        return false;
+    }
+    UMaterialInterface* Material = Mesh->GetMaterial(0);
+    return Material &&
+        Material->GetPathName().Contains(TEXT("M_RockMossSet01")) &&
+        Mesh->IsNaniteEnabled();
+}
+
+bool ValidateLandscapeCandidateReviewedPineMaterials(UStaticMesh* Mesh)
+{
+    if (!Mesh || !Mesh->IsNaniteEnabled())
+    {
+        return false;
+    }
+    bool bHasNeedles = false;
+    bool bHasWood = false;
+    for (int32 MaterialIndex = 0; MaterialIndex < Mesh->GetStaticMaterials().Num(); ++MaterialIndex)
+    {
+        UMaterialInterface* Material = Mesh->GetMaterial(MaterialIndex);
+        if (!Material)
+        {
+            continue;
+        }
+        const FString Path = Material->GetPathName();
+        bHasNeedles |= Path.Contains(TEXT("M_PineTree01_Needles"));
+        bHasWood |= Path.Contains(TEXT("M_PineTree01_Bark")) ||
+            Path.Contains(TEXT("M_PineTree01_Trunk"));
+    }
+    return bHasNeedles && bHasWood;
+}
+
 FBox GetLandscapeCandidateEffectiveMeshBounds(UStaticMesh* Mesh)
 {
     if (!Mesh)
@@ -16335,6 +20302,10 @@ struct FRaftSimLandscapeImportCandidateResult
     bool bDressingUnderstoryMeshNaniteEnabled = false;
     bool bDressingFoliageMaterialsValidated = false;
     int32 DressingExternalReviewAssetCount = 0;
+    int32 DressingExternalRockMeshCount = 0;
+    bool bDressingExternalRockMaterialsValidated = false;
+    int32 DressingExternalPineMeshCount = 0;
+    bool bDressingExternalPineMaterialsValidated = false;
     bool bDressingExternalBroadleafReviewAssetLoaded = false;
     bool bDressingExternalBroadleafMaterialsValidated = false;
     bool bDressingExternalConiferReviewAssetLoaded = false;
@@ -16373,6 +20344,80 @@ bool AddLandscapeCandidateBiomeDressing(
     static const TCHAR* UnderstorySourcePath =
         TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/Plant_01/PVE_Plant_01.PVE_Plant_01");
 
+    const bool bSouthFork = Candidate.PreviewSpec.RiverId == TEXT("american_south_fork");
+    const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    TArray<UStaticMesh*> ReviewedRockMeshes;
+    if (bSouthFork || bZambezi || bFutaleufu)
+    {
+        for (int32 RockIndex = 1; RockIndex <= 6; ++RockIndex)
+        {
+            const FString AssetName = FString::Printf(
+                TEXT("SM_RockMossSet01_rock_moss_set_01_rock%02d"),
+                RockIndex);
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/%s.%s"),
+                *AssetName,
+                *AssetName);
+            if (UStaticMesh* RockMesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                ReviewedRockMeshes.Add(RockMesh);
+            }
+        }
+        OutResult.DressingExternalRockMeshCount = ReviewedRockMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount += ReviewedRockMeshes.Num();
+        OutResult.bDressingExternalRockMaterialsValidated =
+            ReviewedRockMeshes.Num() == 6 &&
+            Algo::AllOf(ReviewedRockMeshes, [](UStaticMesh* Mesh)
+            {
+                return ValidateLandscapeCandidateReviewedRockMaterial(Mesh);
+            });
+        if (!OutResult.bDressingExternalRockMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s reviewed rock comparison loaded %d/6 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                ReviewedRockMeshes.Num());
+            return false;
+        }
+    }
+
+    TArray<UStaticMesh*> ReviewedPineMeshes;
+    if (bSouthFork)
+    {
+        constexpr TCHAR VariantLabels[] = {TEXT('a'), TEXT('b'), TEXT('c')};
+        for (const TCHAR VariantLabel : VariantLabels)
+        {
+            const FString AssetName = FString::Printf(
+                TEXT("SM_PineTree01_pine_tree_01_%c_LOD0"),
+                VariantLabel);
+            const FString ObjectPath = FString::Printf(
+                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/%s.%s"),
+                *AssetName,
+                *AssetName);
+            if (UStaticMesh* PineMesh = LoadObject<UStaticMesh>(nullptr, *ObjectPath))
+            {
+                ReviewedPineMeshes.Add(PineMesh);
+            }
+        }
+        OutResult.DressingExternalPineMeshCount = ReviewedPineMeshes.Num();
+        OutResult.DressingExternalReviewAssetCount += ReviewedPineMeshes.Num();
+        OutResult.bDressingExternalPineMaterialsValidated =
+            ReviewedPineMeshes.Num() == 3 &&
+            Algo::AllOf(ReviewedPineMeshes, [](UStaticMesh* Mesh)
+            {
+                return ValidateLandscapeCandidateReviewedPineMaterials(Mesh);
+            });
+        if (!OutResult.bDressingExternalPineMaterialsValidated)
+        {
+            OutSummary += FString::Printf(
+                TEXT("%s reviewed pine comparison loaded %d/3 meshes or failed material/Nanite validation.\n"),
+                *Candidate.PreviewSpec.RiverId,
+                ReviewedPineMeshes.Num());
+            return false;
+        }
+    }
+
     for (const TCHAR* SourcePath :
          {BroadleafSourcePath, ConiferSourcePath, ShrubSourcePath, UnderstorySourcePath})
     {
@@ -16405,6 +20450,7 @@ bool AddLandscapeCandidateBiomeDressing(
         OutResult.DressingAssetCount += Mesh ? 1 : 0;
         OutResult.DressingConvertedStaticMeshCount += Mesh ? 1 : 0;
     }
+    OutResult.DressingAssetCount += ReviewedRockMeshes.Num() + ReviewedPineMeshes.Num();
     OutResult.bDressingAssetsLoaded =
         OutResult.DressingSourceSkeletalMeshCount == 4 &&
         OutResult.DressingConvertedStaticMeshCount == 4;
@@ -16418,18 +20464,39 @@ bool AddLandscapeCandidateBiomeDressing(
         return false;
     }
 
-    if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+    if (bSouthFork)
     {
         OutSummary += TEXT(
-            "South Fork physical corridor excludes the rights-reviewed Poly Haven tree candidates "
+            "South Fork physical corridor excludes the previously rejected Poly Haven fir and "
+            "small broadleaf candidates "
             "after their recorded not-lifelike visual rejection; converted PVE species remain the "
-            "temporary non-production fallback.\n");
+            "temporary non-production fallback. The rights-reviewed six-variant mossy rock set and "
+            "three-variant dense pine set are enabled only for this isolated visual comparison.\n");
+    }
+    else if (bZambezi)
+    {
+        OutSummary += FString::Printf(
+            TEXT("%s uses the rights-reviewed CC0 rock set only as an isolated river-specific visual "
+                 "evaluation; rejected tree candidates remain excluded and no geology, lifelike, or "
+                 "gameplay promotion is implied.\n"),
+            *Candidate.PreviewSpec.RiverId);
     }
 
-    OutResult.bDressingBoulderMeshNaniteEnabled = false;
+    OutResult.bDressingBoulderMeshNaniteEnabled =
+        ReviewedRockMeshes.Num() == 6 &&
+        Algo::AllOf(ReviewedRockMeshes, [](UStaticMesh* Mesh)
+        {
+            return Mesh && Mesh->IsNaniteEnabled();
+        });
     OutResult.bDressingBroadleafMeshNaniteEnabled =
         BroadleafTreeMesh->IsNaniteEnabled() && ShrubMesh->IsNaniteEnabled();
-    OutResult.bDressingConiferMeshNaniteEnabled = ConiferTreeMesh->IsNaniteEnabled();
+    OutResult.bDressingConiferMeshNaniteEnabled =
+        ConiferTreeMesh->IsNaniteEnabled() &&
+        (ReviewedPineMeshes.IsEmpty() ||
+         Algo::AllOf(ReviewedPineMeshes, [](UStaticMesh* Mesh)
+         {
+             return Mesh && Mesh->IsNaniteEnabled();
+         }));
     OutResult.bDressingUnderstoryMeshNaniteEnabled = UnderstoryMesh->IsNaniteEnabled();
 
     FRaftSimPreviewImage WaterMask;
@@ -16537,8 +20604,40 @@ bool AddLandscapeCandidateBiomeDressing(
             UnderstoryMesh,
             FString::Printf(TEXT("RaftSim_LandscapeCandidate_PveWholeUnderstory_%s"), *Candidate.PreviewSpec.RiverId),
             true);
+    TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedRockInstances;
+    for (int32 RockIndex = 0; RockIndex < ReviewedRockMeshes.Num(); ++RockIndex)
+    {
+        ReviewedRockInstances.Add(AddLandscapeCandidateInstancedMeshComponent(
+            World,
+            ReviewedRockMeshes[RockIndex],
+            FString::Printf(
+                TEXT("RaftSim_LandscapeCandidate_ReviewedRock%02d_%s"),
+                RockIndex + 1,
+                *Candidate.PreviewSpec.RiverId),
+            true));
+    }
+    TArray<UHierarchicalInstancedStaticMeshComponent*> ReviewedPineInstances;
+    for (int32 PineIndex = 0; PineIndex < ReviewedPineMeshes.Num(); ++PineIndex)
+    {
+        ReviewedPineInstances.Add(AddLandscapeCandidateInstancedMeshComponent(
+            World,
+            ReviewedPineMeshes[PineIndex],
+            FString::Printf(
+                TEXT("RaftSim_LandscapeCandidate_ReviewedPine%02d_%s"),
+                PineIndex + 1,
+                *Candidate.PreviewSpec.RiverId),
+            true));
+    }
     if (!BroadleafTreeInstances || !ConiferTreeInstances ||
-        !ShrubInstances || !UnderstoryInstances)
+        !ShrubInstances || !UnderstoryInstances ||
+        Algo::AnyOf(ReviewedRockInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
+        {
+            return Component == nullptr;
+        }) ||
+        Algo::AnyOf(ReviewedPineInstances, [](UHierarchicalInstancedStaticMeshComponent* Component)
+        {
+            return Component == nullptr;
+        }))
     {
         OutSummary += FString::Printf(
             TEXT("Failed to create one or more Landscape biome dressing instance components for %s.\n"),
@@ -16564,15 +20663,11 @@ bool AddLandscapeCandidateBiomeDressing(
             UnderstoryFoliageMaterial);
     if (OutResult.bDressingExternalConiferReviewAssetLoaded)
     {
-        OutResult.bDressingExternalConiferMaterialsValidated =
-            ValidateLandscapeCandidateReviewedFirMaterials(ConiferTreeMesh);
         OutResult.DressingFoliageMaterialBoundSlotCount +=
             OutResult.bDressingExternalConiferMaterialsValidated ? 1 : 0;
     }
     if (OutResult.bDressingExternalBroadleafReviewAssetLoaded)
     {
-        OutResult.bDressingExternalBroadleafMaterialsValidated =
-            ValidateLandscapeCandidateReviewedBroadleafMaterials(BroadleafTreeMesh);
         OutResult.DressingFoliageMaterialBoundSlotCount +=
             OutResult.bDressingExternalBroadleafMaterialsValidated ? 1 : 0;
     }
@@ -16594,6 +20689,7 @@ bool AddLandscapeCandidateBiomeDressing(
     }
 
     const bool bRainforest = Spec.bHasWaterfalls;
+    const bool bZambeziWoodland = Spec.RiverId == TEXT("zambezi_batoka_gorge");
     TArray<FRaftSimLandscapeCandidateCenterlinePoint> PhysicalCenterline;
     if (!LoadLandscapeCandidateLocalCenterline(Candidate, PhysicalCenterline, OutSummary))
     {
@@ -16655,11 +20751,14 @@ bool AddLandscapeCandidateBiomeDressing(
         const float Phase = static_cast<float>(BoulderIndex) * 1.6180339f;
         const float Side = (BoulderIndex % 2 == 0) ? -1.0f : 1.0f;
         const bool bChannelRock = BoulderIndex % 9 == 0;
-        const float BaseX = FMath::Lerp(-1600.0f, 25500.0f, T) + 180.0f * FMath::Sin(Phase);
+        const float BaseX = FMath::Lerp(
+            bPhysicalCorridor ? 5000.0f : -1600.0f,
+            25500.0f,
+            T) + 180.0f * FMath::Sin(Phase);
         const float BaseOffset = bChannelRock
             ? ActiveRiverHalfWidth * (0.62f + 0.24f * FMath::Abs(FMath::Sin(Phase * 0.77f)))
             : FMath::Lerp(
-                  ActiveRiverHalfWidth + 100.0f,
+                  ActiveRiverHalfWidth + (bPhysicalCorridor && BaseX < 3200.0f ? 900.0f : 260.0f),
                   MaxBankOffset * 0.78f,
                   FMath::Pow(FMath::Abs(FMath::Sin(Phase * 0.43f)), 0.72f));
 
@@ -16698,41 +20797,69 @@ bool AddLandscapeCandidateBiomeDressing(
             }
         }
 
-        const float TargetBoulderHeightCm = (Spec.bDesertCanyon
-            ? 82.0f + 20.0f * static_cast<float>(BoulderIndex % 5)
-            : (bRainforest ? 74.0f + 18.0f * static_cast<float>(BoulderIndex % 5)
-                           : 66.0f + 16.0f * static_cast<float>(BoulderIndex % 5))) *
-            (bChannelRock ? 0.72f : 1.0f);
+        const float TargetBoulderHeightCm = bPhysicalCorridor
+            ? (65.0f + 18.0f * static_cast<float>(BoulderIndex % 6)) *
+                (bChannelRock ? 1.05f : 1.0f)
+            : (Spec.bDesertCanyon
+                   ? 82.0f + 20.0f * static_cast<float>(BoulderIndex % 5)
+                   : (bRainforest ? 74.0f + 18.0f * static_cast<float>(BoulderIndex % 5)
+                                  : 66.0f + 16.0f * static_cast<float>(BoulderIndex % 5))) *
+                (bChannelRock ? 0.72f : 1.0f);
         const float BoulderScaleZ = TargetBoulderHeightCm / 100.0f;
-        const FLinearColor BoulderColor = FMath::Lerp(
-            ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.70f : 0.52f),
-            ScalePreviewColor(Spec.WaterColor, 0.28f),
-            bChannelRock ? 0.24f : (bRainforest ? 0.16f : 0.10f));
-        AActor* BoulderActor = AddPreviewIrregularRockActor(
-            World,
-            FString::Printf(TEXT("RaftSim_LandscapeCandidate_IrregularBoulder_%03d_%s"), BoulderIndex, *Spec.RiverId),
-            FVector(BestX, BestY, GetLandscapeHeight(BestX, BestY)),
-            static_cast<float>((BoulderIndex * 47) % 360),
-            FVector(
-                BoulderScaleZ * (1.15f + 0.08f * static_cast<float>(BoulderIndex % 4)),
-                BoulderScaleZ * (0.76f + 0.07f * static_cast<float>((BoulderIndex + 2) % 5)),
-                BoulderScaleZ),
-            BoulderColor,
-            BoulderIndex + 42000);
-        if (BoulderActor)
+        if (ReviewedRockMeshes.Num() == 6 && ReviewedRockInstances.Num() == 6)
         {
-            if (UProceduralMeshComponent* BoulderComponent =
-                    BoulderActor->FindComponentByClass<UProceduralMeshComponent>())
+            const int32 VariantIndex = BoulderIndex % ReviewedRockMeshes.Num();
+            UStaticMesh* RockMesh = ReviewedRockMeshes[VariantIndex];
+            const float MeshHeightCm = FMath::Max(
+                1.0f,
+                GetLandscapeCandidateEffectiveMeshBounds(RockMesh).GetSize().Z);
+            const float UniformScale = TargetBoulderHeightCm / MeshHeightCm;
+            AddGroundedInstance(
+                ReviewedRockInstances[VariantIndex],
+                RockMesh,
+                FVector2D(BestX, BestY),
+                GetLandscapeHeight(BestX, BestY),
+                FRotator(
+                    bChannelRock ? -5.0f : 2.0f * FMath::Sin(Phase),
+                    static_cast<float>((BoulderIndex * 47) % 360),
+                    3.0f * FMath::Cos(Phase * 0.73f)),
+                FVector(
+                    UniformScale * (0.92f + 0.07f * static_cast<float>(BoulderIndex % 4)),
+                    UniformScale * (0.88f + 0.06f * static_cast<float>((BoulderIndex + 2) % 5)),
+                    UniformScale));
+        }
+        else
+        {
+            const FLinearColor BoulderColor = FMath::Lerp(
+                ScalePreviewColor(Spec.RockColor, Spec.bDesertCanyon ? 0.70f : 0.52f),
+                ScalePreviewColor(Spec.WaterColor, 0.28f),
+                bChannelRock ? 0.24f : (bRainforest ? 0.16f : 0.10f));
+            AActor* BoulderActor = AddPreviewIrregularRockActor(
+                World,
+                FString::Printf(TEXT("RaftSim_LandscapeCandidate_IrregularBoulder_%03d_%s"), BoulderIndex, *Spec.RiverId),
+                FVector(BestX, BestY, GetLandscapeHeight(BestX, BestY)),
+                static_cast<float>((BoulderIndex * 47) % 360),
+                FVector(
+                    BoulderScaleZ * (1.15f + 0.08f * static_cast<float>(BoulderIndex % 4)),
+                    BoulderScaleZ * (0.76f + 0.07f * static_cast<float>((BoulderIndex + 2) % 5)),
+                    BoulderScaleZ),
+                BoulderColor,
+                BoulderIndex + 42000);
+            if (BoulderActor)
             {
-                BoulderComponent->SetCastShadow(true);
-                BoulderComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                if (UProceduralMeshComponent* BoulderComponent =
+                        BoulderActor->FindComponentByClass<UProceduralMeshComponent>())
+                {
+                    BoulderComponent->SetCastShadow(true);
+                    BoulderComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                }
             }
         }
         ++OutResult.DressingBoulderInstanceCount;
     }
 
     const int32 FoliageClusterCount = bPhysicalCorridor
-        ? 12000
+        ? (bZambeziWoodland ? 5600 : (Spec.bDesertCanyon ? 800 : 12000))
         : (Spec.bDesertCanyon ? 110 : (bRainforest ? 420 : 260));
     for (int32 ClusterIndex = 0; ClusterIndex < FoliageClusterCount; ++ClusterIndex)
     {
@@ -16772,7 +20899,8 @@ bool AddLandscapeCandidateBiomeDressing(
             const float VegetationT = bPhysicalCorridor
                 ? SmoothPreviewStep(ActiveRiverHalfWidth + 500.0f, MaxBankOffset, CandidateOffset)
                 : SamplePreviewMaskAtWorld(Spec, &VegetationMask, CandidateWorldX, CandidateWorldY);
-            const float Score = VegetationT * (bRainforest ? 1.85f : (Spec.bDesertCanyon ? 0.58f : 1.34f)) -
+            const float Score = VegetationT *
+                    (bRainforest ? 1.85f : (bZambeziWoodland ? 1.22f : (Spec.bDesertCanyon ? 0.58f : 1.34f))) -
                 WaterT * 1.18f +
                 0.07f * FMath::Sin(Phase + static_cast<float>(CandidateIndex) * 0.83f);
             if (Score > BestScore)
@@ -16803,6 +20931,27 @@ bool AddLandscapeCandidateBiomeDressing(
                 TargetHeightCm = bRainforest
                     ? 128.0f + 18.0f * static_cast<float>(ClusterIndex % 5)
                     : 104.0f + 15.0f * static_cast<float>(ClusterIndex % 5);
+            }
+        }
+        else if (bZambeziWoodland)
+        {
+            const int32 SpeciesSelector = ClusterIndex % 8;
+            if (SpeciesSelector <= 4)
+            {
+                SpeciesMesh = BroadleafTreeMesh;
+                SpeciesInstances = BroadleafTreeInstances;
+                TargetHeightCm = 720.0f + 72.0f * static_cast<float>(ClusterIndex % 7);
+                bCanopyTree = true;
+            }
+            else if (SpeciesSelector <= 6)
+            {
+                SpeciesMesh = ShrubMesh;
+                SpeciesInstances = ShrubInstances;
+                TargetHeightCm = 190.0f + 28.0f * static_cast<float>(ClusterIndex % 6);
+            }
+            else
+            {
+                TargetHeightCm = 96.0f + 15.0f * static_cast<float>(ClusterIndex % 5);
             }
         }
         else if (Spec.bDesertCanyon)
@@ -16841,15 +20990,24 @@ bool AddLandscapeCandidateBiomeDressing(
         }
         else
         {
-            const int32 SpeciesSelector = ClusterIndex % 5;
-            if (SpeciesSelector == 0)
+            const int32 SpeciesSelector = ClusterIndex % (bPhysicalCorridor ? 20 : 5);
+            if (bPhysicalCorridor && SpeciesSelector == 0 &&
+                ReviewedPineMeshes.Num() == 3 && ReviewedPineInstances.Num() == 3)
+            {
+                const int32 PineVariant = (ClusterIndex / 20) % ReviewedPineMeshes.Num();
+                SpeciesMesh = ReviewedPineMeshes[PineVariant];
+                SpeciesInstances = ReviewedPineInstances[PineVariant];
+                TargetHeightCm = 1350.0f + 95.0f * static_cast<float>((ClusterIndex / 20) % 6);
+                bCanopyTree = true;
+            }
+            else if (!bPhysicalCorridor && SpeciesSelector == 0)
             {
                 SpeciesMesh = ConiferTreeMesh;
                 SpeciesInstances = ConiferTreeInstances;
                 TargetHeightCm = 940.0f + 92.0f * static_cast<float>(ClusterIndex % 6);
                 bCanopyTree = true;
             }
-            else if (SpeciesSelector == 4)
+            else if (SpeciesSelector == (bPhysicalCorridor ? 19 : 4))
             {
                 SpeciesMesh = ShrubMesh;
                 SpeciesInstances = ShrubInstances;
@@ -16896,13 +21054,17 @@ bool AddLandscapeCandidateBiomeDressing(
     OutResult.bDressingValidated =
         OutResult.DressingBoulderInstanceCount == BoulderCount &&
         OutResult.DressingFoliageInstanceCount == FoliageClusterCount &&
-        (Spec.bDesertCanyon || OutResult.DressingCanopyTreeInstanceCount > 0) &&
+        ((Spec.bDesertCanyon && !bZambeziWoodland) ||
+         OutResult.DressingCanopyTreeInstanceCount > 0) &&
         OutResult.DressingUnderstoryInstanceCount > 0 &&
         OutResult.bDressingFoliageMaterialsValidated;
     OutSummary += FString::Printf(
-        TEXT("Landscape biome dressing for %s: %d dense irregular procedural boulders, %d complete PVE species instances (%d canopy, %d understory), %d river-specific foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),
+        TEXT("Landscape biome dressing for %s: %d %s, %d foliage instances (%d canopy, %d understory), %d river-specific PVE foliage slots; Nanite mesh flags boulder=%d broadleaf=%d conifer=%d understory=%d.\n"),
         *Spec.RiverId,
         OutResult.DressingBoulderInstanceCount,
+        ReviewedRockMeshes.Num() == 6
+            ? TEXT("rights-reviewed six-variant Nanite rock instances")
+            : TEXT("dense irregular procedural boulders"),
         OutResult.DressingFoliageInstanceCount,
         OutResult.DressingCanopyTreeInstanceCount,
         OutResult.DressingUnderstoryInstanceCount,
@@ -16992,12 +21154,14 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
 
     TArray<FVector2D> Centers;
     TArray<float> StationsCm;
+    TArray<float> ConditionedSurfaceWorldZ;
+    int32 ConditionedProfileCenterCount = 0;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
     {
         const FRaftSimLandscapeCandidateCenterlinePoint& A = SourcePoints[SegmentIndex];
         const FRaftSimLandscapeCandidateCenterlinePoint& B = SourcePoints[SegmentIndex + 1];
         const float SegmentLengthCm = (B.LocalCm - A.LocalCm).Size();
-        const int32 Steps = FMath::Max(1, FMath::CeilToInt(SegmentLengthCm / 800.0f));
+        const int32 Steps = FMath::Max(1, FMath::CeilToInt(SegmentLengthCm / 100.0f));
         for (int32 Step = 0; Step < Steps; ++Step)
         {
             const float T = static_cast<float>(Step) / static_cast<float>(Steps);
@@ -17006,6 +21170,23 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
                 -5800.0f + Local.X,
                 -Candidate.HorizontalSpanYCm * 0.5f + Local.Y));
             StationsCm.Add(FMath::Lerp(A.StationMeters, B.StationMeters, T) * 100.0f);
+            if (A.bHasConditionedVisualSurface && B.bHasConditionedVisualSurface)
+            {
+                ConditionedSurfaceWorldZ.Add(
+                    FMath::Lerp(
+                        A.ConditionedVisualSurfaceNormalized,
+                        B.ConditionedVisualSurfaceNormalized,
+                        T) * Candidate.TargetReliefCm);
+                ++ConditionedProfileCenterCount;
+            }
+            else
+            {
+                const FVector2D& Center = Centers.Last();
+                const float TerrainZ = Landscape->GetHeightAtLocation(
+                    FVector(Center.X, Center.Y, 0.0f),
+                    EHeightfieldSource::Editor).Get(0.0f);
+                ConditionedSurfaceWorldZ.Add(TerrainZ + 140.0f);
+            }
         }
     }
     const FRaftSimLandscapeCandidateCenterlinePoint& Last = SourcePoints.Last();
@@ -17013,8 +21194,22 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         -5800.0f + Last.LocalCm.X,
         -Candidate.HorizontalSpanYCm * 0.5f + Last.LocalCm.Y));
     StationsCm.Add(Last.StationMeters * 100.0f);
+    if (Last.bHasConditionedVisualSurface)
+    {
+        ConditionedSurfaceWorldZ.Add(
+            Last.ConditionedVisualSurfaceNormalized * Candidate.TargetReliefCm);
+        ++ConditionedProfileCenterCount;
+    }
+    else
+    {
+        const FVector2D& Center = Centers.Last();
+        const float TerrainZ = Landscape->GetHeightAtLocation(
+            FVector(Center.X, Center.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f);
+        ConditionedSurfaceWorldZ.Add(TerrainZ + 140.0f);
+    }
 
-    constexpr int32 CrossSteps = 12;
+    constexpr int32 CrossSteps = 32;
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
@@ -17030,29 +21225,63 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         const FVector2D Normal(-Tangent.Y, Tangent.X);
         const float HalfWidth = GetPreviewActiveRiverHalfWidthCm(Candidate.PreviewSpec) *
             (0.92f + 0.10f * FMath::Sin(StationsCm[CenterIndex] * 0.00031f));
-        const float TerrainZ = Landscape->GetHeightAtLocation(
-            FVector(Centers[CenterIndex].X, Centers[CenterIndex].Y, 0.0f),
-            EHeightfieldSource::Editor).Get(0.0f);
-        const float SurfaceZ = TerrainZ + 140.0f + Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
+        const float SurfaceZ = ConditionedSurfaceWorldZ[CenterIndex] +
+            Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
         for (int32 CrossIndex = 0; CrossIndex <= CrossSteps; ++CrossIndex)
         {
             const float V = static_cast<float>(CrossIndex) / static_cast<float>(CrossSteps);
             const float Lateral = FMath::Lerp(-HalfWidth, HalfWidth, V);
             const float EdgeT = FMath::Abs(V - 0.5f) * 2.0f;
-            const float Wave =
-                3.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) *
-                (1.0f - EdgeT * 0.65f);
+            const float FlowCueScale = Candidate.PreviewSpec.FlowCurrentCueScale;
+            const float WaveEnvelope = 1.0f - EdgeT * 0.48f;
+            const float Wave = FlowCueScale * WaveEnvelope * (
+                12.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0041f + Lateral * 0.011f) +
+                5.0f * FMath::Sin(StationsCm[CenterIndex] * 0.0107f - Lateral * 0.021f) +
+                2.5f * FMath::Sin(StationsCm[CenterIndex] * 0.0183f + Lateral * 0.037f));
             Vertices.Add(FVector(
                 Centers[CenterIndex].X + Normal.X * Lateral,
                 Centers[CenterIndex].Y + Normal.Y * Lateral,
                 SurfaceZ + Wave));
             UVs.Add(FVector2D(StationsCm[CenterIndex] / 8000.0f, V));
-            const FLinearColor Deep = FMath::Lerp(
-                Candidate.PreviewSpec.WaterColor,
-                FLinearColor(0.018f, 0.115f, 0.085f),
-                0.38f);
-            const FLinearColor Shallow(0.085f, 0.255f, 0.145f);
-            VertexColors.Add(FMath::Lerp(Deep, Shallow, FMath::Pow(EdgeT, 1.7f)));
+            FLinearColor Deep = Candidate.PreviewSpec.bDesertCanyon
+                ? FMath::Lerp(
+                      Candidate.PreviewSpec.WaterColor,
+                      FLinearColor(0.095f, 0.085f, 0.058f),
+                      0.42f)
+                : FMath::Lerp(
+                      Candidate.PreviewSpec.WaterColor,
+                      FLinearColor(0.018f, 0.115f, 0.085f),
+                      0.52f);
+            const FLinearColor Shallow = Candidate.PreviewSpec.bDesertCanyon
+                ? FLinearColor(0.235f, 0.185f, 0.115f)
+                : FLinearColor(0.085f, 0.255f, 0.145f);
+            const float CurrentThread = 0.5f + 0.5f * FMath::Sin(
+                StationsCm[CenterIndex] * 0.0027f + Lateral * 0.0061f);
+            const float FineCurrent = 0.5f + 0.5f * FMath::Sin(
+                StationsCm[CenterIndex] * 0.0091f - Lateral * 0.0173f);
+            const float CrestCue = 0.5f + 0.5f * FMath::Sin(
+                StationsCm[CenterIndex] * 0.0147f + Lateral * 0.028f);
+            Deep = FMath::Lerp(
+                Deep * 0.76f,
+                Candidate.PreviewSpec.bDesertCanyon
+                    ? FLinearColor(0.195f, 0.155f, 0.095f)
+                    : FLinearColor(0.075f, 0.235f, 0.190f),
+                0.18f * CurrentThread + 0.08f * FineCurrent);
+            FLinearColor SurfaceColor = FMath::Lerp(
+                Deep,
+                Shallow,
+                FMath::Pow(EdgeT, 1.8f));
+            const float BreakerSignal =
+                CurrentThread * 0.52f + FineCurrent * 0.28f + CrestCue * 0.20f;
+            const float Breaker = FlowCueScale * WaveEnvelope *
+                SmoothPreviewStep(0.72f, 0.92f, BreakerSignal) * 0.72f;
+            SurfaceColor = FMath::Lerp(
+                SurfaceColor,
+                Candidate.PreviewSpec.bDesertCanyon
+                    ? FLinearColor(0.72f, 0.68f, 0.58f)
+                    : FLinearColor(0.75f, 0.84f, 0.80f),
+                Breaker);
+            VertexColors.Add(SurfaceColor);
         }
     }
     const int32 RowSize = CrossSteps + 1;
@@ -17075,15 +21304,18 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
     for (FVector& Normal : Normals)
     {
-        Normal = FMath::Lerp(Normal, FVector::UpVector, 0.72f).GetSafeNormal();
+        Normal = FMath::Lerp(Normal, FVector::UpVector, 0.24f).GetSafeNormal();
     }
     OutSummary += FString::Printf(
-        TEXT("Built source-aligned physical river ribbon with %d center samples across %.1f m.\n"),
+        TEXT("Built source-aligned physical river ribbon with %d one-metre center samples (%d using the manifest-recorded conditioned visual surface), 32 cross steps, bounded render-only current relief below 20 centimetres, and sparse flow-scaled breaker coloration across %.1f m.\n"),
         Centers.Num(),
+        ConditionedProfileCenterCount,
         Last.StationMeters);
     return AddPreviewProceduralMeshActor(
         World,
-        TEXT("RaftSim_PhysicalCorridorRiverRibbon_american_south_fork"),
+        FString::Printf(
+            TEXT("RaftSim_PhysicalCorridorRiverRibbon_%s"),
+            *Candidate.PreviewSpec.RiverId),
         Vertices,
         Triangles,
         Normals,
@@ -17092,6 +21324,220 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         WaterMaterial,
         &VertexColors,
         false);
+}
+
+AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (!World || !Landscape || !Candidate.bPhysicalScaleSourceCorridor)
+    {
+        return nullptr;
+    }
+
+    const bool bColorado = Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
+    const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
+    const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bRockCanyon = bColorado || bZambezi;
+    FRaftSimPreviewImage SourceAlbedo;
+    FString SourceAlbedoPath = Candidate.PreviewSpec.AerialDrapeImage;
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        SourceAlbedoPath =
+            TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/"
+                 "lees_ferry_reach_2200_4700m/derived/"
+                 "colorado_lees_ferry_reach_terrain_albedo_2048.png");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+    {
+        SourceAlbedoPath =
+            TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+                 "chili_bar_reach_0_2500m/derived/"
+                 "south_fork_chili_bar_reach_source_albedo_2048.png");
+    }
+    if (!LoadPreviewPngImage(SourceAlbedoPath, SourceAlbedo))
+    {
+        OutSummary += TEXT("Failed to load physical corridor source albedo for the dense bank mesh.\n");
+        return nullptr;
+    }
+
+    constexpr float LandscapeMinX = -5800.0f;
+    const float LandscapeMaxX = LandscapeMinX + Candidate.HorizontalSpanXCm;
+    const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
+    const float LandscapeMaxY = Candidate.HorizontalSpanYCm * 0.5f;
+    const bool bInternationalPhysicalCorridor =
+        Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
+        Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const float TargetGridSpacingCm = bInternationalPhysicalCorridor
+        ? 1250.0f
+        : (Candidate.HorizontalSpanXCm > 500000.0f ? 2500.0f : 400.0f);
+    constexpr float SurfaceLiftCm = 6.0f;
+    constexpr int32 TileCountX = 4;
+    const int32 TotalXSteps = FMath::CeilToInt(Candidate.HorizontalSpanXCm / TargetGridSpacingCm);
+    const int32 TotalYSteps = FMath::CeilToInt(Candidate.HorizontalSpanYCm / TargetGridSpacingCm);
+    UMaterialInterface* TerrainMaterial = LoadOrCreatePhysicalSourceTerrainRenderMaterial(Candidate);
+    if (!TerrainMaterial)
+    {
+        OutSummary += TEXT("Failed to load the dense source-terrain vertex-color material.\n");
+        return nullptr;
+    }
+
+    const FLinearColor RockTint = FMath::Lerp(
+        Candidate.PreviewSpec.RockColor,
+        FLinearColor(0.22f, 0.24f, 0.20f),
+        0.38f);
+    AActor* FirstActor = nullptr;
+    int32 TotalVertexCount = 0;
+    int32 TotalTriangleCount = 0;
+    for (int32 TileIndex = 0; TileIndex < TileCountX; ++TileIndex)
+    {
+        const int32 StartXStep = TotalXSteps * TileIndex / TileCountX;
+        const int32 EndXStep = TotalXSteps * (TileIndex + 1) / TileCountX;
+        const int32 TileXSteps = EndXStep - StartXStep;
+        const int32 RowSize = TileXSteps + 1;
+
+        TArray<FVector> Vertices;
+        TArray<FVector2D> UVs;
+        TArray<FLinearColor> VertexColors;
+        TArray<int32> Triangles;
+        Vertices.Reserve(RowSize * (TotalYSteps + 1));
+        UVs.Reserve(RowSize * (TotalYSteps + 1));
+        VertexColors.Reserve(RowSize * (TotalYSteps + 1));
+        Triangles.Reserve(TileXSteps * TotalYSteps * 6);
+
+        for (int32 YStep = 0; YStep <= TotalYSteps; ++YStep)
+        {
+            const float SourceSouthV = static_cast<float>(YStep) / static_cast<float>(TotalYSteps);
+            const float WorldY = FMath::Lerp(LandscapeMinY, LandscapeMaxY, SourceSouthV);
+            const float SourceV = 1.0f - SourceSouthV;
+            for (int32 XStep = StartXStep; XStep <= EndXStep; ++XStep)
+            {
+                const float SourceU = static_cast<float>(XStep) / static_cast<float>(TotalXSteps);
+                const float WorldX = FMath::Lerp(LandscapeMinX, LandscapeMaxX, SourceU);
+                const float TerrainZ = Landscape->GetHeightAtLocation(
+                    FVector(WorldX, WorldY, 0.0f),
+                    EHeightfieldSource::Editor).Get(0.0f);
+                Vertices.Add(FVector(WorldX, WorldY, TerrainZ + SurfaceLiftCm));
+                // World Y advances south-to-north, while the north-up source image advances
+                // top-to-bottom. Match the direct material sample to the proven CPU drape sample.
+                UVs.Add(FVector2D(SourceU, SourceV));
+
+                const FLinearColor SourceSrgb = SourceAlbedo.SampleRawBilinear(SourceU, SourceV);
+                const FColor SourceColor8(
+                    static_cast<uint8>(FMath::Clamp(FMath::RoundToInt(SourceSrgb.R * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(FMath::RoundToInt(SourceSrgb.G * 255.0f), 0, 255)),
+                    static_cast<uint8>(FMath::Clamp(FMath::RoundToInt(SourceSrgb.B * 255.0f), 0, 255)),
+                    255);
+                FLinearColor SourceLinear = FLinearColor::FromSRGBColor(SourceColor8);
+                SourceLinear.R = FMath::Max(SourceLinear.R, 0.012f);
+                SourceLinear.G = FMath::Max(SourceLinear.G, 0.012f);
+                SourceLinear.B = FMath::Max(SourceLinear.B, 0.012f);
+                SourceLinear.A = 1.0f;
+                VertexColors.Add(SourceLinear);
+            }
+        }
+
+        for (int32 YStep = 0; YStep < TotalYSteps; ++YStep)
+        {
+            for (int32 LocalXStep = 0; LocalXStep < TileXSteps; ++LocalXStep)
+            {
+                const int32 A = YStep * RowSize + LocalXStep;
+                const int32 B = A + 1;
+                const int32 C = (YStep + 1) * RowSize + LocalXStep;
+                const int32 D = C + 1;
+                Triangles.Append({A, C, B, B, C, D});
+            }
+        }
+
+        TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        if (bRockCanyon || bFutaleufu)
+        {
+            const float RenderReliefCapCm = bZambezi ? 420.0f : (bFutaleufu ? 240.0f : 180.0f);
+            for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+            {
+                const float Steepness = 1.0f - FMath::Clamp(Normals[VertexIndex].Z, 0.0f, 1.0f);
+                const float SteepReliefT = SmoothPreviewStep(
+                    bFutaleufu ? 0.14f : 0.22f,
+                    bFutaleufu ? 0.62f : 0.72f,
+                    Steepness);
+                if (SteepReliefT <= KINDA_SMALL_NUMBER)
+                {
+                    continue;
+                }
+                const FVector& Vertex = Vertices[VertexIndex];
+                const float BroadFacet = FMath::PerlinNoise2D(
+                    FVector2D(Vertex.X * 0.00024f, Vertex.Y * 0.00024f));
+                const float LocalFracture = FMath::PerlinNoise2D(
+                    FVector2D(Vertex.X * 0.00082f + 17.0f, Vertex.Y * 0.00082f - 9.0f));
+                const float Strata = FMath::Sin(
+                    Vertex.Z * 0.0115f + Vertex.X * 0.00031f - Vertex.Y * 0.00019f);
+                const float ReliefCm = FMath::Clamp(
+                    SteepReliefT *
+                        (BroadFacet * (bZambezi ? 230.0f : (bFutaleufu ? 135.0f : 105.0f)) +
+                         LocalFracture * (bZambezi ? 125.0f : (bFutaleufu ? 88.0f : 62.0f)) +
+                         Strata * (bZambezi ? 82.0f : (bFutaleufu ? 55.0f : 38.0f))),
+                    -RenderReliefCapCm,
+                    RenderReliefCapCm);
+                Vertices[VertexIndex].Z += ReliefCm;
+            }
+            Normals = ComputePreviewMeshNormals(Vertices, Triangles);
+        }
+        for (int32 VertexIndex = 0; VertexIndex < Normals.Num(); ++VertexIndex)
+        {
+            const float Steepness = 1.0f - FMath::Clamp(Normals[VertexIndex].Z, 0.0f, 1.0f);
+            const float RockBlend =
+                SmoothPreviewStep(0.42f, 0.88f, Steepness) * (bRockCanyon ? 0.05f : 0.24f);
+            VertexColors[VertexIndex] = FMath::Lerp(VertexColors[VertexIndex], RockTint, RockBlend);
+            Normals[VertexIndex] =
+                FMath::Lerp(
+                    Normals[VertexIndex],
+                    FVector::UpVector,
+                    bRockCanyon ? 0.04f : 0.18f).GetSafeNormal();
+        }
+
+        AActor* Actor = AddPreviewProceduralMeshActor(
+            World,
+            FString::Printf(
+                TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_%02d_%s"),
+                TileIndex,
+                *Candidate.PreviewSpec.RiverId),
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            Candidate.PreviewSpec.TerrainColor,
+            TerrainMaterial,
+            &VertexColors,
+            false);
+        if (!Actor)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Failed to create dense physical source-terrain tile %d.\n"),
+                TileIndex);
+            return nullptr;
+        }
+        if (!FirstActor)
+        {
+            FirstActor = Actor;
+        }
+        if (UProceduralMeshComponent* MeshComponent =
+                Actor->FindComponentByClass<UProceduralMeshComponent>())
+        {
+            MeshComponent->SetCastShadow(true);
+        }
+        TotalVertexCount += Vertices.Num();
+        TotalTriangleCount += Triangles.Num() / 3;
+    }
+
+    OutSummary += FString::Printf(
+        TEXT("Built four non-self-intersecting dense source-terrain tiles for %s with %d vertices and %d triangles at %.2f m target spacing.\n"),
+        *Candidate.PreviewSpec.RiverId,
+        TotalVertexCount,
+        TotalTriangleCount,
+        TargetGridSpacingCm * 0.01f);
+    return FirstActor;
 }
 
 void RepositionLandscapeCandidatePhysicalCameras(
@@ -17112,12 +21558,30 @@ void RepositionLandscapeCandidatePhysicalCameras(
     auto RiverLocation = [&Candidate, &Points, Landscape](float Progress, float HeightAboveTerrain)
     {
         const FVector2D XY = SampleLandscapeCandidateCenterlineWorld(Candidate, Points, Progress);
+        float ConditionedVisualSurfaceZ = 0.0f;
+        if (SampleLandscapeCandidateConditionedVisualSurfaceWorldZ(
+                Candidate,
+                Points,
+                Progress,
+                ConditionedVisualSurfaceZ))
+        {
+            const float OriginalWaterOffset =
+                140.0f + Candidate.PreviewSpec.FlowWaterLevelOffsetCm;
+            const float ClearanceAboveWater = FMath::Max(
+                8.0f,
+                HeightAboveTerrain - OriginalWaterOffset);
+            return FVector(
+                XY.X,
+                XY.Y,
+                ConditionedVisualSurfaceZ + Candidate.PreviewSpec.FlowWaterLevelOffsetCm +
+                    ClearanceAboveWater);
+        }
         const float TerrainZ = Landscape->GetHeightAtLocation(
             FVector(XY.X, XY.Y, 0.0f),
             EHeightfieldSource::Editor).Get(0.0f);
         return FVector(XY.X, XY.Y, TerrainZ + HeightAboveTerrain);
     };
-    auto SetCamera = [World, &RiverLocation](
+    auto SetCamera = [World, &RiverLocation, &OutSummary](
                          const TCHAR* Label,
                          float Progress,
                          float TargetProgress,
@@ -17133,12 +21597,41 @@ void RepositionLandscapeCandidatePhysicalCameras(
             const FVector Location = RiverLocation(Progress, Height);
             const FVector Target = RiverLocation(TargetProgress, TargetHeight);
             It->SetActorLocationAndRotation(Location, (Target - Location).Rotation());
+            OutSummary += FString::Printf(
+                TEXT("Positioned %s at progress %.4f (%.1f, %.1f, %.1f cm), targeting %.4f (%.1f, %.1f, %.1f cm).\n"),
+                Label,
+                Progress,
+                Location.X,
+                Location.Y,
+                Location.Z,
+                TargetProgress,
+                Target.X,
+                Target.Y,
+                Target.Z);
             return;
         }
     };
-    SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.035f, 0.135f, 330.0f, 170.0f);
-    SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.050f, 0.155f, 260.0f, 155.0f);
-    SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.43f, 0.56f, 260.0f, 155.0f);
+    if (Candidate.PreviewSpec.RiverId == TEXT("colorado_river"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 230.0f, 150.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.450f, 0.565f, 175.0f, 125.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.100f, 0.104f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.285f, 0.289f, 270.0f, 160.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.815f, 0.825f, 330.0f, 170.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.644f, 0.654f, 270.0f, 160.0f);
+    }
+    else
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.365f, 330.0f, 180.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.275f, 0.390f, 270.0f, 165.0f);
+    }
+    SetCamera(TEXT("RaftSim_SolverRapid_RiverEyeCaptureCamera"), 0.530f, 0.645f, 275.0f, 165.0f);
     for (TActorIterator<APlayerStart> It(World); It; ++It)
     {
         if (It->GetActorLabel() == TEXT("RaftSim_GuideSeat_PlayerStart"))
@@ -17408,6 +21901,29 @@ bool BuildLandscapeImportCandidateMap(
             TEXT("Landscape biome dressing validation failed for %s.\n"),
             *Candidate.PreviewSpec.RiverId);
         return false;
+    }
+    if (Candidate.bPhysicalScaleSourceCorridor &&
+        !AddLandscapeCandidatePhysicalBankCorridorMesh(World, Landscape, Candidate, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Dense physical bank corridor mesh generation failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
+    if (Candidate.bPhysicalScaleSourceCorridor)
+    {
+        Landscape->SetActorHiddenInGame(true);
+        for (ULandscapeComponent* LandscapeComponent : Landscape->LandscapeComponents)
+        {
+            if (LandscapeComponent)
+            {
+                LandscapeComponent->SetVisibility(false, true);
+                LandscapeComponent->SetHiddenInGame(true, true);
+            }
+        }
+        OutSummary += TEXT(
+            "Physical source Landscape remains the collision and height-query authority; "
+            "dense source-terrain tiles are the non-colliding render surface.\n");
     }
     AddPreviewLightRig(World, Candidate.PreviewSpec);
     AActor* WaterActor = Candidate.bPhysicalScaleSourceCorridor
@@ -18314,14 +22830,15 @@ template <typename AssetType, typename PopulateFunc>
 bool CreateReviewedAsset(const FString& AssetName, PopulateFunc Populate, FString& OutSummary)
 {
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Tools/Reviewed/%s"), *AssetName);
-    UPackage* Package = CreatePackage(*PackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    AssetType* Asset = LoadObject<AssetType>(nullptr, *ObjectPath);
+    UPackage* Package = Asset ? Asset->GetOutermost() : CreatePackage(*PackagePath);
     if (!Package)
     {
         OutSummary += FString::Printf(TEXT("Failed to create package %s\n"), *PackagePath);
         return false;
     }
 
-    AssetType* Asset = FindObject<AssetType>(Package, *AssetName);
     if (!Asset)
     {
         Asset = NewObject<AssetType>(Package, *AssetName, RF_Public | RF_Standalone);
@@ -18387,6 +22904,443 @@ FRaftSimToolValidationMessage MakeValidationMessage(
     Message.bBlocksExport = bBlocksExport;
     return Message;
 }
+
+struct FRaftSimNamedRapidFilterOption
+{
+    FString Label;
+    FString Value;
+};
+
+struct FRaftSimNamedRapidEditorRow
+{
+    FString RiverId;
+    FString RiverDisplayName;
+    FString FeatureId;
+    FString DisplayName;
+    FString DifficultyLabel;
+    FString Priority;
+    FString StationKind;
+    FString GeometryStatus;
+    FString MapGeometryStatus;
+    FString GuideStatus;
+    FString ExecutionStatus;
+    FString FeatureTags;
+    double StationMeters = 0.0;
+    TMap<FString, int32> RunCountsByFlow;
+};
+
+struct FRaftSimNamedRapidRunAggregate
+{
+    TMap<FString, int32> RunCountsByFlow;
+    FString ExecutionStatus;
+};
+
+struct FRaftSimNamedRapidPanelState : public TSharedFromThis<FRaftSimNamedRapidPanelState>
+{
+    TArray<TSharedPtr<FRaftSimNamedRapidEditorRow>> AllRows;
+    TArray<TSharedPtr<FRaftSimNamedRapidEditorRow>> FilteredRows;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> RiverOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> FlowOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> PriorityOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> StationOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> GeometryOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> GuideOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> ExecutionOptions;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedRiver;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedFlow;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedPriority;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedStation;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedGeometry;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedGuide;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedExecution;
+    TSharedPtr<SListView<TSharedPtr<FRaftSimNamedRapidEditorRow>>> ListView;
+    FString SearchText;
+    FString LoadError;
+    int32 SourceRunCount = 0;
+
+    void ApplyFilters()
+    {
+        FilteredRows.Reset();
+        for (const TSharedPtr<FRaftSimNamedRapidEditorRow>& Row : AllRows)
+        {
+            if (!Row)
+            {
+                continue;
+            }
+            if (SelectedRiver.IsValid() && !SelectedRiver->Value.IsEmpty() && Row->RiverId != SelectedRiver->Value)
+            {
+                continue;
+            }
+            if (SelectedPriority.IsValid() && !SelectedPriority->Value.IsEmpty() && Row->Priority != SelectedPriority->Value)
+            {
+                continue;
+            }
+            if (SelectedStation.IsValid() && SelectedStation->Value == TEXT("published") &&
+                !Row->StationKind.StartsWith(TEXT("published_")))
+            {
+                continue;
+            }
+            if (SelectedStation.IsValid() && SelectedStation->Value == TEXT("provisional") &&
+                !Row->StationKind.StartsWith(TEXT("provisional_")))
+            {
+                continue;
+            }
+            if (SelectedGeometry.IsValid() && SelectedGeometry->Value.StartsWith(TEXT("exact:")) &&
+                Row->GeometryStatus != SelectedGeometry->Value.RightChop(6))
+            {
+                continue;
+            }
+            if (SelectedGeometry.IsValid() && SelectedGeometry->Value.StartsWith(TEXT("map:")) &&
+                Row->MapGeometryStatus != SelectedGeometry->Value.RightChop(4))
+            {
+                continue;
+            }
+            if (SelectedGuide.IsValid() && !SelectedGuide->Value.IsEmpty() && Row->GuideStatus != SelectedGuide->Value)
+            {
+                continue;
+            }
+            if (SelectedExecution.IsValid() && !SelectedExecution->Value.IsEmpty() &&
+                Row->ExecutionStatus != SelectedExecution->Value)
+            {
+                continue;
+            }
+            if (SelectedFlow.IsValid() && !SelectedFlow->Value.IsEmpty() &&
+                Row->RunCountsByFlow.FindRef(SelectedFlow->Value) == 0)
+            {
+                continue;
+            }
+            if (!SearchText.IsEmpty())
+            {
+                const FString SearchCorpus = FString::Printf(
+                    TEXT("%s %s %s %s %s"),
+                    *Row->DisplayName,
+                    *Row->FeatureId,
+                    *Row->RiverDisplayName,
+                    *Row->DifficultyLabel,
+                    *Row->FeatureTags);
+                if (!SearchCorpus.Contains(SearchText, ESearchCase::IgnoreCase))
+                {
+                    continue;
+                }
+            }
+            FilteredRows.Add(Row);
+        }
+        if (ListView.IsValid())
+        {
+            ListView->RequestListRefresh();
+        }
+    }
+
+    int32 DisplayedRunCount() const
+    {
+        int32 Count = 0;
+        for (const TSharedPtr<FRaftSimNamedRapidEditorRow>& Row : FilteredRows)
+        {
+            if (!Row)
+            {
+                continue;
+            }
+            if (SelectedFlow.IsValid() && !SelectedFlow->Value.IsEmpty())
+            {
+                Count += Row->RunCountsByFlow.FindRef(SelectedFlow->Value);
+            }
+            else
+            {
+                for (const TPair<FString, int32>& Pair : Row->RunCountsByFlow)
+                {
+                    Count += Pair.Value;
+                }
+            }
+        }
+        return Count;
+    }
+};
+
+TSharedPtr<FRaftSimNamedRapidFilterOption> MakeNamedRapidFilterOption(const TCHAR* Label, const TCHAR* Value)
+{
+    TSharedPtr<FRaftSimNamedRapidFilterOption> Option = MakeShared<FRaftSimNamedRapidFilterOption>();
+    Option->Label = Label;
+    Option->Value = Value;
+    return Option;
+}
+
+bool LoadJsonObjectFromRepo(const FString& RelativePath, TSharedPtr<FJsonObject>& OutObject, FString& OutError)
+{
+    const FString AbsolutePath = FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), RelativePath));
+    FString Text;
+    if (!FFileHelper::LoadFileToString(Text, *AbsolutePath))
+    {
+        OutError = FString::Printf(TEXT("Could not read %s"), *RelativePath);
+        return false;
+    }
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
+    if (!FJsonSerializer::Deserialize(Reader, OutObject) || !OutObject.IsValid())
+    {
+        OutError = FString::Printf(TEXT("Could not parse %s"), *RelativePath);
+        return false;
+    }
+    return true;
+}
+
+TSharedRef<SWidget> BuildNamedRapidReviewPanel()
+{
+    constexpr const TCHAR* MarkerManifest = TEXT("unreal/Content/RaftSim/River/named_rapid_editor_markers.json");
+    constexpr const TCHAR* RunManifest = TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json");
+    TSharedPtr<FRaftSimNamedRapidPanelState> State = MakeShared<FRaftSimNamedRapidPanelState>();
+
+    TSharedPtr<FJsonObject> MarkerRoot;
+    TSharedPtr<FJsonObject> RunRoot;
+    if (!LoadJsonObjectFromRepo(MarkerManifest, MarkerRoot, State->LoadError) ||
+        !LoadJsonObjectFromRepo(RunManifest, RunRoot, State->LoadError))
+    {
+        return SNew(SBorder)
+            .Padding(8.0f)
+            [SNew(STextBlock).Text(FText::FromString(State->LoadError)).AutoWrapText(true)];
+    }
+
+    TMap<FString, FRaftSimNamedRapidRunAggregate> RunAggregates;
+    const TArray<TSharedPtr<FJsonValue>>* Runs = nullptr;
+    if (RunRoot->TryGetArrayField(TEXT("runs"), Runs) && Runs)
+    {
+        State->SourceRunCount = Runs->Num();
+        for (const TSharedPtr<FJsonValue>& RunValue : *Runs)
+        {
+            const TSharedPtr<FJsonObject> Run = RunValue->AsObject();
+            if (!Run.IsValid())
+            {
+                continue;
+            }
+            const FString FeatureId = Run->GetStringField(TEXT("feature_id"));
+            const FString FlowBand = Run->GetStringField(TEXT("flow_band"));
+            FRaftSimNamedRapidRunAggregate& Aggregate = RunAggregates.FindOrAdd(FeatureId);
+            ++Aggregate.RunCountsByFlow.FindOrAdd(FlowBand);
+            Aggregate.ExecutionStatus = Run->GetStringField(TEXT("execution_status"));
+        }
+    }
+
+    State->RiverOptions.Add(MakeNamedRapidFilterOption(TEXT("All rivers"), TEXT("")));
+    const TArray<TSharedPtr<FJsonValue>>* Rivers = nullptr;
+    if (MarkerRoot->TryGetArrayField(TEXT("rivers"), Rivers) && Rivers)
+    {
+        for (const TSharedPtr<FJsonValue>& RiverValue : *Rivers)
+        {
+            const TSharedPtr<FJsonObject> River = RiverValue->AsObject();
+            if (!River.IsValid())
+            {
+                continue;
+            }
+            const FString RiverId = River->GetStringField(TEXT("river_id"));
+            const FString RiverDisplayName = River->GetStringField(TEXT("display_name"));
+            TSharedPtr<FRaftSimNamedRapidFilterOption> RiverOption = MakeShared<FRaftSimNamedRapidFilterOption>();
+            RiverOption->Label = RiverDisplayName;
+            RiverOption->Value = RiverId;
+            State->RiverOptions.Add(RiverOption);
+
+            const TArray<TSharedPtr<FJsonValue>>* Markers = nullptr;
+            if (!River->TryGetArrayField(TEXT("markers"), Markers) || !Markers)
+            {
+                continue;
+            }
+            for (const TSharedPtr<FJsonValue>& MarkerValue : *Markers)
+            {
+                const TSharedPtr<FJsonObject> Marker = MarkerValue->AsObject();
+                if (!Marker.IsValid())
+                {
+                    continue;
+                }
+                TSharedPtr<FRaftSimNamedRapidEditorRow> Row = MakeShared<FRaftSimNamedRapidEditorRow>();
+                Row->RiverId = RiverId;
+                Row->RiverDisplayName = RiverDisplayName;
+                Row->FeatureId = Marker->GetStringField(TEXT("feature_id"));
+                Row->DisplayName = Marker->GetStringField(TEXT("display_name"));
+                Row->DifficultyLabel = Marker->GetStringField(TEXT("difficulty_label"));
+                Row->Priority = Marker->GetStringField(TEXT("review_priority"));
+                Row->GeometryStatus = Marker->GetStringField(TEXT("exact_geometry_status"));
+                Row->MapGeometryStatus = Marker->GetStringField(TEXT("editor_map_geometry_status"));
+                Row->GuideStatus = Marker->GetStringField(TEXT("guide_review_status"));
+                TArray<FString> FeatureTags;
+                Marker->TryGetStringArrayField(TEXT("feature_tags"), FeatureTags);
+                Row->FeatureTags = FString::Join(FeatureTags, TEXT(", "));
+                const TSharedPtr<FJsonObject> Stationing = Marker->GetObjectField(TEXT("stationing"));
+                Row->StationKind = Stationing->GetStringField(TEXT("station_kind"));
+                Row->StationMeters = Stationing->GetNumberField(TEXT("station_m"));
+                if (const FRaftSimNamedRapidRunAggregate* Aggregate = RunAggregates.Find(Row->FeatureId))
+                {
+                    Row->RunCountsByFlow = Aggregate->RunCountsByFlow;
+                    Row->ExecutionStatus = Aggregate->ExecutionStatus;
+                }
+                State->AllRows.Add(Row);
+            }
+        }
+    }
+
+    State->FlowOptions = {
+        MakeNamedRapidFilterOption(TEXT("All flow bands"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Low review"), TEXT("low_review")),
+        MakeNamedRapidFilterOption(TEXT("Reference review"), TEXT("reference_review")),
+        MakeNamedRapidFilterOption(TEXT("High review"), TEXT("high_review"))};
+    State->PriorityOptions = {
+        MakeNamedRapidFilterOption(TEXT("All priorities"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Critical"), TEXT("critical")),
+        MakeNamedRapidFilterOption(TEXT("High"), TEXT("high")),
+        MakeNamedRapidFilterOption(TEXT("Medium"), TEXT("medium"))};
+    State->StationOptions = {
+        MakeNamedRapidFilterOption(TEXT("All station authority"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Published station"), TEXT("published")),
+        MakeNamedRapidFilterOption(TEXT("Provisional station"), TEXT("provisional"))};
+    State->GeometryOptions = {
+        MakeNamedRapidFilterOption(TEXT("All geometry status"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Exact geometry required"), TEXT("exact:required_before_production")),
+        MakeNamedRapidFilterOption(TEXT("Candidate map projection"), TEXT("map:candidate_centerline_projection_not_exact")),
+        MakeNamedRapidFilterOption(TEXT("Map geometry unavailable"), TEXT("map:unavailable_outside_current_candidate_centerline"))};
+    State->GuideOptions = {
+        MakeNamedRapidFilterOption(TEXT("All guide status"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Guide review required"), TEXT("required"))};
+    State->ExecutionOptions = {
+        MakeNamedRapidFilterOption(TEXT("All execution status"), TEXT("")),
+        MakeNamedRapidFilterOption(
+            TEXT("Blocked pending geometry/water/line"),
+            TEXT("blocked_until_exact_geometry_validated_cpp_window_and_guide_line"))};
+    State->SelectedRiver = State->RiverOptions[0];
+    State->SelectedFlow = State->FlowOptions[0];
+    State->SelectedPriority = State->PriorityOptions[0];
+    State->SelectedStation = State->StationOptions[0];
+    State->SelectedGeometry = State->GeometryOptions[0];
+    State->SelectedGuide = State->GuideOptions[0];
+    State->SelectedExecution = State->ExecutionOptions[0];
+    State->ApplyFilters();
+
+    const auto GenerateOptionWidget = [](TSharedPtr<FRaftSimNamedRapidFilterOption> Option)
+    {
+        return SNew(STextBlock).Text(FText::FromString(Option.IsValid() ? Option->Label : TEXT("")));
+    };
+    const auto MakeComboContent = [](const TSharedPtr<FRaftSimNamedRapidFilterOption>& Selected)
+    {
+        return FText::FromString(Selected.IsValid() ? Selected->Label : TEXT(""));
+    };
+
+    TSharedRef<SUniformGridPanel> FilterGrid = SNew(SUniformGridPanel).SlotPadding(FMargin(3.0f));
+    FilterGrid->AddSlot(0, 0)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->RiverOptions)
+            .InitiallySelectedItem(State->SelectedRiver)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedRiver = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedRiver); })]];
+    FilterGrid->AddSlot(1, 0)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->FlowOptions)
+            .InitiallySelectedItem(State->SelectedFlow)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedFlow = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedFlow); })]];
+    FilterGrid->AddSlot(2, 0)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->PriorityOptions)
+            .InitiallySelectedItem(State->SelectedPriority)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedPriority = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedPriority); })]];
+    FilterGrid->AddSlot(0, 1)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->StationOptions)
+            .InitiallySelectedItem(State->SelectedStation)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedStation = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedStation); })]];
+    FilterGrid->AddSlot(1, 1)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->GeometryOptions)
+            .InitiallySelectedItem(State->SelectedGeometry)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedGeometry = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedGeometry); })]];
+    FilterGrid->AddSlot(2, 1)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->GuideOptions)
+            .InitiallySelectedItem(State->SelectedGuide)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedGuide = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedGuide); })]];
+    FilterGrid->AddSlot(0, 2)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->ExecutionOptions)
+            .InitiallySelectedItem(State->SelectedExecution)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedExecution = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedExecution); })]];
+
+    return SNew(SVerticalBox)
+        + SVerticalBox::Slot().AutoHeight().Padding(0.0f, 6.0f)[
+            SNew(STextBlock)
+                .Text_Lambda([State]()
+                {
+                    return FText::FromString(FString::Printf(
+                        TEXT("Showing %d of %d named rapids and %d of %d review runs"),
+                        State->FilteredRows.Num(),
+                        State->AllRows.Num(),
+                        State->DisplayedRunCount(),
+                        State->SourceRunCount));
+                })]
+        + SVerticalBox::Slot().AutoHeight().Padding(0.0f, 2.0f)[
+            SNew(SSearchBox)
+                .HintText(LOCTEXT("NamedRapidSearchHint", "Search rapid, river, class, or feature tag"))
+                .OnTextChanged_Lambda([State](const FText& Value) { State->SearchText = Value.ToString(); State->ApplyFilters(); })]
+        + SVerticalBox::Slot().AutoHeight().Padding(0.0f, 2.0f)[FilterGrid]
+        + SVerticalBox::Slot().AutoHeight().Padding(0.0f, 4.0f)[
+            SNew(SBox)
+                .HeightOverride(520.0f)
+                [SAssignNew(State->ListView, SListView<TSharedPtr<FRaftSimNamedRapidEditorRow>>)
+                    .ListItemsSource(&State->FilteredRows)
+                    .SelectionMode(ESelectionMode::Single)
+                    .OnGenerateRow_Lambda(
+                        [State](TSharedPtr<FRaftSimNamedRapidEditorRow> Row, const TSharedRef<STableViewBase>& OwnerTable)
+                        {
+                            const bool bProvisional = Row->StationKind.StartsWith(TEXT("provisional_"));
+                            const FString FlowFilter = State->SelectedFlow.IsValid() ? State->SelectedFlow->Value : FString();
+                            int32 VisibleRuns = 0;
+                            if (!FlowFilter.IsEmpty())
+                            {
+                                VisibleRuns = Row->RunCountsByFlow.FindRef(FlowFilter);
+                            }
+                            else
+                            {
+                                for (const TPair<FString, int32>& Pair : Row->RunCountsByFlow)
+                                {
+                                    VisibleRuns += Pair.Value;
+                                }
+                            }
+                            return SNew(STableRow<TSharedPtr<FRaftSimNamedRapidEditorRow>>, OwnerTable)
+                                [SNew(SBorder)
+                                    .Padding(6.0f)
+                                    .BorderBackgroundColor(bProvisional ? FLinearColor(0.30f, 0.16f, 0.04f, 0.75f) : FLinearColor(0.05f, 0.16f, 0.10f, 0.60f))
+                                    [SNew(SVerticalBox)
+                                        + SVerticalBox::Slot().AutoHeight()[
+                                            SNew(STextBlock)
+                                                .Text(FText::FromString(FString::Printf(TEXT("%s  |  %s"), *Row->DisplayName, *Row->RiverDisplayName)))
+                                                .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))]
+                                        + SVerticalBox::Slot().AutoHeight()[
+                                            SNew(STextBlock)
+                                                .Text(FText::FromString(FString::Printf(
+                                                    TEXT("%s | %s priority | %.1f m | %s | %d runs"),
+                                                    *Row->DifficultyLabel,
+                                                    *Row->Priority,
+                                                    Row->StationMeters,
+                                                    bProvisional ? TEXT("PROVISIONAL STATION") : TEXT("published station"),
+                                                    VisibleRuns)))]
+                                        + SVerticalBox::Slot().AutoHeight()[
+                                            SNew(STextBlock).Text(FText::FromString(Row->FeatureTags)).AutoWrapText(true)]
+                                        + SVerticalBox::Slot().AutoHeight()[
+                                            SNew(STextBlock)
+                                                .Text(FText::FromString(FString::Printf(
+                                                    TEXT("Exact geometry: %s | Map: %s | Guide: %s | Execution: %s"),
+                                                    *Row->GeometryStatus,
+                                                    *Row->MapGeometryStatus,
+                                                    *Row->GuideStatus,
+                                                    *Row->ExecutionStatus)))
+                                                .AutoWrapText(true)]]];
+                        })]];
+}
 } // namespace
 
 void FRaftSimEditorModule::StartupModule()
@@ -18421,6 +23375,102 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("RaftSim.CreateLandscapeImportCandidateMaps"),
         TEXT("Import review-gated source DEMs as isolated Unreal Landscape candidate maps and capture them."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand));
+    CaptureZambeziCliffComparisonConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CaptureZambeziCliffComparison"),
+        TEXT("Capture paired baseline and transient Namaqualand cliff analog views in the Zambezi candidate map."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this,
+            &FRaftSimEditorModule::HandleCaptureZambeziCliffComparisonCommand));
+    CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyCorridorComparison"),
+            TEXT("Capture paired baseline and source-masked project-owned coigue views in the Futaleufu physical corridor."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand));
+    CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyRenderDiagnostics"),
+            TEXT("Capture controlled leaf-shadow and opaque-card diagnostics in the Futaleufu physical corridor."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyRenderDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyOpacityDiagnostics"),
+            TEXT("Capture same-shader native leaf alpha-scale and constant-opacity diagnostics in the Futaleufu corridor."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyOpacityDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyLightingDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyLightingDiagnostics"),
+            TEXT("Capture same-shader AO, flat-normal, and diagnostic-emissive foliage response splits."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyLightingDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyCorridorLightRigDiagnostics"),
+            TEXT("Capture fixed-canopy baseline, isolated-fill, and skylight-only corridor lighting splits."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyReflectanceDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyReflectanceDiagnostics"),
+            TEXT("Capture fixed-light leaf base-color, transmission, and interaction diagnostics."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyReflectanceDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyShadingModelDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyShadingModelDiagnostics"),
+            TEXT("Capture same-texture masked TwoSidedFoliage and DefaultLit canopy diagnostics."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyShadingModelDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyMipPaddingDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyMipPaddingDiagnostics"),
+            TEXT("Reimport the alpha-preserving leaf RGB padding and capture the fixed native corridor pair."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyMipPaddingDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyOpacitySelectionDiagnostics"),
+            TEXT("Capture corrected-atlas native alpha scales 2 and 3 against the retained alpha4 reference."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsCommand));
+    CaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics"),
+            TEXT("Capture alpha2 near-canopy dynamic shadows with contact and indirect effects disabled."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsCommand));
+    InspectProceduralVegetationSampleConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.InspectProceduralVegetationSample"),
+        TEXT("Log the installed UE Procedural Vegetation sample graph contract for reproducible asset generation."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleInspectProceduralVegetationSampleCommand));
+    EvaluateProceduralBeechCandidateConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.EvaluateProceduralBeechCandidate"),
+        TEXT("Execute one installed UE PVE European Beech growth-data variant and record structural review evidence."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleEvaluateProceduralBeechCandidateCommand));
+    CreateFutaleufuNativeCanopyPrototypeConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CreateFutaleufuNativeCanopyPrototype"),
+        TEXT("Create the project-owned coigue texture, material, Nanite mesh, map, and capture review assets."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this,
+            &FRaftSimEditorModule::HandleCreateFutaleufuNativeCanopyPrototypeCommand));
+    CreateFutaleufuCordilleraCypressFamilyConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CreateFutaleufuCordilleraCypressFamily"),
+        TEXT("Create the project-owned eight-form cordilleran-cypress isolated review family and captures."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this,
+            &FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressFamilyCommand));
 
     bCreatePhotorealEnvironmentPreviewMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealEnvironmentPreviewMaps"));
@@ -18428,12 +23478,15 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
     bCreateLandscapeImportCandidateMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLandscapeImportCandidateMaps"));
+    bCreateFutaleufuCordilleraCypressFamilyOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateFutaleufuCordilleraCypressFamily"));
     bExitAfterPhotorealEnvironmentAutomation =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterEnvironmentAutomation"));
 
     if (bCreatePhotorealEnvironmentPreviewMapsOnStartup ||
         bCapturePhotorealEnvironmentPreviewsOnStartup ||
-        bCreateLandscapeImportCandidateMapsOnStartup)
+        bCreateLandscapeImportCandidateMapsOnStartup ||
+        bCreateFutaleufuCordilleraCypressFamilyOnStartup)
     {
         PhotorealEnvironmentAutomationPostEngineInitHandle =
             FCoreDelegates::GetOnPostEngineInit().AddRaw(this, &FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup);
@@ -18463,6 +23516,31 @@ void FRaftSimEditorModule::ShutdownModule()
     CreatePhotorealEnvironmentPreviewMapsConsoleCommand.Reset();
     CapturePhotorealEnvironmentPreviewsConsoleCommand.Reset();
     CreateLandscapeImportCandidateMapsConsoleCommand.Reset();
+    CaptureZambeziCliffComparisonConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyLightingDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyReflectanceDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyShadingModelDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyMipPaddingDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsConsoleCommand.Reset();
+    CaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsConsoleCommand.Reset();
+    InspectProceduralVegetationSampleConsoleCommand.Reset();
+    EvaluateProceduralBeechCandidateConsoleCommand.Reset();
+    CreateFutaleufuNativeCanopyPrototypeConsoleCommand.Reset();
+    CreateFutaleufuCordilleraCypressFamilyConsoleCommand.Reset();
+
+    if (ProceduralBeechCandidateTickerHandle.IsValid())
+    {
+        FTSTicker::RemoveTicker(ProceduralBeechCandidateTickerHandle);
+        ProceduralBeechCandidateTickerHandle.Reset();
+    }
+    if (ProceduralBeechExecutionSource || ProceduralBeechCandidateAsset || ProceduralBeechGrowthAsset)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("module shutdown interrupted an active evaluation"));
+    }
     UnregisterToolTabs();
 
     if (UObjectInitialized())
@@ -18673,6 +23751,2930 @@ void FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand(const
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
 }
 
+void FRaftSimEditorModule::HandleCaptureZambeziCliffComparisonCommand(const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureZambeziCliffComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyCorridorComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyRenderDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyRenderDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyOpacityDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyOpacityDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyLightingDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyLightingDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyCorridorLightRigDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyReflectanceDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyReflectanceDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyShadingModelDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyShadingModelDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyMipPaddingDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyMipPaddingDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyOpacitySelectionDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleInspectProceduralVegetationSampleCommand(const TArray<FString>& Args)
+{
+    const FString SamplePath = Args.IsEmpty()
+        ? TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/"
+               "PVE_Sample_Deciduous_Tree_01.PVE_Sample_Deciduous_Tree_01")
+        : Args[0];
+    UProceduralVegetation* Sample = LoadObject<UProceduralVegetation>(nullptr, *SamplePath);
+    if (!Sample)
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("PVE sample inspection could not load %s."), *SamplePath);
+        return;
+    }
+
+    UPCGGraph* Graph = Cast<UPCGGraph>(Sample->GetGraph());
+    if (!Graph)
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("PVE sample %s has no readable PCG graph."), *SamplePath);
+        return;
+    }
+
+    UE_LOG(
+        LogRaftSimEditor,
+        Display,
+        TEXT("PVE_SAMPLE graph=%s nodes=%d source=%s"),
+        *Graph->GetPathName(),
+        Graph->GetNodes().Num(),
+        *SamplePath);
+    const UPCGNode* GraphOutputNode = Graph->GetOutputNode();
+    FString GraphOutputPins;
+    if (GraphOutputNode)
+    {
+        for (const UPCGPin* Pin : GraphOutputNode->GetInputPins())
+        {
+            GraphOutputPins += GraphOutputPins.IsEmpty()
+                ? Pin->Properties.Label.ToString()
+                : TEXT(",") + Pin->Properties.Label.ToString();
+        }
+    }
+    UE_LOG(LogRaftSimEditor, Display, TEXT("PVE_SAMPLE graph_output_inputs=[%s]"), *GraphOutputPins);
+    for (int32 EdgeIndex = 0; EdgeIndex < Graph->GetAllEdges().Num(); ++EdgeIndex)
+    {
+        const UPCGEdge* Edge = Graph->GetAllEdges()[EdgeIndex];
+        if (!Edge || !Edge->IsValid())
+        {
+            continue;
+        }
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("PVE_SAMPLE edge=%d from=%s.%s to=%s.%s"),
+            EdgeIndex,
+            Edge->GetInputNode() ? *Edge->GetInputNode()->GetName() : TEXT("None"),
+            *Edge->GetInputPinLabel().ToString(),
+            Edge->GetOutputNode() ? *Edge->GetOutputNode()->GetName() : TEXT("None"),
+            *Edge->GetOutputPinLabel().ToString());
+    }
+    for (int32 NodeIndex = 0; NodeIndex < Graph->GetNodes().Num(); ++NodeIndex)
+    {
+        UPCGNode* Node = Graph->GetNodes()[NodeIndex];
+        UPCGSettings* Settings = Node ? Node->GetSettings() : nullptr;
+        if (!Node || !Settings)
+        {
+            UE_LOG(LogRaftSimEditor, Warning, TEXT("PVE_SAMPLE node=%d missing node or settings."), NodeIndex);
+            continue;
+        }
+
+        int32 PositionX = 0;
+        int32 PositionY = 0;
+        Node->GetNodePosition(PositionX, PositionY);
+        FString InputPins;
+        for (const UPCGPin* Pin : Node->GetInputPins())
+        {
+            InputPins += InputPins.IsEmpty() ? Pin->Properties.Label.ToString() : TEXT(",") + Pin->Properties.Label.ToString();
+        }
+        FString OutputPins;
+        for (const UPCGPin* Pin : Node->GetOutputPins())
+        {
+            OutputPins += OutputPins.IsEmpty() ? Pin->Properties.Label.ToString() : TEXT(",") + Pin->Properties.Label.ToString();
+        }
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("PVE_SAMPLE node=%d name=%s position=%d,%d settings=%s inputs=[%s] outputs=[%s]"),
+            NodeIndex,
+            *Node->GetName(),
+            PositionX,
+            PositionY,
+            *Settings->GetClass()->GetPathName(),
+            *InputPins,
+            *OutputPins);
+
+        for (TFieldIterator<FProperty> PropertyIt(Settings->GetClass(), EFieldIterationFlags::IncludeSuper); PropertyIt; ++PropertyIt)
+        {
+            FProperty* Property = *PropertyIt;
+            if (!Property->HasAnyPropertyFlags(CPF_Edit | CPF_BlueprintVisible))
+            {
+                continue;
+            }
+            FString Value;
+            if (!Property->ExportText_InContainer(0, Value, Settings, Settings, Settings, PPF_Copy))
+            {
+                continue;
+            }
+            Value.ReplaceInline(TEXT("\r"), TEXT(" "));
+            Value.ReplaceInline(TEXT("\n"), TEXT(" "));
+            Value.LeftInline(600);
+            UE_LOG(
+                LogRaftSimEditor,
+                Display,
+                TEXT("PVE_SAMPLE property node=%d name=%s class=%s value=%s"),
+                NodeIndex,
+                *Property->GetName(),
+                *Property->GetClass()->GetName(),
+                *Value);
+        }
+    }
+}
+
+void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressFamilyCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CreateFutaleufuCordilleraCypressFamily(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("Futaleufu cordilleran-cypress family completed.\n%s"),
+            *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Futaleufu cordilleran-cypress family failed.\n%s"),
+            *Summary);
+    }
+}
+
+bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSummary)
+{
+    OutSummary.Reset();
+    TMap<FString, UTexture2D*> Textures;
+    if (!CreateFutaleufuCordilleraCypressTextureAssets(Textures, OutSummary))
+    {
+        OutSummary += TEXT("Cordilleran-cypress texture creation failed; geometry was not authored.\n");
+        return false;
+    }
+    UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark"), false, Textures, OutSummary);
+    UMaterial* NearSprayMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCordilleraCypress_V11_NearSprays"),
+        true,
+        Textures,
+        OutSummary,
+        false,
+        TEXT("Near"));
+    UMaterial* FarSprayMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCordilleraCypress_V11_FarSprays"),
+        true,
+        Textures,
+        OutSummary,
+        false,
+        TEXT("Far"));
+    if (!BarkMaterial || !NearSprayMaterial || !FarSprayMaterial)
+    {
+        return false;
+    }
+
+    UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    if (!World)
+    {
+        OutSummary += TEXT("Could not create the isolated cordilleran-cypress review map.\n");
+        return false;
+    }
+
+    struct FCypressRuntime
+    {
+        FFutaleufuCordilleraCypressForm Form;
+        FVector WorldOffset = FVector::ZeroVector;
+        TArray<FVector> WoodyVertices;
+        TArray<int32> WoodyTriangles;
+        TArray<FVector> WoodyNormals;
+        TArray<FVector2D> WoodyUVs;
+        TArray<FVector> NearSprayVertices;
+        TArray<int32> NearSprayTriangles;
+        TArray<FVector> NearSprayNormals;
+        TArray<FVector2D> NearSprayUVs;
+        TArray<FVector> SprayVertices;
+        TArray<int32> SprayTriangles;
+        TArray<FVector> SprayNormals;
+        TArray<FVector2D> SprayUVs;
+        FVector CloseupCamera = FVector::ZeroVector;
+        FVector CloseupTarget = FVector::ZeroVector;
+        FString WoodyPackagePath;
+        FString NearSprayPackagePath;
+        FString SprayPackagePath;
+        UStaticMesh* WoodyMesh = nullptr;
+        UStaticMesh* NearSprayMesh = nullptr;
+        UStaticMesh* SprayMesh = nullptr;
+        AStaticMeshActor* NearSprayActor = nullptr;
+        AStaticMeshActor* FarSprayActor = nullptr;
+    };
+    auto MakeForm = [](
+                        const TCHAR* Id,
+                        const TCHAR* DisplayName,
+                        const TCHAR* AssetToken,
+                        const TCHAR* LifeStage,
+                        int32 SeedOffset,
+                        int32 BranchCount,
+                        float HeightCm,
+                        float BaseRadiusCm,
+                        float CrownBaseCm,
+                        float CrownRadiusCm,
+                        float BranchUplift,
+                        float Asymmetry)
+    {
+        FFutaleufuCordilleraCypressForm Form;
+        Form.Id = Id;
+        Form.DisplayName = DisplayName;
+        Form.AssetToken = AssetToken;
+        Form.LifeStage = LifeStage;
+        Form.SeedOffset = SeedOffset;
+        Form.BranchCount = BranchCount;
+        Form.HeightCm = HeightCm;
+        Form.BaseRadiusCm = BaseRadiusCm;
+        Form.CrownBaseCm = CrownBaseCm;
+        Form.CrownRadiusCm = CrownRadiusCm;
+        Form.BranchUplift = BranchUplift;
+        Form.Asymmetry = Asymmetry;
+        return Form;
+    };
+
+    TArray<FCypressRuntime> Variants;
+    Variants.SetNum(8);
+    Variants[0].Form = MakeForm(
+        TEXT("open_grown_conical"), TEXT("open-grown conical adult"), TEXT("OpenGrownConicalAdult"),
+        TEXT("adult"), 18427, 46, 2400.0f, 82.0f, 360.0f, 620.0f, 1.0f, 1.10f);
+    Variants[1].Form = MakeForm(
+        TEXT("closed_grove_columnar"), TEXT("closed-grove columnar adult"), TEXT("ClosedGroveColumnarAdult"),
+        TEXT("adult"), 22409, 44, 2500.0f, 68.0f, 650.0f, 390.0f, 1.16f, 0.82f);
+    Variants[1].Form.SuppressedSectorCenterDegrees = 245.0f;
+    Variants[1].Form.SuppressedSectorHalfWidthDegrees = 48.0f;
+    Variants[1].Form.SuppressedSectorLengthScale = 0.52f;
+    Variants[2].Form = MakeForm(
+        TEXT("rocky_slope_asymmetric"), TEXT("rocky-slope asymmetric adult"), TEXT("RockySlopeAsymmetricAdult"),
+        TEXT("adult"), 26407, 40, 2100.0f, 72.0f, 450.0f, 540.0f, 1.08f, 1.48f);
+    Variants[2].Form.TrunkLeanTopCm = FVector2D(175.0f, -95.0f);
+    Variants[2].Form.SuppressedSectorCenterDegrees = 190.0f;
+    Variants[2].Form.SuppressedSectorHalfWidthDegrees = 72.0f;
+    Variants[2].Form.SuppressedSectorLengthScale = 0.28f;
+    Variants[3].Form = MakeForm(
+        TEXT("storm_damaged"), TEXT("storm-damaged adult"), TEXT("StormDamagedAdult"),
+        TEXT("adult"), 30403, 42, 2050.0f, 76.0f, 390.0f, 560.0f, 0.94f, 1.32f);
+    Variants[3].Form.TrunkLeanTopCm = FVector2D(-80.0f, 60.0f);
+    Variants[3].Form.DamageModulo = 5;
+    Variants[3].Form.DamageRemainder = 2;
+    Variants[3].Form.DamagedBranchLengthScale = 0.30f;
+    Variants[3].Form.CrownGapCenterT = 0.58f;
+    Variants[3].Form.CrownGapHalfWidthT = 0.075f;
+    Variants[3].Form.CrownGapLengthScale = 0.42f;
+    Variants[4].Form = MakeForm(
+        TEXT("coigue_transition_edge"), TEXT("coigue-transition edge adult"), TEXT("CoigueTransitionEdgeAdult"),
+        TEXT("adult"), 34403, 43, 2300.0f, 74.0f, 520.0f, 520.0f, 1.12f, 1.36f);
+    Variants[4].Form.TrunkLeanTopCm = FVector2D(95.0f, 120.0f);
+    Variants[4].Form.SuppressedSectorCenterDegrees = 60.0f;
+    Variants[4].Form.SuppressedSectorHalfWidthDegrees = 64.0f;
+    Variants[4].Form.SuppressedSectorLengthScale = 0.22f;
+    Variants[5].Form = MakeForm(
+        TEXT("grove_intermediate"), TEXT("grove intermediate"), TEXT("GroveIntermediate"),
+        TEXT("intermediate"), 38401, 30, 1300.0f, 38.0f, 260.0f, 290.0f, 1.0f, 0.92f);
+    Variants[6].Form = MakeForm(
+        TEXT("suppressed_intermediate"), TEXT("suppressed intermediate"), TEXT("SuppressedIntermediate"),
+        TEXT("intermediate"), 42397, 24, 850.0f, 24.0f, 300.0f, 165.0f, 1.18f, 0.78f);
+    Variants[6].Form.TrunkLeanTopCm = FVector2D(45.0f, 20.0f);
+    Variants[6].Form.SuppressedSectorCenterDegrees = 210.0f;
+    Variants[6].Form.SuppressedSectorHalfWidthDegrees = 95.0f;
+    Variants[6].Form.SuppressedSectorLengthScale = 0.36f;
+    Variants[7].Form = MakeForm(
+        TEXT("released_intermediate"), TEXT("released intermediate"), TEXT("ReleasedIntermediate"),
+        TEXT("intermediate"), 46381, 34, 1500.0f, 44.0f, 250.0f, 370.0f, 1.05f, 1.52f);
+    Variants[7].Form.TrunkLeanTopCm = FVector2D(-70.0f, 85.0f);
+    Variants[7].Form.CrownGapCenterT = 0.38f;
+    Variants[7].Form.CrownGapHalfWidthT = 0.06f;
+    Variants[7].Form.CrownGapLengthScale = 0.56f;
+    for (int32 VariantIndex = 0; VariantIndex < Variants.Num(); ++VariantIndex)
+    {
+        Variants[VariantIndex].WorldOffset = FVector(VariantIndex * 500000.0f, 0.0f, 0.0f);
+    }
+
+    static const FString MeshRoot =
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+             "CordilleraCypress/Meshes/");
+    bool bActorsComplete = true;
+    for (FCypressRuntime& Variant : Variants)
+    {
+        BuildFutaleufuCordilleraCypressGeometry(
+            Variant.Form,
+            Variant.WoodyVertices,
+            Variant.WoodyTriangles,
+            Variant.WoodyNormals,
+            Variant.WoodyUVs,
+            Variant.NearSprayVertices,
+            Variant.NearSprayTriangles,
+            Variant.NearSprayNormals,
+            Variant.NearSprayUVs,
+            Variant.SprayVertices,
+            Variant.SprayTriangles,
+            Variant.SprayNormals,
+            Variant.SprayUVs,
+            Variant.CloseupCamera,
+            Variant.CloseupTarget);
+        const FString ProceduralStem = FString::Printf(
+            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_Procedural"),
+            *Variant.Form.AssetToken);
+        AActor* WoodyProceduralActor = AddPreviewProceduralMeshActor(
+            World,
+            ProceduralStem + TEXT("_Woody"),
+            Variant.WoodyVertices,
+            Variant.WoodyTriangles,
+            Variant.WoodyNormals,
+            Variant.WoodyUVs,
+            FLinearColor::White,
+            BarkMaterial,
+            nullptr,
+            false);
+        AActor* NearSprayProceduralActor = AddPreviewProceduralMeshActor(
+            World,
+            ProceduralStem + TEXT("_NearTexturedSprays"),
+            Variant.NearSprayVertices,
+            Variant.NearSprayTriangles,
+            Variant.NearSprayNormals,
+            Variant.NearSprayUVs,
+            FLinearColor::White,
+            NearSprayMaterial,
+            nullptr,
+            false);
+        AActor* SprayProceduralActor = AddPreviewProceduralMeshActor(
+            World,
+            ProceduralStem + TEXT("_Sprays"),
+            Variant.SprayVertices,
+            Variant.SprayTriangles,
+            Variant.SprayNormals,
+            Variant.SprayUVs,
+            FLinearColor::White,
+            FarSprayMaterial,
+            nullptr,
+            false);
+        if (!WoodyProceduralActor || !NearSprayProceduralActor || !SprayProceduralActor)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Could not construct the %s procedural mesh actors.\n"),
+                *Variant.Form.DisplayName);
+            return false;
+        }
+        const FString AssetStem = FString::Printf(
+            TEXT("SM_RaftSim_FutaleufuCordilleraCypress_%s_V11"),
+            *Variant.Form.AssetToken);
+        Variant.WoodyPackagePath = MeshRoot + AssetStem + TEXT("_Woody");
+        Variant.NearSprayPackagePath = MeshRoot + AssetStem + TEXT("_NearTexturedSprays");
+        Variant.SprayPackagePath = MeshRoot + AssetStem + TEXT("_FarSprays");
+        Variant.WoodyMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            WoodyProceduralActor,
+            Variant.WoodyPackagePath,
+            BarkMaterial,
+            false,
+            ENaniteShapePreservation::None,
+            OutSummary);
+        Variant.NearSprayMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            NearSprayProceduralActor,
+            Variant.NearSprayPackagePath,
+            NearSprayMaterial,
+            false,
+            ENaniteShapePreservation::None,
+            OutSummary);
+        Variant.SprayMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            SprayProceduralActor,
+            Variant.SprayPackagePath,
+            FarSprayMaterial,
+            false,
+            ENaniteShapePreservation::None,
+            OutSummary);
+        WoodyProceduralActor->Destroy();
+        NearSprayProceduralActor->Destroy();
+        SprayProceduralActor->Destroy();
+        if (!Variant.WoodyMesh || !Variant.NearSprayMesh || !Variant.SprayMesh)
+        {
+            return false;
+        }
+
+        const FTransform VariantTransform(FRotator::ZeroRotator, Variant.WorldOffset);
+        AStaticMeshActor* WoodyActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        AStaticMeshActor* NearSprayActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        AStaticMeshActor* SprayActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        Variant.NearSprayActor = NearSprayActor;
+        Variant.FarSprayActor = SprayActor;
+        bActorsComplete &= WoodyActor && NearSprayActor && SprayActor;
+        if (!WoodyActor || !NearSprayActor || !SprayActor)
+        {
+            continue;
+        }
+        WoodyActor->SetActorLabel(FString::Printf(
+            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_Woody"),
+            *Variant.Form.AssetToken));
+        WoodyActor->GetStaticMeshComponent()->SetStaticMesh(Variant.WoodyMesh);
+        WoodyActor->GetStaticMeshComponent()->SetMaterial(0, BarkMaterial);
+        WoodyActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        WoodyActor->GetStaticMeshComponent()->SetCastShadow(true);
+        NearSprayActor->SetActorLabel(FString::Printf(
+            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_NearTexturedSprays"),
+            *Variant.Form.AssetToken));
+        NearSprayActor->GetStaticMeshComponent()->SetStaticMesh(Variant.NearSprayMesh);
+        NearSprayActor->GetStaticMeshComponent()->SetMaterial(0, NearSprayMaterial);
+        NearSprayActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        NearSprayActor->GetStaticMeshComponent()->SetCastShadow(false);
+        NearSprayActor->GetStaticMeshComponent()->SetCullDistance(2800.0f);
+        SprayActor->SetActorLabel(FString::Printf(
+            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_FarSprays"),
+            *Variant.Form.AssetToken));
+        SprayActor->GetStaticMeshComponent()->SetStaticMesh(Variant.SprayMesh);
+        SprayActor->GetStaticMeshComponent()->SetMaterial(0, FarSprayMaterial);
+        SprayActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        SprayActor->GetStaticMeshComponent()->SetCastShadow(false);
+        SprayActor->GetStaticMeshComponent()->MinDrawDistance = 2800.0f;
+        SprayActor->GetStaticMeshComponent()->bCastDynamicShadow = false;
+        SprayActor->GetStaticMeshComponent()->bCastStaticShadow = false;
+        SprayActor->GetStaticMeshComponent()->bCastContactShadow = false;
+        SprayActor->GetStaticMeshComponent()->bAffectDistanceFieldLighting = false;
+        SprayActor->GetStaticMeshComponent()->bAffectDynamicIndirectLighting = false;
+    }
+
+    UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+    bool bGroundComplete = PlaneMesh != nullptr;
+    for (const FCypressRuntime& Variant : Variants)
+    {
+        AStaticMeshActor* GroundActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(),
+            FTransform(
+                FRotator::ZeroRotator,
+                Variant.WorldOffset + FVector(0.0f, 0.0f, -4.0f),
+                FVector(150.0f, 150.0f, 1.0f)));
+        bGroundComplete &= GroundActor && GroundActor->GetStaticMeshComponent();
+        if (GroundActor && GroundActor->GetStaticMeshComponent())
+        {
+            GroundActor->SetActorLabel(FString::Printf(
+                TEXT("RaftSim_FutaleufuCordilleraCypress_%s_NeutralGround"),
+                *Variant.Form.AssetToken));
+            GroundActor->GetStaticMeshComponent()->SetStaticMesh(PlaneMesh);
+            GroundActor->GetStaticMeshComponent()->SetMaterial(0, LoadPreviewBaseMaterial());
+            GroundActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
+    }
+
+    FRaftSimEnvironmentPreviewSpec ReviewSpec;
+    ReviewSpec.RiverId = TEXT("futaleufu_cordillera_cypress");
+    ReviewSpec.DisplayName = TEXT("Futaleufu project-owned cordilleran-cypress family");
+    ReviewSpec.MapPackagePath =
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+             "L_FutaleufuCordilleraCypress_V11_BranchSystemReview");
+    ReviewSpec.FoliageColor = FLinearColor(0.13f, 0.28f, 0.10f);
+    ReviewSpec.RockColor = FLinearColor(0.31f, 0.30f, 0.27f);
+    AddPreviewLightRig(World, ReviewSpec);
+    for (TActorIterator<ASkyLight> It(World); It; ++It)
+    {
+        if (It->GetLightComponent())
+        {
+            It->GetLightComponent()->SetIntensity(1.55f);
+            It->GetLightComponent()->RecaptureSky();
+        }
+    }
+    ADirectionalLight* FillLight = World->SpawnActor<ADirectionalLight>(
+        ADirectionalLight::StaticClass(), FTransform(FRotator(-30.0f, 38.0f, 0.0f)));
+    if (FillLight && FillLight->GetLightComponent())
+    {
+        FillLight->SetActorLabel(TEXT("RaftSim_CordilleraCypress_NeutralFill"));
+        FillLight->GetLightComponent()->SetIntensity(0.62f);
+        FillLight->GetLightComponent()->SetLightColor(FLinearColor(0.96f, 0.99f, 1.0f));
+        FillLight->GetLightComponent()->SetCastShadows(false);
+    }
+
+    const FRaftSimPhotographicCaptureSettings CaptureSettings =
+        GetPhotographicCaptureSettings(TEXT("futaleufu_terminator"));
+    auto AddReviewCamera = [World, CaptureSettings](
+                               const FString& Label,
+                               const FVector& Location,
+                               const FVector& Target,
+                               float FieldOfView)
+    {
+        ACameraActor* Camera = World->SpawnActor<ACameraActor>(
+            ACameraActor::StaticClass(),
+            FTransform((Target - Location).Rotation(), Location));
+        if (!Camera || !Camera->GetCameraComponent())
+        {
+            return false;
+        }
+        Camera->SetActorLabel(Label);
+        UCameraComponent* CameraComponent = Camera->GetCameraComponent();
+        CameraComponent->FieldOfView = FieldOfView;
+        FPostProcessSettings& Settings = CameraComponent->PostProcessSettings;
+        Settings.bOverride_AutoExposureMethod = true;
+        Settings.AutoExposureMethod = AEM_Manual;
+        Settings.bOverride_AutoExposureBias = true;
+        Settings.AutoExposureBias = CaptureSettings.ExposureBias;
+        Settings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+        Settings.AutoExposureApplyPhysicalCameraExposure = 0;
+        Settings.bOverride_ColorSaturation = true;
+        Settings.ColorSaturation = FVector4(
+            CaptureSettings.Saturation,
+            CaptureSettings.Saturation,
+            CaptureSettings.Saturation,
+            1.0f);
+        Settings.bOverride_ColorContrast = true;
+        Settings.ColorContrast = FVector4(
+            CaptureSettings.Contrast,
+            CaptureSettings.Contrast,
+            CaptureSettings.Contrast,
+            1.0f);
+        Settings.bOverride_Sharpen = true;
+        Settings.Sharpen = CaptureSettings.Sharpen;
+        Settings.bOverride_FilmGrainIntensity = true;
+        Settings.FilmGrainIntensity = 0.0f;
+        return true;
+    };
+
+    struct FCypressCaptureRequest
+    {
+        FString RelativePath;
+        FString CameraLabel;
+        FString CaptureId;
+        FString Description;
+        FString AuthorityMode = TEXT("combined");
+        bool bCaptured = false;
+    };
+    TArray<FCypressCaptureRequest> CaptureRequests;
+    bool bCamerasComplete = true;
+    for (const FCypressRuntime& Variant : Variants)
+    {
+        const FVector CrownTarget = Variant.WorldOffset + FVector(
+            0.0f,
+            0.0f,
+            Variant.Form.CrownBaseCm +
+                (Variant.Form.HeightCm - Variant.Form.CrownBaseCm) * 0.46f);
+        struct FViewDefinition
+        {
+            const TCHAR* CameraSuffix;
+            const TCHAR* CaptureSuffix;
+            const TCHAR* Description;
+            FVector Location;
+            FVector Target;
+            float FieldOfView;
+        };
+        const FViewDefinition Views[] = {
+            {TEXT("Turntable035"), TEXT("turntable_azimuth_035"), TEXT("turntable azimuth 35"),
+             Variant.WorldOffset + FVector(-5600.0f, -3920.0f, 1420.0f), CrownTarget, 48.0f},
+            {TEXT("Turntable145"), TEXT("turntable_azimuth_145"), TEXT("turntable azimuth 145"),
+             Variant.WorldOffset + FVector(5600.0f, -3920.0f, 1420.0f), CrownTarget, 48.0f},
+            {TEXT("BarkSprayCloseup"), TEXT("bark_spray_closeup"), TEXT("bark and spray closeup"),
+             Variant.WorldOffset + Variant.CloseupCamera,
+             Variant.WorldOffset + Variant.CloseupTarget, 38.0f},
+            {TEXT("RiverDistance60m"), TEXT("river_distance_60m"), TEXT("60 m river-distance proxy"),
+             Variant.WorldOffset + FVector(-6000.0f, -700.0f, 1450.0f), CrownTarget, 43.0f},
+            {TEXT("RiverDistance150m"), TEXT("river_distance_150m"), TEXT("150 m river-distance proxy"),
+             Variant.WorldOffset + FVector(-15000.0f, -1200.0f, 1550.0f), CrownTarget, 24.0f}};
+        for (const FViewDefinition& View : Views)
+        {
+            FCypressCaptureRequest Request;
+            Request.CameraLabel = FString::Printf(
+                TEXT("RaftSim_CordilleraCypress_%s_%s"),
+                *Variant.Form.AssetToken,
+                View.CameraSuffix);
+            Request.CaptureId = Variant.Form.Id + TEXT("_") + View.CaptureSuffix;
+            Request.RelativePath = FString::Printf(
+                TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                     "futaleufu_cordillera_cypress_v11_%s_%s.png"),
+                *Variant.Form.Id,
+                View.CaptureSuffix);
+            if (Request.CaptureId.Contains(TEXT("bark_spray_closeup")))
+            {
+                Request.AuthorityMode = TEXT("near_only");
+            }
+            Request.Description = FString::Printf(
+                TEXT("cordilleran cypress %s %s"),
+                *Variant.Form.DisplayName,
+                View.Description);
+            bCamerasComplete &= AddReviewCamera(
+                Request.CameraLabel,
+                View.Location,
+                View.Target,
+                View.FieldOfView);
+            CaptureRequests.Add(MoveTemp(Request));
+        }
+        if (Variant.Form.Id == TEXT("open_grown_conical") ||
+            Variant.Form.Id == TEXT("closed_grove_columnar") ||
+            Variant.Form.Id == TEXT("grove_intermediate"))
+        {
+            const float TransitionDistancesCm[] = {2000.0f, 2800.0f, 3600.0f};
+            const TCHAR* TransitionTokens[] = {TEXT("20m"), TEXT("28m"), TEXT("36m")};
+            const TCHAR* AuthorityTokens[] = {
+                TEXT("near_only"), TEXT("far_only"), TEXT("combined")};
+            for (int32 TransitionIndex = 0; TransitionIndex < 3; ++TransitionIndex)
+            {
+                for (int32 AuthorityIndex = 0; AuthorityIndex < 3; ++AuthorityIndex)
+                {
+                    FCypressCaptureRequest Request;
+                    Request.AuthorityMode = AuthorityTokens[AuthorityIndex];
+                    Request.CameraLabel = FString::Printf(
+                        TEXT("RaftSim_CordilleraCypress_%s_Handoff%s_%s"),
+                        *Variant.Form.AssetToken,
+                        TransitionTokens[TransitionIndex],
+                        AuthorityTokens[AuthorityIndex]);
+                    Request.CaptureId = FString::Printf(
+                        TEXT("%s_handoff_%s_%s"),
+                        *Variant.Form.Id,
+                        TransitionTokens[TransitionIndex],
+                        AuthorityTokens[AuthorityIndex]);
+                    Request.RelativePath = FString::Printf(
+                        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                             "futaleufu_cordillera_cypress_v11_%s_handoff_%s_%s.png"),
+                        *Variant.Form.Id,
+                        TransitionTokens[TransitionIndex],
+                        AuthorityTokens[AuthorityIndex]);
+                    Request.Description = FString::Printf(
+                        TEXT("cordilleran cypress %s handoff %s authority %s"),
+                        *Variant.Form.DisplayName,
+                        TransitionTokens[TransitionIndex],
+                        AuthorityTokens[AuthorityIndex]);
+                    const FVector CameraLocation = Variant.WorldOffset + FVector(
+                        -TransitionDistancesCm[TransitionIndex], -420.0f, 1280.0f);
+                    bCamerasComplete &= AddReviewCamera(
+                        Request.CameraLabel, CameraLocation, CrownTarget, 44.0f);
+                    CaptureRequests.Add(MoveTemp(Request));
+                }
+            }
+        }
+    }
+
+    bool bGeometryValidated = true;
+    for (const FCypressRuntime& Variant : Variants)
+    {
+        const FVector WoodyBounds = Variant.WoodyMesh->GetBoundingBox().GetSize();
+        const FVector NearSprayBounds = Variant.NearSprayMesh->GetBoundingBox().GetSize();
+        const FVector SprayBounds = Variant.SprayMesh->GetBoundingBox().GetSize();
+        bGeometryValidated &=
+            Variant.Form.HeightCm >= 250.0f &&
+            Variant.Form.HeightCm <= 2500.0f &&
+            Variant.WoodyMesh->GetNumVertices(0) > 500 &&
+            Variant.NearSprayMesh->GetNumVertices(0) > 500 &&
+            Variant.SprayMesh->GetNumVertices(0) > 500 &&
+            Variant.NearSprayTriangles.Num() % 3 == 0 &&
+            Variant.SprayTriangles.Num() % 6 == 0 &&
+            WoodyBounds.Z >= Variant.Form.HeightCm * 0.92f &&
+            NearSprayBounds.X >= Variant.Form.CrownRadiusCm * 0.65f &&
+            SprayBounds.X >= Variant.Form.CrownRadiusCm * 0.65f &&
+            !Variant.WoodyMesh->IsNaniteEnabled() &&
+            !Variant.NearSprayMesh->IsNaniteEnabled() &&
+            !Variant.SprayMesh->IsNaniteEnabled();
+    }
+    const bool bSceneComplete =
+        bActorsComplete && bGroundComplete && FillLight && FillLight->GetLightComponent() &&
+        bCamerasComplete && bGeometryValidated && CaptureRequests.Num() == 67;
+    FString MapSummary;
+    const bool bMapSaved = bSceneComplete &&
+        SavePreviewWorld(World, ReviewSpec.MapPackagePath, MapSummary);
+    OutSummary += MapSummary;
+
+    bool bCaptured = bMapSaved;
+    if (bMapSaved)
+    {
+        for (FCypressCaptureRequest& Request : CaptureRequests)
+        {
+            const FString AuthorityMode = Request.AuthorityMode;
+            Request.bCaptured = CapturePreviewImageForSpec(
+                ReviewSpec,
+                GetRepoRoot(),
+                Request.RelativePath,
+                Request.CameraLabel,
+                Request.CaptureId,
+                Request.Description,
+                false,
+                OutSummary,
+                [AuthorityMode](UWorld* CaptureWorld, ACameraActor* CaptureCamera, FString& SetupSummary)
+                {
+                    const bool bNearOnly = AuthorityMode == TEXT("near_only");
+                    const bool bFarOnly = AuthorityMode == TEXT("far_only");
+                    constexpr bool bNearRepresentationEligible = false;
+                    constexpr float ActorRootSelectionDistanceCm = 2800.0f;
+                    int32 NearActorCount = 0;
+                    int32 FarActorCount = 0;
+                    for (TActorIterator<AStaticMeshActor> It(CaptureWorld); It; ++It)
+                    {
+                        AStaticMeshActor* Actor = *It;
+                        UStaticMeshComponent* Component =
+                            Actor ? Actor->GetStaticMeshComponent() : nullptr;
+                        if (!Actor || !Component)
+                        {
+                            continue;
+                        }
+                        const FString Label = Actor->GetActorLabel();
+                        if (Label.Contains(TEXT("_NearTexturedSprays")))
+                        {
+                            ++NearActorCount;
+                            const float RootDistance = CaptureCamera
+                                ? FVector::Distance(
+                                      CaptureCamera->GetActorLocation(), Actor->GetActorLocation())
+                                : TNumericLimits<float>::Max();
+                            const bool bCombinedSelectsNear =
+                                !bNearOnly && !bFarOnly && bNearRepresentationEligible &&
+                                RootDistance < ActorRootSelectionDistanceCm;
+                            const bool bShowNear = bNearOnly || bCombinedSelectsNear;
+                            Actor->SetActorHiddenInGame(!bShowNear);
+                            Component->SetVisibility(bShowNear, true);
+                            Component->SetCullDistance(0.0f);
+                        }
+                        else if (Label.Contains(TEXT("_FarSprays")))
+                        {
+                            ++FarActorCount;
+                            const float RootDistance = CaptureCamera
+                                ? FVector::Distance(
+                                      CaptureCamera->GetActorLocation(), Actor->GetActorLocation())
+                                : TNumericLimits<float>::Max();
+                            const bool bCombinedSelectsNear =
+                                !bNearOnly && !bFarOnly && bNearRepresentationEligible &&
+                                RootDistance < ActorRootSelectionDistanceCm;
+                            const bool bShowFar = bFarOnly || (!bNearOnly && !bCombinedSelectsNear);
+                            Actor->SetActorHiddenInGame(!bShowFar);
+                            Component->SetVisibility(bShowFar, true);
+                            Component->MinDrawDistance = 0.0f;
+                        }
+                    }
+                    const bool bComplete = NearActorCount == 8 && FarActorCount == 8;
+                    if (!bComplete)
+                    {
+                        SetupSummary += FString::Printf(
+                            TEXT("Cypress authority setup found %d near and %d far actors; expected 8 each.\n"),
+                            NearActorCount,
+                            FarActorCount);
+                    }
+                    return bComplete;
+                });
+            bCaptured &= Request.bCaptured;
+        }
+    }
+
+    TSharedRef<FJsonObject> ReportObject = MakeShared<FJsonObject>();
+    ReportObject->SetStringField(
+        TEXT("schema"), TEXT("raftsim.unreal.futaleufu_cordillera_cypress_isolated_family.v11"));
+    ReportObject->SetStringField(
+        TEXT("status"),
+        bCaptured
+            ? TEXT("v11_branch_system_near_candidate_family_captured_pending_human_review")
+            : TEXT("isolated_unreal_family_capture_incomplete"));
+    ReportObject->SetBoolField(TEXT("production_promoted"), false);
+    ReportObject->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    ReportObject->SetStringField(TEXT("species"), TEXT("Austrocedrus chilensis"));
+    ReportObject->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    ReportObject->SetStringField(TEXT("map_asset"), ReviewSpec.MapPackagePath);
+    ReportObject->SetBoolField(TEXT("map_saved"), bMapSaved);
+    ReportObject->SetBoolField(TEXT("geometry_contract_passed"), bGeometryValidated);
+    ReportObject->SetNumberField(TEXT("form_count"), Variants.Num());
+    ReportObject->SetNumberField(TEXT("adult_form_count"), 5);
+    ReportObject->SetNumberField(TEXT("intermediate_form_count"), 3);
+    ReportObject->SetStringField(
+        TEXT("authoring_manifest"),
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/"
+             "FutaleufuNativeCanopy/CordilleraCypress/"
+             "futaleufu_cordillera_cypress_authoring_manifest.json"));
+    ReportObject->SetStringField(
+        TEXT("texture_manifest"),
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/"
+             "FutaleufuNativeCanopy/CordilleraCypress/"
+             "futaleufu_cordillera_cypress_v10_texture_manifest.json"));
+    ReportObject->SetStringField(
+        TEXT("far_texture_manifest"),
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/"
+             "FutaleufuNativeCanopy/CordilleraCypress/"
+             "futaleufu_cordillera_cypress_texture_manifest.json"));
+    ReportObject->SetStringField(
+        TEXT("foliage_representation"),
+        TEXT("V11 grouped curved primary branch systems with one flattened main and one alternating lateral V10 broad-spray card per terminal cluster; retained V3 far atlas remains separate and actor-root fallback remains authoritative"));
+    ReportObject->SetNumberField(TEXT("near_textured_cards_per_terminal_cluster"), 2);
+    ReportObject->SetNumberField(TEXT("far_cards_per_terminal_cluster"), 3);
+    ReportObject->SetNumberField(TEXT("near_max_draw_distance_cm"), 2800.0f);
+    ReportObject->SetNumberField(TEXT("far_min_draw_distance_cm"), 2800.0f);
+    ReportObject->SetNumberField(TEXT("fixed_family_capture_count"), 40);
+    ReportObject->SetNumberField(TEXT("handoff_capture_count"), 27);
+    ReportObject->SetNumberField(TEXT("handoff_authority_modes_per_distance"), 3);
+    ReportObject->SetStringField(TEXT("combined_authority"), TEXT("camera_to_actor_root_distance"));
+    ReportObject->SetNumberField(TEXT("actor_root_selection_distance_cm"), 2800.0f);
+    ReportObject->SetBoolField(TEXT("near_representation_eligible"), false);
+    ReportObject->SetStringField(
+        TEXT("ineligible_near_fallback"), TEXT("far silhouette remains authoritative at all distances"));
+    ReportObject->SetStringField(
+        TEXT("near_candidate_closeup_authority"), TEXT("near_only"));
+    ReportObject->SetStringField(
+        TEXT("shadow_policy"),
+        TEXT("initial isolated spray shadows disabled; production shadow treatment remains gated by V23"));
+
+    TArray<TSharedPtr<FJsonValue>> FormValues;
+    for (const FCypressRuntime& Variant : Variants)
+    {
+        TSharedRef<FJsonObject> FormObject = MakeShared<FJsonObject>();
+        FormObject->SetStringField(TEXT("id"), Variant.Form.Id);
+        FormObject->SetStringField(TEXT("display_name"), Variant.Form.DisplayName);
+        FormObject->SetStringField(TEXT("life_stage"), Variant.Form.LifeStage);
+        FormObject->SetNumberField(TEXT("seed_offset"), Variant.Form.SeedOffset);
+        FormObject->SetNumberField(TEXT("height_cm"), Variant.Form.HeightCm);
+        FormObject->SetNumberField(TEXT("base_radius_cm"), Variant.Form.BaseRadiusCm);
+        FormObject->SetNumberField(TEXT("crown_base_cm"), Variant.Form.CrownBaseCm);
+        FormObject->SetNumberField(TEXT("crown_radius_cm"), Variant.Form.CrownRadiusCm);
+        FormObject->SetNumberField(TEXT("branch_count"), Variant.Form.BranchCount);
+        FormObject->SetStringField(TEXT("woody_asset"), Variant.WoodyPackagePath);
+        FormObject->SetStringField(TEXT("near_textured_spray_asset"), Variant.NearSprayPackagePath);
+        FormObject->SetStringField(TEXT("far_spray_asset"), Variant.SprayPackagePath);
+        FormObject->SetNumberField(TEXT("woody_source_vertices"), Variant.WoodyVertices.Num());
+        FormObject->SetNumberField(TEXT("woody_source_triangles"), Variant.WoodyTriangles.Num() / 3);
+        FormObject->SetNumberField(
+            TEXT("near_textured_spray_source_vertices"), Variant.NearSprayVertices.Num());
+        FormObject->SetNumberField(
+            TEXT("near_textured_spray_source_triangles"), Variant.NearSprayTriangles.Num() / 3);
+        FormObject->SetNumberField(
+            TEXT("near_textured_spray_source_cards"), Variant.NearSprayTriangles.Num() / 6);
+        FormObject->SetNumberField(TEXT("far_spray_source_cards"), Variant.SprayTriangles.Num() / 6);
+        FormObject->SetNumberField(TEXT("far_spray_source_triangles"), Variant.SprayTriangles.Num() / 3);
+        FormObject->SetBoolField(TEXT("woody_nanite_enabled"), Variant.WoodyMesh->IsNaniteEnabled());
+        FormObject->SetBoolField(
+            TEXT("near_textured_spray_nanite_enabled"), Variant.NearSprayMesh->IsNaniteEnabled());
+        FormObject->SetBoolField(TEXT("far_spray_nanite_enabled"), Variant.SprayMesh->IsNaniteEnabled());
+        FormValues.Add(MakeShared<FJsonValueObject>(FormObject));
+    }
+    ReportObject->SetArrayField(TEXT("forms"), FormValues);
+
+    TArray<TSharedPtr<FJsonValue>> CaptureValues;
+    for (const FCypressCaptureRequest& Request : CaptureRequests)
+    {
+        TSharedRef<FJsonObject> CaptureObject = MakeShared<FJsonObject>();
+        CaptureObject->SetStringField(TEXT("path"), Request.RelativePath);
+        CaptureObject->SetStringField(TEXT("camera"), Request.CameraLabel);
+        CaptureObject->SetStringField(TEXT("capture_id"), Request.CaptureId);
+        CaptureObject->SetStringField(TEXT("authority_mode"), Request.AuthorityMode);
+        CaptureObject->SetBoolField(TEXT("captured"), Request.bCaptured);
+        CaptureValues.Add(MakeShared<FJsonValueObject>(CaptureObject));
+    }
+    ReportObject->SetArrayField(TEXT("captures"), CaptureValues);
+    ReportObject->SetStringField(
+        TEXT("promotion_boundary"),
+        TEXT("human visual acceptance, temporal wind, LOD, mixed-ecology corridor, true-north placement, packaged desktop, and on-device VR evidence remain required"));
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(ReportObject, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportPath = FPaths::Combine(
+        GetRepoRoot(),
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+             "futaleufu_cordillera_cypress_v11_isolated_family_report.json"));
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(ReportPath), true);
+    const bool bReportSaved = bSerialized &&
+        FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s cordilleran-cypress isolated family report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bCaptured && bReportSaved;
+}
+
+void FRaftSimEditorModule::HandleCreateFutaleufuNativeCanopyPrototypeCommand(const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CreateFutaleufuNativeCanopyPrototype(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("Futaleufu native-canopy prototype completed.\n%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("Futaleufu native-canopy prototype failed.\n%s"), *Summary);
+    }
+}
+
+bool FRaftSimEditorModule::CreateFutaleufuNativeCanopyPrototype(FString& OutSummary)
+{
+    OutSummary.Reset();
+    TMap<FString, UTexture2D*> Textures;
+    if (!CreateFutaleufuNativeCanopyTextureAssets(Textures, OutSummary))
+    {
+        OutSummary += TEXT("Native-canopy texture creation failed; geometry was not authored.\n");
+        return false;
+    }
+    UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Bark"), false, Textures, OutSummary);
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"), true, Textures, OutSummary);
+    if (!BarkMaterial || !LeafMaterial)
+    {
+        return false;
+    }
+
+    UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    if (!World)
+    {
+        OutSummary += TEXT("Could not create the isolated native-canopy review map.\n");
+        return false;
+    }
+
+    struct FFutaleufuCoigueRuntime
+    {
+        FFutaleufuCoigueCrownForm Form;
+        FVector WorldOffset = FVector::ZeroVector;
+        TArray<FVector> TrunkVertices;
+        TArray<int32> TrunkTriangles;
+        TArray<FVector> TrunkNormals;
+        TArray<FVector2D> TrunkUVs;
+        TArray<FVector> BranchletVertices;
+        TArray<int32> BranchletTriangles;
+        TArray<FVector> BranchletNormals;
+        TArray<FVector2D> BranchletUVs;
+        TArray<FVector> LeafVertices;
+        TArray<int32> LeafTriangles;
+        TArray<FVector> LeafNormals;
+        TArray<FVector2D> LeafUVs;
+        TArray<FVector> FarLeafVertices;
+        TArray<int32> FarLeafTriangles;
+        TArray<FVector> FarLeafNormals;
+        TArray<FVector2D> FarLeafUVs;
+        TArray<FVector> RuntimeFarLeafVertices;
+        TArray<int32> RuntimeFarLeafTriangles;
+        TArray<FVector> RuntimeFarLeafNormals;
+        TArray<FVector2D> RuntimeFarLeafUVs;
+        FVector CloseupCamera = FVector::ZeroVector;
+        FVector CloseupTarget = FVector::ZeroVector;
+        FFutaleufuCoigueRoutingMetrics RoutingMetrics;
+        FString TrunkPackagePath;
+        FString LeafPackagePath;
+        FString BranchletPackagePath;
+        FString FarLeafPackagePath;
+        FString RuntimeFarLeafPackagePath;
+        UStaticMesh* TrunkMesh = nullptr;
+        UStaticMesh* LeafMesh = nullptr;
+        UStaticMesh* BranchletMesh = nullptr;
+        UStaticMesh* FarLeafMesh = nullptr;
+        UStaticMesh* RuntimeFarLeafMesh = nullptr;
+    };
+
+    auto MakeCrownForm = [](
+                             const TCHAR* Id,
+                             const TCHAR* DisplayName,
+                             const TCHAR* AssetToken,
+                             const TCHAR* LifeStage,
+                             int32 SeedOffset,
+                             int32 MainBranchCount,
+                             int32 FarAnchorCount,
+                             float TrunkHeightScale,
+                             float TrunkRadiusScale,
+                             float CrownBaseZCm,
+                             float CrownSpanZCm,
+                             float CrownWidthScale,
+                             float BranchUpliftScale,
+                             float AsymmetryScale)
+    {
+        FFutaleufuCoigueCrownForm Form;
+        Form.Id = Id;
+        Form.DisplayName = DisplayName;
+        Form.AssetToken = AssetToken;
+        Form.LifeStage = LifeStage;
+        Form.SeedOffset = SeedOffset;
+        Form.MainBranchCount = MainBranchCount;
+        Form.FarCrownVolumeAnchorCount = FarAnchorCount;
+        Form.TrunkHeightScale = TrunkHeightScale;
+        Form.TrunkRadiusScale = TrunkRadiusScale;
+        Form.CrownBaseZCm = CrownBaseZCm;
+        Form.CrownSpanZCm = CrownSpanZCm;
+        Form.CrownWidthScale = CrownWidthScale;
+        Form.BranchUpliftScale = BranchUpliftScale;
+        Form.AsymmetryScale = AsymmetryScale;
+        return Form;
+    };
+
+    TArray<FFutaleufuCoigueRuntime> Variants;
+    Variants.SetNum(8);
+    Variants[0].Form = MakeCrownForm(
+        TEXT("open_grown_adult"), TEXT("open-grown adult"), TEXT("AdultPrototype"),
+        TEXT("adult"), 0, 26, 370, 1.0f, 1.0f, 950.0f, 1560.0f, 1.0f, 1.0f, 1.0f);
+    Variants[1].Form = MakeCrownForm(
+        TEXT("forest_grown_adult"), TEXT("forest-grown adult"), TEXT("ForestGrownAdultPrototype"),
+        TEXT("adult"), 3907, 22, 280, 1.12f, 0.78f, 1440.0f, 1510.0f, 0.64f, 1.28f, 1.08f);
+    Variants[2].Form = MakeCrownForm(
+        TEXT("storm_damaged_adult"), TEXT("storm-damaged adult"), TEXT("StormDamagedAdultPrototype"),
+        TEXT("adult"), 5903, 25, 330, 0.98f, 0.94f, 1050.0f, 1550.0f, 0.90f, 1.05f, 1.30f);
+    Variants[2].Form.TrunkLeanTopCm = FVector2D(-60.0f, 35.0f);
+    Variants[2].Form.CrownGapCenterT = 0.62f;
+    Variants[2].Form.CrownGapHalfWidthT = 0.09f;
+    Variants[2].Form.CrownGapLengthScale = 0.50f;
+    Variants[2].Form.DamageModulo = 4;
+    Variants[2].Form.DamageRemainder = 1;
+    Variants[2].Form.DamagedBranchLengthScale = 0.38f;
+    Variants[3].Form = MakeCrownForm(
+        TEXT("competition_lean_adult"), TEXT("competition-lean adult"), TEXT("CompetitionLeanAdultPrototype"),
+        TEXT("adult"), 7901, 24, 310, 1.10f, 0.82f, 1280.0f, 1530.0f, 0.72f, 1.20f, 1.40f);
+    Variants[3].Form.TrunkLeanTopCm = FVector2D(260.0f, -150.0f);
+    Variants[3].Form.SuppressedSectorCenterDegrees = 210.0f;
+    Variants[3].Form.SuppressedSectorHalfWidthDegrees = 70.0f;
+    Variants[3].Form.SuppressedSectorLengthScale = 0.28f;
+    Variants[4].Form = MakeCrownForm(
+        TEXT("crown_gap_adult"), TEXT("crown-gap adult"), TEXT("CrownGapAdultPrototype"),
+        TEXT("adult"), 9901, 25, 340, 1.02f, 0.90f, 1100.0f, 1500.0f, 0.88f, 1.08f, 1.55f);
+    Variants[4].Form.TrunkLeanTopCm = FVector2D(45.0f, 70.0f);
+    Variants[4].Form.SuppressedSectorCenterDegrees = 40.0f;
+    Variants[4].Form.SuppressedSectorHalfWidthDegrees = 45.0f;
+    Variants[4].Form.SuppressedSectorLengthScale = 0.15f;
+    Variants[4].Form.CrownGapCenterT = 0.45f;
+    Variants[4].Form.CrownGapHalfWidthT = 0.07f;
+    Variants[4].Form.CrownGapLengthScale = 0.32f;
+    Variants[5].Form = MakeCrownForm(
+        TEXT("intermediate"), TEXT("intermediate form"), TEXT("IntermediatePrototype"),
+        TEXT("intermediate"), 1907, 24, 320, 1.02f, 0.86f, 1140.0f, 1500.0f, 0.82f, 1.12f, 1.24f);
+    Variants[6].Form = MakeCrownForm(
+        TEXT("intermediate_suppressed"), TEXT("suppressed intermediate"), TEXT("SuppressedIntermediatePrototype"),
+        TEXT("intermediate"), 11903, 20, 250, 0.78f, 0.58f, 960.0f, 1120.0f, 0.48f, 1.35f, 0.95f);
+    Variants[6].Form.TrunkLeanTopCm = FVector2D(90.0f, 40.0f);
+    Variants[6].Form.SuppressedSectorCenterDegrees = 170.0f;
+    Variants[6].Form.SuppressedSectorHalfWidthDegrees = 90.0f;
+    Variants[6].Form.SuppressedSectorLengthScale = 0.40f;
+    Variants[7].Form = MakeCrownForm(
+        TEXT("intermediate_released"), TEXT("released intermediate"), TEXT("ReleasedIntermediatePrototype"),
+        TEXT("intermediate"), 13901, 23, 300, 0.90f, 0.68f, 940.0f, 1340.0f, 0.76f, 1.18f, 1.70f);
+    Variants[7].Form.TrunkLeanTopCm = FVector2D(-120.0f, 100.0f);
+    Variants[7].Form.SuppressedSectorCenterDegrees = 280.0f;
+    Variants[7].Form.SuppressedSectorHalfWidthDegrees = 55.0f;
+    Variants[7].Form.SuppressedSectorLengthScale = 0.45f;
+    for (int32 VariantIndex = 0; VariantIndex < Variants.Num(); ++VariantIndex)
+    {
+        Variants[VariantIndex].WorldOffset = FVector(VariantIndex * 500000.0f, 0.0f, 0.0f);
+    }
+
+    static const FString MeshRoot =
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/");
+    bool bVariantActorsComplete = true;
+    for (FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        BuildFutaleufuCoiguePrototypeGeometry(
+            Variant.Form,
+            Variant.TrunkVertices,
+            Variant.TrunkTriangles,
+            Variant.TrunkNormals,
+            Variant.TrunkUVs,
+            Variant.BranchletVertices,
+            Variant.BranchletTriangles,
+            Variant.BranchletNormals,
+            Variant.BranchletUVs,
+            Variant.LeafVertices,
+            Variant.LeafTriangles,
+            Variant.LeafNormals,
+            Variant.LeafUVs,
+            Variant.FarLeafVertices,
+            Variant.FarLeafTriangles,
+            Variant.FarLeafNormals,
+            Variant.FarLeafUVs,
+            Variant.CloseupCamera,
+            Variant.CloseupTarget,
+            Variant.RoutingMetrics);
+        BuildReducedNativeCanopyCardGeometry(
+            Variant.FarLeafVertices,
+            Variant.FarLeafTriangles,
+            Variant.FarLeafNormals,
+            Variant.FarLeafUVs,
+            6,
+            1.28f,
+            Variant.RuntimeFarLeafVertices,
+            Variant.RuntimeFarLeafTriangles,
+            Variant.RuntimeFarLeafNormals,
+            Variant.RuntimeFarLeafUVs);
+
+        const FString ProceduralStem = FString::Printf(
+            TEXT("RaftSim_FutaleufuCoigue_%s_Procedural"), *Variant.Form.AssetToken);
+        AActor* TrunkProceduralActor = AddPreviewProceduralMeshActor(
+            World, *(ProceduralStem + TEXT("Trunk")),
+            Variant.TrunkVertices, Variant.TrunkTriangles, Variant.TrunkNormals, Variant.TrunkUVs,
+            FLinearColor::White, BarkMaterial, nullptr, false);
+        AActor* LeafProceduralActor = AddPreviewProceduralMeshActor(
+            World, *(ProceduralStem + TEXT("Leaves")),
+            Variant.LeafVertices, Variant.LeafTriangles, Variant.LeafNormals, Variant.LeafUVs,
+            FLinearColor::White, LeafMaterial, nullptr, false);
+        AActor* BranchletProceduralActor = AddPreviewProceduralMeshActor(
+            World, *(ProceduralStem + TEXT("Branchlets")),
+            Variant.BranchletVertices, Variant.BranchletTriangles,
+            Variant.BranchletNormals, Variant.BranchletUVs,
+            FLinearColor::White, BarkMaterial, nullptr, false);
+        AActor* FarLeafProceduralActor = AddPreviewProceduralMeshActor(
+            World, *(ProceduralStem + TEXT("LeavesFar")),
+            Variant.FarLeafVertices, Variant.FarLeafTriangles,
+            Variant.FarLeafNormals, Variant.FarLeafUVs,
+            FLinearColor::White, LeafMaterial, nullptr, false);
+        AActor* RuntimeFarLeafProceduralActor = AddPreviewProceduralMeshActor(
+            World, *(ProceduralStem + TEXT("LeavesFarRuntime")),
+            Variant.RuntimeFarLeafVertices, Variant.RuntimeFarLeafTriangles,
+            Variant.RuntimeFarLeafNormals, Variant.RuntimeFarLeafUVs,
+            FLinearColor::White, LeafMaterial, nullptr, false);
+        if (!TrunkProceduralActor || !BranchletProceduralActor ||
+            !LeafProceduralActor || !FarLeafProceduralActor || !RuntimeFarLeafProceduralActor)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Could not construct all %s procedural mesh actors.\n"),
+                *Variant.Form.DisplayName);
+            return false;
+        }
+
+        const FString AssetStem = FString::Printf(
+            TEXT("SM_RaftSim_FutaleufuCoigue_%s"), *Variant.Form.AssetToken);
+        Variant.TrunkPackagePath = MeshRoot + AssetStem + TEXT("_Trunk");
+        Variant.LeafPackagePath = MeshRoot + AssetStem + TEXT("_Leaves");
+        Variant.BranchletPackagePath = MeshRoot + AssetStem + TEXT("_Branchlets");
+        Variant.FarLeafPackagePath = MeshRoot + AssetStem + TEXT("_LeavesFar");
+        Variant.RuntimeFarLeafPackagePath = MeshRoot + AssetStem + TEXT("_LeavesFarRuntime");
+        Variant.TrunkMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            TrunkProceduralActor, Variant.TrunkPackagePath, BarkMaterial, false,
+            ENaniteShapePreservation::None, OutSummary);
+        Variant.LeafMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            LeafProceduralActor, Variant.LeafPackagePath, LeafMaterial, false,
+            ENaniteShapePreservation::None, OutSummary);
+        Variant.BranchletMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            BranchletProceduralActor, Variant.BranchletPackagePath, BarkMaterial, false,
+            ENaniteShapePreservation::None, OutSummary);
+        Variant.FarLeafMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            FarLeafProceduralActor, Variant.FarLeafPackagePath, LeafMaterial, false,
+            ENaniteShapePreservation::None, OutSummary);
+        Variant.RuntimeFarLeafMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            RuntimeFarLeafProceduralActor, Variant.RuntimeFarLeafPackagePath, LeafMaterial, false,
+            ENaniteShapePreservation::None, OutSummary);
+        TrunkProceduralActor->Destroy();
+        BranchletProceduralActor->Destroy();
+        LeafProceduralActor->Destroy();
+        FarLeafProceduralActor->Destroy();
+        RuntimeFarLeafProceduralActor->Destroy();
+        if (!Variant.TrunkMesh || !Variant.BranchletMesh ||
+            !Variant.LeafMesh || !Variant.FarLeafMesh || !Variant.RuntimeFarLeafMesh)
+        {
+            return false;
+        }
+
+        const FTransform VariantTransform(FRotator::ZeroRotator, Variant.WorldOffset);
+        AStaticMeshActor* TrunkActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        AStaticMeshActor* LeafActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        AStaticMeshActor* BranchletActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        AStaticMeshActor* FarLeafActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(), VariantTransform);
+        if (!TrunkActor || !BranchletActor || !LeafActor || !FarLeafActor)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Could not place all %s static mesh review actors.\n"),
+                *Variant.Form.DisplayName);
+            return false;
+        }
+
+        auto ConfigureActor = [](
+                                  AStaticMeshActor* Actor,
+                                  const FString& Label,
+                                  UStaticMesh* Mesh,
+                                  UMaterialInterface* Material)
+        {
+            Actor->SetActorLabel(Label);
+            Actor->GetStaticMeshComponent()->SetStaticMesh(Mesh);
+            Actor->GetStaticMeshComponent()->SetMaterial(0, Material);
+            Actor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            Actor->GetStaticMeshComponent()->SetMobility(EComponentMobility::Static);
+            Actor->GetStaticMeshComponent()->SetCastShadow(true);
+        };
+        const FString ActorStem = FString::Printf(
+            TEXT("RaftSim_FutaleufuCoigue_%s"), *Variant.Form.AssetToken);
+        ConfigureActor(TrunkActor, ActorStem + TEXT("_Trunk"), Variant.TrunkMesh, BarkMaterial);
+        ConfigureActor(BranchletActor, ActorStem + TEXT("_Branchlets"), Variant.BranchletMesh, BarkMaterial);
+        ConfigureActor(LeafActor, ActorStem + TEXT("_Leaves"), Variant.LeafMesh, LeafMaterial);
+        ConfigureActor(FarLeafActor, ActorStem + TEXT("_LeavesFar"), Variant.FarLeafMesh, LeafMaterial);
+        BranchletActor->GetStaticMeshComponent()->SetCullDistance(3600.0f);
+        LeafActor->GetStaticMeshComponent()->SetCullDistance(3600.0f);
+        FarLeafActor->GetStaticMeshComponent()->MinDrawDistance = 2800.0f;
+        FarLeafActor->GetStaticMeshComponent()->MarkRenderStateDirty();
+        bVariantActorsComplete &= TrunkActor && BranchletActor && LeafActor && FarLeafActor;
+    }
+
+    UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+    bool bGroundActorsComplete = PlaneMesh != nullptr;
+    for (const FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        AStaticMeshActor* GroundActor = World->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(),
+            FTransform(
+                FRotator::ZeroRotator,
+                Variant.WorldOffset + FVector(0.0f, 0.0f, -4.0f),
+                FVector(180.0f, 180.0f, 1.0f)));
+        bGroundActorsComplete &= GroundActor && GroundActor->GetStaticMeshComponent();
+        if (GroundActor && GroundActor->GetStaticMeshComponent())
+        {
+            GroundActor->SetActorLabel(FString::Printf(
+                TEXT("RaftSim_FutaleufuCoigue_%s_NeutralGround"),
+                *Variant.Form.AssetToken));
+            GroundActor->GetStaticMeshComponent()->SetStaticMesh(PlaneMesh);
+            GroundActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            GroundActor->GetStaticMeshComponent()->SetMaterial(0, LoadPreviewBaseMaterial());
+        }
+    }
+
+    FRaftSimEnvironmentPreviewSpec ReviewSpec;
+    ReviewSpec.RiverId = TEXT("futaleufu_terminator");
+    ReviewSpec.DisplayName = TEXT("Futaleufu project-owned coigue crown-form family");
+    ReviewSpec.MapPackagePath =
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+             "L_FutaleufuCoigue_CrownFormFamily_IsolatedReview");
+    ReviewSpec.FoliageColor = FLinearColor(0.12f, 0.28f, 0.10f);
+    ReviewSpec.RockColor = FLinearColor(0.31f, 0.30f, 0.27f);
+    AddPreviewLightRig(World, ReviewSpec);
+    for (TActorIterator<ASkyLight> It(World); It; ++It)
+    {
+        if (It->GetLightComponent())
+        {
+            It->GetLightComponent()->SetIntensity(1.65f);
+            It->GetLightComponent()->RecaptureSky();
+        }
+    }
+    ADirectionalLight* ReviewFill = World->SpawnActor<ADirectionalLight>(
+        ADirectionalLight::StaticClass(),
+        FTransform(FRotator(-32.0f, 42.0f, 0.0f)));
+    if (ReviewFill && ReviewFill->GetLightComponent())
+    {
+        ReviewFill->SetActorLabel(TEXT("RaftSim_Coigue_NeutralFrontFill"));
+        ReviewFill->GetLightComponent()->SetIntensity(0.75f);
+        ReviewFill->GetLightComponent()->SetLightColor(FLinearColor(0.94f, 0.98f, 1.0f));
+        ReviewFill->GetLightComponent()->SetCastShadows(false);
+    }
+    ADirectionalLight* ReviewBackFill = World->SpawnActor<ADirectionalLight>(
+        ADirectionalLight::StaticClass(),
+        FTransform(FRotator(-28.0f, -138.0f, 0.0f)));
+    if (ReviewBackFill && ReviewBackFill->GetLightComponent())
+    {
+        ReviewBackFill->SetActorLabel(TEXT("RaftSim_Coigue_NeutralBackFill"));
+        ReviewBackFill->GetLightComponent()->SetIntensity(0.38f);
+        ReviewBackFill->GetLightComponent()->SetLightColor(FLinearColor(1.0f, 0.96f, 0.90f));
+        ReviewBackFill->GetLightComponent()->SetCastShadows(false);
+    }
+    const bool bReviewLightRigComplete =
+        ReviewFill && ReviewFill->GetLightComponent() &&
+        ReviewBackFill && ReviewBackFill->GetLightComponent();
+
+    const FRaftSimPhotographicCaptureSettings CaptureSettings =
+        GetPhotographicCaptureSettings(ReviewSpec.RiverId);
+    auto AddReviewCamera = [World, CaptureSettings](
+                               const TCHAR* Label,
+                               const FVector& Location,
+                               const FVector& Target,
+                               float FieldOfView)
+    {
+        ACameraActor* Camera = World->SpawnActor<ACameraActor>(
+            ACameraActor::StaticClass(), FTransform((Target - Location).Rotation(), Location));
+        if (!Camera || !Camera->GetCameraComponent())
+        {
+            return false;
+        }
+        Camera->SetActorLabel(Label);
+        UCameraComponent* CameraComponent = Camera->GetCameraComponent();
+        CameraComponent->FieldOfView = FieldOfView;
+        FPostProcessSettings& Settings = CameraComponent->PostProcessSettings;
+        Settings.bOverride_AutoExposureMethod = true;
+        Settings.AutoExposureMethod = AEM_Manual;
+        Settings.bOverride_AutoExposureBias = true;
+        Settings.AutoExposureBias = CaptureSettings.ExposureBias;
+        Settings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+        Settings.AutoExposureApplyPhysicalCameraExposure = 0;
+        Settings.bOverride_ColorSaturation = true;
+        Settings.ColorSaturation = FVector4(
+            CaptureSettings.Saturation,
+            CaptureSettings.Saturation,
+            CaptureSettings.Saturation,
+            1.0f);
+        Settings.bOverride_ColorContrast = true;
+        Settings.ColorContrast = FVector4(
+            CaptureSettings.Contrast,
+            CaptureSettings.Contrast,
+            CaptureSettings.Contrast,
+            1.0f);
+        Settings.bOverride_Sharpen = true;
+        Settings.Sharpen = CaptureSettings.Sharpen;
+        Settings.bOverride_FilmGrainIntensity = true;
+        Settings.FilmGrainIntensity = 0.0f;
+        return true;
+    };
+
+    struct FNativeCanopyCaptureRequest
+    {
+        FString RelativePath;
+        FString CameraLabel;
+        FString CaptureId;
+        FString Description;
+        double CaptureWallTimeMs = 0.0;
+        double GameThreadFrameTimeMs = 0.0;
+        double RenderThreadFrameTimeMs = 0.0;
+        double GpuFrameTimeMs = 0.0;
+        bool bCaptured = false;
+    };
+    TArray<FNativeCanopyCaptureRequest> CaptureRequests;
+    bool bCamerasComplete = true;
+    for (const FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        const FVector CrownTarget = Variant.WorldOffset + FVector(
+            0.0f,
+            0.0f,
+            Variant.Form.CrownBaseZCm + Variant.Form.CrownSpanZCm * 0.32f);
+        const FString LabelStem = FString::Printf(
+            TEXT("RaftSim_Coigue_%s"), *Variant.Form.AssetToken);
+        const FString CaptureStem = Variant.Form.Id;
+        struct FViewDefinition
+        {
+            const TCHAR* Suffix;
+            const TCHAR* CaptureSuffix;
+            const TCHAR* Description;
+            FVector Location;
+            FVector Target;
+            float FieldOfView;
+        };
+        const FViewDefinition Views[] = {
+            {TEXT("_Turntable_Azimuth035"), TEXT("turntable_azimuth_035"),
+             TEXT("turntable azimuth 35"),
+             Variant.WorldOffset + FVector(-6900.0f, -4830.0f, 1650.0f), CrownTarget, 52.0f},
+            {TEXT("_Turntable_Azimuth145"), TEXT("turntable_azimuth_145"),
+             TEXT("turntable azimuth 145"),
+             Variant.WorldOffset + FVector(6900.0f, -4830.0f, 1650.0f), CrownTarget, 52.0f},
+            {TEXT("_BarkLeafCloseup"), TEXT("bark_leaf_closeup"),
+             TEXT("bark and leaf closeup"),
+             Variant.WorldOffset + Variant.CloseupCamera,
+             Variant.WorldOffset + Variant.CloseupTarget, 40.0f},
+            {TEXT("_RiverDistance60m"), TEXT("river_distance_60m"),
+             TEXT("60 m river-distance proxy"),
+             Variant.WorldOffset + FVector(-6000.0f, -800.0f, 1550.0f), CrownTarget, 48.0f},
+            {TEXT("_RiverDistance150m"), TEXT("river_distance_150m"),
+             TEXT("150 m river-distance proxy"),
+             Variant.WorldOffset + FVector(-15000.0f, -1600.0f, 1700.0f), CrownTarget, 28.0f}};
+        for (const FViewDefinition& View : Views)
+        {
+            FNativeCanopyCaptureRequest Request;
+            Request.CameraLabel = LabelStem + View.Suffix;
+            Request.CaptureId = CaptureStem + TEXT("_") + View.CaptureSuffix;
+            Request.RelativePath = FString::Printf(
+                TEXT("unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/%s/%s.png"),
+                *CaptureStem,
+                View.CaptureSuffix);
+            Request.Description = FString::Printf(
+                TEXT("coigue %s %s"), *Variant.Form.DisplayName, View.Description);
+            bCamerasComplete &= AddReviewCamera(
+                *Request.CameraLabel, View.Location, View.Target, View.FieldOfView);
+            CaptureRequests.Add(MoveTemp(Request));
+        }
+    }
+
+    bool bGeometryValidated = true;
+    for (const FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        bGeometryValidated &=
+            !Variant.TrunkMesh->IsNaniteEnabled() &&
+            !Variant.BranchletMesh->IsNaniteEnabled() &&
+            !Variant.LeafMesh->IsNaniteEnabled() &&
+            !Variant.FarLeafMesh->IsNaniteEnabled() &&
+            !Variant.RuntimeFarLeafMesh->IsNaniteEnabled() &&
+            Variant.TrunkMesh->GetNaniteSettings().ShapePreservation == ENaniteShapePreservation::None &&
+            Variant.LeafMesh->GetNaniteSettings().ShapePreservation == ENaniteShapePreservation::None &&
+            Variant.TrunkMesh->GetNumVertices(0) > 500 &&
+            Variant.BranchletMesh->GetNumVertices(0) > 5000 &&
+            Variant.LeafMesh->GetNumVertices(0) > 500 &&
+            Variant.FarLeafMesh->GetNumVertices(0) > 5000 &&
+            Variant.RuntimeFarLeafMesh->GetNumVertices(0) > 1000 &&
+            Variant.RuntimeFarLeafMesh->GetNumTriangles(0) * 5 <
+                Variant.FarLeafMesh->GetNumTriangles(0) &&
+            Variant.TrunkMesh->GetBoundingBox().GetSize().Z >= 2000.0f &&
+            Variant.LeafMesh->GetBoundingBox().GetSize().X >= 650.0f &&
+            Variant.FarLeafMesh->GetBoundingBox().GetSize().X >= 650.0f &&
+            Variant.RuntimeFarLeafMesh->GetBoundingBox().GetSize().X >= 650.0f;
+    }
+    const bool bSceneComplete =
+        bGeometryValidated && bVariantActorsComplete && bGroundActorsComplete &&
+        bReviewLightRigComplete && bCamerasComplete && CaptureRequests.Num() == Variants.Num() * 5;
+    FString MapSummary;
+    const bool bMapSaved = bSceneComplete &&
+        SavePreviewWorld(World, ReviewSpec.MapPackagePath, MapSummary);
+    OutSummary += MapSummary;
+
+    bool bCaptured = bMapSaved;
+    if (bMapSaved)
+    {
+        const FString CaptureRoot = FPaths::Combine(
+            FPaths::ProjectSavedDir(), TEXT("RaftSimNativeCanopyReview/FutaleufuCoigue"));
+        for (FNativeCanopyCaptureRequest& Request : CaptureRequests)
+        {
+            const double CaptureStartSeconds = FPlatformTime::Seconds();
+            Request.bCaptured = CapturePreviewImageForSpec(
+                ReviewSpec,
+                CaptureRoot,
+                Request.RelativePath,
+                Request.CameraLabel,
+                Request.CaptureId,
+                Request.Description,
+                false,
+                OutSummary);
+            Request.CaptureWallTimeMs =
+                (FPlatformTime::Seconds() - CaptureStartSeconds) * 1000.0;
+            FlushRenderingCommands();
+            const double CycleToMilliseconds = FPlatformTime::GetSecondsPerCycle() * 1000.0;
+            Request.GameThreadFrameTimeMs = GGameThreadTime * CycleToMilliseconds;
+            Request.RenderThreadFrameTimeMs = GRenderThreadTime * CycleToMilliseconds;
+            Request.GpuFrameTimeMs = RHIGetGPUFrameCycles() * CycleToMilliseconds;
+            bCaptured &= Request.bCaptured;
+        }
+    }
+
+    FRaftSimEnvironmentPreviewSpec RuntimeBenchmarkSpec = ReviewSpec;
+    RuntimeBenchmarkSpec.DisplayName =
+        TEXT("Futaleufu coigue 512-tree far-corridor HISM benchmark");
+    RuntimeBenchmarkSpec.MapPackagePath =
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+             "L_FutaleufuCoigue_RuntimeFarLod_HismBenchmark");
+    UWorld* RuntimeBenchmarkWorld = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    bool bRuntimeBenchmarkComplete = RuntimeBenchmarkWorld != nullptr && PlaneMesh != nullptr;
+    TArray<UHierarchicalInstancedStaticMeshComponent*> RuntimeTrunkComponents;
+    TArray<UHierarchicalInstancedStaticMeshComponent*> RuntimeCrownComponents;
+    RuntimeTrunkComponents.SetNum(Variants.Num());
+    RuntimeCrownComponents.SetNum(Variants.Num());
+    if (RuntimeBenchmarkWorld)
+    {
+        AddPreviewLightRig(RuntimeBenchmarkWorld, RuntimeBenchmarkSpec);
+        AStaticMeshActor* RuntimeGroundActor = RuntimeBenchmarkWorld->SpawnActor<AStaticMeshActor>(
+            AStaticMeshActor::StaticClass(),
+            FTransform(
+                FRotator::ZeroRotator,
+                FVector(22000.0f, 0.0f, -6.0f),
+                FVector(720.0f, 320.0f, 1.0f)));
+        bRuntimeBenchmarkComplete &=
+            RuntimeGroundActor && RuntimeGroundActor->GetStaticMeshComponent();
+        if (RuntimeGroundActor && RuntimeGroundActor->GetStaticMeshComponent())
+        {
+            RuntimeGroundActor->SetActorLabel(TEXT("RaftSim_CoigueRuntimeBenchmark_Ground"));
+            RuntimeGroundActor->GetStaticMeshComponent()->SetStaticMesh(PlaneMesh);
+            RuntimeGroundActor->GetStaticMeshComponent()->SetMaterial(0, LoadPreviewBaseMaterial());
+            RuntimeGroundActor->GetStaticMeshComponent()->SetCollisionEnabled(
+                ECollisionEnabled::NoCollision);
+        }
+
+        for (int32 VariantIndex = 0; VariantIndex < Variants.Num(); ++VariantIndex)
+        {
+            const FFutaleufuCoigueRuntime& Variant = Variants[VariantIndex];
+            RuntimeTrunkComponents[VariantIndex] = AddLandscapeCandidateInstancedMeshComponent(
+                RuntimeBenchmarkWorld,
+                Variant.TrunkMesh,
+                FString::Printf(
+                    TEXT("RaftSim_CoigueRuntimeBenchmark_%s_Trunks"),
+                    *Variant.Form.AssetToken),
+                true,
+                BarkMaterial);
+            RuntimeCrownComponents[VariantIndex] = AddLandscapeCandidateInstancedMeshComponent(
+                RuntimeBenchmarkWorld,
+                Variant.RuntimeFarLeafMesh,
+                FString::Printf(
+                    TEXT("RaftSim_CoigueRuntimeBenchmark_%s_Crowns"),
+                    *Variant.Form.AssetToken),
+                true,
+                LeafMaterial);
+            bRuntimeBenchmarkComplete &=
+                RuntimeTrunkComponents[VariantIndex] && RuntimeCrownComponents[VariantIndex];
+        }
+
+        constexpr int32 RuntimeTreeCount = 512;
+        constexpr int32 RuntimeColumnCount = 32;
+        for (int32 TreeIndex = 0; TreeIndex < RuntimeTreeCount; ++TreeIndex)
+        {
+            const int32 VariantIndex = TreeIndex % Variants.Num();
+            const int32 Column = TreeIndex % RuntimeColumnCount;
+            const int32 Row = TreeIndex / RuntimeColumnCount;
+            const float NoiseA = FMath::Frac(FMath::Sin(TreeIndex * 12.9898f) * 43758.5453f);
+            const float NoiseB = FMath::Frac(FMath::Sin((TreeIndex + 71) * 78.233f) * 24634.6345f);
+            const float X = Column * 1800.0f + (NoiseA - 0.5f) * 520.0f;
+            const float Y = (Row - 7.5f) * 1700.0f + (NoiseB - 0.5f) * 460.0f;
+            const float UniformScale = 0.82f + 0.34f * FMath::Abs(NoiseA);
+            const FRotator Rotation(0.0f, FMath::Fmod(TreeIndex * 137.50776f, 360.0f), 0.0f);
+            const FFutaleufuCoigueRuntime& Variant = Variants[VariantIndex];
+            const FBox TrunkBounds = Variant.TrunkMesh->GetBoundingBox();
+            const float SharedGroundPivotZ = -TrunkBounds.Min.Z * UniformScale;
+            RuntimeTrunkComponents[VariantIndex]->AddInstance(
+                FTransform(
+                    Rotation,
+                    FVector(X, Y, SharedGroundPivotZ),
+                    FVector(UniformScale)),
+                true);
+            RuntimeCrownComponents[VariantIndex]->AddInstance(
+                FTransform(
+                    Rotation,
+                    FVector(X, Y, SharedGroundPivotZ),
+                    FVector(UniformScale)),
+                true);
+        }
+
+        const FVector RuntimeCameraLocation(-9500.0f, 0.0f, 1650.0f);
+        const FVector RuntimeCameraTarget(34000.0f, 0.0f, 1550.0f);
+        ACameraActor* RuntimeCamera = RuntimeBenchmarkWorld->SpawnActor<ACameraActor>(
+            ACameraActor::StaticClass(),
+            FTransform(
+                (RuntimeCameraTarget - RuntimeCameraLocation).Rotation(),
+                RuntimeCameraLocation));
+        bRuntimeBenchmarkComplete &= RuntimeCamera && RuntimeCamera->GetCameraComponent();
+        if (RuntimeCamera && RuntimeCamera->GetCameraComponent())
+        {
+            RuntimeCamera->SetActorLabel(TEXT("RaftSim_CoigueRuntimeBenchmark_Camera"));
+            RuntimeCamera->GetCameraComponent()->FieldOfView = 62.0f;
+            FPostProcessSettings& Settings =
+                RuntimeCamera->GetCameraComponent()->PostProcessSettings;
+            Settings.bOverride_AutoExposureMethod = true;
+            Settings.AutoExposureMethod = AEM_Manual;
+            Settings.bOverride_AutoExposureBias = true;
+            Settings.AutoExposureBias = 0.0f;
+            Settings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+            Settings.AutoExposureApplyPhysicalCameraExposure = 0;
+            Settings.bOverride_FilmGrainIntensity = true;
+            Settings.FilmGrainIntensity = 0.0f;
+        }
+    }
+
+    FString RuntimeBenchmarkMapSummary;
+    const bool bRuntimeBenchmarkMapSaved = bRuntimeBenchmarkComplete &&
+        SavePreviewWorld(
+            RuntimeBenchmarkWorld,
+            RuntimeBenchmarkSpec.MapPackagePath,
+            RuntimeBenchmarkMapSummary);
+    OutSummary += RuntimeBenchmarkMapSummary;
+    FString RuntimeBenchmarkCapturePath =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+             "futaleufu_coigue_runtime_far_lod_hism_512_tree.png");
+    const bool bRuntimeBenchmarkCaptured = bRuntimeBenchmarkMapSaved &&
+        CapturePreviewImageForSpec(
+            RuntimeBenchmarkSpec,
+            FPaths::Combine(
+                GetRepoRoot(),
+                TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates")),
+            RuntimeBenchmarkCapturePath,
+            TEXT("RaftSim_CoigueRuntimeBenchmark_Camera"),
+            TEXT("coigue_runtime_far_lod_hism_512_tree"),
+            TEXT("Futaleufu coigue 512-tree far-corridor HISM benchmark"),
+            false,
+            OutSummary);
+    bCaptured &= bRuntimeBenchmarkCaptured;
+
+    const FString ReportRelativePath =
+        TEXT("docs/environment-captures/photoreal_river_previews/"
+             "futaleufu_native_canopy_coigue_prototype_report.json");
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(ReportPath), true);
+    auto VectorArray = [](const FVector& Value)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        Values.Add(MakeShared<FJsonValueNumber>(Value.X));
+        Values.Add(MakeShared<FJsonValueNumber>(Value.Y));
+        Values.Add(MakeShared<FJsonValueNumber>(Value.Z));
+        return Values;
+    };
+    auto NumberArray = [](std::initializer_list<double> Numbers)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        for (double Number : Numbers)
+        {
+            Values.Add(MakeShared<FJsonValueNumber>(Number));
+        }
+        return Values;
+    };
+
+    TSharedRef<FJsonObject> ReportObject = MakeShared<FJsonObject>();
+    ReportObject->SetStringField(
+        TEXT("schema"), TEXT("raftsim.unreal.futaleufu_native_canopy_prototype_review.v7"));
+    ReportObject->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    ReportObject->SetStringField(TEXT("species"), TEXT("Nothofagus dombeyi"));
+    ReportObject->SetStringField(
+        TEXT("prototype_revision"), TEXT("v12_far_corridor_lod_and_hism_density_benchmark"));
+    ReportObject->SetStringField(
+        TEXT("status"),
+        bCaptured
+            ? TEXT("isolated_eight_form_forty_view_and_512_tree_runtime_lod_capture_ready_for_human_review")
+            : TEXT("prototype_generation_or_capture_failed"));
+    ReportObject->SetBoolField(TEXT("production_promoted"), false);
+    ReportObject->SetStringField(TEXT("map_asset"), ReviewSpec.MapPackagePath);
+    ReportObject->SetNumberField(TEXT("texture_count"), Textures.Num());
+    ReportObject->SetNumberField(TEXT("material_count"), 2);
+    TSharedRef<FJsonObject> PhotometryObject = MakeShared<FJsonObject>();
+    PhotometryObject->SetStringField(
+        TEXT("method"),
+        TEXT("fixed exposure with bounded bidirectional neutral studio fills and material response; no emissive fill"));
+    PhotometryObject->SetNumberField(TEXT("skylight_intensity"), 1.65);
+    PhotometryObject->SetNumberField(TEXT("front_fill_intensity"), 0.75);
+    PhotometryObject->SetNumberField(TEXT("back_fill_intensity"), 0.38);
+    PhotometryObject->SetBoolField(TEXT("fill_lights_cast_shadows"), false);
+    PhotometryObject->SetBoolField(TEXT("emissive_fill"), false);
+    PhotometryObject->SetNumberField(TEXT("bark_base_color_scale"), 1.72);
+    PhotometryObject->SetNumberField(TEXT("bark_ao_influence"), 0.28);
+    PhotometryObject->SetNumberField(TEXT("leaf_base_color_scale"), 1.18);
+    PhotometryObject->SetNumberField(TEXT("leaf_ao_influence"), 0.55);
+    PhotometryObject->SetArrayField(TEXT("leaf_transmission_tint"), NumberArray({0.55, 0.78, 0.36}));
+    PhotometryObject->SetStringField(
+        TEXT("exposed_parameters"),
+        TEXT("BarkBaseColorScale, BarkAOInfluence, LeafBaseColorScale, LeafAOInfluence, LeafTransmissionTint"));
+    ReportObject->SetObjectField(TEXT("photometry"), PhotometryObject);
+    ReportObject->SetStringField(
+        TEXT("family_scope"),
+        TEXT("five independent adult and three independent intermediate crown-form prototypes; species-count authoring threshold met"));
+
+    TArray<TSharedPtr<FJsonValue>> CrownFormValues;
+    for (const FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        TSharedRef<FJsonObject> FormObject = MakeShared<FJsonObject>();
+        FormObject->SetStringField(TEXT("id"), Variant.Form.Id);
+        FormObject->SetStringField(TEXT("display_name"), Variant.Form.DisplayName);
+        FormObject->SetStringField(TEXT("life_stage"), Variant.Form.LifeStage);
+        FormObject->SetNumberField(TEXT("seed_offset"), Variant.Form.SeedOffset);
+        FormObject->SetNumberField(TEXT("trunk_height_scale"), Variant.Form.TrunkHeightScale);
+        FormObject->SetNumberField(TEXT("trunk_radius_scale"), Variant.Form.TrunkRadiusScale);
+        FormObject->SetNumberField(TEXT("crown_base_z_cm"), Variant.Form.CrownBaseZCm);
+        FormObject->SetNumberField(TEXT("crown_span_z_cm"), Variant.Form.CrownSpanZCm);
+        FormObject->SetNumberField(TEXT("crown_width_scale"), Variant.Form.CrownWidthScale);
+        FormObject->SetNumberField(TEXT("branch_uplift_scale"), Variant.Form.BranchUpliftScale);
+        FormObject->SetNumberField(TEXT("asymmetry_scale"), Variant.Form.AsymmetryScale);
+        FormObject->SetArrayField(
+            TEXT("trunk_lean_top_cm"),
+            NumberArray({Variant.Form.TrunkLeanTopCm.X, Variant.Form.TrunkLeanTopCm.Y}));
+        FormObject->SetNumberField(
+            TEXT("suppressed_sector_center_degrees"), Variant.Form.SuppressedSectorCenterDegrees);
+        FormObject->SetNumberField(
+            TEXT("suppressed_sector_half_width_degrees"), Variant.Form.SuppressedSectorHalfWidthDegrees);
+        FormObject->SetNumberField(
+            TEXT("suppressed_sector_length_scale"), Variant.Form.SuppressedSectorLengthScale);
+        FormObject->SetNumberField(TEXT("crown_gap_center_t"), Variant.Form.CrownGapCenterT);
+        FormObject->SetNumberField(TEXT("crown_gap_half_width_t"), Variant.Form.CrownGapHalfWidthT);
+        FormObject->SetNumberField(TEXT("crown_gap_length_scale"), Variant.Form.CrownGapLengthScale);
+        FormObject->SetNumberField(TEXT("damage_modulo"), Variant.Form.DamageModulo);
+        FormObject->SetNumberField(TEXT("damage_remainder"), Variant.Form.DamageRemainder);
+        FormObject->SetNumberField(
+            TEXT("damaged_branch_length_scale"), Variant.Form.DamagedBranchLengthScale);
+
+        TSharedRef<FJsonObject> TopologyObject = MakeShared<FJsonObject>();
+        const int32 NearLeafCardCount = Variant.LeafTriangles.Num() / 6;
+        const int32 NearAnchorCount = NearLeafCardCount /
+            (FutaleufuCoigueBranchletsPerParentShoot * FutaleufuCoigueAttachedLeavesPerBranchlet);
+        int32 DamagedBranchCount = 0;
+        if (Variant.Form.DamageModulo > 0)
+        {
+            for (int32 BranchIndex = 0; BranchIndex < Variant.Form.MainBranchCount; ++BranchIndex)
+            {
+                DamagedBranchCount +=
+                    (BranchIndex + Variant.Form.SeedOffset) % Variant.Form.DamageModulo ==
+                            Variant.Form.DamageRemainder
+                        ? 1
+                        : 0;
+            }
+        }
+        TopologyObject->SetNumberField(TEXT("main_branches"), Variant.Form.MainBranchCount);
+        TopologyObject->SetNumberField(TEXT("deterministically_damaged_branches"), DamagedBranchCount);
+        TopologyObject->SetNumberField(TEXT("near_foliage_anchors"), NearAnchorCount);
+        TopologyObject->SetNumberField(TEXT("parent_shoots"), NearAnchorCount);
+        TopologyObject->SetNumberField(TEXT("far_only_apical_anchors"), 24);
+        TopologyObject->SetNumberField(
+            TEXT("far_only_interior_crown_anchors"), Variant.Form.FarCrownVolumeAnchorCount);
+        TopologyObject->SetNumberField(
+            TEXT("branchlets_per_parent_shoot"), FutaleufuCoigueBranchletsPerParentShoot);
+        TopologyObject->SetNumberField(
+            TEXT("tertiary_branches_per_branchlet"), FutaleufuCoigueTertiaryBranchesPerBranchlet);
+        TopologyObject->SetNumberField(
+            TEXT("attached_leaf_cards_per_branchlet"), FutaleufuCoigueAttachedLeavesPerBranchlet);
+        TopologyObject->SetNumberField(TEXT("petioles_per_leaf"), 1);
+        TopologyObject->SetNumberField(TEXT("floating_near_card_count"), 0);
+        FormObject->SetObjectField(TEXT("topology"), TopologyObject);
+
+        TSharedRef<FJsonObject> RoutingObject = MakeShared<FJsonObject>();
+        RoutingObject->SetNumberField(TEXT("required_near_branchlet_clearance_cm"), 1.2);
+        RoutingObject->SetNumberField(TEXT("required_near_tertiary_clearance_cm"), 0.6);
+        RoutingObject->SetNumberField(
+            TEXT("minimum_near_branchlet_clearance_cm"),
+            Variant.RoutingMetrics.MinNearBranchletClearanceCm);
+        RoutingObject->SetNumberField(
+            TEXT("minimum_near_tertiary_clearance_cm"),
+            Variant.RoutingMetrics.MinNearTertiaryClearanceCm);
+        RoutingObject->SetNumberField(
+            TEXT("rerouted_branchlet_count"), Variant.RoutingMetrics.ReroutedBranchletCount);
+        RoutingObject->SetNumberField(
+            TEXT("rerouted_tertiary_count"), Variant.RoutingMetrics.ReroutedTertiaryCount);
+        RoutingObject->SetNumberField(
+            TEXT("unresolved_branchlet_clearance_count"),
+            Variant.RoutingMetrics.UnresolvedBranchletClearanceCount);
+        RoutingObject->SetNumberField(
+            TEXT("unresolved_tertiary_clearance_count"),
+            Variant.RoutingMetrics.UnresolvedTertiaryClearanceCount);
+        RoutingObject->SetBoolField(
+            TEXT("near_clearance_contract_passed"),
+            Variant.RoutingMetrics.UnresolvedBranchletClearanceCount == 0 &&
+                Variant.RoutingMetrics.UnresolvedTertiaryClearanceCount == 0);
+        FormObject->SetObjectField(TEXT("routing"), RoutingObject);
+
+        auto MakeMeshObject = [&VectorArray](
+                                  const FString& Asset,
+                                  UStaticMesh* Mesh,
+                                  int32 SourceVertices,
+                                  int32 SourceTriangles,
+                                  int32 SourceCards)
+        {
+            TSharedRef<FJsonObject> MeshObject = MakeShared<FJsonObject>();
+            MeshObject->SetStringField(TEXT("asset"), Asset);
+            MeshObject->SetNumberField(TEXT("source_vertices"), SourceVertices);
+            MeshObject->SetNumberField(TEXT("source_triangles"), SourceTriangles);
+            if (SourceCards >= 0)
+            {
+                MeshObject->SetNumberField(TEXT("source_card_count"), SourceCards);
+            }
+            MeshObject->SetNumberField(TEXT("render_vertices"), Mesh->GetNumVertices(0));
+            MeshObject->SetNumberField(TEXT("render_triangles"), Mesh->GetNumTriangles(0));
+            MeshObject->SetNumberField(
+                TEXT("exclusive_resource_bytes"),
+                static_cast<double>(Mesh->GetResourceSizeBytes(EResourceSizeMode::Exclusive)));
+            MeshObject->SetArrayField(TEXT("bounds_cm"), VectorArray(Mesh->GetBoundingBox().GetSize()));
+            MeshObject->SetBoolField(TEXT("nanite_enabled"), Mesh->IsNaniteEnabled());
+            return MeshObject;
+        };
+        FormObject->SetObjectField(
+            TEXT("trunk"),
+            MakeMeshObject(
+                Variant.TrunkPackagePath, Variant.TrunkMesh,
+                Variant.TrunkVertices.Num(), Variant.TrunkTriangles.Num() / 3, -1));
+        FormObject->SetObjectField(
+            TEXT("branchlets"),
+            MakeMeshObject(
+                Variant.BranchletPackagePath, Variant.BranchletMesh,
+                Variant.BranchletVertices.Num(), Variant.BranchletTriangles.Num() / 3, -1));
+        FormObject->SetObjectField(
+            TEXT("foliage"),
+            MakeMeshObject(
+                Variant.LeafPackagePath, Variant.LeafMesh,
+                Variant.LeafVertices.Num(), Variant.LeafTriangles.Num() / 3,
+                Variant.LeafTriangles.Num() / 6));
+        FormObject->SetObjectField(
+            TEXT("far_foliage"),
+            MakeMeshObject(
+                Variant.FarLeafPackagePath, Variant.FarLeafMesh,
+                Variant.FarLeafVertices.Num(), Variant.FarLeafTriangles.Num() / 3,
+                Variant.FarLeafTriangles.Num() / 6));
+        FormObject->SetObjectField(
+            TEXT("runtime_far_foliage"),
+            MakeMeshObject(
+                Variant.RuntimeFarLeafPackagePath, Variant.RuntimeFarLeafMesh,
+                Variant.RuntimeFarLeafVertices.Num(),
+                Variant.RuntimeFarLeafTriangles.Num() / 3,
+                Variant.RuntimeFarLeafTriangles.Num() / 6));
+        CrownFormValues.Add(MakeShared<FJsonValueObject>(FormObject));
+    }
+    ReportObject->SetArrayField(TEXT("crown_forms"), CrownFormValues);
+
+    TSharedRef<FJsonObject> LeafContractObject = MakeShared<FJsonObject>();
+    LeafContractObject->SetStringField(TEXT("atlas"), TEXT("4x4_v2"));
+    LeafContractObject->SetNumberField(TEXT("single_leaf_tiles"), 12);
+    LeafContractObject->SetNumberField(TEXT("tiny_twig_tiles"), 4);
+    LeafContractObject->SetArrayField(TEXT("visible_leaf_length_cm"), NumberArray({2.0, 3.5}));
+    LeafContractObject->SetArrayField(
+        TEXT("padding_aware_single_leaf_card_cm"), NumberArray({2.8, 5.8}));
+    LeafContractObject->SetNumberField(TEXT("parent_shoot_length_cm"), 56.0);
+    LeafContractObject->SetArrayField(TEXT("branchlet_length_cm"), NumberArray({24.0, 40.0}));
+    LeafContractObject->SetArrayField(
+        TEXT("padding_aware_far_twig_card_cm"), NumberArray({36.0, 80.0}));
+    LeafContractObject->SetArrayField(TEXT("primary_tip_radius_cm"), NumberArray({7.0, 3.2, 0.8}));
+    LeafContractObject->SetArrayField(
+        TEXT("terminal_twig_collar_radius_cm"), NumberArray({3.2, 1.4, 0.72}));
+    LeafContractObject->SetArrayField(TEXT("parent_shoot_radius_cm"), NumberArray({0.74, 0.20}));
+    LeafContractObject->SetStringField(
+        TEXT("near_representation"),
+        TEXT("continuous_limb_to_collar_to_parent_shoot_to_branchlet_to_tertiary_to_petiole_hierarchy"));
+    LeafContractObject->SetStringField(
+        TEXT("far_representation"), TEXT("branch_sprays_plus_irregular_interior_crown_volume"));
+    TArray<TSharedPtr<FJsonValue>> WindParameters;
+    WindParameters.Add(MakeShared<FJsonValueString>(TEXT("WindIntensity")));
+    WindParameters.Add(MakeShared<FJsonValueString>(TEXT("WindWeight")));
+    WindParameters.Add(MakeShared<FJsonValueString>(TEXT("WindSpeed")));
+    LeafContractObject->SetArrayField(TEXT("wind_parameters"), WindParameters);
+    ReportObject->SetObjectField(TEXT("leaf_contract"), LeafContractObject);
+
+    TSharedRef<FJsonObject> LodObject = MakeShared<FJsonObject>();
+    LodObject->SetNumberField(TEXT("near_leaf_max_draw_distance_cm"), 3600.0);
+    LodObject->SetNumberField(TEXT("far_crown_min_draw_distance_cm"), 2800.0);
+    LodObject->SetNumberField(TEXT("overlap_cm"), 800.0);
+    LodObject->SetNumberField(TEXT("runtime_far_card_stride"), 6);
+    LodObject->SetNumberField(TEXT("runtime_far_card_scale"), 1.28);
+    LodObject->SetStringField(
+        TEXT("status"),
+        TEXT("full_isolated_near_and_far_assets_retained_plus_reduced_far_corridor_lod_candidate"));
+    ReportObject->SetObjectField(TEXT("lod_handoff"), LodObject);
+
+    TSharedRef<FJsonObject> CaptureGateObject = MakeShared<FJsonObject>();
+    CaptureGateObject->SetStringField(
+        TEXT("status"),
+        bCaptured
+            ? TEXT("forty_isolated_views_and_512_tree_runtime_benchmark_captured")
+            : TEXT("capture_failed"));
+    CaptureGateObject->SetNumberField(TEXT("views_per_form"), 5);
+    CaptureGateObject->SetNumberField(TEXT("form_count"), Variants.Num());
+    CaptureGateObject->SetStringField(
+        TEXT("git_policy"), TEXT("generated map and captures remain local until human review"));
+    TArray<TSharedPtr<FJsonValue>> CaptureValues;
+    for (const FNativeCanopyCaptureRequest& Request : CaptureRequests)
+    {
+        CaptureValues.Add(MakeShared<FJsonValueString>(Request.RelativePath));
+    }
+    CaptureGateObject->SetArrayField(TEXT("captures"), CaptureValues);
+    ReportObject->SetObjectField(TEXT("capture_gate"), CaptureGateObject);
+
+    TSharedRef<FJsonObject> RuntimeBenchmarkObject = MakeShared<FJsonObject>();
+    RuntimeBenchmarkObject->SetStringField(
+        TEXT("map_asset"), RuntimeBenchmarkSpec.MapPackagePath);
+    RuntimeBenchmarkObject->SetStringField(TEXT("capture"), RuntimeBenchmarkCapturePath);
+    RuntimeBenchmarkObject->SetNumberField(TEXT("tree_instance_count"), 512);
+    RuntimeBenchmarkObject->SetNumberField(TEXT("crown_form_count"), Variants.Num());
+    RuntimeBenchmarkObject->SetNumberField(TEXT("hism_component_count"), Variants.Num() * 2);
+    RuntimeBenchmarkObject->SetBoolField(TEXT("map_saved"), bRuntimeBenchmarkMapSaved);
+    RuntimeBenchmarkObject->SetBoolField(TEXT("capture_saved"), bRuntimeBenchmarkCaptured);
+    RuntimeBenchmarkObject->SetStringField(
+        TEXT("scope"),
+        TEXT("offscreen Metal authoring density and silhouette evidence; not packaged frame-time, draw-call, overdraw, streaming, culling, or VR proof"));
+    ReportObject->SetObjectField(TEXT("runtime_far_lod_hism_benchmark"), RuntimeBenchmarkObject);
+
+    auto AddTimingSummary = [](TSharedRef<FJsonObject> Target, const TCHAR* Field, TArray<double> Values)
+    {
+        Values.Sort();
+        TSharedRef<FJsonObject> Summary = MakeShared<FJsonObject>();
+        if (Values.IsEmpty())
+        {
+            Summary->SetNumberField(TEXT("sample_count"), 0);
+        }
+        else
+        {
+            const int32 Middle = Values.Num() / 2;
+            const double Median = Values.Num() % 2 == 0
+                ? (Values[Middle - 1] + Values[Middle]) * 0.5
+                : Values[Middle];
+            Summary->SetNumberField(TEXT("sample_count"), Values.Num());
+            Summary->SetNumberField(TEXT("minimum_ms"), Values[0]);
+            Summary->SetNumberField(TEXT("median_ms"), Median);
+            Summary->SetNumberField(TEXT("maximum_ms"), Values.Last());
+        }
+        Target->SetObjectField(Field, Summary);
+    };
+    TArray<double> CaptureWallTimes;
+    TArray<double> GameThreadFrameTimes;
+    TArray<double> RenderThreadFrameTimes;
+    TArray<double> GpuFrameTimes;
+    TArray<TSharedPtr<FJsonValue>> CaptureTimingValues;
+    for (const FNativeCanopyCaptureRequest& Request : CaptureRequests)
+    {
+        if (Request.bCaptured)
+        {
+            CaptureWallTimes.Add(Request.CaptureWallTimeMs);
+            GameThreadFrameTimes.Add(Request.GameThreadFrameTimeMs);
+            RenderThreadFrameTimes.Add(Request.RenderThreadFrameTimeMs);
+            GpuFrameTimes.Add(Request.GpuFrameTimeMs);
+        }
+        TSharedRef<FJsonObject> Timing = MakeShared<FJsonObject>();
+        Timing->SetStringField(TEXT("capture"), Request.RelativePath);
+        Timing->SetBoolField(TEXT("captured"), Request.bCaptured);
+        Timing->SetNumberField(TEXT("capture_wall_time_ms"), Request.CaptureWallTimeMs);
+        Timing->SetNumberField(TEXT("game_thread_frame_time_ms"), Request.GameThreadFrameTimeMs);
+        Timing->SetNumberField(TEXT("render_thread_frame_time_ms"), Request.RenderThreadFrameTimeMs);
+        Timing->SetNumberField(TEXT("gpu_frame_time_ms"), Request.GpuFrameTimeMs);
+        CaptureTimingValues.Add(MakeShared<FJsonValueObject>(Timing));
+    }
+    uint64 FamilyExclusiveResourceBytes = 0;
+    int64 FamilyRenderVertices = 0;
+    int64 FamilyRenderTriangles = 0;
+    uint64 RuntimeFarFamilyExclusiveResourceBytes = 0;
+    int64 RuntimeFarFamilyRenderVertices = 0;
+    int64 RuntimeFarFamilyRenderTriangles = 0;
+    for (const FFutaleufuCoigueRuntime& Variant : Variants)
+    {
+        UStaticMesh* Meshes[] = {
+            Variant.TrunkMesh, Variant.BranchletMesh, Variant.LeafMesh, Variant.FarLeafMesh};
+        for (UStaticMesh* Mesh : Meshes)
+        {
+            FamilyExclusiveResourceBytes +=
+                Mesh->GetResourceSizeBytes(EResourceSizeMode::Exclusive);
+            FamilyRenderVertices += Mesh->GetNumVertices(0);
+            FamilyRenderTriangles += Mesh->GetNumTriangles(0);
+        }
+        UStaticMesh* RuntimeMeshes[] = {
+            Variant.TrunkMesh, Variant.RuntimeFarLeafMesh};
+        for (UStaticMesh* Mesh : RuntimeMeshes)
+        {
+            RuntimeFarFamilyExclusiveResourceBytes +=
+                Mesh->GetResourceSizeBytes(EResourceSizeMode::Exclusive);
+            RuntimeFarFamilyRenderVertices += Mesh->GetNumVertices(0);
+            RuntimeFarFamilyRenderTriangles += Mesh->GetNumTriangles(0);
+        }
+    }
+    TSharedRef<FJsonObject> PerformanceObject = MakeShared<FJsonObject>();
+    PerformanceObject->SetStringField(
+        TEXT("measurement_scope"),
+        TEXT("UE 5.8 Metal offscreen isolated-review capture plus 512-tree HISM authoring density map; not gameplay, packaged-build frame time, or VR evidence"));
+    PerformanceObject->SetNumberField(
+        TEXT("family_exclusive_resource_bytes"), static_cast<double>(FamilyExclusiveResourceBytes));
+    PerformanceObject->SetNumberField(
+        TEXT("family_render_vertices_lod0"), static_cast<double>(FamilyRenderVertices));
+    PerformanceObject->SetNumberField(
+        TEXT("family_render_triangles_lod0"), static_cast<double>(FamilyRenderTriangles));
+    PerformanceObject->SetNumberField(
+        TEXT("runtime_far_family_exclusive_resource_bytes"),
+        static_cast<double>(RuntimeFarFamilyExclusiveResourceBytes));
+    PerformanceObject->SetNumberField(
+        TEXT("runtime_far_family_render_vertices_lod0"),
+        static_cast<double>(RuntimeFarFamilyRenderVertices));
+    PerformanceObject->SetNumberField(
+        TEXT("runtime_far_family_render_triangles_lod0"),
+        static_cast<double>(RuntimeFarFamilyRenderTriangles));
+    PerformanceObject->SetNumberField(
+        TEXT("runtime_far_family_resource_reduction_fraction"),
+        FamilyExclusiveResourceBytes > 0
+            ? 1.0 - static_cast<double>(RuntimeFarFamilyExclusiveResourceBytes) /
+                static_cast<double>(FamilyExclusiveResourceBytes)
+            : 0.0);
+    PerformanceObject->SetNumberField(TEXT("static_mesh_assets"), Variants.Num() * 5);
+    PerformanceObject->SetNumberField(TEXT("near_tree_material_sections"), 3);
+    PerformanceObject->SetNumberField(TEXT("far_tree_material_sections"), 2);
+    PerformanceObject->SetStringField(
+        TEXT("unmeasured_gates"),
+        TEXT("packaged desktop and VR frame time, masked overdraw, motion vectors, draw-call submission, streaming, culling, near-to-far transition, and full mixed-ecology corridor density"));
+    auto HasVariablePositiveSamples = [](const TArray<double>& Values)
+    {
+        if (Values.Num() < 2 || Algo::AnyOf(Values, [](double Value) { return Value <= 0.0; }))
+        {
+            return false;
+        }
+        double Minimum = Values[0];
+        double Maximum = Values[0];
+        for (double Value : Values)
+        {
+            Minimum = FMath::Min(Minimum, Value);
+            Maximum = FMath::Max(Maximum, Value);
+        }
+        return Maximum - Minimum > 0.0001;
+    };
+    const bool bCaptureWallTimeValid =
+        CaptureWallTimes.Num() == CaptureRequests.Num() &&
+        !Algo::AnyOf(CaptureWallTimes, [](double Value) { return Value <= 0.0; });
+    const bool bFrameCycleCountersValid =
+        HasVariablePositiveSamples(GameThreadFrameTimes) &&
+        HasVariablePositiveSamples(RenderThreadFrameTimes) &&
+        HasVariablePositiveSamples(GpuFrameTimes);
+    PerformanceObject->SetBoolField(TEXT("capture_wall_time_valid"), bCaptureWallTimeValid);
+    PerformanceObject->SetBoolField(
+        TEXT("frame_cycle_counters_valid"), bFrameCycleCountersValid);
+    PerformanceObject->SetStringField(
+        TEXT("frame_cycle_validation"),
+        bFrameCycleCountersValid
+            ? TEXT("all counters are positive and vary across the forty rendered samples")
+            : TEXT("rejected: offscreen editor counters must be positive and vary across samples; use a packaged on-device benchmark for production frame-time evidence"));
+    AddTimingSummary(PerformanceObject, TEXT("capture_wall_time"), CaptureWallTimes);
+    AddTimingSummary(PerformanceObject, TEXT("game_thread_frame_time"), GameThreadFrameTimes);
+    AddTimingSummary(PerformanceObject, TEXT("render_thread_frame_time"), RenderThreadFrameTimes);
+    AddTimingSummary(PerformanceObject, TEXT("gpu_frame_time"), GpuFrameTimes);
+    PerformanceObject->SetArrayField(TEXT("capture_samples"), CaptureTimingValues);
+    ReportObject->SetObjectField(TEXT("performance_instrumentation"), PerformanceObject);
+    ReportObject->SetStringField(
+        TEXT("promotion_boundary"),
+        TEXT("isolated human visual acceptance, temporal wind, packaged desktop and VR corridor performance, and ecology gates are required before corridor substitution"));
+
+    FString Report;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&Report);
+    const bool bSerialized = FJsonSerializer::Serialize(ReportObject, Writer);
+    Report += TEXT("\n");
+    const bool bReportSaved = bSerialized && FFileHelper::SaveStringToFile(Report, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s native-canopy prototype report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bCaptured && bReportSaved;
+}
+
+void FRaftSimEditorModule::HandleEvaluateProceduralBeechCandidateCommand(const TArray<FString>& Args)
+{
+    if (ProceduralBeechExecutionSource)
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("A PVE beech candidate evaluation is already running."));
+        return;
+    }
+
+    ProceduralBeechVariant = Args.IsEmpty() ? TEXT("Beech_01") : Args[0];
+    const TSet<FString> AllowedVariants = {TEXT("Beech_01"), TEXT("Beech_02"), TEXT("Beech_03"), TEXT("Beech_04")};
+    if (!AllowedVariants.Contains(ProceduralBeechVariant))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Unsupported PVE beech variant %s; expected Beech_01 through Beech_04."),
+            *ProceduralBeechVariant);
+        return;
+    }
+
+    const FString SamplePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/"
+             "PVE_Sample_Deciduous_Tree_01.PVE_Sample_Deciduous_Tree_01");
+    UProceduralVegetation* Sample = LoadObject<UProceduralVegetation>(nullptr, *SamplePath);
+    UClass* GrowthAssetClass = FindObject<UClass>(
+        nullptr,
+        TEXT("/Script/ProceduralVegetation.ProceduralVegetationGrowthDataAsset"));
+    UClass* GrowthLoaderClass = FindObject<UClass>(
+        nullptr,
+        TEXT("/Script/ProceduralVegetation.PVGrowthDataLoaderSettings"));
+    if (!Sample || !GrowthAssetClass || !GrowthLoaderClass)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("required PVE sample or reflected classes are unavailable"));
+        return;
+    }
+
+    ProceduralBeechGrowthAsset = NewObject<UObject>(
+        GetTransientPackage(),
+        GrowthAssetClass,
+        TEXT("RaftSimFutaleufuEuropeanBeechGrowthData"),
+        RF_Transient);
+    if (!ProceduralBeechGrowthAsset)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("could not create transient PVE growth-data asset"));
+        return;
+    }
+    ProceduralBeechGrowthAsset->AddToRoot();
+
+    const FString GrowthJsonDirectory = FPaths::ConvertRelativePathToFull(FPaths::Combine(
+        FPaths::EngineDir(),
+        TEXT("Plugins/Experimental/ProceduralVegetationEditor/Content/SampleAssets/"
+             "Tree_European_Beech_01/Instances")));
+    FStructProperty* JsonDirectoryProperty = FindFProperty<FStructProperty>(
+        GrowthAssetClass,
+        TEXT("JsonDirectoryPath"));
+    UFunction* UpdateDataFunction = GrowthAssetClass->FindFunctionByName(TEXT("UpdateDataAsset"));
+    if (!JsonDirectoryProperty || !UpdateDataFunction)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("PVE growth-data reflection contract changed"));
+        return;
+    }
+    FDirectoryPath* JsonDirectory = JsonDirectoryProperty->ContainerPtrToValuePtr<FDirectoryPath>(
+        ProceduralBeechGrowthAsset);
+    JsonDirectory->Path = GrowthJsonDirectory;
+    ProceduralBeechGrowthAsset->ProcessEvent(UpdateDataFunction, nullptr);
+
+    FArrayProperty* VariationsProperty = FindFProperty<FArrayProperty>(
+        GrowthAssetClass,
+        TEXT("GrowthVariations"));
+    const int32 LoadedVariationCount = VariationsProperty
+        ? FScriptArrayHelper(
+              VariationsProperty,
+              VariationsProperty->ContainerPtrToValuePtr<void>(ProceduralBeechGrowthAsset)).Num()
+        : 0;
+    if (LoadedVariationCount != 4)
+    {
+        FinishProceduralBeechCandidate(
+            false,
+            FString::Printf(TEXT("PVE growth-data asset loaded %d/4 beech variants"), LoadedVariationCount));
+        return;
+    }
+
+    ProceduralBeechCandidateAsset = DuplicateObject<UProceduralVegetation>(
+        Sample,
+        GetTransientPackage(),
+        TEXT("RaftSimFutaleufuEuropeanBeechCandidate"));
+    if (!ProceduralBeechCandidateAsset)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("could not duplicate the PVE sample graph"));
+        return;
+    }
+    ProceduralBeechCandidateAsset->AddToRoot();
+    UPCGGraph* Graph = Cast<UPCGGraph>(ProceduralBeechCandidateAsset->GetGraph());
+    if (!Graph)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("duplicated PVE candidate has no PCG graph"));
+        return;
+    }
+
+    UPCGNode* MesherNode = nullptr;
+    UPCGNode* ExportNode = nullptr;
+    for (UPCGNode* Node : Graph->GetNodes())
+    {
+        UPCGSettings* Settings = Node ? Node->GetSettings() : nullptr;
+        if (!Settings)
+        {
+            continue;
+        }
+        const FString SettingsClassName = Settings->GetClass()->GetName();
+        MesherNode = SettingsClassName == TEXT("PVMeshBuilderSettings") ? Node : MesherNode;
+        ExportNode = SettingsClassName == TEXT("PVExportSettings") ? Node : ExportNode;
+    }
+    if (!MesherNode || !ExportNode || !Graph->GetOutputNode())
+    {
+        FinishProceduralBeechCandidate(false, TEXT("PVE sample graph no longer exposes mesher/export/output nodes"));
+        return;
+    }
+
+    UPCGSettings* LoaderSettings = nullptr;
+    UPCGNode* LoaderNode = Graph->AddNodeOfType(GrowthLoaderClass, LoaderSettings);
+    FObjectPropertyBase* GrowthAssetProperty = LoaderSettings
+        ? FindFProperty<FObjectPropertyBase>(LoaderSettings->GetClass(), TEXT("GrowthAsset"))
+        : nullptr;
+    if (!LoaderNode || !LoaderSettings || !GrowthAssetProperty)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("could not create or configure the PVE growth loader"));
+        return;
+    }
+    GrowthAssetProperty->SetObjectPropertyValue_InContainer(LoaderSettings, ProceduralBeechGrowthAsset);
+    LoaderNode->UpdateAfterSettingsChangeDuringCreation();
+
+    if (!LoaderNode->GetOutputPin(FName(*ProceduralBeechVariant)))
+    {
+        FinishProceduralBeechCandidate(
+            false,
+            FString::Printf(TEXT("growth loader did not expose output pin %s"), *ProceduralBeechVariant));
+        return;
+    }
+    Graph->RemoveInboundEdges(MesherNode, TEXT("In"));
+    Graph->AddEdge(LoaderNode, FName(*ProceduralBeechVariant), MesherNode, TEXT("In"));
+    Graph->AddEdge(ExportNode, TEXT("Out"), Graph->GetOutputNode(), TEXT("Out"));
+
+    FPCGGenerationPostProcessCallback PostProcessCallback;
+    PostProcessCallback.BindRaw(this, &FRaftSimEditorModule::HandleProceduralBeechPostProcess);
+    FPCGDefaultExecutionSourceParams ExecutionParams;
+    ExecutionParams.GraphInterface = Graph;
+    ExecutionParams.Seed = 7023;
+    ExecutionParams.PostProcessCallback = MoveTemp(PostProcessCallback);
+    ProceduralBeechExecutionSource =
+        IPCGBaseSubsystem::CreateExecutionSource<UPCGDefaultExecutionSource>(ExecutionParams);
+    if (!ProceduralBeechExecutionSource)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("could not create a default PCG execution source"));
+        return;
+    }
+    ProceduralBeechExecutionSource->AddToRoot();
+    ProceduralBeechOutputCollection.Reset();
+    ProceduralBeechStartSeconds = FPlatformTime::Seconds();
+    ProceduralBeechExecutionSource->Generate();
+    ProceduralBeechCandidateTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+        FTickerDelegate::CreateRaw(this, &FRaftSimEditorModule::TickProceduralBeechCandidate),
+        0.25f);
+    UE_LOG(
+        LogRaftSimEditor,
+        Display,
+        TEXT("Started headless PVE structural evaluation for %s from %s."),
+        *ProceduralBeechVariant,
+        *GrowthJsonDirectory);
+}
+
+void FRaftSimEditorModule::HandleProceduralBeechPostProcess(const FPCGDataCollection& OutputData)
+{
+    for (const FPCGTaggedData& TaggedData : OutputData.TaggedData)
+    {
+        const UPVMeshData* MeshData = Cast<UPVMeshData>(TaggedData.Data);
+        if (!MeshData || !MeshData->GetSharedCollection().IsValid())
+        {
+            continue;
+        }
+        ProceduralBeechOutputCollection = MakeShared<FManagedArrayCollection>();
+        MeshData->GetSharedCollection()->CopyTo(ProceduralBeechOutputCollection.Get());
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("Received PVE mesh output for %s on pin %s."),
+            *ProceduralBeechVariant,
+            *TaggedData.Pin.ToString());
+        break;
+    }
+}
+
+bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
+{
+    if (!ProceduralBeechExecutionSource)
+    {
+        ProceduralBeechCandidateTickerHandle.Reset();
+        return false;
+    }
+    if (ProceduralBeechExecutionSource->GetExecutionState().IsGenerating())
+    {
+        if (FPlatformTime::Seconds() - ProceduralBeechStartSeconds < 180.0)
+        {
+            return true;
+        }
+        ProceduralBeechCandidateTickerHandle.Reset();
+        FinishProceduralBeechCandidate(false, TEXT("PVE graph execution timed out after 180 seconds"));
+        return false;
+    }
+    ProceduralBeechCandidateTickerHandle.Reset();
+    if (!ProceduralBeechOutputCollection.IsValid())
+    {
+        FinishProceduralBeechCandidate(false, TEXT("PVE graph completed without a mesh collection at graph output"));
+        return false;
+    }
+
+    const FManagedArrayCollection& Collection = *ProceduralBeechOutputCollection;
+    const int32 TransformCount = Collection.NumElements(FGeometryCollection::TransformGroup);
+    const int32 VertexCount = Collection.NumElements(FGeometryCollection::VerticesGroup);
+    const int32 TriangleCount = Collection.NumElements(FGeometryCollection::FacesGroup);
+    const PV::Facades::FFoliageFacade FoliageFacade(Collection);
+    const int32 FoliageMeshCount = FoliageFacade.IsValid() ? FoliageFacade.NumFoliageInfo() : 0;
+    const int32 FoliageInstanceCount = FoliageFacade.IsValid() ? FoliageFacade.NumFoliageEntries() : 0;
+    FString FoliageMeshesJson;
+    if (FoliageFacade.IsValid())
+    {
+        for (int32 Index = 0; Index < FoliageFacade.NumFoliageInfo(); ++Index)
+        {
+            const FString MeshPath = FoliageFacade.GetFoliageInfo(Index).Mesh.ToString();
+            FoliageMeshesJson += FString::Printf(
+                TEXT("%s\"%s\""),
+                Index == 0 ? TEXT("") : TEXT(", "),
+                *EscapeRaftSimJsonString(MeshPath));
+        }
+    }
+
+    bool bLocalTrunkExported = false;
+    bool bLocalTrunkValidated = false;
+    bool bLocalTrunkNaniteEnabled = false;
+    bool bLocalTrunkPreserveArea = false;
+    int32 LocalTrunkVertexCount = 0;
+    int32 LocalTrunkTriangleCount = 0;
+    int32 LocalTrunkMaterialSlotCount = 0;
+    int32 LocalTrunkNonNullMaterialCount = 0;
+    FVector LocalTrunkBoundsSize = FVector::ZeroVector;
+    const FString LocalTrunkAssetPath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/"
+             "SM_FutaleufuPveEuropean%s_Trunk"),
+        *ProceduralBeechVariant);
+    const FString LocalTrunkPackagePath = LocalTrunkAssetPath;
+    const FString TrunkAssetName = FPackageName::GetShortName(LocalTrunkPackagePath);
+    const FString LocalTrunkObjectPath = FString::Printf(
+        TEXT("%s.%s"),
+        *LocalTrunkPackagePath,
+        *TrunkAssetName);
+    UStaticMesh* TrunkMesh = LoadObject<UStaticMesh>(nullptr, *LocalTrunkObjectPath);
+    const bool bNewTrunkMesh = TrunkMesh == nullptr;
+    UPackage* TrunkPackage = TrunkMesh
+        ? TrunkMesh->GetOutermost()
+        : CreatePackage(*LocalTrunkPackagePath);
+    if (TrunkPackage && !TrunkMesh)
+    {
+        TrunkMesh = NewObject<UStaticMesh>(TrunkPackage, *TrunkAssetName, RF_Public | RF_Standalone);
+    }
+    if (TrunkMesh)
+    {
+        const TUniquePtr<FGeometryCollection> GeometryCollection(
+            Collection.NewCopy<FGeometryCollection>());
+        if (GeometryCollection.IsValid() && TransformCount > 0)
+        {
+            const TManagedArray<FTransform3f>& BoneTransforms = Collection.GetAttribute<FTransform3f>(
+                TEXT("Transform"),
+                FGeometryCollection::TransformGroup);
+            TArray<int32> TransformIndices;
+            TransformIndices.Reserve(BoneTransforms.Num());
+            for (int32 Index = 0; Index < BoneTransforms.Num(); ++Index)
+            {
+                TransformIndices.Add(Index);
+            }
+            UE::Geometry::FDynamicMesh3 CombinedMesh;
+            FTransform UnusedTransform;
+            ConvertGeometryCollectionToDynamicMesh(
+                CombinedMesh,
+                UnusedTransform,
+                false,
+                *GeometryCollection,
+                false,
+                BoneTransforms.GetConstArray(),
+                true,
+                TransformIndices);
+            UDynamicMesh* DynamicMesh = NewObject<UDynamicMesh>(GetTransientPackage());
+            DynamicMesh->SetMesh(MoveTemp(CombinedMesh));
+
+            TArray<TObjectPtr<UMaterialInterface>> Materials;
+            if (Collection.HasAttribute(TEXT("MaterialPath"), FGeometryCollection::MaterialGroup))
+            {
+                const TManagedArray<FString>& MaterialPaths = Collection.GetAttribute<FString>(
+                    TEXT("MaterialPath"),
+                    FGeometryCollection::MaterialGroup);
+                for (const FString& MaterialPath : MaterialPaths)
+                {
+                    Materials.Add(LoadObject<UMaterialInterface>(nullptr, *MaterialPath));
+                }
+            }
+            FGeometryScriptCopyMeshToAssetOptions CopyOptions;
+            CopyOptions.bEmitTransaction = false;
+            CopyOptions.bDeferMeshPostEditChange = false;
+            CopyOptions.bEnableRecomputeTangents = false;
+            CopyOptions.bReplaceMaterials = true;
+            CopyOptions.NewMaterials = Materials;
+            CopyOptions.bApplyNaniteSettings = true;
+            CopyOptions.NewNaniteSettings = TrunkMesh->GetNaniteSettings();
+            CopyOptions.NewNaniteSettings.bEnabled = true;
+            CopyOptions.NewNaniteSettings.ShapePreservation = ENaniteShapePreservation::PreserveArea;
+            EGeometryScriptOutcomePins CopyOutcome = EGeometryScriptOutcomePins::Failure;
+            UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshToStaticMesh(
+                DynamicMesh,
+                TrunkMesh,
+                CopyOptions,
+                FGeometryScriptMeshWriteLOD(),
+                CopyOutcome,
+                true,
+                nullptr);
+            if (CopyOutcome == EGeometryScriptOutcomePins::Success)
+            {
+                TrunkMesh->Modify();
+                TrunkMesh->MarkPackageDirty();
+                if (bNewTrunkMesh)
+                {
+                    FAssetRegistryModule::AssetCreated(TrunkMesh);
+                }
+                FAssetCompilingManager::Get().FinishAllCompilation();
+                const FString TrunkFilename = FPackageName::LongPackageNameToFilename(
+                    LocalTrunkPackagePath,
+                    FPackageName::GetAssetPackageExtension());
+                FSavePackageArgs SaveArgs;
+                SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+                SaveArgs.SaveFlags = SAVE_NoError;
+                bLocalTrunkExported = UPackage::SavePackage(
+                    TrunkPackage,
+                    TrunkMesh,
+                    *TrunkFilename,
+                    SaveArgs);
+                if (bLocalTrunkExported)
+                {
+                    LocalTrunkVertexCount = TrunkMesh->GetNumVertices(0);
+                    LocalTrunkTriangleCount = TrunkMesh->GetNumTriangles(0);
+                    LocalTrunkMaterialSlotCount = TrunkMesh->GetStaticMaterials().Num();
+                    for (int32 MaterialIndex = 0; MaterialIndex < LocalTrunkMaterialSlotCount; ++MaterialIndex)
+                    {
+                        LocalTrunkNonNullMaterialCount += TrunkMesh->GetMaterial(MaterialIndex) ? 1 : 0;
+                    }
+                    LocalTrunkBoundsSize = TrunkMesh->GetBoundingBox().GetSize();
+                    bLocalTrunkNaniteEnabled = TrunkMesh->IsNaniteEnabled();
+                    bLocalTrunkPreserveArea =
+                        TrunkMesh->GetNaniteSettings().ShapePreservation ==
+                        ENaniteShapePreservation::PreserveArea;
+                    bLocalTrunkValidated =
+                        bLocalTrunkNaniteEnabled &&
+                        bLocalTrunkPreserveArea &&
+                        LocalTrunkVertexCount > 0 &&
+                        LocalTrunkTriangleCount > 0 &&
+                        LocalTrunkMaterialSlotCount > 0 &&
+                        LocalTrunkNonNullMaterialCount == LocalTrunkMaterialSlotCount &&
+                        LocalTrunkBoundsSize.X > 0.0 &&
+                        LocalTrunkBoundsSize.Y > 0.0 &&
+                        LocalTrunkBoundsSize.Z > 0.0;
+                }
+            }
+        }
+    }
+
+    FString FoliageInstancesJson;
+    if (FoliageFacade.IsValid())
+    {
+        for (int32 Index = 0; Index < FoliageFacade.NumFoliageEntries(); ++Index)
+        {
+            const PV::Facades::FFoliageEntryData Entry = FoliageFacade.GetFoliageEntry(Index);
+            const FTransform Transform = FoliageFacade.GetFoliageTransform(Index);
+            const FVector Location = Transform.GetLocation();
+            const FQuat Rotation = Transform.GetRotation();
+            const FVector Scale = Transform.GetScale3D();
+            FoliageInstancesJson += FString::Printf(
+                TEXT("%s    {\"mesh_index\": %d, \"location_cm\": [%.6f, %.6f, %.6f], "
+                     "\"rotation_xyzw\": [%.9f, %.9f, %.9f, %.9f], \"scale\": [%.6f, %.6f, %.6f]}"),
+                Index == 0 ? TEXT("") : TEXT(",\n"),
+                Entry.NameId,
+                Location.X,
+                Location.Y,
+                Location.Z,
+                Rotation.X,
+                Rotation.Y,
+                Rotation.Z,
+                Rotation.W,
+                Scale.X,
+                Scale.Y,
+                Scale.Z);
+        }
+    }
+    const FString LocalTemplateDirectory = FPaths::Combine(
+        FPaths::ProjectSavedDir(),
+        TEXT("RaftSimPveReview/FutaleufuEuropeanBeech"));
+    IFileManager::Get().MakeDirectory(*LocalTemplateDirectory, true);
+    const FString LocalTemplatePath = FPaths::Combine(
+        LocalTemplateDirectory,
+        ProceduralBeechVariant.ToLower() + TEXT("_foliage_template.json"));
+    const FString LocalTemplate = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.local_pve_foliage_template.v1\",\n")
+        TEXT("  \"variant\": \"%s\",\n")
+        TEXT("  \"source_trunk_asset\": \"%s\",\n")
+        TEXT("  \"foliage_meshes\": [%s],\n")
+        TEXT("  \"instances\": [\n%s\n  ]\n")
+        TEXT("}\n"),
+        *EscapeRaftSimJsonString(ProceduralBeechVariant),
+        *EscapeRaftSimJsonString(LocalTrunkAssetPath),
+        *FoliageMeshesJson,
+        *FoliageInstancesJson);
+    const bool bLocalTemplateSaved = FFileHelper::SaveStringToFile(LocalTemplate, *LocalTemplatePath);
+    const FString LocalTemplateReportPath = FString::Printf(
+        TEXT("unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/%s_foliage_template.json"),
+        *ProceduralBeechVariant.ToLower());
+
+    bool bLocalVisualMapSaved = false;
+    bool bLocalVisualReviewCaptured = false;
+    int32 LocalVisualFoliageMeshCount = 0;
+    int32 LocalVisualFoliageInstanceCount = 0;
+    const FString LocalVisualMapPackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/"
+             "L_FutaleufuPveEuropean%s_IsolatedReview"),
+        *ProceduralBeechVariant);
+    const FString LocalVisualCaptureBase = FString::Printf(
+        TEXT("unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/%s"),
+        *ProceduralBeechVariant.ToLower());
+    FString LocalVisualSummary;
+    TArray<FString> LocalVisualCapturePaths = {
+        LocalVisualCaptureBase + TEXT("_turntable_azimuth_035.png"),
+        LocalVisualCaptureBase + TEXT("_turntable_azimuth_145.png"),
+        LocalVisualCaptureBase + TEXT("_river_distance_60m.png")};
+    if (bLocalTrunkValidated && bLocalTemplateSaved && GEditor && FoliageFacade.IsValid())
+    {
+        UWorld* ReviewWorld = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+        if (ReviewWorld)
+        {
+            AStaticMeshActor* TrunkActor = ReviewWorld->SpawnActor<AStaticMeshActor>(
+                AStaticMeshActor::StaticClass(),
+                FTransform::Identity);
+            if (TrunkActor && TrunkActor->GetStaticMeshComponent())
+            {
+                TrunkActor->SetActorLabel(TEXT("RaftSim_PveReview_Trunk"));
+                TrunkActor->GetStaticMeshComponent()->SetStaticMesh(TrunkMesh);
+                TrunkActor->GetStaticMeshComponent()->SetMobility(EComponentMobility::Static);
+                TrunkActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            }
+
+            AActor* FoliageActor = ReviewWorld->SpawnActor<AActor>();
+            TArray<UHierarchicalInstancedStaticMeshComponent*> FoliageComponents;
+            if (FoliageActor)
+            {
+                FoliageActor->SetActorLabel(TEXT("RaftSim_PveReview_Foliage"));
+                USceneComponent* Root = NewObject<USceneComponent>(FoliageActor, TEXT("Root"));
+                FoliageActor->AddInstanceComponent(Root);
+                FoliageActor->SetRootComponent(Root);
+                Root->SetMobility(EComponentMobility::Static);
+                Root->RegisterComponent();
+                for (int32 MeshIndex = 0; MeshIndex < FoliageFacade.NumFoliageInfo(); ++MeshIndex)
+                {
+                    const FString MeshPath = FoliageFacade.GetFoliageInfo(MeshIndex).Mesh.ToString();
+                    UStaticMesh* FoliageMesh = LoadObject<UStaticMesh>(nullptr, *MeshPath);
+                    if (!FoliageMesh)
+                    {
+                        FoliageComponents.Add(nullptr);
+                        continue;
+                    }
+                    UHierarchicalInstancedStaticMeshComponent* Component =
+                        NewObject<UHierarchicalInstancedStaticMeshComponent>(
+                            FoliageActor,
+                            *FString::Printf(TEXT("PveFoliage_%02d"), MeshIndex));
+                    FoliageActor->AddInstanceComponent(Component);
+                    Component->SetupAttachment(Root);
+                    Component->SetStaticMesh(FoliageMesh);
+                    Component->SetMobility(EComponentMobility::Static);
+                    Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                    Component->RegisterComponent();
+                    FoliageComponents.Add(Component);
+                    ++LocalVisualFoliageMeshCount;
+                }
+                for (int32 EntryIndex = 0; EntryIndex < FoliageFacade.NumFoliageEntries(); ++EntryIndex)
+                {
+                    const PV::Facades::FFoliageEntryData Entry = FoliageFacade.GetFoliageEntry(EntryIndex);
+                    if (!FoliageComponents.IsValidIndex(Entry.NameId) || !FoliageComponents[Entry.NameId])
+                    {
+                        continue;
+                    }
+                    FoliageComponents[Entry.NameId]->AddInstance(
+                        FoliageFacade.GetFoliageTransform(EntryIndex));
+                    ++LocalVisualFoliageInstanceCount;
+                }
+            }
+
+            UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+            AStaticMeshActor* GroundActor = ReviewWorld->SpawnActor<AStaticMeshActor>(
+                AStaticMeshActor::StaticClass(),
+                FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, -2.0f), FVector(100.0f, 100.0f, 1.0f)));
+            if (GroundActor && GroundActor->GetStaticMeshComponent())
+            {
+                GroundActor->SetActorLabel(TEXT("RaftSim_PveReview_NeutralGround"));
+                GroundActor->GetStaticMeshComponent()->SetStaticMesh(PlaneMesh);
+                GroundActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                if (UMaterialInterface* GroundMaterial = LoadObject<UMaterialInterface>(
+                        nullptr,
+                        TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial")))
+                {
+                    GroundActor->GetStaticMeshComponent()->SetMaterial(0, GroundMaterial);
+                }
+            }
+
+            FRaftSimEnvironmentPreviewSpec ReviewSpec;
+            ReviewSpec.RiverId = TEXT("futaleufu_terminator");
+            ReviewSpec.DisplayName = ProceduralBeechVariant + TEXT(" isolated PVE review");
+            ReviewSpec.MapPackagePath = LocalVisualMapPackagePath;
+            ReviewSpec.FoliageColor = FLinearColor(0.15f, 0.32f, 0.12f);
+            ReviewSpec.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
+            AddPreviewLightRig(ReviewWorld, ReviewSpec);
+
+            const FBox TrunkBounds = TrunkMesh->GetBoundingBox();
+            const FVector Target = TrunkBounds.GetCenter();
+            const float ReviewDistance = FMath::Max(
+                TrunkBounds.GetSize().Z * 2.40f,
+                FMath::Max(TrunkBounds.GetSize().X, TrunkBounds.GetSize().Y) * 2.25f);
+            const FRaftSimPhotographicCaptureSettings CaptureSettings =
+                GetPhotographicCaptureSettings(ReviewSpec.RiverId);
+            auto AddReviewCamera = [ReviewWorld, Target, CaptureSettings](
+                                       const TCHAR* Label,
+                                       const FVector& Location,
+                                       float FieldOfView)
+            {
+                ACameraActor* Camera = ReviewWorld->SpawnActor<ACameraActor>(
+                    ACameraActor::StaticClass(),
+                    FTransform((Target - Location).Rotation(), Location));
+                if (!Camera || !Camera->GetCameraComponent())
+                {
+                    return false;
+                }
+                Camera->SetActorLabel(Label);
+                Camera->GetCameraComponent()->FieldOfView = FieldOfView;
+                FPostProcessSettings& Settings = Camera->GetCameraComponent()->PostProcessSettings;
+                Settings.bOverride_AutoExposureMethod = true;
+                Settings.AutoExposureMethod = AEM_Manual;
+                Settings.bOverride_AutoExposureBias = true;
+                Settings.AutoExposureBias = CaptureSettings.ExposureBias;
+                Settings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+                Settings.AutoExposureApplyPhysicalCameraExposure = 0;
+                Settings.bOverride_ColorSaturation = true;
+                Settings.ColorSaturation = FVector4(
+                    CaptureSettings.Saturation,
+                    CaptureSettings.Saturation,
+                    CaptureSettings.Saturation,
+                    1.0f);
+                Settings.bOverride_ColorContrast = true;
+                Settings.ColorContrast = FVector4(
+                    CaptureSettings.Contrast,
+                    CaptureSettings.Contrast,
+                    CaptureSettings.Contrast,
+                    1.0f);
+                Settings.bOverride_Sharpen = true;
+                Settings.Sharpen = CaptureSettings.Sharpen;
+                Settings.bOverride_FilmGrainIntensity = true;
+                Settings.FilmGrainIntensity = 0.0f;
+                return true;
+            };
+            const float CameraHeight = Target.Z + TrunkBounds.GetSize().Z * 0.08f;
+            const bool bCameraA = AddReviewCamera(
+                TEXT("RaftSim_PveTurntable_Azimuth035"),
+                FVector(
+                    Target.X - ReviewDistance * FMath::Cos(FMath::DegreesToRadians(35.0f)),
+                    Target.Y - ReviewDistance * FMath::Sin(FMath::DegreesToRadians(35.0f)),
+                    CameraHeight),
+                46.0f);
+            const bool bCameraB = AddReviewCamera(
+                TEXT("RaftSim_PveTurntable_Azimuth145"),
+                FVector(
+                    Target.X - ReviewDistance * FMath::Cos(FMath::DegreesToRadians(145.0f)),
+                    Target.Y - ReviewDistance * FMath::Sin(FMath::DegreesToRadians(145.0f)),
+                    CameraHeight),
+                46.0f);
+            const bool bCameraDistance = AddReviewCamera(
+                TEXT("RaftSim_PveRiverDistance60m"),
+                FVector(Target.X - 6000.0f, Target.Y - 800.0f, CameraHeight),
+                50.0f);
+
+            const bool bSceneComplete =
+                TrunkActor && TrunkActor->GetStaticMeshComponent() &&
+                LocalVisualFoliageMeshCount == FoliageMeshCount &&
+                LocalVisualFoliageInstanceCount == FoliageInstanceCount &&
+                PlaneMesh && GroundActor && bCameraA && bCameraB && bCameraDistance;
+            bLocalVisualMapSaved = bSceneComplete &&
+                SavePreviewWorld(ReviewWorld, LocalVisualMapPackagePath, LocalVisualSummary);
+            if (bLocalVisualMapSaved)
+            {
+                FAssetCompilingManager::Get().FinishAllCompilation();
+                if (GShaderCompilingManager)
+                {
+                    GShaderCompilingManager->FinishAllCompilation();
+                }
+                const FString LocalCaptureRoot = FPaths::Combine(
+                    FPaths::ProjectSavedDir(),
+                    TEXT("RaftSimPveReview/FutaleufuEuropeanBeech"));
+                bool bCaptureA = CapturePreviewImageForSpec(
+                    ReviewSpec,
+                    LocalCaptureRoot,
+                    LocalVisualCapturePaths[0],
+                    TEXT("RaftSim_PveTurntable_Azimuth035"),
+                    TEXT("turntable_azimuth_035"),
+                    TEXT("PVE turntable azimuth 35"),
+                    false,
+                    LocalVisualSummary);
+                bool bCaptureB = CapturePreviewImageForSpec(
+                    ReviewSpec,
+                    LocalCaptureRoot,
+                    LocalVisualCapturePaths[1],
+                    TEXT("RaftSim_PveTurntable_Azimuth145"),
+                    TEXT("turntable_azimuth_145"),
+                    TEXT("PVE turntable azimuth 145"),
+                    false,
+                    LocalVisualSummary);
+                bool bCaptureDistance = CapturePreviewImageForSpec(
+                    ReviewSpec,
+                    LocalCaptureRoot,
+                    LocalVisualCapturePaths[2],
+                    TEXT("RaftSim_PveRiverDistance60m"),
+                    TEXT("river_distance_60m"),
+                    TEXT("PVE 60 m river-distance proxy"),
+                    false,
+                    LocalVisualSummary);
+                bLocalVisualReviewCaptured = bCaptureA && bCaptureB && bCaptureDistance;
+            }
+        }
+    }
+    const FString LocalVisualReviewJson = FString::Printf(
+        TEXT("{\n")
+        TEXT("    \"status\": \"%s\",\n")
+        TEXT("    \"git_policy\": \"generated_map_and_captures_are_local_and_ignored\",\n")
+        TEXT("    \"map_asset\": \"%s\",\n")
+        TEXT("    \"foliage_mesh_count\": %d,\n")
+        TEXT("    \"foliage_instance_count\": %d,\n")
+        TEXT("    \"captures\": [\"%s\", \"%s\", \"%s\"]\n")
+        TEXT("  }"),
+        bLocalVisualReviewCaptured
+            ? TEXT("isolated_three_view_capture_ready_for_human_material_review")
+            : TEXT("isolated_visual_capture_failed"),
+        *EscapeRaftSimJsonString(LocalVisualMapPackagePath),
+        LocalVisualFoliageMeshCount,
+        LocalVisualFoliageInstanceCount,
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[0]),
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[1]),
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[2]));
+
+    const FString ReportRelativePath = FString::Printf(
+        TEXT("docs/environment-captures/photoreal_river_previews/"
+             "pve_futaleufu_european_beech_%s_structural_report.json"),
+        *ProceduralBeechVariant.ToLower());
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const FString Report = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.pve_growth_candidate_structural_review.v1\",\n")
+        TEXT("  \"river_id\": \"futaleufu_terminator\",\n")
+        TEXT("  \"candidate\": \"ue_5_8_pve_european_beech\",\n")
+        TEXT("  \"variant\": \"%s\",\n")
+        TEXT("  \"status\": \"structurally_generated_local_review_export_ready_not_visual_or_production_promoted\",\n")
+        TEXT("  \"engine_version\": \"5.8\",\n")
+        TEXT("  \"source_growth_json\": \"Engine/Plugins/Experimental/ProceduralVegetationEditor/Content/SampleAssets/Tree_European_Beech_01/Instances/%s.json\",\n")
+        TEXT("  \"source_graph\": \"/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Sample_Deciduous_Tree_01\",\n")
+        TEXT("  \"generated_collection\": {\n")
+        TEXT("    \"transform_count\": %d,\n")
+        TEXT("    \"vertex_count\": %d,\n")
+        TEXT("    \"triangle_count\": %d,\n")
+        TEXT("    \"foliage_mesh_count\": %d,\n")
+        TEXT("    \"foliage_instance_count\": %d,\n")
+        TEXT("    \"foliage_meshes\": [%s]\n")
+        TEXT("  },\n")
+        TEXT("  \"local_review_export\": {\n")
+        TEXT("    \"status\": \"%s\",\n")
+        TEXT("    \"git_policy\": \"generated_files_are_ignored_and_must_not_be_open_source_redistributed\",\n")
+        TEXT("    \"trunk_asset\": \"%s\",\n")
+        TEXT("    \"foliage_template\": \"%s\",\n")
+        TEXT("    \"asset_validation\": {\n")
+        TEXT("      \"passed\": %s,\n")
+        TEXT("      \"nanite_enabled\": %s,\n")
+        TEXT("      \"nanite_shape_preservation\": \"%s\",\n")
+        TEXT("      \"vertex_count_lod0\": %d,\n")
+        TEXT("      \"triangle_count_lod0\": %d,\n")
+        TEXT("      \"material_slot_count\": %d,\n")
+        TEXT("      \"non_null_material_count\": %d,\n")
+        TEXT("      \"bounds_size_cm\": [%.6f, %.6f, %.6f]\n")
+        TEXT("    }\n")
+        TEXT("  },\n")
+        TEXT("  \"local_visual_review\": %s,\n")
+        TEXT("  \"rights_boundary\": \"installed_unreal_engine_sample_evaluation_only_do_not_redistribute_as_open_source_asset\",\n")
+        TEXT("  \"species_boundary\": \"fagus_sylvatica_structure_analog_not_native_nothofagus_or_patagonian_species_approval\",\n")
+        TEXT("  \"promotion_gates\": [\"isolated_visual_material_validation\", \"river_view_comparison\", \"native_species_or_ecology_review\", \"open_source_redistribution_review\", \"desktop_and_vr_performance\"]\n")
+        TEXT("}\n"),
+        *EscapeRaftSimJsonString(ProceduralBeechVariant),
+        *EscapeRaftSimJsonString(ProceduralBeechVariant),
+        TransformCount,
+        VertexCount,
+        TriangleCount,
+        FoliageMeshCount,
+        FoliageInstanceCount,
+        *FoliageMeshesJson,
+        bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved
+            ? TEXT("trunk_nanite_asset_and_foliage_template_generated_locally")
+            : TEXT("local_export_failed"),
+        *EscapeRaftSimJsonString(LocalTrunkAssetPath),
+        *EscapeRaftSimJsonString(LocalTemplateReportPath),
+        bLocalTrunkValidated ? TEXT("true") : TEXT("false"),
+        bLocalTrunkNaniteEnabled ? TEXT("true") : TEXT("false"),
+        bLocalTrunkPreserveArea ? TEXT("preserve_area") : TEXT("other"),
+        LocalTrunkVertexCount,
+        LocalTrunkTriangleCount,
+        LocalTrunkMaterialSlotCount,
+        LocalTrunkNonNullMaterialCount,
+        LocalTrunkBoundsSize.X,
+        LocalTrunkBoundsSize.Y,
+        LocalTrunkBoundsSize.Z,
+        *LocalVisualReviewJson);
+    const bool bSaved = FFileHelper::SaveStringToFile(Report, *ReportPath);
+    FinishProceduralBeechCandidate(
+        bSaved && bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved,
+        FString::Printf(
+            TEXT("%s %s: %d vertices, %d triangles, %d foliage meshes, %d foliage instances -> %s"),
+            bSaved ? TEXT("Recorded") : TEXT("Failed to record"),
+            *ProceduralBeechVariant,
+            VertexCount,
+            TriangleCount,
+            FoliageMeshCount,
+            FoliageInstanceCount,
+            *ReportRelativePath));
+    return false;
+}
+
+void FRaftSimEditorModule::FinishProceduralBeechCandidate(bool bSuccess, const FString& Summary)
+{
+    if (bSuccess)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("PVE beech candidate evaluation finished: %s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("PVE beech candidate evaluation stopped: %s"), *Summary);
+    }
+    ProceduralBeechOutputCollection.Reset();
+    if (ProceduralBeechExecutionSource)
+    {
+        ProceduralBeechExecutionSource->Sunset();
+        ProceduralBeechExecutionSource->RemoveFromRoot();
+        ProceduralBeechExecutionSource = nullptr;
+    }
+    if (ProceduralBeechCandidateAsset)
+    {
+        ProceduralBeechCandidateAsset->RemoveFromRoot();
+        ProceduralBeechCandidateAsset = nullptr;
+    }
+    if (ProceduralBeechGrowthAsset)
+    {
+        ProceduralBeechGrowthAsset->RemoveFromRoot();
+        ProceduralBeechGrowthAsset = nullptr;
+    }
+    if (!IsEngineExitRequested() &&
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterPveGeneration")))
+    {
+        FPlatformMisc::RequestExit(!bSuccess, TEXT("RaftSim PVE beech candidate evaluation finished"));
+    }
+}
+
 void FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup()
 {
     if (PhotorealEnvironmentAutomationPostEngineInitHandle.IsValid())
@@ -18722,6 +26724,11 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
     if (bCreateLandscapeImportCandidateMapsOnStartup)
     {
         bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
+    }
+
+    if (bCreateFutaleufuCordilleraCypressFamilyOnStartup)
+    {
+        bSucceeded &= CreateFutaleufuCordilleraCypressFamily(Summary);
     }
 
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
@@ -18983,6 +26990,11 @@ TSharedRef<SWidget> FRaftSimEditorModule::BuildToolSpecificBody(const FRaftSimEd
         Body->AddSlot().AutoHeight().Padding(0.0f, 4.0f)[MakeSectionHeader(LOCTEXT("RiverEditorPanelsHeader", "Authoring Panels"))];
         Body->AddSlot().AutoHeight()[SNew(STextBlock).Text(LOCTEXT("RiverEditorPanels", "Map view, annotation list, evidence refs, guide notes, expected outcomes, source provenance, validation warnings, and export readiness.")).AutoWrapText(true)];
         Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("SouthForkPass", "South Fork Sample"), TEXT("unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json"))];
+        Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("NamedRapidMarkers", "Named Rapid Markers"), TEXT("unreal/Content/RaftSim/River/named_rapid_editor_markers.json"))];
+        Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("NamedRapidGeometry", "Candidate Marker Geometry"), TEXT("unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson"))];
+        Body->AddSlot().AutoHeight()[MakePathRow(LOCTEXT("NamedRapidRuns", "Simulator Review Runs"), TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json"))];
+        Body->AddSlot().AutoHeight().Padding(0.0f, 8.0f, 0.0f, 0.0f)[MakeSectionHeader(LOCTEXT("NamedRapidBrowserHeader", "Named Rapid Review Browser"))];
+        Body->AddSlot().AutoHeight()[BuildNamedRapidReviewPanel()];
     }
     else if (Descriptor.ToolId == TEXT("FeatureTuningEditor"))
     {
@@ -19046,6 +27058,9 @@ bool FRaftSimEditorModule::CreateReviewedToolDataAssets(FString& OutSummary)
         TEXT("DA_RapidRiverEditorShell"),
         [](URaftSimRapidRiverEditorShellConfig* Asset)
         {
+            Asset->NamedRapidEditorMarkersManifest = TEXT("unreal/Content/RaftSim/River/named_rapid_editor_markers.json");
+            Asset->NamedRapidEditorGeometryManifest = TEXT("unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson");
+            Asset->NamedRapidSimulatorReviewRunsManifest = TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json");
             Asset->RequiredPanelIds = {
                 TEXT("map_view"),
                 TEXT("annotation_list"),
@@ -19170,6 +27185,9 @@ bool FRaftSimEditorModule::CaptureToolEvidence(FString& OutSummary)
             OutSummary += FString::Printf(TEXT("No tab available for %s\n"), *Descriptor.ToolId.ToString());
             continue;
         }
+
+        Tab->ActivateInParent(ETabActivationCause::SetDirectly);
+        PumpSlateForCapture(4);
 
         TSharedPtr<SWidget> ToolPanel = OpenedToolPanels.FindRef(Descriptor.ToolId).Pin();
         const TSharedRef<SWidget> CaptureTarget = ToolPanel.IsValid() ? ToolPanel.ToSharedRef() : Tab.ToSharedRef();
@@ -19438,17 +27456,30 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         if (Candidate.bPhysicalScaleSourceCorridor)
         {
             MaterialSettings.MacroMappingScale = static_cast<float>(Candidate.LandscapeSize - 1);
-            MaterialSettings.DetailMappingScale = 96.0f;
-            MaterialSettings.DetailAlbedoWeight = 0.10f;
-            MaterialSettings.DetailNormalWeight = 0.22f;
-            MaterialSettings.DetailSurfaceResponseWeight = 0.18f;
-            MaterialSettings.RiverbedBlendWeight = 0.18f;
-            MaterialSettings.WetBankBlendWeight = 0.24f;
+            if (Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
+            {
+                MaterialSettings.DetailMappingScale = 96.0f;
+                MaterialSettings.DetailAlbedoWeight = 0.10f;
+                MaterialSettings.DetailNormalWeight = 0.22f;
+                MaterialSettings.DetailSurfaceResponseWeight = 0.18f;
+                MaterialSettings.RiverbedBlendWeight = 0.18f;
+                MaterialSettings.WetBankBlendWeight = 0.24f;
+            }
         }
         FRaftSimLandscapeCandidateWaterSettings WaterSettings =
             GetLandscapeCandidateWaterSettings(Candidate.PreviewSpec.RiverId);
-        if (!Candidate.bUseSolverVisualizationFields)
+        if (!Candidate.bUseSolverVisualizationFields &&
+            Candidate.PreviewSpec.RiverId == TEXT("american_south_fork"))
         {
+            WaterSettings.BaseColorScale = 1.00f;
+            WaterSettings.SurfaceTint = FLinearColor(0.025f, 0.120f, 0.100f);
+            WaterSettings.VertexTintWeight = 0.72f;
+            WaterSettings.EmissiveFillScale = 0.080f;
+            WaterSettings.ReflectionFillIntensity = 0.26f;
+            WaterSettings.ReflectionTint = FLinearColor(0.36f, 0.52f, 0.60f);
+            WaterSettings.Roughness = 0.14f;
+            WaterSettings.Specular = 0.65f;
+            WaterSettings.NormalIntensity = 0.60f;
             WaterSettings.SolverFieldEnable = 0.0f;
             WaterSettings.SolverMacroNormalWeight = 0.0f;
             WaterSettings.SolverDepthColorWeight = 0.0f;
@@ -19469,6 +27500,8 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         const bool bHasSolverVisualizationFields =
             Candidate.PreviewSpec.RiverId == TEXT("american_south_fork") &&
             Candidate.bUseSolverVisualizationFields;
+        const bool bHasManifestConditionedPhysicalChannel =
+            Candidate.bPhysicalScaleSourceCorridor;
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -19534,11 +27567,20 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             TEXT("      \"landscape_material_promotion_status\": \"review_only_not_lifelike_not_gameplay_promoted\",\n")
             TEXT("      \"landscape_dressing_status\": \"%s\",\n")
             TEXT("      \"landscape_dressing_asset_count\": %d,\n")
-            TEXT("      \"landscape_dressing_boulder_asset\": \"first_party_8_ring_20_segment_irregular_procedural_mesh_with_river_specific_lit_color\",\n")
+            TEXT("      \"landscape_dressing_boulder_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_source_species_skeletal_mesh_count\": %d,\n")
             TEXT("      \"landscape_dressing_converted_species_static_mesh_count\": %d,\n")
             TEXT("      \"landscape_dressing_external_review_asset_count\": %d,\n")
             TEXT("      \"landscape_dressing_external_review_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_external_review_rock_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_external_review_rock_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_external_review_rock_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K\",\n")
+            TEXT("      \"landscape_dressing_external_review_rock_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/polyhaven_rock_moss_set_01_source_manifest.json\",\n")
+            TEXT("      \"landscape_dressing_external_review_pine_mesh_count\": %d,\n")
+            TEXT("      \"landscape_dressing_external_review_pine_status\": \"%s\",\n")
+            TEXT("      \"landscape_dressing_external_review_pine_asset_root\": \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K\",\n")
+            TEXT("      \"landscape_dressing_external_review_pine_assets\": [\"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_a_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_b_LOD0\", \"/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_c_LOD0\"],\n")
+            TEXT("      \"landscape_dressing_external_review_pine_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_asset\": \"%s\",\n")
             TEXT("      \"landscape_dressing_external_review_source_manifest\": \"unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json\",\n")
             TEXT("      \"landscape_dressing_external_review_broadleaf_asset\": \"%s\",\n")
@@ -19685,12 +27727,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             static_cast<uint32>(Result.SourceHeightMax),
             static_cast<uint32>(Result.ChannelFloor),
             Result.ChannelModifiedSampleCount,
-            Candidate.bPhysicalScaleSourceCorridor
+            bHasManifestConditionedPhysicalChannel
                 ? TEXT("source_manifest_recorded_bounded_hydrologic_channel_conditioning")
-                : TEXT("preview_only_analytic_channel_burn_for_landscape_import_validation"),
-            Candidate.bPhysicalScaleSourceCorridor
+                : (Candidate.bPhysicalScaleSourceCorridor
+                       ? TEXT("source_dem_unconditioned_channel_pending_manifest_recorded_hydrologic_conditioning")
+                       : TEXT("preview_only_analytic_channel_burn_for_landscape_import_validation")),
+            bHasManifestConditionedPhysicalChannel
                 ? TEXT("review_gated_derived_geometry_not_solver_or_surveyed_bathymetry")
-                : TEXT("not_solver_geometry_not_geospatially_approved_not_for_gameplay"),
+                : (Candidate.bPhysicalScaleSourceCorridor
+                       ? TEXT("conditioning_required_before_lifelike_review")
+                       : TEXT("not_solver_geometry_not_geospatially_approved_not_for_gameplay")),
             Result.LandscapeLocation.X,
             Result.LandscapeLocation.Y,
             Result.LandscapeLocation.Z,
@@ -19717,19 +27763,36 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             MaterialSettings.WetBankColorScale.G,
             MaterialSettings.WetBankColorScale.B,
             Result.bDressingValidated
-                ? TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured")
+                ? (Result.DressingExternalRockMeshCount == 6
+                       ? TEXT("source_mask_placed_complete_pve_species_and_rights_reviewed_rock_comparison_captured")
+                       : TEXT("source_mask_placed_complete_pve_species_and_dense_irregular_rock_evaluation_captured"))
                 : TEXT("dressing_generation_or_validation_failed"),
             Result.DressingAssetCount,
+            Result.DressingExternalRockMeshCount == 6
+                ? TEXT("rights_reviewed_cc0_poly_haven_rock_moss_set_01_six_variant_nanite_visual_comparison")
+                : TEXT("first_party_8_ring_20_segment_irregular_procedural_mesh_with_river_specific_lit_color"),
             Result.DressingSourceSkeletalMeshCount,
             Result.DressingConvertedStaticMeshCount,
             Result.DressingExternalReviewAssetCount,
-            Result.bDressingExternalBroadleafReviewAssetLoaded &&
-                    Result.bDressingExternalConiferReviewAssetLoaded
-                ? (Result.bDressingExternalBroadleafMaterialsValidated &&
-                           Result.bDressingExternalConiferMaterialsValidated
-                       ? TEXT("rights_reviewed_cc0_broadleaf_analog_and_fir_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
-                       : TEXT("rights_reviewed_cc0_tree_assets_loaded_but_material_validation_failed"))
-                : TEXT("no_external_review_asset_selected_for_this_river"),
+            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+                ? TEXT("rights_reviewed_cc0_six_rock_and_three_pine_sets_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
+                : (Result.DressingExternalRockMeshCount == 6
+                       ? TEXT("rights_reviewed_cc0_six_rock_set_loaded_with_explicit_materials_for_isolated_river_visual_comparison")
+                       : (Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                           Result.bDressingExternalConiferReviewAssetLoaded
+                       ? (Result.bDressingExternalBroadleafMaterialsValidated &&
+                                  Result.bDressingExternalConiferMaterialsValidated
+                              ? TEXT("rights_reviewed_cc0_broadleaf_analog_and_fir_loaded_with_explicit_materials_for_isolated_south_fork_visual_comparison")
+                              : TEXT("rights_reviewed_cc0_tree_assets_loaded_but_material_validation_failed"))
+                       : TEXT("no_external_review_asset_selected_for_this_river"))),
+            Result.DressingExternalRockMeshCount,
+            Result.bDressingExternalRockMaterialsValidated
+                ? TEXT("six_meshes_nanite_and_material_validated_visual_comparison_only")
+                : TEXT("no_reviewed_rock_asset_selected_for_this_river"),
+            Result.DressingExternalPineMeshCount,
+            Result.bDressingExternalPineMaterialsValidated
+                ? TEXT("three_meshes_physical_scale_nanite_and_materials_validated_sparse_visual_comparison_only")
+                : TEXT("no_reviewed_pine_asset_selected_for_this_river"),
             *EscapeRaftSimJsonString(
                 Result.bDressingExternalConiferReviewAssetLoaded
                     ? Result.DressingConiferAssetPath
@@ -19744,10 +27807,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
                     : FString()),
             *EscapeRaftSimJsonString(Result.DressingBroadleafAssetPath),
             *EscapeRaftSimJsonString(Result.DressingConiferAssetPath),
-            Result.bDressingExternalBroadleafReviewAssetLoaded &&
-                    Result.bDressingExternalConiferReviewAssetLoaded
-                ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
-                : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"),
+            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+                ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_and_sparse_three_variant_pine_hierarchical_instancing")
+                : (Result.DressingExternalRockMeshCount == 6
+                       ? TEXT("complete_pve_species_hierarchical_instancing_plus_rights_reviewed_six_variant_nanite_rock_hierarchical_instancing")
+                       : (Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                           Result.bDressingExternalConiferReviewAssetLoaded
+                       ? TEXT("complete_pve_shrub_understory_plus_rights_reviewed_broadleaf_and_fir_hierarchical_instancing_and_dense_irregular_procedural_boulders")
+                       : TEXT("complete_pve_species_skeletal_to_static_conversion_plus_hierarchical_instancing_and_dense_irregular_procedural_boulders"))),
             Result.DressingBoulderInstanceCount,
             Result.DressingFoliageInstanceCount,
             Result.DressingCanopyTreeInstanceCount,
@@ -19789,10 +27856,14 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
             Result.bDressingBroadleafMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingConiferMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
             Result.bDressingUnderstoryMeshNaniteEnabled ? TEXT("true") : TEXT("false"),
-            Result.bDressingExternalBroadleafReviewAssetLoaded &&
-                    Result.bDressingExternalConiferReviewAssetLoaded
-                ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
-                : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"),
+            Result.DressingExternalRockMeshCount == 6 && Result.DressingExternalPineMeshCount == 3
+                ? TEXT("rights_reviewed_rock_and_pine_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
+                : (Result.DressingExternalRockMeshCount == 6
+                       ? TEXT("rights_reviewed_rock_visual_comparison_only_not_geology_ecology_guide_performance_or_gameplay_promoted")
+                       : (Result.bDressingExternalBroadleafReviewAssetLoaded &&
+                           Result.bDressingExternalConiferReviewAssetLoaded
+                       ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
+                       : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"))),
             Result.bSolverSurfaceWaterMaterialBound
                 ? TEXT("solver_surface_default_lit_candidate_bound_and_captured")
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
@@ -19879,7 +27950,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllSucceeded ? TEXT("three_source_landscape_candidates_captured_review_gated") : TEXT("one_or_more_landscape_candidates_failed"),
+        bAllSucceeded ? TEXT("five_source_landscape_candidates_captured_review_gated") : TEXT("one_or_more_landscape_candidates_failed"),
         *EntriesJson);
     const FString ManifestPath = FPaths::Combine(CandidateCaptureRoot, TEXT("landscape_candidate_manifest.json"));
     const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestPath);
@@ -19888,6 +27959,2566 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         bManifestSaved ? TEXT("Saved") : TEXT("Failed"),
         *ManifestPath);
     return bAllSucceeded && bManifestSaved;
+}
+
+bool FRaftSimEditorModule::CaptureZambeziCliffComparison(FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* ZambeziCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            ZambeziCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!ZambeziCandidate)
+    {
+        OutSummary += TEXT("The Zambezi physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CliffAssetPath =
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/"
+             "SM_NamaqualandCliff02.SM_NamaqualandCliff02");
+    UStaticMesh* CliffMesh = LoadObject<UStaticMesh>(nullptr, *CliffAssetPath);
+    if (!CliffMesh)
+    {
+        OutSummary += FString::Printf(TEXT("Missing reviewed Zambezi cliff mesh %s.\n"), *CliffAssetPath);
+        return false;
+    }
+    const FVector CliffDimensionsCm =
+        GetZambeziCliffComparisonEffectiveBounds(CliffMesh).GetSize();
+    UMaterialInterface* CliffMaterial = CliffMesh->GetMaterial(0);
+    const bool bAssetValidated =
+        CliffMesh->IsNaniteEnabled() &&
+        CliffDimensionsCm.X >= 1900.0f && CliffDimensionsCm.X <= 2150.0f &&
+        CliffDimensionsCm.Y >= 550.0f && CliffDimensionsCm.Y <= 760.0f &&
+        CliffDimensionsCm.Z >= 600.0f && CliffDimensionsCm.Z <= 820.0f &&
+        CliffMaterial &&
+        CliffMaterial->GetPathName().Contains(TEXT("M_NamaqualandCliff02_ReviewLit"));
+    if (!bAssetValidated)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Reviewed cliff validation failed: Nanite=%d dimensions=(%.2f, %.2f, %.2f) material=%s.\n"),
+            CliffMesh->IsNaniteEnabled(),
+            CliffDimensionsCm.X,
+            CliffDimensionsCm.Y,
+            CliffDimensionsCm.Z,
+            CliffMaterial ? *CliffMaterial->GetPathName() : TEXT("<null>"));
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString BaselineGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_gorge_pre_namaqualand_cliff_review_guide_seat_downstream.png"));
+    FString BaselineRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_gorge_pre_namaqualand_cliff_review_river_eye_downstream.png"));
+    FString ComparisonGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_gorge_namaqualand_cliff_review_guide_seat_downstream.png"));
+    FString ComparisonRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_gorge_namaqualand_cliff_review_river_eye_downstream.png"));
+
+    const bool bBaselineGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("pre_namaqualand_cliff_review_guide_seat_downstream"),
+        TEXT("Zambezi baseline guide-seat cliff comparison"),
+        true,
+        OutSummary);
+    const bool bBaselineRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("pre_namaqualand_cliff_review_river_eye_downstream"),
+        TEXT("Zambezi baseline river-eye cliff comparison"),
+        true,
+        OutSummary);
+
+    TArray<FZambeziCliffComparisonPlacement> GuidePlacements;
+    TArray<FZambeziCliffComparisonPlacement> RiverEyePlacements;
+    auto MakeWorldSetup = [CliffMesh](TArray<FZambeziCliffComparisonPlacement>& Placements)
+    {
+        return [CliffMesh, &Placements](UWorld* World, ACameraActor* Camera, FString& Summary)
+        {
+            return AddZambeziCliffComparisonInstances(
+                World,
+                Camera,
+                CliffMesh,
+                Placements,
+                Summary);
+        };
+    };
+    const bool bComparisonGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("namaqualand_cliff_review_guide_seat_downstream"),
+        TEXT("Zambezi guide-seat Namaqualand cliff analog comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(GuidePlacements));
+    const bool bComparisonRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("namaqualand_cliff_review_river_eye_downstream"),
+        TEXT("Zambezi river-eye Namaqualand cliff analog comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(RiverEyePlacements));
+    const bool bAllCaptured =
+        bBaselineGuideCaptured && bBaselineRiverEyeCaptured &&
+        bComparisonGuideCaptured && bComparisonRiverEyeCaptured;
+
+    auto MakeVectorArray = [](const FVector& Value)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        Values.Add(MakeShared<FJsonValueNumber>(Value.X));
+        Values.Add(MakeShared<FJsonValueNumber>(Value.Y));
+        Values.Add(MakeShared<FJsonValueNumber>(Value.Z));
+        return Values;
+    };
+    auto MakePlacementArray = [&MakeVectorArray](
+                                  const TArray<FZambeziCliffComparisonPlacement>& Placements)
+    {
+        TArray<TSharedPtr<FJsonValue>> Values;
+        for (int32 Index = 0; Index < Placements.Num(); ++Index)
+        {
+            const FZambeziCliffComparisonPlacement& Placement = Placements[Index];
+            TSharedRef<FJsonObject> PlacementObject = MakeShared<FJsonObject>();
+            PlacementObject->SetNumberField(TEXT("instance_index"), Index);
+            PlacementObject->SetArrayField(TEXT("location_cm"), MakeVectorArray(Placement.Location));
+            PlacementObject->SetArrayField(
+                TEXT("rotation_degrees"),
+                MakeVectorArray(FVector(
+                    Placement.Rotation.Roll,
+                    Placement.Rotation.Pitch,
+                    Placement.Rotation.Yaw)));
+            PlacementObject->SetArrayField(TEXT("scale"), MakeVectorArray(Placement.Scale));
+            Values.Add(MakeShared<FJsonValueObject>(PlacementObject));
+        }
+        return Values;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"), TEXT("raftsim.unreal.zambezi_cliff_corridor_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("zambezi_batoka_gorge"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("paired_transient_corridor_comparison_captured_pending_human_review")
+            : TEXT("one_or_more_comparison_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetStringField(TEXT("source_map"), ZambeziCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(TEXT("asset"), CliffAssetPath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        TEXT("unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/"
+             "NamaqualandCliff02_2K/polyhaven_namaqualand_cliff_02_source_manifest.json"));
+    Report->SetStringField(
+        TEXT("geology_boundary"),
+        TEXT("South African weathered-cliff structure analog only; not Batoka basalt, surveyed gorge, collision, or gameplay authority"));
+    Report->SetArrayField(TEXT("mesh_dimensions_cm"), MakeVectorArray(CliffDimensionsCm));
+    Report->SetBoolField(TEXT("nanite_enabled"), CliffMesh->IsNaniteEnabled());
+    Report->SetStringField(TEXT("material"), CliffMaterial->GetPathName());
+    Report->SetNumberField(TEXT("instances_per_capture"), GuidePlacements.Num());
+    Report->SetArrayField(TEXT("guide_seat_placements"), MakePlacementArray(GuidePlacements));
+    Report->SetArrayField(TEXT("river_eye_placements"), MakePlacementArray(RiverEyePlacements));
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("baseline_guide_seat"), BaselineGuidePath);
+    Captures->SetStringField(TEXT("baseline_river_eye"), BaselineRiverEyePath);
+    Captures->SetStringField(TEXT("comparison_guide_seat"), ComparisonGuidePath);
+    Captures->SetStringField(TEXT("comparison_river_eye"), ComparisonRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> PromotionGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("Batoka_geology_review"),
+             TEXT("guide_and_hazard_readability_review"),
+             TEXT("repetition_and_silhouette_review"),
+             TEXT("desktop_and_VR_corridor_performance"),
+             TEXT("rights_and_attribution_audit")})
+    {
+        PromotionGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), PromotionGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("polyhaven_namaqualand_cliff_02_corridor_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Zambezi cliff corridor comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyCorridorComparison(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString BaselineGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v14_pre_instanced_material_review_guide_seat_downstream.png"));
+    FString BaselineRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v14_pre_instanced_material_review_river_eye_downstream.png"));
+    FString ComparisonGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v14_instanced_material_review_guide_seat_downstream.png"));
+    FString ComparisonRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v14_instanced_material_review_river_eye_downstream.png"));
+
+    const bool bBaselineGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("pre_native_coigue_corridor_review_guide_seat_downstream"),
+        TEXT("Futaleufu baseline guide-seat native-canopy corridor comparison"),
+        true,
+        OutSummary);
+    const bool bBaselineRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("pre_native_coigue_corridor_review_river_eye_downstream"),
+        TEXT("Futaleufu baseline river-eye native-canopy corridor comparison"),
+        true,
+        OutSummary);
+
+    FFutaleufuCanopyCorridorComparisonStats GuideStats;
+    FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::Native,
+                Stats,
+                Summary);
+        };
+    };
+    const bool bComparisonGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("native_coigue_corridor_review_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat source-masked native-coigue corridor comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(GuideStats));
+    const bool bComparisonRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("native_coigue_corridor_review_river_eye_downstream"),
+        TEXT("Futaleufu river-eye source-masked native-coigue corridor comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(RiverEyeStats));
+    const bool bAllCaptured =
+        bBaselineGuideCaptured && bBaselineRiverEyeCaptured &&
+        bComparisonGuideCaptured && bComparisonRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        Object->SetNumberField(TEXT("rejected_natural_gap_count"), Stats.RejectedNaturalGapCount);
+        Object->SetNumberField(
+            TEXT("rejected_vegetation_mask_count"),
+            Stats.RejectedVegetationMaskCount);
+        Object->SetNumberField(TEXT("rejected_water_mask_count"), Stats.RejectedWaterMaskCount);
+        Object->SetNumberField(TEXT("rejected_elevation_count"), Stats.RejectedElevationCount);
+        Object->SetNumberField(TEXT("rejected_slope_count"), Stats.RejectedSlopeCount);
+        Object->SetNumberField(TEXT("rejected_dry_aspect_count"), Stats.RejectedDryAspectCount);
+        Object->SetNumberField(TEXT("rejected_spacing_count"), Stats.RejectedSpacingCount);
+        Object->SetNumberField(
+            TEXT("minimum_accepted_slope_degrees"),
+            Stats.MinimumAcceptedSlopeDegrees);
+        Object->SetNumberField(
+            TEXT("maximum_accepted_slope_degrees"),
+            Stats.MaximumAcceptedSlopeDegrees);
+        Object->SetNumberField(
+            TEXT("minimum_accepted_elevation_m"),
+            Stats.MinimumAcceptedElevationCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("maximum_accepted_elevation_m"),
+            Stats.MaximumAcceptedElevationCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("mean_accepted_vegetation_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedVegetationMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("mean_accepted_water_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedWaterMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_corridor_comparison.v2"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("paired_source_masked_transient_corridor_comparison_captured_pending_human_review")
+            : TEXT("one_or_more_corridor_comparison_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        FutaleufuCandidate->PreviewSpec.SourceManifest);
+    Report->SetStringField(
+        TEXT("vegetation_mask"),
+        FutaleufuCandidate->PreviewSpec.VegetationMaskImage);
+    Report->SetStringField(TEXT("water_mask"), FutaleufuCandidate->PreviewSpec.WaterMaskImage);
+    Report->SetStringField(
+        TEXT("placement_boundary"),
+        TEXT("Transient review-only HISM components replace only visible temporary PVE foliage for each capture; source Landscape, dense visual terrain, physical river ribbon, water, rocks, collision, solver, and saved map remain unchanged."));
+    TSharedRef<FJsonObject> MaterialContract = MakeShared<FJsonObject>();
+    MaterialContract->SetBoolField(TEXT("bark_instanced_static_meshes_usage_persisted"), true);
+    MaterialContract->SetBoolField(TEXT("leaf_instanced_static_meshes_usage_persisted"), true);
+    MaterialContract->SetStringField(
+        TEXT("compile_order"),
+        TEXT("material expression refresh, InstancedStaticMeshes usage enablement, shader completion, package save, then HISM creation"));
+    MaterialContract->SetStringField(
+        TEXT("experiment"),
+        TEXT("V14 isolates whether the V13 corridor silhouette failure was caused by late automatic HISM shader-permutation creation"));
+    Report->SetObjectField(TEXT("material_contract"), MaterialContract);
+
+    TSharedRef<FJsonObject> Placement = MakeShared<FJsonObject>();
+    Placement->SetStringField(
+        TEXT("mask_mapping"),
+        TEXT("north-up source image UV mapped over the physical Landscape bounds; Unreal +Y follows source rows south from the northwest corner"));
+    Placement->SetStringField(
+        TEXT("distribution"),
+        TEXT("Halton low-discrepancy candidates with 15 m minimum-spacing rejection and three macro plus deterministic micro canopy gaps"));
+    Placement->SetNumberField(TEXT("target_tree_count_per_view"), 1200);
+    Placement->SetNumberField(TEXT("centerline_progress_min"), 0.55);
+    Placement->SetNumberField(TEXT("centerline_progress_max"), 0.91);
+    Placement->SetNumberField(TEXT("river_setback_m"), 65.0);
+    Placement->SetNumberField(TEXT("maximum_lateral_offset_m"), 300.0);
+    Placement->SetNumberField(TEXT("minimum_spacing_m"), 15.0);
+    Placement->SetNumberField(TEXT("minimum_vegetation_mask"), 0.34);
+    Placement->SetNumberField(TEXT("maximum_water_mask"), 0.28);
+    Placement->SetNumberField(TEXT("minimum_elevation_m"), 100.0);
+    Placement->SetNumberField(TEXT("maximum_elevation_m"), 900.0);
+    Placement->SetNumberField(TEXT("maximum_slope_degrees"), 39.0);
+    Placement->SetStringField(
+        TEXT("aspect_treatment"),
+        TEXT("Moist southwest-facing and flat sites retained; dry-aspect candidates below 0.28 suitability are deterministically thinned by 52 percent."));
+    Placement->SetNumberField(TEXT("near_full_representation_max_distance_m"), 300.0);
+    Placement->SetNumberField(TEXT("mid_representation_max_distance_m"), 500.0);
+    Placement->SetStringField(
+        TEXT("far_representation"),
+        TEXT("v12 runtime far crown beyond 500 m; 94-percent family resource reduction measured in the isolated benchmark"));
+    Report->SetObjectField(TEXT("placement_contract"), Placement);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("baseline_guide_seat"), BaselineGuidePath);
+    Captures->SetStringField(TEXT("baseline_river_eye"), BaselineRiverEyePath);
+    Captures->SetStringField(TEXT("comparison_guide_seat"), ComparisonGuidePath);
+    Captures->SetStringField(TEXT("comparison_river_eye"), ComparisonRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("guide_seat_stats"), MakeStatsObject(GuideStats));
+    Report->SetObjectField(TEXT("river_eye_stats"), MakeStatsObject(RiverEyeStats));
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("moving_camera_transition_and_temporal_wind_review"),
+             TEXT("second_native_canopy_species_and_understory_strata"),
+             TEXT("guide_ecology_and_hazard_readability_review"),
+             TEXT("masked_overdraw_streaming_and_culling_measurement"),
+             TEXT("packaged_desktop_and_on_device_VR_performance")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v14_instanced_material_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy corridor comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyRenderDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString ShadowlessGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png"));
+    FString ShadowlessRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png"));
+    FString OpaqueGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v15_opaque_leaf_no_shadows_guide_seat_downstream.png"));
+    FString OpaqueRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v15_opaque_leaf_no_shadows_river_eye_downstream.png"));
+
+    FFutaleufuCanopyCorridorComparisonStats ShadowlessGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats ShadowlessRiverEyeStats;
+    FFutaleufuCanopyCorridorComparisonStats OpaqueGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats OpaqueRiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+
+    const bool bShadowlessGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ShadowlessGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat native leaf material with leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeLeavesNoShadow,
+            ShadowlessGuideStats));
+    const bool bShadowlessRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ShadowlessRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream"),
+        TEXT("Futaleufu river-eye native leaf material with leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeLeavesNoShadow,
+            ShadowlessRiverEyeStats));
+    const bool bOpaqueGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        OpaqueGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v15_opaque_leaf_no_shadows_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat opaque diagnostic leaf cards with shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::OpaqueLeavesNoShadow,
+            OpaqueGuideStats));
+    const bool bOpaqueRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        OpaqueRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v15_opaque_leaf_no_shadows_river_eye_downstream"),
+        TEXT("Futaleufu river-eye opaque diagnostic leaf cards with shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::OpaqueLeavesNoShadow,
+            OpaqueRiverEyeStats));
+    const bool bAllCaptured =
+        bShadowlessGuideCaptured && bShadowlessRiverEyeCaptured &&
+        bOpaqueGuideCaptured && bOpaqueRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        Object->SetNumberField(TEXT("rejected_natural_gap_count"), Stats.RejectedNaturalGapCount);
+        Object->SetNumberField(TEXT("rejected_vegetation_mask_count"), Stats.RejectedVegetationMaskCount);
+        Object->SetNumberField(TEXT("rejected_water_mask_count"), Stats.RejectedWaterMaskCount);
+        Object->SetNumberField(TEXT("rejected_elevation_count"), Stats.RejectedElevationCount);
+        Object->SetNumberField(TEXT("rejected_slope_count"), Stats.RejectedSlopeCount);
+        Object->SetNumberField(TEXT("rejected_dry_aspect_count"), Stats.RejectedDryAspectCount);
+        Object->SetNumberField(TEXT("rejected_spacing_count"), Stats.RejectedSpacingCount);
+        return Object;
+    };
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount &&
+            A.RejectedNaturalGapCount == B.RejectedNaturalGapCount &&
+            A.RejectedVegetationMaskCount == B.RejectedVegetationMaskCount &&
+            A.RejectedWaterMaskCount == B.RejectedWaterMaskCount &&
+            A.RejectedElevationCount == B.RejectedElevationCount &&
+            A.RejectedSlopeCount == B.RejectedSlopeCount &&
+            A.RejectedDryAspectCount == B.RejectedDryAspectCount &&
+            A.RejectedSpacingCount == B.RejectedSpacingCount;
+    };
+    const bool bPlacementCountsIdentical =
+        PlacementCountsMatch(ShadowlessGuideStats, OpaqueGuideStats) &&
+        PlacementCountsMatch(ShadowlessRiverEyeStats, OpaqueRiverEyeStats);
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_render_diagnostic.v15"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("controlled_leaf_shadow_and_opaque_card_diagnostics_captured_pending_human_review")
+            : TEXT("one_or_more_render_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("native_reference_guide_seat"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v14_instanced_material_review_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("native_reference_river_eye"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v14_instanced_material_review_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("Camera, exposure, source masks, tree transforms, near/mid/far meshes, terrain, water, rocks, collision, custom C++ solver, and GeoClaw reference remain fixed; only leaf shadow casting and the leaf material override vary."));
+
+    TSharedRef<FJsonObject> RenderModes = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> ShadowlessMode = MakeShared<FJsonObject>();
+    ShadowlessMode->SetStringField(TEXT("leaf_material"), TEXT("native masked TwoSidedFoliage"));
+    ShadowlessMode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+    ShadowlessMode->SetBoolField(TEXT("trunk_and_branchlet_cast_shadow"), true);
+    RenderModes->SetObjectField(TEXT("native_leaves_no_shadow"), ShadowlessMode);
+    TSharedRef<FJsonObject> OpaqueMode = MakeShared<FJsonObject>();
+    OpaqueMode->SetStringField(TEXT("leaf_material"), TEXT("opaque two-sided DefaultLit diagnostic green"));
+    OpaqueMode->SetArrayField(
+        TEXT("linear_color_rgba"),
+        {
+            MakeShared<FJsonValueNumber>(0.045),
+            MakeShared<FJsonValueNumber>(0.31),
+            MakeShared<FJsonValueNumber>(0.065),
+            MakeShared<FJsonValueNumber>(1.0),
+        });
+    OpaqueMode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+    OpaqueMode->SetBoolField(TEXT("trunk_and_branchlet_cast_shadow"), true);
+    RenderModes->SetObjectField(TEXT("opaque_leaves_no_shadow"), OpaqueMode);
+    Report->SetObjectField(TEXT("render_modes"), RenderModes);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("native_leaves_no_shadow_guide_seat"), ShadowlessGuidePath);
+    Captures->SetStringField(TEXT("native_leaves_no_shadow_river_eye"), ShadowlessRiverEyePath);
+    Captures->SetStringField(TEXT("opaque_leaves_no_shadow_guide_seat"), OpaqueGuidePath);
+    Captures->SetStringField(TEXT("opaque_leaves_no_shadow_river_eye"), OpaqueRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(TEXT("native_leaves_no_shadow_guide_seat"), MakeStatsObject(ShadowlessGuideStats));
+    Stats->SetObjectField(TEXT("native_leaves_no_shadow_river_eye"), MakeStatsObject(ShadowlessRiverEyeStats));
+    Stats->SetObjectField(TEXT("opaque_leaves_no_shadow_guide_seat"), MakeStatsObject(OpaqueGuideStats));
+    Stats->SetObjectField(TEXT("opaque_leaves_no_shadow_river_eye"), MakeStatsObject(OpaqueRiverEyeStats));
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+
+    TArray<TSharedPtr<FJsonValue>> Questions;
+    Questions.Add(MakeShared<FJsonValueString>(
+        TEXT("Do the elongated black ground marks disappear when native leaf shadows are disabled?")));
+    Questions.Add(MakeShared<FJsonValueString>(
+        TEXT("Do opaque cards reveal retained crown geometry at near, mid, and runtime-far distances?")));
+    Questions.Add(MakeShared<FJsonValueString>(
+        TEXT("Does the remaining failure localize to opacity/mips, foliage lighting/transmission, shadows, or insufficient distance-crown geometry?")));
+    Report->SetArrayField(TEXT("human_review_questions"), Questions);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v15_leaf_shadow_opacity_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V15 render diagnostic report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyOpacityDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *Spec.GetTextureAssetPath(),
+            *Spec.GetTextureAssetName());
+        UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+        if (!Texture)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Futaleufu V16 opacity diagnostic could not load texture %s.\n"),
+                *ObjectPath);
+            return false;
+        }
+        NativeTextures.Add(Spec.MapKey, Texture);
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    UTexture2D* LeafAlbedo = NativeTextures.FindRef(TEXT("LeafAlbedoOpacity"));
+    if (!LeafMaterial || !LeafAlbedo)
+    {
+        OutSummary += TEXT("Futaleufu V16 opacity diagnostic could not rebuild the parameterized native leaf material.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString AlphaScaleGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png"));
+    FString AlphaScaleRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png"));
+    FString ConstantOpacityGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v16_native_constant_opacity_no_shadows_guide_seat_downstream.png"));
+    FString ConstantOpacityRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v16_native_constant_opacity_no_shadows_river_eye_downstream.png"));
+
+    FFutaleufuCanopyCorridorComparisonStats AlphaScaleGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats AlphaScaleRiverEyeStats;
+    FFutaleufuCanopyCorridorComparisonStats ConstantOpacityGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats ConstantOpacityRiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+
+    const bool bAlphaScaleGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        AlphaScaleGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat native TwoSidedFoliage with 4x opacity scale and leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow,
+            AlphaScaleGuideStats));
+    const bool bAlphaScaleRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        AlphaScaleRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream"),
+        TEXT("Futaleufu river-eye native TwoSidedFoliage with 4x opacity scale and leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow,
+            AlphaScaleRiverEyeStats));
+    const bool bConstantOpacityGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ConstantOpacityGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v16_native_constant_opacity_no_shadows_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat native TwoSidedFoliage with constant opacity and leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow,
+            ConstantOpacityGuideStats));
+    const bool bConstantOpacityRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        ConstantOpacityRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v16_native_constant_opacity_no_shadows_river_eye_downstream"),
+        TEXT("Futaleufu river-eye native TwoSidedFoliage with constant opacity and leaf shadows disabled"),
+        true,
+        OutSummary,
+        MakeWorldSetup(
+            EFutaleufuCanopyCorridorRenderMode::NativeConstantOpacityNoShadow,
+            ConstantOpacityRiverEyeStats));
+    const bool bAllCaptured =
+        bAlphaScaleGuideCaptured && bAlphaScaleRiverEyeCaptured &&
+        bConstantOpacityGuideCaptured && bConstantOpacityRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    const bool bPlacementCountsIdentical =
+        PlacementCountsMatch(AlphaScaleGuideStats, ConstantOpacityGuideStats) &&
+        PlacementCountsMatch(AlphaScaleRiverEyeStats, ConstantOpacityRiverEyeStats);
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_same_shader_opacity_diagnostic.v16"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("same_shader_alpha_scale_and_constant_opacity_diagnostics_captured_pending_human_review")
+            : TEXT("one_or_more_same_shader_opacity_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("shadowless_native_reference_guide_seat"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("shadowless_native_reference_river_eye"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The native masked TwoSidedFoliage shader, textures, cutoff, source masks, tree transforms, near/mid/far meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed; only LeafOpacityScale or LeafOpacityOverride varies, and leaf shadows remain disabled."));
+
+    TSharedRef<FJsonObject> TextureContract = MakeShared<FJsonObject>();
+    TextureContract->SetBoolField(TEXT("has_alpha_channel"), LeafAlbedo->HasAlphaChannel());
+    TextureContract->SetBoolField(TEXT("compression_no_alpha"), LeafAlbedo->CompressionNoAlpha);
+    TextureContract->SetBoolField(
+        TEXT("scale_mips_for_alpha_coverage"),
+        LeafAlbedo->bDoScaleMipsForAlphaCoverage);
+    TextureContract->SetArrayField(
+        TEXT("alpha_coverage_thresholds_rgba"),
+        {
+            MakeShared<FJsonValueNumber>(LeafAlbedo->AlphaCoverageThresholds.X),
+            MakeShared<FJsonValueNumber>(LeafAlbedo->AlphaCoverageThresholds.Y),
+            MakeShared<FJsonValueNumber>(LeafAlbedo->AlphaCoverageThresholds.Z),
+            MakeShared<FJsonValueNumber>(LeafAlbedo->AlphaCoverageThresholds.W),
+        });
+    TextureContract->SetBoolField(TEXT("sharpen5_mips"), LeafAlbedo->MipGenSettings == TMGS_Sharpen5);
+    TextureContract->SetBoolField(TEXT("never_stream"), LeafAlbedo->NeverStream);
+    TextureContract->SetBoolField(TEXT("virtual_texture_streaming"), LeafAlbedo->VirtualTextureStreaming);
+    Report->SetObjectField(TEXT("leaf_texture_contract"), TextureContract);
+
+    TSharedRef<FJsonObject> MaterialContract = MakeShared<FJsonObject>();
+    MaterialContract->SetStringField(TEXT("blend_mode"), TEXT("masked"));
+    MaterialContract->SetStringField(TEXT("shading_model"), TEXT("TwoSidedFoliage"));
+    MaterialContract->SetNumberField(TEXT("opacity_mask_clip_value"), LeafMaterial->OpacityMaskClipValue);
+    MaterialContract->SetBoolField(TEXT("two_sided"), LeafMaterial->TwoSided);
+    MaterialContract->SetBoolField(TEXT("dithered_lod_transition"), LeafMaterial->DitheredLODTransition);
+    MaterialContract->SetNumberField(TEXT("default_leaf_opacity_scale"), 1.0);
+    MaterialContract->SetNumberField(TEXT("default_leaf_opacity_override"), 0.0);
+    Report->SetObjectField(TEXT("leaf_material_contract"), MaterialContract);
+
+    TSharedRef<FJsonObject> RenderModes = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> AlphaScaleMode = MakeShared<FJsonObject>();
+    AlphaScaleMode->SetNumberField(TEXT("LeafOpacityScale"), 4.0);
+    AlphaScaleMode->SetNumberField(TEXT("LeafOpacityOverride"), 0.0);
+    AlphaScaleMode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+    RenderModes->SetObjectField(TEXT("native_alpha_scale_4_no_shadow"), AlphaScaleMode);
+    TSharedRef<FJsonObject> ConstantOpacityMode = MakeShared<FJsonObject>();
+    ConstantOpacityMode->SetNumberField(TEXT("LeafOpacityScale"), 1.0);
+    ConstantOpacityMode->SetNumberField(TEXT("LeafOpacityOverride"), 1.0);
+    ConstantOpacityMode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+    RenderModes->SetObjectField(TEXT("native_constant_opacity_no_shadow"), ConstantOpacityMode);
+    Report->SetObjectField(TEXT("render_modes"), RenderModes);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("native_alpha_scale_4_no_shadow_guide_seat"), AlphaScaleGuidePath);
+    Captures->SetStringField(TEXT("native_alpha_scale_4_no_shadow_river_eye"), AlphaScaleRiverEyePath);
+    Captures->SetStringField(TEXT("native_constant_opacity_no_shadow_guide_seat"), ConstantOpacityGuidePath);
+    Captures->SetStringField(TEXT("native_constant_opacity_no_shadow_river_eye"), ConstantOpacityRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(TEXT("native_alpha_scale_4_no_shadow_guide_seat"), MakeStatsObject(AlphaScaleGuideStats));
+    Stats->SetObjectField(TEXT("native_alpha_scale_4_no_shadow_river_eye"), MakeStatsObject(AlphaScaleRiverEyeStats));
+    Stats->SetObjectField(TEXT("native_constant_opacity_no_shadow_guide_seat"), MakeStatsObject(ConstantOpacityGuideStats));
+    Stats->SetObjectField(TEXT("native_constant_opacity_no_shadow_river_eye"), MakeStatsObject(ConstantOpacityRiverEyeStats));
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v16_same_shader_opacity_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V16 same-shader opacity report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyLightingDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *Spec.GetTextureAssetPath(),
+            *Spec.GetTextureAssetName());
+        UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+        if (!Texture)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Futaleufu V17 lighting diagnostic could not load texture %s.\n"),
+                *ObjectPath);
+            return false;
+        }
+        NativeTextures.Add(Spec.MapKey, Texture);
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V17 lighting diagnostic could not rebuild the parameterized native leaf material.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+
+    struct FFutaleufuLightingDiagnostic
+    {
+        EFutaleufuCanopyCorridorRenderMode RenderMode =
+            EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow;
+        FString Token;
+        FString Description;
+        FString GuidePath;
+        FString RiverEyePath;
+        FFutaleufuCanopyCorridorComparisonStats GuideStats;
+        FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+        bool bGuideCaptured = false;
+        bool bRiverEyeCaptured = false;
+    };
+    TArray<FFutaleufuLightingDiagnostic> Diagnostics;
+    auto AddDiagnostic = [&Diagnostics, &CaptureRelativeRoot](
+                             EFutaleufuCanopyCorridorRenderMode RenderMode,
+                             const TCHAR* Token,
+                             const TCHAR* Description)
+    {
+        FFutaleufuLightingDiagnostic& Diagnostic = Diagnostics.AddDefaulted_GetRef();
+        Diagnostic.RenderMode = RenderMode;
+        Diagnostic.Token = Token;
+        Diagnostic.Description = Description;
+        Diagnostic.GuidePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v17_%s_guide_seat_downstream.png"), Token));
+        Diagnostic.RiverEyePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v17_%s_river_eye_downstream.png"), Token));
+    };
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow,
+        TEXT("alpha4_ao_off_no_shadows"),
+        TEXT("native TwoSidedFoliage with 4x alpha, AO influence zero, and leaf shadows disabled"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourFlatNormalNoShadow,
+        TEXT("alpha4_flat_normal_no_shadows"),
+        TEXT("native TwoSidedFoliage with 4x alpha, flat two-sided normals, and leaf shadows disabled"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow,
+        TEXT("alpha4_emissive_035_no_shadows"),
+        TEXT("native TwoSidedFoliage with 4x alpha, diagnostic emissive 0.35, and leaf shadows disabled"));
+
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+    bool bAllCaptured = true;
+    for (FFutaleufuLightingDiagnostic& Diagnostic : Diagnostics)
+    {
+        Diagnostic.bGuideCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v17_%s_guide_seat_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu guide-seat %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.GuideStats));
+        Diagnostic.bRiverEyeCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v17_%s_river_eye_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu river-eye %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.RiverEyeStats));
+        bAllCaptured &= Diagnostic.bGuideCaptured && Diagnostic.bRiverEyeCaptured;
+    }
+
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    bool bPlacementCountsIdentical = Diagnostics.Num() == 3;
+    for (int32 Index = 1; Index < Diagnostics.Num(); ++Index)
+    {
+        bPlacementCountsIdentical &=
+            PlacementCountsMatch(Diagnostics[0].GuideStats, Diagnostics[Index].GuideStats) &&
+            PlacementCountsMatch(Diagnostics[0].RiverEyeStats, Diagnostics[Index].RiverEyeStats);
+    }
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_lighting_diagnostic.v17"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("controlled_ao_normal_and_diagnostic_emissive_splits_captured_pending_human_review")
+            : TEXT("one_or_more_lighting_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("alpha4_reference_guide_seat"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("alpha4_reference_river_eye"),
+        FPaths::Combine(
+            CaptureRelativeRoot,
+            TEXT("futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The 4x restored-alpha silhouette, native masked TwoSidedFoliage graph, textures, source masks, transforms, meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed. AO influence, normal strength, or diagnostic emissive changes independently; leaf shadows remain disabled."));
+
+    TSharedRef<FJsonObject> MaterialDefaults = MakeShared<FJsonObject>();
+    MaterialDefaults->SetNumberField(TEXT("LeafOpacityScale"), 1.0);
+    MaterialDefaults->SetNumberField(TEXT("LeafOpacityOverride"), 0.0);
+    MaterialDefaults->SetNumberField(TEXT("LeafAOInfluence"), 0.55);
+    MaterialDefaults->SetNumberField(TEXT("LeafNormalStrength"), 1.0);
+    MaterialDefaults->SetNumberField(TEXT("LeafDiagnosticEmissive"), 0.0);
+    Report->SetObjectField(TEXT("retained_neutral_material_defaults"), MaterialDefaults);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Modes = MakeShared<FJsonObject>();
+    for (const FFutaleufuLightingDiagnostic& Diagnostic : Diagnostics)
+    {
+        Captures->SetStringField(Diagnostic.Token + TEXT("_guide_seat"), Diagnostic.GuidePath);
+        Captures->SetStringField(Diagnostic.Token + TEXT("_river_eye"), Diagnostic.RiverEyePath);
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_guide_seat"), MakeStatsObject(Diagnostic.GuideStats));
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_river_eye"), MakeStatsObject(Diagnostic.RiverEyeStats));
+        TSharedRef<FJsonObject> Mode = MakeShared<FJsonObject>();
+        Mode->SetNumberField(TEXT("LeafOpacityScale"), 4.0);
+        Mode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+        Mode->SetNumberField(
+            TEXT("LeafAOInfluence"),
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourAoOffNoShadow
+                ? 0.0
+                : 0.55);
+        Mode->SetNumberField(
+            TEXT("LeafNormalStrength"),
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourFlatNormalNoShadow
+                ? 0.0
+                : 1.0);
+        Mode->SetNumberField(
+            TEXT("LeafDiagnosticEmissive"),
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow
+                ? 0.35
+                : 0.0);
+        Mode->SetBoolField(
+            TEXT("promotion_eligible"),
+            Diagnostic.RenderMode != EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourEmissiveNoShadow);
+        Modes->SetObjectField(Diagnostic.Token, Mode);
+    }
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+    Report->SetObjectField(TEXT("render_modes"), Modes);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v17_lighting_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V17 lighting diagnostic report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyCorridorLightRigDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *Spec.GetTextureAssetPath(),
+            *Spec.GetTextureAssetName());
+        UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+        if (!Texture)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Futaleufu V18 light-rig diagnostic could not load texture %s.\n"),
+                *ObjectPath);
+            return false;
+        }
+        NativeTextures.Add(Spec.MapKey, Texture);
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V18 light-rig diagnostic could not rebuild the neutral native leaf material.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+
+    struct FFutaleufuLightRigDiagnostic
+    {
+        EFutaleufuCanopyCorridorLightingTreatment Treatment =
+            EFutaleufuCanopyCorridorLightingTreatment::Baseline;
+        FString Token;
+        FString Description;
+        FString GuidePath;
+        FString RiverEyePath;
+        FFutaleufuCanopyCorridorComparisonStats GuideStats;
+        FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+        bool bGuideCaptured = false;
+        bool bRiverEyeCaptured = false;
+    };
+    TArray<FFutaleufuLightRigDiagnostic> Diagnostics;
+    auto AddDiagnostic = [&Diagnostics, &CaptureRelativeRoot](
+                             EFutaleufuCanopyCorridorLightingTreatment Treatment,
+                             const TCHAR* Token,
+                             const TCHAR* Description)
+    {
+        FFutaleufuLightRigDiagnostic& Diagnostic = Diagnostics.AddDefaulted_GetRef();
+        Diagnostic.Treatment = Treatment;
+        Diagnostic.Token = Token;
+        Diagnostic.Description = Description;
+        Diagnostic.GuidePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v18_%s_guide_seat_downstream.png"), Token));
+        Diagnostic.RiverEyePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v18_%s_river_eye_downstream.png"), Token));
+    };
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorLightingTreatment::Baseline,
+        TEXT("alpha4_baseline_no_shadows"),
+        TEXT("saved corridor light rig with neutral material, 4x alpha, and leaf shadows disabled"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill,
+        TEXT("alpha4_isolated_fill_no_shadows"),
+        TEXT("transient isolated-review 0.75 front fill, 0.38 back fill, and 1.65 skylight"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorLightingTreatment::SkyLightDouble,
+        TEXT("alpha4_skylight_310_no_shadows"),
+        TEXT("transient recaptured 3.10 skylight with no added fill lights"));
+
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorLightingTreatment Treatment,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, Treatment, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            if (!AddFutaleufuCanopyCorridorComparisonInstances(
+                    World,
+                    Camera,
+                    *FutaleufuCandidate,
+                    EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow,
+                    Stats,
+                    Summary))
+            {
+                return false;
+            }
+            return ApplyFutaleufuCanopyCorridorLightingTreatment(World, Treatment, Summary);
+        };
+    };
+
+    bool bAllCaptured = true;
+    for (FFutaleufuLightRigDiagnostic& Diagnostic : Diagnostics)
+    {
+        Diagnostic.bGuideCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v18_%s_guide_seat_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu guide-seat %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.Treatment, Diagnostic.GuideStats));
+        Diagnostic.bRiverEyeCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v18_%s_river_eye_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu river-eye %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.Treatment, Diagnostic.RiverEyeStats));
+        bAllCaptured &= Diagnostic.bGuideCaptured && Diagnostic.bRiverEyeCaptured;
+    }
+
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    bool bPlacementCountsIdentical = Diagnostics.Num() == 3;
+    for (int32 Index = 1; Index < Diagnostics.Num(); ++Index)
+    {
+        bPlacementCountsIdentical &=
+            PlacementCountsMatch(Diagnostics[0].GuideStats, Diagnostics[Index].GuideStats) &&
+            PlacementCountsMatch(Diagnostics[0].RiverEyeStats, Diagnostics[Index].RiverEyeStats);
+    }
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_corridor_light_rig_diagnostic.v18"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("controlled_baseline_fill_and_skylight_splits_captured_pending_human_review")
+            : TEXT("one_or_more_light_rig_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The neutral masked TwoSidedFoliage graph, 4x opacity diagnostic, disabled leaf shadows, source masks, transforms, meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed. Only transient unsaved direct-fill or skylight intensity changes."));
+
+    TSharedRef<FJsonObject> SavedLighting = MakeShared<FJsonObject>();
+    SavedLighting->SetNumberField(TEXT("sun_intensity"), 4.75);
+    SavedLighting->SetNumberField(TEXT("skylight_intensity"), 1.55);
+    SavedLighting->SetNumberField(TEXT("exposure_compensation"), -0.16);
+    SavedLighting->SetNumberField(TEXT("fog_density"), 0.0055);
+    Report->SetObjectField(TEXT("saved_corridor_photometry"), SavedLighting);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Treatments = MakeShared<FJsonObject>();
+    for (const FFutaleufuLightRigDiagnostic& Diagnostic : Diagnostics)
+    {
+        Captures->SetStringField(Diagnostic.Token + TEXT("_guide_seat"), Diagnostic.GuidePath);
+        Captures->SetStringField(Diagnostic.Token + TEXT("_river_eye"), Diagnostic.RiverEyePath);
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_guide_seat"), MakeStatsObject(Diagnostic.GuideStats));
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_river_eye"), MakeStatsObject(Diagnostic.RiverEyeStats));
+        TSharedRef<FJsonObject> Treatment = MakeShared<FJsonObject>();
+        Treatment->SetNumberField(TEXT("LeafOpacityScale"), 4.0);
+        Treatment->SetBoolField(TEXT("leaf_cast_shadow"), false);
+        Treatment->SetNumberField(TEXT("LeafAOInfluence"), 0.55);
+        Treatment->SetNumberField(TEXT("LeafNormalStrength"), 1.0);
+        Treatment->SetNumberField(TEXT("LeafDiagnosticEmissive"), 0.0);
+        Treatment->SetNumberField(
+            TEXT("skylight_intensity"),
+            Diagnostic.Treatment == EFutaleufuCanopyCorridorLightingTreatment::Baseline
+                ? 1.55
+                : (Diagnostic.Treatment == EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill
+                       ? 1.65
+                       : 3.10));
+        Treatment->SetNumberField(
+            TEXT("front_fill_intensity"),
+            Diagnostic.Treatment == EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill
+                ? 0.75
+                : 0.0);
+        Treatment->SetNumberField(
+            TEXT("back_fill_intensity"),
+            Diagnostic.Treatment == EFutaleufuCanopyCorridorLightingTreatment::IsolatedReviewFill
+                ? 0.38
+                : 0.0);
+        Treatment->SetBoolField(TEXT("saved_to_source_map"), false);
+        Treatment->SetBoolField(TEXT("promotion_eligible"), false);
+        Treatments->SetObjectField(Diagnostic.Token, Treatment);
+    }
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+    Report->SetObjectField(TEXT("lighting_treatments"), Treatments);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v18_corridor_light_rig_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V18 corridor light-rig report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyReflectanceDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *Spec.GetTextureAssetPath(),
+            *Spec.GetTextureAssetName());
+        UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+        if (!Texture)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Futaleufu V19 reflectance diagnostic could not load texture %s.\n"),
+                *ObjectPath);
+            return false;
+        }
+        NativeTextures.Add(Spec.MapKey, Texture);
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V19 reflectance diagnostic could not rebuild the neutral native leaf material.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+
+    struct FFutaleufuReflectanceDiagnostic
+    {
+        EFutaleufuCanopyCorridorRenderMode RenderMode =
+            EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow;
+        FString Token;
+        FString Description;
+        FString GuidePath;
+        FString RiverEyePath;
+        FFutaleufuCanopyCorridorComparisonStats GuideStats;
+        FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+        bool bGuideCaptured = false;
+        bool bRiverEyeCaptured = false;
+    };
+    TArray<FFutaleufuReflectanceDiagnostic> Diagnostics;
+    auto AddDiagnostic = [&Diagnostics, &CaptureRelativeRoot](
+                             EFutaleufuCanopyCorridorRenderMode RenderMode,
+                             const TCHAR* Token,
+                             const TCHAR* Description)
+    {
+        FFutaleufuReflectanceDiagnostic& Diagnostic = Diagnostics.AddDefaulted_GetRef();
+        Diagnostic.RenderMode = RenderMode;
+        Diagnostic.Token = Token;
+        Diagnostic.Description = Description;
+        Diagnostic.GuidePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v19_%s_guide_seat_downstream.png"), Token));
+        Diagnostic.RiverEyePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v19_%s_river_eye_downstream.png"), Token));
+    };
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow,
+        TEXT("alpha4_basecolor_236_no_shadows"),
+        TEXT("native foliage with LeafBaseColorScale 2.36 and neutral transmission"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourTransmissionWhiteNoShadow,
+        TEXT("alpha4_white_transmission_no_shadows"),
+        TEXT("native foliage with LeafBaseColorScale 1.18 and neutral-white transmission"));
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow,
+        TEXT("alpha4_basecolor_236_white_transmission_no_shadows"),
+        TEXT("native foliage with LeafBaseColorScale 2.36 and neutral-white transmission"));
+
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+
+    bool bAllCaptured = true;
+    for (FFutaleufuReflectanceDiagnostic& Diagnostic : Diagnostics)
+    {
+        Diagnostic.bGuideCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v19_%s_guide_seat_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu guide-seat %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.GuideStats));
+        Diagnostic.bRiverEyeCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v19_%s_river_eye_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu river-eye %s"), *Diagnostic.Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.RiverEyeStats));
+        bAllCaptured &= Diagnostic.bGuideCaptured && Diagnostic.bRiverEyeCaptured;
+    }
+
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    bool bPlacementCountsIdentical = Diagnostics.Num() == 3;
+    for (int32 Index = 1; Index < Diagnostics.Num(); ++Index)
+    {
+        bPlacementCountsIdentical &=
+            PlacementCountsMatch(Diagnostics[0].GuideStats, Diagnostics[Index].GuideStats) &&
+            PlacementCountsMatch(Diagnostics[0].RiverEyeStats, Diagnostics[Index].RiverEyeStats);
+    }
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_reflectance_diagnostic.v19"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("controlled_basecolor_transmission_and_interaction_splits_captured_pending_human_review")
+            : TEXT("one_or_more_reflectance_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("alpha4_reference_guide_seat"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("alpha4_reference_river_eye"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("Saved corridor lighting, exposure, native textures and graph, 4x opacity diagnostic, disabled leaf shadows, AO, normals, emissive, masks, placement, geometry, cameras, terrain, water, rocks, and physics authority remain fixed. Base-color scale and transmission tint change independently, followed by an interaction control."));
+
+    TSharedRef<FJsonObject> MaterialDefaults = MakeShared<FJsonObject>();
+    MaterialDefaults->SetNumberField(TEXT("LeafBaseColorScale"), 1.18);
+    MaterialDefaults->SetStringField(TEXT("LeafTransmissionTint"), TEXT("0.55,0.78,0.36"));
+    MaterialDefaults->SetNumberField(TEXT("LeafOpacityScale"), 1.0);
+    MaterialDefaults->SetNumberField(TEXT("LeafAOInfluence"), 0.55);
+    MaterialDefaults->SetNumberField(TEXT("LeafNormalStrength"), 1.0);
+    MaterialDefaults->SetNumberField(TEXT("LeafDiagnosticEmissive"), 0.0);
+    Report->SetObjectField(TEXT("retained_neutral_material_defaults"), MaterialDefaults);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Modes = MakeShared<FJsonObject>();
+    for (const FFutaleufuReflectanceDiagnostic& Diagnostic : Diagnostics)
+    {
+        Captures->SetStringField(Diagnostic.Token + TEXT("_guide_seat"), Diagnostic.GuidePath);
+        Captures->SetStringField(Diagnostic.Token + TEXT("_river_eye"), Diagnostic.RiverEyePath);
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_guide_seat"), MakeStatsObject(Diagnostic.GuideStats));
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_river_eye"), MakeStatsObject(Diagnostic.RiverEyeStats));
+        const bool bDoubleBaseColor =
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleNoShadow ||
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow;
+        const bool bWhiteTransmission =
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourTransmissionWhiteNoShadow ||
+            Diagnostic.RenderMode == EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourBaseColorDoubleTransmissionWhiteNoShadow;
+        TSharedRef<FJsonObject> Mode = MakeShared<FJsonObject>();
+        Mode->SetNumberField(TEXT("LeafOpacityScale"), 4.0);
+        Mode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+        Mode->SetNumberField(TEXT("LeafBaseColorScale"), bDoubleBaseColor ? 2.36 : 1.18);
+        Mode->SetStringField(
+            TEXT("LeafTransmissionTint"),
+            bWhiteTransmission ? TEXT("1,1,1") : TEXT("0.55,0.78,0.36"));
+        Mode->SetNumberField(TEXT("LeafAOInfluence"), 0.55);
+        Mode->SetNumberField(TEXT("LeafNormalStrength"), 1.0);
+        Mode->SetNumberField(TEXT("LeafDiagnosticEmissive"), 0.0);
+        Mode->SetBoolField(TEXT("promotion_eligible"), false);
+        Modes->SetObjectField(Diagnostic.Token, Mode);
+    }
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+    Report->SetObjectField(TEXT("render_modes"), Modes);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v19_reflectance_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V19 reflectance report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyShadingModelDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec :
+         GetFutaleufuNativeCanopyTextureAssetSpecs())
+    {
+        const FString ObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *Spec.GetTextureAssetPath(),
+            *Spec.GetTextureAssetName());
+        UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+        if (!Texture)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Futaleufu V20 shading-model diagnostic could not load texture %s.\n"),
+                *ObjectPath);
+            return false;
+        }
+        NativeTextures.Add(Spec.MapKey, Texture);
+    }
+    UMaterial* NativeLeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    UMaterial* DefaultLitLeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves_DefaultLitDiagnostic"),
+        true,
+        NativeTextures,
+        OutSummary,
+        true);
+    if (!NativeLeafMaterial || !DefaultLitLeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V20 shading-model diagnostic could not build both leaf materials.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+
+    struct FFutaleufuShadingModelDiagnostic
+    {
+        EFutaleufuCanopyCorridorRenderMode RenderMode =
+            EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourNoShadow;
+        FString Token;
+        double BaseColorScale = 1.18;
+        FString GuidePath;
+        FString RiverEyePath;
+        FFutaleufuCanopyCorridorComparisonStats GuideStats;
+        FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+        bool bGuideCaptured = false;
+        bool bRiverEyeCaptured = false;
+    };
+    TArray<FFutaleufuShadingModelDiagnostic> Diagnostics;
+    auto AddDiagnostic = [&Diagnostics, &CaptureRelativeRoot](
+                             EFutaleufuCanopyCorridorRenderMode RenderMode,
+                             const TCHAR* Token,
+                             double BaseColorScale)
+    {
+        FFutaleufuShadingModelDiagnostic& Diagnostic = Diagnostics.AddDefaulted_GetRef();
+        Diagnostic.RenderMode = RenderMode;
+        Diagnostic.Token = Token;
+        Diagnostic.BaseColorScale = BaseColorScale;
+        Diagnostic.GuidePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v20_%s_guide_seat_downstream.png"), Token));
+        Diagnostic.RiverEyePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v20_%s_river_eye_downstream.png"), Token));
+    };
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourNoShadow,
+        TEXT("defaultlit_alpha4_basecolor_118_no_shadows"),
+        1.18);
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::DefaultLitAlphaScaleFourBaseColorDoubleNoShadow,
+        TEXT("defaultlit_alpha4_basecolor_236_no_shadows"),
+        2.36);
+
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+
+    bool bAllCaptured = true;
+    for (FFutaleufuShadingModelDiagnostic& Diagnostic : Diagnostics)
+    {
+        const FString Description = FString::Printf(
+            TEXT("masked DefaultLit same-texture foliage with LeafBaseColorScale %.2f"),
+            Diagnostic.BaseColorScale);
+        Diagnostic.bGuideCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v20_%s_guide_seat_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu guide-seat %s"), *Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.GuideStats));
+        Diagnostic.bRiverEyeCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v20_%s_river_eye_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu river-eye %s"), *Description),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.RiverEyeStats));
+        bAllCaptured &= Diagnostic.bGuideCaptured && Diagnostic.bRiverEyeCaptured;
+    }
+
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    const bool bPlacementCountsIdentical = Diagnostics.Num() == 2 &&
+        PlacementCountsMatch(Diagnostics[0].GuideStats, Diagnostics[1].GuideStats) &&
+        PlacementCountsMatch(Diagnostics[0].RiverEyeStats, Diagnostics[1].RiverEyeStats);
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_shading_model_diagnostic.v20"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("same_texture_defaultlit_pairs_captured_pending_human_review")
+            : TEXT("one_or_more_shading_model_diagnostics_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("defaultlit_material"),
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/M_RaftSim_FutaleufuCoigue_Leaves_DefaultLitDiagnostic"));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The source leaf textures, masked opacity graph, 4x opacity diagnostic, two-sided geometry, normal graph, base-color scales, saved corridor lighting, shadows, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. DefaultLit omits only the TwoSidedFoliage-specific subsurface input."));
+
+    TSharedRef<FJsonObject> References = MakeShared<FJsonObject>();
+    References->SetStringField(
+        TEXT("twosidedfoliage_basecolor_118_guide_seat"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png")));
+    References->SetStringField(
+        TEXT("twosidedfoliage_basecolor_118_river_eye"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png")));
+    References->SetStringField(
+        TEXT("twosidedfoliage_basecolor_236_guide_seat"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v19_alpha4_basecolor_236_no_shadows_guide_seat_downstream.png")));
+    References->SetStringField(
+        TEXT("twosidedfoliage_basecolor_236_river_eye"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v19_alpha4_basecolor_236_no_shadows_river_eye_downstream.png")));
+    Report->SetObjectField(TEXT("twosidedfoliage_references"), References);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Modes = MakeShared<FJsonObject>();
+    for (const FFutaleufuShadingModelDiagnostic& Diagnostic : Diagnostics)
+    {
+        Captures->SetStringField(Diagnostic.Token + TEXT("_guide_seat"), Diagnostic.GuidePath);
+        Captures->SetStringField(Diagnostic.Token + TEXT("_river_eye"), Diagnostic.RiverEyePath);
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_guide_seat"), MakeStatsObject(Diagnostic.GuideStats));
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_river_eye"), MakeStatsObject(Diagnostic.RiverEyeStats));
+        TSharedRef<FJsonObject> Mode = MakeShared<FJsonObject>();
+        Mode->SetStringField(TEXT("shading_model"), TEXT("DefaultLit"));
+        Mode->SetBoolField(TEXT("masked"), true);
+        Mode->SetBoolField(TEXT("two_sided_geometry"), true);
+        Mode->SetNumberField(TEXT("LeafOpacityScale"), 4.0);
+        Mode->SetNumberField(TEXT("LeafBaseColorScale"), Diagnostic.BaseColorScale);
+        Mode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+        Mode->SetBoolField(TEXT("promotion_eligible"), false);
+        Modes->SetObjectField(Diagnostic.Token, Mode);
+    }
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+    Report->SetObjectField(TEXT("render_modes"), Modes);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v20_shading_model_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V20 shading-model report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyMipPaddingDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    if (!CreateFutaleufuNativeCanopyTextureAssets(NativeTextures, OutSummary))
+    {
+        OutSummary += TEXT("Futaleufu V21 mip-padding diagnostic could not import the corrected native textures.\n");
+        return false;
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V21 mip-padding diagnostic could not rebuild native TwoSidedFoliage.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString GuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png"));
+    FString RiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png"));
+    FFutaleufuCanopyCorridorComparisonStats GuideStats;
+    FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleFourNoShadow,
+                Stats,
+                Summary);
+        };
+    };
+    const bool bGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        GuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat alpha-preserved per-tile RGB-padded native foliage"),
+        true,
+        OutSummary,
+        MakeWorldSetup(GuideStats));
+    const bool bRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        RiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream"),
+        TEXT("Futaleufu river-eye alpha-preserved per-tile RGB-padded native foliage"),
+        true,
+        OutSummary,
+        MakeWorldSetup(RiverEyeStats));
+    const bool bAllCaptured = bGuideCaptured && bRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_mip_padding_diagnostic.v21"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("alpha_preserved_rgb_padded_native_pair_captured_pending_human_review")
+            : TEXT("one_or_more_mip_padding_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        TEXT("unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/futaleufu_native_canopy_texture_manifest.json"));
+    Report->SetStringField(
+        TEXT("reference_guide_seat"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("reference_river_eye"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The alpha channel, nontransparent source RGB, normal and packed texture sources, native TwoSidedFoliage graph and defaults, 4x opacity diagnostic, disabled leaf shadows, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Only RGB at alpha <=2 is padded up to 24 pixels within each atlas tile before Unreal mip generation."));
+
+    TSharedRef<FJsonObject> PaddingContract = MakeShared<FJsonObject>();
+    PaddingContract->SetNumberField(TEXT("padding_pixels"), 24);
+    PaddingContract->SetNumberField(TEXT("alpha_threshold_255"), 2);
+    PaddingContract->SetNumberField(TEXT("atlas_columns"), 4);
+    PaddingContract->SetNumberField(TEXT("atlas_rows"), 4);
+    PaddingContract->SetBoolField(TEXT("tile_boundary_crossing_allowed"), false);
+    PaddingContract->SetBoolField(TEXT("alpha_preserved_byte_for_byte"), true);
+    PaddingContract->SetBoolField(TEXT("nontransparent_rgb_preserved_byte_for_byte"), true);
+    PaddingContract->SetStringField(
+        TEXT("alpha_sha256"),
+        TEXT("c8b8ce2baab7a740417696a9e3cfdbcd5ad42458ed30828358922d473e1c18c6"));
+    PaddingContract->SetStringField(
+        TEXT("nontransparent_rgb_sha256"),
+        TEXT("0a4101494bd6a579e8fc0390da9cc13bd2f51f0d9735d5e44e7a1095b552ae16"));
+    PaddingContract->SetNumberField(TEXT("padded_transparent_pixel_count"), 517669);
+    Report->SetObjectField(TEXT("padding_contract"), PaddingContract);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("guide_seat"), GuidePath);
+    Captures->SetStringField(TEXT("river_eye"), RiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    TSharedRef<FJsonObject> PlacementStats = MakeShared<FJsonObject>();
+    PlacementStats->SetObjectField(TEXT("guide_seat"), MakeStatsObject(GuideStats));
+    PlacementStats->SetObjectField(TEXT("river_eye"), MakeStatsObject(RiverEyeStats));
+    Report->SetObjectField(TEXT("placement_stats"), PlacementStats);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v21_mip_padding_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V21 mip-padding report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyOpacitySelectionDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    if (!CreateFutaleufuNativeCanopyTextureAssets(NativeTextures, OutSummary))
+    {
+        OutSummary += TEXT("Futaleufu V22 opacity-selection diagnostic could not import the corrected native textures.\n");
+        return false;
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V22 opacity-selection diagnostic could not rebuild native TwoSidedFoliage.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    struct FFutaleufuOpacitySelectionDiagnostic
+    {
+        EFutaleufuCanopyCorridorRenderMode RenderMode =
+            EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow;
+        FString Token;
+        double OpacityScale = 2.0;
+        FString GuidePath;
+        FString RiverEyePath;
+        FFutaleufuCanopyCorridorComparisonStats GuideStats;
+        FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+        bool bGuideCaptured = false;
+        bool bRiverEyeCaptured = false;
+    };
+    TArray<FFutaleufuOpacitySelectionDiagnostic> Diagnostics;
+    auto AddDiagnostic = [&Diagnostics, &CaptureRelativeRoot](
+                             EFutaleufuCanopyCorridorRenderMode RenderMode,
+                             const TCHAR* Token,
+                             double OpacityScale)
+    {
+        FFutaleufuOpacitySelectionDiagnostic& Diagnostic = Diagnostics.AddDefaulted_GetRef();
+        Diagnostic.RenderMode = RenderMode;
+        Diagnostic.Token = Token;
+        Diagnostic.OpacityScale = OpacityScale;
+        Diagnostic.GuidePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v22_%s_guide_seat_downstream.png"), Token));
+        Diagnostic.RiverEyePath = FPaths::Combine(
+            CaptureRelativeRoot,
+            FString::Printf(TEXT("futaleufu_v22_%s_river_eye_downstream.png"), Token));
+    };
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow,
+        TEXT("rgb_padded_alpha2_no_shadows"),
+        2.0);
+    AddDiagnostic(
+        EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleThreeNoShadow,
+        TEXT("rgb_padded_alpha3_no_shadows"),
+        3.0);
+
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              EFutaleufuCanopyCorridorRenderMode RenderMode,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, RenderMode, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                RenderMode,
+                Stats,
+                Summary);
+        };
+    };
+    bool bAllCaptured = true;
+    for (FFutaleufuOpacitySelectionDiagnostic& Diagnostic : Diagnostics)
+    {
+        Diagnostic.bGuideCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.GuidePath,
+            TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v22_%s_guide_seat_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu guide-seat RGB-padded alpha %.0f native foliage"), Diagnostic.OpacityScale),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.GuideStats));
+        Diagnostic.bRiverEyeCaptured = CapturePreviewImageForSpec(
+            FutaleufuCandidate->PreviewSpec,
+            CaptureRoot,
+            Diagnostic.RiverEyePath,
+            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+            FString::Printf(TEXT("futaleufu_v22_%s_river_eye_downstream"), *Diagnostic.Token),
+            FString::Printf(TEXT("Futaleufu river-eye RGB-padded alpha %.0f native foliage"), Diagnostic.OpacityScale),
+            true,
+            OutSummary,
+            MakeWorldSetup(Diagnostic.RenderMode, Diagnostic.RiverEyeStats));
+        bAllCaptured &= Diagnostic.bGuideCaptured && Diagnostic.bRiverEyeCaptured;
+    }
+
+    auto PlacementCountsMatch = [](const FFutaleufuCanopyCorridorComparisonStats& A,
+                                   const FFutaleufuCanopyCorridorComparisonStats& B)
+    {
+        return A.CandidateCount == B.CandidateCount &&
+            A.AcceptedTreeCount == B.AcceptedTreeCount &&
+            A.NearTreeCount == B.NearTreeCount &&
+            A.MidTreeCount == B.MidTreeCount &&
+            A.FarTreeCount == B.FarTreeCount &&
+            A.HiddenFallbackActorCount == B.HiddenFallbackActorCount;
+    };
+    const bool bPlacementCountsIdentical = Diagnostics.Num() == 2 &&
+        PlacementCountsMatch(Diagnostics[0].GuideStats, Diagnostics[1].GuideStats) &&
+        PlacementCountsMatch(Diagnostics[0].RiverEyeStats, Diagnostics[1].RiverEyeStats);
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_opacity_selection_diagnostic.v22"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bPlacementCountsIdentical
+            ? TEXT("rgb_padded_alpha2_and_alpha3_pairs_captured_pending_human_review")
+            : TEXT("one_or_more_opacity_selection_captures_failed_or_changed_placement"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("placement_counts_identical_between_render_modes"), bPlacementCountsIdentical);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("alpha4_reference_guide_seat"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png")));
+    Report->SetStringField(
+        TEXT("alpha4_reference_river_eye"),
+        FPaths::Combine(CaptureRelativeRoot, TEXT("futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png")));
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The corrected RGB-padded atlas and alpha, native TwoSidedFoliage graph and neutral reflectance/transmission/AO/normal/emissive defaults, disabled leaf shadows, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Only LeafOpacityScale changes from the retained alpha4 reference to 2 or 3."));
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    TSharedRef<FJsonObject> Modes = MakeShared<FJsonObject>();
+    for (const FFutaleufuOpacitySelectionDiagnostic& Diagnostic : Diagnostics)
+    {
+        Captures->SetStringField(Diagnostic.Token + TEXT("_guide_seat"), Diagnostic.GuidePath);
+        Captures->SetStringField(Diagnostic.Token + TEXT("_river_eye"), Diagnostic.RiverEyePath);
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_guide_seat"), MakeStatsObject(Diagnostic.GuideStats));
+        Stats->SetObjectField(Diagnostic.Token + TEXT("_river_eye"), MakeStatsObject(Diagnostic.RiverEyeStats));
+        TSharedRef<FJsonObject> Mode = MakeShared<FJsonObject>();
+        Mode->SetNumberField(TEXT("LeafOpacityScale"), Diagnostic.OpacityScale);
+        Mode->SetNumberField(TEXT("LeafBaseColorScale"), 1.18);
+        Mode->SetStringField(TEXT("LeafTransmissionTint"), TEXT("0.55,0.78,0.36"));
+        Mode->SetBoolField(TEXT("leaf_cast_shadow"), false);
+        Mode->SetBoolField(TEXT("promotion_eligible"), false);
+        Modes->SetObjectField(Diagnostic.Token, Mode);
+    }
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+    Report->SetObjectField(TEXT("placement_stats"), Stats);
+    Report->SetObjectField(TEXT("render_modes"), Modes);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v22_opacity_selection_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V22 opacity-selection report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bPlacementCountsIdentical && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    TMap<FString, UTexture2D*> NativeTextures;
+    if (!CreateFutaleufuNativeCanopyTextureAssets(NativeTextures, OutSummary))
+    {
+        OutSummary += TEXT("Futaleufu V23 bounded-shadow diagnostic could not import the corrected native textures.\n");
+        return false;
+    }
+    UMaterial* LeafMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCoigue_Leaves"),
+        true,
+        NativeTextures,
+        OutSummary);
+    if (!LeafMaterial)
+    {
+        OutSummary += TEXT("Futaleufu V23 bounded-shadow diagnostic could not rebuild native TwoSidedFoliage.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString GuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_guide_seat_downstream.png"));
+    FString RiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_river_eye_downstream.png"));
+    const FString GuideReferencePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v22_rgb_padded_alpha2_no_shadows_guide_seat_downstream.png"));
+    const FString RiverEyeReferencePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v22_rgb_padded_alpha2_no_shadows_river_eye_downstream.png"));
+    const bool bReferencesExist =
+        FPaths::FileExists(FPaths::Combine(GetRepoRoot(), GuideReferencePath)) &&
+        FPaths::FileExists(FPaths::Combine(GetRepoRoot(), RiverEyeReferencePath));
+
+    FFutaleufuCanopyCorridorComparisonStats GuideStats;
+    FFutaleufuCanopyCorridorComparisonStats RiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoBoundedShadow,
+                Stats,
+                Summary);
+        };
+    };
+    const bool bGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        GuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat RGB-padded alpha2 bounded near dynamic shadows"),
+        true,
+        OutSummary,
+        MakeWorldSetup(GuideStats));
+    const bool bRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        RiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_river_eye_downstream"),
+        TEXT("Futaleufu river-eye RGB-padded alpha2 bounded near dynamic shadows"),
+        true,
+        OutSummary,
+        MakeWorldSetup(RiverEyeStats));
+    const bool bAllCaptured = bGuideCaptured && bRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(TEXT("hidden_fallback_pve_actor_count"), Stats.HiddenFallbackActorCount);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_native_canopy_bounded_shadow_diagnostic.v23"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bReferencesExist
+            ? TEXT("alpha2_bounded_near_shadow_pair_captured_pending_artifact_review")
+            : TEXT("bounded_shadow_capture_or_reference_missing"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("collision_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("no_shadow_references_exist"), bReferencesExist);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("control_boundary"),
+        TEXT("The corrected RGB-padded atlas, alpha2 dynamic material, native TwoSidedFoliage graph and neutral reflectance/transmission/AO/normal/emissive defaults, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Relative to V22 alpha2, only near-representation leaf dynamic shadows are enabled; mid and runtime-far leaf shadows, static shadows, contact shadows, distance-field lighting, and dynamic indirect lighting remain disabled."));
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("guide_seat_bounded_shadow"), GuidePath);
+    Captures->SetStringField(TEXT("river_eye_bounded_shadow"), RiverEyePath);
+    Captures->SetStringField(TEXT("guide_seat_no_shadow_reference"), GuideReferencePath);
+    Captures->SetStringField(TEXT("river_eye_no_shadow_reference"), RiverEyeReferencePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TSharedRef<FJsonObject> PlacementStats = MakeShared<FJsonObject>();
+    PlacementStats->SetObjectField(TEXT("guide_seat"), MakeStatsObject(GuideStats));
+    PlacementStats->SetObjectField(TEXT("river_eye"), MakeStatsObject(RiverEyeStats));
+    Report->SetObjectField(TEXT("placement_stats"), PlacementStats);
+
+    TSharedRef<FJsonObject> ShadowPolicy = MakeShared<FJsonObject>();
+    ShadowPolicy->SetNumberField(TEXT("LeafOpacityScale"), 2.0);
+    ShadowPolicy->SetStringField(TEXT("shadowed_leaf_representation"), TEXT("near_only"));
+    ShadowPolicy->SetNumberField(TEXT("near_leaf_cull_distance_cm"), 38000);
+    ShadowPolicy->SetBoolField(TEXT("cast_shadow"), true);
+    ShadowPolicy->SetBoolField(TEXT("cast_dynamic_shadow"), true);
+    ShadowPolicy->SetBoolField(TEXT("cast_static_shadow"), false);
+    ShadowPolicy->SetBoolField(TEXT("cast_contact_shadow"), false);
+    ShadowPolicy->SetBoolField(TEXT("affect_distance_field_lighting"), false);
+    ShadowPolicy->SetBoolField(TEXT("affect_dynamic_indirect_lighting"), false);
+    ShadowPolicy->SetBoolField(TEXT("mid_leaf_cast_shadow"), false);
+    ShadowPolicy->SetBoolField(TEXT("runtime_far_leaf_cast_shadow"), false);
+    Report->SetObjectField(TEXT("bounded_shadow_policy"), ShadowPolicy);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v23_bounded_shadow_diagnostic_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu native-canopy V23 bounded-shadow report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReferencesExist && bReportSaved;
 }
 
 bool FRaftSimEditorModule::CapturePhotorealEnvironmentPreviews(FString& OutSummary)

@@ -1,0 +1,85 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_same_shader_opacity_review.v16",
+  "river_id": "futaleufu_terminator",
+  "status": "alpha_visibility_failure_confirmed_lit_foliage_response_still_near_black_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "opacity_parameters_retained_with_neutral_defaults": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v16_same_shader_opacity_diagnostic_report.json",
+  "decision": "retain_parameterized_native_material_and_geometry_reject_alpha_scale_4_and_constant_opacity_visual_promotion",
+  "diagnostic_conclusions": {
+    "live_texture_has_alpha": true,
+    "live_texture_preserves_alpha_in_compression": true,
+    "alpha_coverage_mip_scaling_enabled": true,
+    "sharpen5_mips_enabled": true,
+    "texture_streaming_or_virtual_texture_loss_present": false,
+    "alpha_scale_4_restores_crown_silhouette": true,
+    "alpha_scale_4_nearly_matches_constant_opacity": true,
+    "alpha_scale_4_is_bounded_visual_candidate": false,
+    "native_two_sided_foliage_response_remains_near_black": true,
+    "source_leaf_rgb_is_intrinsically_black": false,
+    "ao_normal_or_lighting_response_requires_split_test": true
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "shadowless_native_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png",
+      "shadowless_native_reference_sha256": "39ff116db3b6d3682831acd5b913abaecaf25bfbafd208ccaa4f206bb24a5864",
+      "alpha_scale_4": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png",
+      "alpha_scale_4_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "constant_opacity": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_constant_opacity_no_shadows_guide_seat_downstream.png",
+      "constant_opacity_sha256": "22115342f7fcfe793d32fc1a62074b36b0765420cbdbdc57f150dc5fdefa846e",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_shadowless_native_to_alpha_scale_4": 0.034025607638888886,
+      "changed_pixel_fraction_alpha_scale_4_to_constant_opacity": 0.00013780381944444444,
+      "mean_absolute_rgb_delta_alpha_scale_4_to_constant_opacity": [0.0003656684027777778, 0.00045355902777777777, 0.00016493055555555556],
+      "dark_pixel_fraction": {
+        "shadowless_native_reference": 0.00015625,
+        "alpha_scale_4": 0.011155598958333334,
+        "constant_opacity": 0.011158854166666666
+      }
+    },
+    "river_eye": {
+      "shadowless_native_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png",
+      "shadowless_native_reference_sha256": "ce250b0aebc1490bb6cd932372e836b5314e1050274d516177821233ba22b8c6",
+      "alpha_scale_4": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png",
+      "alpha_scale_4_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "constant_opacity": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_constant_opacity_no_shadows_river_eye_downstream.png",
+      "constant_opacity_sha256": "2e6cd468c6fd51e8c0a758954657cc3d6ff66ba2a4162e9eddf8030258178aea",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_shadowless_native_to_alpha_scale_4": 0.07214735243055556,
+      "changed_pixel_fraction_alpha_scale_4_to_constant_opacity": 0.0004991319444444444,
+      "mean_absolute_rgb_delta_alpha_scale_4_to_constant_opacity": [0.0028255208333333335, 0.002880859375, 0.0014116753472222222],
+      "dark_pixel_fraction": {
+        "shadowless_native_reference": 0.0006217447916666667,
+        "alpha_scale_4": 0.02832465277777778,
+        "constant_opacity": 0.028350694444444446
+      }
+    }
+  },
+  "source_leaf_rgb_evidence": {
+    "selection": "mip-0 atlas pixels with alpha greater than 0.5",
+    "mean_rgb_255": [81.86273956298828, 111.59679412841797, 47.95236587524414],
+    "median_luma_255": 97.42279999999998,
+    "interpretation": "The project-owned leaf atlas contains readable olive-green source color; near-black corridor crowns are not explained by source RGB."
+  },
+  "accepted_findings": [
+    "The live Unreal texture reports alpha present, CompressionNoAlpha false, Sharpen5 mips, alpha-coverage scaling at 0.5, NeverStream true, and virtual texturing false.",
+    "A 4x opacity scale restores the retained near, mid, and runtime-far crown silhouettes under the same masked TwoSidedFoliage shader.",
+    "The 4x-alpha and constant-opacity captures differ in fewer than 0.05 percent of pixels, proving that 4x scaling effectively saturates the sampled corridor card opacity.",
+    "LeafOpacityScale and LeafOpacityOverride remain exposed with neutral defaults of 1 and 0 for controlled diagnostics and later bounded tuning."
+  ],
+  "rejection_reasons": [
+    "Both restored silhouettes render as nearly black crown masses, increasing dark-image coverage to 1.12 percent in guide-seat and 2.83 percent in river-eye.",
+    "The 4x scale destroys useful alpha discrimination at corridor distance and is visually equivalent to the proof-only constant-opacity mode.",
+    "Neither mode produces leaf-shaped green breakup, plausible transmission, readable crown interiors, or photoreal distance response.",
+    "The material response still requires separate AO, normal, transmission, and lighting diagnostics before any corridor promotion."
+  ],
+  "next_iteration_requirements": [
+    "Hold 4x alpha and leaf shadows off while testing AO influence, flat versus sampled two-sided normals, and a bounded diagnostic emissive independently.",
+    "Use the split to choose a physically lit material correction; diagnostic emissive may localize the issue but cannot be promoted as a substitute for correct lighting.",
+    "After fixing foliage response, lower opacity amplification until leaf-shaped breakup survives distance without converging to constant-opacity crown masses.",
+    "Repeat both corridor views before mixed-species ecology or production substitution."
+  ]
+}

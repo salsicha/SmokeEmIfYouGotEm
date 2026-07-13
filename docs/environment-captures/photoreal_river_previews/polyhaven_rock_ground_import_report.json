@@ -1,0 +1,29 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_rock_ground_4k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "rock_ground_diff_4k.jpg",
+      "sha256": "1bd796dcfb07bf473732f53ade9bd6c27f56df5150f6f120b9aeb5994884cce7",
+      "bytes": 11382047
+    },
+    {
+      "relative_path": "rock_ground_nor_gl_4k.jpg",
+      "sha256": "ddbff689451fd5ef8a88dacc596b23ccad5a3651a19d86e37282e40553152bca",
+      "bytes": 20844654
+    },
+    {
+      "relative_path": "rock_ground_rough_4k.jpg",
+      "sha256": "a6ba535fb2138e1e6c5c3fa6a52a770580d4139d1640ba21b8fb4b07bb3b36c6",
+      "bytes": 7272979
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/T_RockGround_BaseColor_4K.T_RockGround_BaseColor_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/T_RockGround_NormalGL_4K.T_RockGround_NormalGL_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/T_RockGround_Roughness_4K.T_RockGround_Roughness_4K"
+  ]
+}

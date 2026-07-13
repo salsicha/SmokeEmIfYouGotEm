@@ -1,0 +1,159 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_authoring.v1",
+  "river_id": "futaleufu_terminator",
+  "status": "v10_silhouette_and_resource_pass_closeup_topology_rejected_v11_pending",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": {
+    "scientific_name": "Austrocedrus chilensis",
+    "common_names": ["cipres de la cordillera", "cordilleran cypress"],
+    "family": "Cupressaceae",
+    "role": "second native canopy stratum, north/east dry-slope grove, and conifer silhouette accent"
+  },
+  "authority_sources": [
+    {
+      "title": "Reserva Nacional Futaleufu",
+      "publisher": "Corporacion Nacional Forestal (CONAF)",
+      "url": "https://www.conaf.cl/parque_nacionales/reserva-nacional-futaleufu/",
+      "retrieved": "2026-07-12",
+      "authority": "local forest type, exposure, grove form, and southern-range context",
+      "facts_used": [
+        "The species forms locally near-pure groves in the north of the reserve.",
+        "Those groves are associated with north and east exposures.",
+        "The Futaleufu reserve is at the species' southern distribution limit."
+      ]
+    },
+    {
+      "title": "Reserva Nacional Futaleufu - ecosystems",
+      "publisher": "Ministerio del Medio Ambiente de Chile, SIMBIO",
+      "url": "https://simbio.mma.gob.cl/CbaAP/Details/993",
+      "retrieved": "2026-07-12",
+      "authority": "local watershed association and protected-area ecosystem inventory",
+      "facts_used": [
+        "Austrocedrus chilensis and Nothofagus dombeyi form a mapped evergreen Andean forest association.",
+        "The association occupies 1293.181 hectares, or 9.875 percent, of the listed protected-area ecosystem inventory.",
+        "The reserve lies in the Rio Futaleufu watershed and Valdivian temperate forest ecoregion."
+      ]
+    },
+    {
+      "title": "Austrocedrus chilensis native-species dossier",
+      "publisher": "Instituto Forestal de Chile (INFOR)",
+      "url": "https://bibliotecadigital.infor.cl/bitstream/handle/20.500.12220/33116/33116.pdf?isAllowed=y&sequence=3",
+      "retrieved": "2026-07-12",
+      "authority": "species morphology, national range, elevation, and habitat",
+      "facts_used": [
+        "The Chilean range extends through Los Lagos, principally in the Andean foothills and cordillera.",
+        "The reported elevation range is approximately 400 to 1500 meters, with greatest abundance from 700 to 1200 meters.",
+        "Trees are evergreen and may reach 25 meters tall and 2 meters trunk diameter.",
+        "Bark is rough, brown low on the trunk, and ash-gray above.",
+        "Opposite overlapping scale leaves are dimorphic, with lateral leaves up to 3 millimeters and facial leaves about 1 millimeter."
+      ]
+    }
+  ],
+  "link_only_visual_references": [
+    {
+      "title": "Austrocedrus chilensis",
+      "publisher": "Arauco Chile biodiversity catalog",
+      "url": "https://arauco.com/chile/sostenibilidad/austrocedrus-chilensis/",
+      "retrieved": "2026-07-12",
+      "use": "temporary human review of dense feathery scale-leaf sprays, red-brown twigs, compact crown, and rough bark",
+      "content_vendored": false,
+      "derivative_pixels_used": false
+    },
+    {
+      "title": "Austrocedrus chilensis description and photo index",
+      "publisher": "The Gymnosperm Database",
+      "url": "https://www.conifers.org/cu/Austrocedrus.php",
+      "retrieved": "2026-07-12",
+      "use": "temporary human review of dense flat shoots and red-brown thread-peeling bark",
+      "content_vendored": false,
+      "derivative_pixels_used": false
+    }
+  ],
+  "provenance_and_rights_boundary": {
+    "external_images_vendored": false,
+    "external_geometry_vendored": false,
+    "external_texture_pixels_vendored": false,
+    "stored_material": "source URLs, publishers, retrieval dates, and bounded factual summaries only",
+    "future_asset_ownership": "project-authored geometry, textures, materials, wind data, and procedural recipes",
+    "field_reference_requirement": "guide or first-party field imagery should validate corridor frequency and visual phenotype before production promotion",
+    "source_limit": "protected-area and species sources establish local plausibility, not exact tree locations along the runnable corridor"
+  },
+  "ecological_placement_contract": {
+    "source_authority_elevation_m": [400.0, 1500.0],
+    "initial_corridor_review_elevation_m": [400.0, 900.0],
+    "required_geographic_aspects": ["north", "northeast", "east"],
+    "true_north_transform_required": true,
+    "minimum_slope_degrees_review_heuristic": 6.0,
+    "maximum_slope_degrees_review_heuristic": 39.0,
+    "minimum_river_setback_m_review_heuristic": 65.0,
+    "minimum_vegetation_mask_value": 0.34,
+    "maximum_water_mask_value": 0.20,
+    "distribution": "clustered near-pure groves with sparse coigue transition edges, never uniform one-for-one mixing",
+    "grove_radius_m_review_range": [45.0, 120.0],
+    "within_grove_spacing_m_review_range": [5.0, 12.0],
+    "maximum_share_of_total_corridor_canopy_review_heuristic": 0.18,
+    "excluded_bands": [
+      "wet low riparian shelf",
+      "active gravel bar",
+      "water mask",
+      "south- and west-facing moist coigue-dominant slope",
+      "unverified protected or sensitive location"
+    ]
+  },
+  "asset_contract": {
+    "texture_candidate_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_texture_manifest.json",
+    "height_classes_m": [[2.5, 7.0], [7.0, 15.0], [15.0, 25.0]],
+    "adult_variants": [
+      "open_grown_conical",
+      "closed_grove_columnar",
+      "rocky_slope_asymmetric",
+      "storm_damaged",
+      "coigue_transition_edge"
+    ],
+    "intermediate_variants": [
+      "grove_intermediate",
+      "suppressed_intermediate",
+      "released_intermediate"
+    ],
+    "bark": "rough vertically fibrous brown lower trunk transitioning toward ash gray above",
+    "foliage_representation": "small overlapping scale leaves authored as layered branch sprays, not broadleaf cards or individually modeled millimeter leaves",
+    "near_lod": "modeled primary and secondary branches with masked multi-spray foliage clusters",
+    "mid_lod": "reduced branch structure with merged alpha-preserving spray clusters",
+    "runtime_far_lod": "registered sparse silhouette clusters plus trunk, measured before corridor use",
+    "texture_requirements": [
+      "project-owned periodic bark albedo, normal, and AO-roughness-height maps",
+      "project-owned non-overlapping cypress branch-spray atlas with opacity, normal, roughness, and subsurface inputs",
+      "tile-bounded transparent RGB mip padding from the first generated version",
+      "neutral material defaults with all corridor tuning exposed through instances"
+    ],
+    "shadow_policy": "disabled for initial corridor ecology captures; any later shadow-pass density or proxy must pass V23 off-crown and crown-photometry gates",
+    "collision_policy": "visual HISM review instances remain transient and non-colliding; gameplay collision authority is unchanged"
+  },
+  "promotion_gates": {
+    "isolated": [
+      "two adult and one intermediate turntable azimuth per form",
+      "bark and scale-leaf spray closeups",
+      "60 meter and 150 meter silhouette captures",
+      "Metal material and alpha-mip validation",
+      "no broadleaf identity, opaque card walls, black branch marks, or repeated conical clones"
+    ],
+    "corridor": [
+      "aspect and elevation placement audit",
+      "guide-seat, river-eye, and high-bank ecology captures",
+      "coigue transition edge and near-pure grove review",
+      "moving-camera temporal stability",
+      "packaged desktop and on-device VR performance",
+      "guide or local ecology review of abundance and placement"
+    ],
+    "automatic_reject_conditions": [
+      "uniform corridor-wide distribution",
+      "placement below 400 meters without direct field evidence",
+      "placement without a verified true-north transform",
+      "external source pixels or geometry copied without redistribution approval",
+      "shadow treatment that reintroduces V15 ground carpets or V23 crown collapse",
+      "production claim based only on protected-area plausibility"
+    ]
+  },
+  "next_step": "Build V11 with irregular grouped, curved, and variably ascending primary systems instead of evenly spaced horizontal shelves. Align one or two V10 broad cards to each authored branch system, preserve the V10 near/far foreground-silhouette floor and reduced card budget, move closeup evidence to exposed outer terminal attachments, retain exact actor-root fallback authority, and keep corridor placement closed until topology, overdraw, temporal, ecology, desktop, and VR gates pass."
+}

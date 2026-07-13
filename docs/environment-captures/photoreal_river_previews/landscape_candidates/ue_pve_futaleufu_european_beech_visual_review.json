@@ -1,0 +1,88 @@
+{
+  "schema": "raftsim.unreal.local_pve_visual_comparison_review.v1",
+  "candidate_id": "ue_5_8_pve_futaleufu_european_beech",
+  "river_id": "futaleufu_terminator",
+  "status": "rejected_at_isolated_visual_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "reject_all_four_variants_for_futaleufu_canopy_use",
+  "decision_basis": [
+    "Beech 01 and 02 are tall but sparse, top-heavy, and visually thin at river distance.",
+    "Beech 03 is a sparse juvenile structure that nearly disappears in the 60 m view.",
+    "Beech 04 has greater local leaf mass but reads as a dark shrub-like silhouette and also loses useful canopy character at 60 m.",
+    "The installed twig materials render excessively dark under the fixed Futaleufu review photometry and do not provide stable layered crown breakup.",
+    "Fagus sylvatica is a non-native structure analog and cannot establish Patagonian or Nothofagus ecology approval."
+  ],
+  "review_contract": {
+    "engine_version": "5.8",
+    "rhi": "offscreen Metal",
+    "capture_resolution": [1280, 720],
+    "views_per_variant": 3,
+    "views": [
+      "turntable azimuth 35 degrees",
+      "turntable azimuth 145 degrees",
+      "60 m river-distance proxy"
+    ],
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "capture_storage": "local ignored Unreal Saved directory",
+    "capture_redistribution": "not approved; hashes and reproducible paths only are retained in the open-source repository"
+  },
+  "variants": [
+    {
+      "variant": "Beech_01",
+      "bounds_size_cm": [867.566101, 938.792175, 2356.21241],
+      "foliage_instance_count": 765,
+      "decision": "reject",
+      "finding": "Tall sparse vertical silhouette with a top-heavy crown, large open gaps, dark twig masses, and inadequate continuous canopy at 60 m.",
+      "captures": [
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_01_turntable_azimuth_035.png", "sha256": "b165c9cd808f3981a48db8dea25c419baf3187984b5c90bb9ef10ed981be388e"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_01_turntable_azimuth_145.png", "sha256": "168a504172e2abf8bf19fb75f7c09f0f367ffcda749d780711f7ed2d6c015696"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_01_river_distance_60m.png", "sha256": "257bddeb958ca0b0f40587c1c7f4ef13d1eb823a8a4308c5b52506b217a7fdaa"}
+      ]
+    },
+    {
+      "variant": "Beech_02",
+      "bounds_size_cm": [909.531555, 959.231537, 2533.569257],
+      "foliage_instance_count": 815,
+      "decision": "reject",
+      "finding": "Tall narrow trunk and sparse upper crown remain visually thin from both turntable angles and fail to build dense rainforest slope mass at 60 m.",
+      "captures": [
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_turntable_azimuth_035.png", "sha256": "72162135d7fc9b66c95381fb84e5b409d148b8c9c953348963471d95375f6c88"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_turntable_azimuth_145.png", "sha256": "a46fa3cd3bc43f59c45d05fc75afff68908d699a5dc31bb07d663c08e66d89cf"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_river_distance_60m.png", "sha256": "11125a2c2bdf5aefa4823d6984a562f7313e21600e2f341f2acb0d074b9f39a4"}
+      ]
+    },
+    {
+      "variant": "Beech_03",
+      "bounds_size_cm": [416.72403, 511.572891, 980.237698],
+      "foliage_instance_count": 201,
+      "decision": "reject",
+      "finding": "Small juvenile structure has only 201 twig instances, an open triangular crown, and almost no useful silhouette at the 60 m proxy distance.",
+      "captures": [
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_03_turntable_azimuth_035.png", "sha256": "25c9ecaaac3ddb9a284d61a4ee9ec4136230cc93606d1c779d0e544cfe853586"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_03_turntable_azimuth_145.png", "sha256": "6efc71301ad5c7d44063c49f1197d0b2d95498e136b5b9652eeeb619f8f0184c"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_03_river_distance_60m.png", "sha256": "005a4ae01286829011b041551ff328ae5317e14e8533feaccec843de1122a353"}
+      ]
+    },
+    {
+      "variant": "Beech_04",
+      "bounds_size_cm": [359.162201, 360.873398, 832.707283],
+      "foliage_instance_count": 389,
+      "decision": "reject",
+      "finding": "The locally denser crown remains short, dark, and shrub-like; oversized twig masses collapse into a nearly black silhouette and lose identity at 60 m.",
+      "captures": [
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_04_turntable_azimuth_035.png", "sha256": "c1a6d0728fa7589aaa8d113dab3a2fe5382c23651e77ab29e87a66bc3955fbb8"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_04_turntable_azimuth_145.png", "sha256": "b4655dab56bc7b74834bea8cbfcb5d7f0eef6fa6c61c6564c9f3430d3432be3e"},
+        {"path": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_04_river_distance_60m.png", "sha256": "392680e2d24d079bd092c8ba3a7c5c40d81601ea31cf85a1b4b8022601081f6d"}
+      ]
+    }
+  ],
+  "next_asset_requirements": [
+    "Rights-clear native Patagonian or ecology-reviewed Nothofagus-family species identity.",
+    "Several adult and intermediate age variants with broad, layered, distance-stable crowns.",
+    "Leaf and branch materials proven under Metal, Nanite, two-sided foliage, and fixed river-camera photometry.",
+    "Forest-band ecology that combines canopy, subcanopy, saplings, ferns, deadwood, and edge response without obvious repetition.",
+    "Measured desktop and VR performance before any production promotion."
+  ]
+}

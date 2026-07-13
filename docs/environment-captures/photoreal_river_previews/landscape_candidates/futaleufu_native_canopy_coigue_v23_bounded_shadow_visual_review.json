@@ -1,0 +1,126 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_bounded_shadow_review.v23",
+  "river_id": "futaleufu_terminator",
+  "status": "ground_carpet_regression_passed_near_shadow_self_darkening_failed_candidate_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "rgb_mip_padding_source_fix_retained": true,
+  "alpha2_no_shadow_candidate_retained": true,
+  "bounded_shadow_candidate_retained": false,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v23_bounded_shadow_diagnostic_report.json",
+  "decision": "retain_alpha2_no_shadow_for_ecology_expansion_reject_current_near_dynamic_shadow_response",
+  "diagnostic_conclusions": {
+    "placement_contract_preserved": true,
+    "near_only_dynamic_shadow_policy_enforced": true,
+    "v15_elongated_ground_carpet_recurred": false,
+    "bounded_shadow_causes_unacceptable_crown_self_darkening": true,
+    "bounded_shadow_is_production_promoted": false,
+    "alpha2_no_shadow_is_production_promoted": false,
+    "shadow_pass_density_or_geometry_requires_separate_iteration": true
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "saved_corridor_photometry_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "fixed_between_v22_and_v23": "corrected RGB-padded atlas, alpha2 material parameters, native TwoSidedFoliage graph, saved lighting, source masks, deterministic placement, meshes, cameras, terrain, water, rocks, and physics authority",
+    "changed_in_v23": "near leaf HISM dynamic shadow casting only, with static, contact, distance-field, dynamic-indirect, mid-leaf, and runtime-far leaf shadows disabled"
+  },
+  "artifact_metric": {
+    "purpose": "separate V15-style off-crown ground projection from crown self-darkening",
+    "crown_mask": "pixels where any RGB channel differs by more than 5 between the V15 opaque-leaf no-shadow control and V15 native-leaf no-shadow capture, dilated by a five-pixel radius",
+    "darkened_pixel": "reference mean RGB minus candidate mean RGB is greater than 5",
+    "off_crown_ground_region": "all pixels outside the dilated V15 crown mask",
+    "recurrence_ratio": "V23 darkened off-crown pixels divided by V15 darkened off-crown pixels",
+    "green_dominant_pixel": "G > 1.05*R, G > 1.08*B, and mean RGB > 55",
+    "dark_pixel": "mean RGB < 55"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "no_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_guide_seat_downstream.png",
+      "no_shadow_reference_sha256": "4dace4111947672c1fb21dec950c330573d660cb294dacef5d2561be77e58808",
+      "bounded_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_guide_seat_downstream.png",
+      "bounded_shadow_sha256": "80ad824e9819fafa78ff3693249259e8a9079bb13b3723b923ea1a3dc3c2a139",
+      "v15_native_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_guide_seat_downstream.png",
+      "v15_native_shadow_reference_sha256": "1bbe22f82fbd4efe8e3c7a950039f04774fb08dda278a13fc70c21f0a40ef2b6",
+      "v15_native_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png",
+      "v15_native_no_shadow_sha256": "39ff116db3b6d3682831acd5b913abaecaf25bfbafd208ccaa4f206bb24a5864",
+      "v15_opaque_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_guide_seat_downstream.png",
+      "v15_opaque_no_shadow_sha256": "f96734b75ea328e445c4377dd820b11c1177bb59fba772bdf776c8c4c003ff9a",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_count": 33375,
+      "changed_pixel_fraction": 0.036214192708333336,
+      "mean_absolute_rgb_delta": [1.0597819010416667, 1.1072406684027778, 0.6724359809027778],
+      "darkened_more_than_5_pixel_fraction": 0.014116753472222222,
+      "brightened_more_than_5_pixel_fraction": 0.000015190972222222222,
+      "off_crown_ground_shadow": {
+        "v15_darkened_pixel_count": 1714,
+        "v23_darkened_pixel_count": 2,
+        "v23_to_v15_recurrence_ratio": 0.0011668611435239206,
+        "v15_overlap_pixel_count": 0
+      },
+      "shadow_affected_region": {
+        "no_shadow_mean_rgb": [92.04892883895131, 102.47703370786517, 83.72605243445693],
+        "bounded_shadow_mean_rgb": [62.862082397003746, 71.9374382022472, 65.31553558052434],
+        "no_shadow_green_dominant_fraction": 0.373063670411985,
+        "bounded_shadow_green_dominant_fraction": 0.0037752808988764045,
+        "no_shadow_dark_fraction": 0.0024868913857677903,
+        "bounded_shadow_dark_fraction": 0.3626067415730337
+      }
+    },
+    "river_eye": {
+      "no_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_river_eye_downstream.png",
+      "no_shadow_reference_sha256": "7e5fb81161194f1c868830a58d1f94ad48e8dbc1f1d6f1bc0a531c8611dc8b45",
+      "bounded_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_river_eye_downstream.png",
+      "bounded_shadow_sha256": "e0fa6f57e8ca0a3597b0ce8e04b3fbfb0eed984c1b64c6f4e7e0fdea11d6877c",
+      "v15_native_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_river_eye_downstream.png",
+      "v15_native_shadow_reference_sha256": "5857f463d231628ee2813284849202c94bcf474d746b1bb2f59e50e483abc8e6",
+      "v15_native_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png",
+      "v15_native_no_shadow_sha256": "ce250b0aebc1490bb6cd932372e836b5314e1050274d516177821233ba22b8c6",
+      "v15_opaque_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_river_eye_downstream.png",
+      "v15_opaque_no_shadow_sha256": "b844bd91748438e12c8fe46cc7e21370a5433a57c325785b4fe5023a4dc72b8a",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_count": 67665,
+      "changed_pixel_fraction": 0.07342122395833334,
+      "mean_absolute_rgb_delta": [2.500365668402778, 2.6081043836805557, 1.6071636284722222],
+      "darkened_more_than_5_pixel_fraction": 0.03279296875,
+      "brightened_more_than_5_pixel_fraction": 0.00008029513888888889,
+      "off_crown_ground_shadow": {
+        "v15_darkened_pixel_count": 2163,
+        "v23_darkened_pixel_count": 1,
+        "v23_to_v15_recurrence_ratio": 0.0004623208506703652,
+        "v15_overlap_pixel_count": 1
+      },
+      "shadow_affected_region": {
+        "no_shadow_mean_rgb": [92.96227000665041, 104.05929210079066, 81.63765609990394],
+        "bounded_shadow_mean_rgb": [59.0032217542304, 68.56461981822213, 59.81236976280204],
+        "no_shadow_green_dominant_fraction": 0.4314342717800931,
+        "bounded_shadow_green_dominant_fraction": 0.009015000369467228,
+        "no_shadow_dark_fraction": 0.007093770782531589,
+        "bounded_shadow_dark_fraction": 0.42168033695411217
+      }
+    }
+  },
+  "accepted_findings": [
+    "The bounded component policy removes the V15 elongated off-crown ground carpets in both fixed corridor views.",
+    "The source-masked 1,200-tree placement and near, mid, and runtime-far representation counts remain unchanged.",
+    "Disabling mid and runtime-far leaf shadows prevents distant foliage cards from projecting broad valley-floor artifacts.",
+    "The alpha2 no-shadow captures remain the best current corridor foliage reference and can support the next ecology expansion without changing saved material defaults."
+  ],
+  "rejection_reasons": [
+    "Near-leaf dynamic shadows make affected crowns visually near-black and erase the olive color restored by RGB mip padding.",
+    "Shadow-affected dark coverage rises to 36.26 percent in guide-seat and 42.17 percent in river-eye, while green classification falls below one percent.",
+    "The candidate remains a sparse single-species line on smooth provisional terrain and is not a production forest treatment.",
+    "No packaged desktop or on-device VR performance and temporal stability evidence exists for this shadow mode."
+  ],
+  "next_iteration_requirements": [
+    "Keep leaf shadows disabled while adding the second ecology-reviewed native canopy stratum and denser source-masked forest bands.",
+    "Revisit canopy shadows with a separately bounded shadow-pass density or simplified shadow proxy that preserves crown transmission and never changes collision or gameplay authority.",
+    "Repeat the V15 off-crown artifact metric and crown photometry metric for every future shadow candidate.",
+    "Do not promote alpha2 or any shadow mode until mixed ecology, moving-camera temporal stability, packaged desktop, and on-device VR gates pass."
+  ]
+}

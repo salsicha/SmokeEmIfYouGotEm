@@ -1,0 +1,133 @@
+{
+  "schema": "raftsim.unreal.native_canopy_authoring_spec.v1",
+  "river_id": "futaleufu_terminator",
+  "status": "coigue_candidate_reviewed_second_cypress_stratum_v10_silhouette_pass_topology_rejected",
+  "production_promoted": false,
+  "sources": [
+    {
+      "title": "Reserva Nacional Futaleufu",
+      "publisher": "Corporacion Nacional Forestal (CONAF)",
+      "url": "https://www.conaf.cl/parque_nacionales/reserva-nacional-futaleufu/",
+      "retrieved": "2026-07-11",
+      "use": "authoritative local forest types and species composition"
+    },
+    {
+      "title": "Nothofagus dombeyi - Flora Arborea de Chile",
+      "publisher": "Chilebosque",
+      "url": "https://www.chilebosque.cl/fac/fac_nothofagus_dombeyi.html",
+      "retrieved": "2026-07-11",
+      "use": "coigue adult dimensions, bark, branch, foliage, and leaf morphology"
+    },
+    {
+      "title": "Reserva Nacional Futaleufu - ecosystems",
+      "publisher": "Ministerio del Medio Ambiente de Chile, SIMBIO",
+      "url": "https://simbio.mma.gob.cl/CbaAP/Details/993",
+      "retrieved": "2026-07-12",
+      "use": "local Austrocedrus chilensis and Nothofagus dombeyi evergreen association"
+    },
+    {
+      "title": "Austrocedrus chilensis native-species dossier",
+      "publisher": "Instituto Forestal de Chile (INFOR)",
+      "url": "https://bibliotecadigital.infor.cl/bitstream/handle/20.500.12220/33116/33116.pdf?isAllowed=y&sequence=3",
+      "retrieved": "2026-07-12",
+      "use": "cordilleran cypress morphology, elevation range, and habitat"
+    },
+    {
+      "title": "Fab search: Nothofagus",
+      "publisher": "Epic Games Fab",
+      "url": "https://www.fab.com/search?q=Nothofagus",
+      "retrieved": "2026-07-11",
+      "use": "asset availability audit; no exact result"
+    },
+    {
+      "title": "Fab search: coihue lenga tree",
+      "publisher": "Epic Games Fab",
+      "url": "https://www.fab.com/search?q=coihue%20lenga%20tree",
+      "retrieved": "2026-07-11",
+      "use": "native-species asset availability audit; no exact result"
+    }
+  ],
+  "second_canopy_stratum_decision": {
+    "scientific_name": "Austrocedrus chilensis",
+    "common_name": "cipres de la cordillera",
+    "decision": "selected_for_project_owned_isolated_asset_authoring",
+    "production_promoted": false,
+    "authoring_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_authoring_manifest.json",
+    "reason": "CONAF records local near-pure north/east-facing groves and MMA maps an Austrocedrus chilensis - Nothofagus dombeyi evergreen association in the Futaleufu watershed",
+    "corridor_boundary": "local ecological plausibility only; exact corridor frequency and locations require aspect/elevation filtering plus guide or first-party field validation"
+  },
+  "forest_bands": [
+    {
+      "id": "low_valley_evergreen",
+      "terrain_relation": "lower valley and wetter river-adjacent slopes",
+      "canopy_species": [
+        {"common_name": "coigue", "scientific_name": "Nothofagus dombeyi", "role": "dominant tall evergreen canopy"},
+        {"common_name": "tepa", "scientific_name": "Laureliopsis philippiana", "role": "evergreen canopy and subcanopy"},
+        {"common_name": "manio", "scientific_name": "Podocarpus nubigenus", "role": "evergreen coniferous canopy accent"},
+        {"common_name": "radal", "scientific_name": "Lomatia hirsuta", "role": "broadleaf subcanopy and edge tree"}
+      ]
+    },
+    {
+      "id": "high_valley_lenga",
+      "terrain_relation": "higher valley walls and colder exposed elevations",
+      "canopy_species": [
+        {"common_name": "lenga", "scientific_name": "Nothofagus pumilio", "role": "dominant deciduous high-elevation canopy"},
+        {"common_name": "nirre", "scientific_name": "Nothofagus antarctica", "role": "wind-shaped subcanopy and treeline form"},
+        {"common_name": "coigue_de_magallanes", "scientific_name": "Nothofagus betuloides", "role": "evergreen high-elevation canopy companion"}
+      ]
+    },
+    {
+      "id": "north_east_cordillera_cypress",
+      "terrain_relation": "north- and east-facing drier exposures",
+      "canopy_species": [
+        {"common_name": "cipres_de_la_cordillera", "scientific_name": "Austrocedrus chilensis", "role": "locally near-pure conifer grove and dry-slope accent"}
+      ]
+    }
+  ],
+  "coigue_reference_architecture": {
+    "adult_height_max_m": 40.0,
+    "trunk_diameter_max_m": 2.5,
+    "trunk_form": "relatively straight cylindrical trunk",
+    "bark": "dark gray, initially smooth, with small vertical fissures",
+    "crown": "dense foliage on strong open branches with predominantly horizontal disposition",
+    "leaf_length_cm": [2.0, 3.5],
+    "leaf_form": "persistent simple alternate leathery ovate-lanceolate to rhombic leaves with fine serration"
+  },
+  "first_party_asset_contract": {
+    "ownership": "project-authored geometry, textures, masks, materials, wind data, and procedural recipes",
+    "minimum_species_count": 8,
+    "minimum_adult_canopy_variants_per_dominant_species": 5,
+    "minimum_intermediate_variants_per_dominant_species": 3,
+    "minimum_age_classes": 3,
+    "target_height_classes_m": [[4.0, 10.0], [10.0, 22.0], [22.0, 40.0]],
+    "required_strata": ["emergent_canopy", "closed_canopy", "subcanopy", "sapling", "shrub", "fern_and_groundcover", "deadwood"],
+    "required_crown_behavior": [
+      "broad layered silhouettes instead of top-heavy poles",
+      "continuous but nonuniform canopy mass at 60-150 m river-camera distance",
+      "horizontal strong-branch forms for adult coigue",
+      "wind- and exposure-shaped high-elevation forms",
+      "no repeated card walls, black branch marks, or oversized leaf clumps"
+    ],
+    "material_requirements": [
+      "project-owned bark and leaf albedo, normal, roughness, opacity, and subsurface/transmission inputs",
+      "two-sided foliage validated on Metal",
+      "Nanite PreserveArea where compatible",
+      "wind response without crown-scale phase locking",
+      "seasonal state parameters for evergreen and deciduous species"
+    ]
+  },
+  "promotion_gates": {
+    "isolated_views": ["two turntable azimuths", "leaf and bark closeup", "60 m proxy", "150 m proxy"],
+    "corridor_views": ["guide seat downstream", "river eye downstream", "high-bank ecology overview"],
+    "required_reviews": ["ecology", "rights", "environment art", "guide", "hazard readability", "desktop performance", "VR performance"],
+    "automatic_reject_conditions": [
+      "non-native identity presented as native",
+      "single-species corridor monoculture",
+      "canopy disappears or becomes a pole field at river distance",
+      "black or bright branch-card artifacts",
+      "unbounded instance density or unmeasured performance",
+      "third-party source or derived content copied without redistribution approval"
+    ]
+  },
+  "next_step": "Retain V10's three broad sources, separate far atlas, exact fallback authority, reduced card budget, and passing foreground-silhouette floor. Rebuild the cypress as irregular grouped, curved, variably ascending primary systems with one or two branch-aligned cards and exposed outer-terminal closeup evidence before reconsidering near eligibility or corridor placement."
+}

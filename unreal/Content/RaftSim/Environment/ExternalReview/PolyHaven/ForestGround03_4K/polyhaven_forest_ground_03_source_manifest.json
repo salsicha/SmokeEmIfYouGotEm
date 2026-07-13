@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_forrest_ground_03_4k",
+  "status": "rights_reviewed_source_maps_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American close-range forest-floor albedo, normal, and roughness detail under source-authoritative NAIP macro color",
+  "source": {
+    "title": "Forest Ground 03",
+    "publisher": "Poly Haven",
+    "authors": ["Rob Tuytel"],
+    "asset_url": "https://polyhaven.com/a/forrest_ground_03",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "direct official download links exposed by the asset website",
+    "public_api_used": false,
+    "downloaded_package": "three 4K PNG maps",
+    "publisher_width_m": 2.0,
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "south_fork_ground_cover_approval": "not_reviewed_use_as_close_range_structure_analog_only",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "allowed_now": [
+      "isolated Unreal import",
+      "source-authoritative terrain detail blend comparison",
+      "South Fork visual comparison captures"
+    ],
+    "blocked_now": [
+      "replacing NAIP macro color authority",
+      "claiming exact South Fork ground-cover composition",
+      "claiming lifelike environment completion",
+      "shipping before ecology, guide, art, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "forrest_ground_03_diff_4k.png": "5e3abfb2403767a0abf5fc7d30b9f4b3be28dce2494df22401a7c92fc904a170",
+    "forrest_ground_03_nor_gl_4k.png": "09ad2277c51ae876113bbaae2e569fd5c80389bf454054696a08476fe7ee0813",
+    "forrest_ground_03_rough_4k.png": "3a0586ecd529ffd1a92e4357e9aa6a771c26f9980205bed1781849c1295553a3"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_terrain_detail_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_TERRAIN_DETAIL_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K",
+    "texture_policy": "4K source maps imported explicitly; GL normal green channel flipped for Unreal; diffuse remains sRGB and roughness remains linear masks",
+    "material_policy": "blend below source-authoritative NAIP macro color at true two-metre tiling scale",
+    "promotion_policy": "manual after visual, ecology, guide, art, and performance review"
+  }
+}

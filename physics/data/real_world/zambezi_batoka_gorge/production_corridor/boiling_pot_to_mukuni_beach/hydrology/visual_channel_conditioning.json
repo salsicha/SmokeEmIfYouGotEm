@@ -1,0 +1,1922 @@
+{
+  "schema": "raftsim.visual_channel_conditioning.v1",
+  "status": "bounded_visual_terrain_conditioning_review_gated",
+  "river_id": "zambezi_batoka_gorge",
+  "authority": {
+    "scope": "Unreal visual terrain and render-water alignment only",
+    "changes_custom_cpp_solver_state": false,
+    "changes_collision_or_raft_forces": false,
+    "surveyed_bathymetry": false,
+    "may_hide_conservation_or_parity_failures": false
+  },
+  "parameters": {
+    "channel_half_width_m": 60.0,
+    "channel_feather_width_m": 90.0,
+    "profile_smoothing_radius_m": 500.0,
+    "maximum_downstream_slope": 0.025,
+    "bed_depth_below_visual_surface_m": 2.0,
+    "maximum_terrain_cut_m": 240.0,
+    "maximum_terrain_fill_m": 0.0,
+    "profile_policy": "raw_and_triangular_smoothed_lower_envelope_then_backward_nonrising_slope_bound",
+    "raster_policy": "smoothstep_core_and_feather_cut_or_fill_clamped_to_explicit_bounds"
+  },
+  "measurements": {
+    "route_sample_count": 209,
+    "modified_raster_sample_count": 139520,
+    "maximum_cut_m": 218.8192,
+    "maximum_fill_m": 0.0,
+    "raw_profile_total_upstream_rise_m": 1264.6834,
+    "conditioned_profile_maximum_upstream_rise_m": 0.0,
+    "conditioned_profile_maximum_downstream_slope": 0.025,
+    "conditioned_profile_total_drop_m": 95.0141
+  },
+  "profile_samples": [
+    {
+      "station_m": 0.0,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 882.0,
+      "conditioned_surface_elevation_m": 816.3525,
+      "conditioned_bed_elevation_m": 814.3525,
+      "conditioned_surface_normalized": 0.42661215,
+      "conditioned_bed_normalized": 0.42125783
+    },
+    {
+      "station_m": 42.219,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 881.7558,
+      "conditioned_surface_elevation_m": 815.297,
+      "conditioned_bed_elevation_m": 813.297,
+      "conditioned_surface_normalized": 0.4237864,
+      "conditioned_bed_normalized": 0.41843208
+    },
+    {
+      "station_m": 84.373,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 880.9769,
+      "conditioned_surface_elevation_m": 814.2432,
+      "conditioned_bed_elevation_m": 812.2432,
+      "conditioned_surface_normalized": 0.42096521,
+      "conditioned_bed_normalized": 0.41561089
+    },
+    {
+      "station_m": 157.247,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 878.499,
+      "conditioned_surface_elevation_m": 812.4213,
+      "conditioned_bed_elevation_m": 810.4213,
+      "conditioned_surface_normalized": 0.4160877,
+      "conditioned_bed_normalized": 0.41073338
+    },
+    {
+      "station_m": 178.033,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 877.6939,
+      "conditioned_surface_elevation_m": 811.9017,
+      "conditioned_bed_elevation_m": 809.9017,
+      "conditioned_surface_normalized": 0.41469664,
+      "conditioned_bed_normalized": 0.40934232
+    },
+    {
+      "station_m": 216.755,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 876.1147,
+      "conditioned_surface_elevation_m": 810.9336,
+      "conditioned_bed_elevation_m": 808.9336,
+      "conditioned_surface_normalized": 0.41210488,
+      "conditioned_bed_normalized": 0.40675056
+    },
+    {
+      "station_m": 288.077,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 872.8223,
+      "conditioned_surface_elevation_m": 809.1506,
+      "conditioned_bed_elevation_m": 807.1506,
+      "conditioned_surface_normalized": 0.40733151,
+      "conditioned_bed_normalized": 0.40197719
+    },
+    {
+      "station_m": 410.828,
+      "raw_dem_elevation_m": 882.0,
+      "smoothed_surface_elevation_m": 865.2435,
+      "conditioned_surface_elevation_m": 806.0818,
+      "conditioned_bed_elevation_m": 804.0818,
+      "conditioned_surface_normalized": 0.39911584,
+      "conditioned_bed_normalized": 0.39376152
+    },
+    {
+      "station_m": 530.156,
+      "raw_dem_elevation_m": 823.5289,
+      "smoothed_surface_elevation_m": 853.7907,
+      "conditioned_surface_elevation_m": 803.0986,
+      "conditioned_bed_elevation_m": 801.0986,
+      "conditioned_surface_normalized": 0.39112934,
+      "conditioned_bed_normalized": 0.38577502
+    },
+    {
+      "station_m": 603.088,
+      "raw_dem_elevation_m": 801.2753,
+      "smoothed_surface_elevation_m": 849.1294,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 876.211,
+      "raw_dem_elevation_m": 880.5228,
+      "smoothed_surface_elevation_m": 870.4366,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1015.113,
+      "raw_dem_elevation_m": 889.611,
+      "smoothed_surface_elevation_m": 884.0907,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1130.901,
+      "raw_dem_elevation_m": 888.7372,
+      "smoothed_surface_elevation_m": 887.4315,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1222.031,
+      "raw_dem_elevation_m": 893.2241,
+      "smoothed_surface_elevation_m": 887.1584,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1272.772,
+      "raw_dem_elevation_m": 890.1038,
+      "smoothed_surface_elevation_m": 886.847,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1345.517,
+      "raw_dem_elevation_m": 886.9875,
+      "smoothed_surface_elevation_m": 886.3252,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1385.929,
+      "raw_dem_elevation_m": 885.0051,
+      "smoothed_surface_elevation_m": 886.0025,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1406.143,
+      "raw_dem_elevation_m": 885.0728,
+      "smoothed_surface_elevation_m": 885.8376,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1420.746,
+      "raw_dem_elevation_m": 884.9977,
+      "smoothed_surface_elevation_m": 885.7243,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1462.315,
+      "raw_dem_elevation_m": 884.2157,
+      "smoothed_surface_elevation_m": 885.409,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1496.358,
+      "raw_dem_elevation_m": 883.9294,
+      "smoothed_surface_elevation_m": 885.1563,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1546.948,
+      "raw_dem_elevation_m": 883.7897,
+      "smoothed_surface_elevation_m": 884.7712,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1622.088,
+      "raw_dem_elevation_m": 882.9958,
+      "smoothed_surface_elevation_m": 884.1663,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1702.312,
+      "raw_dem_elevation_m": 882.0523,
+      "smoothed_surface_elevation_m": 883.4757,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 1823.742,
+      "raw_dem_elevation_m": 880.2597,
+      "smoothed_surface_elevation_m": 882.4203,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 2000.55,
+      "raw_dem_elevation_m": 881.4709,
+      "smoothed_surface_elevation_m": 880.9405,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 2245.644,
+      "raw_dem_elevation_m": 880.5621,
+      "smoothed_surface_elevation_m": 873.0366,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 2306.371,
+      "raw_dem_elevation_m": 879.8914,
+      "smoothed_surface_elevation_m": 868.5903,
+      "conditioned_surface_elevation_m": 801.2753,
+      "conditioned_bed_elevation_m": 799.2753,
+      "conditioned_surface_normalized": 0.38624807,
+      "conditioned_bed_normalized": 0.38089375
+    },
+    {
+      "station_m": 2359.214,
+      "raw_dem_elevation_m": 879.7828,
+      "smoothed_surface_elevation_m": 863.1493,
+      "conditioned_surface_elevation_m": 801.2628,
+      "conditioned_bed_elevation_m": 799.2628,
+      "conditioned_surface_normalized": 0.38621461,
+      "conditioned_bed_normalized": 0.38086029
+    },
+    {
+      "station_m": 2434.423,
+      "raw_dem_elevation_m": 878.1018,
+      "smoothed_surface_elevation_m": 852.9759,
+      "conditioned_surface_elevation_m": 799.3825,
+      "conditioned_bed_elevation_m": 797.3825,
+      "conditioned_surface_normalized": 0.38118074,
+      "conditioned_bed_normalized": 0.37582642
+    },
+    {
+      "station_m": 2590.998,
+      "raw_dem_elevation_m": 795.4682,
+      "smoothed_surface_elevation_m": 829.9246,
+      "conditioned_surface_elevation_m": 795.4682,
+      "conditioned_bed_elevation_m": 793.4682,
+      "conditioned_surface_normalized": 0.37070153,
+      "conditioned_bed_normalized": 0.36534721
+    },
+    {
+      "station_m": 2719.549,
+      "raw_dem_elevation_m": 808.8228,
+      "smoothed_surface_elevation_m": 816.5997,
+      "conditioned_surface_elevation_m": 795.4682,
+      "conditioned_bed_elevation_m": 793.4682,
+      "conditioned_surface_normalized": 0.37070153,
+      "conditioned_bed_normalized": 0.36534721
+    },
+    {
+      "station_m": 2777.23,
+      "raw_dem_elevation_m": 826.7865,
+      "smoothed_surface_elevation_m": 811.1618,
+      "conditioned_surface_elevation_m": 795.2012,
+      "conditioned_bed_elevation_m": 793.2012,
+      "conditioned_surface_normalized": 0.36998673,
+      "conditioned_bed_normalized": 0.36463241
+    },
+    {
+      "station_m": 2814.395,
+      "raw_dem_elevation_m": 801.7577,
+      "smoothed_surface_elevation_m": 807.7425,
+      "conditioned_surface_elevation_m": 794.2721,
+      "conditioned_bed_elevation_m": 792.2721,
+      "conditioned_surface_normalized": 0.36749938,
+      "conditioned_bed_normalized": 0.36214506
+    },
+    {
+      "station_m": 2865.279,
+      "raw_dem_elevation_m": 793.0,
+      "smoothed_surface_elevation_m": 804.1802,
+      "conditioned_surface_elevation_m": 793.0,
+      "conditioned_bed_elevation_m": 791.0,
+      "conditioned_surface_normalized": 0.36409377,
+      "conditioned_bed_normalized": 0.35873945
+    },
+    {
+      "station_m": 2921.464,
+      "raw_dem_elevation_m": 792.5652,
+      "smoothed_surface_elevation_m": 801.7258,
+      "conditioned_surface_elevation_m": 792.5652,
+      "conditioned_bed_elevation_m": 790.5652,
+      "conditioned_surface_normalized": 0.36292974,
+      "conditioned_bed_normalized": 0.35757542
+    },
+    {
+      "station_m": 3203.136,
+      "raw_dem_elevation_m": 790.1847,
+      "smoothed_surface_elevation_m": 798.4232,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 3517.322,
+      "raw_dem_elevation_m": 806.1401,
+      "smoothed_surface_elevation_m": 824.6786,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 3652.435,
+      "raw_dem_elevation_m": 841.8224,
+      "smoothed_surface_elevation_m": 833.102,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 3796.441,
+      "raw_dem_elevation_m": 834.2276,
+      "smoothed_surface_elevation_m": 833.8155,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 3872.946,
+      "raw_dem_elevation_m": 876.1933,
+      "smoothed_surface_elevation_m": 835.6428,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 4012.524,
+      "raw_dem_elevation_m": 798.9481,
+      "smoothed_surface_elevation_m": 846.317,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 4152.084,
+      "raw_dem_elevation_m": 799.242,
+      "smoothed_surface_elevation_m": 858.4807,
+      "conditioned_surface_elevation_m": 790.1847,
+      "conditioned_bed_elevation_m": 788.1847,
+      "conditioned_surface_normalized": 0.35655676,
+      "conditioned_bed_normalized": 0.35120244
+    },
+    {
+      "station_m": 4321.993,
+      "raw_dem_elevation_m": 887.1668,
+      "smoothed_surface_elevation_m": 873.1299,
+      "conditioned_surface_elevation_m": 787.6633,
+      "conditioned_bed_elevation_m": 785.6633,
+      "conditioned_surface_normalized": 0.34980657,
+      "conditioned_bed_normalized": 0.34445225
+    },
+    {
+      "station_m": 4346.692,
+      "raw_dem_elevation_m": 888.3364,
+      "smoothed_surface_elevation_m": 874.4254,
+      "conditioned_surface_elevation_m": 787.0458,
+      "conditioned_bed_elevation_m": 785.0458,
+      "conditioned_surface_normalized": 0.34815342,
+      "conditioned_bed_normalized": 0.3427991
+    },
+    {
+      "station_m": 4370.851,
+      "raw_dem_elevation_m": 889.5136,
+      "smoothed_surface_elevation_m": 875.4549,
+      "conditioned_surface_elevation_m": 786.4419,
+      "conditioned_bed_elevation_m": 784.4419,
+      "conditioned_surface_normalized": 0.34653668,
+      "conditioned_bed_normalized": 0.34118236
+    },
+    {
+      "station_m": 4386.741,
+      "raw_dem_elevation_m": 889.9604,
+      "smoothed_surface_elevation_m": 876.0046,
+      "conditioned_surface_elevation_m": 786.0446,
+      "conditioned_bed_elevation_m": 784.0446,
+      "conditioned_surface_normalized": 0.34547305,
+      "conditioned_bed_normalized": 0.34011873
+    },
+    {
+      "station_m": 4410.453,
+      "raw_dem_elevation_m": 889.3674,
+      "smoothed_surface_elevation_m": 876.654,
+      "conditioned_surface_elevation_m": 785.4518,
+      "conditioned_bed_elevation_m": 783.4518,
+      "conditioned_surface_normalized": 0.34388603,
+      "conditioned_bed_normalized": 0.33853171
+    },
+    {
+      "station_m": 4432.217,
+      "raw_dem_elevation_m": 888.4455,
+      "smoothed_surface_elevation_m": 877.1175,
+      "conditioned_surface_elevation_m": 784.9077,
+      "conditioned_bed_elevation_m": 782.9077,
+      "conditioned_surface_normalized": 0.34242938,
+      "conditioned_bed_normalized": 0.33707506
+    },
+    {
+      "station_m": 4551.709,
+      "raw_dem_elevation_m": 867.2014,
+      "smoothed_surface_elevation_m": 878.2852,
+      "conditioned_surface_elevation_m": 781.9204,
+      "conditioned_bed_elevation_m": 779.9204,
+      "conditioned_surface_normalized": 0.3344319,
+      "conditioned_bed_normalized": 0.32907758
+    },
+    {
+      "station_m": 4630.741,
+      "raw_dem_elevation_m": 862.148,
+      "smoothed_surface_elevation_m": 876.8036,
+      "conditioned_surface_elevation_m": 779.9446,
+      "conditioned_bed_elevation_m": 777.9446,
+      "conditioned_surface_normalized": 0.32914237,
+      "conditioned_bed_normalized": 0.32378805
+    },
+    {
+      "station_m": 4676.04,
+      "raw_dem_elevation_m": 873.3291,
+      "smoothed_surface_elevation_m": 874.6868,
+      "conditioned_surface_elevation_m": 778.8121,
+      "conditioned_bed_elevation_m": 776.8121,
+      "conditioned_surface_normalized": 0.32611049,
+      "conditioned_bed_normalized": 0.32075617
+    },
+    {
+      "station_m": 4787.758,
+      "raw_dem_elevation_m": 882.2181,
+      "smoothed_surface_elevation_m": 867.0831,
+      "conditioned_surface_elevation_m": 776.0192,
+      "conditioned_bed_elevation_m": 774.0192,
+      "conditioned_surface_normalized": 0.31863345,
+      "conditioned_bed_normalized": 0.31327913
+    },
+    {
+      "station_m": 4808.389,
+      "raw_dem_elevation_m": 881.6039,
+      "smoothed_surface_elevation_m": 865.0343,
+      "conditioned_surface_elevation_m": 775.5034,
+      "conditioned_bed_elevation_m": 773.5034,
+      "conditioned_surface_normalized": 0.31725257,
+      "conditioned_bed_normalized": 0.31189825
+    },
+    {
+      "station_m": 4975.549,
+      "raw_dem_elevation_m": 878.1165,
+      "smoothed_surface_elevation_m": 849.1626,
+      "conditioned_surface_elevation_m": 771.3244,
+      "conditioned_bed_elevation_m": 769.3244,
+      "conditioned_surface_normalized": 0.30606472,
+      "conditioned_bed_normalized": 0.3007104
+    },
+    {
+      "station_m": 5012.185,
+      "raw_dem_elevation_m": 868.0629,
+      "smoothed_surface_elevation_m": 845.8778,
+      "conditioned_surface_elevation_m": 770.4085,
+      "conditioned_bed_elevation_m": 768.4085,
+      "conditioned_surface_normalized": 0.30361271,
+      "conditioned_bed_normalized": 0.29825839
+    },
+    {
+      "station_m": 5053.886,
+      "raw_dem_elevation_m": 840.9283,
+      "smoothed_surface_elevation_m": 841.6493,
+      "conditioned_surface_elevation_m": 769.366,
+      "conditioned_bed_elevation_m": 767.366,
+      "conditioned_surface_normalized": 0.30082177,
+      "conditioned_bed_normalized": 0.29546745
+    },
+    {
+      "station_m": 5087.168,
+      "raw_dem_elevation_m": 819.2112,
+      "smoothed_surface_elevation_m": 838.6095,
+      "conditioned_surface_elevation_m": 768.5339,
+      "conditioned_bed_elevation_m": 766.5339,
+      "conditioned_surface_normalized": 0.2985941,
+      "conditioned_bed_normalized": 0.29323978
+    },
+    {
+      "station_m": 5122.861,
+      "raw_dem_elevation_m": 798.5903,
+      "smoothed_surface_elevation_m": 835.568,
+      "conditioned_surface_elevation_m": 767.6416,
+      "conditioned_bed_elevation_m": 765.6416,
+      "conditioned_surface_normalized": 0.29620527,
+      "conditioned_bed_normalized": 0.29085095
+    },
+    {
+      "station_m": 5249.932,
+      "raw_dem_elevation_m": 764.4648,
+      "smoothed_surface_elevation_m": 832.3577,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5414.108,
+      "raw_dem_elevation_m": 840.4285,
+      "smoothed_surface_elevation_m": 846.4938,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5540.256,
+      "raw_dem_elevation_m": 873.9004,
+      "smoothed_surface_elevation_m": 854.3994,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5637.437,
+      "raw_dem_elevation_m": 878.3735,
+      "smoothed_surface_elevation_m": 857.2217,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5673.05,
+      "raw_dem_elevation_m": 879.8262,
+      "smoothed_surface_elevation_m": 857.2492,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5698.976,
+      "raw_dem_elevation_m": 880.8571,
+      "smoothed_surface_elevation_m": 857.1664,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5724.663,
+      "raw_dem_elevation_m": 878.8425,
+      "smoothed_surface_elevation_m": 856.8447,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5749.383,
+      "raw_dem_elevation_m": 872.6522,
+      "smoothed_surface_elevation_m": 856.3287,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5786.908,
+      "raw_dem_elevation_m": 847.9665,
+      "smoothed_surface_elevation_m": 854.6483,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5828.777,
+      "raw_dem_elevation_m": 824.3683,
+      "smoothed_surface_elevation_m": 853.0924,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5873.81,
+      "raw_dem_elevation_m": 816.4807,
+      "smoothed_surface_elevation_m": 851.9396,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5941.821,
+      "raw_dem_elevation_m": 821.7289,
+      "smoothed_surface_elevation_m": 851.0265,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 5971.692,
+      "raw_dem_elevation_m": 824.3206,
+      "smoothed_surface_elevation_m": 850.9317,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6001.063,
+      "raw_dem_elevation_m": 836.4755,
+      "smoothed_surface_elevation_m": 851.1876,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6071.004,
+      "raw_dem_elevation_m": 877.7589,
+      "smoothed_surface_elevation_m": 853.0559,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6172.93,
+      "raw_dem_elevation_m": 883.429,
+      "smoothed_surface_elevation_m": 856.4138,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6292.018,
+      "raw_dem_elevation_m": 883.3135,
+      "smoothed_surface_elevation_m": 864.8108,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6521.686,
+      "raw_dem_elevation_m": 883.8114,
+      "smoothed_surface_elevation_m": 883.4081,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6928.661,
+      "raw_dem_elevation_m": 884.1841,
+      "smoothed_surface_elevation_m": 884.4109,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 6994.04,
+      "raw_dem_elevation_m": 884.3918,
+      "smoothed_surface_elevation_m": 884.4375,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7051.988,
+      "raw_dem_elevation_m": 884.7914,
+      "smoothed_surface_elevation_m": 884.4513,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7131.26,
+      "raw_dem_elevation_m": 885.5713,
+      "smoothed_surface_elevation_m": 884.1059,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7234.19,
+      "raw_dem_elevation_m": 882.9318,
+      "smoothed_surface_elevation_m": 883.4082,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7364.283,
+      "raw_dem_elevation_m": 883.9023,
+      "smoothed_surface_elevation_m": 881.5937,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7411.475,
+      "raw_dem_elevation_m": 884.9621,
+      "smoothed_surface_elevation_m": 880.7191,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7561.917,
+      "raw_dem_elevation_m": 873.305,
+      "smoothed_surface_elevation_m": 876.9223,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7615.134,
+      "raw_dem_elevation_m": 879.9613,
+      "smoothed_surface_elevation_m": 875.5248,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 7762.627,
+      "raw_dem_elevation_m": 857.4591,
+      "smoothed_surface_elevation_m": 870.2797,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 8037.682,
+      "raw_dem_elevation_m": 865.3772,
+      "smoothed_surface_elevation_m": 843.8294,
+      "conditioned_surface_elevation_m": 764.4648,
+      "conditioned_bed_elevation_m": 762.4648,
+      "conditioned_surface_normalized": 0.28770047,
+      "conditioned_bed_normalized": 0.28234615
+    },
+    {
+      "station_m": 8246.864,
+      "raw_dem_elevation_m": 846.4604,
+      "smoothed_surface_elevation_m": 817.734,
+      "conditioned_surface_elevation_m": 760.2094,
+      "conditioned_bed_elevation_m": 758.2094,
+      "conditioned_surface_normalized": 0.27630808,
+      "conditioned_bed_normalized": 0.27095376
+    },
+    {
+      "station_m": 8330.415,
+      "raw_dem_elevation_m": 799.2988,
+      "smoothed_surface_elevation_m": 809.7287,
+      "conditioned_surface_elevation_m": 758.1207,
+      "conditioned_bed_elevation_m": 756.1207,
+      "conditioned_surface_normalized": 0.2707163,
+      "conditioned_bed_normalized": 0.26536198
+    },
+    {
+      "station_m": 8404.966,
+      "raw_dem_elevation_m": 792.0807,
+      "smoothed_surface_elevation_m": 804.7687,
+      "conditioned_surface_elevation_m": 756.2569,
+      "conditioned_bed_elevation_m": 754.2569,
+      "conditioned_surface_normalized": 0.26572661,
+      "conditioned_bed_normalized": 0.26037229
+    },
+    {
+      "station_m": 8505.088,
+      "raw_dem_elevation_m": 781.847,
+      "smoothed_surface_elevation_m": 800.401,
+      "conditioned_surface_elevation_m": 753.7538,
+      "conditioned_bed_elevation_m": 751.7538,
+      "conditioned_surface_normalized": 0.25902541,
+      "conditioned_bed_normalized": 0.25367109
+    },
+    {
+      "station_m": 8652.655,
+      "raw_dem_elevation_m": 778.2449,
+      "smoothed_surface_elevation_m": 798.2465,
+      "conditioned_surface_elevation_m": 750.0647,
+      "conditioned_bed_elevation_m": 748.0647,
+      "conditioned_surface_normalized": 0.2491491,
+      "conditioned_bed_normalized": 0.24379478
+    },
+    {
+      "station_m": 8793.064,
+      "raw_dem_elevation_m": 824.7081,
+      "smoothed_surface_elevation_m": 800.1832,
+      "conditioned_surface_elevation_m": 746.5544,
+      "conditioned_bed_elevation_m": 744.5544,
+      "conditioned_surface_normalized": 0.23975146,
+      "conditioned_bed_normalized": 0.23439714
+    },
+    {
+      "station_m": 8912.069,
+      "raw_dem_elevation_m": 818.8366,
+      "smoothed_surface_elevation_m": 802.9122,
+      "conditioned_surface_elevation_m": 743.5793,
+      "conditioned_bed_elevation_m": 741.5793,
+      "conditioned_surface_normalized": 0.23178664,
+      "conditioned_bed_normalized": 0.22643232
+    },
+    {
+      "station_m": 8942.764,
+      "raw_dem_elevation_m": 811.3028,
+      "smoothed_surface_elevation_m": 803.7085,
+      "conditioned_surface_elevation_m": 742.8119,
+      "conditioned_bed_elevation_m": 740.8119,
+      "conditioned_surface_normalized": 0.22973219,
+      "conditioned_bed_normalized": 0.22437787
+    },
+    {
+      "station_m": 8979.467,
+      "raw_dem_elevation_m": 799.2067,
+      "smoothed_surface_elevation_m": 805.0956,
+      "conditioned_surface_elevation_m": 741.8944,
+      "conditioned_bed_elevation_m": 739.8944,
+      "conditioned_surface_normalized": 0.2272759,
+      "conditioned_bed_normalized": 0.22192158
+    },
+    {
+      "station_m": 9071.346,
+      "raw_dem_elevation_m": 739.5974,
+      "smoothed_surface_elevation_m": 811.9837,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9246.339,
+      "raw_dem_elevation_m": 868.4762,
+      "smoothed_surface_elevation_m": 842.1427,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9419.066,
+      "raw_dem_elevation_m": 872.4787,
+      "smoothed_surface_elevation_m": 866.5197,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9463.388,
+      "raw_dem_elevation_m": 873.8343,
+      "smoothed_surface_elevation_m": 870.0835,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9514.863,
+      "raw_dem_elevation_m": 874.8565,
+      "smoothed_surface_elevation_m": 872.6494,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9548.091,
+      "raw_dem_elevation_m": 874.1848,
+      "smoothed_surface_elevation_m": 873.9685,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9619.155,
+      "raw_dem_elevation_m": 875.033,
+      "smoothed_surface_elevation_m": 875.0966,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9662.977,
+      "raw_dem_elevation_m": 875.9375,
+      "smoothed_surface_elevation_m": 875.3021,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9715.009,
+      "raw_dem_elevation_m": 876.7816,
+      "smoothed_surface_elevation_m": 875.5415,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9752.743,
+      "raw_dem_elevation_m": 876.7536,
+      "smoothed_surface_elevation_m": 875.5023,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9774.573,
+      "raw_dem_elevation_m": 876.4956,
+      "smoothed_surface_elevation_m": 874.9259,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 9783.66,
+      "raw_dem_elevation_m": 876.365,
+      "smoothed_surface_elevation_m": 874.6657,
+      "conditioned_surface_elevation_m": 739.5974,
+      "conditioned_bed_elevation_m": 737.5974,
+      "conditioned_surface_normalized": 0.22112646,
+      "conditioned_bed_normalized": 0.21577214
+    },
+    {
+      "station_m": 10245.761,
+      "raw_dem_elevation_m": 776.5878,
+      "smoothed_surface_elevation_m": 783.8461,
+      "conditioned_surface_elevation_m": 738.8098,
+      "conditioned_bed_elevation_m": 736.8098,
+      "conditioned_surface_normalized": 0.21901793,
+      "conditioned_bed_normalized": 0.21366361
+    },
+    {
+      "station_m": 10288.745,
+      "raw_dem_elevation_m": 759.6381,
+      "smoothed_surface_elevation_m": 785.4825,
+      "conditioned_surface_elevation_m": 737.7352,
+      "conditioned_bed_elevation_m": 735.7352,
+      "conditioned_surface_normalized": 0.21614105,
+      "conditioned_bed_normalized": 0.21078673
+    },
+    {
+      "station_m": 10336.44,
+      "raw_dem_elevation_m": 736.5428,
+      "smoothed_surface_elevation_m": 789.6553,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10362.22,
+      "raw_dem_elevation_m": 742.0115,
+      "smoothed_surface_elevation_m": 792.3529,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10392.001,
+      "raw_dem_elevation_m": 749.6302,
+      "smoothed_surface_elevation_m": 796.0603,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10500.04,
+      "raw_dem_elevation_m": 808.1821,
+      "smoothed_surface_elevation_m": 811.3411,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10552.294,
+      "raw_dem_elevation_m": 846.1343,
+      "smoothed_surface_elevation_m": 819.0509,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10600.634,
+      "raw_dem_elevation_m": 866.7579,
+      "smoothed_surface_elevation_m": 826.1682,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10628.518,
+      "raw_dem_elevation_m": 869.2249,
+      "smoothed_surface_elevation_m": 829.9022,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10651.074,
+      "raw_dem_elevation_m": 869.9363,
+      "smoothed_surface_elevation_m": 832.6415,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 10662.895,
+      "raw_dem_elevation_m": 870.1908,
+      "smoothed_surface_elevation_m": 833.9221,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 11029.821,
+      "raw_dem_elevation_m": 879.2118,
+      "smoothed_surface_elevation_m": 873.9956,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 11908.867,
+      "raw_dem_elevation_m": 890.0737,
+      "smoothed_surface_elevation_m": 889.965,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 11924.593,
+      "raw_dem_elevation_m": 889.8528,
+      "smoothed_surface_elevation_m": 889.9615,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 12563.383,
+      "raw_dem_elevation_m": 885.3487,
+      "smoothed_surface_elevation_m": 882.9407,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 12903.8,
+      "raw_dem_elevation_m": 876.9925,
+      "smoothed_surface_elevation_m": 874.7947,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13024.089,
+      "raw_dem_elevation_m": 876.458,
+      "smoothed_surface_elevation_m": 864.8434,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13247.037,
+      "raw_dem_elevation_m": 869.3652,
+      "smoothed_surface_elevation_m": 854.7701,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13343.443,
+      "raw_dem_elevation_m": 839.4312,
+      "smoothed_surface_elevation_m": 852.5308,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13394.448,
+      "raw_dem_elevation_m": 828.8974,
+      "smoothed_surface_elevation_m": 852.0596,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13425.726,
+      "raw_dem_elevation_m": 832.0243,
+      "smoothed_surface_elevation_m": 852.6149,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13553.703,
+      "raw_dem_elevation_m": 884.9344,
+      "smoothed_surface_elevation_m": 860.3462,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13753.793,
+      "raw_dem_elevation_m": 894.3076,
+      "smoothed_surface_elevation_m": 877.4141,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 13961.152,
+      "raw_dem_elevation_m": 893.7254,
+      "smoothed_surface_elevation_m": 893.3542,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 14088.347,
+      "raw_dem_elevation_m": 892.8737,
+      "smoothed_surface_elevation_m": 893.992,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 14264.407,
+      "raw_dem_elevation_m": 895.8639,
+      "smoothed_surface_elevation_m": 894.5027,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 14769.875,
+      "raw_dem_elevation_m": 898.3023,
+      "smoothed_surface_elevation_m": 897.804,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 14834.849,
+      "raw_dem_elevation_m": 896.5199,
+      "smoothed_surface_elevation_m": 898.0275,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 15102.58,
+      "raw_dem_elevation_m": 899.6541,
+      "smoothed_surface_elevation_m": 899.948,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 15287.299,
+      "raw_dem_elevation_m": 903.4211,
+      "smoothed_surface_elevation_m": 901.1681,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 15441.845,
+      "raw_dem_elevation_m": 900.7167,
+      "smoothed_surface_elevation_m": 901.0192,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 15609.295,
+      "raw_dem_elevation_m": 899.6387,
+      "smoothed_surface_elevation_m": 900.1119,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16031.625,
+      "raw_dem_elevation_m": 895.5654,
+      "smoothed_surface_elevation_m": 894.9336,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16076.13,
+      "raw_dem_elevation_m": 894.0682,
+      "smoothed_surface_elevation_m": 894.8663,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16160.071,
+      "raw_dem_elevation_m": 893.3502,
+      "smoothed_surface_elevation_m": 895.042,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16277.567,
+      "raw_dem_elevation_m": 895.6816,
+      "smoothed_surface_elevation_m": 895.7409,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16499.927,
+      "raw_dem_elevation_m": 898.4424,
+      "smoothed_surface_elevation_m": 898.2445,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16563.473,
+      "raw_dem_elevation_m": 897.8103,
+      "smoothed_surface_elevation_m": 899.4192,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16743.058,
+      "raw_dem_elevation_m": 904.2907,
+      "smoothed_surface_elevation_m": 902.8513,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 16941.776,
+      "raw_dem_elevation_m": 905.7411,
+      "smoothed_surface_elevation_m": 905.5112,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 17027.861,
+      "raw_dem_elevation_m": 909.379,
+      "smoothed_surface_elevation_m": 906.7924,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 17535.01,
+      "raw_dem_elevation_m": 901.8158,
+      "smoothed_surface_elevation_m": 899.3743,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 17855.848,
+      "raw_dem_elevation_m": 892.5606,
+      "smoothed_surface_elevation_m": 894.7596,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 18181.706,
+      "raw_dem_elevation_m": 893.8136,
+      "smoothed_surface_elevation_m": 895.1302,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 18496.95,
+      "raw_dem_elevation_m": 901.1152,
+      "smoothed_surface_elevation_m": 901.0498,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 18872.654,
+      "raw_dem_elevation_m": 911.5426,
+      "smoothed_surface_elevation_m": 909.3599,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 19186.007,
+      "raw_dem_elevation_m": 909.0032,
+      "smoothed_surface_elevation_m": 909.3525,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 19598.383,
+      "raw_dem_elevation_m": 906.6804,
+      "smoothed_surface_elevation_m": 913.9284,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 19848.347,
+      "raw_dem_elevation_m": 930.1483,
+      "smoothed_surface_elevation_m": 924.2899,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 20289.138,
+      "raw_dem_elevation_m": 949.182,
+      "smoothed_surface_elevation_m": 947.1667,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21229.438,
+      "raw_dem_elevation_m": 925.096,
+      "smoothed_surface_elevation_m": 923.5377,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21239.086,
+      "raw_dem_elevation_m": 924.4095,
+      "smoothed_surface_elevation_m": 923.5037,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21284.997,
+      "raw_dem_elevation_m": 923.1396,
+      "smoothed_surface_elevation_m": 923.3202,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21359.509,
+      "raw_dem_elevation_m": 922.323,
+      "smoothed_surface_elevation_m": 923.058,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21436.164,
+      "raw_dem_elevation_m": 922.6722,
+      "smoothed_surface_elevation_m": 922.8259,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21575.83,
+      "raw_dem_elevation_m": 921.6825,
+      "smoothed_surface_elevation_m": 922.3587,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21716.206,
+      "raw_dem_elevation_m": 920.4025,
+      "smoothed_surface_elevation_m": 921.4625,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 21880.752,
+      "raw_dem_elevation_m": 922.4622,
+      "smoothed_surface_elevation_m": 920.0755,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 22162.902,
+      "raw_dem_elevation_m": 911.9945,
+      "smoothed_surface_elevation_m": 914.6304,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 22431.301,
+      "raw_dem_elevation_m": 911.6255,
+      "smoothed_surface_elevation_m": 911.8686,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 22906.871,
+      "raw_dem_elevation_m": 915.6501,
+      "smoothed_surface_elevation_m": 914.8089,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 22986.159,
+      "raw_dem_elevation_m": 914.0458,
+      "smoothed_surface_elevation_m": 914.707,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 23375.841,
+      "raw_dem_elevation_m": 914.1069,
+      "smoothed_surface_elevation_m": 916.0125,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 23596.722,
+      "raw_dem_elevation_m": 918.6577,
+      "smoothed_surface_elevation_m": 917.2438,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 23650.556,
+      "raw_dem_elevation_m": 917.9466,
+      "smoothed_surface_elevation_m": 917.3103,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 23864.337,
+      "raw_dem_elevation_m": 916.6199,
+      "smoothed_surface_elevation_m": 914.5521,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 24185.518,
+      "raw_dem_elevation_m": 902.5392,
+      "smoothed_surface_elevation_m": 906.1707,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 24291.944,
+      "raw_dem_elevation_m": 903.4149,
+      "smoothed_surface_elevation_m": 904.8077,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 24403.836,
+      "raw_dem_elevation_m": 909.8341,
+      "smoothed_surface_elevation_m": 903.3631,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 24725.984,
+      "raw_dem_elevation_m": 886.3627,
+      "smoothed_surface_elevation_m": 892.0303,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25043.216,
+      "raw_dem_elevation_m": 885.9006,
+      "smoothed_surface_elevation_m": 892.6426,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25220.313,
+      "raw_dem_elevation_m": 898.5063,
+      "smoothed_surface_elevation_m": 896.6119,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25357.591,
+      "raw_dem_elevation_m": 899.8844,
+      "smoothed_surface_elevation_m": 897.7338,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25390.67,
+      "raw_dem_elevation_m": 898.9844,
+      "smoothed_surface_elevation_m": 897.7309,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25497.416,
+      "raw_dem_elevation_m": 899.4909,
+      "smoothed_surface_elevation_m": 897.1804,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25677.666,
+      "raw_dem_elevation_m": 895.6449,
+      "smoothed_surface_elevation_m": 894.8799,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25862.365,
+      "raw_dem_elevation_m": 889.2187,
+      "smoothed_surface_elevation_m": 890.6134,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 25881.29,
+      "raw_dem_elevation_m": 888.1273,
+      "smoothed_surface_elevation_m": 890.2397,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 26214.379,
+      "raw_dem_elevation_m": 882.9843,
+      "smoothed_surface_elevation_m": 884.9929,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 26496.82,
+      "raw_dem_elevation_m": 884.3297,
+      "smoothed_surface_elevation_m": 882.0419,
+      "conditioned_surface_elevation_m": 736.5428,
+      "conditioned_bed_elevation_m": 734.5428,
+      "conditioned_surface_normalized": 0.21294881,
+      "conditioned_bed_normalized": 0.20759449
+    },
+    {
+      "station_m": 26829.586,
+      "raw_dem_elevation_m": 878.183,
+      "smoothed_surface_elevation_m": 819.1155,
+      "conditioned_surface_elevation_m": 728.6635,
+      "conditioned_bed_elevation_m": 726.6635,
+      "conditioned_surface_normalized": 0.19185466,
+      "conditioned_bed_normalized": 0.18650034
+    },
+    {
+      "station_m": 26991.09,
+      "raw_dem_elevation_m": 759.2403,
+      "smoothed_surface_elevation_m": 792.9484,
+      "conditioned_surface_elevation_m": 724.6259,
+      "conditioned_bed_elevation_m": 722.6259,
+      "conditioned_surface_normalized": 0.18104536,
+      "conditioned_bed_normalized": 0.17569104
+    },
+    {
+      "station_m": 27122.591,
+      "raw_dem_elevation_m": 721.3384,
+      "smoothed_surface_elevation_m": 791.4426,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27287.348,
+      "raw_dem_elevation_m": 820.7045,
+      "smoothed_surface_elevation_m": 817.576,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27360.863,
+      "raw_dem_elevation_m": 856.0089,
+      "smoothed_surface_elevation_m": 830.21,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27595.977,
+      "raw_dem_elevation_m": 876.1827,
+      "smoothed_surface_elevation_m": 866.5202,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27633.364,
+      "raw_dem_elevation_m": 878.0134,
+      "smoothed_surface_elevation_m": 870.5925,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27734.453,
+      "raw_dem_elevation_m": 876.3967,
+      "smoothed_surface_elevation_m": 876.4007,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 27988.864,
+      "raw_dem_elevation_m": 882.3656,
+      "smoothed_surface_elevation_m": 889.9583,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28102.224,
+      "raw_dem_elevation_m": 892.6396,
+      "smoothed_surface_elevation_m": 894.8525,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28181.829,
+      "raw_dem_elevation_m": 896.3147,
+      "smoothed_surface_elevation_m": 897.4238,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28220.807,
+      "raw_dem_elevation_m": 898.4637,
+      "smoothed_surface_elevation_m": 898.5497,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28258.973,
+      "raw_dem_elevation_m": 900.565,
+      "smoothed_surface_elevation_m": 899.4496,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28360.651,
+      "raw_dem_elevation_m": 906.6555,
+      "smoothed_surface_elevation_m": 901.6363,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28464.996,
+      "raw_dem_elevation_m": 910.1188,
+      "smoothed_surface_elevation_m": 903.3332,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28621.763,
+      "raw_dem_elevation_m": 910.2462,
+      "smoothed_surface_elevation_m": 903.9508,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 28878.132,
+      "raw_dem_elevation_m": 885.7097,
+      "smoothed_surface_elevation_m": 895.4607,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 29460.936,
+      "raw_dem_elevation_m": 896.5299,
+      "smoothed_surface_elevation_m": 896.3832,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 29926.342,
+      "raw_dem_elevation_m": 894.2628,
+      "smoothed_surface_elevation_m": 895.7283,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    },
+    {
+      "station_m": 30000.0,
+      "raw_dem_elevation_m": 897.3818,
+      "smoothed_surface_elevation_m": 895.9463,
+      "conditioned_surface_elevation_m": 721.3384,
+      "conditioned_bed_elevation_m": 719.3384,
+      "conditioned_surface_normalized": 0.17224419,
+      "conditioned_bed_normalized": 0.16688987
+    }
+  ],
+  "promotion_gates": [
+    "geospatial reviewer approves cut/fill bounds and source alignment",
+    "local guide reviews channel placement and river-level corridor silhouettes",
+    "higher-resolution terrain or surveyed bathymetry replaces this visual approximation where available",
+    "custom C++ and GeoClaw validation remain independently green with no dependence on this visual terrain"
+  ]
+}

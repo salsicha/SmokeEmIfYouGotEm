@@ -1,0 +1,97 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_mip_padding_review.v21",
+  "river_id": "futaleufu_terminator",
+  "status": "rgb_mip_padding_color_fix_accepted_alpha4_corridor_and_production_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "rgb_mip_padding_source_fix_retained": true,
+  "neutral_twosidedfoliage_defaults_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v21_mip_padding_diagnostic_report.json",
+  "decision": "retain_alpha_preserving_tile_bounded_rgb_padding_reject_alpha4_visual_promotion_and_tune_opacity_downward",
+  "diagnostic_conclusions": {
+    "transparent_black_rgb_mip_bleed_was_primary_color_loss_cause": true,
+    "rgb_padding_restores_green_crown_response": true,
+    "source_alpha_changed": false,
+    "nontransparent_source_rgb_changed": false,
+    "rgb_padding_fix_should_be_retained": true,
+    "alpha_scale_4_is_promotion_eligible": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "saved_corridor_photometry_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "placement_counts_identical_to_reference": true
+  },
+  "source_contract": {
+    "manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/futaleufu_native_canopy_texture_manifest.json",
+    "schema": "raftsim.unreal.futaleufu_native_canopy_textures.v3",
+    "padding_pixels": 24,
+    "alpha_threshold_255": 2,
+    "atlas_grid": [4, 4],
+    "tile_boundary_crossing_allowed": false,
+    "alpha_preserved_byte_for_byte": true,
+    "nontransparent_rgb_preserved_byte_for_byte": true,
+    "alpha_sha256": "c8b8ce2baab7a740417696a9e3cfdbcd5ad42458ed30828358922d473e1c18c6",
+    "nontransparent_rgb_sha256": "0a4101494bd6a579e8fc0390da9cc13bd2f51f0d9735d5e44e7a1095b552ae16",
+    "padded_transparent_pixel_count": 517669
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+      "reference_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "rgb_padded": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png",
+      "rgb_padded_sha256": "d011073d1016bc08e45ffc55e4a554e4d42e98e8bb70adab4b1ca69171a1cb40",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.016068793402777778,
+      "mean_absolute_rgb_delta": [0.04659830729166667, 0.13922526041666666, 0.025879991319444445],
+      "restored_crown_metrics": {
+        "reference_mean_rgb": [24.200439527129433, 34.20756289784783, 36.95278872385571],
+        "rgb_padded_mean_rgb": [26.042209760533495, 42.75545619884814, 37.758108517732644],
+        "reference_green_dominant_fraction": 0.008790542588663231,
+        "rgb_padded_green_dominant_fraction": 0.6545165201576235,
+        "reference_dark_fraction": 0.7821309487723552,
+        "rgb_padded_dark_fraction": 0.31471658078205517
+      }
+    },
+    "river_eye": {
+      "reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+      "reference_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "rgb_padded": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png",
+      "rgb_padded_sha256": "018e2ec019358264bcab7143af12888a13b2c92bda564014828b97d27ae59693",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.035966796875,
+      "mean_absolute_rgb_delta": [0.09660807291666666, 0.33673177083333333, 0.05287977430555556],
+      "restored_crown_metrics": {
+        "reference_mean_rgb": [20.855473454640148, 29.4460141271443, 30.446079229191756],
+        "rgb_padded_mean_rgb": [22.913739787116306, 38.821490185866345, 31.401191367468506],
+        "reference_green_dominant_fraction": 0.018488981478467496,
+        "rgb_padded_green_dominant_fraction": 0.7100029295921356,
+        "reference_dark_fraction": 0.8507210051756128,
+        "rgb_padded_dark_fraction": 0.6133589401386673
+      }
+    }
+  },
+  "accepted_findings": [
+    "Per-tile transparent RGB padding restores strong olive-green response in the retained near, mid, and runtime-far crown geometry.",
+    "The correction changes only RGB at alpha <=2, while alpha and all nontransparent source RGB remain byte-for-byte identical by recorded hashes.",
+    "Normal and packed texture source files retain their pre-padding hashes, isolating the correction to albedo mip filtering.",
+    "The source correction is deterministic, project-owned, tile-bounded, regression-tested, and retained for later foliage passes."
+  ],
+  "rejection_reasons": [
+    "Four-times opacity still saturates card coverage and produces dense solid crown masses instead of leaf-shaped distance breakup.",
+    "River-eye crown pixels remain 61.34 percent dark despite the large green-response improvement.",
+    "The corridor still contains only one dominant species family and lacks riparian understory, deadwood, mixed canopy, and ecology review.",
+    "Coarse terrain, provisional water, sparse placement, temporal wind, and packaged desktop/VR gates remain open."
+  ],
+  "next_iteration_requirements": [
+    "Capture alpha scales 2 and 3 with the corrected atlas, neutral 1.18 reflectance, native TwoSidedFoliage, and leaf shadows disabled.",
+    "Choose the lowest opacity scale that preserves registered near/mid/far crown continuity while restoring leaf-edge breakup.",
+    "Then reintroduce bounded leaf shadows with contact-shadow controls and verify that elongated ground carpets do not return.",
+    "Repeat both corridor views before adding a second ecology-reviewed native canopy stratum."
+  ]
+}

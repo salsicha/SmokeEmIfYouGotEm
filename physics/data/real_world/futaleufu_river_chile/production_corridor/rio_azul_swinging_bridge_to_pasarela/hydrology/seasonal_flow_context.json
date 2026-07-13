@@ -1,0 +1,60 @@
+{
+  "provider": "Direccion General de Aguas, Chile",
+  "station": "Rio Futaleufu ante junta rio Malito",
+  "station_code": "10704002-1",
+  "station_lon_lat": [
+    -72.1075,
+    -43.449166
+  ],
+  "units": "m3/s",
+  "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+  "official_monthly_mean_m3_s_2020_2023": {
+    "jan": 275.23,
+    "feb": 160.3,
+    "mar": 130.61,
+    "apr": 168.58,
+    "may": 222.89,
+    "jun": 410.51,
+    "jul": 320.07,
+    "aug": 256.56,
+    "sep": 223.64,
+    "oct": 208.66,
+    "nov": 289.29,
+    "dec": 290.2
+  },
+  "source_urls": [
+    "https://climatologia.meteochile.gob.cl/application/informacion/fichaDeEstacion/430011",
+    "https://www.camara.cl/verdoc.aspx?prmID=132134&prmTIPO=OFICIO_FISCALIZACION_RESPUESTA"
+  ],
+  "planning_bands": [
+    {
+      "id": "low_technical",
+      "range_m3_s": [
+        60.0,
+        160.0
+      ]
+    },
+    {
+      "id": "normal_runnable",
+      "range_m3_s": [
+        160.0,
+        300.0
+      ]
+    },
+    {
+      "id": "high_big_water",
+      "range_m3_s": [
+        300.0,
+        500.0
+      ]
+    },
+    {
+      "id": "unsafe_review_only",
+      "range_m3_s": [
+        500.0,
+        900.0
+      ]
+    }
+  ],
+  "promotion_gate": "Planning bands remain review-only until DGA time-series acquisition, upstream release/rain/snowmelt interpretation, route translation, and Futaleufu guide validation are complete."
+}

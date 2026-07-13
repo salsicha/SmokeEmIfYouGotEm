@@ -1,0 +1,1488 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_visual_review.v9",
+  "generated_on": "2026-07-13",
+  "status": "v9_texture_detail_improved_near_topology_and_overdraw_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_isolated_family_report.json",
+  "source_report_sha256": "23ab8ad761c52eb319c3e39f5407dcf7f537ea130406903766af0aff612fa903",
+  "source_texture_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_v9_texture_manifest.json",
+  "source_texture_manifest_sha256": "3f51132e1e88cd13cf31cf83881eb34fd3a3c3495d5420ef1d669f29d5a4e0d7",
+  "v8_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v8_visual_review.json",
+  "v8_review_sha256": "463443a5b095640e0946dbd2e849f472db4231b01f338af7e22e5be76ac41c48",
+  "review_scope": {
+    "form_count": 8,
+    "fixed_capture_count": 40,
+    "authority_handoff_capture_count": 27,
+    "capture_count": 67,
+    "rhi": "offscreen Metal",
+    "combined_authority": "camera_to_actor_root_distance",
+    "near_representation_eligible": false,
+    "minimum_near_cards_per_form": 10480,
+    "maximum_near_cards_per_form": 19984,
+    "minimum_near_triangles_per_form": 20960,
+    "maximum_near_triangles_per_form": 39968,
+    "near_triangle_reduction_from_v8": 0.75,
+    "texture_source_has_external_reference_images": false
+  },
+  "accepted_findings": [
+    "The project-generated V9 source resolves individual scale leaves, twig color, and asymmetric terminal detail far beyond the V8 flat-color ribbons.",
+    "Near geometry falls to 20,960-39,968 triangles per form, at least 74.99 percent below the V8 maximum, while all eight near-only closeups render.",
+    "Actor-root fallback authority remains exact: all nine combined captures are byte-identical to far-only and contain no representation mixture."
+  ],
+  "rejection_reasons": [
+    "The narrower V9 atlas regresses the authoritative far fallback: mean turntable coverage falls from 1.82 to 0.39 percent and mean 60 m coverage falls from 2.94 to 0.75 percent, failing both retained floors.",
+    "At 20-36 m the near cards often turn edge-on and read as sparse pointed spikes rather than continuous flattened cypress sprays; the far fallback remains visibly fuller.",
+    "Closeups expose severe self-intersection, repeated radial card placement, long disconnected-looking twigs, and near-black overdraw pockets even though the source texture itself is improved.",
+    "Each form uses 10,480-19,984 masked cards, creating an unvalidated and likely excessive masked-overdraw burden despite the low triangle count.",
+    "The sixteen atlas tiles are bounded transformations of one generated source, so repeated branch identity remains visible and is insufficient for production variety.",
+    "Full-tree crowns retain repeated horizontal primary tiers and underfilled lower/middle interiors."
+  ],
+  "quantitative_review": {
+    "view_summaries": {
+      "turntable": {
+        "sample_count": 16,
+        "authority_mode": "combined_far_fallback",
+        "minimum_green_dominant_fraction": 0.0006130642361111111,
+        "mean_green_dominant_fraction": 0.0039039442274305556,
+        "maximum_green_dominant_fraction": 0.006260850694444445,
+        "v8_mean_green_dominant_fraction": 0.01817755805121528,
+        "regression_floor": 0.015,
+        "regression_floor_passed": false
+      },
+      "closeup": {
+        "sample_count": 8,
+        "authority_mode": "near_only",
+        "minimum_green_dominant_fraction": 0.06086371527777778,
+        "mean_green_dominant_fraction": 0.11742119683159723,
+        "maximum_green_dominant_fraction": 0.14359483506944445,
+        "v8_mean_green_dominant_fraction": 8.138020833333334e-07,
+        "regression_floor": null,
+        "regression_floor_passed": null
+      },
+      "river_distance_60m": {
+        "sample_count": 8,
+        "authority_mode": "combined_far_fallback",
+        "minimum_green_dominant_fraction": 0.0015028211805555556,
+        "mean_green_dominant_fraction": 0.0075318739149305555,
+        "maximum_green_dominant_fraction": 0.01244357638888889,
+        "v8_mean_green_dominant_fraction": 0.029378526475694444,
+        "regression_floor": 0.008,
+        "regression_floor_passed": false
+      },
+      "river_distance_150m": {
+        "sample_count": 8,
+        "authority_mode": "combined_far_fallback",
+        "minimum_green_dominant_fraction": 0.0010362413194444444,
+        "mean_green_dominant_fraction": 0.004770372178819445,
+        "maximum_green_dominant_fraction": 0.0076877170138888885,
+        "v8_mean_green_dominant_fraction": 0.01782958984375,
+        "regression_floor": 0.003,
+        "regression_floor_passed": true
+      }
+    },
+    "regression_floor_result": {
+      "turntable": false,
+      "river_distance_60m": false,
+      "river_distance_150m": true,
+      "all_required_floors_passed": false,
+      "visual_acceptance_implied_by_floor_pass": false
+    },
+    "near_to_far_green_dominant_fraction": {
+      "minimum": 0.4880117890712124,
+      "mean": 0.5808741219056808,
+      "maximum": 0.6866703036915803
+    },
+    "authority_result": {
+      "triplet_count": 9,
+      "combined_matches_near_count": 0,
+      "combined_matches_far_count": 9,
+      "combined_differs_from_both_count": 0,
+      "actor_root_authority_passed": true,
+      "triplets": [
+        {
+          "form_id": "open_grown_conical",
+          "distance": "20m",
+          "near_only_capture": "open_grown_conical_handoff_20m_near_only",
+          "far_only_capture": "open_grown_conical_handoff_20m_far_only",
+          "combined_capture": "open_grown_conical_handoff_20m_combined",
+          "near_to_far_green_dominant_fraction": 0.6199717874044411,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.41961588541666667,
+            "mean_absolute_rgb_delta": 17.479894386574074,
+            "maximum_channel_delta": 231
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.41961588541666667,
+            "mean_absolute_rgb_delta": 17.479894386574074,
+            "maximum_channel_delta": 231
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "open_grown_conical",
+          "distance": "28m",
+          "near_only_capture": "open_grown_conical_handoff_28m_near_only",
+          "far_only_capture": "open_grown_conical_handoff_28m_far_only",
+          "combined_capture": "open_grown_conical_handoff_28m_combined",
+          "near_to_far_green_dominant_fraction": 0.5645161290322581,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.2975835503472222,
+            "mean_absolute_rgb_delta": 12.000940755208333,
+            "maximum_channel_delta": 231
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.2975835503472222,
+            "mean_absolute_rgb_delta": 12.000940755208333,
+            "maximum_channel_delta": 231
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "open_grown_conical",
+          "distance": "36m",
+          "near_only_capture": "open_grown_conical_handoff_36m_near_only",
+          "far_only_capture": "open_grown_conical_handoff_36m_far_only",
+          "combined_capture": "open_grown_conical_handoff_36m_combined",
+          "near_to_far_green_dominant_fraction": 0.4880117890712124,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.24355902777777777,
+            "mean_absolute_rgb_delta": 8.97142722800926,
+            "maximum_channel_delta": 230
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.24355902777777777,
+            "mean_absolute_rgb_delta": 8.97142722800926,
+            "maximum_channel_delta": 230
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "closed_grove_columnar",
+          "distance": "20m",
+          "near_only_capture": "closed_grove_columnar_handoff_20m_near_only",
+          "far_only_capture": "closed_grove_columnar_handoff_20m_far_only",
+          "combined_capture": "closed_grove_columnar_handoff_20m_combined",
+          "near_to_far_green_dominant_fraction": 0.6866703036915803,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.31103298611111113,
+            "mean_absolute_rgb_delta": 11.752227285879629,
+            "maximum_channel_delta": 205
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.31103298611111113,
+            "mean_absolute_rgb_delta": 11.752227285879629,
+            "maximum_channel_delta": 205
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "closed_grove_columnar",
+          "distance": "28m",
+          "near_only_capture": "closed_grove_columnar_handoff_28m_near_only",
+          "far_only_capture": "closed_grove_columnar_handoff_28m_far_only",
+          "combined_capture": "closed_grove_columnar_handoff_28m_combined",
+          "near_to_far_green_dominant_fraction": 0.6051621904429717,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.23027560763888888,
+            "mean_absolute_rgb_delta": 8.344552589699074,
+            "maximum_channel_delta": 229
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.23027560763888888,
+            "mean_absolute_rgb_delta": 8.344552589699074,
+            "maximum_channel_delta": 229
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "closed_grove_columnar",
+          "distance": "36m",
+          "near_only_capture": "closed_grove_columnar_handoff_36m_near_only",
+          "far_only_capture": "closed_grove_columnar_handoff_36m_far_only",
+          "combined_capture": "closed_grove_columnar_handoff_36m_combined",
+          "near_to_far_green_dominant_fraction": 0.5468785342682652,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.17692599826388888,
+            "mean_absolute_rgb_delta": 6.226716941550926,
+            "maximum_channel_delta": 227
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.17692599826388888,
+            "mean_absolute_rgb_delta": 6.226716941550926,
+            "maximum_channel_delta": 227
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "grove_intermediate",
+          "distance": "20m",
+          "near_only_capture": "grove_intermediate_handoff_20m_near_only",
+          "far_only_capture": "grove_intermediate_handoff_20m_far_only",
+          "combined_capture": "grove_intermediate_handoff_20m_combined",
+          "near_to_far_green_dominant_fraction": 0.6532085941946499,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.24519205729166665,
+            "mean_absolute_rgb_delta": 11.217951388888888,
+            "maximum_channel_delta": 233
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.24519205729166665,
+            "mean_absolute_rgb_delta": 11.217951388888888,
+            "maximum_channel_delta": 233
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "grove_intermediate",
+          "distance": "28m",
+          "near_only_capture": "grove_intermediate_handoff_28m_near_only",
+          "far_only_capture": "grove_intermediate_handoff_28m_far_only",
+          "combined_capture": "grove_intermediate_handoff_28m_combined",
+          "near_to_far_green_dominant_fraction": 0.5625071616821359,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.15892469618055555,
+            "mean_absolute_rgb_delta": 6.398688512731481,
+            "maximum_channel_delta": 232
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.15892469618055555,
+            "mean_absolute_rgb_delta": 6.398688512731481,
+            "maximum_channel_delta": 232
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        },
+        {
+          "form_id": "grove_intermediate",
+          "distance": "36m",
+          "near_only_capture": "grove_intermediate_handoff_36m_near_only",
+          "far_only_capture": "grove_intermediate_handoff_36m_far_only",
+          "combined_capture": "grove_intermediate_handoff_36m_combined",
+          "near_to_far_green_dominant_fraction": 0.5009406073636119,
+          "near_vs_far": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.10942708333333333,
+            "mean_absolute_rgb_delta": 3.7348961950231483,
+            "maximum_channel_delta": 232
+          },
+          "combined_vs_near": {
+            "byte_identical": false,
+            "changed_pixel_fraction": 0.10942708333333333,
+            "mean_absolute_rgb_delta": 3.7348961950231483,
+            "maximum_channel_delta": 232
+          },
+          "combined_vs_far": {
+            "byte_identical": true,
+            "changed_pixel_fraction": 0.0,
+            "mean_absolute_rgb_delta": 0.0,
+            "maximum_channel_delta": 0
+          }
+        }
+      ]
+    }
+  },
+  "captures": [
+    {
+      "capture_id": "open_grown_conical_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "125aa09e24d08afc0214336a2614ebc724397f0970b0c741de5de6e0b7bd87e6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5677,
+      "green_dominant_fraction": 0.006159939236111111,
+      "dark_pixel_fraction": 0.022276475694444443,
+      "mean_rgb": [
+        166.8717041015625,
+        180.6625518798828,
+        185.1658477783203
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "3d80f80a7b01bbcb8451916e43679f067ae562223fde5b43f3d715441b2f6607",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5770,
+      "green_dominant_fraction": 0.006260850694444445,
+      "dark_pixel_fraction": 0.017237413194444443,
+      "mean_rgb": [
+        166.58212280273438,
+        180.3139190673828,
+        184.90184020996094
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "101d7028bf8d79049ca4b3a17b3d5ae4d2280cb1bb812d2f177f16053cfa203f",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 56092,
+      "green_dominant_fraction": 0.06086371527777778,
+      "dark_pixel_fraction": 0.5052983940972222,
+      "mean_rgb": [
+        96.88050079345703,
+        96.65812683105469,
+        83.81716918945312
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "e944bc30258a097d7dab484b9b1b4d71085e8850697e7ce6ee8027b3684f45bd",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 11468,
+      "green_dominant_fraction": 0.01244357638888889,
+      "dark_pixel_fraction": 0.039140625,
+      "mean_rgb": [
+        166.89413452148438,
+        179.35862731933594,
+        181.9011993408203
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "ffff3a784f6b83ee882397132482e783db7c6b33aeefb567c566eba818d62214",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 7085,
+      "green_dominant_fraction": 0.0076877170138888885,
+      "dark_pixel_fraction": 0.019044053819444445,
+      "mean_rgb": [
+        179.8482666015625,
+        189.9911346435547,
+        190.1091766357422
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_20m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_20m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "ac554daa3332fff298bfc94593ac1ef5e37ad5c4fe6159fd65a741c2a3060208",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 27249,
+      "green_dominant_fraction": 0.029567057291666667,
+      "dark_pixel_fraction": 0.15451931423611112,
+      "mean_rgb": [
+        133.2072296142578,
+        146.2744598388672,
+        147.50839233398438
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_20m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_20m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "0e2c2075a6cec60df2ae4e1414ca09068cc90c23ba2798c4188fc6bf699824f8",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 43952,
+      "green_dominant_fraction": 0.047690972222222225,
+      "dark_pixel_fraction": 0.18270616319444444,
+      "mean_rgb": [
+        127.00189971923828,
+        139.417236328125,
+        137.7764129638672
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_20m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_20m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "0e2c2075a6cec60df2ae4e1414ca09068cc90c23ba2798c4188fc6bf699824f8",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 43952,
+      "green_dominant_fraction": 0.047690972222222225,
+      "dark_pixel_fraction": 0.18270616319444444,
+      "mean_rgb": [
+        127.00189971923828,
+        139.417236328125,
+        137.7764129638672
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_28m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_28m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "ac1ca2517699ae43c96236b42a8b151141ab0af2952b631e5b0e679d4cdfd742",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 17640,
+      "green_dominant_fraction": 0.019140625,
+      "dark_pixel_fraction": 0.10159613715277778,
+      "mean_rgb": [
+        144.09750366210938,
+        158.167724609375,
+        161.28868103027344
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_28m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_28m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "3ad1ad358076903622ee3b59940767360838870be1357203a5272a9aefad71a6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 31248,
+      "green_dominant_fraction": 0.03390625,
+      "dark_pixel_fraction": 0.12069444444444444,
+      "mean_rgb": [
+        139.70567321777344,
+        153.46337890625,
+        154.72203063964844
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_28m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_28m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "3ad1ad358076903622ee3b59940767360838870be1357203a5272a9aefad71a6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 31248,
+      "green_dominant_fraction": 0.03390625,
+      "dark_pixel_fraction": 0.12069444444444444,
+      "mean_rgb": [
+        139.70567321777344,
+        153.46337890625,
+        154.72203063964844
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_36m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_36m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "7409b9048477c7bf57b3a57bd930547f81bd6659e88ea4b248d7cdae98479f31",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 12253,
+      "green_dominant_fraction": 0.013295355902777778,
+      "dark_pixel_fraction": 0.0763650173611111,
+      "mean_rgb": [
+        150.17864990234375,
+        164.33290100097656,
+        168.09329223632812
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_36m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_36m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "c8acef4c92315de2f575c344642a398ca5e38975b22fdc0ab1851798e48a787e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 25108,
+      "green_dominant_fraction": 0.02724392361111111,
+      "dark_pixel_fraction": 0.09014539930555555,
+      "mean_rgb": [
+        146.8013153076172,
+        160.8123016357422,
+        163.1356201171875
+      ]
+    },
+    {
+      "capture_id": "open_grown_conical_handoff_36m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_open_grown_conical_handoff_36m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "c8acef4c92315de2f575c344642a398ca5e38975b22fdc0ab1851798e48a787e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 25108,
+      "green_dominant_fraction": 0.02724392361111111,
+      "dark_pixel_fraction": 0.09014539930555555,
+      "mean_rgb": [
+        146.8013153076172,
+        160.8123016357422,
+        163.1356201171875
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "7ad01125bd0e3f913eab80d5eb4dceab48178e083190f6c5249bbba4104a981e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4446,
+      "green_dominant_fraction": 0.00482421875,
+      "dark_pixel_fraction": 0.01767578125,
+      "mean_rgb": [
+        160.001708984375,
+        176.31439208984375,
+        183.30300903320312
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "2b099d3d621ba2950f67f1d0605d1d93ed6c906214c4608786182194e5d59915",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4343,
+      "green_dominant_fraction": 0.0047124565972222225,
+      "dark_pixel_fraction": 0.013322482638888888,
+      "mean_rgb": [
+        159.80316162109375,
+        176.0326385498047,
+        183.04774475097656
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "2b7e8da7c908d8b3d7546ae6c05555e4c7711201c2f43b613e67c7a2ec7701f7",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 119787,
+      "green_dominant_fraction": 0.12997721354166666,
+      "dark_pixel_fraction": 0.364990234375,
+      "mean_rgb": [
+        114.26973724365234,
+        116.6166763305664,
+        97.24980926513672
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "551bba62f2904285fb77111c36097238fde4bd8a08168ae1b048347de0067bdd",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 7816,
+      "green_dominant_fraction": 0.008480902777777778,
+      "dark_pixel_fraction": 0.029638671875,
+      "mean_rgb": [
+        159.85589599609375,
+        175.5993194580078,
+        181.30419921875
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "b846dfd8d5572bbbfa1c36fcb282d95ae9409ae57aadd9861d9a11a37a81772c",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5155,
+      "green_dominant_fraction": 0.005593532986111111,
+      "dark_pixel_fraction": 0.015518663194444445,
+      "mean_rgb": [
+        175.46624755859375,
+        187.6194305419922,
+        189.22799682617188
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_20m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_20m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "72d57bf0bfee97759975566c052f06f28de68c856d578351456f7403846b2071",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 22656,
+      "green_dominant_fraction": 0.024583333333333332,
+      "dark_pixel_fraction": 0.12040147569444444,
+      "mean_rgb": [
+        113.42550659179688,
+        135.1450653076172,
+        144.66619873046875
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_20m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_20m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "0da9169f58ec2a9ef0c93f12636a0084a9467db2fc9783d916849cd2c454a593",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 32994,
+      "green_dominant_fraction": 0.03580078125,
+      "dark_pixel_fraction": 0.13887152777777778,
+      "mean_rgb": [
+        110.3471908569336,
+        131.19833374023438,
+        138.1842498779297
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_20m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_20m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "0da9169f58ec2a9ef0c93f12636a0084a9467db2fc9783d916849cd2c454a593",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 32994,
+      "green_dominant_fraction": 0.03580078125,
+      "dark_pixel_fraction": 0.13887152777777778,
+      "mean_rgb": [
+        110.3471908569336,
+        131.19833374023438,
+        138.1842498779297
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_28m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_28m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "cb5fa9f01abd615fe35318565d68205422386816ce85d3ab3809a834a4f1e4b1",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 13880,
+      "green_dominant_fraction": 0.01506076388888889,
+      "dark_pixel_fraction": 0.08020182291666667,
+      "mean_rgb": [
+        127.6351547241211,
+        148.41769409179688,
+        157.830322265625
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_28m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_28m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "230ad10d57f666e7563419413271d1ec729dd7d01efece47deea05809b603a9c",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 22936,
+      "green_dominant_fraction": 0.02488715277777778,
+      "dark_pixel_fraction": 0.09303168402777778,
+      "mean_rgb": [
+        124.96944427490234,
+        145.31259155273438,
+        153.09730529785156
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_28m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_28m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "230ad10d57f666e7563419413271d1ec729dd7d01efece47deea05809b603a9c",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 22936,
+      "green_dominant_fraction": 0.02488715277777778,
+      "dark_pixel_fraction": 0.09303168402777778,
+      "mean_rgb": [
+        124.96944427490234,
+        145.31259155273438,
+        153.09730529785156
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_36m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_36m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "6faa23ce72aa294c713707340a183dbd9f03f0e4f6e36aff92383f6aefa3d87b",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 9671,
+      "green_dominant_fraction": 0.010493706597222222,
+      "dark_pixel_fraction": 0.057426215277777776,
+      "mean_rgb": [
+        137.55287170410156,
+        157.23373413085938,
+        166.2322540283203
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_36m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_36m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "1c0fd486f7bea85906a76e0bcbe4d8a8ebc015f2e6ae84300ef98e2ce20fd684",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 17684,
+      "green_dominant_fraction": 0.019188368055555554,
+      "dark_pixel_fraction": 0.06681532118055555,
+      "mean_rgb": [
+        135.36807250976562,
+        154.8433837890625,
+        162.74208068847656
+      ]
+    },
+    {
+      "capture_id": "closed_grove_columnar_handoff_36m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_closed_grove_columnar_handoff_36m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "1c0fd486f7bea85906a76e0bcbe4d8a8ebc015f2e6ae84300ef98e2ce20fd684",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 17684,
+      "green_dominant_fraction": 0.019188368055555554,
+      "dark_pixel_fraction": 0.06681532118055555,
+      "mean_rgb": [
+        135.36807250976562,
+        154.8433837890625,
+        162.74208068847656
+      ]
+    },
+    {
+      "capture_id": "rocky_slope_asymmetric_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_rocky_slope_asymmetric_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "7b7deb2aad2aca9db8212f89260535043f08d9858d4f8169b60691478527fc77",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4122,
+      "green_dominant_fraction": 0.00447265625,
+      "dark_pixel_fraction": 0.015636935763888887,
+      "mean_rgb": [
+        171.85350036621094,
+        184.92324829101562,
+        188.92807006835938
+      ]
+    },
+    {
+      "capture_id": "rocky_slope_asymmetric_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_rocky_slope_asymmetric_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "a13caa56599cf73ff8082481c3e65f30b3c55bb026ce9f5bc0069f875a2f353d",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4324,
+      "green_dominant_fraction": 0.004691840277777777,
+      "dark_pixel_fraction": 0.01556423611111111,
+      "mean_rgb": [
+        171.5772247314453,
+        184.5399932861328,
+        188.5133056640625
+      ]
+    },
+    {
+      "capture_id": "rocky_slope_asymmetric_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_rocky_slope_asymmetric_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "576a39868eb45b2ee955cae338e968b573c8eaf22c2203f5439073a3a5e8cca7",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 118435,
+      "green_dominant_fraction": 0.12851019965277777,
+      "dark_pixel_fraction": 0.45601236979166665,
+      "mean_rgb": [
+        97.40202331542969,
+        99.56100463867188,
+        81.43964385986328
+      ]
+    },
+    {
+      "capture_id": "rocky_slope_asymmetric_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_rocky_slope_asymmetric_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "e2fc2d38b934b4b3deffe27f1bf3eba36991509c9c50cbce202c8317c1d046c5",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 8274,
+      "green_dominant_fraction": 0.008977864583333333,
+      "dark_pixel_fraction": 0.02826931423611111,
+      "mean_rgb": [
+        173.1586151123047,
+        184.7943572998047,
+        186.86734008789062
+      ]
+    },
+    {
+      "capture_id": "rocky_slope_asymmetric_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_rocky_slope_asymmetric_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "49ad251eb3975279ee49377c43b98f1152b520408181089ecf560d42248851bd",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5424,
+      "green_dominant_fraction": 0.005885416666666666,
+      "dark_pixel_fraction": 0.01433376736111111,
+      "mean_rgb": [
+        183.22596740722656,
+        192.7855682373047,
+        192.68997192382812
+      ]
+    },
+    {
+      "capture_id": "storm_damaged_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_storm_damaged_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "0159cfa5316796452e9743f384d6334c20be280eee9fdee3f83e1919837dadf4",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4090,
+      "green_dominant_fraction": 0.004437934027777778,
+      "dark_pixel_fraction": 0.014555121527777777,
+      "mean_rgb": [
+        173.85986328125,
+        186.35130310058594,
+        189.8462677001953
+      ]
+    },
+    {
+      "capture_id": "storm_damaged_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_storm_damaged_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "2799b3d1738385c2b4dc9e885287c65934cce6e3267b4ec0918a356e154f0c8f",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 3804,
+      "green_dominant_fraction": 0.004127604166666667,
+      "dark_pixel_fraction": 0.011178385416666667,
+      "mean_rgb": [
+        174.26031494140625,
+        186.5232696533203,
+        189.90684509277344
+      ]
+    },
+    {
+      "capture_id": "storm_damaged_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_storm_damaged_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "2a35c113949a0b298e9192154f1ac67ac3c220e2ae3ad3b282aa19020d032e36",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 120473,
+      "green_dominant_fraction": 0.13072157118055555,
+      "dark_pixel_fraction": 0.47749131944444445,
+      "mean_rgb": [
+        95.06131744384766,
+        97.44949340820312,
+        80.12520599365234
+      ]
+    },
+    {
+      "capture_id": "storm_damaged_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_storm_damaged_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "bc65dee469d0484a0180347e94fe0670c52afdf477d71ed28bdf45159936c679",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 8241,
+      "green_dominant_fraction": 0.008942057291666666,
+      "dark_pixel_fraction": 0.026260850694444445,
+      "mean_rgb": [
+        175.6321563720703,
+        186.5486297607422,
+        188.05328369140625
+      ]
+    },
+    {
+      "capture_id": "storm_damaged_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_storm_damaged_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "313cfce1e5b8c811c2513d9cfd6bb9a343a3ff80d498544d6f098f0443c72715",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4859,
+      "green_dominant_fraction": 0.005272352430555556,
+      "dark_pixel_fraction": 0.012776692708333334,
+      "mean_rgb": [
+        184.8541717529297,
+        194.03529357910156,
+        193.77578735351562
+      ]
+    },
+    {
+      "capture_id": "coigue_transition_edge_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_coigue_transition_edge_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "357b7175ee99481c79b1adb33af651d38976f0ddfef54d15324fbdedec55dedc",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5021,
+      "green_dominant_fraction": 0.0054481336805555555,
+      "dark_pixel_fraction": 0.017161458333333334,
+      "mean_rgb": [
+        166.07354736328125,
+        180.60671997070312,
+        185.9423065185547
+      ]
+    },
+    {
+      "capture_id": "coigue_transition_edge_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_coigue_transition_edge_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "1f9ffa446d762c959f168348293ecb338c32e2258ed83e5dfe195a0ed796a74c",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4824,
+      "green_dominant_fraction": 0.005234375,
+      "dark_pixel_fraction": 0.014817708333333334,
+      "mean_rgb": [
+        166.3328094482422,
+        180.63983154296875,
+        185.82489013671875
+      ]
+    },
+    {
+      "capture_id": "coigue_transition_edge_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_coigue_transition_edge_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "d52211c2c3957fd563f90966b1278b57a56e57aef9838b3a0440dab7917a84e4",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 85986,
+      "green_dominant_fraction": 0.09330078125,
+      "dark_pixel_fraction": 0.46860677083333335,
+      "mean_rgb": [
+        99.74626922607422,
+        101.594482421875,
+        88.0926742553711
+      ]
+    },
+    {
+      "capture_id": "coigue_transition_edge_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_coigue_transition_edge_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "c993fec1a747360bf67819ad7860f597d5784512735124c60bc6260cdced90b6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 8975,
+      "green_dominant_fraction": 0.009738498263888888,
+      "dark_pixel_fraction": 0.031276041666666664,
+      "mean_rgb": [
+        166.6990966796875,
+        180.20738220214844,
+        183.8961639404297
+      ]
+    },
+    {
+      "capture_id": "coigue_transition_edge_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_coigue_transition_edge_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "2003590b8c444d92b04798e38b04eef6261590edabcf61e228e2eefeec015f21",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5806,
+      "green_dominant_fraction": 0.006299913194444445,
+      "dark_pixel_fraction": 0.015775824652777777,
+      "mean_rgb": [
+        179.28746032714844,
+        190.1277618408203,
+        190.87286376953125
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "cdb461a238f4e88abbaa431115f2814b30ac798505f6211e00000109e26858b5",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 2041,
+      "green_dominant_fraction": 0.0022146267361111112,
+      "dark_pixel_fraction": 0.0062282986111111115,
+      "mean_rgb": [
+        191.33489990234375,
+        199.45449829101562,
+        199.54501342773438
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "06e8ddd77c832c8862dffe5851dd18db7e4a09b855905a6541146e1a193c0e20",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 2176,
+      "green_dominant_fraction": 0.002361111111111111,
+      "dark_pixel_fraction": 0.005317925347222223,
+      "mean_rgb": [
+        191.75767517089844,
+        199.61985778808594,
+        199.41786193847656
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "c71dd85ac7710eb9f337f8ce68dd30f9752bcc5880f70977ebe16db862278911",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 132320,
+      "green_dominant_fraction": 0.14357638888888888,
+      "dark_pixel_fraction": 0.46328125,
+      "mean_rgb": [
+        90.01136016845703,
+        90.97284698486328,
+        66.34996795654297
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "848ce09090dc53f54393f8165ef624e45fa67dc66a382020ab558c92f221bde0",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 3923,
+      "green_dominant_fraction": 0.004256727430555556,
+      "dark_pixel_fraction": 0.011115451388888888,
+      "mean_rgb": [
+        196.7251434326172,
+        202.630126953125,
+        200.79116821289062
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "72f450cd17325f8ccbd2656feb43d8e4941a3078d754b4e0d72f99edbf394e3f",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 2527,
+      "green_dominant_fraction": 0.0027419704861111113,
+      "dark_pixel_fraction": 0.005383029513888889,
+      "mean_rgb": [
+        196.79368591308594,
+        202.8845977783203,
+        201.15122985839844
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_20m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_20m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "872f102f86ff678c3a7e8068cb68316569d61139f0f46edcbabd6243de41eb08",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 18363,
+      "green_dominant_fraction": 0.019925130208333332,
+      "dark_pixel_fraction": 0.07799370659722223,
+      "mean_rgb": [
+        195.02120971679688,
+        195.29078674316406,
+        188.37332153320312
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_20m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_20m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "f2b66750364c3cb3e5dd40919857b6aff8cf5c463d756e23d6a50c7b7c8cdf1e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 28112,
+      "green_dominant_fraction": 0.030503472222222223,
+      "dark_pixel_fraction": 0.08913411458333333,
+      "mean_rgb": [
+        190.26548767089844,
+        190.5931396484375,
+        182.145263671875
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_20m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_20m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "f2b66750364c3cb3e5dd40919857b6aff8cf5c463d756e23d6a50c7b7c8cdf1e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 28112,
+      "green_dominant_fraction": 0.030503472222222223,
+      "dark_pixel_fraction": 0.08913411458333333,
+      "mean_rgb": [
+        190.26548767089844,
+        190.5931396484375,
+        182.145263671875
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_28m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_28m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "f0a6394bf51ddd1c2fc0b956312eebfea2827e101370febb568bb03af8c66667",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 9818,
+      "green_dominant_fraction": 0.010653211805555556,
+      "dark_pixel_fraction": 0.04694010416666667,
+      "mean_rgb": [
+        197.96575927734375,
+        199.95327758789062,
+        195.07435607910156
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_28m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_28m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "72d5ea322fc0f5b75efa08abe02152a04dcb75d184dc8426b6a166d65365a287",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 17454,
+      "green_dominant_fraction": 0.018938802083333334,
+      "dark_pixel_fraction": 0.053981119791666664,
+      "mean_rgb": [
+        195.24365234375,
+        197.29098510742188,
+        191.5554962158203
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_28m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_28m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "72d5ea322fc0f5b75efa08abe02152a04dcb75d184dc8426b6a166d65365a287",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 17454,
+      "green_dominant_fraction": 0.018938802083333334,
+      "dark_pixel_fraction": 0.053981119791666664,
+      "mean_rgb": [
+        195.24365234375,
+        197.29098510742188,
+        191.5554962158203
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_36m_near_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_36m_near_only.png",
+      "view_group": "handoff",
+      "authority_mode": "near_only",
+      "sha256": "6bfbebd5e34711337e18a8f0445d76337ce2adc5a9699bb3c0e3803c4d47876e",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5592,
+      "green_dominant_fraction": 0.006067708333333333,
+      "dark_pixel_fraction": 0.028958333333333332,
+      "mean_rgb": [
+        196.6326446533203,
+        200.63241577148438,
+        197.2106475830078
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_36m_far_only",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_36m_far_only.png",
+      "view_group": "handoff",
+      "authority_mode": "far_only",
+      "sha256": "47aaa11d92685ed59a2c154e6d696003b47436ea67846115fdadcd21400cdf54",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 11163,
+      "green_dominant_fraction": 0.012112630208333334,
+      "dark_pixel_fraction": 0.033434244791666665,
+      "mean_rgb": [
+        195.02259826660156,
+        199.08023071289062,
+        195.17703247070312
+      ]
+    },
+    {
+      "capture_id": "grove_intermediate_handoff_36m_combined",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_grove_intermediate_handoff_36m_combined.png",
+      "view_group": "handoff",
+      "authority_mode": "combined",
+      "sha256": "47aaa11d92685ed59a2c154e6d696003b47436ea67846115fdadcd21400cdf54",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 11163,
+      "green_dominant_fraction": 0.012112630208333334,
+      "dark_pixel_fraction": 0.033434244791666665,
+      "mean_rgb": [
+        195.02259826660156,
+        199.08023071289062,
+        195.17703247070312
+      ]
+    },
+    {
+      "capture_id": "suppressed_intermediate_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_suppressed_intermediate_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "e14a7fddb44a3fe1aea6d3bf18480798ddc673c87ee74070fb9d89ad5f90a5d6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 565,
+      "green_dominant_fraction": 0.0006130642361111111,
+      "dark_pixel_fraction": 0.0024641927083333334,
+      "mean_rgb": [
+        198.57701110839844,
+        204.85043334960938,
+        203.72630310058594
+      ]
+    },
+    {
+      "capture_id": "suppressed_intermediate_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_suppressed_intermediate_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "007fb2ace7e46f3f398c2778b7eeb1ad6266c7644cc57025a5ff1975deb191ac",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 697,
+      "green_dominant_fraction": 0.0007562934027777778,
+      "dark_pixel_fraction": 0.0023773871527777777,
+      "mean_rgb": [
+        199.141357421875,
+        205.158447265625,
+        203.74887084960938
+      ]
+    },
+    {
+      "capture_id": "suppressed_intermediate_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_suppressed_intermediate_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "1dc4520c7ca8c9b12b9aa57fee0f0b2560d337d90797fa2b5ce1ad13f9d04f68",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 100293,
+      "green_dominant_fraction": 0.10882486979166667,
+      "dark_pixel_fraction": 0.43971788194444444,
+      "mean_rgb": [
+        99.75968933105469,
+        100.3283920288086,
+        77.58698272705078
+      ]
+    },
+    {
+      "capture_id": "suppressed_intermediate_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_suppressed_intermediate_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "513e5308b5048b252554e5c8e0cd67ddcf712deeeba98a4ff275081ad4e0e050",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 1385,
+      "green_dominant_fraction": 0.0015028211805555556,
+      "dark_pixel_fraction": 0.004996744791666666,
+      "mean_rgb": [
+        204.89329528808594,
+        208.73435974121094,
+        206.01658630371094
+      ]
+    },
+    {
+      "capture_id": "suppressed_intermediate_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_suppressed_intermediate_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "d6762bc79f68a53853b1cc859193fdc26348f39cb8859910d618435147d59cf1",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 955,
+      "green_dominant_fraction": 0.0010362413194444444,
+      "dark_pixel_fraction": 0.0025086805555555557,
+      "mean_rgb": [
+        201.6287078857422,
+        206.5093994140625,
+        204.3407745361328
+      ]
+    },
+    {
+      "capture_id": "released_intermediate_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_released_intermediate_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "bb88f140771858a08b32f452f7aa156748176fc42b5c78ff556f995e2cc9dcd9",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 2825,
+      "green_dominant_fraction": 0.0030653211805555555,
+      "dark_pixel_fraction": 0.008225911458333334,
+      "mean_rgb": [
+        187.28492736816406,
+        196.3900909423828,
+        197.21348571777344
+      ]
+    },
+    {
+      "capture_id": "released_intermediate_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_released_intermediate_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "authority_mode": "combined",
+      "sha256": "2c6a2da7a4b91bd317688dc91048af64788af8a00c00100da169d0124b702287",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 2841,
+      "green_dominant_fraction": 0.0030826822916666667,
+      "dark_pixel_fraction": 0.006590711805555555,
+      "mean_rgb": [
+        188.22618103027344,
+        196.9318084716797,
+        197.34857177734375
+      ]
+    },
+    {
+      "capture_id": "released_intermediate_bark_spray_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_released_intermediate_bark_spray_closeup.png",
+      "view_group": "closeup",
+      "authority_mode": "near_only",
+      "sha256": "b818064961dde515f9bf6d8515b806085f733bc28cf945bbd95449713b338bb6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 132337,
+      "green_dominant_fraction": 0.14359483506944445,
+      "dark_pixel_fraction": 0.4438205295138889,
+      "mean_rgb": [
+        97.90383911132812,
+        99.55558776855469,
+        77.78131866455078
+      ]
+    },
+    {
+      "capture_id": "released_intermediate_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_released_intermediate_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "authority_mode": "combined",
+      "sha256": "97ec3c4ad1555ef1ba6e3860255cccdf56d3b86e9f8c015b79cffde0d1813c1a",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5449,
+      "green_dominant_fraction": 0.005912543402777777,
+      "dark_pixel_fraction": 0.015667317708333333,
+      "mean_rgb": [
+        191.69857788085938,
+        198.67015075683594,
+        197.40988159179688
+      ]
+    },
+    {
+      "capture_id": "released_intermediate_river_distance_150m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_released_intermediate_river_distance_150m.png",
+      "view_group": "river_distance_150m",
+      "authority_mode": "combined",
+      "sha256": "1aec00660016555fda221fb5e6ee35908c4ab4577ca07a628f9ddc45d86c1079",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 3360,
+      "green_dominant_fraction": 0.0036458333333333334,
+      "dark_pixel_fraction": 0.007620442708333334,
+      "mean_rgb": [
+        193.74188232421875,
+        200.56512451171875,
+        199.17047119140625
+      ]
+    }
+  ],
+  "decision": "retain_v9_texture_detail_lesson_keep_near_disabled_and_rebuild_spray_shape_distribution",
+  "next_iteration_requirements": [
+    "Author several broader flattened branch-spray sources with much higher lateral alpha occupancy instead of transforming one narrow conical source.",
+    "Cut near card count and radial overlap substantially, orient cards in source-matched flattened branch systems, and require the near silhouette to meet or exceed far coverage at 20 m.",
+    "Rebuild lower/middle crown topology before reconsidering hard near authority.",
+    "Repeat closeup, authority, temporal, overdraw, ecology, desktop, and VR gates; keep the corridor closed."
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_performance_review.v11",
+  "reviewed_on": "2026-07-12",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "prototype_revision": "v11_static_cost_and_offscreen_timing_instrumentation",
+  "status": "rejected_at_packaged_performance_temporal_projected_topology_and_ecology_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "visual_review_carried_forward": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v10_visual_review.json",
+  "accepted_findings": [
+    "UE 5.8 now records exclusive UObject resource bytes, LOD0 render vertices, and LOD0 render triangles for all thirty-two generated crown-form meshes.",
+    "The isolated eight-form family accounts for 367,918,128 exclusive resource bytes, 6,961,948 LOD0 render vertices, and 3,859,140 LOD0 render triangles.",
+    "Forty successful offscreen capture wall-time samples range from 221.41 ms to 407.08 ms with a 241.35 ms median; these measure the authoring capture path, not gameplay frame time.",
+    "The unattended game/render/GPU frame-cycle counters are automatically rejected because the game-thread values are zero and the render/GPU values do not vary across samples.",
+    "All forty captures are byte-for-byte identical to the V10 visual-review hashes, and all eight physical near-centerline routing contracts remain passed."
+  ],
+  "rejection_reasons": [
+    "A 350.87 MiB isolated family before corridor instancing, mixed ecology, and streaming overhead is too costly to promote without LOD reduction, batching, and measured budgets.",
+    "Offscreen editor capture wall time is not packaged desktop or VR frame-time evidence, and the stale frame-cycle counters cannot be used as a substitute.",
+    "No corridor-density HISM/PCG benchmark, masked-foliage overdraw profile, draw-call submission count, streaming test, or culling trace exists.",
+    "The V10 closeup topology rejection remains: projected silhouettes and abrupt procedural junctions are not yet photoreal.",
+    "Temporal wind, motion vectors, mixed native ecology, and source-matched corridor review remain open."
+  ],
+  "performance_contract": {
+    "unreal_version": "5.8",
+    "rendering_backend": "Metal",
+    "measurement_scope": "offscreen isolated-review authoring capture",
+    "static_mesh_assets": 32,
+    "family_exclusive_resource_bytes": 367918128,
+    "family_exclusive_resource_mib": 350.87,
+    "family_render_vertices_lod0": 6961948,
+    "family_render_triangles_lod0": 3859140,
+    "capture_sample_count": 40,
+    "capture_wall_time_minimum_ms": 221.41362726688385,
+    "capture_wall_time_median_ms": 241.34985357522964,
+    "capture_wall_time_maximum_ms": 407.08308294415474,
+    "capture_wall_time_valid": true,
+    "frame_cycle_counters_valid": false,
+    "packaged_desktop_benchmark_passed": false,
+    "packaged_vr_benchmark_passed": false,
+    "corridor_density_benchmark_passed": false
+  },
+  "evidence_integrity": {
+    "capture_count": 40,
+    "capture_hashes_reused_from": "futaleufu_native_canopy_coigue_v10_visual_review.json",
+    "capture_hashes_match_v10": true,
+    "geometry_changed_from_v10": false,
+    "routing_contract_forms_passing": 8,
+    "routing_unresolved_conflicts": 0
+  },
+  "next_iteration_requirements": [
+    "Create reduced near/far LODs and a corridor-density HISM/PCG benchmark map, then profile a packaged desktop build and the project VR target on device.",
+    "Capture masked overdraw, draw calls, streaming, culling, CPU, GPU, and memory budgets with repeatable warmup and percentile reporting.",
+    "Add deterministic temporal wind and motion-vector evidence with separate trunk, branchlet, and leaf response bounds.",
+    "Retain the V10 junction, projected-silhouette, primary-growth, and mixed-ecology requirements before corridor substitution."
+  ]
+}

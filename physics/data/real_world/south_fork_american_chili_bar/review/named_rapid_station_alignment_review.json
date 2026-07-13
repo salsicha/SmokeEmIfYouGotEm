@@ -1,0 +1,43 @@
+{
+  "schema": "raftsim.south_fork.named_rapid_station_alignment_review.v1",
+  "status": "failed_alignment_binding_disabled",
+  "production_promoted": false,
+  "review_date": "2026-07-12",
+  "section_id": "chili_bar_to_coloma",
+  "published_reference": {
+    "source_id": "south_fork_american_rivers_mile_guide",
+    "url": "https://www.american-rivers.com/sf-rio-descr.htm",
+    "chili_bar_put_in_river_mile": 0.0,
+    "troublemaker_river_mile": 5.2,
+    "troublemaker_station_m": 8368.5888,
+    "coloma_bridge_river_mile": 5.6,
+    "coloma_bridge_station_m": 9012.3264
+  },
+  "candidate_centerline": {
+    "path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
+    "declared_status": "draft_from_nhd_mainstem_candidate_review_gated_not_final_centerline",
+    "declared_length_m": 26204.692,
+    "declared_section_id": "chili_bar_to_coloma"
+  },
+  "access_seed_comparison": {
+    "path": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson",
+    "coloma_takeout_review_seed_station_m": 5200.0,
+    "published_coloma_bridge_station_m": 9012.3264,
+    "absolute_station_delta_m": 3812.3264,
+    "seed_to_published_station_ratio": 0.576988
+  },
+  "decision": "Do not project published named-rapid miles onto this candidate centerline until the route is clipped and anchored to reviewed Chili Bar and Coloma locations.",
+  "blocked_outputs": [
+    "South Fork named-rapid point geometry",
+    "Meat Grinder and Troublemaker solver-window binding",
+    "exact access, rescue, or publication geometry"
+  ],
+  "required_fix": [
+    "confirm the NHD flowline set and downstream direction",
+    "anchor Chili Bar and Coloma against official access or reviewed guide GPS",
+    "clip the centerline to the authored section",
+    "recompute geodesic stationing from Chili Bar",
+    "compare published Meat Grinder, Maya, Triple Threat, and Troublemaker mile positions against aerial imagery and guide review",
+    "record residual station error before enabling editor geometry binding"
+  ]
+}

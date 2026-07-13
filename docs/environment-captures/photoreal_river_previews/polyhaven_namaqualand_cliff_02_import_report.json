@@ -1,0 +1,55 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_namaqualand_cliff_02_2k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "namaqualand_cliff_02_2k.fbx",
+      "sha256": "465bf72788387b5ef4306bd3858610c942a7cf127b8a84a555e6aa5cd39b209d",
+      "bytes": 6028748
+    },
+    {
+      "relative_path": "namaqualand_cliff_02_diff_2k.jpg",
+      "sha256": "9618e2a42155b93189e0bac9edebcc46a6af1357f4f6ed56f79ca1714690d4f0",
+      "bytes": 2845716
+    },
+    {
+      "relative_path": "namaqualand_cliff_02_nor_gl_2k.jpg",
+      "sha256": "634bc52174130d6992a7539d1f7bb923c4a103f117ab09966782c0e89eb571f6",
+      "bytes": 4125317
+    },
+    {
+      "relative_path": "namaqualand_cliff_02_arm_2k.jpg",
+      "sha256": "3b4d733be37186ab6b62b8ddde90f9dc439f5b42a17293f1b65844a0f0d9e02f",
+      "bytes": 2846951
+    }
+  ],
+  "mesh": {
+    "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/SM_NamaqualandCliff02.SM_NamaqualandCliff02",
+    "dimensions_cm": [
+      2022.7500915527344,
+      659.3420505523682,
+      718.3820992708206
+    ],
+    "base_z_cm": -15.984418988227844,
+    "lod0_build_scale": [
+      100.0,
+      100.0,
+      100.0
+    ],
+    "nanite_enabled": true,
+    "nanite_fallback_triangle_count_lod0": 5846,
+    "material_slot_count": 1,
+    "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/M_NamaqualandCliff02_ReviewLit.M_NamaqualandCliff02_ReviewLit"
+  },
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/T_NamaqualandCliff02_ARM_2K.T_NamaqualandCliff02_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/T_NamaqualandCliff02_BaseColor_2K.T_NamaqualandCliff02_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/T_NamaqualandCliff02_NormalGL_2K.T_NamaqualandCliff02_NormalGL_2K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/M_NamaqualandCliff02_ReviewLit.M_NamaqualandCliff02_ReviewLit"
+  ]
+}

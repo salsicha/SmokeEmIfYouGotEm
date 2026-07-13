@@ -1,0 +1,100 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_same_shader_opacity_diagnostic.v16",
+	"river_id": "futaleufu_terminator",
+	"status": "same_shader_alpha_scale_and_constant_opacity_diagnostics_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"shadowless_native_reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png",
+	"shadowless_native_reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png",
+	"control_boundary": "The native masked TwoSidedFoliage shader, textures, cutoff, source masks, tree transforms, near/mid/far meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed; only LeafOpacityScale or LeafOpacityOverride varies, and leaf shadows remain disabled.",
+	"leaf_texture_contract":
+	{
+		"has_alpha_channel": true,
+		"compression_no_alpha": false,
+		"scale_mips_for_alpha_coverage": true,
+		"alpha_coverage_thresholds_rgba": [
+			0,
+			0,
+			0,
+			0.5
+		],
+		"sharpen5_mips": true,
+		"never_stream": true,
+		"virtual_texture_streaming": false
+	},
+	"leaf_material_contract":
+	{
+		"blend_mode": "masked",
+		"shading_model": "TwoSidedFoliage",
+		"opacity_mask_clip_value": 0.5,
+		"two_sided": true,
+		"dithered_lod_transition": true,
+		"default_leaf_opacity_scale": 1,
+		"default_leaf_opacity_override": 0
+	},
+	"render_modes":
+	{
+		"native_alpha_scale_4_no_shadow":
+		{
+			"LeafOpacityScale": 4,
+			"LeafOpacityOverride": 0,
+			"leaf_cast_shadow": false
+		},
+		"native_constant_opacity_no_shadow":
+		{
+			"LeafOpacityScale": 1,
+			"LeafOpacityOverride": 1,
+			"leaf_cast_shadow": false
+		}
+	},
+	"captures":
+	{
+		"native_alpha_scale_4_no_shadow_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png",
+		"native_alpha_scale_4_no_shadow_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png",
+		"native_constant_opacity_no_shadow_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_constant_opacity_no_shadows_guide_seat_downstream.png",
+		"native_constant_opacity_no_shadow_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_constant_opacity_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"native_alpha_scale_4_no_shadow_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"native_alpha_scale_4_no_shadow_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"native_constant_opacity_no_shadow_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"native_constant_opacity_no_shadow_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	}
+}

@@ -31,11 +31,13 @@ BBOX_EPSG3857 = (
 )
 LANDSCAPE_SIZE = 2017
 EARTH_RADIUS_M = 6_378_137.0
-CHANNEL_HALF_WIDTH_M = 18.0
-CHANNEL_FEATHER_WIDTH_M = 30.0
+CHANNEL_HALF_WIDTH_M = 14.0
+CHANNEL_FEATHER_WIDTH_M = 12.0
 CHANNEL_DEPTH_M = 1.4
-MAX_CHANNEL_LOWERING_M = 8.0
-WATER_HALF_WIDTH_M = 14.0
+MAX_CHANNEL_LOWERING_M = 4.0
+MAX_SOURCE_HEIGHT_ABOVE_SURFACE_M = 3.0
+WATER_HALF_WIDTH_M = 11.0
+CHANNEL_SMOOTHING_ITERATIONS = 24
 
 
 def _sha256(path: Path) -> str:
@@ -182,6 +184,7 @@ def _condition_channel(
 
     conditioned = dem.copy()
     touched = np.zeros(dem.shape, dtype=bool)
+    corridor_weight = np.zeros(dem.shape, dtype=np.float32)
     half_width_with_feather = CHANNEL_HALF_WIDTH_M + CHANNEL_FEATHER_WIDTH_M
     dense_profile: list[tuple[float, float, float]] = []
     for index in range(len(normalized_centerline) - 1):
@@ -228,6 +231,10 @@ def _condition_channel(
             1.0,
         )
         blend = blend * blend * (3.0 - 2.0 * blend)
+        corridor_weight[y_start:y_stop, x_start:x_stop] = np.maximum(
+            corridor_weight[y_start:y_stop, x_start:x_stop],
+            1.0 - blend,
+        )
         source_window = conditioned[y_start:y_stop, x_start:x_stop]
         original_window = dem[y_start:y_stop, x_start:x_stop]
         target_bed_m = surface_elevation_m - CHANNEL_DEPTH_M
@@ -236,9 +243,31 @@ def _condition_channel(
             original_window - MAX_CHANNEL_LOWERING_M,
             np.minimum(source_window, lowered),
         )
+        candidate = np.where(
+            original_window <= surface_elevation_m + MAX_SOURCE_HEIGHT_ABOVE_SURFACE_M,
+            candidate,
+            source_window,
+        )
         modified = candidate < source_window - 1.0e-4
         source_window[modified] = candidate[modified]
         touched[y_start:y_stop, x_start:x_stop] |= modified
+
+    smoothed = conditioned.copy()
+    for _ in range(CHANNEL_SMOOTHING_ITERATIONS):
+        padded = np.pad(smoothed, 1, mode="edge")
+        smoothed = (
+            padded[1:-1, 1:-1] * 4.0
+            + padded[:-2, 1:-1]
+            + padded[2:, 1:-1]
+            + padded[1:-1, :-2]
+            + padded[1:-1, 2:]
+        ) * 0.125
+    smoothing_weight = np.clip(corridor_weight * 0.82, 0.0, 0.82)
+    conditioned = np.minimum(
+        dem,
+        conditioned * (1.0 - smoothing_weight) + smoothed * smoothing_weight,
+    )
+    conditioned = np.maximum(conditioned, dem - MAX_CHANNEL_LOWERING_M)
 
     delta = dem - conditioned
     profile = [
@@ -255,6 +284,9 @@ def _condition_channel(
         "bank_feather_width_m": CHANNEL_FEATHER_WIDTH_M,
         "nominal_depth_m": CHANNEL_DEPTH_M,
         "maximum_allowed_lowering_m": MAX_CHANNEL_LOWERING_M,
+        "maximum_source_height_above_surface_m": MAX_SOURCE_HEIGHT_ABOVE_SURFACE_M,
+        "corridor_smoothing_iterations": CHANNEL_SMOOTHING_ITERATIONS,
+        "corridor_smoothing_weight": 0.82,
         "profile_start_surface_m_navd88": float(monotone_surfaces[0]),
         "profile_end_surface_m_navd88": float(monotone_surfaces[-1]),
         "profile_drop_m": float(monotone_surfaces[0] - monotone_surfaces[-1]),

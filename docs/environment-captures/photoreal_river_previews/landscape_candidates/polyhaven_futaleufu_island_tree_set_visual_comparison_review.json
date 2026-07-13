@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.unreal.biome_asset_visual_comparison_review.v1",
+  "asset_id": "polyhaven_futaleufu_island_tree_set_1k",
+  "river_id": "futaleufu_terminator",
+  "status": "rights_clear_import_validated_visual_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "reviewed_candidate": {
+    "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_island_tree_set_review_guide_seat_downstream.png",
+    "guide_seat_sha256": "005e0edba2a4da7aa9137d2999afd06af4c6de9b6ef893248ef12030f52a3845",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_island_tree_set_review_river_eye_downstream.png",
+    "river_eye_sha256": "c3fbc93dba7d5354f608516cabe21bed119555c51de0ee30274c99ce3c5f6ec7",
+    "pre_trial_baseline_guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_island_tree_set_guide_seat_downstream.png",
+    "pre_trial_baseline_guide_seat_sha256": "79fd0b0e38e6e95079c552519af90e16d432d9ea5d91b98219ac47c17943f266",
+    "pre_trial_baseline_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_island_tree_set_river_eye_downstream.png",
+    "pre_trial_baseline_river_eye_sha256": "cfdd1ed62a3af8db8976bb8adbc15d3f49d729fd146f8a187876b38439babdf7",
+    "restored_active_guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_post_island_tree_set_restored_guide_seat_downstream.png",
+    "restored_active_guide_seat_sha256": "7222a98fa1614057a2a68ada4b5f614ed621741f1caea3fb28a562c8860c7b06",
+    "restored_active_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_post_island_tree_set_restored_river_eye_downstream.png",
+    "restored_active_river_eye_sha256": "c01de63f16418d5966e9c908cc25cd48b0ab2fbd2b8c5064626806277dc223a6"
+  },
+  "import_findings": {
+    "verified_source_file_count": 33,
+    "mesh_count": 3,
+    "texture_count": 30,
+    "material_count": 9,
+    "publisher_widths_cm": [1250.0, 850.0, 850.0],
+    "measured_heights_cm": [1304.85, 686.96, 789.97],
+    "publisher_width_relative_error_max": 0.0,
+    "grounded_pivots_validated": true,
+    "nanite_enabled_for_all_meshes": true,
+    "explicit_trunk_leaf_branch_material_roles_validated": true
+  },
+  "visual_findings": [
+    "The bounded one-in-five substitution placed 2400 reviewed adult broadleaf instances while retaining 80 percent of the PVE control foliage and the near-camera setback.",
+    "At guide-seat distance the substituted crowns collapse into black branch-card marks across the central and right slopes instead of creating continuous forest mass.",
+    "At river-eye distance the same dark marks become more conspicuous on the left bank and reduce depth and material continuity relative to the immutable baseline.",
+    "The three wind-sculpted coastal broadleaf meshes do not provide native Patagonian or Nothofagus species identity, sufficient canopy diversity, or stable far-distance crown behavior.",
+    "Correct rights, source hashes, physical width, grounded pivots, material roles, and Nanite configuration are necessary intake gates but do not establish a lifelike visual result."
+  ],
+  "decision": "retain_import_pipeline_and_isolated_assets_reject_visual_promotion",
+  "active_map_policy": "futaleufu_island_tree_set_must_not_be_loaded_or_recorded_by_the_default_landscape_candidate_generator",
+  "next_asset_requirements": [
+    "Acquire multiple rights-cleared native Patagonian broadleaf or reviewed Nothofagus-family species with adult crown, age, and density variants.",
+    "Require distance-stable authored foliage, impostor, or cluster behavior that preserves crown mass without opaque branch-card collapse from river cameras.",
+    "Validate leaf-card sorting, masked-material mip behavior, Nanite PreserveArea behavior, and Metal rendering before corridor-scale placement.",
+    "Author source-mask-aware forest bands, gaps, riparian transitions, understory, deadfall, wind, wetness, and seasonal states while preserving guide sightlines.",
+    "Pass ecology, guide, art, rights, gameplay, seasonal-flow, and measured desktop and VR performance review before production promotion."
+  ]
+}

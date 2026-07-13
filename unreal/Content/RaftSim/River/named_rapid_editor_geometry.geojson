@@ -1,0 +1,1090 @@
+{
+  "feature_count": 45,
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -83.73899122,
+          9.93687567
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Bienvenidos",
+        "feature_id": "pacuare_river_costa_rica__bienvenidos",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 1640.625
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.7290566,
+          9.92583535
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Pyramid Rock",
+        "feature_id": "pacuare_river_costa_rica__pyramid_rock",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 3281.25
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.71919125,
+          9.91473419
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Pele El Ojo",
+        "feature_id": "pacuare_river_costa_rica__pele_el_ojo",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 4921.875
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.70841754,
+          9.9045032
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Upper Huacas",
+        "feature_id": "pacuare_river_costa_rica__upper_huacas",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 6562.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.69548044,
+          9.89725675
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Bobo Falls",
+        "feature_id": "pacuare_river_costa_rica__bobo_falls",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 8203.125
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.68075211,
+          9.89750434
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Lower Huacas",
+        "feature_id": "pacuare_river_costa_rica__lower_huacas",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 9843.75
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.66772321,
+          9.90464612
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Rodeo",
+        "feature_id": "pacuare_river_costa_rica__rodeo",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 11484.375
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.65631984,
+          9.9142032
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Guatemala",
+        "feature_id": "pacuare_river_costa_rica__guatemala",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 13125.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.64517436,
+          9.92405846
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-",
+        "display_name": "Double Drop",
+        "feature_id": "pacuare_river_costa_rica__double_drop",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 14765.625
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.63299604,
+          9.93260076
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III-IV",
+        "display_name": "Cimarrones",
+        "feature_id": "pacuare_river_costa_rica__cimarrones",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 16406.25
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.61873291,
+          9.93654597
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Upper Pinball",
+        "feature_id": "pacuare_river_costa_rica__upper_pinball",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 18046.875
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.60452727,
+          9.93242372
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Lower Pinball",
+        "feature_id": "pacuare_river_costa_rica__lower_pinball",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 19687.5
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.59253902,
+          9.92362816
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Wall of Sorrow",
+        "feature_id": "pacuare_river_costa_rica__wall_of_sorrow",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 21328.125
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.58175949,
+          9.91338663
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Dos Montanas",
+        "feature_id": "pacuare_river_costa_rica__dos_montanas",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 22968.75
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -83.57096693,
+          9.90315955
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Las Ranitas",
+        "feature_id": "pacuare_river_costa_rica__las_ranitas",
+        "geometry_source": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "geometry_source_status": "preview_scaffold_not_official_hydrography",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 24609.375
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.85077554,
+          -17.92945395
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-V",
+        "display_name": "Against the Wall",
+        "feature_id": "zambezi_batoka_gorge__against_the_wall",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 1052.263
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.85373208,
+          -17.93136288
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "The Bridge",
+        "feature_id": "zambezi_batoka_gorge__the_bridge",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 2104.527
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.85678901,
+          -17.93363711
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Between Two Worlds",
+        "feature_id": "zambezi_batoka_gorge__between_two_worlds",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 3156.79
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.84760458,
+          -17.93694359
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-V",
+        "display_name": "Morning Glory",
+        "feature_id": "zambezi_batoka_gorge__morning_glory",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 4209.054
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.84760319,
+          -17.94427598
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Stairway to Heaven",
+        "feature_id": "zambezi_batoka_gorge__stairway_to_heaven",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5261.317
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.85624905,
+          -17.94798817
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Devil's Toilet Bowl",
+        "feature_id": "zambezi_batoka_gorge__devil_s_toilet_bowl",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 6313.58
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.86059885,
+          -17.9541138
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Gulliver's Travels",
+        "feature_id": "zambezi_batoka_gorge__gulliver_s_travels",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 7365.844
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.8568404,
+          -17.96265399
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III-V",
+        "display_name": "Midnight Diner",
+        "feature_id": "zambezi_batoka_gorge__midnight_diner",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 8418.107
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.86206971,
+          -17.96915632
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V-VI",
+        "display_name": "Commercial Suicide",
+        "feature_id": "zambezi_batoka_gorge__commercial_suicide",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 9470.37
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.85843354,
+          -17.97547253
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Gnashing Jaws of Death",
+        "feature_id": "zambezi_batoka_gorge__gnashing_jaws_of_death",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 10522.634
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.86799657,
+          -17.97503539
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Overland Truck Eater",
+        "feature_id": "zambezi_batoka_gorge__overland_truck_eater",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 11574.897
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.87792469,
+          -17.97486542
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III-IV",
+        "display_name": "Three Ugly Sisters",
+        "feature_id": "zambezi_batoka_gorge__three_ugly_sisters",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 12627.161
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.88177052,
+          -17.97815545
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-V",
+        "display_name": "The Mother",
+        "feature_id": "zambezi_batoka_gorge__the_mother",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 13679.424
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.88995238,
+          -17.9802515
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III",
+        "display_name": "Surprise Surprise",
+        "feature_id": "zambezi_batoka_gorge__surprise_surprise",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 14731.687
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.89921346,
+          -17.98200109
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-V",
+        "display_name": "The Washing Machine",
+        "feature_id": "zambezi_batoka_gorge__the_washing_machine",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 15783.951
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.90849938,
+          -17.98383704
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "The Terminators",
+        "feature_id": "zambezi_batoka_gorge__the_terminators",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 16836.214
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.91154846,
+          -17.9916818
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Double Trouble",
+        "feature_id": "zambezi_batoka_gorge__double_trouble",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 17888.478
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.91915748,
+          -17.99702905
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Oblivion",
+        "feature_id": "zambezi_batoka_gorge__oblivion",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 18940.741
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.92876794,
+          -17.99458856
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "The Last Straw",
+        "feature_id": "zambezi_batoka_gorge__the_last_straw",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 19993.004
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.93847073,
+          -17.99249275
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Rapid 20",
+        "feature_id": "zambezi_batoka_gorge__rapid_20",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 21045.268
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.94684637,
+          -17.9962074
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Rapid 21",
+        "feature_id": "zambezi_batoka_gorge__rapid_21",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 22097.531
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.95660764,
+          -17.99587424
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Morning Shave",
+        "feature_id": "zambezi_batoka_gorge__morning_shave",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 23149.794
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.96349244,
+          -17.99952491
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Morning Shower",
+        "feature_id": "zambezi_batoka_gorge__morning_shower",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 24202.058
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.97185794,
+          -18.0014545
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Rapid 24",
+        "feature_id": "zambezi_batoka_gorge__rapid_24",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 25254.321
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          25.981146,
+          -17.99868946
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "II-III",
+        "display_name": "Rapid 25",
+        "feature_id": "zambezi_batoka_gorge__rapid_25",
+        "geometry_source": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "medium",
+        "river_id": "zambezi_batoka_gorge",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 26306.585
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -72.00129139,
+          -43.31022185
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "III-IV",
+        "display_name": "Asleep at the Wheel",
+        "feature_id": "futaleufu_river_chile__asleep_at_the_wheel",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "high",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 1666.667
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.98608042,
+          -43.31445862
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "V",
+        "display_name": "Terminator",
+        "feature_id": "futaleufu_river_chile__terminator",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 3333.333
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.97414559,
+          -43.31625981
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV-V",
+        "display_name": "Son of Terminator",
+        "feature_id": "futaleufu_river_chile__son_of_terminator",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 5000.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.9739467,
+          -43.3262478
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV+",
+        "display_name": "Khyber Pass",
+        "feature_id": "futaleufu_river_chile__khyber_pass",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 6666.667
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -71.98264298,
+          -43.33935226
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "difficulty_label": "IV",
+        "display_name": "Himalayas",
+        "feature_id": "futaleufu_river_chile__himalayas",
+        "geometry_source": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "geometry_source_status": "osm_route_trace_review_gated_not_guide_stationing",
+        "geometry_status": "candidate_centerline_projection_not_exact",
+        "guide_review_status": "required",
+        "production_authoritative": false,
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "station_kind": "provisional_downstream_order_interpolation",
+        "station_m": 8333.333
+      },
+      "type": "Feature"
+    }
+  ],
+  "production_promoted": false,
+  "schema": "raftsim.unreal.named_rapid_editor_geometry.geojson.v1",
+  "source_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
+  "status": "candidate_centerline_projections_for_editor_review_not_exact_geometry",
+  "type": "FeatureCollection"
+}

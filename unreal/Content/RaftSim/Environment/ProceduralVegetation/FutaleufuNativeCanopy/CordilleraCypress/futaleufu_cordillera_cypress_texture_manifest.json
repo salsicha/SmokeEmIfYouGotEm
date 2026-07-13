@@ -1,0 +1,162 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v3",
+  "generated_on": "2026-07-13",
+  "status": "first_party_cypress_texture_candidates_ready_for_isolated_unreal_review",
+  "production_promoted": false,
+  "corridor_use_allowed": false,
+  "species": {
+    "scientific_name": "Austrocedrus chilensis",
+    "common_names": [
+      "cipres de la cordillera",
+      "cordilleran cypress"
+    ],
+    "scope": "second native canopy stratum for bounded north/east dry-slope groves"
+  },
+  "sources": {
+    "bark": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_bark_source_v3.png",
+      "sha256": "bec47c4575da1fc24d2ff7921f8d5bfa78f3114b67c816f2899190ee40068ca9",
+      "generator": "deterministic project-owned Python procedural synthesis",
+      "generator_path": "physics/src/raftsim/futaleufu_cordillera_cypress_assets.py",
+      "generator_sha256": "8d1326aaff05720cf99dc670081b0d18b552d11f87f0d4478fcfaad572ea049f",
+      "input_images_used": false,
+      "intent": "periodic rough vertically fibrous brown-to-ash bark candidate"
+    },
+    "scale_leaf_spray_atlas": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_spray_atlas_source_v3.png",
+      "sha256": "7911491f64c85c62cae4a2679bb18f45c4270bd2a7526638a8d76dbc50030d49",
+      "generator": "deterministic project-owned Python procedural synthesis",
+      "generator_path": "physics/src/raftsim/futaleufu_cordillera_cypress_assets.py",
+      "generator_sha256": "8d1326aaff05720cf99dc670081b0d18b552d11f87f0d4478fcfaad572ea049f",
+      "input_images_used": false,
+      "intent": "sixteen non-overlapping flattened scale-leaf branch sprays"
+    }
+  },
+  "procedural_parameters": {
+    "seed": 18427,
+    "output_size_px": 2048,
+    "atlas_columns": 4,
+    "atlas_rows": 4,
+    "supersample": 2,
+    "source_facts": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_authoring_manifest.json",
+    "generated_pixels_are_botanical_measurements": false
+  },
+  "maps": {
+    "bark_albedo": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_bark_v3_albedo.png",
+      "sha256": "bec47c4575da1fc24d2ff7921f8d5bfa78f3114b67c816f2899190ee40068ca9",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB base color",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "bark_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_bark_v3_normal.png",
+      "sha256": "50f20dc755a1a2355c9d3185e0c777af51d844ed8d00b42a286d907636ef9b07",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "bark_ao_roughness_height": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_bark_v3_ao_roughness_height.png",
+      "sha256": "c3a1990e9cf4ce08d0a9610c2a237cdb9574400f025afe215da6c3082890260a",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=height",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v3_albedo_opacity.png",
+      "sha256": "25ffede0f556c1c3cf2d48274fac2c5dae542006210f30c107ac0e542b3284e9",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v3_normal.png",
+      "sha256": "0d35b4dc165a2fa7ecc23c8e2dbff780dde46985822f06ad631af6a9d945cf4e",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v3_ao_roughness_subsurface.png",
+      "sha256": "73d3c3c757149d793b011b29f4c5378929794359cd61390563116490901237d5",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "derivation": {
+    "bark": "periodic integer-frequency relief and fissure synthesis followed by wrapped map derivation",
+    "spray": "supersampled project-authored branch and scale-leaf polygons with deterministic variation",
+    "spray_rgb_mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "2efc10b8769100e72234aea77ca553d0017dce5f7a549602c0df581854eb9742",
+      "nontransparent_rgb_sha256": "a4db647c338d023ef8cf497e7d28282aee8cf7d690d562354ddf98cf06bb200c",
+      "padded_transparent_pixel_count": 770368,
+      "transparent_nonzero_rgb_pixel_count": 770343
+    },
+    "spray_surface": "alpha-aware normal, AO, roughness, and subsurface estimates shared with coigue"
+  },
+  "unreal_contract": {
+    "texture_asset_root": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures",
+    "bark_material": "opaque DefaultLit with periodic UVs and packed surface channels",
+    "spray_material": "masked TwoSidedFoliage with alpha2 review tuning exposed only in instances",
+    "atlas_layout": {
+      "columns": 4,
+      "rows": 4,
+      "branch_spray_tiles": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "tile_bleed_inset": 0.012
+    },
+    "shadow_policy": "off for initial isolated and corridor ecology review pending a V23-compatible shadow pass"
+  },
+  "provenance_and_fidelity_boundary": {
+    "project_owned_generated_sources": true,
+    "external_images_or_data_vendored": false,
+    "botanical_reference_contract": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_authoring_manifest.json",
+    "generated_pixels_are_not_botanical_measurements": true,
+    "isolated_visual_review_required": true,
+    "corridor_use_before_visual_acceptance_forbidden": true
+  }
+}

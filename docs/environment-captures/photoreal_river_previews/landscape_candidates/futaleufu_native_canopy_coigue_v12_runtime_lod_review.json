@@ -1,0 +1,60 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_runtime_lod_review.v12",
+  "reviewed_on": "2026-07-12",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "prototype_revision": "v12_far_corridor_lod_and_hism_density_benchmark",
+  "status": "runtime_far_lod_technical_candidate_accepted_corridor_and_production_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "runtime_far_lod_retained": true,
+  "source_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "visual_review_carried_forward": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v10_visual_review.json",
+  "performance_review_carried_forward": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v11_performance_review.json",
+  "accepted_findings": [
+    "The full eight-form, forty-view closeup source family remains byte-structurally unchanged and available for morphology review; the runtime family is a separate artifact rather than a destructive simplification.",
+    "One-in-six deterministic far-card selection plus 1.28x card expansion reduces the trunk-plus-far-crown family from 367,918,128 bytes to 20,264,400 bytes in the final run, a 94.492 percent resource reduction.",
+    "The runtime family contains 435,064 render vertices and 223,592 render triangles across eight independent forms, versus 6,961,948 vertices and 3,859,140 triangles in the full family.",
+    "A UE 5.8 Metal map saves and renders 512 trees through sixteen HISM components with shared trunk/crown ground transforms and no collision.",
+    "After correcting the first benchmark's independently grounded crown bug, the retained frame keeps foliage on the branch structure and removes the false forest-floor leaf carpet and bare-crown failure."
+  ],
+  "capture_evidence": {
+    "map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCoigue_RuntimeFarLod_HismBenchmark",
+    "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_coigue_runtime_far_lod_hism_512_tree.png",
+    "sha256": "303b9639f6ab3f91d8f844351e4d0687e994b46a8b0e584368bde64b18989982",
+    "width": 1280,
+    "height": 720,
+    "tree_instance_count": 512,
+    "hism_component_count": 16,
+    "dark_pixel_fraction_below_luma_45": 0.3512554253472222
+  },
+  "performance_contract": {
+    "full_family_exclusive_resource_bytes": 367918128,
+    "runtime_far_family_exclusive_resource_bytes": 20264400,
+    "runtime_far_family_resource_reduction_fraction": 0.94492144187035,
+    "full_family_render_vertices_lod0": 6961948,
+    "runtime_far_family_render_vertices_lod0": 435064,
+    "full_family_render_triangles_lod0": 3859140,
+    "runtime_far_family_render_triangles_lod0": 223592,
+    "runtime_static_mesh_assets": 16,
+    "packaged_desktop_benchmark_passed": false,
+    "packaged_vr_benchmark_passed": false,
+    "corridor_density_visual_capture_passed": true,
+    "corridor_density_performance_budget_passed": false
+  },
+  "rejection_reasons": [
+    "The 512-tree frame is a flat neutral benchmark, not source-matched Futaleufu terrain, slope, river, light, fog, weather, or seasonal context.",
+    "The stand reads as an even-aged plantation with regular spacing and a continuous dark crown wall rather than mapped Patagonian forest bands with natural gaps, disturbance, and aspect/elevation response.",
+    "Thirty-five percent of the frame falls below luma 45; transmission, exposure, crown depth, and shadow response need corridor photometry review before this can support a lifelike river frame.",
+    "The far representation intentionally omits branchlets, near leaves, understory, saplings, deadwood, epiphytes, shrubs, and the other native species required by the ecology contract.",
+    "No near-to-far transition, temporal wind, motion-vector, masked-overdraw, draw-call, streaming, culling, packaged desktop, or on-device VR evidence exists.",
+    "The accepted resource reduction does not resolve the V10 closeup junction and projected-silhouette rejection in the full source family."
+  ],
+  "next_iteration_requirements": [
+    "Add a deterministic near/mid/far transition test with camera motion and no visible crown pop, branch disappearance, or material change.",
+    "Profile the 512-tree map in a packaged desktop build and on the project VR target with warmup, frame-time percentiles, draw calls, overdraw, streaming, culling, and memory capture.",
+    "Place the retained far family through source masks, slope, aspect, elevation, riparian setback, disturbance gaps, and non-grid blue-noise ecology in a bounded Futaleufu corridor copy.",
+    "Add native understory, sapling, deadwood, and at least one additional reviewed Nothofagus-family crown set before ecology review.",
+    "Tune two-sided transmission and corridor photometry while preserving the project-owned material provenance and an engine-measured far-family resource reduction above 94 percent."
+  ]
+}

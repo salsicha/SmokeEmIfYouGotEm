@@ -1,0 +1,327 @@
+{
+	"schema": "raftsim.unreal.zambezi_cliff_corridor_comparison.v1",
+	"river_id": "zambezi_batoka_gorge",
+	"status": "paired_transient_corridor_comparison_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+	"asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/SM_NamaqualandCliff02.SM_NamaqualandCliff02",
+	"source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/polyhaven_namaqualand_cliff_02_source_manifest.json",
+	"geology_boundary": "South African weathered-cliff structure analog only; not Batoka basalt, surveyed gorge, collision, or gameplay authority",
+	"mesh_dimensions_cm": [
+		2022.7500915527344,
+		659.34205055236816,
+		718.38209927082062
+	],
+	"nanite_enabled": true,
+	"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/M_NamaqualandCliff02_ReviewLit.M_NamaqualandCliff02_ReviewLit",
+	"instances_per_capture": 8,
+	"guide_seat_placements": [
+		{
+			"instance_index": 0,
+			"location_cm": [
+				313515.63164896093,
+				-334211.81151088962,
+				14361.863759130763
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				144.98634068870774
+			],
+			"scale": [
+				1.0800000429153442,
+				1.0800000429153442,
+				1.0800000429153442
+			]
+		},
+		{
+			"instance_index": 1,
+			"location_cm": [
+				299812.90863299428,
+				-347879.12221737823,
+				13191.306603810825
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				163.98634068870774
+			],
+			"scale": [
+				0.93999999761581421,
+				0.93999999761581421,
+				0.93999999761581421
+			]
+		},
+		{
+			"instance_index": 2,
+			"location_cm": [
+				303114.88171790884,
+				-325990.83827946981,
+				17003.317559477764
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				159.98634068870774
+			],
+			"scale": [
+				1.3400000333786011,
+				1.3400000333786011,
+				1.3400000333786011
+			]
+		},
+		{
+			"instance_index": 3,
+			"location_cm": [
+				287522.01404833299,
+				-341163.92227182601,
+				13141.356378617807
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				139.98634068870774
+			],
+			"scale": [
+				1.1599999666213989,
+				1.1599999666213989,
+				1.1599999666213989
+			]
+		},
+		{
+			"instance_index": 4,
+			"location_cm": [
+				289496.39350089087,
+				-317476.33426085883,
+				14040.018268532456
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				167.98634068870774
+			],
+			"scale": [
+				1.4800000190734863,
+				1.4800000190734863,
+				1.4800000190734863
+			]
+		},
+		{
+			"instance_index": 5,
+			"location_cm": [
+				269959.0629009456,
+				-333781.32469411095,
+				13011.076539072841
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				146.98634068870774
+			],
+			"scale": [
+				1.2400000095367432,
+				1.2400000095367432,
+				1.2400000095367432
+			]
+		},
+		{
+			"instance_index": 6,
+			"location_cm": [
+				270441.67509799585,
+				-306414.79247924563,
+				12418.647960812377
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				135.98634068870774
+			],
+			"scale": [
+				1.5800000429153442,
+				1.5800000429153442,
+				1.5800000429153442
+			]
+		},
+		{
+			"instance_index": 7,
+			"location_cm": [
+				247232.4033093325,
+				-323317.15039286099,
+				13144.246974690035
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				161.98634068870774
+			],
+			"scale": [
+				1.3799999952316284,
+				1.3799999952316284,
+				1.3799999952316284
+			]
+		}
+	],
+	"river_eye_placements": [
+		{
+			"instance_index": 0,
+			"location_cm": [
+				325632.70744451013,
+				7708.7120863116634,
+				9753.9985247557634
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				68.278289329284135
+			],
+			"scale": [
+				1.0800000429153442,
+				1.0800000429153442,
+				1.0800000429153442
+			]
+		},
+		{
+			"instance_index": 1,
+			"location_cm": [
+				309181.09382380883,
+				17902.06331518415,
+				9783.2626584983245
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				87.278289329284135
+			],
+			"scale": [
+				0.93999999761581421,
+				0.93999999761581421,
+				0.93999999761581421
+			]
+		},
+		{
+			"instance_index": 2,
+			"location_cm": [
+				331242.18316620053,
+				19720.946771322022,
+				10191.931817290262
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				83.278289329284135
+			],
+			"scale": [
+				1.3400000333786011,
+				1.3400000333786011,
+				1.3400000333786011
+			]
+		},
+		{
+			"instance_index": 3,
+			"location_cm": [
+				312890.56534136622,
+				31407.611103424006,
+				8480.1639958053074
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				63.278289329284135
+			],
+			"scale": [
+				1.1599999666213989,
+				1.1599999666213989,
+				1.1599999666213989
+			]
+		},
+		{
+			"instance_index": 4,
+			"location_cm": [
+				336397.52653277601,
+				34932.206902313992,
+				8087.3874091574562
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				91.278289329284135
+			],
+			"scale": [
+				1.4800000190734863,
+				1.4800000190734863,
+				1.4800000190734863
+			]
+		},
+		{
+			"instance_index": 5,
+			"location_cm": [
+				316037.4414617797,
+				50197.426714088499,
+				15003.722046885341
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				70.278289329284135
+			],
+			"scale": [
+				1.2400000095367432,
+				1.2400000095367432,
+				1.2400000095367432
+			]
+		},
+		{
+			"instance_index": 6,
+			"location_cm": [
+				342781.81566431164,
+				56019.664128944132,
+				16461.073742062377
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				59.278289329284135
+			],
+			"scale": [
+				1.5800000429153442,
+				1.5800000429153442,
+				1.5800000429153442
+			]
+		},
+		{
+			"instance_index": 7,
+			"location_cm": [
+				320996.13893129601,
+				74721.115657757095,
+				8089.3006856275351
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				85.278289329284135
+			],
+			"scale": [
+				1.3799999952316284,
+				1.3799999952316284,
+				1.3799999952316284
+			]
+		}
+	],
+	"captures":
+	{
+		"baseline_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_pre_namaqualand_cliff_review_guide_seat_downstream.png",
+		"baseline_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_pre_namaqualand_cliff_review_river_eye_downstream.png",
+		"comparison_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_namaqualand_cliff_review_guide_seat_downstream.png",
+		"comparison_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_namaqualand_cliff_review_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"open_promotion_gates": [
+		"paired_human_visual_review",
+		"Batoka_geology_review",
+		"guide_and_hazard_readability_review",
+		"repetition_and_silhouette_review",
+		"desktop_and_VR_corridor_performance",
+		"rights_and_attribution_audit"
+	]
+}

@@ -28,12 +28,22 @@ public class RaftSimEditor : ModuleRules
             "Landscape",
             "LandscapeEditor",
             "LevelEditor",
+            "Chaos",
+            "GeometryCollectionEngine",
+            "GeometryCore",
+            "GeometryFramework",
+            "GeometryScriptingCore",
             "Json",
             "ImageWrapper",
+            "InputCore",
             "MeshUtilities",
             "Projects",
             "ProceduralMeshComponent",
+            "ProceduralVegetation",
+            "PCG",
+            "PlanarCut",
             "RenderCore",
+            "RHI",
             "UnrealEd"
         });
     }

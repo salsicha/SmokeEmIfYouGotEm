@@ -1,0 +1,201 @@
+{
+  "schema": "raftsim.international_production_corridor.v1",
+  "generated_at": "2026-07-11T20:19:01.457758+00:00",
+  "river_id": "futaleufu_terminator",
+  "display_name": "Futaleufu: Rio Azul Swinging Bridge to The Pasarela",
+  "status": "source_scale_technical_corridor_not_yet_lifelike",
+  "bounds_wgs84": [
+    -72.07691839357143,
+    -43.36896476762486,
+    -71.95249270642857,
+    -43.29373863237514
+  ],
+  "physical_size_m": {
+    "width": 10063.909207044122,
+    "height": 8364.764590846402
+  },
+  "route": {
+    "length_m": 15936.77551712958,
+    "point_count": 205,
+    "way_ids": [
+      213541728,
+      265661722
+    ],
+    "geometry_authority": "osm_named_river_cross_reference_with_rapid_tags_not_surveyed_centerline",
+    "start_lon_lat": [
+      -72.0143132,
+      -43.3072133
+    ],
+    "end_lon_lat": [
+      -72.058394,
+      -43.3519794
+    ],
+    "endpoint_evidence": [
+      {
+        "endpoint": "put_in",
+        "name": "Rio Azul Swinging Bridge",
+        "policy": "nearest Rio Azul centerline point to OSM track bridge 635437017",
+        "confidence": "high_review_gated",
+        "source": "OSM bridge geometry plus published Terminator-section access description"
+      },
+      {
+        "endpoint": "take_out",
+        "name": "The Pasarela",
+        "policy": "nearest Futaleufu centerline point to OSM track bridge 165621980",
+        "confidence": "high_review_gated",
+        "source": "OSM bridge geometry plus published Terminator-section takeout description"
+      }
+    ],
+    "guide_approval": null
+  },
+  "source_records": [
+    {
+      "role": "named_route_cross_reference",
+      "path": "physics/data/real_world/futaleufu_river_chile/hydrography/source/osm_futaleufu_river_ways.json",
+      "sha256": "171d37a706c1a3d1802dc154f4f8d017b8e6dc2ce1d9464537687accd3789015",
+      "provider": "OpenStreetMap contributors",
+      "license": "ODbL-1.0",
+      "query": "[out:json][timeout:60];way[waterway=river](-43.40,-72.20,-43.00,-71.60);out tags geom;",
+      "authority": "cross_reference_not_survey_authority"
+    },
+    {
+      "role": "sentinel_scene_search",
+      "path": "physics/data/real_world/futaleufu_river_chile/imagery/source/earth_search_stac_response.json",
+      "sha256": "9cdf2d60da742fb86864eaa62977403802c86bb12570189ddd4b7bf1156be156",
+      "provider": "Element 84 Earth Search / Copernicus Sentinel-2",
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "authority": "visual_surface_reference"
+    },
+    {
+      "role": "route_visual",
+      "path": "physics/data/real_world/futaleufu_river_chile/imagery/source/sentinel2_20260104_route_visual.png",
+      "sha256": "9499bef1c0090fce18dbef571e52448e290af070af1d1306115e21bc0dfc9fff",
+      "provider": "Copernicus Sentinel-2",
+      "scenes": [
+        {
+          "item_id": "S2B_18GYS_20260104_0_L2A",
+          "datetime_utc": "2026-01-04T14:45:04.391000Z",
+          "cloud_cover_percent": 0.00152,
+          "tile_id": "18GYS",
+          "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/G/YS/2026/1/S2B_18GYS_20260104_0_L2A/TCI.tif"
+        },
+        {
+          "item_id": "S2B_18GYT_20260104_0_L2A",
+          "datetime_utc": "2026-01-04T14:44:49.998000Z",
+          "cloud_cover_percent": 0.015259,
+          "tile_id": "18GYT",
+          "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/18/G/YT/2026/1/S2B_18GYT_20260104_0_L2A/TCI.tif"
+        }
+      ],
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "authority": "visual_surface_reference_not_bed_geometry"
+    },
+    {
+      "role": "terrain",
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/source/copernicus_dem_glo30_S44_W073.tif",
+      "sha256": "8f5a14b49d7903cca873bbc6c489b61f23fa85c67dfa7e178285d666632494a7",
+      "provider": "Copernicus DEM GLO-30",
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_S44_00_W073_00_DEM/Copernicus_DSM_COG_10_S44_00_W073_00_DEM.tif",
+      "license": "Copernicus DEM ESA user license; attribution and redistribution review required",
+      "authority": "30m_surface_model_terrain_source"
+    },
+    {
+      "role": "terrain",
+      "path": "physics/data/real_world/futaleufu_river_chile/terrain/source/copernicus_dem_glo30_S44_W072.tif",
+      "sha256": "2a4b5352efbd5ff48cdc15f396bd74d5db2378dd8b954cf5b7fe9e24341277d9",
+      "provider": "Copernicus DEM GLO-30",
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_S44_00_W072_00_DEM/Copernicus_DSM_COG_10_S44_00_W072_00_DEM.tif",
+      "license": "Copernicus DEM ESA user license; attribution and redistribution review required",
+      "authority": "30m_surface_model_terrain_source"
+    }
+  ],
+  "environment_contract": {
+    "geology": "glacial Patagonian valley with granite and metamorphic boulder gardens",
+    "water": "clear turquoise big water with powerful wave trains, holes, pillows, and boulder push",
+    "ecology": "temperate rainforest, coigue-dominant woodland, riparian shrubs, and gravel bars",
+    "atmosphere": "cool humid valley light, mountain cloud, localized spray and mist",
+    "procedural_layers": [
+      "granite",
+      "wet_boulders",
+      "gravel_bars",
+      "temperate_rainforest",
+      "foam",
+      "spray",
+      "mist"
+    ]
+  },
+  "artifacts": {
+    "centerline_geojson": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_centerline.geojson",
+    "stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+    "centerline_local": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json",
+    "heightfield": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png",
+    "dem_relief": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/dem_relief_2048.png",
+    "terrain_normal": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/terrain_normal_2048.png",
+    "terrain_ao_roughness_height": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/terrain_ao_roughness_height_2048.png",
+    "visual_channel_conditioning": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/visual_channel_conditioning.json",
+    "channel_conditioning_summary": {
+      "status": "bounded_visual_terrain_conditioning_review_gated",
+      "parameters": {
+        "channel_half_width_m": 48.0,
+        "channel_feather_width_m": 75.0,
+        "profile_smoothing_radius_m": 400.0,
+        "maximum_downstream_slope": 0.02,
+        "bed_depth_below_visual_surface_m": 1.8,
+        "maximum_terrain_cut_m": 25.0,
+        "maximum_terrain_fill_m": 0.0,
+        "profile_policy": "raw_and_triangular_smoothed_lower_envelope_then_backward_nonrising_slope_bound",
+        "raster_policy": "smoothstep_core_and_feather_cut_or_fill_clamped_to_explicit_bounds"
+      },
+      "measurements": {
+        "route_sample_count": 205,
+        "modified_raster_sample_count": 186418,
+        "maximum_cut_m": 25.0,
+        "maximum_fill_m": 0.0,
+        "raw_profile_total_upstream_rise_m": 97.4743,
+        "conditioned_profile_maximum_upstream_rise_m": 0.0,
+        "conditioned_profile_maximum_downstream_slope": 0.02,
+        "conditioned_profile_total_drop_m": 134.5572
+      },
+      "authority": {
+        "scope": "Unreal visual terrain and render-water alignment only",
+        "changes_custom_cpp_solver_state": false,
+        "changes_collision_or_raft_forces": false,
+        "surveyed_bathymetry": false,
+        "may_hide_conservation_or_parity_failures": false
+      }
+    },
+    "source_minimum_elevation_m": 131.0,
+    "source_maximum_elevation_m": 1809.9468994140625,
+    "minimum_elevation_m": 131.0,
+    "maximum_elevation_m": 1809.9468994140625,
+    "relief_m": 1678.9468994140625,
+    "source_albedo": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/source_albedo_2048.png",
+    "material_zones": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/material_zones_2048.png",
+    "water_mask": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/water_mask_2048.png",
+    "vegetation_mask": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/vegetation_mask_2048.png",
+    "unreal_texture_inputs": {
+      "physical_source_albedo": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/futaleufu_terminator_source_albedo_2048.png",
+      "physical_normal": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/futaleufu_terminator_normal_2048.png",
+      "physical_packed": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/futaleufu_terminator_ao_roughness_height_2048.png",
+      "physical_material_zones": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/futaleufu_terminator_material_zones_2048.png",
+      "atlas_albedo": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/futaleufu_terminator_first_party_material_texture_atlas_albedo.png",
+      "atlas_normal": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/futaleufu_terminator_first_party_material_texture_atlas_normal.png",
+      "atlas_packed": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/futaleufu_terminator_first_party_material_texture_atlas_ao_roughness_height.png",
+      "source_macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/futaleufu_terminator_source_conditioned_macro_albedo.png",
+      "source_normal_detail": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/futaleufu_terminator_source_conditioned_normal_detail.png",
+      "source_packed": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/futaleufu_terminator_source_conditioned_ao_roughness_height.png",
+      "source_material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/futaleufu_terminator_source_conditioned_material_zones.png",
+      "detail_albedo": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/futaleufu_terminator_terrain_bank_detail_v1_albedo.png",
+      "detail_normal": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/futaleufu_terminator_terrain_bank_detail_v1_normal.png",
+      "detail_packed": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/futaleufu_terminator_terrain_bank_detail_v1_ao_roughness_height.png"
+    },
+    "seasonal_flow_context": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json"
+  },
+  "promotion_gates": [
+    "local guide confirms exact put-in, take-out, line direction, rapid stations, access, and rescue routes",
+    "geospatial reviewer confirms DEM datum, route alignment, channel conditioning, and bank geometry",
+    "rights reviewer confirms Copernicus DEM redistribution/attribution and all public capture references",
+    "seasonal-flow reviewer confirms gauge-to-reach translation and flow-dependent visual/gameplay bands",
+    "Unreal map uses source-scale terrain and approved assets, passes desktop/VR budgets, and has human lifelike approval"
+  ]
+}

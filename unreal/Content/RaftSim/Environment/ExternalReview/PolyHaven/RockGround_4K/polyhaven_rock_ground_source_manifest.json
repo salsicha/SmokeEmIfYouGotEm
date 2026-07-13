@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_rock_ground_4k",
+  "status": "rights_reviewed_source_maps_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American steep-bank rock albedo, normal, and roughness detail under source-authoritative NAIP macro color",
+  "source": {
+    "title": "Rock Ground",
+    "publisher": "Poly Haven",
+    "authors": ["Rob Tuytel"],
+    "asset_url": "https://polyhaven.com/a/rock_ground",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "direct official download links exposed by the asset website",
+    "public_api_used": false,
+    "downloaded_package": "three 4K JPG maps",
+    "publisher_width_m": 1.5,
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "south_fork_rock_approval": "not_reviewed_use_as_close_range_structure_analog_only",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "allowed_now": [
+      "isolated Unreal import",
+      "source-authoritative steep-bank detail blend comparison",
+      "South Fork visual comparison captures"
+    ],
+    "blocked_now": [
+      "replacing NAIP macro color authority",
+      "claiming exact South Fork lithology",
+      "claiming lifelike environment completion",
+      "shipping before geology, guide, art, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "rock_ground_diff_4k.jpg": "1bd796dcfb07bf473732f53ade9bd6c27f56df5150f6f120b9aeb5994884cce7",
+    "rock_ground_nor_gl_4k.jpg": "ddbff689451fd5ef8a88dacc596b23ccad5a3651a19d86e37282e40553152bca",
+    "rock_ground_rough_4k.jpg": "a6ba535fb2138e1e6c5c3fa6a52a770580d4139d1640ba21b8fb4b07bb3b36c6"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_ROCK_GROUND_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K",
+    "texture_policy": "4K source maps imported explicitly; GL normal green channel flipped for Unreal; diffuse remains sRGB and roughness remains linear masks",
+    "material_policy": "slope-conditioned detail below source-authoritative NAIP macro color at true 1.5-metre tiling scale",
+    "promotion_policy": "manual after visual, geology, guide, art, and performance review"
+  }
+}

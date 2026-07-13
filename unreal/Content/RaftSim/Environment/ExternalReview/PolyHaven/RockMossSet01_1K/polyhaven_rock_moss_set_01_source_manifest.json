@@ -1,0 +1,54 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_rock_moss_set_01_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American bank and channel rock silhouette, material, variation, and distance-stability evaluation",
+  "source": {
+    "title": "Rock Moss Set 01",
+    "publisher": "Poly Haven",
+    "authors": ["Kless Gyzen"],
+    "asset_url": "https://polyhaven.com/a/rock_moss_set_01",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "manual download from the asset website",
+    "public_api_used": false,
+    "downloaded_package": "1K FBX",
+    "archive_bytes": 4476266,
+    "archive_sha256": "83dd466314481d8aff9397d83e9249f1e83af1c5ec7f02d87aca384b3e101bb0",
+    "publisher_width_m": 8.0,
+    "publisher_triangle_count_label": "63K",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "river_geology_approval": "not_reviewed_use_as_weathered_rock_structure_analog_only",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material, pivot, scale, Nanite, and distance-stability validation",
+      "South Fork visual comparison captures"
+    ],
+    "blocked_now": [
+      "claiming exact South Fork lithology",
+      "automatic production rock replacement",
+      "claiming lifelike environment completion",
+      "shipping before geology, guide, art, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "rock_moss_set_01_1k.fbx": "8fa2a2666ecc4591f59e1d45db05d86857115b55492c8522917f3de5e650e6f9",
+    "textures/rock_moss_set_01_diff_1k.jpg": "40cea65d8aa4ee73a93b04af19963834d061eee9779c3fc2c1cba76eef812ccc",
+    "textures/rock_moss_set_01_nor_gl_1k.exr": "d86555deabb910ed82b2b770d852ba5aa931d373689ff7ae028574c7b310be99",
+    "textures/rock_moss_set_01_rough_1k.jpg": "4d6ec46623abd8e2cdb855f59c7ce31873ad61b36b60e4de579e9e776a497c6b"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_ROCK_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K",
+    "mesh_policy": "six source rocks imported separately as static meshes",
+    "material_policy": "base color, GL normal with Unreal green-channel correction, and roughness authored into one local opaque material",
+    "nanite_policy": "enabled on all six isolated static meshes",
+    "promotion_policy": "manual after visual, geology, performance, and guide review"
+  }
+}

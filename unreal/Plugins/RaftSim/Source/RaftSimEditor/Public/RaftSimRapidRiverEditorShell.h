@@ -90,6 +90,15 @@ public:
     FString RoundTripValidationManifest = TEXT("unreal/Content/RaftSim/River/round_trip_validation.json");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RiverEditorShell")
+    FString NamedRapidEditorMarkersManifest = TEXT("unreal/Content/RaftSim/River/named_rapid_editor_markers.json");
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RiverEditorShell")
+    FString NamedRapidEditorGeometryManifest = TEXT("unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson");
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RiverEditorShell")
+    FString NamedRapidSimulatorReviewRunsManifest = TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json");
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RiverEditorShell")
     TArray<FName> RequiredPanelIds;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|RiverEditorShell")

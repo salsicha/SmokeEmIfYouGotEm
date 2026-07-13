@@ -1,0 +1,53 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_mip_padding_diagnostic.v21",
+	"river_id": "futaleufu_terminator",
+	"status": "alpha_preserved_rgb_padded_native_pair_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"source_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/futaleufu_native_canopy_texture_manifest.json",
+	"reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+	"reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+	"control_boundary": "The alpha channel, nontransparent source RGB, normal and packed texture sources, native TwoSidedFoliage graph and defaults, 4x opacity diagnostic, disabled leaf shadows, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Only RGB at alpha <=2 is padded up to 24 pixels within each atlas tile before Unreal mip generation.",
+	"padding_contract":
+	{
+		"padding_pixels": 24,
+		"alpha_threshold_255": 2,
+		"atlas_columns": 4,
+		"atlas_rows": 4,
+		"tile_boundary_crossing_allowed": false,
+		"alpha_preserved_byte_for_byte": true,
+		"nontransparent_rgb_preserved_byte_for_byte": true,
+		"alpha_sha256": "c8b8ce2baab7a740417696a9e3cfdbcd5ad42458ed30828358922d473e1c18c6",
+		"nontransparent_rgb_sha256": "0a4101494bd6a579e8fc0390da9cc13bd2f51f0d9735d5e44e7a1095b552ae16",
+		"padded_transparent_pixel_count": 517669
+	},
+	"captures":
+	{
+		"guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png",
+		"river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	}
+}

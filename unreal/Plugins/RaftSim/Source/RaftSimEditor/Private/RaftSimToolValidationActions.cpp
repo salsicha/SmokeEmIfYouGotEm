@@ -197,7 +197,12 @@ TArray<FRaftSimToolValidationAction> BuildDefaultValidationActions()
         TEXT("unreal/Content/RaftSim/Tools/rapid_river_editor_shell.json"),
         TEXT("unreal/Content/RaftSim/River/round_trip_validation.json"),
         TEXT("Export JSON/GeoJSON editor artifacts with stable ordering and manifest-recorded provenance."),
-        {TEXT("unreal/Content/RaftSim/River/rapid_river_editor.json"), TEXT("unreal/Content/RaftSim/River/traceable_river_data_assets.json")},
+        {
+            TEXT("unreal/Content/RaftSim/River/rapid_river_editor.json"),
+            TEXT("unreal/Content/RaftSim/River/traceable_river_data_assets.json"),
+            TEXT("unreal/Content/RaftSim/River/named_rapid_editor_markers.json"),
+            TEXT("unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson"),
+            TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json")},
         false,
         true);
 
@@ -209,7 +214,10 @@ TArray<FRaftSimToolValidationAction> BuildDefaultValidationActions()
         TEXT("unreal/Content/RaftSim/River/round_trip_validation.json"),
         TEXT("physics/reports/milestone20/report_set_lock.json"),
         TEXT("Regenerate solver-facing arrays and comparison inputs from exported river editor data."),
-        {TEXT("unreal/Content/RaftSim/River/round_trip_validation.json"), TEXT("physics/reports/milestone16/full_cpp_validation_gate.json")},
+        {
+            TEXT("unreal/Content/RaftSim/River/round_trip_validation.json"),
+            TEXT("unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json"),
+            TEXT("physics/reports/milestone16/full_cpp_validation_gate.json")},
         true,
         true);
 

@@ -33,8 +33,8 @@
     "source_conditioned_material_texture_assets": {
       "root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
       "exists": true,
-      "file_count": 12,
-      "total_bytes": 94946503
+      "file_count": 18,
+      "total_bytes": 121625956
     },
     "material_instance_review_assets": {
       "root": "unreal/Content/RaftSim/Materials/MaterialInstances",

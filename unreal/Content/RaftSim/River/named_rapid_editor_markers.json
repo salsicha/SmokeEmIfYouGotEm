@@ -1,0 +1,4910 @@
+{
+  "editor_contract": {
+    "block_gameplay_promotion_without_guide_review": true,
+    "block_solver_window_export_without_exact_geometry": true,
+    "show_expected_outcomes": true,
+    "show_flow_hypotheses": true,
+    "show_provisional_station_badge": true,
+    "show_source_and_rights_panel": true
+  },
+  "production_promoted": false,
+  "rivers": [
+    {
+      "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
+      "marker_count": 20,
+      "markers": [
+        {
+          "aliases": [],
+          "difficulty_label": "surf feature",
+          "display_name": "Chili Bar Hole",
+          "downstream_order": 1,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__chili_bar_hole",
+          "feature_tags": [
+            "hole",
+            "surf_wave",
+            "recovery_pool"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 0.0,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 0.0
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III+",
+          "display_name": "Meat Grinder",
+          "downstream_order": 2,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__meat_grinder",
+          "feature_tags": [
+            "boulder_garden",
+            "constriction",
+            "wave_train",
+            "pin_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 0.6,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 965.606
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Racehorse Bend",
+          "downstream_order": 3,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "south_fork_american_chili_bar__racehorse_bend",
+          "feature_tags": [
+            "bend",
+            "lateral",
+            "boulder"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 1.3,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 2092.147
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Maya",
+          "downstream_order": 4,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__maya",
+          "feature_tags": [
+            "hole",
+            "ledge",
+            "surf_wave",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 1.5,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 2414.016
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II",
+          "display_name": "Rock Garden",
+          "downstream_order": 5,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "south_fork_american_chili_bar__rock_garden",
+          "feature_tags": [
+            "boulder_garden",
+            "shallow_shelf",
+            "pin_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 1.7,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 2735.885
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II",
+          "display_name": "African Queen",
+          "downstream_order": 6,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__african_queen",
+          "feature_tags": [
+            "wave_train",
+            "boulder"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 2.0,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 3218.688
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Triple Threat",
+          "downstream_order": 7,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "south_fork_american_chili_bar__triple_threat",
+          "feature_tags": [
+            "boulder_garden",
+            "multiple_channels",
+            "pin_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 3.1,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 4988.966
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III+",
+          "display_name": "Troublemaker",
+          "downstream_order": 8,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__troublemaker",
+          "feature_tags": [
+            "boulder_garden",
+            "hole",
+            "diagonal_wave",
+            "eddy",
+            "wrap_hazard",
+            "multiple_lines"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 5.2,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 8368.589
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Fowler's Rock",
+          "downstream_order": 9,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "south_fork_american_chili_bar__fowler_s_rock",
+          "feature_tags": [
+            "boulder_garden",
+            "constriction",
+            "pin_hazard",
+            "slalom"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 15.8,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 25427.635
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Upper Haystack Canyon",
+          "downstream_order": 10,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__upper_haystack_canyon",
+          "feature_tags": [
+            "wave_train",
+            "canyon_constriction"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 16.2,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 26071.373
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-",
+          "display_name": "Lost Hat",
+          "downstream_order": 11,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__lost_hat",
+          "feature_tags": [
+            "wave_train",
+            "continuous_entry"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 16.7,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 26876.045
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III+",
+          "display_name": "Satan's Cesspool",
+          "downstream_order": 12,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf",
+            "swimmer_recovery"
+          ],
+          "feature_id": "south_fork_american_chili_bar__satan_s_cesspool",
+          "feature_tags": [
+            "hole",
+            "curling_wave",
+            "central_island",
+            "eddy",
+            "swimmer_hazard",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 16.9,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 27197.914
+          }
+        },
+        {
+          "aliases": [
+            "Deadman's Drop"
+          ],
+          "difficulty_label": "II+-III",
+          "display_name": "Son of Satan",
+          "downstream_order": 13,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "swimmer_recovery"
+          ],
+          "feature_id": "south_fork_american_chili_bar__son_of_satan",
+          "feature_tags": [
+            "submerged_rock",
+            "wall_push",
+            "swimmer_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 17.0,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 27358.848
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Scissors",
+          "downstream_order": 14,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "south_fork_american_chili_bar__scissors",
+          "feature_tags": [
+            "diagonal_ledge",
+            "boulder",
+            "lateral"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 17.4,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 28002.586
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II+",
+          "display_name": "Lower Haystack Canyon",
+          "downstream_order": 15,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__lower_haystack_canyon",
+          "feature_tags": [
+            "wave_train",
+            "canyon_constriction"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 17.6,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 28324.454
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Bouncing Rock",
+          "downstream_order": 16,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__bouncing_rock",
+          "feature_tags": [
+            "rock_push",
+            "hole",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 18.2,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 29290.061
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-",
+          "display_name": "Pre-Op",
+          "downstream_order": 17,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__pre_op",
+          "feature_tags": [
+            "wave_train",
+            "bank_holes",
+            "boulders"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 18.4,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 29611.93
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Hospital Bar",
+          "downstream_order": 18,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__hospital_bar",
+          "feature_tags": [
+            "boulder_garden",
+            "chute",
+            "diagonal_hole",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 18.6,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 29933.798
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Recovery Room",
+          "downstream_order": 19,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__recovery_room",
+          "feature_tags": [
+            "hole",
+            "reservoir_stage_sensitive",
+            "recovery"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 18.8,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 30255.667
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Surprise",
+          "downstream_order": 20,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "south_fork_american_chili_bar__surprise",
+          "feature_tags": [
+            "seasonal_rock",
+            "chute",
+            "hole",
+            "low_flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "south_fork_american_rivers_mile_guide",
+            "south_fork_americanwhitewater_map"
+          ],
+          "stationing": {
+            "production_authoritative": true,
+            "published_unit": "river_mile",
+            "published_value": 19.3,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 31060.339
+          }
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "run_length_m": 33796.224,
+      "source_refs": [
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "south_fork_american_chili_bar",
+          "source_id": "south_fork_american_rivers_mile_guide",
+          "source_kind": "guide_mile_log",
+          "title": "South Fork American River Rafting: Mile-by-Mile",
+          "url": "https://www.american-rivers.com/sf-rio-descr.htm"
+        },
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "south_fork_american_chili_bar",
+          "source_id": "south_fork_americanwhitewater_map",
+          "source_kind": "guide_feature_description",
+          "title": "South Fork American River Map",
+          "url": "https://www.americanwhitewater.com/american-river-rafting/south-fork/map"
+        }
+      ],
+      "stationing_authority": "published_river_miles"
+    },
+    {
+      "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+      "marker_count": 15,
+      "markers": [
+        {
+          "aliases": [],
+          "difficulty_label": "5/10",
+          "display_name": "Badger Creek",
+          "downstream_order": 1,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__badger_creek",
+          "feature_tags": [
+            "pour_over",
+            "hole",
+            "debris_fan"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 8.0,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 12874.752
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "5/10",
+          "display_name": "Soap Creek",
+          "downstream_order": 2,
+          "editor_color": "yellow",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__soap_creek",
+          "feature_tags": [
+            "wave_train",
+            "lateral",
+            "debris_fan"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 11.4,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 18346.522
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "7/10",
+          "display_name": "House Rock",
+          "downstream_order": 3,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__house_rock",
+          "feature_tags": [
+            "large_hole",
+            "right_run",
+            "lateral",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 17.1,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 27519.782
+          }
+        },
+        {
+          "aliases": [
+            "24 Mile"
+          ],
+          "difficulty_label": "6/10",
+          "display_name": "Georgie",
+          "downstream_order": 4,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__georgie",
+          "feature_tags": [
+            "drop",
+            "wave_train",
+            "hole"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 24.4,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 39267.994
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "6/10",
+          "display_name": "Unkar",
+          "downstream_order": 5,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__unkar",
+          "feature_tags": [
+            "boulder_garden",
+            "laterals",
+            "debris_fan"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 72.9,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 117321.178
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "8/10",
+          "display_name": "Hance",
+          "downstream_order": 6,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__hance",
+          "feature_tags": [
+            "boulder_garden",
+            "multiple_moves",
+            "holes",
+            "low_flow_difficulty"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 77.1,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 124080.422
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "7/10",
+          "display_name": "Sockdolager",
+          "downstream_order": 7,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__sockdolager",
+          "feature_tags": [
+            "wave_train",
+            "holes",
+            "canyon_constriction"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 79.1,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 127299.11
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "7/10",
+          "display_name": "Grapevine",
+          "downstream_order": 8,
+          "editor_color": "orange",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__grapevine",
+          "feature_tags": [
+            "wave_train",
+            "laterals",
+            "debris_fan"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 81.6,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 131322.47
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "8/10",
+          "display_name": "Horn Creek",
+          "downstream_order": 9,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__horn_creek",
+          "feature_tags": [
+            "large_hole",
+            "rock_ledge",
+            "right_to_left_move",
+            "low_flow_difficulty"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 90.8,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 146128.435
+          }
+        },
+        {
+          "aliases": [
+            "Granite Falls"
+          ],
+          "difficulty_label": "8/10",
+          "display_name": "Granite",
+          "downstream_order": 10,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__granite",
+          "feature_tags": [
+            "large_waves",
+            "laterals",
+            "debris_fan"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 93.9,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 151117.402
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "8/10",
+          "display_name": "Hermit",
+          "downstream_order": 11,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__hermit",
+          "feature_tags": [
+            "large_wave_train",
+            "hydraulics",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 95.5,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 153692.352
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "8/10",
+          "display_name": "Crystal",
+          "downstream_order": 12,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__crystal",
+          "feature_tags": [
+            "large_holes",
+            "rock_garden",
+            "debris_fan",
+            "multiple_lines",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 98.2,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 158037.581
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "7/10",
+          "display_name": "Bedrock",
+          "downstream_order": 13,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__bedrock",
+          "feature_tags": [
+            "central_island",
+            "channel_choice",
+            "wrap_hazard",
+            "rock_push"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 131.1,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 210984.998
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "8/10",
+          "display_name": "Upset",
+          "downstream_order": 14,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__upset",
+          "feature_tags": [
+            "large_hole",
+            "wave_train",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 150.2,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 241723.469
+          }
+        },
+        {
+          "aliases": [
+            "Vulcan"
+          ],
+          "difficulty_label": "9/10",
+          "display_name": "Lava Falls",
+          "downstream_order": 15,
+          "editor_color": "red",
+          "editor_map_geometry": null,
+          "editor_map_geometry_status": "unavailable_outside_current_candidate_centerline",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "colorado_river_grand_canyon_rowing__lava_falls",
+          "feature_tags": [
+            "ledge_hole",
+            "large_waves",
+            "laterals",
+            "multiple_lines",
+            "flip_hazard",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "grand_canyon_nps_rapids_interview",
+            "grand_canyon_usgs_hydraulic_maps",
+            "grand_canyon_secondary_mile_index"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "river_mile",
+            "published_value": 179.7,
+            "station_kind": "published_river_mile_converted",
+            "station_m": 289199.117
+          }
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "run_length_m": 451420.0,
+      "source_refs": [
+        {
+          "rights_status": "link_only_government_reference",
+          "river_id": "colorado_river_grand_canyon_rowing",
+          "source_id": "grand_canyon_nps_rapids_interview",
+          "source_kind": "official_agency_interview",
+          "title": "Behind the Scenery: Colorado River Rapids",
+          "url": "https://www.nps.gov/podcasts/behind-the-scenery.htm?hiderightrail=true&maxrows=10&reinit=false&season=0&sortby=date-desc&startrow=21"
+        },
+        {
+          "rights_status": "government_source_terms_review_required_before_asset_import",
+          "river_id": "colorado_river_grand_canyon_rowing",
+          "source_id": "grand_canyon_usgs_hydraulic_maps",
+          "source_kind": "official_hydraulic_map_series",
+          "title": "Hydraulic Maps of Major Rapids, Grand Canyon, Arizona",
+          "url": "https://pubs.usgs.gov/imap/1897j/"
+        },
+        {
+          "rights_status": "link_only_factual_index_verify_against_nps_usgs_and_guide",
+          "river_id": "colorado_river_grand_canyon_rowing",
+          "source_id": "grand_canyon_secondary_mile_index",
+          "source_kind": "secondary_station_index",
+          "title": "List of Grand Canyon rapids and features",
+          "url": "https://en.wikipedia.org/wiki/List_of_Grand_Canyon_rapids_and_features"
+        }
+      ],
+      "stationing_authority": "published_river_miles_secondary_index_pending_nps_usgs_crosscheck"
+    },
+    {
+      "display_name": "Pacuare River: Tres Equis to Siquirres",
+      "marker_count": 15,
+      "markers": [
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Bienvenidos",
+          "downstream_order": 1,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.73899122,
+              9.93687567
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__bienvenidos",
+          "feature_tags": [
+            "wave_train",
+            "training_entry"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 1,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 1640.625
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Pyramid Rock",
+          "downstream_order": 2,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.7290566,
+              9.92583535
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "pacuare_river_costa_rica__pyramid_rock",
+          "feature_tags": [
+            "boulder",
+            "channel_choice",
+            "rock_push"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 2,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 3281.25
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Pele El Ojo",
+          "downstream_order": 3,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.71919125,
+              9.91473419
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__pele_el_ojo",
+          "feature_tags": [
+            "hole",
+            "wave_train"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 3,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 4921.875
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Upper Huacas",
+          "downstream_order": 4,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.70841754,
+              9.9045032
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__upper_huacas",
+          "feature_tags": [
+            "gorge",
+            "drop",
+            "hole",
+            "waterfall_context",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 4,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 6562.5
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Bobo Falls",
+          "downstream_order": 5,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.69548044,
+              9.89725675
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__bobo_falls",
+          "feature_tags": [
+            "drop",
+            "wave_train"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 5,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 8203.125
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Lower Huacas",
+          "downstream_order": 6,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.68075211,
+              9.89750434
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__lower_huacas",
+          "feature_tags": [
+            "gorge",
+            "drop",
+            "hole",
+            "waterfall_context",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 6,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 9843.75
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Rodeo",
+          "downstream_order": 7,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.66772321,
+              9.90464612
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__rodeo",
+          "feature_tags": [
+            "wave_train",
+            "laterals"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 7,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 11484.375
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Guatemala",
+          "downstream_order": 8,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.65631984,
+              9.9142032
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__guatemala",
+          "feature_tags": [
+            "boulder_garden",
+            "wave_train"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 8,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 13125.0
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-",
+          "display_name": "Double Drop",
+          "downstream_order": 9,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.64517436,
+              9.92405846
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__double_drop",
+          "feature_tags": [
+            "two_stage_drop",
+            "holes",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 9,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 14765.625
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-IV",
+          "display_name": "Cimarrones",
+          "downstream_order": 10,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.63299604,
+              9.93260076
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__cimarrones",
+          "feature_tags": [
+            "boulders",
+            "pour_over",
+            "holes",
+            "large_waves"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 10,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 16406.25
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Upper Pinball",
+          "downstream_order": 11,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.61873291,
+              9.93654597
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "pacuare_river_costa_rica__upper_pinball",
+          "feature_tags": [
+            "boulder_garden",
+            "multiple_moves",
+            "pin_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 11,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 18046.875
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Lower Pinball",
+          "downstream_order": 12,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.60452727,
+              9.93242372
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release"
+          ],
+          "feature_id": "pacuare_river_costa_rica__lower_pinball",
+          "feature_tags": [
+            "boulder_garden",
+            "multiple_moves",
+            "pin_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 12,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 19687.5
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Wall of Sorrow",
+          "downstream_order": 13,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.59253902,
+              9.92362816
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush"
+          ],
+          "feature_id": "pacuare_river_costa_rica__wall_of_sorrow",
+          "feature_tags": [
+            "wall_push",
+            "lateral",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 13,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 21328.125
+          }
+        },
+        {
+          "aliases": [
+            "Dos Monta\u00f1as"
+          ],
+          "difficulty_label": "IV",
+          "display_name": "Dos Montanas",
+          "downstream_order": 14,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.58175949,
+              9.91338663
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__dos_montanas",
+          "feature_tags": [
+            "canyon_constriction",
+            "long_rapid",
+            "wave_train",
+            "holes"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 14,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 22968.75
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Las Ranitas",
+          "downstream_order": 15,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -83.57096693,
+              9.90315955
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+            "source_status": "preview_scaffold_not_official_hydrography",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "pacuare_river_costa_rica__las_ranitas",
+          "feature_tags": [
+            "wave_train",
+            "boulders"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "pacuare_rios_lodge_map",
+            "pacuare_gorafting_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 15,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 24609.375
+          }
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "run_length_m": 26250.0,
+      "source_refs": [
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "pacuare_river_costa_rica",
+          "source_id": "pacuare_rios_lodge_map",
+          "source_kind": "outfitter_route_map",
+          "title": "Pacuare River Map",
+          "url": "https://rioslodge.com/wp-content/uploads/Pacuare-River-Map.pdf"
+        },
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "pacuare_river_costa_rica",
+          "source_id": "pacuare_gorafting_guide",
+          "source_kind": "guide_route_index",
+          "title": "Pacuare River Whitewater Guide and Map",
+          "url": "https://gorafting.com/costa-rica/pacuare-river/"
+        }
+      ],
+      "stationing_authority": "published_map_order_only"
+    },
+    {
+      "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
+      "marker_count": 25,
+      "markers": [
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V",
+          "display_name": "Against the Wall",
+          "downstream_order": 1,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.85077554,
+              -17.92945395
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush"
+          ],
+          "feature_id": "zambezi_batoka_gorge__against_the_wall",
+          "feature_tags": [
+            "wall_cushion",
+            "eddy_ferry",
+            "boils",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase downstream momentum and cover shallow geometry; do not invent hydraulics without source evidence."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "1",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 1,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 1052.263
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "The Bridge",
+          "downstream_order": 2,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.85373208,
+              -17.93136288
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__the_bridge",
+          "feature_tags": [
+            "surf_wave",
+            "hole"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "2",
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 2,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 2104.527
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Between Two Worlds",
+          "downstream_order": 3,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.85678901,
+              -17.93363711
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__between_two_worlds",
+          "feature_tags": [
+            "wave",
+            "hole"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "3",
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 3,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 3156.79
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V",
+          "display_name": "Morning Glory",
+          "downstream_order": 4,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.84760458,
+              -17.93694359
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__morning_glory",
+          "feature_tags": [
+            "dragons_back",
+            "tight_line",
+            "wave_train",
+            "low_flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "4",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 4,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 4209.054
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Stairway to Heaven",
+          "downstream_order": 5,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.84760319,
+              -17.94427598
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__stairway_to_heaven",
+          "feature_tags": [
+            "drop",
+            "hole",
+            "wave_train"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "5",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 5,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 5261.317
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Devil's Toilet Bowl",
+          "downstream_order": 6,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.85624905,
+              -17.94798817
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__devil_s_toilet_bowl",
+          "feature_tags": [
+            "large_wave_train",
+            "hole"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "6",
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 6,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 6313.58
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Gulliver's Travels",
+          "downstream_order": 7,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.86059885,
+              -17.9541138
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__gulliver_s_travels",
+          "feature_tags": [
+            "large_diagonal",
+            "large_waves",
+            "multiple_moves"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "7",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 7,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 7365.844
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-V",
+          "display_name": "Midnight Diner",
+          "downstream_order": 8,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.8568404,
+              -17.96265399
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__midnight_diner",
+          "feature_tags": [
+            "large_hole",
+            "multiple_lines",
+            "star_trek_line",
+            "muncher_line",
+            "chicken_line"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "8",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 8,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 8418.107
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V-VI",
+          "display_name": "Commercial Suicide",
+          "downstream_order": 9,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.86206971,
+              -17.96915632
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "portage",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__commercial_suicide",
+          "feature_tags": [
+            "river_wide_pourover",
+            "narrow_slot",
+            "mandatory_commercial_portage",
+            "high_consequence"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "9",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 9,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 9470.37
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Gnashing Jaws of Death",
+          "downstream_order": 10,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.85843354,
+              -17.97547253
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__gnashing_jaws_of_death",
+          "feature_tags": [
+            "large_waves",
+            "holes"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "10",
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 10,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 10522.634
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Overland Truck Eater",
+          "downstream_order": 11,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.86799657,
+              -17.97503539
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__overland_truck_eater",
+          "feature_tags": [
+            "boils",
+            "large_waves",
+            "high_water_put_in"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "11",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 11,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 11574.897
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-IV",
+          "display_name": "Three Ugly Sisters",
+          "downstream_order": 12,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.87792469,
+              -17.97486542
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__three_ugly_sisters",
+          "feature_tags": [
+            "large_wave_train",
+            "surf_wave"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "12",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 12,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 12627.161
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V",
+          "display_name": "The Mother",
+          "downstream_order": 13,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.88177052,
+              -17.97815545
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__the_mother",
+          "feature_tags": [
+            "large_wave_train",
+            "holes"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "13",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 13,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 13679.424
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III",
+          "display_name": "Surprise Surprise",
+          "downstream_order": 14,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.88995238,
+              -17.9802515
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__surprise_surprise",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "14",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 14,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 14731.687
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V",
+          "display_name": "The Washing Machine",
+          "downstream_order": 15,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.89921346,
+              -17.98200109
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__the_washing_machine",
+          "feature_tags": [
+            "recirculating_pourover",
+            "central_hole",
+            "multiple_avoidance_lines",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "15",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 15,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 15783.951
+          }
+        },
+        {
+          "aliases": [
+            "Terminator I and II"
+          ],
+          "difficulty_label": "IV",
+          "display_name": "The Terminators",
+          "downstream_order": 16,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.90849938,
+              -17.98383704
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__the_terminators",
+          "feature_tags": [
+            "large_wave_train",
+            "flip_wave",
+            "high_flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "16",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 16,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 16836.214
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Double Trouble",
+          "downstream_order": 17,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.91154846,
+              -17.9916818
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__double_trouble",
+          "feature_tags": [
+            "two_large_holes",
+            "flow_sensitive",
+            "multiple_avoidance_lines"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "17",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 17,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 17888.478
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Oblivion",
+          "downstream_order": 18,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.91915748,
+              -17.99702905
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__oblivion",
+          "feature_tags": [
+            "crashing_hole",
+            "third_wave",
+            "flip_hazard",
+            "surf",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "18",
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 18,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 18940.741
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "The Last Straw",
+          "downstream_order": 19,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.92876794,
+              -17.99458856
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__the_last_straw",
+          "feature_tags": [
+            "wave_train",
+            "boils"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "19",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 19,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 19993.004
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 20",
+          "downstream_order": 20,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.93847073,
+              -17.99249275
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__rapid_20",
+          "feature_tags": [
+            "waves",
+            "eddy_lines"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "20",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 20,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 21045.268
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 21",
+          "downstream_order": 21,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.94684637,
+              -17.9962074
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__rapid_21",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "21",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 21,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 22097.531
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Morning Shave",
+          "downstream_order": 22,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.95660764,
+              -17.99587424
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__morning_shave",
+          "feature_tags": [
+            "wave_train",
+            "eddy_lines"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "22",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 22,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 23149.794
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Morning Shower",
+          "downstream_order": 23,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.96349244,
+              -17.99952491
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__morning_shower",
+          "feature_tags": [
+            "wave_train",
+            "high_water_takeout_context"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "23",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 23,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 24202.058
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 24",
+          "downstream_order": 24,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.97185794,
+              -18.0014545
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__rapid_24",
+          "feature_tags": [
+            "waves",
+            "boils"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "24",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 24,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 25254.321
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "II-III",
+          "display_name": "Rapid 25",
+          "downstream_order": 25,
+          "editor_color": "yellow",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              25.981146,
+              -17.99868946
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+            "source_status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "zambezi_batoka_gorge__rapid_25",
+          "feature_tags": [
+            "wave_train",
+            "takeout_context"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": "25",
+          "review_priority": "medium",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "zambezi_whitewater_guidebook",
+            "zambezi_victoria_falls_guide"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 25,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 26306.585
+          }
+        }
+      ],
+      "river_id": "zambezi_batoka_gorge",
+      "run_length_m": 27358.848,
+      "source_refs": [
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "zambezi_batoka_gorge",
+          "source_id": "zambezi_whitewater_guidebook",
+          "source_kind": "guide_route_index",
+          "title": "Zambezi River: Batoka Gorge",
+          "url": "https://www.whitewaterguidebook.com/africa/zambezi-river-batoka-gorge/"
+        },
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "zambezi_batoka_gorge",
+          "source_id": "zambezi_victoria_falls_guide",
+          "source_kind": "guide_flow_behavior_description",
+          "title": "Victoria Falls Rafting Rapid Guide",
+          "url": "https://www.victoriafalls-guide.net/victoria-falls-rafting.html"
+        }
+      ],
+      "stationing_authority": "published_rapid_number_order_only"
+    },
+    {
+      "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",
+      "marker_count": 5,
+      "markers": [
+        {
+          "aliases": [],
+          "difficulty_label": "III-IV",
+          "display_name": "Asleep at the Wheel",
+          "downstream_order": 1,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -72.00129139,
+              -43.31022185
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+            "source_status": "osm_route_trace_review_gated_not_guide_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "futaleufu_river_chile__asleep_at_the_wheel",
+          "feature_tags": [
+            "warmup",
+            "wave_train",
+            "surf"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "futaleufu_rivers_of_chile_terminator",
+            "futaleufu_expediciones_chile"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 1,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 1666.667
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "V",
+          "display_name": "Terminator",
+          "downstream_order": 2,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -71.98608042,
+              -43.31445862
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+            "source_status": "osm_route_trace_review_gated_not_guide_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "portage",
+            "release",
+            "retention",
+            "surf"
+          ],
+          "feature_id": "futaleufu_river_chile__terminator",
+          "feature_tags": [
+            "long_rapid",
+            "multiple_holes",
+            "multiple_lines",
+            "sneak_line",
+            "scout",
+            "portage",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "futaleufu_rivers_of_chile_terminator",
+            "futaleufu_expediciones_chile"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 2,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 3333.333
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V",
+          "display_name": "Son of Terminator",
+          "downstream_order": 3,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -71.97414559,
+              -43.31625981
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+            "source_status": "osm_route_trace_review_gated_not_guide_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "futaleufu_river_chile__son_of_terminator",
+          "feature_tags": [
+            "holes",
+            "wave_train",
+            "continuous_whitewater"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "futaleufu_rivers_of_chile_terminator",
+            "futaleufu_expediciones_chile"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 3,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 5000.0
+          }
+        },
+        {
+          "aliases": [
+            "Kyber Pass",
+            "Kipper Pass"
+          ],
+          "difficulty_label": "IV+",
+          "display_name": "Khyber Pass",
+          "downstream_order": 4,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -71.9739467,
+              -43.3262478
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+            "source_status": "osm_route_trace_review_gated_not_guide_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "release",
+            "retention",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "futaleufu_river_chile__khyber_pass",
+          "feature_tags": [
+            "hydraulic_holes",
+            "large_waves",
+            "multiple_moves"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "futaleufu_rivers_of_chile_terminator",
+            "futaleufu_expediciones_chile"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 4,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 6666.667
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV",
+          "display_name": "Himalayas",
+          "downstream_order": 5,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -71.98264298,
+              -43.33935226
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+            "source_status": "osm_route_trace_review_gated_not_guide_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "futaleufu_river_chile__himalayas",
+          "feature_tags": [
+            "very_large_standing_waves",
+            "wave_train",
+            "surf",
+            "flip_hazard"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Reduce feature scale and expose shallow geometry; verify the rapid does not receive artificial high-flow behavior."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "futaleufu_rivers_of_chile_terminator",
+            "futaleufu_expediciones_chile"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 5,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 8333.333
+          }
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "run_length_m": 10000.0,
+      "source_refs": [
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "futaleufu_river_chile",
+          "source_id": "futaleufu_rivers_of_chile_terminator",
+          "source_kind": "guide_route_index",
+          "title": "Rio Futaleufu: Terminator Section",
+          "url": "https://riversofchile.com/rio-futaleufu-terminator-section/"
+        },
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "futaleufu_river_chile",
+          "source_id": "futaleufu_expediciones_chile",
+          "source_kind": "outfitter_feature_description",
+          "title": "Futaleufu FastTrack Rafting",
+          "url": "https://exchile.com/adventures/futaleufu-fasttrack-rafting/"
+        }
+      ],
+      "stationing_authority": "published_order_only_route_length_approximate"
+    }
+  ],
+  "schema": "raftsim.unreal.named_rapid_editor_markers.v1",
+  "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+  "status": "editor_review_markers_ready_exact_geometry_and_guide_review_required"
+}

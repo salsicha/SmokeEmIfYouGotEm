@@ -1,0 +1,84 @@
+{
+  "schema": "raftsim.colorado_production_corridor.v1",
+  "river_id": "colorado_river",
+  "reach_id": "lees_ferry_2200_4700m",
+  "status": "official_source_attached_physical_landscape_inputs_generated_review_gated",
+  "production_promoted": false,
+  "bounds_epsg3857": [
+    -12420287.377530713,
+    4420517.479914844,
+    -12416576.0031,
+    4423064.718244922
+  ],
+  "ground_span_m_approx": [
+    2968.8977175379428,
+    2037.6521435330399
+  ],
+  "unreal_landscape": {
+    "heightfield": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png",
+    "heightfield_size_px": [
+      2017,
+      2017
+    ],
+    "horizontal_span_cm": [
+      296889.7717537943,
+      203765.21435330398
+    ],
+    "elevation_min_m_navd88": 951.609130859375,
+    "elevation_max_m_navd88": 1444.7747802734375,
+    "relief_m": 493.1656494140625,
+    "z_scale_cm": 96.32141590118408,
+    "channel_conditioning": {
+      "policy": "none_preserve_official_3dep_surface_for_first_source_scale_visual_slice",
+      "authority": "source_dem_visual_review_only_not_bathymetry_or_solver_geometry"
+    }
+  },
+  "source_artifacts": {
+    "tile_hashes": {
+      "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c0.tif": "ea2b70bf25c0f82bb97494008fc410c57cfefcfab9d4d8d1f3287c7e80b6223d",
+      "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r0_c1.tif": "71fe8f13b1740ae588c0cdd20810a9904828f2b59f614d70440f8ba5c5a889af",
+      "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c0.tif": "1e73fcc827cf2eea06795e2561748466456f7ebcc22c5d7a954b4bad6ee311d1",
+      "terrain/production_import_pilot/3dep_tiles/colorado_lees_ferry_tile_r1_c1.tif": "a1ee9f7a40682181332c9a8f070c60bff5fe213a80d4cad1bc1243a22e13efc3",
+      "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c0.png": "60c627be7f447ed90166f4bc25aae3204f4114471edbdeca5c8da9155226b728",
+      "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r0_c1.png": "22fa3b69bfd54fc2f836e8f3d93c7b2fe230fc8359e710b21865a6005f5c8006",
+      "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c0.png": "53424d46e2675818694837c6337bf8af8e52bdae2b4966c6cb3deaddd06f613e",
+      "imagery/production_import_pilot/naip_tiles/colorado_lees_ferry_tile_r1_c1.png": "27726a165d82d37d3fa6c118a35d5257966f95d48c5fada00731962fdc505f3f"
+    },
+    "stationing": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+    "source_bbox_epsg3857": [
+      -12429934.342,
+      4411265.9103,
+      -12416576.0031,
+      4425177.2279
+    ]
+  },
+  "derived_artifacts": {
+    "heightfield": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png",
+    "local_centerline": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/centerline_local.json",
+    "centerline_alignment_preview": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_centerline_alignment_2048.png",
+    "source_albedo": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_source_albedo_2048.png",
+    "terrain_albedo": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_terrain_albedo_2048.png",
+    "material_zones": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_material_zones_2048.png",
+    "normal": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_normal_2048.png",
+    "ao_roughness_height": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_ao_roughness_height_2048.png"
+  },
+  "terrain_albedo_conditioning": {
+    "policy": "retain_raw_naip_and_generate_local_luminance_normalized_warm_shadow_render_derivative",
+    "purpose": "remove_baked_aerial_cast_shadows_before_unreal_relights_steep_canyon_walls",
+    "local_luminance_blur_radius_px": 56,
+    "shadow_target_luminance": 0.25,
+    "authority": "visual_render_derivative_only_not_source_measurement_or_geometry"
+  },
+  "review_boundaries": {
+    "allowed_now": [
+      "isolated source-scale Unreal visual candidate",
+      "camera and material calibration"
+    ],
+    "blocked_now": [
+      "solver or collision bathymetry authority",
+      "full Grand Canyon route claim",
+      "lifelike or production promotion",
+      "guide or oarsman approval"
+    ]
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_lighting_diagnostic_review.v17",
+  "river_id": "futaleufu_terminator",
+  "status": "ao_and_sampled_normals_excluded_emissive_localizes_low_lighting_response_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "neutral_material_defaults_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v17_lighting_diagnostic_report.json",
+  "decision": "retain_neutral_ao_normal_and_emissive_defaults_reject_all_v17_render_modes_and_test_corridor_light_balance",
+  "diagnostic_conclusions": {
+    "ambient_occlusion_is_primary_darkness_cause": false,
+    "sampled_leaf_normals_are_primary_darkness_cause": false,
+    "diagnostic_emissive_proves_source_color_reaches_shader": true,
+    "diagnostic_emissive_is_promotion_eligible": false,
+    "corridor_ambient_direct_or_transmission_balance_requires_split_test": true,
+    "alpha_scale_4_remains_promotion_eligible": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "placement_counts_identical_between_render_modes": true
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "alpha4_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png",
+      "alpha4_reference_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "ao_off": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_ao_off_no_shadows_guide_seat_downstream.png",
+      "ao_off_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "flat_normal": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_flat_normal_no_shadows_guide_seat_downstream.png",
+      "flat_normal_sha256": "4c17a216048d268e8772fb7dd163554ce7d5f3b48c753a5f567105c7fee1ca8e",
+      "emissive_035": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_emissive_035_no_shadows_guide_seat_downstream.png",
+      "emissive_035_sha256": "32597e0e9d65763922e121943a523a5481a799e14a0371aca8d73fd3c96deb7b",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_alpha4_reference": {
+        "ao_off": 0.0,
+        "flat_normal": 0.00011284722222222222,
+        "emissive_035": 0.015668402777777778
+      },
+      "mean_absolute_rgb_delta_vs_alpha4_reference": {
+        "ao_off": [0.0, 0.0, 0.0],
+        "flat_normal": [0.000244140625, 0.0002734375, 0.00009548611111111112],
+        "emissive_035": [0.07972981770833333, 0.11152018229166667, 0.03222330729166667]
+      },
+      "green_dominant_fraction": {
+        "alpha4_reference": 0.000007595486111111111,
+        "ao_off": 0.000007595486111111111,
+        "flat_normal": 0.000007595486111111111,
+        "emissive_035": 0.000390625
+      },
+      "dark_pixel_fraction": {
+        "alpha4_reference": 0.011155598958333334,
+        "ao_off": 0.011155598958333334,
+        "flat_normal": 0.011166449652777778,
+        "emissive_035": 0.003955078125
+      }
+    },
+    "river_eye": {
+      "alpha4_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png",
+      "alpha4_reference_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "ao_off": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_ao_off_no_shadows_river_eye_downstream.png",
+      "ao_off_sha256": "c4e67602e6117b1f1a16eaecda563c03ba39caa2463bbf9821caf24c671d71fd",
+      "flat_normal": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_flat_normal_no_shadows_river_eye_downstream.png",
+      "flat_normal_sha256": "6ad225945410b59a13c2119689624fca7482c4e50cc61c2a3979bf3d03c675f7",
+      "emissive_035": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_emissive_035_no_shadows_river_eye_downstream.png",
+      "emissive_035_sha256": "b676195d6e49ddf7f8479a0bd439554de7c855ec5e38d0f662d6ac10386feaac",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_alpha4_reference": {
+        "ao_off": 0.0000010850694444444444,
+        "flat_normal": 0.0002973090277777778,
+        "emissive_035": 0.03613823784722222
+      },
+      "mean_absolute_rgb_delta_vs_alpha4_reference": {
+        "ao_off": [0.0, 0.000002170138888888889, 0.0],
+        "flat_normal": [0.0006032986111111111, 0.0009299045138888889, 0.00032660590277777777],
+        "emissive_035": [0.20984049479166667, 0.28989149305555556, 0.08543402777777778]
+      },
+      "green_dominant_fraction": {
+        "alpha4_reference": 0.00014756944444444445,
+        "ao_off": 0.00014756944444444445,
+        "flat_normal": 0.0001486545138888889,
+        "emissive_035": 0.000615234375
+      },
+      "dark_pixel_fraction": {
+        "alpha4_reference": 0.02832465277777778,
+        "ao_off": 0.02832465277777778,
+        "flat_normal": 0.028330078125,
+        "emissive_035": 0.022286241319444445
+      }
+    }
+  },
+  "accepted_findings": [
+    "AO-off is byte-identical to the alpha4 guide-seat reference and changes only an effectively negligible river-eye pixel fraction.",
+    "Flat leaf normals change fewer than 0.03 percent of pixels in either corridor view, excluding sampled normals as the primary dark-crown cause.",
+    "A bounded diagnostic emissive changes the crown response in both views and increases olive-green coverage, proving that project-owned source color reaches the material graph.",
+    "LeafNormalStrength and LeafDiagnosticEmissive remain exposed at neutral defaults of 1 and 0 for repeatable diagnostics only."
+  ],
+  "rejection_reasons": [
+    "AO-off and flat-normal modes retain the same nearly black, visually saturated crown masses as the V16 alpha4 reference.",
+    "The emissive mode is deliberately non-physical and cannot substitute for plausible direct, ambient, or two-sided transmission lighting.",
+    "Four-times alpha still destroys useful leaf-edge discrimination and remains visually close to constant opacity.",
+    "None of the V17 modes produces a lifelike mixed-species Patagonian rainforest corridor."
+  ],
+  "next_iteration_requirements": [
+    "Hold geometry, masks, placement, alpha4, leaf-shadow disable, exposure, and neutral material controls fixed while adding transient front and back fill lights matching the accepted isolated review rig.",
+    "Capture a separate transient skylight-intensity and recapture treatment so direct-fill response can be distinguished from ambient-light response.",
+    "If either treatment restores leaf color, implement a physically plausible corridor lighting or transmission correction without emissive fill and then reduce opacity scale below saturation.",
+    "Repeat guide-seat and river-eye captures before adding the second ecology-reviewed canopy stratum or promoting any corridor substitution."
+  ]
+}

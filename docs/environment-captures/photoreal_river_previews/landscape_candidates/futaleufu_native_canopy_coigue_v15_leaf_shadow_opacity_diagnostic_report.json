@@ -1,0 +1,114 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_render_diagnostic.v15",
+	"river_id": "futaleufu_terminator",
+	"status": "controlled_leaf_shadow_and_opaque_card_diagnostics_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"native_reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_guide_seat_downstream.png",
+	"native_reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_river_eye_downstream.png",
+	"control_boundary": "Camera, exposure, source masks, tree transforms, near/mid/far meshes, terrain, water, rocks, collision, custom C++ solver, and GeoClaw reference remain fixed; only leaf shadow casting and the leaf material override vary.",
+	"render_modes":
+	{
+		"native_leaves_no_shadow":
+		{
+			"leaf_material": "native masked TwoSidedFoliage",
+			"leaf_cast_shadow": false,
+			"trunk_and_branchlet_cast_shadow": true
+		},
+		"opaque_leaves_no_shadow":
+		{
+			"leaf_material": "opaque two-sided DefaultLit diagnostic green",
+			"linear_color_rgba": [
+				0.044999999999999998,
+				0.31,
+				0.065000000000000002,
+				1
+			],
+			"leaf_cast_shadow": false,
+			"trunk_and_branchlet_cast_shadow": true
+		}
+	},
+	"captures":
+	{
+		"native_leaves_no_shadow_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png",
+		"native_leaves_no_shadow_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png",
+		"opaque_leaves_no_shadow_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_guide_seat_downstream.png",
+		"opaque_leaves_no_shadow_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"native_leaves_no_shadow_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4,
+			"rejected_natural_gap_count": 7440,
+			"rejected_vegetation_mask_count": 114,
+			"rejected_water_mask_count": 0,
+			"rejected_elevation_count": 20084,
+			"rejected_slope_count": 2127,
+			"rejected_dry_aspect_count": 1667,
+			"rejected_spacing_count": 5324
+		},
+		"native_leaves_no_shadow_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4,
+			"rejected_natural_gap_count": 7440,
+			"rejected_vegetation_mask_count": 114,
+			"rejected_water_mask_count": 0,
+			"rejected_elevation_count": 20084,
+			"rejected_slope_count": 2127,
+			"rejected_dry_aspect_count": 1667,
+			"rejected_spacing_count": 5324
+		},
+		"opaque_leaves_no_shadow_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4,
+			"rejected_natural_gap_count": 7440,
+			"rejected_vegetation_mask_count": 114,
+			"rejected_water_mask_count": 0,
+			"rejected_elevation_count": 20084,
+			"rejected_slope_count": 2127,
+			"rejected_dry_aspect_count": 1667,
+			"rejected_spacing_count": 5324
+		},
+		"opaque_leaves_no_shadow_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4,
+			"rejected_natural_gap_count": 7440,
+			"rejected_vegetation_mask_count": 114,
+			"rejected_water_mask_count": 0,
+			"rejected_elevation_count": 20084,
+			"rejected_slope_count": 2127,
+			"rejected_dry_aspect_count": 1667,
+			"rejected_spacing_count": 5324
+		}
+	},
+	"human_review_questions": [
+		"Do the elongated black ground marks disappear when native leaf shadows are disabled?",
+		"Do opaque cards reveal retained crown geometry at near, mid, and runtime-far distances?",
+		"Does the remaining failure localize to opacity/mips, foliage lighting/transmission, shadows, or insufficient distance-crown geometry?"
+	]
+}

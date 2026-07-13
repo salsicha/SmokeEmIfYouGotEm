@@ -1,0 +1,260 @@
+{
+  "schema": "raftsim.real_world.named_rapid_source_catalog.v1",
+  "status": "review_baseline_not_guide_approved",
+  "accessed_on": "2026-07-12",
+  "rights_policy": "Link-only factual indexing. Do not vendor guide text, photos, video, maps, or social-media content without item-level permission.",
+  "stationing_policy": {
+    "published": "Preserve a source-published river mile or kilometer and convert it to meters from the authored put-in.",
+    "ordered_only": "Generate a visibly provisional station from published downstream order so the editor can display a marker; replace it with GPS, imagery, or guide-reviewed stationing before terrain or solver promotion.",
+    "no_geometry_claim": "A marker records review intent and does not assert exact bank, bed, hazard, or runnable-line geometry."
+  },
+  "sources": [
+    {
+      "source_id": "south_fork_american_rivers_mile_guide",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "South Fork American River Rafting: Mile-by-Mile",
+      "url": "https://www.american-rivers.com/sf-rio-descr.htm",
+      "source_kind": "guide_mile_log",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "south_fork_americanwhitewater_map",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "South Fork American River Map",
+      "url": "https://www.americanwhitewater.com/american-river-rafting/south-fork/map",
+      "source_kind": "guide_feature_description",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "grand_canyon_nps_rapids_interview",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "title": "Behind the Scenery: Colorado River Rapids",
+      "url": "https://www.nps.gov/podcasts/behind-the-scenery.htm?hiderightrail=true&maxrows=10&reinit=false&season=0&sortby=date-desc&startrow=21",
+      "source_kind": "official_agency_interview",
+      "rights_status": "link_only_government_reference"
+    },
+    {
+      "source_id": "grand_canyon_usgs_hydraulic_maps",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "title": "Hydraulic Maps of Major Rapids, Grand Canyon, Arizona",
+      "url": "https://pubs.usgs.gov/imap/1897j/",
+      "source_kind": "official_hydraulic_map_series",
+      "rights_status": "government_source_terms_review_required_before_asset_import"
+    },
+    {
+      "source_id": "grand_canyon_secondary_mile_index",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "title": "List of Grand Canyon rapids and features",
+      "url": "https://en.wikipedia.org/wiki/List_of_Grand_Canyon_rapids_and_features",
+      "source_kind": "secondary_station_index",
+      "rights_status": "link_only_factual_index_verify_against_nps_usgs_and_guide"
+    },
+    {
+      "source_id": "pacuare_rios_lodge_map",
+      "river_id": "pacuare_river_costa_rica",
+      "title": "Pacuare River Map",
+      "url": "https://rioslodge.com/wp-content/uploads/Pacuare-River-Map.pdf",
+      "source_kind": "outfitter_route_map",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "pacuare_gorafting_guide",
+      "river_id": "pacuare_river_costa_rica",
+      "title": "Pacuare River Whitewater Guide and Map",
+      "url": "https://gorafting.com/costa-rica/pacuare-river/",
+      "source_kind": "guide_route_index",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "zambezi_whitewater_guidebook",
+      "river_id": "zambezi_batoka_gorge",
+      "title": "Zambezi River: Batoka Gorge",
+      "url": "https://www.whitewaterguidebook.com/africa/zambezi-river-batoka-gorge/",
+      "source_kind": "guide_route_index",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "zambezi_victoria_falls_guide",
+      "river_id": "zambezi_batoka_gorge",
+      "title": "Victoria Falls Rafting Rapid Guide",
+      "url": "https://www.victoriafalls-guide.net/victoria-falls-rafting.html",
+      "source_kind": "guide_flow_behavior_description",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "futaleufu_rivers_of_chile_terminator",
+      "river_id": "futaleufu_river_chile",
+      "title": "Rio Futaleufu: Terminator Section",
+      "url": "https://riversofchile.com/rio-futaleufu-terminator-section/",
+      "source_kind": "guide_route_index",
+      "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "futaleufu_expediciones_chile",
+      "river_id": "futaleufu_river_chile",
+      "title": "Futaleufu FastTrack Rafting",
+      "url": "https://exchile.com/adventures/futaleufu-fasttrack-rafting/",
+      "source_kind": "outfitter_feature_description",
+      "rights_status": "link_only_factual_index"
+    }
+  ],
+  "rivers": [
+    {
+      "river_id": "south_fork_american_chili_bar",
+      "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
+      "run_length_m": 33796.224,
+      "stationing_authority": "published_river_miles",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
+        "format": "geojson_linestring",
+        "status": "binding_disabled_nhd_candidate_length_and_access_seed_station_conflict_with_published_mile_log",
+        "binding_enabled": false,
+        "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json"
+      },
+      "source_ids": ["south_fork_american_rivers_mile_guide", "south_fork_americanwhitewater_map"],
+      "rapids": [
+        {"name": "Chili Bar Hole", "order": 1, "river_mile": 0.0, "class": "surf feature", "feature_tags": ["hole", "surf_wave", "recovery_pool"], "review_priority": "high"},
+        {"name": "Meat Grinder", "order": 2, "river_mile": 0.6, "class": "III+", "feature_tags": ["boulder_garden", "constriction", "wave_train", "pin_hazard"], "review_priority": "critical"},
+        {"name": "Racehorse Bend", "order": 3, "river_mile": 1.3, "class": "III", "feature_tags": ["bend", "lateral", "boulder"], "review_priority": "medium"},
+        {"name": "Maya", "order": 4, "river_mile": 1.5, "class": "II-III", "feature_tags": ["hole", "ledge", "surf_wave", "flow_sensitive"], "review_priority": "high"},
+        {"name": "Rock Garden", "order": 5, "river_mile": 1.7, "class": "II", "feature_tags": ["boulder_garden", "shallow_shelf", "pin_hazard"], "review_priority": "high"},
+        {"name": "African Queen", "order": 6, "river_mile": 2.0, "class": "II", "feature_tags": ["wave_train", "boulder"], "review_priority": "medium"},
+        {"name": "Triple Threat", "order": 7, "river_mile": 3.1, "class": "III", "feature_tags": ["boulder_garden", "multiple_channels", "pin_hazard"], "review_priority": "high"},
+        {"name": "Troublemaker", "order": 8, "river_mile": 5.2, "class": "III+", "feature_tags": ["boulder_garden", "hole", "diagonal_wave", "eddy", "wrap_hazard", "multiple_lines"], "review_priority": "critical"},
+        {"name": "Fowler's Rock", "order": 9, "river_mile": 15.8, "class": "III", "feature_tags": ["boulder_garden", "constriction", "pin_hazard", "slalom"], "review_priority": "high"},
+        {"name": "Upper Haystack Canyon", "order": 10, "river_mile": 16.2, "class": "III", "feature_tags": ["wave_train", "canyon_constriction"], "review_priority": "medium"},
+        {"name": "Lost Hat", "order": 11, "river_mile": 16.7, "class": "III-", "feature_tags": ["wave_train", "continuous_entry"], "review_priority": "medium"},
+        {"name": "Satan's Cesspool", "order": 12, "river_mile": 16.9, "class": "III+", "feature_tags": ["hole", "curling_wave", "central_island", "eddy", "swimmer_hazard", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Son of Satan", "aliases": ["Deadman's Drop"], "order": 13, "river_mile": 17.0, "class": "II+-III", "feature_tags": ["submerged_rock", "wall_push", "swimmer_hazard"], "review_priority": "high"},
+        {"name": "Scissors", "order": 14, "river_mile": 17.4, "class": "III", "feature_tags": ["diagonal_ledge", "boulder", "lateral"], "review_priority": "high"},
+        {"name": "Lower Haystack Canyon", "order": 15, "river_mile": 17.6, "class": "II+", "feature_tags": ["wave_train", "canyon_constriction"], "review_priority": "medium"},
+        {"name": "Bouncing Rock", "order": 16, "river_mile": 18.2, "class": "III", "feature_tags": ["rock_push", "hole", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Pre-Op", "order": 17, "river_mile": 18.4, "class": "III-", "feature_tags": ["wave_train", "bank_holes", "boulders"], "review_priority": "medium"},
+        {"name": "Hospital Bar", "order": 18, "river_mile": 18.6, "class": "III", "feature_tags": ["boulder_garden", "chute", "diagonal_hole", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Recovery Room", "order": 19, "river_mile": 18.8, "class": "II-III", "feature_tags": ["hole", "reservoir_stage_sensitive", "recovery"], "review_priority": "high"},
+        {"name": "Surprise", "order": 20, "river_mile": 19.3, "class": "II-III", "feature_tags": ["seasonal_rock", "chute", "hole", "low_flow_sensitive"], "review_priority": "high"}
+      ]
+    },
+    {
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+      "run_length_m": 451420.0,
+      "stationing_authority": "published_river_miles_secondary_index_pending_nps_usgs_crosscheck",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/production_import_pilot/centerline.geojson",
+        "format": "geojson_linestring",
+        "status": "lees_ferry_pilot_centerline_review_gated",
+        "binding_enabled": true,
+        "maximum_bind_station_m": 4700.0
+      },
+      "source_ids": ["grand_canyon_nps_rapids_interview", "grand_canyon_usgs_hydraulic_maps", "grand_canyon_secondary_mile_index"],
+      "rapids": [
+        {"name": "Badger Creek", "order": 1, "river_mile": 8.0, "class": "5/10", "feature_tags": ["pour_over", "hole", "debris_fan"], "review_priority": "high"},
+        {"name": "Soap Creek", "order": 2, "river_mile": 11.4, "class": "5/10", "feature_tags": ["wave_train", "lateral", "debris_fan"], "review_priority": "medium"},
+        {"name": "House Rock", "order": 3, "river_mile": 17.1, "class": "7/10", "feature_tags": ["large_hole", "right_run", "lateral", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Georgie", "aliases": ["24 Mile"], "order": 4, "river_mile": 24.4, "class": "6/10", "feature_tags": ["drop", "wave_train", "hole"], "review_priority": "high"},
+        {"name": "Unkar", "order": 5, "river_mile": 72.9, "class": "6/10", "feature_tags": ["boulder_garden", "laterals", "debris_fan"], "review_priority": "high"},
+        {"name": "Hance", "order": 6, "river_mile": 77.1, "class": "8/10", "feature_tags": ["boulder_garden", "multiple_moves", "holes", "low_flow_difficulty"], "review_priority": "critical"},
+        {"name": "Sockdolager", "order": 7, "river_mile": 79.1, "class": "7/10", "feature_tags": ["wave_train", "holes", "canyon_constriction"], "review_priority": "high"},
+        {"name": "Grapevine", "order": 8, "river_mile": 81.6, "class": "7/10", "feature_tags": ["wave_train", "laterals", "debris_fan"], "review_priority": "high"},
+        {"name": "Horn Creek", "order": 9, "river_mile": 90.8, "class": "8/10", "feature_tags": ["large_hole", "rock_ledge", "right_to_left_move", "low_flow_difficulty"], "review_priority": "critical"},
+        {"name": "Granite", "aliases": ["Granite Falls"], "order": 10, "river_mile": 93.9, "class": "8/10", "feature_tags": ["large_waves", "laterals", "debris_fan"], "review_priority": "critical"},
+        {"name": "Hermit", "order": 11, "river_mile": 95.5, "class": "8/10", "feature_tags": ["large_wave_train", "hydraulics", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Crystal", "order": 12, "river_mile": 98.2, "class": "8/10", "feature_tags": ["large_holes", "rock_garden", "debris_fan", "multiple_lines", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Bedrock", "order": 13, "river_mile": 131.1, "class": "7/10", "feature_tags": ["central_island", "channel_choice", "wrap_hazard", "rock_push"], "review_priority": "critical"},
+        {"name": "Upset", "order": 14, "river_mile": 150.2, "class": "8/10", "feature_tags": ["large_hole", "wave_train", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Lava Falls", "aliases": ["Vulcan"], "order": 15, "river_mile": 179.7, "class": "9/10", "feature_tags": ["ledge_hole", "large_waves", "laterals", "multiple_lines", "flip_hazard", "flow_sensitive"], "review_priority": "critical"}
+      ]
+    },
+    {
+      "river_id": "pacuare_river_costa_rica",
+      "display_name": "Pacuare River: Tres Equis to Siquirres",
+      "run_length_m": 26250.0,
+      "stationing_authority": "published_map_order_only",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+        "format": "geojson_linestring",
+        "status": "preview_scaffold_not_official_hydrography",
+        "binding_enabled": true
+      },
+      "source_ids": ["pacuare_rios_lodge_map", "pacuare_gorafting_guide"],
+      "rapids": [
+        {"name": "Bienvenidos", "order": 1, "class": "III", "feature_tags": ["wave_train", "training_entry"], "review_priority": "medium"},
+        {"name": "Pyramid Rock", "order": 2, "class": "III", "feature_tags": ["boulder", "channel_choice", "rock_push"], "review_priority": "high"},
+        {"name": "Pele El Ojo", "order": 3, "class": "III", "feature_tags": ["hole", "wave_train"], "review_priority": "high"},
+        {"name": "Upper Huacas", "order": 4, "class": "IV", "feature_tags": ["gorge", "drop", "hole", "waterfall_context", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Bobo Falls", "order": 5, "class": "III", "feature_tags": ["drop", "wave_train"], "review_priority": "high"},
+        {"name": "Lower Huacas", "order": 6, "class": "IV", "feature_tags": ["gorge", "drop", "hole", "waterfall_context", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Rodeo", "order": 7, "class": "III", "feature_tags": ["wave_train", "laterals"], "review_priority": "medium"},
+        {"name": "Guatemala", "order": 8, "class": "III", "feature_tags": ["boulder_garden", "wave_train"], "review_priority": "medium"},
+        {"name": "Double Drop", "order": 9, "class": "IV-", "feature_tags": ["two_stage_drop", "holes", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Cimarrones", "order": 10, "class": "III-IV", "feature_tags": ["boulders", "pour_over", "holes", "large_waves"], "review_priority": "critical"},
+        {"name": "Upper Pinball", "order": 11, "class": "III", "feature_tags": ["boulder_garden", "multiple_moves", "pin_hazard"], "review_priority": "high"},
+        {"name": "Lower Pinball", "order": 12, "class": "III", "feature_tags": ["boulder_garden", "multiple_moves", "pin_hazard"], "review_priority": "high"},
+        {"name": "Wall of Sorrow", "order": 13, "class": "IV", "feature_tags": ["wall_push", "lateral", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Dos Montanas", "aliases": ["Dos Montañas"], "order": 14, "class": "IV", "feature_tags": ["canyon_constriction", "long_rapid", "wave_train", "holes"], "review_priority": "critical"},
+        {"name": "Las Ranitas", "order": 15, "class": "III", "feature_tags": ["wave_train", "boulders"], "review_priority": "medium"}
+      ]
+    },
+    {
+      "river_id": "zambezi_batoka_gorge",
+      "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
+      "run_length_m": 27358.848,
+      "stationing_authority": "published_rapid_number_order_only",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+        "format": "route_stationing_json",
+        "status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
+        "binding_enabled": true
+      },
+      "source_ids": ["zambezi_whitewater_guidebook", "zambezi_victoria_falls_guide"],
+      "rapids": [
+        {"name": "Against the Wall", "rapid_number": "1", "order": 1, "class": "IV-V", "feature_tags": ["wall_cushion", "eddy_ferry", "boils", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "The Bridge", "rapid_number": "2", "order": 2, "class": "III", "feature_tags": ["surf_wave", "hole"], "review_priority": "high"},
+        {"name": "Between Two Worlds", "rapid_number": "3", "order": 3, "class": "IV", "feature_tags": ["wave", "hole"], "review_priority": "high"},
+        {"name": "Morning Glory", "rapid_number": "4", "order": 4, "class": "IV-V", "feature_tags": ["dragons_back", "tight_line", "wave_train", "low_flow_sensitive"], "review_priority": "critical"},
+        {"name": "Stairway to Heaven", "rapid_number": "5", "order": 5, "class": "V", "feature_tags": ["drop", "hole", "wave_train"], "review_priority": "critical"},
+        {"name": "Devil's Toilet Bowl", "rapid_number": "6", "order": 6, "class": "IV", "feature_tags": ["large_wave_train", "hole"], "review_priority": "high"},
+        {"name": "Gulliver's Travels", "rapid_number": "7", "order": 7, "class": "V", "feature_tags": ["large_diagonal", "large_waves", "multiple_moves"], "review_priority": "critical"},
+        {"name": "Midnight Diner", "rapid_number": "8", "order": 8, "class": "III-V", "feature_tags": ["large_hole", "multiple_lines", "star_trek_line", "muncher_line", "chicken_line"], "review_priority": "critical"},
+        {"name": "Commercial Suicide", "rapid_number": "9", "order": 9, "class": "V-VI", "feature_tags": ["river_wide_pourover", "narrow_slot", "mandatory_commercial_portage", "high_consequence"], "review_priority": "critical"},
+        {"name": "Gnashing Jaws of Death", "rapid_number": "10", "order": 10, "class": "IV", "feature_tags": ["large_waves", "holes"], "review_priority": "high"},
+        {"name": "Overland Truck Eater", "rapid_number": "11", "order": 11, "class": "V", "feature_tags": ["boils", "large_waves", "high_water_put_in"], "review_priority": "critical"},
+        {"name": "Three Ugly Sisters", "rapid_number": "12", "order": 12, "class": "III-IV", "feature_tags": ["large_wave_train", "surf_wave"], "review_priority": "critical"},
+        {"name": "The Mother", "rapid_number": "13", "order": 13, "class": "IV-V", "feature_tags": ["large_wave_train", "holes"], "review_priority": "critical"},
+        {"name": "Surprise Surprise", "rapid_number": "14", "order": 14, "class": "III", "feature_tags": ["waves", "boils"], "review_priority": "medium"},
+        {"name": "The Washing Machine", "rapid_number": "15", "order": 15, "class": "IV-V", "feature_tags": ["recirculating_pourover", "central_hole", "multiple_avoidance_lines", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "The Terminators", "aliases": ["Terminator I and II"], "rapid_number": "16", "order": 16, "class": "IV", "feature_tags": ["large_wave_train", "flip_wave", "high_flow_sensitive"], "review_priority": "critical"},
+        {"name": "Double Trouble", "rapid_number": "17", "order": 17, "class": "V", "feature_tags": ["two_large_holes", "flow_sensitive", "multiple_avoidance_lines"], "review_priority": "critical"},
+        {"name": "Oblivion", "rapid_number": "18", "order": 18, "class": "V", "feature_tags": ["crashing_hole", "third_wave", "flip_hazard", "surf", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "The Last Straw", "rapid_number": "19", "order": 19, "class": "II-III", "feature_tags": ["wave_train", "boils"], "review_priority": "medium"},
+        {"name": "Rapid 20", "rapid_number": "20", "order": 20, "class": "II-III", "feature_tags": ["waves", "eddy_lines"], "review_priority": "medium"},
+        {"name": "Rapid 21", "rapid_number": "21", "order": 21, "class": "II-III", "feature_tags": ["waves", "boils"], "review_priority": "medium"},
+        {"name": "Morning Shave", "rapid_number": "22", "order": 22, "class": "II-III", "feature_tags": ["wave_train", "eddy_lines"], "review_priority": "medium"},
+        {"name": "Morning Shower", "rapid_number": "23", "order": 23, "class": "II-III", "feature_tags": ["wave_train", "high_water_takeout_context"], "review_priority": "medium"},
+        {"name": "Rapid 24", "rapid_number": "24", "order": 24, "class": "II-III", "feature_tags": ["waves", "boils"], "review_priority": "medium"},
+        {"name": "Rapid 25", "rapid_number": "25", "order": 25, "class": "II-III", "feature_tags": ["wave_train", "takeout_context"], "review_priority": "medium"}
+      ]
+    },
+    {
+      "river_id": "futaleufu_river_chile",
+      "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",
+      "run_length_m": 10000.0,
+      "stationing_authority": "published_order_only_route_length_approximate",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "format": "route_stationing_json",
+        "status": "osm_route_trace_review_gated_not_guide_stationing",
+        "binding_enabled": true
+      },
+      "source_ids": ["futaleufu_rivers_of_chile_terminator", "futaleufu_expediciones_chile"],
+      "rapids": [
+        {"name": "Asleep at the Wheel", "order": 1, "class": "III-IV", "feature_tags": ["warmup", "wave_train", "surf"], "review_priority": "high"},
+        {"name": "Terminator", "order": 2, "class": "V", "feature_tags": ["long_rapid", "multiple_holes", "multiple_lines", "sneak_line", "scout", "portage", "flip_hazard"], "review_priority": "critical"},
+        {"name": "Son of Terminator", "order": 3, "class": "IV-V", "feature_tags": ["holes", "wave_train", "continuous_whitewater"], "review_priority": "critical"},
+        {"name": "Khyber Pass", "aliases": ["Kyber Pass", "Kipper Pass"], "order": 4, "class": "IV+", "feature_tags": ["hydraulic_holes", "large_waves", "multiple_moves"], "review_priority": "critical"},
+        {"name": "Himalayas", "order": 5, "class": "IV", "feature_tags": ["very_large_standing_waves", "wave_train", "surf", "flip_hazard"], "review_priority": "critical"}
+      ]
+    }
+  ]
+}

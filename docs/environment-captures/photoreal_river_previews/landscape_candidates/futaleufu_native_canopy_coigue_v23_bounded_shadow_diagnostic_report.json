@@ -1,0 +1,54 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_bounded_shadow_diagnostic.v23",
+	"river_id": "futaleufu_terminator",
+	"status": "alpha2_bounded_near_shadow_pair_captured_pending_artifact_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"no_shadow_references_exist": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"control_boundary": "The corrected RGB-padded atlas, alpha2 dynamic material, native TwoSidedFoliage graph and neutral reflectance/transmission/AO/normal/emissive defaults, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Relative to V22 alpha2, only near-representation leaf dynamic shadows are enabled; mid and runtime-far leaf shadows, static shadows, contact shadows, distance-field lighting, and dynamic indirect lighting remain disabled.",
+	"captures":
+	{
+		"guide_seat_bounded_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_guide_seat_downstream.png",
+		"river_eye_bounded_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v23_rgb_padded_alpha2_bounded_near_shadows_river_eye_downstream.png",
+		"guide_seat_no_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_guide_seat_downstream.png",
+		"river_eye_no_shadow_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"bounded_shadow_policy":
+	{
+		"LeafOpacityScale": 2,
+		"shadowed_leaf_representation": "near_only",
+		"near_leaf_cull_distance_cm": 38000,
+		"cast_shadow": true,
+		"cast_dynamic_shadow": true,
+		"cast_static_shadow": false,
+		"cast_contact_shadow": false,
+		"affect_distance_field_lighting": false,
+		"affect_dynamic_indirect_lighting": false,
+		"mid_leaf_cast_shadow": false,
+		"runtime_far_leaf_cast_shadow": false
+	}
+}

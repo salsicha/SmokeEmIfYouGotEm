@@ -1,0 +1,127 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_corridor_light_rig_diagnostic.v18",
+	"river_id": "futaleufu_terminator",
+	"status": "controlled_baseline_fill_and_skylight_splits_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"control_boundary": "The neutral masked TwoSidedFoliage graph, 4x opacity diagnostic, disabled leaf shadows, source masks, transforms, meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed. Only transient unsaved direct-fill or skylight intensity changes.",
+	"saved_corridor_photometry":
+	{
+		"sun_intensity": 4.75,
+		"skylight_intensity": 1.55,
+		"exposure_compensation": -0.16,
+		"fog_density": 0.0054999999999999997
+	},
+	"captures":
+	{
+		"alpha4_baseline_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+		"alpha4_baseline_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+		"alpha4_isolated_fill_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_isolated_fill_no_shadows_guide_seat_downstream.png",
+		"alpha4_isolated_fill_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_isolated_fill_no_shadows_river_eye_downstream.png",
+		"alpha4_skylight_310_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_skylight_310_no_shadows_guide_seat_downstream.png",
+		"alpha4_skylight_310_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_skylight_310_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"alpha4_baseline_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_baseline_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_isolated_fill_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_isolated_fill_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_skylight_310_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_skylight_310_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"lighting_treatments":
+	{
+		"alpha4_baseline_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"skylight_intensity": 1.55,
+			"front_fill_intensity": 0,
+			"back_fill_intensity": 0,
+			"saved_to_source_map": false,
+			"promotion_eligible": false
+		},
+		"alpha4_isolated_fill_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"skylight_intensity": 1.6499999999999999,
+			"front_fill_intensity": 0.75,
+			"back_fill_intensity": 0.38,
+			"saved_to_source_map": false,
+			"promotion_eligible": false
+		},
+		"alpha4_skylight_310_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"skylight_intensity": 3.1000000000000001,
+			"front_fill_intensity": 0,
+			"back_fill_intensity": 0,
+			"saved_to_source_map": false,
+			"promotion_eligible": false
+		}
+	}
+}

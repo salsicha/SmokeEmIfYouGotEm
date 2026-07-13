@@ -1,0 +1,64 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_jacaranda_tree_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "Zambezi Batoka Gorge dense woodland canopy silhouette and distance-stability comparison only",
+  "source": {
+    "title": "Jacaranda Tree",
+    "publisher": "Poly Haven",
+    "authors": [
+      "Rico Cilliers",
+      "Rob Tuytel"
+    ],
+    "asset_url": "https://polyhaven.com/a/jacaranda_tree",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "direct asset-page file links from dl.polyhaven.org",
+    "public_api_used": false,
+    "downloaded_package": "1K FBX plus selected PNG material maps",
+    "publisher_width_m": 24.2,
+    "publisher_triangle_count_label": "312K",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "batoka_species_approval": "not_reviewed_structure_analog_only_not_exact_species_identity",
+    "river_guide_visual_approval": "not_reviewed",
+    "ecology_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "seasonal_state_approval": "not_reviewed",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material, pivot, scale, Nanite, and distance-stability validation",
+      "Zambezi Landscape candidate visual comparison captures"
+    ],
+    "blocked_now": [
+      "claiming exact Batoka Gorge tree species identity",
+      "automatic production foliage replacement",
+      "claiming lifelike environment completion",
+      "shipping before ecology, guide, art, rights, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "jacaranda_tree_1k.fbx": "392c74d85100efc8ee045fed820ec4fbe79d62e154e4c54156ef1e0ec0465a5a",
+    "textures/jacaranda_tree_branches_diff_1k.png": "fe671f7fae88e269e4a517b6ff7be74ae3c2d1fdedfea206ebfa9941af0d9e20",
+    "textures/jacaranda_tree_branches_nor_gl_1k.png": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+    "textures/jacaranda_tree_branches_rough_1k.png": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+    "textures/jacaranda_tree_leaves_alpha_1k.png": "c708a7e928a2e4d26981b021a22deeefc0ebb0e467f60b53cfa636a7e24d68f7",
+    "textures/jacaranda_tree_leaves_diff_1k.png": "5729978e92649ee6cc70bdc457aac1b28b16a10bde0a55004b659a1923c8861b",
+    "textures/jacaranda_tree_leaves_nor_gl_1k.png": "4dc58cca117cb193629bf6a2b909bd281451c60a5d85f1b1d438d296b90a1091",
+    "textures/jacaranda_tree_leaves_rough_1k.png": "2f6b89e7a1983cfa6fc2050f993c2c91c9afc86ce285607fa5a5f8f6b1b4c879",
+    "textures/jacaranda_tree_trunk_diff_1k.png": "9ba4a3af9d38d54638df35a2bae4f30455f5fb25c080825f6e22af4e5d65c7f2",
+    "textures/jacaranda_tree_trunk_nor_gl_1k.png": "d2c1dd8a274983731e2418b4eb6b49bddcf375d170c70010b799d7417eafbfac",
+    "textures/jacaranda_tree_trunk_rough_1k.png": "9262a1d4e8cc848a29bfc93333e8ad844c7e470e592787604b7e090e0ed149f2"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_jacaranda_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_JACARANDA_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/JacarandaTree_1K",
+    "mesh_policy": "single complete tree imported as one static mesh with source material slots preserved by role",
+    "material_policy": "ten selected PNG maps imported explicitly; GL normals corrected for Unreal; leaf alpha drives masked two-sided foliage",
+    "nanite_policy": "enabled with PreserveArea after physical-scale and grounded-pivot validation",
+    "promotion_policy": "manual only after Zambezi visual comparison, ecology, guide, art, rights, and measured performance review"
+  }
+}
