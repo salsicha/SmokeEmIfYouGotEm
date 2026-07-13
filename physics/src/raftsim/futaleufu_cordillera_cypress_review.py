@@ -98,6 +98,30 @@ V10_TEXTURE_MANIFEST_RELATIVE_PATH = Path(
     "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
     "CordilleraCypress/futaleufu_cordillera_cypress_v10_texture_manifest.json"
 )
+V11_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v11_isolated_family_report.json"
+)
+V11_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v11_visual_review.json"
+)
+V12_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v12_isolated_family_report.json"
+)
+V12_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v12_visual_review.json"
+)
+V13_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v13_morphology_donor_report.json"
+)
+V13_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v13_morphology_donor_visual_review.json"
+)
 GENERATED_ON = "2026-07-13"
 
 
@@ -1647,6 +1671,449 @@ def build_futaleufu_cordillera_cypress_v10_visual_review(repo_root: Path) -> dic
 def write_futaleufu_cordillera_cypress_v10_visual_review(repo_root: Path) -> dict:
     review = build_futaleufu_cordillera_cypress_v10_visual_review(repo_root)
     output_path = repo_root.resolve() / V10_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return review
+
+
+def build_futaleufu_cordillera_cypress_v11_visual_review(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    report_path = repo_root / V11_REPORT_RELATIVE_PATH
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    v10_path = repo_root / V10_REVIEW_RELATIVE_PATH
+    v10 = json.loads(v10_path.read_text(encoding="utf-8"))
+    texture_manifest_path = repo_root / V10_TEXTURE_MANIFEST_RELATIVE_PATH
+    captures = []
+    capture_by_id = {}
+    for capture in report["captures"]:
+        relative_path = Path(capture["path"])
+        capture_id = capture["capture_id"]
+        entry = {
+            "capture_id": capture_id,
+            "path": str(relative_path),
+            "view_group": (
+                "handoff" if "handoff" in capture_id
+                else "turntable" if "turntable" in capture_id
+                else "closeup" if "closeup" in capture_id
+                else "river_distance_60m" if "river_distance_60m" in capture_id
+                else "river_distance_150m"
+            ),
+            "authority_mode": capture["authority_mode"],
+            **_capture_metrics(repo_root / relative_path),
+        }
+        captures.append(entry)
+        capture_by_id[capture_id] = entry
+
+    def image_delta(first: Path, second: Path) -> dict:
+        with Image.open(first) as image:
+            first_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        with Image.open(second) as image:
+            second_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        delta = np.abs(first_rgb - second_rgb)
+        return {
+            "byte_identical": bool(np.count_nonzero(delta) == 0),
+            "changed_pixel_fraction": float(np.mean(np.any(delta > 0, axis=2))),
+            "mean_absolute_rgb_delta": float(np.mean(delta)),
+            "maximum_channel_delta": int(np.max(delta)),
+        }
+
+    triplets = []
+    silhouette_ratios = []
+    combined_matches_near_count = 0
+    combined_matches_far_count = 0
+    for form_id in ("open_grown_conical", "closed_grove_columnar", "grove_intermediate"):
+        for distance in ("20m", "28m", "36m"):
+            base = f"{form_id}_handoff_{distance}"
+            near = capture_by_id[f"{base}_near_only"]
+            far = capture_by_id[f"{base}_far_only"]
+            combined = capture_by_id[f"{base}_combined"]
+            near_path = repo_root / near["path"]
+            far_path = repo_root / far["path"]
+            combined_path = repo_root / combined["path"]
+            combined_vs_near = image_delta(combined_path, near_path)
+            combined_vs_far = image_delta(combined_path, far_path)
+            combined_matches_near_count += int(combined_vs_near["byte_identical"])
+            combined_matches_far_count += int(combined_vs_far["byte_identical"])
+            near_silhouette = _foreground_silhouette_fraction(near_path)
+            far_silhouette = _foreground_silhouette_fraction(far_path)
+            silhouette_ratio = near_silhouette / max(far_silhouette, 1.0e-9)
+            silhouette_ratios.append(silhouette_ratio)
+            triplets.append({
+                "form_id": form_id,
+                "distance": distance,
+                "near_to_far_foreground_silhouette_ratio": silhouette_ratio,
+                "combined_vs_near": combined_vs_near,
+                "combined_vs_far": combined_vs_far,
+            })
+
+    cards = [form["near_textured_spray_source_cards"] for form in report["forms"]]
+    triangles = [form["near_textured_spray_source_triangles"] for form in report["forms"]]
+    combined_differs_from_both_count = (
+        len(triplets) - combined_matches_near_count - combined_matches_far_count
+    )
+    authority_passed = (
+        combined_matches_far_count == len(triplets)
+        and combined_matches_near_count == 0
+        and combined_differs_from_both_count == 0
+        and report["near_representation_eligible"] is False
+    )
+    return {
+        "schema": "raftsim.unreal.futaleufu_cordillera_cypress_visual_review.v11",
+        "generated_on": GENERATED_ON,
+        "status": "v11_card_budget_improved_silhouette_and_branch_system_regressed",
+        "production_promoted": False,
+        "corridor_substitution_performed": False,
+        "source_report": str(V11_REPORT_RELATIVE_PATH),
+        "source_report_sha256": _sha256(report_path),
+        "source_texture_manifest": str(V10_TEXTURE_MANIFEST_RELATIVE_PATH),
+        "source_texture_manifest_sha256": _sha256(texture_manifest_path),
+        "v10_review": str(V10_REVIEW_RELATIVE_PATH),
+        "v10_review_sha256": _sha256(v10_path),
+        "review_scope": {
+            "form_count": report["form_count"],
+            "capture_count": len(captures),
+            "minimum_near_cards_per_form": min(cards),
+            "maximum_near_cards_per_form": max(cards),
+            "minimum_near_triangles_per_form": min(triangles),
+            "maximum_near_triangles_per_form": max(triangles),
+            "maximum_card_reduction_from_v10": (
+                1.0 - max(cards) / v10["review_scope"]["maximum_near_cards_per_form"]
+            ),
+            "near_representation_eligible": report["near_representation_eligible"],
+        },
+        "accepted_findings": [
+            "Two branch-aligned near cards per terminal cluster reduce the family to 2,638-5,030 cards and 5,276-10,060 triangles per form.",
+            "Bounded spray roll and an exterior closeup make planar overlap and attachment defects easier to see than the V10 interior-crown view.",
+            "All 67 captures complete and all nine combined handoff views remain exact far-only fallbacks.",
+        ],
+        "rejection_reasons": [
+            "The grouped primary layout opens the crown into more obvious horizontal shelves and exposed trunk instead of producing irregular connected cypress mass.",
+            "The minimum near/far foreground-silhouette ratio falls to 0.964, regressing V10's hard 1.0 floor.",
+            "Exterior closeups prove that complete branch-photo cards are still repeated at leaf-cluster density, producing large intersecting planes, disconnected pale twigs, and implausible scale.",
+            "Changing the shared branch topology also changes the far fallback silhouette, so V12 must restore the retained V10 branch distribution before testing a sparser near representation.",
+        ],
+        "quantitative_review": {
+            "near_to_far_foreground_silhouette": {
+                "minimum": min(silhouette_ratios),
+                "mean": sum(silhouette_ratios) / len(silhouette_ratios),
+                "maximum": max(silhouette_ratios),
+                "required_minimum": 1.0,
+                "all_handoff_views_passed": min(silhouette_ratios) >= 1.0,
+            },
+            "authority_result": {
+                "triplet_count": len(triplets),
+                "combined_matches_near_count": combined_matches_near_count,
+                "combined_matches_far_count": combined_matches_far_count,
+                "combined_differs_from_both_count": combined_differs_from_both_count,
+                "actor_root_authority_passed": authority_passed,
+                "triplets": triplets,
+            },
+        },
+        "captures": captures,
+        "decision": "reject_v11_restore_v10_branch_distribution_and_sample_near_at_branch_scale",
+        "next_iteration_requirements": [
+            "Restore V10's deterministic primary distribution so the retained far fallback is not silently changed by a near-only experiment.",
+            "Treat each V10 source as a complete branch spray: place one enlarged near card for a sparse deterministic subset of terminal systems instead of one or two cards at every cluster.",
+            "Keep bounded branch-relative roll, exterior closeups, exact actor-root authority, and the V10 silhouette floor.",
+            "Repeat all 67 captures and reject any result that reopens the minimum silhouette, topology, or resource contracts.",
+        ],
+    }
+
+
+def write_futaleufu_cordillera_cypress_v11_visual_review(repo_root: Path) -> dict:
+    review = build_futaleufu_cordillera_cypress_v11_visual_review(repo_root)
+    output_path = repo_root.resolve() / V11_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return review
+
+
+def build_futaleufu_cordillera_cypress_v12_visual_review(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    report_path = repo_root / V12_REPORT_RELATIVE_PATH
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    v11_path = repo_root / V11_REVIEW_RELATIVE_PATH
+    v11 = json.loads(v11_path.read_text(encoding="utf-8"))
+    v10_path = repo_root / V10_REVIEW_RELATIVE_PATH
+    v10 = json.loads(v10_path.read_text(encoding="utf-8"))
+    captures = []
+    capture_by_id = {}
+    for capture in report["captures"]:
+        relative_path = Path(capture["path"])
+        capture_id = capture["capture_id"]
+        entry = {
+            "capture_id": capture_id,
+            "path": str(relative_path),
+            "authority_mode": capture["authority_mode"],
+            **_capture_metrics(repo_root / relative_path),
+        }
+        captures.append(entry)
+        capture_by_id[capture_id] = entry
+
+    def image_delta(first: Path, second: Path) -> dict:
+        with Image.open(first) as image:
+            first_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        with Image.open(second) as image:
+            second_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        delta = np.abs(first_rgb - second_rgb)
+        return {
+            "byte_identical": bool(np.count_nonzero(delta) == 0),
+            "changed_pixel_fraction": float(np.mean(np.any(delta > 0, axis=2))),
+            "mean_absolute_rgb_delta": float(np.mean(delta)),
+            "maximum_channel_delta": int(np.max(delta)),
+        }
+
+    triplets = []
+    silhouette_ratios = []
+    combined_matches_near_count = 0
+    combined_matches_far_count = 0
+    for form_id in ("open_grown_conical", "closed_grove_columnar", "grove_intermediate"):
+        for distance in ("20m", "28m", "36m"):
+            base = f"{form_id}_handoff_{distance}"
+            near = capture_by_id[f"{base}_near_only"]
+            far = capture_by_id[f"{base}_far_only"]
+            combined = capture_by_id[f"{base}_combined"]
+            near_path = repo_root / near["path"]
+            far_path = repo_root / far["path"]
+            combined_path = repo_root / combined["path"]
+            combined_vs_near = image_delta(combined_path, near_path)
+            combined_vs_far = image_delta(combined_path, far_path)
+            combined_matches_near_count += int(combined_vs_near["byte_identical"])
+            combined_matches_far_count += int(combined_vs_far["byte_identical"])
+            near_silhouette = _foreground_silhouette_fraction(near_path)
+            far_silhouette = _foreground_silhouette_fraction(far_path)
+            silhouette_ratio = near_silhouette / max(far_silhouette, 1.0e-9)
+            silhouette_ratios.append(silhouette_ratio)
+            triplets.append({
+                "form_id": form_id,
+                "distance": distance,
+                "near_to_far_foreground_silhouette_ratio": silhouette_ratio,
+                "combined_vs_near": combined_vs_near,
+                "combined_vs_far": combined_vs_far,
+            })
+
+    cards = [form["near_textured_spray_source_cards"] for form in report["forms"]]
+    triangles = [form["near_textured_spray_source_triangles"] for form in report["forms"]]
+    combined_differs_from_both_count = (
+        len(triplets) - combined_matches_near_count - combined_matches_far_count
+    )
+    authority_passed = (
+        combined_matches_far_count == len(triplets)
+        and combined_matches_near_count == 0
+        and combined_differs_from_both_count == 0
+        and report["near_representation_eligible"] is False
+    )
+    return {
+        "schema": "raftsim.unreal.futaleufu_cordillera_cypress_visual_review.v12",
+        "generated_on": GENERATED_ON,
+        "status": "v12_branch_scale_and_resource_improved_silhouette_floor_rejected",
+        "production_promoted": False,
+        "corridor_substitution_performed": False,
+        "source_report": str(V12_REPORT_RELATIVE_PATH),
+        "source_report_sha256": _sha256(report_path),
+        "source_texture_manifest": str(V10_TEXTURE_MANIFEST_RELATIVE_PATH),
+        "source_texture_manifest_sha256": _sha256(
+            repo_root / V10_TEXTURE_MANIFEST_RELATIVE_PATH
+        ),
+        "v11_review": str(V11_REVIEW_RELATIVE_PATH),
+        "v11_review_sha256": _sha256(v11_path),
+        "v10_review": str(V10_REVIEW_RELATIVE_PATH),
+        "v10_review_sha256": _sha256(v10_path),
+        "review_scope": {
+            "form_count": report["form_count"],
+            "capture_count": len(captures),
+            "minimum_near_cards_per_form": min(cards),
+            "maximum_near_cards_per_form": max(cards),
+            "minimum_near_triangles_per_form": min(triangles),
+            "maximum_near_triangles_per_form": max(triangles),
+            "maximum_card_reduction_from_v10": (
+                1.0 - max(cards) / v10["review_scope"]["maximum_near_cards_per_form"]
+            ),
+            "selected_terminal_system_sampling_probability":
+                report["near_terminal_system_sampling_probability"],
+            "near_representation_eligible": report["near_representation_eligible"],
+        },
+        "accepted_findings": [
+            "Restoring V10's primary distribution removes the V11 grouped-whorl experiment from the retained far-generation path.",
+            "Treating each generated source as a complete branch spray reduces near assets to 443-945 cards and 886-1,890 triangles per form, at least 87.47 percent below V10's maximum card count.",
+            "Sparse enlarged sprays read at a more plausible branch scale than V10/V11 leaf-cluster stamping, and all nine combined captures remain exact far-only fallbacks.",
+        ],
+        "rejection_reasons": [
+            "Near/far foreground silhouette reaches only 0.815-0.926, failing the retained 1.0 floor in every handoff view.",
+            "Closeups still reveal stretched planar photographs, intersecting cards, and disconnected woody attachments; changing sampling density cannot make this representation photoreal at branch distance.",
+            "Adding enough of the same planes to recover coverage would return toward V10's overlap problem rather than solve topology or botanical fidelity.",
+            "No exact Austrocedrus chilensis production model was found in the initial Fab, SpeedTree, or general commercial-model search; close relatives require explicit morphology-donor review and cannot be labeled native assets without reconstruction and validation.",
+        ],
+        "quantitative_review": {
+            "near_to_far_foreground_silhouette": {
+                "minimum": min(silhouette_ratios),
+                "mean": sum(silhouette_ratios) / len(silhouette_ratios),
+                "maximum": max(silhouette_ratios),
+                "required_minimum": 1.0,
+                "all_handoff_views_passed": min(silhouette_ratios) >= 1.0,
+            },
+            "authority_result": {
+                "triplet_count": len(triplets),
+                "combined_matches_near_count": combined_matches_near_count,
+                "combined_matches_far_count": combined_matches_far_count,
+                "combined_differs_from_both_count": combined_differs_from_both_count,
+                "actor_root_authority_passed": authority_passed,
+                "triplets": triplets,
+            },
+        },
+        "captures": captures,
+        "decision": "retain_v10_far_and_v12_branch_scale_lesson_stop_density_retuning_a_failed_card_representation",
+        "next_iteration_requirements": [
+            "Review a rights-cleared high-fidelity Cupressaceae morphology donor, prioritizing Western red cedar flattened sprays, against the Austrocedrus source contract before purchase or import.",
+            "If no donor passes, author opaque geometric branchlets and scale-leaf clusters for the near tier rather than another masked-card density iteration.",
+            "Keep the V10 far fallback, actor-root authority, V10 silhouette floor, V12 resource ceiling, and exterior closeup as mandatory comparison evidence.",
+            "Do not place or label a donor as native Austrocedrus until reconstructed crown, bark, scale-leaf, form-variation, rights, ecology, and performance gates pass.",
+        ],
+    }
+
+
+def write_futaleufu_cordillera_cypress_v12_visual_review(repo_root: Path) -> dict:
+    review = build_futaleufu_cordillera_cypress_v12_visual_review(repo_root)
+    output_path = repo_root.resolve() / V12_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return review
+
+
+def build_futaleufu_cordillera_cypress_v13_visual_review(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    report_path = repo_root / V13_REPORT_RELATIVE_PATH
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    import_report_path = repo_root / report["import_report"]
+    import_report = json.loads(import_report_path.read_text(encoding="utf-8"))
+    v10_path = repo_root / V10_REVIEW_RELATIVE_PATH
+    v12_path = repo_root / V12_REVIEW_RELATIVE_PATH
+
+    captures = []
+    view_values: dict[str, list[float]] = {
+        "turntable": [],
+        "branch_closeup": [],
+        "river_distance_60m": [],
+    }
+    foreground_values: dict[str, list[float]] = {
+        "turntable": [],
+        "branch_closeup": [],
+        "river_distance_60m": [],
+    }
+    for capture in report["captures"]:
+        relative_path = Path(capture["path"])
+        capture_id = capture["capture_id"]
+        if "turntable" in capture_id:
+            view_group = "turntable"
+        elif "branch_closeup" in capture_id:
+            view_group = "branch_closeup"
+        else:
+            view_group = "river_distance_60m"
+        metrics = _capture_metrics(repo_root / relative_path)
+        foreground_fraction = _foreground_silhouette_fraction(repo_root / relative_path)
+        view_values[view_group].append(metrics["green_dominant_fraction"])
+        foreground_values[view_group].append(foreground_fraction)
+        captures.append(
+            {
+                "capture_id": capture_id,
+                "path": str(relative_path),
+                "view_group": view_group,
+                "foreground_silhouette_fraction": foreground_fraction,
+                **metrics,
+            }
+        )
+
+    view_summaries = {}
+    for view_group, values in view_values.items():
+        foreground = foreground_values[view_group]
+        view_summaries[view_group] = {
+            "sample_count": len(values),
+            "minimum_green_dominant_fraction": min(values),
+            "mean_green_dominant_fraction": sum(values) / len(values),
+            "maximum_green_dominant_fraction": max(values),
+            "minimum_foreground_silhouette_fraction": min(foreground),
+            "mean_foreground_silhouette_fraction": sum(foreground) / len(foreground),
+            "maximum_foreground_silhouette_fraction": max(foreground),
+        }
+
+    source_triangles = [
+        asset["source_triangle_count_lod0"] for asset in import_report["meshes"]
+    ]
+    fallback_triangles = [donor["render_triangles"] for donor in report["donors"]]
+    effective_heights = [donor["bounds_size_cm"][2] for donor in report["donors"]]
+    return {
+        "schema": "raftsim.unreal.futaleufu_cordillera_cypress_morphology_donor_visual_review.v13",
+        "generated_on": GENERATED_ON,
+        "status": "v13_cc0_fir_direct_donor_rejected_opaque_geometric_reconstruction_required",
+        "production_promoted": False,
+        "corridor_substitution_performed": False,
+        "native_species_claim": False,
+        "source_report": str(V13_REPORT_RELATIVE_PATH),
+        "source_report_sha256": _sha256(report_path),
+        "source_manifest": report["source_manifest"],
+        "source_manifest_sha256": _sha256(repo_root / report["source_manifest"]),
+        "import_report": report["import_report"],
+        "import_report_sha256": _sha256(import_report_path),
+        "v10_review": str(V10_REVIEW_RELATIVE_PATH),
+        "v10_review_sha256": _sha256(v10_path),
+        "v12_review": str(V12_REVIEW_RELATIVE_PATH),
+        "v12_review_sha256": _sha256(v12_path),
+        "review_scope": {
+            "donor_species_identity": report["source_species"],
+            "donor_mesh_count": len(report["donors"]),
+            "capture_count": len(captures),
+            "views_per_mesh": 4,
+            "rhi": "offscreen Metal",
+            "license": report["license"],
+            "minimum_effective_height_cm": min(effective_heights),
+            "maximum_effective_height_cm": max(effective_heights),
+            "total_source_triangles": sum(source_triangles),
+            "total_nanite_fallback_triangles": sum(fallback_triangles),
+            "review_actor_scale": 1.0,
+            "review_culling_bounds_scale": report["review_culling_bounds_scale"],
+        },
+        "accepted_findings": [
+            "The already rights-reviewed CC0 source supports a repeatable three-mesh, twelve-view isolated donor gate without purchase, new vendoring, corridor placement, or a native-species claim.",
+            "All three meshes preserve original bark and needle material slots, Nanite remains enabled, and effective 14.1-18.9 m heights agree with the import report.",
+            "Woody trunks and branches are connected, irregular, and materially more organic at close range than V10/V12 intersecting procedural cylinders and detached spray-card attachments.",
+            "The gate exposes a legacy import defect: BuildScale3D 100 affects rendered geometry while persisted culling bounds stay pre-build-scale, requiring a review-only expanded bounds override at actor scale one.",
+        ],
+        "rejection_reasons": [
+            "Every turntable and 60 m view reads as a bare or nearly bare snag; the original needle stratum collapses instead of producing an evergreen crown.",
+            "The surviving woody hierarchy is sparse fir topology with long exposed limbs, not the flattened dense scale-leaf sprays and broad distance-stable Austrocedrus crown required by the source contract.",
+            "The legacy build-scale/culling-bounds mismatch is unsuitable for direct runtime reuse and would need a separately validated reimport or reconstruction pipeline.",
+            "Copying or relabeling this non-native geometry would not establish Austrocedrus morphology, form variation, ecology, seasonal response, wind, LOD, or desktop/VR performance.",
+            "The link-only Western Red Cedar and generic cypress listings remain unpurchased and unevaluated in-engine; neither can close this gate without license review and the same non-native reconstruction boundary.",
+        ],
+        "quantitative_review": {
+            "green_dominant_definition": "G>=35, G>=1.08R, G>=1.05B, and G-min(R,B)>=7",
+            "view_summaries": view_summaries,
+            "direct_donor_acceptance": {
+                "all_twelve_captures_present": len(captures) == 12,
+                "all_three_nanite_meshes_present": all(
+                    donor["nanite_enabled"] for donor in report["donors"]
+                ),
+                "evergreen_crown_mass_present": False,
+                "native_morphology_established": False,
+                "runtime_bounds_contract_valid": False,
+                "direct_geometry_donor_passed": False,
+            },
+        },
+        "captures": captures,
+        "decision": "reject_direct_fir_geometry_retain_connected_wood_lesson_and_author_project_owned_opaque_cypress_branchlets_plus_scale_leaf_clusters",
+        "next_iteration_requirements": [
+            "Build the next near-tier prototype from project-owned opaque geometric primary, secondary, and tertiary branchlets carrying bounded scale-leaf clusters; do not copy or relabel the fir geometry.",
+            "Retain V10 far fallback authority, V10 silhouette floors, V12 branch-scale/resource ceiling, V13 exterior closeups, and exact-camera checks as guardrails.",
+            "Require connected attachments, non-tiered broad crown mass, visible evergreen silhouette at turntable and 60 m, and no masked whole-spray cards before another corridor review.",
+            "Keep the Fab Western Red Cedar and generic cypress options link-only unless a later license and maintenance decision explicitly authorizes acquisition for non-native morphology study.",
+            "Repair and separately validate the legacy Poly Haven build-scale/culling-bounds import path before any of those assets are considered for runtime placement elsewhere.",
+        ],
+    }
+
+
+def write_futaleufu_cordillera_cypress_v13_visual_review(repo_root: Path) -> dict:
+    review = build_futaleufu_cordillera_cypress_v13_visual_review(repo_root)
+    output_path = repo_root.resolve() / V13_REVIEW_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
     return review
