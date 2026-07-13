@@ -49,14 +49,17 @@ def test_south_fork_production_corridor_is_official_physical_and_reproducible():
     assert conditioning["authority"] == (
         "derived_render_and_landscape_geometry_not_solver_or_surveyed_bathymetry"
     )
-    assert conditioning["channel_half_width_m"] == 18.0
-    assert conditioning["bank_feather_width_m"] == 30.0
+    assert conditioning["channel_half_width_m"] == 14.0
+    assert conditioning["bank_feather_width_m"] == 12.0
     assert conditioning["nominal_depth_m"] == 1.4
-    assert conditioning["maximum_allowed_lowering_m"] == 8.0
+    assert conditioning["maximum_allowed_lowering_m"] == 4.0
+    assert conditioning["maximum_source_height_above_surface_m"] == 3.0
+    assert conditioning["corridor_smoothing_iterations"] == 24
+    assert conditioning["corridor_smoothing_weight"] == 0.82
     assert conditioning["monotone_downstream"] is True
     assert conditioning["profile_drop_m"] > 45.0
     assert conditioning["modified_source_sample_count"] > 50_000
-    assert 1.0 < conditioning["maximum_lowering_m"] <= 8.01
+    assert 1.0 < conditioning["maximum_lowering_m"] <= 4.01
 
     sources = manifest["source_artifacts"]
     assert sources["dem"]["catalog_object_id"] == 131308

@@ -159,7 +159,7 @@
       "url": "https://www.openstreetmap.org/copyright"
     }
   ],
-  "goal": "Build complete photorealistic Unreal river environments for South Fork American, Colorado River, and Pacuare River from traceable maps, seasonal flow evidence, aerial imagery, reviewed reference media, and procedural generation where appropriate.",
+  "goal": "Build complete photorealistic Unreal river environments for South Fork American, Colorado River, Pacuare River, Zambezi River in Batoka Gorge, and Futaleufu River from traceable maps, seasonal flow evidence, aerial imagery, reviewed reference media, and procedural generation where appropriate.",
   "production_environment_gap_register": "physics/data/real_world/production_environment_gap_register.json",
   "production_geospatial_source_readiness_manifest": "physics/data/real_world/production_geospatial_source_readiness.json",
   "reference_media_link_manifest": "physics/data/real_world/reference_media_link_manifest.json",
@@ -1415,6 +1415,123 @@
         "ao_roughness_height": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_ao_roughness_height.png",
         "normal_detail": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/pacuare_source_conditioned_normal_detail.png"
       }
+    },
+    {
+      "river_id": "zambezi_batoka_gorge",
+      "display_name": "Zambezi River, Boiling Pot to Mukuni Beach",
+      "section_id": "boiling_pot_to_mukuni_beach",
+      "source_manifest": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/manifest.json",
+      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "river_map_sources": [
+        {
+          "source_id": "copernicus_dem_glo30",
+          "status": "route_corridor_tiles_attached",
+          "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"
+        },
+        {
+          "source_id": "copernicus_sentinel2_l2a",
+          "status": "near_cloud_free_route_visual_attached",
+          "url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2"
+        },
+        {
+          "source_id": "openstreetmap_named_mainstem_cross_reference",
+          "status": "route_stationed_local_guide_review_pending",
+          "url": "https://www.openstreetmap.org/copyright"
+        },
+        {
+          "source_id": "zra_bghes_lidar_and_drone_survey_acquisition_leads",
+          "status": "0.3m_lidar_dtm_and_5cm_local_drone_dsm_confirmed_to_exist_data_access_rights_and_game_reach_coverage_pending",
+          "url": "https://zambezira.org/hydro-electric-schemes/batoka-hes-project",
+          "lead_manifest": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json",
+          "authority": "discovery_only_no_geometry_or_media_imported"
+        }
+      ],
+      "flow_sources": [
+        {
+          "source_id": "zambezi_river_authority_victoria_falls_nanas_farm",
+          "status": "official_flow_context_attached_planning_bands_review_gated",
+          "url": "https://zambezira.org/hydrology/river-flows"
+        }
+      ],
+      "flow_levels": [
+        {"flow_band": "low_water_technical", "range_m3_s": [350.0, 900.0]},
+        {"flow_band": "normal_big_water", "range_m3_s": [900.0, 2200.0]},
+        {"flow_band": "high_water", "range_m3_s": [2200.0, 4500.0]}
+      ],
+      "environment_recipe": {
+        "biome": "batoka_gorge_southern_african_woodland",
+        "terrain_style": "steep_jointed_basalt_gorge",
+        "water_style": "warm_brown_green_big_water_with_wave_trains_holes_boils_and_laterals",
+        "procedural_layers": ["basalt_strata", "wet_basalt", "talus", "gorge_woodland", "foam", "spray", "mist"]
+      },
+      "source_sample_artifacts": [
+        {
+          "artifact_id": "zambezi_source_scale_corridor",
+          "category": "route_terrain_imagery_and_unreal_import_package",
+          "path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach",
+          "status": "source_scale_technical_corridor_not_yet_lifelike"
+        }
+      ],
+      "reference_media_sources": [
+        {"source_id": "first_party_field_capture", "status": "planned", "rights_status": "preferred_for_shipping"},
+        {"source_id": "public_social_and_outfitter_links", "status": "link_only_review_queue_pending", "rights_status": "reference_only_no_download_no_scraping"}
+      ],
+      "capture_targets": ["guide_seat_downstream", "river_eye_downstream_environment_review", "rapid_entry_wave_train", "swimmer_rescue_visibility"]
+    },
+    {
+      "river_id": "futaleufu_terminator",
+      "display_name": "Futaleufu River, Rio Azul Swinging Bridge to The Pasarela",
+      "section_id": "rio_azul_swinging_bridge_to_pasarela",
+      "source_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json",
+      "target_unreal_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+      "river_map_sources": [
+        {
+          "source_id": "copernicus_dem_glo30",
+          "status": "route_corridor_tiles_attached",
+          "url": "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM"
+        },
+        {
+          "source_id": "copernicus_sentinel2_l2a",
+          "status": "near_cloud_free_route_visual_attached",
+          "url": "https://dataspace.copernicus.eu/data-collections/copernicus-sentinel-missions/sentinel-2"
+        },
+        {
+          "source_id": "openstreetmap_rio_azul_and_futaleufu_cross_reference",
+          "status": "bridge_to_bridge_route_stationed_local_guide_review_pending",
+          "url": "https://www.openstreetmap.org/copyright"
+        }
+      ],
+      "flow_sources": [
+        {
+          "source_id": "dga_10704002_1_futaleufu_ante_junta_malito",
+          "status": "official_station_and_monthly_context_attached_time_series_pending",
+          "url": "https://climatologia.meteochile.gob.cl/application/informacion/fichaDeEstacion/430011"
+        }
+      ],
+      "flow_levels": [
+        {"flow_band": "low_technical", "range_m3_s": [60.0, 160.0]},
+        {"flow_band": "normal_runnable", "range_m3_s": [160.0, 300.0]},
+        {"flow_band": "high_big_water", "range_m3_s": [300.0, 500.0]}
+      ],
+      "environment_recipe": {
+        "biome": "patagonian_temperate_rainforest_valley",
+        "terrain_style": "glacial_granite_metamorphic_valley_and_boulder_gardens",
+        "water_style": "clear_turquoise_big_water_with_wave_trains_holes_pillows_and_boulder_push",
+        "procedural_layers": ["granite", "wet_boulders", "gravel_bars", "temperate_rainforest", "foam", "spray", "mist"]
+      },
+      "source_sample_artifacts": [
+        {
+          "artifact_id": "futaleufu_source_scale_corridor",
+          "category": "route_terrain_imagery_and_unreal_import_package",
+          "path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela",
+          "status": "source_scale_technical_corridor_not_yet_lifelike"
+        }
+      ],
+      "reference_media_sources": [
+        {"source_id": "first_party_field_capture", "status": "planned", "rights_status": "preferred_for_shipping"},
+        {"source_id": "public_social_and_outfitter_links", "status": "link_only_review_queue_pending", "rights_status": "reference_only_no_download_no_scraping"}
+      ],
+      "capture_targets": ["guide_seat_downstream", "river_eye_downstream_environment_review", "terminator_entry", "swimmer_rescue_visibility"]
     }
   ],
   "schema": "raftsim.unreal.photoreal_river_environment_sources.v1",
@@ -1427,7 +1544,7 @@
     "social_media_is_reference_only_until_explicit_rights_clear": true,
     "third_party_photos_require_per_item_license_review": true
   },
-  "status": "south_fork_colorado_and_pacuare_larger_source_draped_previews_available; production_geospatial_imports_and_photoreal_assets_pending_with_first_party_texture2d_atlas_assets_bound_material_instances_and_review_sampler_material",
+  "status": "five_river_source_manifest_active; zambezi_and_futaleufu_source_scale_corridors_attached_not_yet_lifelike; production_geospatial_imports_photoreal_assets_and_human_approval_pending",
   "unreal_generation": {
     "final_acceptance": [
       "production_dem_or_reviewed_proxy_terrain",

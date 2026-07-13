@@ -1,0 +1,106 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_corridor_light_rig_review.v18",
+  "river_id": "futaleufu_terminator",
+  "status": "direct_fill_changes_scene_but_not_crown_readability_skylight_treatment_pixel_identical_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "saved_corridor_photometry_modified": false,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v18_corridor_light_rig_diagnostic_report.json",
+  "decision": "retain_saved_corridor_photometry_reject_fill_and_skylight_overrides_and_split_leaf_reflectance_from_transmission",
+  "diagnostic_conclusions": {
+    "transient_fill_lights_affect_scene": true,
+    "transient_fill_lights_restore_readable_green_crowns": false,
+    "skylight_310_capture_differs_from_baseline": false,
+    "global_corridor_brightness_is_primary_darkness_cause": false,
+    "leaf_base_color_or_transmission_requires_split_test": true,
+    "alpha_scale_4_remains_promotion_eligible": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "placement_counts_identical_between_render_modes": true
+  },
+  "metric_contract": {
+    "changed_pixel": "any RGB channel differs from the V18 alpha4 baseline",
+    "restored_crown_mask": "pixel differs from the V15 shadowless native-opacity reference by summed absolute RGB greater than 8",
+    "green_dominant": "G exceeds R and B by 10 percent and G exceeds 25",
+    "dark": "Rec.709 luma is below 32/255"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+      "baseline_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "isolated_fill": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_isolated_fill_no_shadows_guide_seat_downstream.png",
+      "isolated_fill_sha256": "5da64dcf505b5847b012c5f575c7f1c3c571db20ab304988df592f51c71dc135",
+      "skylight_310": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_skylight_310_no_shadows_guide_seat_downstream.png",
+      "skylight_310_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_baseline": {
+        "isolated_fill": 0.43362196180555557,
+        "skylight_310": 0.0
+      },
+      "mean_absolute_rgb_delta_vs_baseline": {
+        "isolated_fill": [4.9005750868055555, 4.50021484375, 3.5083355034722223],
+        "skylight_310": [0.0, 0.0, 0.0]
+      },
+      "restored_crown_mask_fraction": 0.01431857638888889,
+      "restored_crown_metrics": {
+        "baseline_mean_rgb": [24.200439527129433, 34.20756289784783, 36.95278872385571],
+        "isolated_fill_mean_rgb": [26.448848135798727, 36.58434374052743, 37.96044255835101],
+        "baseline_dark_fraction": 0.7821309487723552,
+        "isolated_fill_dark_fraction": 0.7086238254016368,
+        "baseline_green_dominant_fraction": 0.008790542588663231,
+        "isolated_fill_green_dominant_fraction": 0.0276598969384662
+      }
+    },
+    "river_eye": {
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+      "baseline_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "isolated_fill": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_isolated_fill_no_shadows_river_eye_downstream.png",
+      "isolated_fill_sha256": "ce7034844b6648494b9b768218d78d3e9b735982f5de3bc55fcecfc012822eaa",
+      "skylight_310": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_skylight_310_no_shadows_river_eye_downstream.png",
+      "skylight_310_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_baseline": {
+        "isolated_fill": 0.30171549479166665,
+        "skylight_310": 0.0
+      },
+      "mean_absolute_rgb_delta_vs_baseline": {
+        "isolated_fill": [3.4023958333333333, 3.279177517361111, 2.3461241319444444],
+        "skylight_310": [0.0, 0.0, 0.0]
+      },
+      "restored_crown_mask_fraction": 0.03333441840277778,
+      "restored_crown_metrics": {
+        "baseline_mean_rgb": [20.855473454640148, 29.4460141271443, 30.446079229191756],
+        "isolated_fill_mean_rgb": [22.958888057029395, 32.01617785879366, 31.582370365547998],
+        "baseline_dark_fraction": 0.8507210051756128,
+        "isolated_fill_dark_fraction": 0.8267634517105563,
+        "baseline_green_dominant_fraction": 0.018488981478467496,
+        "isolated_fill_green_dominant_fraction": 0.06930112952052342
+      }
+    }
+  },
+  "accepted_findings": [
+    "The fresh V18 baseline reproduces both V16 alpha4 hashes exactly, preserving the diagnostic control.",
+    "The isolated-review fill changes 43.36 percent of guide-seat pixels and 30.17 percent of river-eye pixels, proving that the transient direct lights affect the loaded corridor scene.",
+    "The crown-only mask records only a 2-3 level RGB lift under direct fill and remains predominantly dark in both views.",
+    "The 3.10 skylight-only captures are byte-identical to baseline under the current offscreen corridor path and provide no visual correction."
+  ],
+  "rejection_reasons": [
+    "The direct-fill treatment brightens terrain and water much more than foliage and would wash out the valley before restoring readable crowns.",
+    "After direct fill, 70.86 percent of guide-seat and 82.68 percent of river-eye restored-crown pixels remain below the dark threshold.",
+    "The skylight treatment produces no pixel change and cannot justify a saved photometry change.",
+    "Four-times alpha still produces visually saturated, non-leaf-shaped crown masses and remains promotion-ineligible."
+  ],
+  "next_iteration_requirements": [
+    "Hold the saved corridor light rig fixed and test a two-times LeafBaseColorScale override independently from a neutral-white LeafTransmissionTint override.",
+    "Include a combined reflectance-plus-transmission control only to detect interaction; do not promote any diagnostic override automatically.",
+    "Use the same restored-crown mask to measure whether color improves in foliage rather than merely brightening terrain or water.",
+    "After choosing a physically plausible leaf response, reduce opacity amplification and recover leaf-edge breakup before ecology expansion."
+  ]
+}

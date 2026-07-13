@@ -1,0 +1,94 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v9",
+  "generated_on": "2026-07-13",
+  "status": "v9_high_fidelity_branch_spray_texture_candidate_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "generation_method": "OpenAI built-in image generation followed by local chroma-key removal",
+    "reference_images_supplied": false,
+    "external_photo_pixels_vendored": false,
+    "botanical_measurement_claimed": false,
+    "prompt_summary": "orthographic complete cordilleran-cypress terminal branch spray with dense scale leaves on a flat magenta key",
+    "chroma_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_branch_spray_chroma_source_v9.png",
+    "chroma_source_sha256": "10944c6718e5e02d88f8c746d60ba588e011b7a23d44b7551c8654de7cc2a1a1",
+    "alpha_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_branch_spray_alpha_source_v9.png",
+    "alpha_source_sha256": "6f670a01a153820eb5caa51ddd0070d28d81d05c648914194f0ee67b31ae2292"
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v9_assets.py",
+    "generator_sha256": "4e07d3fe6789271ebd92c0bcc330999c65b856dc68ed507f5bf654128248036b",
+    "seed": 90818427,
+    "atlas_columns": 4,
+    "atlas_rows": 4,
+    "variant_operations": [
+      "aspect-preserving resize with bounded horizontal width variation",
+      "bounded rotation and horizontal reflection",
+      "bounded RGB variation",
+      "tile-local placement with transparent padding"
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "4fbc9406229bf506ebde8d10d03252edca81b18003c9986a646543475aca1e2e",
+      "nontransparent_rgb_sha256": "ce1d6a9805fbac9b85c84e8adb2e5c34e1ce7e352c25e6a8b5dfabd0ea3cec0e",
+      "padded_transparent_pixel_count": 630300,
+      "transparent_nonzero_rgb_pixel_count": 607060
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 397220,
+    "nonzero_fraction": 0.09470462799072266,
+    "opaque_pixel_count": 142120,
+    "opaque_fraction": 0.03388404846191406,
+    "transparent_corners": true
+  },
+  "maps": {
+    "spray_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v9_albedo_opacity.png",
+      "sha256": "6c3b3992fae8d0f30bb03c193ea7956486670ad505ed2bcf15f376efbe0b6dbd",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v9_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v9_normal.png",
+      "sha256": "cbd31bf758cfaa5750905fc1270d6eef35ddc36bbbb1e946450a96e37f52d639",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v9_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v9_ao_roughness_subsurface.png",
+      "sha256": "78bfde29d82cc385ea5b01b5f189fb108da78385377ffe78a378828269aa5883",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v9_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "review_boundary": {
+    "near_representation_eligible": false,
+    "required_before_eligibility": [
+      "isolated closeup exceeds V8 far fallback",
+      "turntable and 20 m silhouette has no card-wall or repeated-fan artifact",
+      "all nine actor-root authority triplets remain overlap-free after hard near selection",
+      "resource and masked-overdraw budgets pass"
+    ]
+  }
+}

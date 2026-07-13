@@ -1,0 +1,147 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_rock_moss_set_01_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "rock_moss_set_01_1k.fbx",
+      "sha256": "8fa2a2666ecc4591f59e1d45db05d86857115b55492c8522917f3de5e650e6f9",
+      "bytes": 2652988
+    },
+    {
+      "relative_path": "textures/rock_moss_set_01_diff_1k.jpg",
+      "sha256": "40cea65d8aa4ee73a93b04af19963834d061eee9779c3fc2c1cba76eef812ccc",
+      "bytes": 168099
+    },
+    {
+      "relative_path": "textures/rock_moss_set_01_nor_gl_1k.exr",
+      "sha256": "d86555deabb910ed82b2b770d852ba5aa931d373689ff7ae028574c7b310be99",
+      "bytes": 1571891
+    },
+    {
+      "relative_path": "textures/rock_moss_set_01_rough_1k.jpg",
+      "sha256": "4d6ec46623abd8e2cdb855f59c7ce31873ad61b36b60e4de579e9e776a497c6b",
+      "bytes": 82624
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock01.SM_RockMossSet01_rock_moss_set_01_rock01",
+      "nanite_fallback_triangle_count_lod0": 3358,
+      "dimensions_cm": [
+        223.7632155418396,
+        336.8804335594177,
+        147.26980924606323
+      ],
+      "base_z_cm": -65.65686464309692,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock02.SM_RockMossSet01_rock_moss_set_01_rock02",
+      "nanite_fallback_triangle_count_lod0": 2475,
+      "dimensions_cm": [
+        265.5380845069885,
+        326.3720393180847,
+        126.19911730289459
+      ],
+      "base_z_cm": -46.56194746494293,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock03.SM_RockMossSet01_rock_moss_set_01_rock03",
+      "nanite_fallback_triangle_count_lod0": 1916,
+      "dimensions_cm": [
+        210.8582615852356,
+        207.95856714248657,
+        109.96944606304169
+      ],
+      "base_z_cm": -41.08721911907196,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock04.SM_RockMossSet01_rock_moss_set_01_rock04",
+      "nanite_fallback_triangle_count_lod0": 2470,
+      "dimensions_cm": [
+        212.76293396949768,
+        196.4741349220276,
+        176.8319845199585
+      ],
+      "base_z_cm": -66.09705686569214,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock05.SM_RockMossSet01_rock_moss_set_01_rock05",
+      "nanite_fallback_triangle_count_lod0": 2210,
+      "dimensions_cm": [
+        181.73227906227112,
+        299.86637830734253,
+        120.5450713634491
+      ],
+      "base_z_cm": -57.255446910858154,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/SM_RockMossSet01_rock_moss_set_01_rock06.SM_RockMossSet01_rock_moss_set_01_rock06",
+      "nanite_fallback_triangle_count_lod0": 2248,
+      "dimensions_cm": [
+        212.59822249412537,
+        275.73031187057495,
+        126.18526816368103
+      ],
+      "base_z_cm": -52.805668115615845,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/T_RockMossSet01_BaseColor_1K.T_RockMossSet01_BaseColor_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/T_RockMossSet01_NormalGL_1K.T_RockMossSet01_NormalGL_1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/T_RockMossSet01_Roughness_1K.T_RockMossSet01_Roughness_1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"
+  ]
+}

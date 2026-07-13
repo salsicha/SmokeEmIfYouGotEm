@@ -1,0 +1,45 @@
+{
+  "schema": "raftsim.unreal.pve_growth_candidate_structural_review.v1",
+  "river_id": "futaleufu_terminator",
+  "candidate": "ue_5_8_pve_european_beech",
+  "variant": "Beech_02",
+  "status": "structurally_generated_local_review_export_ready_not_visual_or_production_promoted",
+  "engine_version": "5.8",
+  "source_growth_json": "Engine/Plugins/Experimental/ProceduralVegetationEditor/Content/SampleAssets/Tree_European_Beech_01/Instances/Beech_02.json",
+  "source_graph": "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Sample_Deciduous_Tree_01",
+  "generated_collection": {
+    "transform_count": 1,
+    "vertex_count": 78839,
+    "triangle_count": 154109,
+    "foliage_mesh_count": 5,
+    "foliage_instance_count": 815,
+    "foliage_meshes": ["/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_01.Leaf_Twig_01", "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_02.Leaf_Twig_02", "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_03.Leaf_Twig_03", "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_04.Leaf_Twig_04", "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/Instances/Leaf_Twig_05.Leaf_Twig_05"]
+  },
+  "local_review_export": {
+    "status": "trunk_nanite_asset_and_foliage_template_generated_locally",
+    "git_policy": "generated_files_are_ignored_and_must_not_be_open_source_redistributed",
+    "trunk_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/SM_FutaleufuPveEuropeanBeech_02_Trunk",
+    "foliage_template": "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_foliage_template.json",
+    "asset_validation": {
+      "passed": true,
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "preserve_area",
+      "vertex_count_lod0": 6744,
+      "triangle_count_lod0": 9503,
+      "material_slot_count": 1,
+      "non_null_material_count": 1,
+      "bounds_size_cm": [909.531555, 959.231537, 2533.569257]
+    }
+  },
+  "local_visual_review": {
+    "status": "isolated_three_view_capture_ready_for_human_material_review",
+    "git_policy": "generated_map_and_captures_are_local_and_ignored",
+    "map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/L_FutaleufuPveEuropeanBeech_02_IsolatedReview",
+    "foliage_mesh_count": 5,
+    "foliage_instance_count": 815,
+    "captures": ["unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_turntable_azimuth_035.png", "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_turntable_azimuth_145.png", "unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/beech_02_river_distance_60m.png"]
+  },
+  "rights_boundary": "installed_unreal_engine_sample_evaluation_only_do_not_redistribute_as_open_source_asset",
+  "species_boundary": "fagus_sylvatica_structure_analog_not_native_nothofagus_or_patagonian_species_approval",
+  "promotion_gates": ["isolated_visual_material_validation", "river_view_comparison", "native_species_or_ecology_review", "open_source_redistribution_review", "desktop_and_vr_performance"]
+}

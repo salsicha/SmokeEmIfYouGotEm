@@ -183,6 +183,7 @@ def texture_sample(
 
 
 def configure_existing_sampler_types(material: unreal.Material) -> None:
+    material.modify()
     for expression in unreal.MaterialEditingLibrary.get_material_expressions(material):
         if not isinstance(expression, unreal.MaterialExpressionTextureSample):
             continue
@@ -190,9 +191,16 @@ def configure_existing_sampler_types(material: unreal.Material) -> None:
         if not texture:
             continue
         texture_name = texture.get_name().lower()
-        if "normalgl" in texture_name:
+        expression.modify()
+        if "normalgl" in texture_name or "norgl" in texture_name or "normal" in texture_name:
             expression.sampler_type = unreal.MaterialSamplerType.SAMPLERTYPE_NORMAL
-        elif "roughness" in texture_name or "opacity" in texture_name or "displacement" in texture_name:
+        elif (
+            "roughness" in texture_name
+            or "rough" in texture_name
+            or "opacity" in texture_name
+            or "alpha" in texture_name
+            or "displacement" in texture_name
+        ):
             expression.sampler_type = unreal.MaterialSamplerType.SAMPLERTYPE_MASKS
         else:
             expression.sampler_type = unreal.MaterialSamplerType.SAMPLERTYPE_COLOR

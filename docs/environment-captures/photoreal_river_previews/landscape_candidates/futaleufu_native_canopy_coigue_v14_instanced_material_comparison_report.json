@@ -1,0 +1,100 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_corridor_comparison.v2",
+	"river_id": "futaleufu_terminator",
+	"status": "paired_source_masked_transient_corridor_comparison_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"source_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json",
+	"vegetation_mask": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/vegetation_mask_2048.png",
+	"water_mask": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/water_mask_2048.png",
+	"placement_boundary": "Transient review-only HISM components replace only visible temporary PVE foliage for each capture; source Landscape, dense visual terrain, physical river ribbon, water, rocks, collision, solver, and saved map remain unchanged.",
+	"material_contract":
+	{
+		"bark_instanced_static_meshes_usage_persisted": true,
+		"leaf_instanced_static_meshes_usage_persisted": true,
+		"compile_order": "material expression refresh, InstancedStaticMeshes usage enablement, shader completion, package save, then HISM creation",
+		"experiment": "V14 isolates whether the V13 corridor silhouette failure was caused by late automatic HISM shader-permutation creation"
+	},
+	"placement_contract":
+	{
+		"mask_mapping": "north-up source image UV mapped over the physical Landscape bounds; Unreal +Y follows source rows south from the northwest corner",
+		"distribution": "Halton low-discrepancy candidates with 15 m minimum-spacing rejection and three macro plus deterministic micro canopy gaps",
+		"target_tree_count_per_view": 1200,
+		"centerline_progress_min": 0.55000000000000004,
+		"centerline_progress_max": 0.91000000000000003,
+		"river_setback_m": 65,
+		"maximum_lateral_offset_m": 300,
+		"minimum_spacing_m": 15,
+		"minimum_vegetation_mask": 0.34000000000000002,
+		"maximum_water_mask": 0.28000000000000003,
+		"minimum_elevation_m": 100,
+		"maximum_elevation_m": 900,
+		"maximum_slope_degrees": 39,
+		"aspect_treatment": "Moist southwest-facing and flat sites retained; dry-aspect candidates below 0.28 suitability are deterministically thinned by 52 percent.",
+		"near_full_representation_max_distance_m": 300,
+		"mid_representation_max_distance_m": 500,
+		"far_representation": "v12 runtime far crown beyond 500 m; 94-percent family resource reduction measured in the isolated benchmark"
+	},
+	"captures":
+	{
+		"baseline_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_pre_instanced_material_review_guide_seat_downstream.png",
+		"baseline_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_pre_instanced_material_review_river_eye_downstream.png",
+		"comparison_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_guide_seat_downstream.png",
+		"comparison_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"guide_seat_stats":
+	{
+		"candidate_count": 37956,
+		"accepted_tree_count": 1200,
+		"near_full_tree_count": 50,
+		"mid_tree_count": 126,
+		"runtime_far_tree_count": 1024,
+		"hidden_fallback_pve_actor_count": 4,
+		"rejected_natural_gap_count": 7440,
+		"rejected_vegetation_mask_count": 114,
+		"rejected_water_mask_count": 0,
+		"rejected_elevation_count": 20084,
+		"rejected_slope_count": 2127,
+		"rejected_dry_aspect_count": 1667,
+		"rejected_spacing_count": 5324,
+		"minimum_accepted_slope_degrees": 0.60587668418884277,
+		"maximum_accepted_slope_degrees": 38.996940612792969,
+		"minimum_accepted_elevation_m": 100.01070404052734,
+		"maximum_accepted_elevation_m": 253.78640747070312,
+		"mean_accepted_vegetation_mask": 0.60679739711185299,
+		"mean_accepted_water_mask": 0
+	},
+	"river_eye_stats":
+	{
+		"candidate_count": 37956,
+		"accepted_tree_count": 1200,
+		"near_full_tree_count": 40,
+		"mid_tree_count": 157,
+		"runtime_far_tree_count": 1003,
+		"hidden_fallback_pve_actor_count": 4,
+		"rejected_natural_gap_count": 7440,
+		"rejected_vegetation_mask_count": 114,
+		"rejected_water_mask_count": 0,
+		"rejected_elevation_count": 20084,
+		"rejected_slope_count": 2127,
+		"rejected_dry_aspect_count": 1667,
+		"rejected_spacing_count": 5324,
+		"minimum_accepted_slope_degrees": 0.60587668418884277,
+		"maximum_accepted_slope_degrees": 38.996940612792969,
+		"minimum_accepted_elevation_m": 100.01070404052734,
+		"maximum_accepted_elevation_m": 253.78640747070312,
+		"mean_accepted_vegetation_mask": 0.60679739711185299,
+		"mean_accepted_water_mask": 0
+	},
+	"open_promotion_gates": [
+		"paired_human_visual_review",
+		"moving_camera_transition_and_temporal_wind_review",
+		"second_native_canopy_species_and_understory_strata",
+		"guide_ecology_and_hazard_readability_review",
+		"masked_overdraw_streaming_and_culling_measurement",
+		"packaged_desktop_and_on_device_VR_performance"
+	]
+}

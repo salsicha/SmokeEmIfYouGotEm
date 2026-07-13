@@ -38,17 +38,20 @@
       "centerline_source": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
       "surface_sample_percentile": 5.0,
       "surface_sample_radius_m": 10.0,
-      "channel_half_width_m": 18.0,
-      "bank_feather_width_m": 30.0,
+      "channel_half_width_m": 14.0,
+      "bank_feather_width_m": 12.0,
       "nominal_depth_m": 1.4,
-      "maximum_allowed_lowering_m": 8.0,
+      "maximum_allowed_lowering_m": 4.0,
+      "maximum_source_height_above_surface_m": 3.0,
+      "corridor_smoothing_iterations": 24,
+      "corridor_smoothing_weight": 0.82,
       "profile_start_surface_m_navd88": 464.40814208984375,
       "profile_end_surface_m_navd88": 413.2114562988281,
       "profile_drop_m": 51.196685791015625,
       "monotone_downstream": true,
-      "modified_source_sample_count": 181613,
-      "maximum_lowering_m": 8.0,
-      "mean_lowering_over_modified_samples_m": 5.225875377655029
+      "modified_source_sample_count": 61783,
+      "maximum_lowering_m": 4.0,
+      "mean_lowering_over_modified_samples_m": 1.9283488988876343
     }
   },
   "source_artifacts": {
@@ -129,7 +132,7 @@
   "derived_artifacts": {
     "heightfield": {
       "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_heightfield_2017.png",
-      "sha256": "2b8ff7aa115b73758403befc3574ce398170917c2458c4925246c1806cb8a395",
+      "sha256": "b0478c6d5fd2c6fc763f37c205473127d0e717bdf4434804347b3add68abd77c",
       "dimensions": [
         2017,
         2017
@@ -138,7 +141,7 @@
     },
     "hillshade": {
       "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_hillshade_2048.png",
-      "sha256": "2cf8f69ebf9cc8080fc52f01900e6b92e340594684e1c7d273774f6008b08081",
+      "sha256": "467f0a451e7415bf07bd682898f92aeddf845d353c9a85a778388dccda142668",
       "dimensions": [
         2048,
         1445
@@ -168,7 +171,7 @@
       },
       "material_zones": {
         "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_material_zones_2048.png",
-        "sha256": "608b37275991f2295601eb042ea5ce8646c02a0c92fd4ea87c6f51ed137ef71a",
+        "sha256": "7c01828e56010f82d65c5b505201ee16c0d02664455f2b03b2f7b29e7b629efd",
         "dimensions": [
           2048,
           2048
@@ -176,7 +179,7 @@
       },
       "normal": {
         "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_normal_2048.png",
-        "sha256": "22d699811509dd2e07bce35c157166a18261315e61a4d62f0238caa6d9173834",
+        "sha256": "bfa34b01d2fa48c54dcbc36ab8d152e37447b418506fa977f0820315605a5d14",
         "dimensions": [
           2048,
           2048
@@ -184,7 +187,7 @@
       },
       "ao_roughness_height": {
         "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/derived/south_fork_chili_bar_reach_ao_roughness_height_2048.png",
-        "sha256": "b9e2046141cec7eedaeb8cfecd91eb241e627b95d5c2e49ec6ae4c7babab101f",
+        "sha256": "2a863c0fcf35d016939bfcc975f17ac0017d63bc131c72aa950e7fd931f1dfac",
         "dimensions": [
           2048,
           2048

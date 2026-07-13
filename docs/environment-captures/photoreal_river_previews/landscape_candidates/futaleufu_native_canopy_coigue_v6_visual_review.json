@@ -1,0 +1,78 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_visual_review.v6",
+  "candidate_id": "first_party_futaleufu_coigue_adult_prototype_v6",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "status": "rejected_at_photometry_and_variant_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "retain_blended_junction_hierarchy_for_v7_parameterized_crown_forms",
+  "prototype_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "accepted_evidence": [
+    "All 26 primary branches now continue through explicit 7.0-to-3.2-to-0.8 cm tip tapers instead of ending at a visible production-scale cylinder.",
+    "All 78 terminal secondary twigs now continue through 3.2-to-1.4-to-0.72 cm collars before meeting a 0.74 cm parent shoot, and every later generation decreases monotonically in radius.",
+    "The tangential closeup no longer shows the v5 cylindrical cutoff and preserves readable parent-shoot, branchlet, tertiary, petiole, and leaf hierarchy.",
+    "The added transitions cost only 936 trunk vertices and 1716 branchlet triangles while leaving the 19656-card near foliage and 90432-card far crown unchanged.",
+    "The final UE 5.8 Metal run has zero material compile errors, zero map-check errors, zero map-check warnings, and no corridor substitution."
+  ],
+  "junction_contract": {
+    "primary_tip_radius_cm": [7.0, 3.2, 0.8],
+    "terminal_twig_collar_radius_cm": [3.2, 1.4, 0.72],
+    "parent_shoot_radius_cm": [0.74, 0.2],
+    "branchlet_radius_cm": [0.42, 0.08],
+    "tertiary_radius_cm": [0.16, 0.045],
+    "radius_increases_between_generations": 0,
+    "scope": "single open-grown adult isolated prototype"
+  },
+  "rejection_reasons": [
+    "Bark and interior foliage remain too dark under the fixed review photometry, obscuring fine fissure, petiole, and leaf-surface response despite the improved silhouette.",
+    "The single crown remains too regular in live-crown ratio and broad envelope to represent natural variation across open, forest-edge, and closed-stand growth conditions.",
+    "Only one open-grown adult form exists; forest-grown adult, intermediate, juvenile, damaged, and deadwood variants remain absent.",
+    "No temporal wind and LOD capture, corridor ecology placement, guide or ecology review, or measured desktop and VR performance evidence exists."
+  ],
+  "review_contract": {
+    "engine_version": "5.8",
+    "rhi": "offscreen Metal",
+    "capture_resolution": [1280, 720],
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "material_compile_errors": 0,
+    "views": [
+      "turntable azimuth 35 degrees",
+      "turntable azimuth 145 degrees",
+      "tangential blended terminal hierarchy closeup",
+      "60 m far-crown proxy",
+      "150 m far-crown proxy"
+    ],
+    "capture_storage": "local ignored Unreal Saved directory",
+    "capture_redistribution": "not approved; hashes and reproducible paths only are retained in the open-source repository"
+  },
+  "captures": [
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_035.png",
+      "sha256": "b1eb81ca9bbddb7ebde8d188de5f9c427e20a711236561e86bcf523f7f520cc0"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_145.png",
+      "sha256": "4995bd41d148dea61c4310acf9f837dc9a4888d34c151862e071dee0717eabb4"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/bark_leaf_closeup.png",
+      "sha256": "2bb8ec79907a9e56f7ed0ef08276d099e5a8d7bd71c91d0ff236c39b1cbd2641"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_60m.png",
+      "sha256": "7170a6ab73b4077a6c6504d29b6feff7004e9403b716158c9cec71f90606b9e6"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_150m.png",
+      "sha256": "f3877a1b6f507c45b5c14d48706e0d2d9b6f963f68d73aac41eb8a83c71a4fa5"
+    }
+  ],
+  "next_iteration_requirements": [
+    "Parameterize and author open-grown adult, forest-grown adult, and intermediate forms with distinct live-crown ratio, branch angle, width, asymmetry, damage, and deterministic seeds.",
+    "Rebalance bark ambient response and foliage transmission while preserving physically lit response and the fixed review exposure.",
+    "Capture all five isolated views for every required crown form and compare their measured bounds, geometry cost, and distance silhouettes.",
+    "Add temporal wind and 28-36 m LOD handoff evidence before any corridor ecology placement."
+  ]
+}

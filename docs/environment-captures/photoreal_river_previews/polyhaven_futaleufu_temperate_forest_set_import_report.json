@@ -1,0 +1,492 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_futaleufu_temperate_forest_set_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "fir_sapling_medium/fir_sapling_medium_1k.fbx",
+      "sha256": "f09677355367e2a4a29b9542474049fcee311a2cc8aa561f9d316153cf5c33c4",
+      "bytes": 51634508
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_branches_diff_1k.png",
+      "sha256": "508ca0a40d118beec98e8375b4611e8a16123eec94b5d2b4870617cf4d24e6fa",
+      "bytes": 5652976
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_branches_nor_gl_1k.png",
+      "sha256": "b889e7080d6efb0592f83e64cc5a5afa5fb7787b4b7d1ae13a65602689e793e8",
+      "bytes": 5778805
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_branches_rough_1k.png",
+      "sha256": "b198105d3022db6c459ae9c307ecdb7b644832ee20bcbfd89c3741cecc77881f",
+      "bytes": 1778413
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_twigs_alpha_1k.png",
+      "sha256": "3f399629337e7ac3af27a01b08ffb9c0d60224a9dd374a1427761a5c2eea9d6e",
+      "bytes": 371026
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_twigs_diff_1k.png",
+      "sha256": "581df52e36fa3ea1d348df6b84e276fb3c88ee33cc182c2987eff61bf3daa513",
+      "bytes": 1745129
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_twigs_nor_gl_1k.png",
+      "sha256": "cbb6b8179a9f7f6e84fd15d1f422bc342841d20845b2bad437612f03fb0067de",
+      "bytes": 1825146
+    },
+    {
+      "relative_path": "fir_sapling_medium/textures/fir_sapling_medium_twigs_rough_1k.png",
+      "sha256": "a4f0a4c8bc93946dea229def779ffe5d32c555c717e4bf7b0e4b4d86bc21987a",
+      "bytes": 1155354
+    },
+    {
+      "relative_path": "fir_sapling/fir_sapling_1k.fbx",
+      "sha256": "5eafd5fd2914639960238a6beef97c4d64be9fb0a5b690fd03d13b2291f71db1",
+      "bytes": 19037468
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_branches_diff_1k.png",
+      "sha256": "8813b75888f3d76ae8581a09b7f9fdb8d2b7b0d3c7977ba32be1678373eee657",
+      "bytes": 5653081
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_branches_nor_gl_1k.png",
+      "sha256": "86e1b91b1f7bfdf4505b465ea0e6271ed526d7a6354a0260119aa143bacc0671",
+      "bytes": 5778910
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_branches_rough_1k.png",
+      "sha256": "8d96bd806bd7ebe73b69ddc38516533f0a616c1bfd0e6670fe7a99a34b23e371",
+      "bytes": 1778567
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_twigs_alpha_1k.png",
+      "sha256": "91e8a6114e2f180de3d2fa60d397d69fee0d3c745a15e012da705c86cd4de976",
+      "bytes": 107682
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_twigs_diff_1k.png",
+      "sha256": "c29cb18884dc4cd24a72d0e39f01c1baeadb798d0fe3d196d82b8cb11b18f061",
+      "bytes": 1400815
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_twigs_nor_gl_1k.png",
+      "sha256": "5e1ca8d4c227fae4dab854028775b9cac49201966cb18817a1040194b33ec98b",
+      "bytes": 1549817
+    },
+    {
+      "relative_path": "fir_sapling/textures/fir_sapling_twigs_rough_1k.png",
+      "sha256": "64e351910b74d2450029713dc08f7cd1ff0bb0c0c5a17ce271a0c87527e38812",
+      "bytes": 431383
+    },
+    {
+      "relative_path": "fern_02/fern_02_1k.fbx",
+      "sha256": "6d8238b9cc1bbb5f5766396c2db26f2219c0d0e5ca226fb81dcc44bdb35045e8",
+      "bytes": 223596
+    },
+    {
+      "relative_path": "fern_02/textures/fern_02_alpha_1k.png",
+      "sha256": "ea3c64284c7ebdeedf484d2d816eae92825ec526140c3bb83859ddc7a64001f9",
+      "bytes": 114589
+    },
+    {
+      "relative_path": "fern_02/textures/fern_02_diff_1k.png",
+      "sha256": "f8f504bce117647f1df386cd7bc99a79c664bb49f82d1dd6412c83a700c48e94",
+      "bytes": 1986120
+    },
+    {
+      "relative_path": "fern_02/textures/fern_02_nor_gl_1k.png",
+      "sha256": "438c065c60754ad410c5b4690df6547d06d9907b8d2c9c3a908cb135ffd52b97",
+      "bytes": 3192675
+    },
+    {
+      "relative_path": "fern_02/textures/fern_02_rough_1k.png",
+      "sha256": "1485a265bcd40e5d9362c0ed56f9024df3ab5241dc9f83c8011165d2223c5d20",
+      "bytes": 374345
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSaplingMedium_fir_sapling_medium_a_LOD0.SM_FirSaplingMedium_fir_sapling_medium_a_LOD0",
+      "collection": "fir_sapling_medium",
+      "stratum": "canopy",
+      "preconfiguration_triangle_count_lod0": 4551,
+      "nanite_fallback_triangle_count_lod0": 4551,
+      "height_cm": 880.6455217301846,
+      "width_cm": 527.3018598556519,
+      "plausible_physical_height": true,
+      "base_z_cm": -7.722815126180649,
+      "base_contact_tolerance_cm": 22.016138043254614,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_medium_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_medium_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Twigs.M_FirSaplingMedium_Twigs"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_sapling_medium_branches_dead",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSaplingMedium_fir_sapling_medium_b_LOD0.SM_FirSaplingMedium_fir_sapling_medium_b_LOD0",
+      "collection": "fir_sapling_medium",
+      "stratum": "canopy",
+      "preconfiguration_triangle_count_lod0": 4250,
+      "nanite_fallback_triangle_count_lod0": 4250,
+      "height_cm": 778.6793224513531,
+      "width_cm": 426.60651206970215,
+      "plausible_physical_height": true,
+      "base_z_cm": -10.987662523984909,
+      "base_contact_tolerance_cm": 19.466983061283827,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_medium_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_medium_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Twigs.M_FirSaplingMedium_Twigs"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_sapling_medium_branches_dead",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSaplingMedium_fir_sapling_medium_c_LOD0.SM_FirSaplingMedium_fir_sapling_medium_c_LOD0",
+      "collection": "fir_sapling_medium",
+      "stratum": "canopy",
+      "preconfiguration_triangle_count_lod0": 5290,
+      "nanite_fallback_triangle_count_lod0": 5290,
+      "height_cm": 588.8458222150803,
+      "width_cm": 430.4030418395996,
+      "plausible_physical_height": true,
+      "base_z_cm": -13.447758555412292,
+      "base_contact_tolerance_cm": 14.721145555377007,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_medium_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_medium_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Twigs.M_FirSaplingMedium_Twigs"
+        },
+        {
+          "index": 2,
+          "slot_name": "fir_sapling_medium_branches_dead",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSapling_fir_sapling_a.SM_FirSapling_fir_sapling_a",
+      "collection": "fir_sapling",
+      "stratum": "sapling",
+      "preconfiguration_triangle_count_lod0": 3174,
+      "nanite_fallback_triangle_count_lod0": 3174,
+      "height_cm": 130.0737977027893,
+      "width_cm": 86.11465394496918,
+      "plausible_physical_height": true,
+      "base_z_cm": -0.7901787757873535,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSapling_fir_sapling_b.SM_FirSapling_fir_sapling_b",
+      "collection": "fir_sapling",
+      "stratum": "sapling",
+      "preconfiguration_triangle_count_lod0": 3785,
+      "nanite_fallback_triangle_count_lod0": 3785,
+      "height_cm": 95.15935136005282,
+      "width_cm": 81.75603151321411,
+      "plausible_physical_height": true,
+      "base_z_cm": -0.0009949319064617157,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_FirSapling_fir_sapling_c.SM_FirSapling_fir_sapling_c",
+      "collection": "fir_sapling",
+      "stratum": "sapling",
+      "preconfiguration_triangle_count_lod0": 3566,
+      "nanite_fallback_triangle_count_lod0": 3566,
+      "height_cm": 73.57000019401312,
+      "width_cm": 63.400521874427795,
+      "plausible_physical_height": true,
+      "base_z_cm": -0.007270835340023041,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fir_sapling_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches"
+        },
+        {
+          "index": 1,
+          "slot_name": "fir_sapling_twigs",
+          "role": "twigs",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_Fern02_fern_02_a.SM_Fern02_fern_02_a",
+      "collection": "fern_02",
+      "stratum": "understory",
+      "preconfiguration_triangle_count_lod0": 494,
+      "nanite_fallback_triangle_count_lod0": 494,
+      "height_cm": 28.680354543030262,
+      "width_cm": 61.34210824966431,
+      "plausible_physical_height": true,
+      "base_z_cm": -2.877351827919483,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fern_02",
+          "role": "fronds",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_Fern02_fern_02_b.SM_Fern02_fern_02_b",
+      "collection": "fern_02",
+      "stratum": "understory",
+      "preconfiguration_triangle_count_lod0": 1102,
+      "nanite_fallback_triangle_count_lod0": 1102,
+      "height_cm": 42.76947118341923,
+      "width_cm": 98.9747405052185,
+      "plausible_physical_height": true,
+      "base_z_cm": -3.0510280281305313,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fern_02",
+          "role": "fronds",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_Fern02_fern_02_c.SM_Fern02_fern_02_c",
+      "collection": "fern_02",
+      "stratum": "understory",
+      "preconfiguration_triangle_count_lod0": 1312,
+      "nanite_fallback_triangle_count_lod0": 1312,
+      "height_cm": 34.90203693509102,
+      "width_cm": 87.43258118629456,
+      "plausible_physical_height": true,
+      "base_z_cm": -2.877367287874222,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fern_02",
+          "role": "fronds",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/SM_Fern02_fern_02_d.SM_Fern02_fern_02_d",
+      "collection": "fern_02",
+      "stratum": "understory",
+      "preconfiguration_triangle_count_lod0": 524,
+      "nanite_fallback_triangle_count_lod0": 524,
+      "height_cm": 21.308755222707987,
+      "width_cm": 59.327828884124756,
+      "plausible_physical_height": true,
+      "base_z_cm": -1.3578944839537144,
+      "base_contact_tolerance_cm": 5.0,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "fern_02",
+          "role": "fronds",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds"
+        }
+      ]
+    }
+  ],
+  "variant_counts": {
+    "fir_sapling_medium": 3,
+    "fir_sapling": 3,
+    "fern_02": 4
+  },
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_Fern02_Fern02Alpha1K.T_Fern02_Fern02Alpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_Fern02_Fern02Diff1K.T_Fern02_Fern02Diff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_Fern02_Fern02NorGl1K.T_Fern02_Fern02NorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_Fern02_Fern02Rough1K.T_Fern02_Fern02Rough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumBranchesDiff1K.T_FirSaplingMedium_FirSaplingMediumBranchesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumBranchesNorGl1K.T_FirSaplingMedium_FirSaplingMediumBranchesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumBranchesRough1K.T_FirSaplingMedium_FirSaplingMediumBranchesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumTwigsAlpha1K.T_FirSaplingMedium_FirSaplingMediumTwigsAlpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumTwigsDiff1K.T_FirSaplingMedium_FirSaplingMediumTwigsDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumTwigsNorGl1K.T_FirSaplingMedium_FirSaplingMediumTwigsNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSaplingMedium_FirSaplingMediumTwigsRough1K.T_FirSaplingMedium_FirSaplingMediumTwigsRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingBranchesDiff1K.T_FirSapling_FirSaplingBranchesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingBranchesNorGl1K.T_FirSapling_FirSaplingBranchesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingBranchesRough1K.T_FirSapling_FirSaplingBranchesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingTwigsAlpha1K.T_FirSapling_FirSaplingTwigsAlpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingTwigsDiff1K.T_FirSapling_FirSaplingTwigsDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingTwigsNorGl1K.T_FirSapling_FirSaplingTwigsNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/T_FirSapling_FirSaplingTwigsRough1K.T_FirSapling_FirSaplingTwigsRough1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_Fern02_Fronds.M_Fern02_Fronds",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Branches.M_FirSaplingMedium_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSaplingMedium_Twigs.M_FirSaplingMedium_Twigs",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Branches.M_FirSapling_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuTemperateForestSet_1K/M_FirSapling_Twigs.M_FirSapling_Twigs"
+  ]
+}

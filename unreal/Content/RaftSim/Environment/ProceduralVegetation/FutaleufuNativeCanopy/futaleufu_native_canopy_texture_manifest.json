@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_textures.v3",
+  "generated_on": "2026-07-12",
+  "status": "first_party_coigue_texture_candidates_ready_for_isolated_unreal_review",
+  "production_promoted": false,
+  "species": {
+    "scientific_name": "Nothofagus dombeyi",
+    "common_names": [
+      "coigue",
+      "coihue"
+    ],
+    "scope": "first prototype species for the low-valley evergreen canopy band"
+  },
+  "sources": {
+    "bark": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Sources/coigue_bark_source_v1.png",
+      "sha256": "cbee0971ab5ec85f7caa41da4e343e1a59bb680981fbb709c3581d9f371f7b15",
+      "generator": "OpenAI built-in image generation",
+      "input_images_used": false,
+      "prompt_intent": "dark gray mature coigue bark with fine vertical fissures under diffuse scan lighting"
+    },
+    "leaf_atlas_chroma": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Sources/coigue_leaf_atlas_chroma_source_v2.png",
+      "sha256": "49a746951fe7956ad691280a4287bce7f70728a6e29f93da195caca83640ffba",
+      "generator": "OpenAI built-in image generation",
+      "input_images_used": true,
+      "reference_image": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Sources/coigue_leaf_atlas_chroma_source_v1.png",
+      "reference_role": "botanical and material study only; the v1 branch-spray layout was not retained",
+      "prompt_intent": "twelve isolated coigue leaf studies and four tiny three-to-five-leaf twigs arranged as a non-overlapping 4x4 chroma atlas"
+    }
+  },
+  "maps": {
+    "bark_albedo": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_bark_v1_albedo.png",
+      "sha256": "21ae53c1c68d0c70cfe235945b40bb6f8606ac0f5f7122004542e01c0a4282e3",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB base color",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "bark_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_bark_v1_normal.png",
+      "sha256": "bd76b19c70d2178d73f70ae84070375d49d2a3a39ee726131ddbfd68200cd206",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "bark_ao_roughness_height": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_bark_v1_ao_roughness_height.png",
+      "sha256": "71f20f9e990d6353b38279b2b8a86ac2735a783d815037a3b94fb26f2fc0a4d0",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=height",
+      "unreal_address_mode": "wrap",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "leaf_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_leaf_atlas_v2_albedo_opacity.png",
+      "sha256": "e68ffcadd16de0a289fc08ac62f23be3849d68c21ccffa3ccecf1f4b54e88aad",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "leaf_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_leaf_atlas_v2_normal.png",
+      "sha256": "a37edbd64e5bd5addb23e480e238d5ad4eaeb4c7f5470a86293c17890823273f",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    },
+    "leaf_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures/coigue_leaf_atlas_v2_ao_roughness_subsurface.png",
+      "sha256": "522fdfb18ddd24b78ec2a4f2430990107ab4a4c32df776de936073d82630f2c5",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "first_party_generated_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "derivation": {
+    "bark": "periodic opposite-edge feathering followed by deterministic wrapped relief derivation",
+    "leaf_alpha": "deterministic border-key chroma distance matte with soft edge cleanup and bounded despill",
+    "leaf_rgb_mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "c8b8ce2baab7a740417696a9e3cfdbcd5ad42458ed30828358922d473e1c18c6",
+      "nontransparent_rgb_sha256": "0a4101494bd6a579e8fc0390da9cc13bd2f51f0d9735d5e44e7a1095b552ae16",
+      "padded_transparent_pixel_count": 517669,
+      "transparent_nonzero_rgb_pixel_count": 517669
+    },
+    "leaf_surface": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates"
+  },
+  "unreal_contract": {
+    "texture_asset_root": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Textures",
+    "bark_material": "opaque DefaultLit; periodic UVs; packed surface channels",
+    "leaf_material": "masked TwoSidedFoliage; opacity from alpha; packed subsurface response",
+    "leaf_atlas_layout": {
+      "columns": 4,
+      "rows": 4,
+      "single_leaf_tiles": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "tiny_twig_tiles": [
+        12,
+        13,
+        14,
+        15
+      ],
+      "tile_bleed_inset": 0.012
+    },
+    "nanite": "enable PreserveArea on reviewed trunk geometry; retain full non-Nanite source geometry for masked leaf microcards because the isolated UE 5.8 comparison proved PreserveArea expands them into opaque triangles and None simplifies them away"
+  },
+  "provenance_and_fidelity_boundary": {
+    "project_owned_generated_sources": true,
+    "external_images_or_data_vendored": false,
+    "botanical_reference_contract": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/futaleufu_native_canopy_authoring_spec.json",
+    "generated_pixels_are_not_botanical_measurements": true,
+    "isolated_closeup_turntable_60m_150m_review_required": true,
+    "corridor_use_before_visual_acceptance_forbidden": true
+  }
+}

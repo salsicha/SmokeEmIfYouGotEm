@@ -1,0 +1,241 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_pine_tree_01_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "pine_tree_01_1k.fbx",
+      "sha256": "b220661091fb81046d9af751259c5d3e4f1cde3b79b48cdaddc79b4762515dc3",
+      "bytes": 648483964
+    },
+    {
+      "relative_path": "textures/pine_tree_01_bark_diff_1k.png",
+      "sha256": "91e79e9bd1d5d68922262b4eee752808c49c55c2941b531a65b586dae8984bc9",
+      "bytes": 5568559
+    },
+    {
+      "relative_path": "textures/pine_tree_01_bark_disp_1k.png",
+      "sha256": "8cce79758590f833bd8435c428110bcd656ff8e242c899acbd416b6eeb7e8606",
+      "bytes": 1633203
+    },
+    {
+      "relative_path": "textures/pine_tree_01_bark_nor_gl_1k.png",
+      "sha256": "d0cdc8ff2f74da8023a1f18512f9db643284d94a698a4ac491f63c4c11c95211",
+      "bytes": 5640903
+    },
+    {
+      "relative_path": "textures/pine_tree_01_bark_rough_1k.png",
+      "sha256": "63c3785c47a2f4193e5054d9f8481da0bd41bc2bfc1a993cd8785fad6339fe97",
+      "bytes": 2488380
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_a_diff_1k.png",
+      "sha256": "50e8911ac39d8eeb720d7412495d00f8639f2a0ad01dec1c22aa79efc16e9f08",
+      "bytes": 5013819
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_a_nor_gl_1k.png",
+      "sha256": "e1dfe1dcfd4d92eb7dd732cff98ac32c8a3aa5a36b9eea220e22030ea604ec09",
+      "bytes": 4338077
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_a_rough_1k.png",
+      "sha256": "ebda61e833608c3df8d65018330c9e0bb80ec39b30d9416de0cc088c520ca8b6",
+      "bytes": 1656557
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_b_diff_1k.png",
+      "sha256": "41bd8a65e0a827646b3a33dc1607eba2082ddc25fe714752259447c49d0600cc",
+      "bytes": 4847111
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_b_nor_gl_1k.png",
+      "sha256": "fe5f1dafe611a7f04142abf7878622a6212ed7c1737711d548ec3301b3210cf7",
+      "bytes": 4129931
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_b_rough_1k.png",
+      "sha256": "ff399f6d054f903deee0e4d455c09f12ac3441f5c9547a0e9d06c163e6958dee",
+      "bytes": 1626272
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_c_diff_1k.png",
+      "sha256": "edbceb8657a036e98831a3550433ab2d78928fcf9060e400ca84748cedcaf962",
+      "bytes": 5140137
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_c_nor_gl_1k.png",
+      "sha256": "08a40a7486ad3a8d97cf3da0afe5951f1a038cb51395020e2c4a2113f46d1610",
+      "bytes": 4450875
+    },
+    {
+      "relative_path": "textures/pine_tree_01_trunk_c_rough_1k.png",
+      "sha256": "48fcced840b4beed4e03e09a352a67dd36185c9cd4247090069391bfb9746de9",
+      "bytes": 1722380
+    },
+    {
+      "relative_path": "textures/pine_tree_01_twig_diff_1k.png",
+      "sha256": "d02c031de64b8ad671f3dd0da19870fa4783d912ae6674aeab0702871deeaeaa",
+      "bytes": 3208228
+    },
+    {
+      "relative_path": "textures/pine_tree_01_twig_nor_gl_1k.png",
+      "sha256": "4b79eda7fe8843d71f9289bd0d3897a1b0a7310b1872b390a589a04b510b0597",
+      "bytes": 3021524
+    },
+    {
+      "relative_path": "textures/pine_tree_01_twig_rough_1k.png",
+      "sha256": "c12da3dd6c1588f50307d96807d78115757f110bc562811369d90b86bd6fddc7",
+      "bytes": 1342516
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_a_LOD0.SM_PineTree01_pine_tree_01_a_LOD0",
+      "nanite_fallback_triangle_count_lod0": 4027,
+      "height_cm": 2034.9239975214005,
+      "plausible_tree_height": true,
+      "base_z_cm": -6.314149498939514,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "pine_tree_01_bark",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "pine_tree_01_trunk_a",
+          "role": "trunk_a",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkA.M_PineTree01_TrunkA"
+        },
+        {
+          "index": 2,
+          "slot_name": "pine_tree_01_twig",
+          "role": "needles",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"
+        },
+        {
+          "index": 3,
+          "slot_name": "pine_tree_01_dead_branches",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_b_LOD0.SM_PineTree01_pine_tree_01_b_LOD0",
+      "nanite_fallback_triangle_count_lod0": 3432,
+      "height_cm": 1486.7447659373283,
+      "plausible_tree_height": true,
+      "base_z_cm": -7.669620215892792,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "pine_tree_01_bark",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "pine_tree_01_twig",
+          "role": "needles",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"
+        },
+        {
+          "index": 2,
+          "slot_name": "pine_tree_01_dead_branches",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        },
+        {
+          "index": 3,
+          "slot_name": "pine_tree_01_trunk_b",
+          "role": "trunk_b",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkB.M_PineTree01_TrunkB"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/SM_PineTree01_pine_tree_01_c_LOD0.SM_PineTree01_pine_tree_01_c_LOD0",
+      "nanite_fallback_triangle_count_lod0": 4428,
+      "height_cm": 1750.995896011591,
+      "plausible_tree_height": true,
+      "base_z_cm": -7.408211380243301,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "pine_tree_01_bark",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        },
+        {
+          "index": 1,
+          "slot_name": "pine_tree_01_twig",
+          "role": "needles",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"
+        },
+        {
+          "index": 2,
+          "slot_name": "pine_tree_01_dead_branches",
+          "role": "bark",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark"
+        },
+        {
+          "index": 3,
+          "slot_name": "pine_tree_01_trunk_c",
+          "role": "trunk_c",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkC.M_PineTree01_TrunkC"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_BarkDiff1K.T_PineTree01_BarkDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_BarkDisp1K.T_PineTree01_BarkDisp1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_BarkNorGl1K.T_PineTree01_BarkNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_BarkRough1K.T_PineTree01_BarkRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkADiff1K.T_PineTree01_TrunkADiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkANorGl1K.T_PineTree01_TrunkANorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkARough1K.T_PineTree01_TrunkARough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkBDiff1K.T_PineTree01_TrunkBDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkBNorGl1K.T_PineTree01_TrunkBNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkBRough1K.T_PineTree01_TrunkBRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkCDiff1K.T_PineTree01_TrunkCDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkCNorGl1K.T_PineTree01_TrunkCNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TrunkCRough1K.T_PineTree01_TrunkCRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TwigDiff1K.T_PineTree01_TwigDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TwigNorGl1K.T_PineTree01_TwigNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/T_PineTree01_TwigRough1K.T_PineTree01_TwigRough1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_Bark.M_PineTree01_Bark",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkA.M_PineTree01_TrunkA",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkB.M_PineTree01_TrunkB",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/M_PineTree01_TrunkC.M_PineTree01_TrunkC"
+  ]
+}

@@ -1,0 +1,160 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_visual_review.v7",
+  "reviewed_on": "2026-07-12",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "prototype_revision": "v7_parameterized_crown_form_family",
+  "status": "rejected_at_family_density_and_ecology_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCoigue_CrownFormFamily_IsolatedReview",
+  "accepted_findings": [
+    "Open-grown adult, intermediate, and forest-grown adult are independently generated static-mesh families with different deterministic seeds and authored live-crown, width, uplift, asymmetry, trunk, branch-count, and interior-density parameters; none is a transformed copy.",
+    "The three forms read as materially different silhouettes in both turntable azimuths and at the 60 m and 150 m proxies.",
+    "Bounded BarkBaseColorScale, BarkAOInfluence, LeafBaseColorScale, LeafAOInfluence, and LeafTransmissionTint controls improve leaf and interior-crown readability under fixed exposure without emissive fill.",
+    "All fifteen Metal captures completed after a zero-error, zero-warning map check and no material compile errors."
+  ],
+  "rejection_reasons": [
+    "Three crown-form prototypes do not satisfy the authoring contract for at least five adult variants and three intermediate variants across three age classes.",
+    "The crowns still expose repeated horizontal shelf spacing and a procedural radial cadence, especially in the open-grown form; damage history, competition response, and crown gaps need per-instance structural variation.",
+    "The closeups remain too sparse and diagrammatic for a photoreal foreground asset: twig and leaf density is low, branch intersections remain visible, and bark response still collapses too dark on the unlit trunk side.",
+    "Temporal wind coherence, measured performance, ecology-set composition, and a source-matched corridor comparison remain untested."
+  ],
+  "crown_form_contract": {
+    "required_forms": [
+      "open_grown_adult",
+      "intermediate",
+      "forest_grown_adult"
+    ],
+    "captured_forms": [
+      "open_grown_adult",
+      "intermediate",
+      "forest_grown_adult"
+    ],
+    "independent_geometry_assets": true,
+    "transformed_copy_count": 0,
+    "views_per_form": 5,
+    "full_ecology_variant_contract_satisfied": false
+  },
+  "photometry_contract": {
+    "fixed_exposure": true,
+    "emissive_fill": false,
+    "exposed_material_parameters": [
+      "BarkBaseColorScale",
+      "BarkAOInfluence",
+      "LeafBaseColorScale",
+      "LeafAOInfluence",
+      "LeafTransmissionTint"
+    ],
+    "leaf_and_interior_readability_improved": true,
+    "shadow_side_bark_readability_accepted": false
+  },
+  "review_contract": {
+    "unreal_version": "5.8",
+    "rendering_backend": "Metal",
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "material_compile_errors": 0,
+    "capture_count": 15,
+    "capture_hash_scope": "identifies the authoritative final review run; byte-for-byte cross-run determinism is not claimed"
+  },
+  "captures": [
+    {
+      "form": "open_grown_adult",
+      "view": "turntable_azimuth_035",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_035.png",
+      "sha256": "ddd9647ead7e94629e27ae8e9b23d397e15a3a7e89106ea72d5f372b724affb9"
+    },
+    {
+      "form": "open_grown_adult",
+      "view": "turntable_azimuth_145",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_145.png",
+      "sha256": "9dd7dcd4d820f59bc56b65cf4d805a3d96ecfd7e2b06afb97767940c3c00d1f1"
+    },
+    {
+      "form": "open_grown_adult",
+      "view": "bark_leaf_closeup",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/bark_leaf_closeup.png",
+      "sha256": "3b12a23eb501952d4c9d64c0f9bd7874ce000b6f653617c4d8fc3f2d14409a38"
+    },
+    {
+      "form": "open_grown_adult",
+      "view": "river_distance_60m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_60m.png",
+      "sha256": "119c4e9fe18e88840769627458f00395af39845dbc5976a039ace1ddf816fc86"
+    },
+    {
+      "form": "open_grown_adult",
+      "view": "river_distance_150m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_150m.png",
+      "sha256": "2825653de7b6038a79f901c9b26d48e3e0ae187bfe47bcd13d75e093ed3ae7b4"
+    },
+    {
+      "form": "intermediate",
+      "view": "turntable_azimuth_035",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_035.png",
+      "sha256": "9c0133e2f7ca471dd49339c868827cdfa1a557c4afeb48af55c1aa306fe271a1"
+    },
+    {
+      "form": "intermediate",
+      "view": "turntable_azimuth_145",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_145.png",
+      "sha256": "4815e43bac0b3c6f96c146e6d6aa5cf5d9a9e7423e90eed6ad8b876821c42b37"
+    },
+    {
+      "form": "intermediate",
+      "view": "bark_leaf_closeup",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/bark_leaf_closeup.png",
+      "sha256": "8be7f9f176940bb56b6754dabd9118df652cd72bd38cc2a47523e00d8d64e36e"
+    },
+    {
+      "form": "intermediate",
+      "view": "river_distance_60m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_60m.png",
+      "sha256": "f806fca1befc0447a6c82a30e20a8ab0a212ccb964338c8b7bde930d177425b7"
+    },
+    {
+      "form": "intermediate",
+      "view": "river_distance_150m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_150m.png",
+      "sha256": "5fe27a7eb054f2eeeb9788686c6530c38c6004f5fdc8e4e7a3ae2f39813a6194"
+    },
+    {
+      "form": "forest_grown_adult",
+      "view": "turntable_azimuth_035",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_035.png",
+      "sha256": "6945ae311f4a55bbd93f9c84ef71d96fe7145b1f9e5ad28f461b9c17b90beac7"
+    },
+    {
+      "form": "forest_grown_adult",
+      "view": "turntable_azimuth_145",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_145.png",
+      "sha256": "07e70cf36f30a42089a70ef693669fde30bd999429d9b01e8f072e1284c66996"
+    },
+    {
+      "form": "forest_grown_adult",
+      "view": "bark_leaf_closeup",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/bark_leaf_closeup.png",
+      "sha256": "fbde129ee01dcd9a8b15a32d88bc8609de4176d0dea04bcf87a204aff21e6318"
+    },
+    {
+      "form": "forest_grown_adult",
+      "view": "river_distance_60m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_60m.png",
+      "sha256": "ed4b018e5c00594dc6f0d3136747907ea143a31c3bd265202c6b454ed42c6ff1"
+    },
+    {
+      "form": "forest_grown_adult",
+      "view": "river_distance_150m",
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_150m.png",
+      "sha256": "19e81b9842656c4c6fcc4e883dfb917d2fc26f0e2a481a23c89412e34c436cdd"
+    }
+  ],
+  "next_iteration_requirements": [
+    "Add at least three more independently seeded adult forms and two more intermediate forms with storm damage, competition lean, crown gaps, and suppressed-side branching.",
+    "Increase foreground twig and leaf density while removing visible intersections and repeated radial shelf cadence.",
+    "Tune shadow-side bark response against source references without changing fixed exposure or adding emissive fill.",
+    "Run temporal wind, measured performance, mixed-species ecology, and source-matched corridor gates before any production substitution."
+  ]
+}

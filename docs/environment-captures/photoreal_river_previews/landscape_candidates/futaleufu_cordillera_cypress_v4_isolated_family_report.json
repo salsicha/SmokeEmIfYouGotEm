@@ -1,0 +1,417 @@
+{
+	"schema": "raftsim.unreal.futaleufu_cordillera_cypress_isolated_family.v4",
+	"status": "v4_eight_form_isolated_unreal_family_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"species": "Austrocedrus chilensis",
+	"river_id": "futaleufu_terminator",
+	"map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCordilleraCypress_V4_EightForm_IsolatedReview",
+	"map_saved": true,
+	"geometry_contract_passed": true,
+	"form_count": 8,
+	"adult_form_count": 5,
+	"intermediate_form_count": 3,
+	"authoring_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_authoring_manifest.json",
+	"texture_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_texture_manifest.json",
+	"foliage_representation": "V4 five-shoot volumetric terminal clusters with two irregular scale-leaf sub-sprays per short tapered shoot",
+	"terminal_cluster_shoot_count": 5,
+	"sprays_per_terminal_cluster_shoot": 2,
+	"shadow_policy": "initial isolated spray shadows disabled; production shadow treatment remains gated by V23",
+	"forms": [
+		{
+			"id": "open_grown_conical",
+			"display_name": "open-grown conical adult",
+			"life_stage": "adult",
+			"seed_offset": 18427,
+			"height_cm": 2400,
+			"base_radius_cm": 82,
+			"crown_base_cm": 360,
+			"crown_radius_cm": 620,
+			"branch_count": 46,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_OpenGrownConicalAdult_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_OpenGrownConicalAdult_V4_Sprays",
+			"woody_source_vertices": 110928,
+			"woody_source_triangles": 110928,
+			"spray_source_cards": 23600,
+			"spray_source_triangles": 47200,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "closed_grove_columnar",
+			"display_name": "closed-grove columnar adult",
+			"life_stage": "adult",
+			"seed_offset": 22409,
+			"height_cm": 2500,
+			"base_radius_cm": 68,
+			"crown_base_cm": 650,
+			"crown_radius_cm": 390,
+			"branch_count": 44,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_ClosedGroveColumnarAdult_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_ClosedGroveColumnarAdult_V4_Sprays",
+			"woody_source_vertices": 106140,
+			"woody_source_triangles": 106140,
+			"spray_source_cards": 22580,
+			"spray_source_triangles": 45160,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "rocky_slope_asymmetric",
+			"display_name": "rocky-slope asymmetric adult",
+			"life_stage": "adult",
+			"seed_offset": 26407,
+			"height_cm": 2100,
+			"base_radius_cm": 72,
+			"crown_base_cm": 450,
+			"crown_radius_cm": 540,
+			"branch_count": 40,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_RockySlopeAsymmetricAdult_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_RockySlopeAsymmetricAdult_V4_Sprays",
+			"woody_source_vertices": 96564,
+			"woody_source_triangles": 96564,
+			"spray_source_cards": 20540,
+			"spray_source_triangles": 41080,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "storm_damaged",
+			"display_name": "storm-damaged adult",
+			"life_stage": "adult",
+			"seed_offset": 30403,
+			"height_cm": 2050,
+			"base_radius_cm": 76,
+			"crown_base_cm": 390,
+			"crown_radius_cm": 560,
+			"branch_count": 42,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_StormDamagedAdult_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_StormDamagedAdult_V4_Sprays",
+			"woody_source_vertices": 90504,
+			"woody_source_triangles": 90504,
+			"spray_source_cards": 19160,
+			"spray_source_triangles": 38320,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "coigue_transition_edge",
+			"display_name": "coigue-transition edge adult",
+			"life_stage": "adult",
+			"seed_offset": 34403,
+			"height_cm": 2300,
+			"base_radius_cm": 74,
+			"crown_base_cm": 520,
+			"crown_radius_cm": 520,
+			"branch_count": 43,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_CoigueTransitionEdgeAdult_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_CoigueTransitionEdgeAdult_V4_Sprays",
+			"woody_source_vertices": 103746,
+			"woody_source_triangles": 103746,
+			"spray_source_cards": 22070,
+			"spray_source_triangles": 44140,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "grove_intermediate",
+			"display_name": "grove intermediate",
+			"life_stage": "intermediate",
+			"seed_offset": 38401,
+			"height_cm": 1300,
+			"base_radius_cm": 38,
+			"crown_base_cm": 260,
+			"crown_radius_cm": 290,
+			"branch_count": 30,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_GroveIntermediate_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_GroveIntermediate_V4_Sprays",
+			"woody_source_vertices": 72624,
+			"woody_source_triangles": 72624,
+			"spray_source_cards": 15440,
+			"spray_source_triangles": 30880,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "suppressed_intermediate",
+			"display_name": "suppressed intermediate",
+			"life_stage": "intermediate",
+			"seed_offset": 42397,
+			"height_cm": 850,
+			"base_radius_cm": 24,
+			"crown_base_cm": 300,
+			"crown_radius_cm": 165,
+			"branch_count": 24,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_SuppressedIntermediate_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_SuppressedIntermediate_V4_Sprays",
+			"woody_source_vertices": 58260,
+			"woody_source_triangles": 58260,
+			"spray_source_cards": 12380,
+			"spray_source_triangles": 24760,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		},
+		{
+			"id": "released_intermediate",
+			"display_name": "released intermediate",
+			"life_stage": "intermediate",
+			"seed_offset": 46381,
+			"height_cm": 1500,
+			"base_radius_cm": 44,
+			"crown_base_cm": 250,
+			"crown_radius_cm": 370,
+			"branch_count": 34,
+			"woody_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_ReleasedIntermediate_V4_Woody",
+			"spray_asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Meshes/SM_RaftSim_FutaleufuCordilleraCypress_ReleasedIntermediate_V4_Sprays",
+			"woody_source_vertices": 81560,
+			"woody_source_triangles": 81560,
+			"spray_source_cards": 17320,
+			"spray_source_triangles": 34640,
+			"woody_nanite_enabled": false,
+			"spray_nanite_enabled": false
+		}
+	],
+	"captures": [
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_open_grown_conical_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_OpenGrownConicalAdult_Turntable035",
+			"capture_id": "open_grown_conical_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_open_grown_conical_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_OpenGrownConicalAdult_Turntable145",
+			"capture_id": "open_grown_conical_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_open_grown_conical_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_OpenGrownConicalAdult_BarkSprayCloseup",
+			"capture_id": "open_grown_conical_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_open_grown_conical_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_OpenGrownConicalAdult_RiverDistance60m",
+			"capture_id": "open_grown_conical_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_open_grown_conical_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_OpenGrownConicalAdult_RiverDistance150m",
+			"capture_id": "open_grown_conical_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_closed_grove_columnar_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_ClosedGroveColumnarAdult_Turntable035",
+			"capture_id": "closed_grove_columnar_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_closed_grove_columnar_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_ClosedGroveColumnarAdult_Turntable145",
+			"capture_id": "closed_grove_columnar_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_closed_grove_columnar_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_ClosedGroveColumnarAdult_BarkSprayCloseup",
+			"capture_id": "closed_grove_columnar_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_closed_grove_columnar_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_ClosedGroveColumnarAdult_RiverDistance60m",
+			"capture_id": "closed_grove_columnar_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_closed_grove_columnar_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_ClosedGroveColumnarAdult_RiverDistance150m",
+			"capture_id": "closed_grove_columnar_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_rocky_slope_asymmetric_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_RockySlopeAsymmetricAdult_Turntable035",
+			"capture_id": "rocky_slope_asymmetric_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_rocky_slope_asymmetric_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_RockySlopeAsymmetricAdult_Turntable145",
+			"capture_id": "rocky_slope_asymmetric_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_rocky_slope_asymmetric_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_RockySlopeAsymmetricAdult_BarkSprayCloseup",
+			"capture_id": "rocky_slope_asymmetric_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_rocky_slope_asymmetric_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_RockySlopeAsymmetricAdult_RiverDistance60m",
+			"capture_id": "rocky_slope_asymmetric_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_rocky_slope_asymmetric_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_RockySlopeAsymmetricAdult_RiverDistance150m",
+			"capture_id": "rocky_slope_asymmetric_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_storm_damaged_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_StormDamagedAdult_Turntable035",
+			"capture_id": "storm_damaged_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_storm_damaged_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_StormDamagedAdult_Turntable145",
+			"capture_id": "storm_damaged_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_storm_damaged_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_StormDamagedAdult_BarkSprayCloseup",
+			"capture_id": "storm_damaged_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_storm_damaged_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_StormDamagedAdult_RiverDistance60m",
+			"capture_id": "storm_damaged_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_storm_damaged_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_StormDamagedAdult_RiverDistance150m",
+			"capture_id": "storm_damaged_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_coigue_transition_edge_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_CoigueTransitionEdgeAdult_Turntable035",
+			"capture_id": "coigue_transition_edge_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_coigue_transition_edge_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_CoigueTransitionEdgeAdult_Turntable145",
+			"capture_id": "coigue_transition_edge_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_coigue_transition_edge_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_CoigueTransitionEdgeAdult_BarkSprayCloseup",
+			"capture_id": "coigue_transition_edge_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_coigue_transition_edge_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_CoigueTransitionEdgeAdult_RiverDistance60m",
+			"capture_id": "coigue_transition_edge_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_coigue_transition_edge_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_CoigueTransitionEdgeAdult_RiverDistance150m",
+			"capture_id": "coigue_transition_edge_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_grove_intermediate_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_GroveIntermediate_Turntable035",
+			"capture_id": "grove_intermediate_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_grove_intermediate_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_GroveIntermediate_Turntable145",
+			"capture_id": "grove_intermediate_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_grove_intermediate_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_GroveIntermediate_BarkSprayCloseup",
+			"capture_id": "grove_intermediate_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_grove_intermediate_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_GroveIntermediate_RiverDistance60m",
+			"capture_id": "grove_intermediate_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_grove_intermediate_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_GroveIntermediate_RiverDistance150m",
+			"capture_id": "grove_intermediate_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_suppressed_intermediate_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_SuppressedIntermediate_Turntable035",
+			"capture_id": "suppressed_intermediate_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_suppressed_intermediate_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_SuppressedIntermediate_Turntable145",
+			"capture_id": "suppressed_intermediate_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_suppressed_intermediate_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_SuppressedIntermediate_BarkSprayCloseup",
+			"capture_id": "suppressed_intermediate_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_suppressed_intermediate_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_SuppressedIntermediate_RiverDistance60m",
+			"capture_id": "suppressed_intermediate_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_suppressed_intermediate_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_SuppressedIntermediate_RiverDistance150m",
+			"capture_id": "suppressed_intermediate_river_distance_150m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_released_intermediate_turntable_azimuth_035.png",
+			"camera": "RaftSim_CordilleraCypress_ReleasedIntermediate_Turntable035",
+			"capture_id": "released_intermediate_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_released_intermediate_turntable_azimuth_145.png",
+			"camera": "RaftSim_CordilleraCypress_ReleasedIntermediate_Turntable145",
+			"capture_id": "released_intermediate_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_released_intermediate_bark_spray_closeup.png",
+			"camera": "RaftSim_CordilleraCypress_ReleasedIntermediate_BarkSprayCloseup",
+			"capture_id": "released_intermediate_bark_spray_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_released_intermediate_river_distance_60m.png",
+			"camera": "RaftSim_CordilleraCypress_ReleasedIntermediate_RiverDistance60m",
+			"capture_id": "released_intermediate_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_released_intermediate_river_distance_150m.png",
+			"camera": "RaftSim_CordilleraCypress_ReleasedIntermediate_RiverDistance150m",
+			"capture_id": "released_intermediate_river_distance_150m",
+			"captured": true
+		}
+	],
+	"promotion_boundary": "human visual acceptance, temporal wind, LOD, mixed-ecology corridor, true-north placement, packaged desktop, and on-device VR evidence remain required"
+}

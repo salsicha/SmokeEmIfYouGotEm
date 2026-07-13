@@ -1,0 +1,76 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_visual_review.v3",
+  "candidate_id": "first_party_futaleufu_coigue_adult_prototype_v3",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "status": "rejected_at_shoot_density_and_crown_mass_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "retain_split_nanite_topology_findings_for_v4_dense_shoot_authoring",
+  "prototype_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "accepted_evidence": [
+    "The near representation replaces the v2 independent-card volume with 260 deterministic anchors, four secondary branchlets per anchor, two tertiary branches per branchlet, and 14560 single-leaf cards attached through modeled petioles.",
+    "No near leaf card is authored without an attachment point; the runtime report records floating_near_card_count as zero.",
+    "A controlled two-run Unreal comparison proves centimeter-scale woody detail cannot share the Nanite PreserveArea trunk mesh: the merged run expanded branchlets into pale wedges, while the selected split retains 201760 branchlet vertices and 126880 triangles in a non-Nanite bark mesh.",
+    "The structural trunk remains Nanite PreserveArea, masked near/far foliage and branchlets retain full non-Nanite geometry, and the near branchlet/leaf meshes share a 36 m maximum draw distance.",
+    "The isolated UE 5.8 Metal map passes map check with zero errors and warnings and captures all five required views."
+  ],
+  "nanite_comparison": {
+    "structural_trunk": "accepted_with_nanite_preserve_area",
+    "merged_centimeter_branchlets_and_petioles": "rejected_because_preserve_area_expanded_microgeometry_into_large_pale_wedges",
+    "selected_branchlet_path": "separate_non_nanite_mesh_full_source_geometry_retained_with_near_leaf_cull_distance",
+    "masked_foliage_selected_path": "nanite_disabled_full_source_geometry_retained",
+    "scope": "UE 5.8 offscreen Metal isolated prototype"
+  },
+  "rejection_reasons": [
+    "The main-limb distribution remains visibly tiered and sparse, so the whole-tree silhouette still reads as a pruned or conifer-like procedural tree rather than a dense irregular evergreen coigue crown.",
+    "The closeup proves branchlet and petiole geometry now exists, but the branchlets are overlong, cross through one another, and carry leaves too small and infrequent to read as coherent dense shoots.",
+    "The far representation preserves a clean silhouette after the split, but its repeated horizontal foliage shelves do not provide the layered crown mass required for a photoreal river corridor.",
+    "Only one open-grown adult form exists; forest-grown adult, intermediate, juvenile, damaged, and deadwood variants remain absent.",
+    "No corridor ecology placement, wind-motion capture, guide or ecology review, or measured desktop and VR performance evidence exists."
+  ],
+  "review_contract": {
+    "engine_version": "5.8",
+    "rhi": "offscreen Metal",
+    "capture_resolution": [1280, 720],
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "views": [
+      "turntable azimuth 35 degrees",
+      "turntable azimuth 145 degrees",
+      "lower-branch bark, branchlet, petiole, and leaf closeup",
+      "60 m far-crown proxy",
+      "150 m far-crown proxy"
+    ],
+    "capture_storage": "local ignored Unreal Saved directory",
+    "capture_redistribution": "not approved; hashes and reproducible paths only are retained in the open-source repository"
+  },
+  "captures": [
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_035.png",
+      "sha256": "7f57321c221f43d9294fbd973d9623df8c15d009f5a8e51816dce5589718b62c"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_145.png",
+      "sha256": "d399f454783ed3eacb3a05c5f0634a810e2a7f0ec298b7bd218a1d66376e1e6a"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/bark_leaf_closeup.png",
+      "sha256": "1f0dca3866ced00080bdf2c98779a76a015cb3a93d73835bd2ff5d603da921df"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_60m.png",
+      "sha256": "49147fa9274cfd1ed42f970bb94d8dad3417f29325bbbcf30750d732fdc4603e"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_150m.png",
+      "sha256": "a1b7fb6e2c156ac650330fc271f2632e93a221a55ee51c7c3150cb70a9231bdc"
+    }
+  ],
+  "next_iteration_requirements": [
+    "Replace long radial branchlets with short source-matched shoots whose petiole spacing and leaf density produce coherent local clusters without intersections.",
+    "Author a broad irregular crown envelope with clustered gaps instead of vertically repeated horizontal shelves.",
+    "Create open-grown adult, forest-grown adult, and intermediate forms before another corridor comparison.",
+    "Repeat all five views and require both closeup shoot morphology and 60/150 m crown-mass acceptance before ecology placement or corridor promotion."
+  ]
+}

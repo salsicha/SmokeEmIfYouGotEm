@@ -1,0 +1,53 @@
+{
+  "schema": "raftsim.unreal.named_rapid_editor_data_asset_generation_report.v1",
+  "run_date": "2026-07-12",
+  "status": "compiled_and_saved_shutdown_required_manual_interrupt_after_quit",
+  "production_promoted": false,
+  "editor_version": "Unreal Engine 5.8",
+  "compile": {
+    "target": "SmokeEmIfYouGotEmEditor Mac Development",
+    "result": "succeeded"
+  },
+  "inputs": {
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
+    "editor_geometry": "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson",
+    "simulator_review_runs": "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json",
+    "marker_count": 80,
+    "candidate_geometry_count": 45,
+    "run_definition_count": 423
+  },
+  "saved_assets": [
+    "unreal/Content/RaftSim/Tools/Reviewed/DA_RaftSimToolRegistry.uasset",
+    "unreal/Content/RaftSim/Tools/Reviewed/DA_ReplayDebugViewer.uasset",
+    "unreal/Content/RaftSim/Tools/Reviewed/DA_RapidRiverEditorShell.uasset",
+    "unreal/Content/RaftSim/Tools/Reviewed/DA_FeatureTuningEditorShell.uasset",
+    "unreal/Content/RaftSim/Tools/Reviewed/DA_ToolValidationActions.uasset"
+  ],
+  "live_browser": {
+    "status": "loaded_and_captured",
+    "marker_count": 80,
+    "run_definition_count": 423,
+    "filters": ["text", "river", "flow", "priority", "station_authority", "exact_or_candidate_geometry", "guide_review", "execution_status"],
+    "provisional_station_badge": true,
+    "capture": "docs/tool-captures/milestone25a/RapidRiverEditor.png",
+    "capture_fix": "activate each dock tab in its parent and tick Slate before capture so hidden-tab layout does not produce clipped or blank evidence"
+  },
+  "automation": {
+    "command": "RaftSim.CreateReviewedDataAssets",
+    "save_result": "all_five_assets_saved",
+    "helper_fix": "load existing reviewed asset before updating and saving its package",
+    "shutdown_result": "Quit was logged after successful saves, but the macOS offscreen process remained alive until an interrupt and then exited with code 0"
+  },
+  "platform_sdk_observation": {
+    "valid_on_host": ["Mac", "IOS", "TVOS", "VisionOS"],
+    "not_installed_or_invalid_on_host": ["Win64", "Linux", "LinuxArm64", "Android"],
+    "meaning": "This host compile proves the Mac editor integration only; target-platform packaging and performance evidence remain open."
+  },
+  "remaining_gates": [
+    "replace provisional stations with exact reviewed geometry",
+    "bind run definitions to validated C++ water windows and guide lines",
+    "execute and capture telemetry and video",
+    "validate target platform SDKs, builds, performance, and behavior parity"
+  ]
+}

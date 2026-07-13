@@ -1,0 +1,119 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_futaleufu_island_tree_set_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "Futaleufu adult dense broadleaf crown-mass, silhouette variation, distance-stability, material, and Nanite comparison only",
+  "sources": [
+    {
+      "title": "Island Tree 01",
+      "publisher": "Poly Haven",
+      "authors": [
+        "Rico Cilliers",
+        "Rob Tuytel"
+      ],
+      "asset_url": "https://polyhaven.com/a/island_tree_01",
+      "license": "CC0 1.0 Universal",
+      "license_url": "https://polyhaven.com/license",
+      "downloaded_package": "1K FBX plus selected PNG material maps",
+      "publisher_width_m": 12.5,
+      "publisher_triangle_count_label": "4M"
+    },
+    {
+      "title": "Island Tree 02",
+      "publisher": "Poly Haven",
+      "authors": [
+        "Rico Cilliers",
+        "Rob Tuytel"
+      ],
+      "asset_url": "https://polyhaven.com/a/island_tree_02",
+      "license": "CC0 1.0 Universal",
+      "license_url": "https://polyhaven.com/license",
+      "downloaded_package": "1K FBX plus selected PNG material maps",
+      "publisher_width_m": 8.5,
+      "publisher_triangle_count_label": "2M"
+    },
+    {
+      "title": "Island Tree 03",
+      "publisher": "Poly Haven",
+      "authors": [
+        "Rico Cilliers",
+        "Rob Tuytel"
+      ],
+      "asset_url": "https://polyhaven.com/a/island_tree_03",
+      "license": "CC0 1.0 Universal",
+      "license_url": "https://polyhaven.com/license",
+      "downloaded_package": "1K FBX plus selected PNG material maps",
+      "publisher_width_m": 8.5,
+      "publisher_triangle_count_label": "5M"
+    }
+  ],
+  "acquisition": {
+    "method": "direct asset-page file links from dl.polyhaven.org",
+    "public_api_used": false,
+    "source_bundle_committed": false,
+    "acquired_for_review_date": "2026-07-11"
+  },
+  "review_boundaries": {
+    "futaleufu_species_approval": "not_reviewed_dense_coastal_broadleaf_structure_analog_only_not_native_nothofagus_or_exact_patagonian_species_identity",
+    "river_guide_visual_approval": "not_reviewed",
+    "ecology_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "seasonal_state_approval": "not_reviewed",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material, pivot, scale, crown-width, Nanite, and distance-stability validation",
+      "bounded source-mask-aware Futaleufu Landscape candidate visual comparison captures"
+    ],
+    "blocked_now": [
+      "claiming native Patagonian or Nothofagus species identity",
+      "automatic production foliage replacement",
+      "claiming lifelike environment completion",
+      "shipping before ecology, guide, art, rights, gameplay, and measured performance review"
+    ]
+  },
+  "expected_source_files": {
+    "island_tree_01/island_tree_01_1k.fbx": "3f193c0ca27977b001682aa4ba3eef654b31c1af60a166af4024a11cc19a2948",
+    "island_tree_01/textures/island_tree_01_diff_1k.png": "519a34062e3eb42e14d9f2b6454669d8e71ccf0ab0b95fe05e00f31ee7ffdf29",
+    "island_tree_01/textures/island_tree_01_nor_gl_1k.png": "039b67b309fd3cf7333fbd8e2a8db0f253a87def5e7e9d88b06401d8f605ed1f",
+    "island_tree_01/textures/island_tree_01_rough_1k.png": "eab3874d010768431baac106ca2904e8bfb7736e6fa17fecf24855ca37bcf565",
+    "island_tree_01/textures/island_tree_01_branches_diff_1k.png": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+    "island_tree_01/textures/island_tree_01_branches_nor_gl_1k.png": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+    "island_tree_01/textures/island_tree_01_branches_rough_1k.png": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+    "island_tree_01/textures/island_tree_01_leaves_alpha_1k.png": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+    "island_tree_01/textures/island_tree_01_leaves_diff_1k.png": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+    "island_tree_01/textures/island_tree_01_leaves_nor_gl_1k.png": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+    "island_tree_01/textures/island_tree_01_leaves_rough_1k.png": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78",
+    "island_tree_02/island_tree_02_1k.fbx": "ac2489d7c5b76cbe050a4f78d1984d614c2a7b0cfbe617b95836859613ab6d76",
+    "island_tree_02/textures/island_tree_02_diff_1k.png": "398424083d2db299f5445e7c6422498688643f634767383ba8cd8bbfbfb0b27b",
+    "island_tree_02/textures/island_tree_02_nor_gl_1k.png": "0c300f7a5da76c57b5e8475d32e3e60fa7605a29f52c1a38f2501f537aa2f3e2",
+    "island_tree_02/textures/island_tree_02_rough_1k.png": "59add752a4dc6d898c54bef061e31a92b1632be6cdb638b15ea446f2d2d03603",
+    "island_tree_02/textures/island_tree_02_branches_diff_1k.png": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+    "island_tree_02/textures/island_tree_02_branches_nor_gl_1k.png": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+    "island_tree_02/textures/island_tree_02_branches_rough_1k.png": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+    "island_tree_02/textures/island_tree_02_leaves_alpha_1k.png": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+    "island_tree_02/textures/island_tree_02_leaves_diff_1k.png": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+    "island_tree_02/textures/island_tree_02_leaves_nor_gl_1k.png": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+    "island_tree_02/textures/island_tree_02_leaves_rough_1k.png": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78",
+    "island_tree_03/island_tree_03_1k.fbx": "32b2a158689fde1df5f55bad89b1eb4f131bacf534fac45155fc1d4c49afba49",
+    "island_tree_03/textures/island_tree_03_diff_1k.png": "264330f1ae3998fe5620ec85fd175628bfabd79f80d25f777e18274997fd916f",
+    "island_tree_03/textures/island_tree_03_nor_gl_1k.png": "886c7e7468e9485626510308d03160d7b73789d584165bfa412e7b36ee5dc5b6",
+    "island_tree_03/textures/island_tree_03_rough_1k.png": "7a49a0de9979eaf33a2226aebb6e540cb0bc2e5a2725b19046f1bf1026953fb8",
+    "island_tree_03/textures/island_tree_03_branches_diff_1k.png": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+    "island_tree_03/textures/island_tree_03_branches_nor_gl_1k.png": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+    "island_tree_03/textures/island_tree_03_branches_rough_1k.png": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+    "island_tree_03/textures/island_tree_03_leaves_alpha_1k.png": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+    "island_tree_03/textures/island_tree_03_leaves_diff_1k.png": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+    "island_tree_03/textures/island_tree_03_leaves_nor_gl_1k.png": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+    "island_tree_03/textures/island_tree_03_leaves_rough_1k.png": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_futaleufu_island_tree_set.py",
+    "source_root_environment_variable": "RAFTSIM_FUTALEUFU_ISLAND_TREE_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K",
+    "mesh_policy": "three source trees imported as separate static meshes with source material slots preserved by role",
+    "material_policy": "thirty selected PNG maps imported explicitly; GL normals corrected for Unreal; explicit leaf alpha drives masked two-sided foliage",
+    "nanite_policy": "enabled with PreserveArea after physical-height, crown-width, and grounded-pivot validation",
+    "promotion_policy": "manual only after Futaleufu visual comparison, ecology, guide, art, rights, gameplay, seasonal, and measured desktop and VR performance review"
+  }
+}

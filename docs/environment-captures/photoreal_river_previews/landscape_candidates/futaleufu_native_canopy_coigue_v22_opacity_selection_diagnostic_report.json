@@ -1,0 +1,79 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_opacity_selection_diagnostic.v22",
+	"river_id": "futaleufu_terminator",
+	"status": "rgb_padded_alpha2_and_alpha3_pairs_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"alpha4_reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png",
+	"alpha4_reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png",
+	"control_boundary": "The corrected RGB-padded atlas and alpha, native TwoSidedFoliage graph and neutral reflectance/transmission/AO/normal/emissive defaults, disabled leaf shadows, saved lighting, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. Only LeafOpacityScale changes from the retained alpha4 reference to 2 or 3.",
+	"captures":
+	{
+		"rgb_padded_alpha2_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_guide_seat_downstream.png",
+		"rgb_padded_alpha2_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_river_eye_downstream.png",
+		"rgb_padded_alpha3_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha3_no_shadows_guide_seat_downstream.png",
+		"rgb_padded_alpha3_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha3_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"rgb_padded_alpha2_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"rgb_padded_alpha2_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"rgb_padded_alpha3_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"rgb_padded_alpha3_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"render_modes":
+	{
+		"rgb_padded_alpha2_no_shadows":
+		{
+			"LeafOpacityScale": 2,
+			"LeafBaseColorScale": 1.1799999999999999,
+			"LeafTransmissionTint": "0.55,0.78,0.36",
+			"leaf_cast_shadow": false,
+			"promotion_eligible": false
+		},
+		"rgb_padded_alpha3_no_shadows":
+		{
+			"LeafOpacityScale": 3,
+			"LeafBaseColorScale": 1.1799999999999999,
+			"LeafTransmissionTint": "0.55,0.78,0.36",
+			"leaf_cast_shadow": false,
+			"promotion_eligible": false
+		}
+	}
+}

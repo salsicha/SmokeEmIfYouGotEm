@@ -1,0 +1,45 @@
+{
+  "provider": "Zambezi River Authority",
+  "station": "Victoria Falls - Nana's Farm Station",
+  "source_url": "https://zambezira.org/hydrology/river-flows",
+  "units": "m3/s",
+  "relation_to_reach": "upstream control station for the below-falls Batoka Gorge run",
+  "published_reference_statistics": {
+    "long_term_mean_annual_flow_m3_s": 1100.0,
+    "historical_maximum_m3_s": 10000.0,
+    "historical_maximum_month": "1958-03",
+    "lowest_annual_mean_m3_s": 390.0,
+    "lowest_annual_mean_water_year": "1995/96"
+  },
+  "planning_bands": [
+    {
+      "id": "low_water_technical",
+      "range_m3_s": [
+        350.0,
+        900.0
+      ]
+    },
+    {
+      "id": "normal_big_water",
+      "range_m3_s": [
+        900.0,
+        2200.0
+      ]
+    },
+    {
+      "id": "high_water",
+      "range_m3_s": [
+        2200.0,
+        4500.0
+      ]
+    },
+    {
+      "id": "extreme_review_only",
+      "range_m3_s": [
+        4500.0,
+        10000.0
+      ]
+    }
+  ],
+  "promotion_gate": "Planning bands are visual/gameplay hypotheses until a Zambezi guide validates rapid-specific lines, closure seasons, hole washout, access, and station-to-reach lag."
+}

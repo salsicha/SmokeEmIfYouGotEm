@@ -1,0 +1,125 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_reflectance_diagnostic.v19",
+	"river_id": "futaleufu_terminator",
+	"status": "controlled_basecolor_transmission_and_interaction_splits_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"alpha4_reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+	"alpha4_reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+	"control_boundary": "Saved corridor lighting, exposure, native textures and graph, 4x opacity diagnostic, disabled leaf shadows, AO, normals, emissive, masks, placement, geometry, cameras, terrain, water, rocks, and physics authority remain fixed. Base-color scale and transmission tint change independently, followed by an interaction control.",
+	"retained_neutral_material_defaults":
+	{
+		"LeafBaseColorScale": 1.1799999999999999,
+		"LeafTransmissionTint": "0.55,0.78,0.36",
+		"LeafOpacityScale": 1,
+		"LeafAOInfluence": 0.55000000000000004,
+		"LeafNormalStrength": 1,
+		"LeafDiagnosticEmissive": 0
+	},
+	"captures":
+	{
+		"alpha4_basecolor_236_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_guide_seat_downstream.png",
+		"alpha4_basecolor_236_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_river_eye_downstream.png",
+		"alpha4_white_transmission_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_white_transmission_no_shadows_guide_seat_downstream.png",
+		"alpha4_white_transmission_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_white_transmission_no_shadows_river_eye_downstream.png",
+		"alpha4_basecolor_236_white_transmission_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_white_transmission_no_shadows_guide_seat_downstream.png",
+		"alpha4_basecolor_236_white_transmission_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_white_transmission_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"alpha4_basecolor_236_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_basecolor_236_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_white_transmission_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_white_transmission_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_basecolor_236_white_transmission_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_basecolor_236_white_transmission_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"render_modes":
+	{
+		"alpha4_basecolor_236_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafBaseColorScale": 2.3599999999999999,
+			"LeafTransmissionTint": "0.55,0.78,0.36",
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"promotion_eligible": false
+		},
+		"alpha4_white_transmission_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafBaseColorScale": 1.1799999999999999,
+			"LeafTransmissionTint": "1,1,1",
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"promotion_eligible": false
+		},
+		"alpha4_basecolor_236_white_transmission_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafBaseColorScale": 2.3599999999999999,
+			"LeafTransmissionTint": "1,1,1",
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"promotion_eligible": false
+		}
+	}
+}

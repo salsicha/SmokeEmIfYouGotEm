@@ -1,0 +1,98 @@
+{
+  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v1",
+  "reviewed_on": "2026-07-12",
+  "river_id": "zambezi_batoka_gorge",
+  "reach": "Boiling Pot to Mukuni Beach",
+  "status": "high_resolution_surveys_confirmed_to_exist_data_access_rights_and_reach_coverage_pending",
+  "production_promoted": false,
+  "policy": {
+    "link_only_until_access_and_rights_clear": true,
+    "report_figures_are_not_geometry_authority": true,
+    "no_pdf_figure_digitization_or_photogrammetric_derivative": true,
+    "no_lidar_dtm_dsm_ortho_or_breakline_data_downloaded": true,
+    "replacement_requires_crs_vertical_datum_coverage_accuracy_terms_attribution_and_guide_geospatial_review": true
+  },
+  "discovered_sources": [
+    {
+      "source_id": "zra_bghes_project_document_index",
+      "provider": "Zambezi River Authority",
+      "url": "https://zambezira.org/hydro-electric-schemes/batoka-hes-project",
+      "source_class": "official_project_document_index",
+      "observed_evidence": [
+        "Official BGHES project page publishes the final ESIA document family and shared annexures.",
+        "The page establishes ZRA as the appropriate first acquisition contact for project survey products."
+      ],
+      "data_attached": false,
+      "rights_status": "page_public_data_product_access_and_redistribution_not_granted"
+    },
+    {
+      "source_id": "bghes_dam_safety_plan_346_gen_r_sp_001",
+      "provider": "Zambezi River Authority / Studio Pietrangeli / ERM-hosted BGHES documents",
+      "url": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/annexes/annex-o---emergency-response-plans.pdf",
+      "source_class": "official_feasibility_document_and_lidar_existence_evidence",
+      "observed_evidence": [
+        "Section E.8.2 states that a 0.3 m LiDAR DTM and 30 m SRTM DEM were used.",
+        "The LiDAR DTM is described as covering the main Zambezi channel and close surroundings.",
+        "The documented coordinate reference is WGS 84 / UTM zone 35S.",
+        "The displayed downstream HEC-RAS study does not establish that the complete Boiling Pot to Mukuni Beach game reach is included in the distributable LiDAR product."
+      ],
+      "data_attached": false,
+      "rights_status": "public_report_only_underlying_lidar_access_license_and_redistribution_unknown"
+    },
+    {
+      "source_id": "bghes_lidar_topographic_survey_report_230_gen_r_sp_001",
+      "provider": "Zambezi River Authority / BGHES feasibility design team",
+      "url": "https://www.zambezira.org/sites/default/files/ACCESS%20ROAD%20ESMP_V5.0_COMP_2021-11-10.pdf",
+      "source_class": "official_volume_index_lead",
+      "observed_evidence": [
+        "The published feasibility-design volume list names Vol.3 as 230 GEN R SP 001 - LIDAR TOPOGRAPHIC SURVEY REPORT.",
+        "No direct public download for Vol.3 or its terrain payload was found during this review."
+      ],
+      "data_attached": false,
+      "rights_status": "volume_existence_confirmed_report_and_payload_access_terms_pending"
+    },
+    {
+      "source_id": "pietrangeli_batoka_drone_photogrammetry_case_study",
+      "provider": "Studio Pietrangeli",
+      "url": "https://www.pietrangeli.com/wp-content/uploads/2022/04/029-INNOVATIVE-APPLICATIONS-OF-DRONE-TECHNOLOGY-IN-THE-ENGINEERING-OF-LARGE-DAMS-Pietrangeli-G-Pittalis-G-Milesi-V-Cifra-R-2015.pdf",
+      "source_class": "engineering_photogrammetry_existence_evidence",
+      "observed_evidence": [
+        "The Batoka case study reports a drone-derived DSM at approximately 5 cm ground resolution.",
+        "The paper demonstrates local high-resolution survey capability but does not establish full game-reach coverage or grant access to source photos, point clouds, DSM, orthophotos, or meshes."
+      ],
+      "data_attached": false,
+      "rights_status": "public_paper_only_underlying_survey_data_and_derivative_rights_unknown"
+    }
+  ],
+  "acquisition_request": {
+    "priority_contacts": [
+      "Zambezi River Authority BGHES project office",
+      "Studio Pietrangeli feasibility survey team",
+      "ERM BGHES document custodian"
+    ],
+    "request_products": [
+      "Vol.3 230 GEN R SP 001 LiDAR Topographic Survey Report",
+      "classified ground point cloud or bare-earth DTM for Boiling Pot to Mukuni Beach",
+      "survey breaklines and Zambezi main-channel centerline",
+      "orthophoto or source-image mosaic with acquisition metadata",
+      "cross sections, control points, and vertical-datum transformation metadata",
+      "explicit commercial game-use, derivative, screenshot, attribution, storage, and redistribution terms"
+    ],
+    "minimum_metadata": [
+      "spatial coverage polygon",
+      "horizontal CRS and epoch",
+      "vertical datum and geoid model",
+      "nominal point density or raster cell size",
+      "ground classification and void policy",
+      "acquisition date and sensor",
+      "accuracy statement and control network",
+      "license, attribution, derivative-use, and redistribution conditions"
+    ]
+  },
+  "fallback": {
+    "current_source": "Copernicus DEM GLO-30 DSM",
+    "allowed_use": "review-gated technical corridor only",
+    "forbidden_claim": "photoreal or surveyed gorge geometry",
+    "procedural_scope": "bounded visual detailing may add basalt strata and talus but may not invent or conceal authoritative gorge walls, banks, bed elevations, or centerline alignment"
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v10",
+  "generated_on": "2026-07-13",
+  "status": "v10_three_source_broad_spray_texture_candidate_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "generation_method": "three independent OpenAI built-in image generations followed by local chroma-key removal",
+    "reference_images_supplied": false,
+    "external_photo_pixels_vendored": false,
+    "botanical_measurement_claimed": false,
+    "source_count": 3,
+    "sources": [
+      {
+        "id": "a",
+        "chroma_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_a_chroma_source_v10.png",
+        "chroma_source_sha256": "7378bff5d30060b4ba94006cc23c725797147921190c53b06dbbcb7950e5e637",
+        "alpha_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_a_alpha_source_v10.png",
+        "alpha_source_sha256": "2e1b5fd89a3cddeb9a8a5aad18cb2eb7eb997a9beb6cf67732ca0a43512a2e2c",
+        "width": 1042,
+        "height": 1509,
+        "nonzero_alpha_fraction": 0.3900391636107857,
+        "transparent_corners": true
+      },
+      {
+        "id": "b",
+        "chroma_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_b_chroma_source_v10.png",
+        "chroma_source_sha256": "b4da1266cffd4d3f0601172d0ae8aa213f6f5d61d141cdcce0c65dcd222bfe31",
+        "alpha_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_b_alpha_source_v10.png",
+        "alpha_source_sha256": "aedc4ff1c20bbcf25153b395c2006ac76e5be6c5244aee857d1a55c068aa282b",
+        "width": 1080,
+        "height": 1456,
+        "nonzero_alpha_fraction": 0.3095556064306064,
+        "transparent_corners": true
+      },
+      {
+        "id": "c",
+        "chroma_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_c_chroma_source_v10.png",
+        "chroma_source_sha256": "d174352e378eac89f9af7fb093328f90ff834dcd6a08cd187811af78d8e72f96",
+        "alpha_source": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_c_alpha_source_v10.png",
+        "alpha_source_sha256": "810b5211f505ea8a09cc1761ae1fa5e42c7f35fd699ab5ab44de80aed07182d8",
+        "width": 1348,
+        "height": 1167,
+        "nonzero_alpha_fraction": 0.28696485192446075,
+        "transparent_corners": true
+      }
+    ]
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v10_assets.py",
+    "generator_sha256": "ab9bb9347fbbc06e500634ca4f113da2db7fa858c90b9c5f61db742cde41aaeb",
+    "seed": 100818427,
+    "atlas_columns": 4,
+    "atlas_rows": 4,
+    "tile_records": [
+      {
+        "tile": 0,
+        "independent_source": "a",
+        "mirrored": false,
+        "rotation_degrees": 3.3330688393352648,
+        "placed_width": 299,
+        "placed_height": 421
+      },
+      {
+        "tile": 1,
+        "independent_source": "b",
+        "mirrored": false,
+        "rotation_degrees": 4.8181625293780215,
+        "placed_width": 337,
+        "placed_height": 443
+      },
+      {
+        "tile": 2,
+        "independent_source": "c",
+        "mirrored": true,
+        "rotation_degrees": -2.09058563846969,
+        "placed_width": 472,
+        "placed_height": 409
+      },
+      {
+        "tile": 3,
+        "independent_source": "a",
+        "mirrored": false,
+        "rotation_degrees": -0.9272092313153819,
+        "placed_width": 288,
+        "placed_height": 418
+      },
+      {
+        "tile": 4,
+        "independent_source": "b",
+        "mirrored": false,
+        "rotation_degrees": -0.20880137103722873,
+        "placed_width": 297,
+        "placed_height": 413
+      },
+      {
+        "tile": 5,
+        "independent_source": "c",
+        "mirrored": false,
+        "rotation_degrees": 3.681676524632742,
+        "placed_width": 484,
+        "placed_height": 422
+      },
+      {
+        "tile": 6,
+        "independent_source": "a",
+        "mirrored": true,
+        "rotation_degrees": -4.431489389365739,
+        "placed_width": 323,
+        "placed_height": 448
+      },
+      {
+        "tile": 7,
+        "independent_source": "b",
+        "mirrored": false,
+        "rotation_degrees": -2.12112523197512,
+        "placed_width": 336,
+        "placed_height": 454
+      },
+      {
+        "tile": 8,
+        "independent_source": "c",
+        "mirrored": false,
+        "rotation_degrees": -2.076454674173096,
+        "placed_width": 472,
+        "placed_height": 410
+      },
+      {
+        "tile": 9,
+        "independent_source": "a",
+        "mirrored": false,
+        "rotation_degrees": 1.242581986822604,
+        "placed_width": 281,
+        "placed_height": 405
+      },
+      {
+        "tile": 10,
+        "independent_source": "b",
+        "mirrored": true,
+        "rotation_degrees": -2.8773361521515786,
+        "placed_width": 325,
+        "placed_height": 438
+      },
+      {
+        "tile": 11,
+        "independent_source": "c",
+        "mirrored": false,
+        "rotation_degrees": -5.288004049881242,
+        "placed_width": 494,
+        "placed_height": 434
+      },
+      {
+        "tile": 12,
+        "independent_source": "a",
+        "mirrored": false,
+        "rotation_degrees": 4.841141428140363,
+        "placed_width": 342,
+        "placed_height": 473
+      },
+      {
+        "tile": 13,
+        "independent_source": "b",
+        "mirrored": false,
+        "rotation_degrees": -3.9924421166305617,
+        "placed_width": 358,
+        "placed_height": 476
+      },
+      {
+        "tile": 14,
+        "independent_source": "c",
+        "mirrored": true,
+        "rotation_degrees": 1.093415403939093,
+        "placed_width": 466,
+        "placed_height": 402
+      },
+      {
+        "tile": 15,
+        "independent_source": "a",
+        "mirrored": false,
+        "rotation_degrees": 2.685694799763979,
+        "placed_width": 295,
+        "placed_height": 419
+      }
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "af618b4cf09c859e9ebe336718508f1903ee4cb4cf0c39064e7fca8fdff4d6f8",
+      "nontransparent_rgb_sha256": "c6ff1830fa74a561f9e02df3c7481535845b74bbb2d9be17d243ea8d53a7adb3",
+      "padded_transparent_pixel_count": 940934,
+      "transparent_nonzero_rgb_pixel_count": 892990
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 930014,
+    "nonzero_fraction": 0.22173261642456055,
+    "opaque_pixel_count": 373611,
+    "opaque_fraction": 0.08907580375671387,
+    "transparent_corners": true
+  },
+  "maps": {
+    "spray_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v10_albedo_opacity.png",
+      "sha256": "f40f272a97e3c621ae37888124c2c5e829863496bcd68a95f8d98cf5d3de653a",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v10_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v10_normal.png",
+      "sha256": "3b062d3e21bcb8e25b0f299140c1268fb1fa125a97d72d43cccaef2e8ca9cc07",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v10_isolated_review_candidate_not_production_promoted"
+    },
+    "spray_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_spray_v10_ao_roughness_subsurface.png",
+      "sha256": "a903b67ed665e18e2f01849c1fee537bb00919b0c1d39f82b67b7f4ff4f5829b",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v10_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "unreal_contract": {
+    "near_texture_keys": [
+      "NearLeafAlbedoOpacity",
+      "NearLeafNormal",
+      "NearLeafAORoughnessSubsurface"
+    ],
+    "far_fallback_texture_version": "v3",
+    "near_representation_eligible": false,
+    "required_before_eligibility": [
+      "near green-dominant coverage meets or exceeds far at 20 m",
+      "closeup has no radial card tangle or dark overdraw pocket",
+      "all nine actor-root authority triplets remain overlap-free",
+      "masked-card and measured overdraw budgets pass"
+    ]
+  }
+}

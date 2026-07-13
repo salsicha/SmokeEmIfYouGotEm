@@ -1,0 +1,1555 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_prototype_review.v7",
+	"river_id": "futaleufu_terminator",
+	"species": "Nothofagus dombeyi",
+	"prototype_revision": "v12_far_corridor_lod_and_hism_density_benchmark",
+	"status": "isolated_eight_form_forty_view_and_512_tree_runtime_lod_capture_ready_for_human_review",
+	"production_promoted": false,
+	"map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCoigue_CrownFormFamily_IsolatedReview",
+	"texture_count": 6,
+	"material_count": 2,
+	"photometry":
+	{
+		"method": "fixed exposure with bounded bidirectional neutral studio fills and material response; no emissive fill",
+		"skylight_intensity": 1.6499999999999999,
+		"front_fill_intensity": 0.75,
+		"back_fill_intensity": 0.38,
+		"fill_lights_cast_shadows": false,
+		"emissive_fill": false,
+		"bark_base_color_scale": 1.72,
+		"bark_ao_influence": 0.28000000000000003,
+		"leaf_base_color_scale": 1.1799999999999999,
+		"leaf_ao_influence": 0.55000000000000004,
+		"leaf_transmission_tint": [
+			0.55000000000000004,
+			0.78000000000000003,
+			0.35999999999999999
+		],
+		"exposed_parameters": "BarkBaseColorScale, BarkAOInfluence, LeafBaseColorScale, LeafAOInfluence, LeafTransmissionTint"
+	},
+	"family_scope": "five independent adult and three independent intermediate crown-form prototypes; species-count authoring threshold met",
+	"crown_forms": [
+		{
+			"id": "open_grown_adult",
+			"display_name": "open-grown adult",
+			"life_stage": "adult",
+			"seed_offset": 0,
+			"trunk_height_scale": 1,
+			"trunk_radius_scale": 1,
+			"crown_base_z_cm": 950,
+			"crown_span_z_cm": 1560,
+			"crown_width_scale": 1,
+			"branch_uplift_scale": 1,
+			"asymmetry_scale": 1,
+			"trunk_lean_top_cm": [
+				0,
+				0
+			],
+			"suppressed_sector_center_degrees": 0,
+			"suppressed_sector_half_width_degrees": 0,
+			"suppressed_sector_length_scale": 1,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 26,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 234,
+				"parent_shoots": 234,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 370,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 5.054349422454834,
+				"minimum_near_tertiary_clearance_cm": 0.60055446624755859,
+				"rerouted_branchlet_count": 0,
+				"rerouted_tertiary_count": 92,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_AdultPrototype_Trunk",
+				"source_vertices": 2104,
+				"source_triangles": 2104,
+				"render_vertices": 2560,
+				"render_triangles": 2104,
+				"exclusive_resource_bytes": 183236,
+				"bounds_cm": [
+					2291.5330810546875,
+					2384.2689208984375,
+					2930.1041510105133
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_AdultPrototype_Branchlets",
+				"source_vertices": 287376,
+				"source_triangles": 287376,
+				"render_vertices": 468872,
+				"render_triangles": 287376,
+				"exclusive_resource_bytes": 24993684,
+				"bounds_cm": [
+					2193.0242919921875,
+					2162.3534545898438,
+					1864.1629638671875
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_AdultPrototype_Leaves",
+				"source_vertices": 164736,
+				"source_triangles": 82368,
+				"source_card_count": 41184,
+				"render_vertices": 164736,
+				"render_triangles": 82368,
+				"exclusive_resource_bytes": 8634036,
+				"bounds_cm": [
+					2196.3148193359375,
+					2163.3994750976562,
+					1870.283447265625
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_AdultPrototype_LeavesFar",
+				"source_vertices": 361728,
+				"source_triangles": 180864,
+				"source_card_count": 90432,
+				"render_vertices": 361728,
+				"render_triangles": 180864,
+				"exclusive_resource_bytes": 18877620,
+				"bounds_cm": [
+					2343.3941650390625,
+					2394.919677734375,
+					2067.8385620117188
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_AdultPrototype_LeavesFarRuntime",
+				"source_vertices": 60288,
+				"source_triangles": 30144,
+				"source_card_count": 15072,
+				"render_vertices": 60288,
+				"render_triangles": 30144,
+				"exclusive_resource_bytes": 2720436,
+				"bounds_cm": [
+					2320.0418701171875,
+					2383.620849609375,
+					2052.3445434570312
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "forest_grown_adult",
+			"display_name": "forest-grown adult",
+			"life_stage": "adult",
+			"seed_offset": 3907,
+			"trunk_height_scale": 1.1200000047683716,
+			"trunk_radius_scale": 0.77999997138977051,
+			"crown_base_z_cm": 1440,
+			"crown_span_z_cm": 1510,
+			"crown_width_scale": 0.63999998569488525,
+			"branch_uplift_scale": 1.2799999713897705,
+			"asymmetry_scale": 1.0800000429153442,
+			"trunk_lean_top_cm": [
+				0,
+				0
+			],
+			"suppressed_sector_center_degrees": 0,
+			"suppressed_sector_half_width_degrees": 0,
+			"suppressed_sector_length_scale": 1,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 22,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 198,
+				"parent_shoots": 198,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 280,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 4.8387951850891113,
+				"minimum_near_tertiary_clearance_cm": 0.60526996850967407,
+				"rerouted_branchlet_count": 0,
+				"rerouted_tertiary_count": 134,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ForestGrownAdultPrototype_Trunk",
+				"source_vertices": 1816,
+				"source_triangles": 1816,
+				"render_vertices": 2208,
+				"render_triangles": 1816,
+				"exclusive_resource_bytes": 171140,
+				"bounds_cm": [
+					1467.3246459960938,
+					1511.7166748046875,
+					3371.4084159135818
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ForestGrownAdultPrototype_Branchlets",
+				"source_vertices": 242538,
+				"source_triangles": 242538,
+				"render_vertices": 395694,
+				"render_triangles": 242538,
+				"exclusive_resource_bytes": 21103812,
+				"bounds_cm": [
+					1458.311279296875,
+					1385.7769165039062,
+					1918.2706298828125
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ForestGrownAdultPrototype_Leaves",
+				"source_vertices": 139392,
+				"source_triangles": 69696,
+				"source_card_count": 34848,
+				"render_vertices": 139392,
+				"render_triangles": 69696,
+				"exclusive_resource_bytes": 7316148,
+				"bounds_cm": [
+					1458.5391845703125,
+					1389.2481689453125,
+					1925.842041015625
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ForestGrownAdultPrototype_LeavesFar",
+				"source_vertices": 289152,
+				"source_triangles": 144576,
+				"source_card_count": 72288,
+				"render_vertices": 288992,
+				"render_triangles": 144576,
+				"exclusive_resource_bytes": 15097908,
+				"bounds_cm": [
+					1570.988525390625,
+					1592.3906860351562,
+					2057.995361328125
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ForestGrownAdultPrototype_LeavesFarRuntime",
+				"source_vertices": 48192,
+				"source_triangles": 24096,
+				"source_card_count": 12048,
+				"render_vertices": 48192,
+				"render_triangles": 24096,
+				"exclusive_resource_bytes": 2188212,
+				"bounds_cm": [
+					1582.455322265625,
+					1591.8780517578125,
+					2059.73828125
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "storm_damaged_adult",
+			"display_name": "storm-damaged adult",
+			"life_stage": "adult",
+			"seed_offset": 5903,
+			"trunk_height_scale": 0.98000001907348633,
+			"trunk_radius_scale": 0.93999999761581421,
+			"crown_base_z_cm": 1050,
+			"crown_span_z_cm": 1550,
+			"crown_width_scale": 0.89999997615814209,
+			"branch_uplift_scale": 1.0499999523162842,
+			"asymmetry_scale": 1.2999999523162842,
+			"trunk_lean_top_cm": [
+				-60,
+				35
+			],
+			"suppressed_sector_center_degrees": 0,
+			"suppressed_sector_half_width_degrees": 0,
+			"suppressed_sector_length_scale": 1,
+			"crown_gap_center_t": 0.62000000476837158,
+			"crown_gap_half_width_t": 0.090000003576278687,
+			"crown_gap_length_scale": 0.5,
+			"damage_modulo": 4,
+			"damage_remainder": 1,
+			"damaged_branch_length_scale": 0.37999999523162842,
+			"topology":
+			{
+				"main_branches": 25,
+				"deterministically_damaged_branches": 6,
+				"near_foliage_anchors": 177,
+				"parent_shoots": 177,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 330,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 4.0258173942565918,
+				"minimum_near_tertiary_clearance_cm": 0.60000211000442505,
+				"rerouted_branchlet_count": 0,
+				"rerouted_tertiary_count": 89,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_StormDamagedAdultPrototype_Trunk",
+				"source_vertices": 2032,
+				"source_triangles": 2032,
+				"render_vertices": 2472,
+				"render_triangles": 2032,
+				"exclusive_resource_bytes": 179572,
+				"bounds_cm": [
+					1882.9050903320312,
+					1911.6666870117188,
+					3089.0444357395172
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_StormDamagedAdultPrototype_Branchlets",
+				"source_vertices": 216748,
+				"source_triangles": 216748,
+				"render_vertices": 353616,
+				"render_triangles": 216748,
+				"exclusive_resource_bytes": 18866372,
+				"bounds_cm": [
+					1945.8929443359375,
+					1811.6347045898438,
+					1937.4833984375
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_StormDamagedAdultPrototype_Leaves",
+				"source_vertices": 124608,
+				"source_triangles": 62304,
+				"source_card_count": 31152,
+				"render_vertices": 124608,
+				"render_triangles": 62304,
+				"exclusive_resource_bytes": 6546868,
+				"bounds_cm": [
+					1946.6826171875,
+					1812.64013671875,
+					1942.4515380859375
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_StormDamagedAdultPrototype_LeavesFar",
+				"source_vertices": 305856,
+				"source_triangles": 152928,
+				"source_card_count": 76464,
+				"render_vertices": 305668,
+				"render_triangles": 152928,
+				"exclusive_resource_bytes": 15965508,
+				"bounds_cm": [
+					2335.3255615234375,
+					1926.789306640625,
+					2105.8677978515625
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_StormDamagedAdultPrototype_LeavesFarRuntime",
+				"source_vertices": 50976,
+				"source_triangles": 25488,
+				"source_card_count": 12744,
+				"render_vertices": 50976,
+				"render_triangles": 25488,
+				"exclusive_resource_bytes": 2310708,
+				"bounds_cm": [
+					2341.2940673828125,
+					1931.5552368164062,
+					2103.2503662109375
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "competition_lean_adult",
+			"display_name": "competition-lean adult",
+			"life_stage": "adult",
+			"seed_offset": 7901,
+			"trunk_height_scale": 1.1000000238418579,
+			"trunk_radius_scale": 0.81999999284744263,
+			"crown_base_z_cm": 1280,
+			"crown_span_z_cm": 1530,
+			"crown_width_scale": 0.72000002861022949,
+			"branch_uplift_scale": 1.2000000476837158,
+			"asymmetry_scale": 1.3999999761581421,
+			"trunk_lean_top_cm": [
+				260,
+				-150
+			],
+			"suppressed_sector_center_degrees": 210,
+			"suppressed_sector_half_width_degrees": 70,
+			"suppressed_sector_length_scale": 0.2800000011920929,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 24,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 216,
+				"parent_shoots": 216,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 310,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 1.2181086540222168,
+				"minimum_near_tertiary_clearance_cm": 0.60017776489257812,
+				"rerouted_branchlet_count": 3,
+				"rerouted_tertiary_count": 122,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CompetitionLeanAdultPrototype_Trunk",
+				"source_vertices": 1960,
+				"source_triangles": 1960,
+				"render_vertices": 2384,
+				"render_triangles": 1960,
+				"exclusive_resource_bytes": 177956,
+				"bounds_cm": [
+					1573.9838256835938,
+					1559.278564453125,
+					3220.2089052200317
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CompetitionLeanAdultPrototype_Branchlets",
+				"source_vertices": 264906,
+				"source_triangles": 264906,
+				"render_vertices": 432198,
+				"render_triangles": 264906,
+				"exclusive_resource_bytes": 23044260,
+				"bounds_cm": [
+					1521.5888671875,
+					1496.6238403320312,
+					1940.809814453125
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CompetitionLeanAdultPrototype_Leaves",
+				"source_vertices": 152064,
+				"source_triangles": 76032,
+				"source_card_count": 38016,
+				"render_vertices": 152064,
+				"render_triangles": 76032,
+				"exclusive_resource_bytes": 7975092,
+				"bounds_cm": [
+					1522.37353515625,
+					1499.760986328125,
+					1947.673828125
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CompetitionLeanAdultPrototype_LeavesFar",
+				"source_vertices": 316800,
+				"source_triangles": 158400,
+				"source_card_count": 79200,
+				"render_vertices": 316636,
+				"render_triangles": 158400,
+				"exclusive_resource_bytes": 16535460,
+				"bounds_cm": [
+					1986.2579956054688,
+					1593.4616088867188,
+					2177.1873779296875
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CompetitionLeanAdultPrototype_LeavesFarRuntime",
+				"source_vertices": 52800,
+				"source_triangles": 26400,
+				"source_card_count": 13200,
+				"render_vertices": 52800,
+				"render_triangles": 26400,
+				"exclusive_resource_bytes": 2390964,
+				"bounds_cm": [
+					1986.3009033203125,
+					1594.8548583984375,
+					2187.32421875
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "crown_gap_adult",
+			"display_name": "crown-gap adult",
+			"life_stage": "adult",
+			"seed_offset": 9901,
+			"trunk_height_scale": 1.0199999809265137,
+			"trunk_radius_scale": 0.89999997615814209,
+			"crown_base_z_cm": 1100,
+			"crown_span_z_cm": 1500,
+			"crown_width_scale": 0.87999999523162842,
+			"branch_uplift_scale": 1.0800000429153442,
+			"asymmetry_scale": 1.5499999523162842,
+			"trunk_lean_top_cm": [
+				45,
+				70
+			],
+			"suppressed_sector_center_degrees": 40,
+			"suppressed_sector_half_width_degrees": 45,
+			"suppressed_sector_length_scale": 0.15000000596046448,
+			"crown_gap_center_t": 0.44999998807907104,
+			"crown_gap_half_width_t": 0.070000000298023224,
+			"crown_gap_length_scale": 0.31999999284744263,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 25,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 216,
+				"parent_shoots": 216,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 340,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 1.3700493574142456,
+				"minimum_near_tertiary_clearance_cm": 0.60831719636917114,
+				"rerouted_branchlet_count": 8,
+				"rerouted_tertiary_count": 109,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CrownGapAdultPrototype_Trunk",
+				"source_vertices": 2032,
+				"source_triangles": 2032,
+				"render_vertices": 2472,
+				"render_triangles": 2032,
+				"exclusive_resource_bytes": 182644,
+				"bounds_cm": [
+					1775.8657836914062,
+					1709.1607055664062,
+					3011.1021358966827
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CrownGapAdultPrototype_Branchlets",
+				"source_vertices": 265092,
+				"source_triangles": 265092,
+				"render_vertices": 432508,
+				"render_triangles": 265092,
+				"exclusive_resource_bytes": 23060628,
+				"bounds_cm": [
+					1800.417724609375,
+					1724.9739990234375,
+					1997.4083251953125
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CrownGapAdultPrototype_Leaves",
+				"source_vertices": 152064,
+				"source_triangles": 76032,
+				"source_card_count": 38016,
+				"render_vertices": 152064,
+				"render_triangles": 76032,
+				"exclusive_resource_bytes": 7975092,
+				"bounds_cm": [
+					1804.7544555664062,
+					1725.3511352539062,
+					2002.14697265625
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CrownGapAdultPrototype_LeavesFar",
+				"source_vertices": 334080,
+				"source_triangles": 167040,
+				"source_card_count": 83520,
+				"render_vertices": 333912,
+				"render_triangles": 167040,
+				"exclusive_resource_bytes": 17433364,
+				"bounds_cm": [
+					2617.8426513671875,
+					1889.8565063476562,
+					2144.5786743164062
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_CrownGapAdultPrototype_LeavesFarRuntime",
+				"source_vertices": 55680,
+				"source_triangles": 27840,
+				"source_card_count": 13920,
+				"render_vertices": 55680,
+				"render_triangles": 27840,
+				"exclusive_resource_bytes": 2517172,
+				"bounds_cm": [
+					2631.11376953125,
+					1909.7088623046875,
+					2147.138671875
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "intermediate",
+			"display_name": "intermediate form",
+			"life_stage": "intermediate",
+			"seed_offset": 1907,
+			"trunk_height_scale": 1.0199999809265137,
+			"trunk_radius_scale": 0.86000001430511475,
+			"crown_base_z_cm": 1140,
+			"crown_span_z_cm": 1500,
+			"crown_width_scale": 0.81999999284744263,
+			"branch_uplift_scale": 1.1200000047683716,
+			"asymmetry_scale": 1.2400000095367432,
+			"trunk_lean_top_cm": [
+				0,
+				0
+			],
+			"suppressed_sector_center_degrees": 0,
+			"suppressed_sector_half_width_degrees": 0,
+			"suppressed_sector_length_scale": 1,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 24,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 216,
+				"parent_shoots": 216,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 320,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 4.8971786499023438,
+				"minimum_near_tertiary_clearance_cm": 0.61272835731506348,
+				"rerouted_branchlet_count": 0,
+				"rerouted_tertiary_count": 109,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_IntermediatePrototype_Trunk",
+				"source_vertices": 1960,
+				"source_triangles": 1960,
+				"render_vertices": 2384,
+				"render_triangles": 1960,
+				"exclusive_resource_bytes": 178468,
+				"bounds_cm": [
+					1810.7394409179688,
+					1890.8035278320312,
+					3155.0579469203949
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_IntermediatePrototype_Branchlets",
+				"source_vertices": 265260,
+				"source_triangles": 265260,
+				"render_vertices": 432788,
+				"render_triangles": 265260,
+				"exclusive_resource_bytes": 23075412,
+				"bounds_cm": [
+					1726.463623046875,
+					1792.3856811523438,
+					1953.632080078125
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_IntermediatePrototype_Leaves",
+				"source_vertices": 152064,
+				"source_triangles": 76032,
+				"source_card_count": 38016,
+				"render_vertices": 152064,
+				"render_triangles": 76032,
+				"exclusive_resource_bytes": 7975092,
+				"bounds_cm": [
+					1731.19873046875,
+					1794.3255004882812,
+					1959.301513671875
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_IntermediatePrototype_LeavesFar",
+				"source_vertices": 322560,
+				"source_triangles": 161280,
+				"source_card_count": 80640,
+				"render_vertices": 322376,
+				"render_triangles": 161280,
+				"exclusive_resource_bytes": 16834260,
+				"bounds_cm": [
+					2419.7178955078125,
+					1934.7399291992188,
+					2111.5535888671875
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_IntermediatePrototype_LeavesFarRuntime",
+				"source_vertices": 53760,
+				"source_triangles": 26880,
+				"source_card_count": 13440,
+				"render_vertices": 53760,
+				"render_triangles": 26880,
+				"exclusive_resource_bytes": 2433204,
+				"bounds_cm": [
+					2437.923095703125,
+					1930.59814453125,
+					2117.023681640625
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "intermediate_suppressed",
+			"display_name": "suppressed intermediate",
+			"life_stage": "intermediate",
+			"seed_offset": 11903,
+			"trunk_height_scale": 0.77999997138977051,
+			"trunk_radius_scale": 0.57999998331069946,
+			"crown_base_z_cm": 960,
+			"crown_span_z_cm": 1120,
+			"crown_width_scale": 0.47999998927116394,
+			"branch_uplift_scale": 1.3500000238418579,
+			"asymmetry_scale": 0.94999998807907104,
+			"trunk_lean_top_cm": [
+				90,
+				40
+			],
+			"suppressed_sector_center_degrees": 170,
+			"suppressed_sector_half_width_degrees": 90,
+			"suppressed_sector_length_scale": 0.40000000596046448,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 20,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 180,
+				"parent_shoots": 180,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 250,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 1.2511042356491089,
+				"minimum_near_tertiary_clearance_cm": 0.60183173418045044,
+				"rerouted_branchlet_count": 4,
+				"rerouted_tertiary_count": 138,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_SuppressedIntermediatePrototype_Trunk",
+				"source_vertices": 1672,
+				"source_triangles": 1672,
+				"render_vertices": 2032,
+				"render_triangles": 1672,
+				"exclusive_resource_bytes": 162276,
+				"bounds_cm": [
+					874.53659057617188,
+					1125.7783203125,
+					2364.4218349456787
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_SuppressedIntermediatePrototype_Branchlets",
+				"source_vertices": 221298,
+				"source_triangles": 221298,
+				"render_vertices": 361070,
+				"render_triangles": 221298,
+				"exclusive_resource_bytes": 19262628,
+				"bounds_cm": [
+					872.61611938476562,
+					992.83160400390625,
+					1369.1920166015625
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_SuppressedIntermediatePrototype_Leaves",
+				"source_vertices": 126720,
+				"source_triangles": 63360,
+				"source_card_count": 31680,
+				"render_vertices": 126720,
+				"render_triangles": 63360,
+				"exclusive_resource_bytes": 6657204,
+				"bounds_cm": [
+					877.24664306640625,
+					992.42922973632812,
+					1374.048583984375
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_SuppressedIntermediatePrototype_LeavesFar",
+				"source_vertices": 261504,
+				"source_triangles": 130752,
+				"source_card_count": 65376,
+				"render_vertices": 261340,
+				"render_triangles": 130752,
+				"exclusive_resource_bytes": 13660068,
+				"bounds_cm": [
+					989.92813110351562,
+					1161.524658203125,
+					1643.6234741210938
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_SuppressedIntermediatePrototype_LeavesFarRuntime",
+				"source_vertices": 43584,
+				"source_triangles": 21792,
+				"source_card_count": 10896,
+				"render_vertices": 43584,
+				"render_triangles": 21792,
+				"exclusive_resource_bytes": 1985460,
+				"bounds_cm": [
+					993.61737060546875,
+					1178.6083984375,
+					1630.9637451171875
+				],
+				"nanite_enabled": false
+			}
+		},
+		{
+			"id": "intermediate_released",
+			"display_name": "released intermediate",
+			"life_stage": "intermediate",
+			"seed_offset": 13901,
+			"trunk_height_scale": 0.89999997615814209,
+			"trunk_radius_scale": 0.68000000715255737,
+			"crown_base_z_cm": 940,
+			"crown_span_z_cm": 1340,
+			"crown_width_scale": 0.75999999046325684,
+			"branch_uplift_scale": 1.1799999475479126,
+			"asymmetry_scale": 1.7000000476837158,
+			"trunk_lean_top_cm": [
+				-120,
+				100
+			],
+			"suppressed_sector_center_degrees": 280,
+			"suppressed_sector_half_width_degrees": 55,
+			"suppressed_sector_length_scale": 0.44999998807907104,
+			"crown_gap_center_t": -1,
+			"crown_gap_half_width_t": 0,
+			"crown_gap_length_scale": 1,
+			"damage_modulo": 0,
+			"damage_remainder": 0,
+			"damaged_branch_length_scale": 1,
+			"topology":
+			{
+				"main_branches": 23,
+				"deterministically_damaged_branches": 0,
+				"near_foliage_anchors": 207,
+				"parent_shoots": 207,
+				"far_only_apical_anchors": 24,
+				"far_only_interior_crown_anchors": 300,
+				"branchlets_per_parent_shoot": 8,
+				"tertiary_branches_per_branchlet": 3,
+				"attached_leaf_cards_per_branchlet": 22,
+				"petioles_per_leaf": 1,
+				"floating_near_card_count": 0
+			},
+			"routing":
+			{
+				"required_near_branchlet_clearance_cm": 1.2,
+				"required_near_tertiary_clearance_cm": 0.59999999999999998,
+				"minimum_near_branchlet_clearance_cm": 3.0032713413238525,
+				"minimum_near_tertiary_clearance_cm": 0.60439962148666382,
+				"rerouted_branchlet_count": 1,
+				"rerouted_tertiary_count": 109,
+				"unresolved_branchlet_clearance_count": 0,
+				"unresolved_tertiary_clearance_count": 0,
+				"near_clearance_contract_passed": true
+			},
+			"trunk":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ReleasedIntermediatePrototype_Trunk",
+				"source_vertices": 1888,
+				"source_triangles": 1888,
+				"render_vertices": 2296,
+				"render_triangles": 1888,
+				"exclusive_resource_bytes": 172244,
+				"bounds_cm": [
+					1813.8381958007812,
+					1451.3551635742188,
+					2762.9733572006226
+				],
+				"nanite_enabled": false
+			},
+			"branchlets":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ReleasedIntermediatePrototype_Branchlets",
+				"source_vertices": 253002,
+				"source_triangles": 253002,
+				"render_vertices": 412746,
+				"render_triangles": 253002,
+				"exclusive_resource_bytes": 22010676,
+				"bounds_cm": [
+					1648.83642578125,
+					1464.8048706054688,
+					1889.11328125
+				],
+				"nanite_enabled": false
+			},
+			"foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ReleasedIntermediatePrototype_Leaves",
+				"source_vertices": 145728,
+				"source_triangles": 72864,
+				"source_card_count": 36432,
+				"render_vertices": 145728,
+				"render_triangles": 72864,
+				"exclusive_resource_bytes": 7645620,
+				"bounds_cm": [
+					1651.7318725585938,
+					1467.664794921875,
+					1892.2694702148438
+				],
+				"nanite_enabled": false
+			},
+			"far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ReleasedIntermediatePrototype_LeavesFar",
+				"source_vertices": 305856,
+				"source_triangles": 152928,
+				"source_card_count": 76464,
+				"render_vertices": 305620,
+				"render_triangles": 152928,
+				"exclusive_resource_bytes": 15963780,
+				"bounds_cm": [
+					2715.29931640625,
+					1569.2340087890625,
+					2027.259033203125
+				],
+				"nanite_enabled": false
+			},
+			"runtime_far_foliage":
+			{
+				"asset": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Meshes/SM_RaftSim_FutaleufuCoigue_ReleasedIntermediatePrototype_LeavesFarRuntime",
+				"source_vertices": 50976,
+				"source_triangles": 25488,
+				"source_card_count": 12744,
+				"render_vertices": 50976,
+				"render_triangles": 25488,
+				"exclusive_resource_bytes": 2310708,
+				"bounds_cm": [
+					2740.414306640625,
+					1576.4146728515625,
+					2037.3679809570312
+				],
+				"nanite_enabled": false
+			}
+		}
+	],
+	"leaf_contract":
+	{
+		"atlas": "4x4_v2",
+		"single_leaf_tiles": 12,
+		"tiny_twig_tiles": 4,
+		"visible_leaf_length_cm": [
+			2,
+			3.5
+		],
+		"padding_aware_single_leaf_card_cm": [
+			2.7999999999999998,
+			5.7999999999999998
+		],
+		"parent_shoot_length_cm": 56,
+		"branchlet_length_cm": [
+			24,
+			40
+		],
+		"padding_aware_far_twig_card_cm": [
+			36,
+			80
+		],
+		"primary_tip_radius_cm": [
+			7,
+			3.2000000000000002,
+			0.80000000000000004
+		],
+		"terminal_twig_collar_radius_cm": [
+			3.2000000000000002,
+			1.3999999999999999,
+			0.71999999999999997
+		],
+		"parent_shoot_radius_cm": [
+			0.73999999999999999,
+			0.20000000000000001
+		],
+		"near_representation": "continuous_limb_to_collar_to_parent_shoot_to_branchlet_to_tertiary_to_petiole_hierarchy",
+		"far_representation": "branch_sprays_plus_irregular_interior_crown_volume",
+		"wind_parameters": [
+			"WindIntensity",
+			"WindWeight",
+			"WindSpeed"
+		]
+	},
+	"lod_handoff":
+	{
+		"near_leaf_max_draw_distance_cm": 3600,
+		"far_crown_min_draw_distance_cm": 2800,
+		"overlap_cm": 800,
+		"runtime_far_card_stride": 6,
+		"runtime_far_card_scale": 1.28,
+		"status": "full_isolated_near_and_far_assets_retained_plus_reduced_far_corridor_lod_candidate"
+	},
+	"capture_gate":
+	{
+		"status": "forty_isolated_views_and_512_tree_runtime_benchmark_captured",
+		"views_per_form": 5,
+		"form_count": 8,
+		"git_policy": "generated map and captures remain local until human review",
+		"captures": [
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/river_distance_150m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/turntable_azimuth_035.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/turntable_azimuth_145.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/bark_leaf_closeup.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/river_distance_60m.png",
+			"unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/river_distance_150m.png"
+		]
+	},
+	"runtime_far_lod_hism_benchmark":
+	{
+		"map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCoigue_RuntimeFarLod_HismBenchmark",
+		"capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_coigue_runtime_far_lod_hism_512_tree.png",
+		"tree_instance_count": 512,
+		"crown_form_count": 8,
+		"hism_component_count": 16,
+		"map_saved": true,
+		"capture_saved": true,
+		"scope": "offscreen Metal authoring density and silhouette evidence; not packaged frame-time, draw-call, overdraw, streaming, culling, or VR proof"
+	},
+	"performance_instrumentation":
+	{
+		"measurement_scope": "UE 5.8 Metal offscreen isolated-review capture plus 512-tree HISM authoring density map; not gameplay, packaged-build frame time, or VR evidence",
+		"family_exclusive_resource_bytes": 367918128,
+		"family_render_vertices_lod0": 6961948,
+		"family_render_triangles_lod0": 3859140,
+		"runtime_far_family_exclusive_resource_bytes": 20264400,
+		"runtime_far_family_render_vertices_lod0": 435064,
+		"runtime_far_family_render_triangles_lod0": 223592,
+		"runtime_far_family_resource_reduction_fraction": 0.94492144187034999,
+		"static_mesh_assets": 40,
+		"near_tree_material_sections": 3,
+		"far_tree_material_sections": 2,
+		"unmeasured_gates": "packaged desktop and VR frame time, masked overdraw, motion vectors, draw-call submission, streaming, culling, near-to-far transition, and full mixed-ecology corridor density",
+		"capture_wall_time_valid": true,
+		"frame_cycle_counters_valid": false,
+		"frame_cycle_validation": "rejected: offscreen editor counters must be positive and vary across samples; use a packaged on-device benchmark for production frame-time evidence",
+		"capture_wall_time":
+		{
+			"sample_count": 40,
+			"minimum_ms": 171.8699187040329,
+			"median_ms": 198.72681237757206,
+			"maximum_ms": 314.90254029631615
+		},
+		"game_thread_frame_time":
+		{
+			"sample_count": 40,
+			"minimum_ms": 0,
+			"median_ms": 0,
+			"maximum_ms": 0
+		},
+		"render_thread_frame_time":
+		{
+			"sample_count": 40,
+			"minimum_ms": 8.6469583333333357,
+			"median_ms": 8.6469583333333357,
+			"maximum_ms": 8.6469583333333357
+		},
+		"gpu_frame_time":
+		{
+			"sample_count": 40,
+			"minimum_ms": 0.013333333333333338,
+			"median_ms": 0.013333333333333338,
+			"maximum_ms": 0.013333333333333338
+		},
+		"capture_samples": [
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 314.90254029631615,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 187.58054077625275,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 171.8699187040329,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 183.40453878045082,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/open_grown_adult/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 182.12899938225746,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 198.0271227657795,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 193.61221045255661,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 191.6067898273468,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 208.22170749306679,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/forest_grown_adult/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 197.71245867013931,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 218.79028901457787,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 188.69649991393089,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 199.60249960422516,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 198.95616546273232,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/storm_damaged_adult/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 194.08870860934258,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 199.46470856666565,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 209.7974568605423,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 184.32583287358284,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 200.15891641378403,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/competition_lean_adult/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 213.16049993038177,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 192.90170818567276,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 191.64004176855087,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 215.88120982050896,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 192.02233478426933,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/crown_gap_adult/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 194.04004141688347,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 200.61804354190826,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 214.56125006079674,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 197.35520705580711,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 201.34583115577698,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 198.10070842504501,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 194.16283443570137,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 208.43596011400223,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 198.4974592924118,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 215.73549881577492,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_suppressed/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 212.68691495060921,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/turntable_azimuth_035.png",
+				"captured": true,
+				"capture_wall_time_ms": 232.53187537193298,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/turntable_azimuth_145.png",
+				"captured": true,
+				"capture_wall_time_ms": 200.61491802334785,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/bark_leaf_closeup.png",
+				"captured": true,
+				"capture_wall_time_ms": 194.47237253189087,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/river_distance_60m.png",
+				"captured": true,
+				"capture_wall_time_ms": 207.43254199624062,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			},
+			{
+				"capture": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/intermediate_released/river_distance_150m.png",
+				"captured": true,
+				"capture_wall_time_ms": 200.01900196075439,
+				"game_thread_frame_time_ms": 0,
+				"render_thread_frame_time_ms": 8.6469583333333357,
+				"gpu_frame_time_ms": 0.013333333333333338
+			}
+		]
+	},
+	"promotion_boundary": "isolated human visual acceptance, temporal wind, packaged desktop and VR corridor performance, and ecology gates are required before corridor substitution"
+}

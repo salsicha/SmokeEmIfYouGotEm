@@ -1,0 +1,3093 @@
+{
+  "schema": "raftsim.local_centerline.v1",
+  "river_id": "futaleufu_terminator",
+  "bounds_wgs84": [
+    -72.07691839357143,
+    -43.36896476762486,
+    -71.95249270642857,
+    -43.29373863237514
+  ],
+  "local_metric_policy": "equirectangular offsets at corridor center latitude; Unreal local X increases east and local Y follows source image rows southward from the northwest heightfield corner",
+  "points": [
+    {
+      "station_m": 0.0,
+      "lon": -72.0143132,
+      "lat": -43.3072133,
+      "x_m": 5069.385171298128,
+      "y_m": 1499.9999999996926,
+      "unreal_local_cm": [
+        506938.5171298128,
+        149999.99999996927
+      ],
+      "conditioned_visual_surface_elevation_m": 279.4202,
+      "conditioned_visual_bed_elevation_m": 277.6202,
+      "conditioned_visual_surface_normalized": 0.08840077,
+      "conditioned_visual_bed_normalized": 0.08732867
+    },
+    {
+      "station_m": 211.85269664545044,
+      "lon": -72.0130395,
+      "lat": -43.3088779,
+      "x_m": 5172.521596957589,
+      "y_m": 1685.3032719994717,
+      "unreal_local_cm": [
+        517252.15969575895,
+        168530.32719994718
+      ],
+      "conditioned_visual_surface_elevation_m": 278.2529,
+      "conditioned_visual_bed_elevation_m": 276.4529,
+      "conditioned_visual_surface_normalized": 0.08770551,
+      "conditioned_visual_bed_normalized": 0.08663341
+    },
+    {
+      "station_m": 324.93008271090525,
+      "lon": -72.0117137,
+      "lat": -43.3091995,
+      "x_m": 5279.8767615488,
+      "y_m": 1721.1037839994137,
+      "unreal_local_cm": [
+        527987.67615488,
+        172110.37839994137
+      ],
+      "conditioned_visual_surface_elevation_m": 275.9913,
+      "conditioned_visual_bed_elevation_m": 274.1913,
+      "conditioned_visual_surface_normalized": 0.08635848,
+      "conditioned_visual_bed_normalized": 0.08528638
+    },
+    {
+      "station_m": 442.61095117681845,
+      "lon": -72.0104399,
+      "lat": -43.3086887,
+      "x_m": 5383.021284596516,
+      "y_m": 1664.2415279993359,
+      "unreal_local_cm": [
+        538302.1284596516,
+        166424.1527999336
+      ],
+      "conditioned_visual_surface_elevation_m": 273.6377,
+      "conditioned_visual_bed_elevation_m": 271.8377,
+      "conditioned_visual_surface_normalized": 0.08495665,
+      "conditioned_visual_bed_normalized": 0.08388455
+    },
+    {
+      "station_m": 582.2893697957317,
+      "lon": -72.0088022,
+      "lat": -43.3082915,
+      "x_m": 5515.632201061584,
+      "y_m": 1620.0252239999181,
+      "unreal_local_cm": [
+        551563.2201061584,
+        162002.5223999918
+      ],
+      "conditioned_visual_surface_elevation_m": 270.8442,
+      "conditioned_visual_bed_elevation_m": 269.0442,
+      "conditioned_visual_surface_normalized": 0.08329281,
+      "conditioned_visual_bed_normalized": 0.08222071
+    },
+    {
+      "station_m": 669.0129202112907,
+      "lon": -72.0078384,
+      "lat": -43.3086327,
+      "x_m": 5593.674822598463,
+      "y_m": 1658.0076079992555,
+      "unreal_local_cm": [
+        559367.4822598463,
+        165800.76079992554
+      ],
+      "conditioned_visual_surface_elevation_m": 269.9777,
+      "conditioned_visual_bed_elevation_m": 268.1777,
+      "conditioned_visual_surface_normalized": 0.08277671,
+      "conditioned_visual_bed_normalized": 0.08170461
+    },
+    {
+      "station_m": 789.2604617469655,
+      "lon": -72.0078598,
+      "lat": -43.309714,
+      "x_m": 5591.941981654762,
+      "y_m": 1778.377923999559,
+      "unreal_local_cm": [
+        559194.1981654762,
+        177837.7923999559
+      ],
+      "conditioned_visual_surface_elevation_m": 267.5728,
+      "conditioned_visual_bed_elevation_m": 265.7728,
+      "conditioned_visual_surface_normalized": 0.08134432,
+      "conditioned_visual_bed_normalized": 0.08027222
+    },
+    {
+      "station_m": 835.7807404722536,
+      "lon": -72.0075648,
+      "lat": -43.3100731,
+      "x_m": 5615.82927502874,
+      "y_m": 1818.352935999244,
+      "unreal_local_cm": [
+        561582.927502874,
+        181835.2935999244
+      ],
+      "conditioned_visual_surface_elevation_m": 266.6424,
+      "conditioned_visual_bed_elevation_m": 264.8424,
+      "conditioned_visual_surface_normalized": 0.08079017,
+      "conditioned_visual_bed_normalized": 0.07971807
+    },
+    {
+      "station_m": 903.0895531150701,
+      "lon": -72.0067977,
+      "lat": -43.3103073,
+      "x_m": 5677.944335186115,
+      "y_m": 1844.4240799993881,
+      "unreal_local_cm": [
+        567794.4335186115,
+        184442.40799993882
+      ],
+      "conditioned_visual_surface_elevation_m": 265.2962,
+      "conditioned_visual_bed_elevation_m": 263.4962,
+      "conditioned_visual_surface_normalized": 0.07998835,
+      "conditioned_visual_bed_normalized": 0.07891625
+    },
+    {
+      "station_m": 988.914369702563,
+      "lon": -72.0057495,
+      "lat": -43.3104256,
+      "x_m": 5762.821151844498,
+      "y_m": 1857.5932359998346,
+      "unreal_local_cm": [
+        576282.1151844498,
+        185759.32359998347
+      ],
+      "conditioned_visual_surface_elevation_m": 263.5797,
+      "conditioned_visual_bed_elevation_m": 261.7797,
+      "conditioned_visual_surface_normalized": 0.07896599,
+      "conditioned_visual_bed_normalized": 0.07789389
+    },
+    {
+      "station_m": 1047.1262495677126,
+      "lon": -72.005065,
+      "lat": -43.3102644,
+      "x_m": 5818.247769857435,
+      "y_m": 1839.6484519997389,
+      "unreal_local_cm": [
+        581824.7769857434,
+        183964.84519997388
+      ],
+      "conditioned_visual_surface_elevation_m": 262.4155,
+      "conditioned_visual_bed_elevation_m": 260.6155,
+      "conditioned_visual_surface_normalized": 0.07827258,
+      "conditioned_visual_bed_normalized": 0.07720048
+    },
+    {
+      "station_m": 1109.3204622830876,
+      "lon": -72.0044802,
+      "lat": -43.3099014,
+      "x_m": 5865.601292449545,
+      "y_m": 1799.2392919997264,
+      "unreal_local_cm": [
+        586560.1292449546,
+        179923.92919997266
+      ],
+      "conditioned_visual_surface_elevation_m": 261.1716,
+      "conditioned_visual_bed_elevation_m": 259.3716,
+      "conditioned_visual_surface_normalized": 0.0775317,
+      "conditioned_visual_bed_normalized": 0.0764596
+    },
+    {
+      "station_m": 1185.9124604611552,
+      "lon": -72.0042206,
+      "lat": -43.309239,
+      "x_m": 5886.6221106186,
+      "y_m": 1725.5009239993856,
+      "unreal_local_cm": [
+        588662.2110618601,
+        172550.09239993856
+      ],
+      "conditioned_visual_surface_elevation_m": 259.6397,
+      "conditioned_visual_bed_elevation_m": 257.8397,
+      "conditioned_visual_surface_normalized": 0.07661928,
+      "conditioned_visual_bed_normalized": 0.07554718
+    },
+    {
+      "station_m": 1250.9660407743934,
+      "lon": -72.0041348,
+      "lat": -43.3086573,
+      "x_m": 5893.5696691653075,
+      "y_m": 1660.7460799996184,
+      "unreal_local_cm": [
+        589356.9669165307,
+        166074.60799996182
+      ],
+      "conditioned_visual_surface_elevation_m": 258.3387,
+      "conditioned_visual_bed_elevation_m": 256.5387,
+      "conditioned_visual_surface_normalized": 0.07584439,
+      "conditioned_visual_bed_normalized": 0.07477229
+    },
+    {
+      "station_m": 1315.3829860896105,
+      "lon": -72.0037346,
+      "lat": -43.3081565,
+      "x_m": 5925.975414277266,
+      "y_m": 1604.9970239998938,
+      "unreal_local_cm": [
+        592597.5414277266,
+        160499.7023999894
+      ],
+      "conditioned_visual_surface_elevation_m": 258.3387,
+      "conditioned_visual_bed_elevation_m": 256.5387,
+      "conditioned_visual_surface_normalized": 0.07584439,
+      "conditioned_visual_bed_normalized": 0.07477229
+    },
+    {
+      "station_m": 1370.5672955730786,
+      "lon": -72.0030587,
+      "lat": -43.3080902,
+      "x_m": 5980.705656959033,
+      "y_m": 1597.616507999861,
+      "unreal_local_cm": [
+        598070.5656959033,
+        159761.6507999861
+      ],
+      "conditioned_visual_surface_elevation_m": 258.1297,
+      "conditioned_visual_bed_elevation_m": 256.3297,
+      "conditioned_visual_surface_normalized": 0.07571991,
+      "conditioned_visual_bed_normalized": 0.0746478
+    },
+    {
+      "station_m": 1449.4204330365037,
+      "lon": -72.0021735,
+      "lat": -43.3083868,
+      "x_m": 6052.383731854023,
+      "y_m": 1630.6340199997103,
+      "unreal_local_cm": [
+        605238.3731854022,
+        163063.401999971
+      ],
+      "conditioned_visual_surface_elevation_m": 256.5526,
+      "conditioned_visual_bed_elevation_m": 254.7526,
+      "conditioned_visual_surface_normalized": 0.07478057,
+      "conditioned_visual_bed_normalized": 0.07370847
+    },
+    {
+      "station_m": 1548.6484781931363,
+      "lon": -72.0017283,
+      "lat": -43.3092183,
+      "x_m": 6088.433301378865,
+      "y_m": 1723.1965999993504,
+      "unreal_local_cm": [
+        608843.3301378865,
+        172319.65999993504
+      ],
+      "conditioned_visual_surface_elevation_m": 254.5681,
+      "conditioned_visual_bed_elevation_m": 252.7681,
+      "conditioned_visual_surface_normalized": 0.07359858,
+      "conditioned_visual_bed_normalized": 0.07252647
+    },
+    {
+      "station_m": 1634.6587521091842,
+      "lon": -72.0014869,
+      "lat": -43.3099716,
+      "x_m": 6107.980395006488,
+      "y_m": 1807.053955999296,
+      "unreal_local_cm": [
+        610798.0395006487,
+        180705.39559992962
+      ],
+      "conditioned_visual_surface_elevation_m": 252.8479,
+      "conditioned_visual_bed_elevation_m": 251.0479,
+      "conditioned_visual_surface_normalized": 0.072574,
+      "conditioned_visual_bed_normalized": 0.0715019
+    },
+    {
+      "station_m": 1685.5913240123234,
+      "lon": -72.0011758,
+      "lat": -43.3103698,
+      "x_m": 6133.171367781218,
+      "y_m": 1851.3815799992235,
+      "unreal_local_cm": [
+        613317.1367781218,
+        185138.15799992235
+      ],
+      "conditioned_visual_surface_elevation_m": 251.8292,
+      "conditioned_visual_bed_elevation_m": 250.0292,
+      "conditioned_visual_surface_normalized": 0.07196726,
+      "conditioned_visual_bed_normalized": 0.07089515
+    },
+    {
+      "station_m": 1739.310991020642,
+      "lon": -72.0005374,
+      "lat": -43.3105025,
+      "x_m": 6184.865090118531,
+      "y_m": 1866.1537439994197,
+      "unreal_local_cm": [
+        618486.5090118531,
+        186615.37439994197
+      ],
+      "conditioned_visual_surface_elevation_m": 250.7548,
+      "conditioned_visual_bed_elevation_m": 248.9548,
+      "conditioned_visual_surface_normalized": 0.07132733,
+      "conditioned_visual_bed_normalized": 0.07025523
+    },
+    {
+      "station_m": 1796.5727918829018,
+      "lon": -71.9999044,
+      "lat": -43.3102722,
+      "x_m": 6236.121553525793,
+      "y_m": 1840.5167479996032,
+      "unreal_local_cm": [
+        623612.1553525793,
+        184051.6747999603
+      ],
+      "conditioned_visual_surface_elevation_m": 250.7548,
+      "conditioned_visual_bed_elevation_m": 248.9548,
+      "conditioned_visual_surface_normalized": 0.07132733,
+      "conditioned_visual_bed_normalized": 0.07025523
+    },
+    {
+      "station_m": 1889.6077870453516,
+      "lon": -71.9990246,
+      "lat": -43.3097335,
+      "x_m": 6307.3623694918815,
+      "y_m": 1780.5486639996152,
+      "unreal_local_cm": [
+        630736.2369491882,
+        178054.86639996152
+      ],
+      "conditioned_visual_surface_elevation_m": 250.4117,
+      "conditioned_visual_bed_elevation_m": 248.6117,
+      "conditioned_visual_surface_normalized": 0.07112298,
+      "conditioned_visual_bed_normalized": 0.07005088
+    },
+    {
+      "station_m": 1965.2429185756728,
+      "lon": -71.9982307,
+      "lat": -43.3093744,
+      "x_m": 6371.647529523009,
+      "y_m": 1740.5736519999302,
+      "unreal_local_cm": [
+        637164.752952301,
+        174057.36519999302
+      ],
+      "conditioned_visual_surface_elevation_m": 249.7042,
+      "conditioned_visual_bed_elevation_m": 247.9042,
+      "conditioned_visual_surface_normalized": 0.07070158,
+      "conditioned_visual_bed_normalized": 0.06962948
+    },
+    {
+      "station_m": 2029.7330900585496,
+      "lon": -71.99744,
+      "lat": -43.3093014,
+      "x_m": 6435.673573150716,
+      "y_m": 1732.447291999882,
+      "unreal_local_cm": [
+        643567.3573150716,
+        173244.7291999882
+      ],
+      "conditioned_visual_surface_elevation_m": 248.5707,
+      "conditioned_visual_bed_elevation_m": 246.7707,
+      "conditioned_visual_surface_normalized": 0.07002646,
+      "conditioned_visual_bed_normalized": 0.06895435
+    },
+    {
+      "station_m": 2089.770405433494,
+      "lon": -71.9967608,
+      "lat": -43.3095188,
+      "x_m": 6490.671029621854,
+      "y_m": 1756.6482599995275,
+      "unreal_local_cm": [
+        649067.1029621854,
+        175664.82599995274
+      ],
+      "conditioned_visual_surface_elevation_m": 248.4591,
+      "conditioned_visual_bed_elevation_m": 246.6591,
+      "conditioned_visual_surface_normalized": 0.06995999,
+      "conditioned_visual_bed_normalized": 0.06888788
+    },
+    {
+      "station_m": 2118.391099782418,
+      "lon": -71.9965602,
+      "lat": -43.3097308,
+      "x_m": 6506.914389115654,
+      "y_m": 1780.2480999992667,
+      "unreal_local_cm": [
+        650691.4389115653,
+        178024.80999992669
+      ],
+      "conditioned_visual_surface_elevation_m": 248.2569,
+      "conditioned_visual_bed_elevation_m": 246.4569,
+      "conditioned_visual_surface_normalized": 0.06983955,
+      "conditioned_visual_bed_normalized": 0.06876745
+    },
+    {
+      "station_m": 2159.1992923209536,
+      "lon": -71.9965195,
+      "lat": -43.3100966,
+      "x_m": 6510.210025862375,
+      "y_m": 1820.968955999758,
+      "unreal_local_cm": [
+        651021.0025862375,
+        182096.8955999758
+      ],
+      "conditioned_visual_surface_elevation_m": 247.7331,
+      "conditioned_visual_bed_elevation_m": 245.9331,
+      "conditioned_visual_surface_normalized": 0.06952757,
+      "conditioned_visual_bed_normalized": 0.06845547
+    },
+    {
+      "station_m": 2285.2221058238856,
+      "lon": -71.9968681,
+      "lat": -43.3112012,
+      "x_m": 6481.982532744344,
+      "y_m": 1943.9330279995243,
+      "unreal_local_cm": [
+        648198.2532744344,
+        194393.30279995242
+      ],
+      "conditioned_visual_surface_elevation_m": 245.2126,
+      "conditioned_visual_bed_elevation_m": 243.4126,
+      "conditioned_visual_surface_normalized": 0.06802633,
+      "conditioned_visual_bed_normalized": 0.06695423
+    },
+    {
+      "station_m": 2322.9863376615945,
+      "lon": -71.9968628,
+      "lat": -43.3115408,
+      "x_m": 6482.411694286142,
+      "y_m": 1981.737299999944,
+      "unreal_local_cm": [
+        648241.1694286142,
+        198173.7299999944
+      ],
+      "conditioned_visual_surface_elevation_m": 244.4831,
+      "conditioned_visual_bed_elevation_m": 242.6831,
+      "conditioned_visual_surface_normalized": 0.06759183,
+      "conditioned_visual_bed_normalized": 0.06651973
+    },
+    {
+      "station_m": 2392.6596758951696,
+      "lon": -71.9962512,
+      "lat": -43.3119819,
+      "x_m": 6531.935316750854,
+      "y_m": 2030.8405519995208,
+      "unreal_local_cm": [
+        653193.5316750854,
+        203084.05519995207
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2429.812057554838,
+      "lon": -71.9960742,
+      "lat": -43.3122902,
+      "x_m": 6546.267692775472,
+      "y_m": 2065.160507999562,
+      "unreal_local_cm": [
+        654626.7692775471,
+        206516.0507999562
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2465.1452628711777,
+      "lon": -71.9957255,
+      "lat": -43.3124815,
+      "x_m": 6574.5032832806055,
+      "y_m": 2086.456023999266,
+      "unreal_local_cm": [
+        657450.3283280606,
+        208645.6023999266
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2537.3469952305345,
+      "lon": -71.9948833,
+      "lat": -43.3126962,
+      "x_m": 6642.699481515137,
+      "y_m": 2110.356427999354,
+      "unreal_local_cm": [
+        664269.9481515137,
+        211035.6427999354
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2594.3109858328826,
+      "lon": -71.9941859,
+      "lat": -43.3126259,
+      "x_m": 6699.170662526557,
+      "y_m": 2102.5306319996544,
+      "unreal_local_cm": [
+        669917.0662526557,
+        210253.06319996543
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2661.8705081588323,
+      "lon": -71.9934028,
+      "lat": -43.3128368,
+      "x_m": 6762.5813046987305,
+      "y_m": 2126.0080199995446,
+      "unreal_local_cm": [
+        676258.1304698731,
+        212600.80199995445
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2706.2289443695595,
+      "lon": -71.9929628,
+      "lat": -43.3130748,
+      "x_m": 6798.209810068879,
+      "y_m": 2152.5021799998863,
+      "unreal_local_cm": [
+        679820.9810068879,
+        215250.2179999886
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2742.8989284404797,
+      "lon": -71.9925391,
+      "lat": -43.3131919,
+      "x_m": 6832.518441262917,
+      "y_m": 2165.5377519995627,
+      "unreal_local_cm": [
+        683251.8441262917,
+        216553.77519995626
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2778.926850320484,
+      "lon": -71.9920938,
+      "lat": -43.3131919,
+      "x_m": 6868.576108174862,
+      "y_m": 2165.5377519995627,
+      "unreal_local_cm": [
+        686857.6108174862,
+        216553.77519995626
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2823.07009938672,
+      "lon": -71.991552,
+      "lat": -43.3132387,
+      "x_m": 6912.447754106515,
+      "y_m": 2170.7475279995397,
+      "unreal_local_cm": [
+        691244.7754106516,
+        217074.75279995397
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2881.583489125717,
+      "lon": -71.9909244,
+      "lat": -43.3135002,
+      "x_m": 6963.266958584875,
+      "y_m": 2199.8577079996044,
+      "unreal_local_cm": [
+        696326.6958584875,
+        219985.77079996045
+      ],
+      "conditioned_visual_surface_elevation_m": 243.2737,
+      "conditioned_visual_bed_elevation_m": 241.4737,
+      "conditioned_visual_surface_normalized": 0.0668715,
+      "conditioned_visual_bed_normalized": 0.0657994
+    },
+    {
+      "station_m": 2975.2509669353744,
+      "lon": -71.9900768,
+      "lat": -43.314074,
+      "x_m": 7031.90041574831,
+      "y_m": 2263.733123999377,
+      "unreal_local_cm": [
+        703190.041574831,
+        226373.31239993768
+      ],
+      "conditioned_visual_surface_elevation_m": 241.5717,
+      "conditioned_visual_bed_elevation_m": 239.7717,
+      "conditioned_visual_surface_normalized": 0.06585777,
+      "conditioned_visual_bed_normalized": 0.06478567
+    },
+    {
+      "station_m": 3055.8049261371093,
+      "lon": -71.9892346,
+      "lat": -43.3144604,
+      "x_m": 7100.096613981692,
+      "y_m": 2306.7471719997734,
+      "unreal_local_cm": [
+        710009.6613981692,
+        230674.71719997734
+      ],
+      "conditioned_visual_surface_elevation_m": 239.9606,
+      "conditioned_visual_bed_elevation_m": 238.1606,
+      "conditioned_visual_surface_normalized": 0.06489818,
+      "conditioned_visual_bed_normalized": 0.06382608
+    },
+    {
+      "station_m": 3129.4482539067244,
+      "lon": -71.9883387,
+      "lat": -43.3145775,
+      "x_m": 7172.641109348533,
+      "y_m": 2319.78274399945,
+      "unreal_local_cm": [
+        717264.1109348533,
+        231978.274399945
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3199.0921346595233,
+      "lon": -71.9874911,
+      "lat": -43.3146868,
+      "x_m": 7241.2745665119655,
+      "y_m": 2331.950019999262,
+      "unreal_local_cm": [
+        724127.4566511966,
+        233195.00199992623
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3248.1051328527683,
+      "lon": -71.9869332,
+      "lat": -43.3148586,
+      "x_m": 7286.449891844371,
+      "y_m": 2351.074795999701,
+      "unreal_local_cm": [
+        728644.9891844371,
+        235107.4795999701
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3273.3010013610306,
+      "lon": -71.9866253,
+      "lat": -43.3148246,
+      "x_m": 7311.381748215681,
+      "y_m": 2347.289915999765,
+      "unreal_local_cm": [
+        731138.1748215681,
+        234728.9915999765
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3311.721432431195,
+      "lon": -71.986268,
+      "lat": -43.314597,
+      "x_m": 7340.313714054288,
+      "y_m": 2321.9534839995063,
+      "unreal_local_cm": [
+        734031.3714054287,
+        232195.34839995063
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3356.217253787915,
+      "lon": -71.9858818,
+      "lat": -43.3143121,
+      "x_m": 7371.585824903874,
+      "y_m": 2290.2384159998487,
+      "unreal_local_cm": [
+        737158.5824903874,
+        229023.84159998488
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3382.188496251383,
+      "lon": -71.9855653,
+      "lat": -43.3142731,
+      "x_m": 7397.214056607504,
+      "y_m": 2285.8969359997363,
+      "unreal_local_cm": [
+        739721.4056607505,
+        228589.69359997363
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4878,
+      "conditioned_visual_bed_elevation_m": 236.6878,
+      "conditioned_visual_surface_normalized": 0.06402096,
+      "conditioned_visual_bed_normalized": 0.06294886
+    },
+    {
+      "station_m": 3427.027084128171,
+      "lon": -71.9850718,
+      "lat": -43.3140896,
+      "x_m": 7437.174664335753,
+      "y_m": 2265.469715999897,
+      "unreal_local_cm": [
+        743717.4664335753,
+        226546.9715999897
+      ],
+      "conditioned_visual_surface_elevation_m": 238.4599,
+      "conditioned_visual_bed_elevation_m": 236.6599,
+      "conditioned_visual_surface_normalized": 0.06400435,
+      "conditioned_visual_bed_normalized": 0.06293225
+    },
+    {
+      "station_m": 3478.814004789528,
+      "lon": -71.9845783,
+      "lat": -43.313793,
+      "x_m": 7477.135272064001,
+      "y_m": 2232.452203999256,
+      "unreal_local_cm": [
+        747713.5272064001,
+        223245.22039992563
+      ],
+      "conditioned_visual_surface_elevation_m": 237.4241,
+      "conditioned_visual_bed_elevation_m": 235.6241,
+      "conditioned_visual_surface_normalized": 0.06338741,
+      "conditioned_visual_bed_normalized": 0.06231531
+    },
+    {
+      "station_m": 3517.0629270767154,
+      "lon": -71.9841598,
+      "lat": -43.313633,
+      "x_m": 7511.022839103343,
+      "y_m": 2214.6410039999305,
+      "unreal_local_cm": [
+        751102.2839103343,
+        221464.10039999304
+      ],
+      "conditioned_visual_surface_elevation_m": 236.6592,
+      "conditioned_visual_bed_elevation_m": 234.8592,
+      "conditioned_visual_surface_normalized": 0.06293183,
+      "conditioned_visual_bed_normalized": 0.06185973
+    },
+    {
+      "station_m": 3563.6483958240005,
+      "lon": -71.9836234,
+      "lat": -43.3134807,
+      "x_m": 7554.457226104944,
+      "y_m": 2197.686967999548,
+      "unreal_local_cm": [
+        755445.7226104945,
+        219768.6967999548
+      ],
+      "conditioned_visual_surface_elevation_m": 235.7274,
+      "conditioned_visual_bed_elevation_m": 233.9274,
+      "conditioned_visual_surface_normalized": 0.06237684,
+      "conditioned_visual_bed_normalized": 0.06130474
+    },
+    {
+      "station_m": 3661.0485980615945,
+      "lon": -71.9824486,
+      "lat": -43.313672,
+      "x_m": 7649.5853354438605,
+      "y_m": 2218.982483999252,
+      "unreal_local_cm": [
+        764958.533544386,
+        221898.2483999252
+      ],
+      "conditioned_visual_surface_elevation_m": 233.7794,
+      "conditioned_visual_bed_elevation_m": 231.9794,
+      "conditioned_visual_surface_normalized": 0.06121659,
+      "conditioned_visual_bed_normalized": 0.06014449
+    },
+    {
+      "station_m": 3695.4353236914217,
+      "lon": -71.9820248,
+      "lat": -43.3136954,
+      "x_m": 7683.902064025002,
+      "y_m": 2221.5873719996357,
+      "unreal_local_cm": [
+        768390.2064025002,
+        222158.73719996357
+      ],
+      "conditioned_visual_surface_elevation_m": 233.0917,
+      "conditioned_visual_bed_elevation_m": 231.2917,
+      "conditioned_visual_surface_normalized": 0.06080699,
+      "conditioned_visual_bed_normalized": 0.05973489
+    },
+    {
+      "station_m": 3746.488722750322,
+      "lon": -71.9814562,
+      "lat": -43.3134963,
+      "x_m": 7729.943809829258,
+      "y_m": 2199.4235599992767,
+      "unreal_local_cm": [
+        772994.3809829258,
+        219942.35599992768
+      ],
+      "conditioned_visual_surface_elevation_m": 232.0706,
+      "conditioned_visual_bed_elevation_m": 230.2706,
+      "conditioned_visual_surface_normalized": 0.06019881,
+      "conditioned_visual_bed_normalized": 0.05912671
+    },
+    {
+      "station_m": 3903.492573621814,
+      "lon": -71.979614,
+      "lat": -43.3130525,
+      "x_m": 7879.11388390472,
+      "y_m": 2150.0197439993512,
+      "unreal_local_cm": [
+        787911.3883904719,
+        215001.97439993513
+      ],
+      "conditioned_visual_surface_elevation_m": 228.9306,
+      "conditioned_visual_bed_elevation_m": 227.1306,
+      "conditioned_visual_surface_normalized": 0.05832859,
+      "conditioned_visual_bed_normalized": 0.05725649
+    },
+    {
+      "station_m": 4056.9682070610174,
+      "lon": -71.977774,
+      "lat": -43.3127169,
+      "x_m": 8028.105815453552,
+      "y_m": 2112.6607519993895,
+      "unreal_local_cm": [
+        802810.5815453553,
+        211266.07519993896
+      ],
+      "conditioned_visual_surface_elevation_m": 225.861,
+      "conditioned_visual_bed_elevation_m": 224.061,
+      "conditioned_visual_surface_normalized": 0.0565003,
+      "conditioned_visual_bed_normalized": 0.0554282
+    },
+    {
+      "station_m": 4166.602730451863,
+      "lon": -71.976419,
+      "lat": -43.3127079,
+      "x_m": 8137.825417218203,
+      "y_m": 2111.658871999546,
+      "unreal_local_cm": [
+        813782.5417218204,
+        211165.88719995462
+      ],
+      "conditioned_visual_surface_elevation_m": 223.6684,
+      "conditioned_visual_bed_elevation_m": 221.8684,
+      "conditioned_visual_surface_normalized": 0.05519436,
+      "conditioned_visual_bed_normalized": 0.05412226
+    },
+    {
+      "station_m": 4243.250510004464,
+      "lon": -71.9754942,
+      "lat": -43.3128574,
+      "x_m": 8212.710057597173,
+      "y_m": 2128.30121199945,
+      "unreal_local_cm": [
+        821271.0057597173,
+        212830.12119994502
+      ],
+      "conditioned_visual_surface_elevation_m": 223.1577,
+      "conditioned_visual_bed_elevation_m": 221.3577,
+      "conditioned_visual_surface_normalized": 0.05489018,
+      "conditioned_visual_bed_normalized": 0.05381808
+    },
+    {
+      "station_m": 4301.7826591691155,
+      "lon": -71.9748955,
+      "lat": -43.3131529,
+      "x_m": 8261.189117063403,
+      "y_m": 2161.1962719994503,
+      "unreal_local_cm": [
+        826118.9117063403,
+        216119.62719994504
+      ],
+      "conditioned_visual_surface_elevation_m": 222.4302,
+      "conditioned_visual_bed_elevation_m": 220.6302,
+      "conditioned_visual_surface_normalized": 0.05445687,
+      "conditioned_visual_bed_normalized": 0.05338477
+    },
+    {
+      "station_m": 4381.7182461775155,
+      "lon": -71.9749384,
+      "lat": -43.3138711,
+      "x_m": 8257.71533779005,
+      "y_m": 2241.146295999611,
+      "unreal_local_cm": [
+        825771.533779005,
+        224114.6295999611
+      ],
+      "conditioned_visual_surface_elevation_m": 220.9701,
+      "conditioned_visual_bed_elevation_m": 219.1701,
+      "conditioned_visual_surface_normalized": 0.05358722,
+      "conditioned_visual_bed_normalized": 0.05251512
+    },
+    {
+      "station_m": 4451.01246523239,
+      "lon": -71.9753783,
+      "lat": -43.3144058,
+      "x_m": 8222.094929807006,
+      "y_m": 2300.6690999999323,
+      "unreal_local_cm": [
+        822209.4929807007,
+        230066.90999999322
+      ],
+      "conditioned_visual_surface_elevation_m": 219.7126,
+      "conditioned_visual_bed_elevation_m": 217.9126,
+      "conditioned_visual_surface_normalized": 0.05283824,
+      "conditioned_visual_bed_normalized": 0.05176614
+    },
+    {
+      "station_m": 4548.06112766273,
+      "lon": -71.975904,
+      "lat": -43.3151903,
+      "x_m": 8179.526963277254,
+      "y_m": 2387.999639999335,
+      "unreal_local_cm": [
+        817952.6963277254,
+        238799.9639999335
+      ],
+      "conditioned_visual_surface_elevation_m": 218.6,
+      "conditioned_visual_bed_elevation_m": 216.8,
+      "conditioned_visual_surface_normalized": 0.05217556,
+      "conditioned_visual_bed_normalized": 0.05110346
+    },
+    {
+      "station_m": 4697.315004469428,
+      "lon": -71.9766529,
+      "lat": -43.316417,
+      "x_m": 8118.885627659009,
+      "y_m": 2524.555883999746,
+      "unreal_local_cm": [
+        811888.5627659009,
+        252455.5883999746
+      ],
+      "conditioned_visual_surface_elevation_m": 217.1713,
+      "conditioned_visual_bed_elevation_m": 215.3713,
+      "conditioned_visual_surface_normalized": 0.05132461,
+      "conditioned_visual_bed_normalized": 0.05025251
+    },
+    {
+      "station_m": 4747.098750866253,
+      "lon": -71.9764565,
+      "lat": -43.3168413,
+      "x_m": 8134.788896874901,
+      "y_m": 2571.788959999615,
+      "unreal_local_cm": [
+        813478.8896874901,
+        257178.8959999615
+      ],
+      "conditioned_visual_surface_elevation_m": 216.1757,
+      "conditioned_visual_bed_elevation_m": 214.3757,
+      "conditioned_visual_surface_normalized": 0.05073162,
+      "conditioned_visual_bed_normalized": 0.04965952
+    },
+    {
+      "station_m": 4787.808680265217,
+      "lon": -71.9761615,
+      "lat": -43.3171379,
+      "x_m": 8158.676190247728,
+      "y_m": 2604.8064719994645,
+      "unreal_local_cm": [
+        815867.6190247728,
+        260480.64719994646
+      ],
+      "conditioned_visual_surface_elevation_m": 215.3615,
+      "conditioned_visual_bed_elevation_m": 213.5615,
+      "conditioned_visual_surface_normalized": 0.05024668,
+      "conditioned_visual_bed_normalized": 0.04917457
+    },
+    {
+      "station_m": 4828.547597813098,
+      "lon": -71.9756733,
+      "lat": -43.3172277,
+      "x_m": 8198.20763643418,
+      "y_m": 2614.8030079992204,
+      "unreal_local_cm": [
+        819820.763643418,
+        261480.30079992203
+      ],
+      "conditioned_visual_surface_elevation_m": 214.5467,
+      "conditioned_visual_bed_elevation_m": 212.7467,
+      "conditioned_visual_surface_normalized": 0.04976137,
+      "conditioned_visual_bed_normalized": 0.04868927
+    },
+    {
+      "station_m": 4881.89370481292,
+      "lon": -71.9750618,
+      "lat": -43.3170482,
+      "x_m": 8247.723161510636,
+      "y_m": 2594.8210679998383,
+      "unreal_local_cm": [
+        824772.3161510635,
+        259482.10679998383
+      ],
+      "conditioned_visual_surface_elevation_m": 213.4798,
+      "conditioned_visual_bed_elevation_m": 211.6798,
+      "conditioned_visual_surface_normalized": 0.04912591,
+      "conditioned_visual_bed_normalized": 0.04805381
+    },
+    {
+      "station_m": 4923.579219548468,
+      "lon": -71.9746219,
+      "lat": -43.316853,
+      "x_m": 8283.34356949368,
+      "y_m": 2573.091403999807,
+      "unreal_local_cm": [
+        828334.356949368,
+        257309.1403999807
+      ],
+      "conditioned_visual_surface_elevation_m": 212.646,
+      "conditioned_visual_bed_elevation_m": 210.846,
+      "conditioned_visual_surface_normalized": 0.04862929,
+      "conditioned_visual_bed_normalized": 0.04755719
+    },
+    {
+      "station_m": 4984.75855119198,
+      "lon": -71.9742496,
+      "lat": -43.3163741,
+      "x_m": 8313.490143470297,
+      "y_m": 2519.780255999306,
+      "unreal_local_cm": [
+        831349.0143470297,
+        251978.0255999306
+      ],
+      "conditioned_visual_surface_elevation_m": 212.646,
+      "conditioned_visual_bed_elevation_m": 210.846,
+      "conditioned_visual_surface_normalized": 0.04862929,
+      "conditioned_visual_bed_normalized": 0.04755719
+    },
+    {
+      "station_m": 5092.141948920675,
+      "lon": -71.9735168,
+      "lat": -43.3155689,
+      "x_m": 8372.82779968664,
+      "y_m": 2430.1453919998676,
+      "unreal_local_cm": [
+        837282.779968664,
+        243014.53919998676
+      ],
+      "conditioned_visual_surface_elevation_m": 211.6715,
+      "conditioned_visual_bed_elevation_m": 209.8715,
+      "conditioned_visual_surface_normalized": 0.04804887,
+      "conditioned_visual_bed_normalized": 0.04697677
+    },
+    {
+      "station_m": 5213.991448628714,
+      "lon": -71.972769,
+      "lat": -43.3146177,
+      "x_m": 8433.380064040994,
+      "y_m": 2324.257807999542,
+      "unreal_local_cm": [
+        843338.0064040994,
+        232425.7807999542
+      ],
+      "conditioned_visual_surface_elevation_m": 209.2345,
+      "conditioned_visual_bed_elevation_m": 207.4345,
+      "conditioned_visual_surface_normalized": 0.04659736,
+      "conditioned_visual_bed_normalized": 0.04552526
+    },
+    {
+      "station_m": 5255.200534133291,
+      "lon": -71.9722616,
+      "lat": -43.3145853,
+      "x_m": 8474.466208643362,
+      "y_m": 2320.6510399993144,
+      "unreal_local_cm": [
+        847446.6208643361,
+        232065.10399993145
+      ],
+      "conditioned_visual_surface_elevation_m": 208.4103,
+      "conditioned_visual_bed_elevation_m": 206.6103,
+      "conditioned_visual_surface_normalized": 0.04610646,
+      "conditioned_visual_bed_normalized": 0.04503436
+    },
+    {
+      "station_m": 5327.219119223559,
+      "lon": -71.9714972,
+      "lat": -43.3149172,
+      "x_m": 8536.362639336285,
+      "y_m": 2357.598147999209,
+      "unreal_local_cm": [
+        853636.2639336284,
+        235759.8147999209
+      ],
+      "conditioned_visual_surface_elevation_m": 206.97,
+      "conditioned_visual_bed_elevation_m": 205.17,
+      "conditioned_visual_surface_normalized": 0.0452486,
+      "conditioned_visual_bed_normalized": 0.0441765
+    },
+    {
+      "station_m": 5361.143148385616,
+      "lon": -71.9711003,
+      "lat": -43.3150156,
+      "x_m": 8568.50117065772,
+      "y_m": 2368.55203599987,
+      "unreal_local_cm": [
+        856850.1170657721,
+        236855.203599987
+      ],
+      "conditioned_visual_surface_elevation_m": 206.2915,
+      "conditioned_visual_bed_elevation_m": 204.4915,
+      "conditioned_visual_surface_normalized": 0.04484448,
+      "conditioned_visual_bed_normalized": 0.04377238
+    },
+    {
+      "station_m": 5379.5370921400745,
+      "lon": -71.9711874,
+      "lat": -43.3151684,
+      "x_m": 8561.448346071766,
+      "y_m": 2385.5617319993207,
+      "unreal_local_cm": [
+        856144.8346071766,
+        238556.17319993206
+      ],
+      "conditioned_visual_surface_elevation_m": 206.0819,
+      "conditioned_visual_bed_elevation_m": 204.2819,
+      "conditioned_visual_surface_normalized": 0.04471964,
+      "conditioned_visual_bed_normalized": 0.04364754
+    },
+    {
+      "station_m": 5397.934130093476,
+      "lon": -71.9712746,
+      "lat": -43.3153212,
+      "x_m": 8554.387424098706,
+      "y_m": 2402.5714279995627,
+      "unreal_local_cm": [
+        855438.7424098706,
+        240257.14279995626
+      ],
+      "conditioned_visual_surface_elevation_m": 205.7651,
+      "conditioned_visual_bed_elevation_m": 203.9651,
+      "conditioned_visual_surface_normalized": 0.04453095,
+      "conditioned_visual_bed_normalized": 0.04345885
+    },
+    {
+      "station_m": 5447.83097993119,
+      "lon": -71.9714785,
+      "lat": -43.3157447,
+      "x_m": 8537.876850814384,
+      "y_m": 2449.715447999973,
+      "unreal_local_cm": [
+        853787.6850814384,
+        244971.5447999973
+      ],
+      "conditioned_visual_surface_elevation_m": 205.4384,
+      "conditioned_visual_bed_elevation_m": 203.6384,
+      "conditioned_visual_surface_normalized": 0.04433636,
+      "conditioned_visual_bed_normalized": 0.04326426
+    },
+    {
+      "station_m": 5508.515991223284,
+      "lon": -71.9716287,
+      "lat": -43.3162794,
+      "x_m": 8525.71457466352,
+      "y_m": 2509.2382519995035,
+      "unreal_local_cm": [
+        852571.4574663519,
+        250923.82519995034
+      ],
+      "conditioned_visual_surface_elevation_m": 205.0,
+      "conditioned_visual_bed_elevation_m": 203.2,
+      "conditioned_visual_surface_normalized": 0.04407525,
+      "conditioned_visual_bed_normalized": 0.04300315
+    },
+    {
+      "station_m": 5513.995334966782,
+      "lon": -71.9716381,
+      "lat": -43.3163282,
+      "x_m": 8524.953420229767,
+      "y_m": 2514.6706679997087,
+      "unreal_local_cm": [
+        852495.3420229767,
+        251467.06679997087
+      ],
+      "conditioned_visual_surface_elevation_m": 205.0,
+      "conditioned_visual_bed_elevation_m": 203.2,
+      "conditioned_visual_surface_normalized": 0.04407525,
+      "conditioned_visual_bed_normalized": 0.04300315
+    },
+    {
+      "station_m": 5536.345762679462,
+      "lon": -71.9716394,
+      "lat": -43.3165292,
+      "x_m": 8524.84815419167,
+      "y_m": 2537.045987999376,
+      "unreal_local_cm": [
+        852484.815419167,
+        253704.59879993758
+      ],
+      "conditioned_visual_surface_elevation_m": 205.0,
+      "conditioned_visual_bed_elevation_m": 203.2,
+      "conditioned_visual_surface_normalized": 0.04407525,
+      "conditioned_visual_bed_normalized": 0.04300315
+    },
+    {
+      "station_m": 5584.241411613897,
+      "lon": -71.9715911,
+      "lat": -43.3169585,
+      "x_m": 8528.759192395075,
+      "y_m": 2584.8356639994217,
+      "unreal_local_cm": [
+        852875.9192395075,
+        258483.56639994218
+      ],
+      "conditioned_visual_surface_elevation_m": 204.801,
+      "conditioned_visual_bed_elevation_m": 203.001,
+      "conditioned_visual_surface_normalized": 0.04395672,
+      "conditioned_visual_bed_normalized": 0.04288462
+    },
+    {
+      "station_m": 5630.900740235412,
+      "lon": -71.9714677,
+      "lat": -43.3173684,
+      "x_m": 8538.751368673336,
+      "y_m": 2630.4657319995413,
+      "unreal_local_cm": [
+        853875.1368673337,
+        263046.5731999541
+      ],
+      "conditioned_visual_surface_elevation_m": 204.801,
+      "conditioned_visual_bed_elevation_m": 203.001,
+      "conditioned_visual_surface_normalized": 0.04395672,
+      "conditioned_visual_bed_normalized": 0.04288462
+    },
+    {
+      "station_m": 5694.5459633962,
+      "lon": -71.9713497,
+      "lat": -43.3179343,
+      "x_m": 8548.306286022698,
+      "y_m": 2693.4617199993195,
+      "unreal_local_cm": [
+        854830.6286022698,
+        269346.171999932
+      ],
+      "conditioned_visual_surface_elevation_m": 204.801,
+      "conditioned_visual_bed_elevation_m": 203.001,
+      "conditioned_visual_surface_normalized": 0.04395672,
+      "conditioned_visual_bed_normalized": 0.04288462
+    },
+    {
+      "station_m": 5778.21097375101,
+      "lon": -71.9712378,
+      "lat": -43.3186823,
+      "x_m": 8557.367262729982,
+      "y_m": 2776.7290799994894,
+      "unreal_local_cm": [
+        855736.7262729981,
+        277672.90799994895
+      ],
+      "conditioned_visual_surface_elevation_m": 204.7856,
+      "conditioned_visual_bed_elevation_m": 202.9856,
+      "conditioned_visual_surface_normalized": 0.04394755,
+      "conditioned_visual_bed_normalized": 0.04287545
+    },
+    {
+      "station_m": 5861.563573972045,
+      "lon": -71.9710876,
+      "lat": -43.3194239,
+      "x_m": 8569.529538880846,
+      "y_m": 2859.283991999243,
+      "unreal_local_cm": [
+        856952.9538880846,
+        285928.3991999243
+      ],
+      "conditioned_visual_surface_elevation_m": 204.0,
+      "conditioned_visual_bed_elevation_m": 202.2,
+      "conditioned_visual_surface_normalized": 0.04347964,
+      "conditioned_visual_bed_normalized": 0.04240754
+    },
+    {
+      "station_m": 5949.548132908871,
+      "lon": -71.9710171,
+      "lat": -43.3202135,
+      "x_m": 8575.238197128232,
+      "y_m": 2947.182263999744,
+      "unreal_local_cm": [
+        857523.8197128233,
+        294718.2263999744
+      ],
+      "conditioned_visual_surface_elevation_m": 203.8186,
+      "conditioned_visual_bed_elevation_m": 202.0186,
+      "conditioned_visual_surface_normalized": 0.04337159,
+      "conditioned_visual_bed_normalized": 0.04229949
+    },
+    {
+      "station_m": 5982.210048048314,
+      "lon": -71.9710493,
+      "lat": -43.3205063,
+      "x_m": 8572.630838325578,
+      "y_m": 2979.776759999396,
+      "unreal_local_cm": [
+        857263.0838325578,
+        297977.67599993956
+      ],
+      "conditioned_visual_surface_elevation_m": 203.5909,
+      "conditioned_visual_bed_elevation_m": 201.7909,
+      "conditioned_visual_surface_normalized": 0.04323597,
+      "conditioned_visual_bed_normalized": 0.04216387
+    },
+    {
+      "station_m": 6014.388781805611,
+      "lon": -71.9711191,
+      "lat": -43.3207912,
+      "x_m": 8566.978861792519,
+      "y_m": 3011.491827999844,
+      "unreal_local_cm": [
+        856697.8861792518,
+        301149.1827999844
+      ],
+      "conditioned_visual_surface_elevation_m": 203.5,
+      "conditioned_visual_bed_elevation_m": 201.7,
+      "conditioned_visual_surface_normalized": 0.04318183,
+      "conditioned_visual_bed_normalized": 0.04210973
+    },
+    {
+      "station_m": 6070.2350165760345,
+      "lon": -71.9713987,
+      "lat": -43.3212504,
+      "x_m": 8544.338566107268,
+      "y_m": 3062.609971999238,
+      "unreal_local_cm": [
+        854433.8566107268,
+        306260.9971999238
+      ],
+      "conditioned_visual_surface_elevation_m": 203.5,
+      "conditioned_visual_bed_elevation_m": 201.7,
+      "conditioned_visual_surface_normalized": 0.04318183,
+      "conditioned_visual_bed_normalized": 0.04210973
+    },
+    {
+      "station_m": 6172.855045410556,
+      "lon": -71.9718593,
+      "lat": -43.3221103,
+      "x_m": 8507.0419988937,
+      "y_m": 3158.3340399994386,
+      "unreal_local_cm": [
+        850704.1998893699,
+        315833.40399994387
+      ],
+      "conditioned_visual_surface_elevation_m": 203.1692,
+      "conditioned_visual_bed_elevation_m": 201.3692,
+      "conditioned_visual_surface_normalized": 0.0429848,
+      "conditioned_visual_bed_normalized": 0.0419127
+    },
+    {
+      "station_m": 6306.54250729399,
+      "lon": -71.9724172,
+      "lat": -43.323242,
+      "x_m": 8461.866673562445,
+      "y_m": 3284.314883999656,
+      "unreal_local_cm": [
+        846186.6673562445,
+        328431.48839996563
+      ],
+      "conditioned_visual_surface_elevation_m": 202.5479,
+      "conditioned_visual_bed_elevation_m": 200.7479,
+      "conditioned_visual_surface_normalized": 0.04261475,
+      "conditioned_visual_bed_normalized": 0.04154265
+    },
+    {
+      "station_m": 6392.489961868041,
+      "lon": -71.9729652,
+      "lat": -43.3239042,
+      "x_m": 8417.49298960046,
+      "y_m": 3358.0309879997367,
+      "unreal_local_cm": [
+        841749.2989600459,
+        335803.09879997367
+      ],
+      "conditioned_visual_surface_elevation_m": 202.3096,
+      "conditioned_visual_bed_elevation_m": 200.5096,
+      "conditioned_visual_surface_normalized": 0.04247281,
+      "conditioned_visual_bed_normalized": 0.04140071
+    },
+    {
+      "station_m": 6490.388554435005,
+      "lon": -71.9734587,
+      "lat": -43.3247081,
+      "x_m": 8377.532381873361,
+      "y_m": 3447.5211359998566,
+      "unreal_local_cm": [
+        837753.2381873361,
+        344752.11359998566
+      ],
+      "conditioned_visual_surface_elevation_m": 201.909,
+      "conditioned_visual_bed_elevation_m": 200.109,
+      "conditioned_visual_surface_normalized": 0.04223421,
+      "conditioned_visual_bed_normalized": 0.04116211
+    },
+    {
+      "station_m": 6552.185992994425,
+      "lon": -71.9736967,
+      "lat": -43.3252362,
+      "x_m": 8358.260599422216,
+      "y_m": 3506.3092279995017,
+      "unreal_local_cm": [
+        835826.0599422216,
+        350630.9227999502
+      ],
+      "conditioned_visual_surface_elevation_m": 201.5779,
+      "conditioned_visual_bed_elevation_m": 199.7779,
+      "conditioned_visual_surface_normalized": 0.04203701,
+      "conditioned_visual_bed_normalized": 0.0409649
+    },
+    {
+      "station_m": 6651.672335626992,
+      "lon": -71.9739415,
+      "lat": -43.326113,
+      "x_m": 8338.438194616965,
+      "y_m": 3603.9146039995403,
+      "unreal_local_cm": [
+        833843.8194616965,
+        360391.46039995406
+      ],
+      "conditioned_visual_surface_elevation_m": 201.406,
+      "conditioned_visual_bed_elevation_m": 199.606,
+      "conditioned_visual_surface_normalized": 0.04193462,
+      "conditioned_visual_bed_normalized": 0.04086252
+    },
+    {
+      "station_m": 6744.567740926454,
+      "lon": -71.9739737,
+      "lat": -43.3269481,
+      "x_m": 8335.830835814311,
+      "y_m": 3696.8779359999085,
+      "unreal_local_cm": [
+        833583.0835814311,
+        369687.79359999084
+      ],
+      "conditioned_visual_surface_elevation_m": 201.0,
+      "conditioned_visual_bed_elevation_m": 199.2,
+      "conditioned_visual_surface_normalized": 0.0416928,
+      "conditioned_visual_bed_normalized": 0.0406207
+    },
+    {
+      "station_m": 6796.130071189636,
+      "lon": -71.9742358,
+      "lat": -43.3273708,
+      "x_m": 8314.607582956163,
+      "y_m": 3743.9328999992777,
+      "unreal_local_cm": [
+        831460.7582956164,
+        374393.28999992774
+      ],
+      "conditioned_visual_surface_elevation_m": 200.995,
+      "conditioned_visual_bed_elevation_m": 199.195,
+      "conditioned_visual_surface_normalized": 0.04168982,
+      "conditioned_visual_bed_normalized": 0.04061772
+    },
+    {
+      "station_m": 6859.6640423562985,
+      "lon": -71.9747032,
+      "lat": -43.32783,
+      "x_m": 8276.760393388493,
+      "y_m": 3795.0510439994623,
+      "unreal_local_cm": [
+        827676.0393388493,
+        379505.1043999462
+      ],
+      "conditioned_visual_surface_elevation_m": 200.5444,
+      "conditioned_visual_bed_elevation_m": 198.7444,
+      "conditioned_visual_surface_normalized": 0.04142144,
+      "conditioned_visual_bed_normalized": 0.04034934
+    },
+    {
+      "station_m": 6970.267451415122,
+      "lon": -71.9757083,
+      "lat": -43.3285044,
+      "x_m": 8195.37355077997,
+      "y_m": 3870.125251999594,
+      "unreal_local_cm": [
+        819537.355077997,
+        387012.5251999594
+      ],
+      "conditioned_visual_surface_elevation_m": 200.5444,
+      "conditioned_visual_bed_elevation_m": 198.7444,
+      "conditioned_visual_surface_normalized": 0.04142144,
+      "conditioned_visual_bed_normalized": 0.04034934
+    },
+    {
+      "station_m": 7102.175723514287,
+      "lon": -71.9767417,
+      "lat": -43.3294221,
+      "x_m": 8111.69514748424,
+      "y_m": 3972.283615999844,
+      "unreal_local_cm": [
+        811169.514748424,
+        397228.3615999844
+      ],
+      "conditioned_visual_surface_elevation_m": 200.0,
+      "conditioned_visual_bed_elevation_m": 198.2,
+      "conditioned_visual_surface_normalized": 0.04109719,
+      "conditioned_visual_bed_normalized": 0.04002509
+    },
+    {
+      "station_m": 7235.098680262709,
+      "lon": -71.9776107,
+      "lat": -43.3304367,
+      "x_m": 8041.328849378257,
+      "y_m": 4085.228887999594,
+      "unreal_local_cm": [
+        804132.8849378256,
+        408522.8887999594
+      ],
+      "conditioned_visual_surface_elevation_m": 199.9052,
+      "conditioned_visual_bed_elevation_m": 198.1052,
+      "conditioned_visual_surface_normalized": 0.04104073,
+      "conditioned_visual_bed_normalized": 0.03996863
+    },
+    {
+      "station_m": 7474.799157687417,
+      "lon": -71.979112,
+      "lat": -43.3322953,
+      "x_m": 7919.762769577036,
+      "y_m": 4292.128239999426,
+      "unreal_local_cm": [
+        791976.2769577036,
+        429212.82399994263
+      ],
+      "conditioned_visual_surface_elevation_m": 198.797,
+      "conditioned_visual_bed_elevation_m": 196.997,
+      "conditioned_visual_surface_normalized": 0.04038067,
+      "conditioned_visual_bed_normalized": 0.03930857
+    },
+    {
+      "station_m": 7612.904183368661,
+      "lon": -71.9801044,
+      "lat": -43.333306,
+      "x_m": 7839.404295191639,
+      "y_m": 4404.6393639996395,
+      "unreal_local_cm": [
+        783940.4295191639,
+        440463.936399964
+      ],
+      "conditioned_visual_surface_elevation_m": 198.3139,
+      "conditioned_visual_bed_elevation_m": 196.5139,
+      "conditioned_visual_surface_normalized": 0.04009293,
+      "conditioned_visual_bed_normalized": 0.03902083
+    },
+    {
+      "station_m": 7698.938747407025,
+      "lon": -71.9804585,
+      "lat": -43.3340356,
+      "x_m": 7810.731445756452,
+      "y_m": 4485.858435999602,
+      "unreal_local_cm": [
+        781073.1445756452,
+        448585.8435999602
+      ],
+      "conditioned_visual_surface_elevation_m": 198.0,
+      "conditioned_visual_bed_elevation_m": 196.2,
+      "conditioned_visual_surface_normalized": 0.03990597,
+      "conditioned_visual_bed_normalized": 0.03883387
+    },
+    {
+      "station_m": 7770.709482979473,
+      "lon": -71.9806838,
+      "lat": -43.3346599,
+      "x_m": 7792.48803152958,
+      "y_m": 4555.355511999419,
+      "unreal_local_cm": [
+        779248.803152958,
+        455535.5511999419
+      ],
+      "conditioned_visual_surface_elevation_m": 197.9726,
+      "conditioned_visual_bed_elevation_m": 196.1726,
+      "conditioned_visual_surface_normalized": 0.03988965,
+      "conditioned_visual_bed_normalized": 0.03881755
+    },
+    {
+      "station_m": 7875.268865575751,
+      "lon": -71.9808018,
+      "lat": -43.3355963,
+      "x_m": 7782.93311418022,
+      "y_m": 4659.595559999475,
+      "unreal_local_cm": [
+        778293.311418022,
+        465959.5559999475
+      ],
+      "conditioned_visual_surface_elevation_m": 197.5,
+      "conditioned_visual_bed_elevation_m": 195.7,
+      "conditioned_visual_surface_normalized": 0.03960816,
+      "conditioned_visual_bed_normalized": 0.03853606
+    },
+    {
+      "station_m": 8057.8715450494,
+      "lon": -71.9809467,
+      "lat": -43.3372351,
+      "x_m": 7771.199999570003,
+      "y_m": 4842.026775999703,
+      "unreal_local_cm": [
+        777119.9999570003,
+        484202.6775999703
+      ],
+      "conditioned_visual_surface_elevation_m": 197.0,
+      "conditioned_visual_bed_elevation_m": 195.2,
+      "conditioned_visual_surface_normalized": 0.03931036,
+      "conditioned_visual_bed_normalized": 0.03823826
+    },
+    {
+      "station_m": 8184.9939109247425,
+      "lon": -71.9815314,
+      "lat": -43.3382963,
+      "x_m": 7723.854574366146,
+      "y_m": 4960.159559999961,
+      "unreal_local_cm": [
+        772385.4574366147,
+        496015.9559999961
+      ],
+      "conditioned_visual_surface_elevation_m": 196.5374,
+      "conditioned_visual_bed_elevation_m": 194.7374,
+      "conditioned_visual_surface_normalized": 0.03903483,
+      "conditioned_visual_bed_normalized": 0.03796273
+    },
+    {
+      "station_m": 8318.813288256008,
+      "lon": -71.9825031,
+      "lat": -43.3392704,
+      "x_m": 7645.172259210123,
+      "y_m": 5068.59637199923,
+      "unreal_local_cm": [
+        764517.2259210123,
+        506859.637199923
+      ],
+      "conditioned_visual_surface_elevation_m": 196.2453,
+      "conditioned_visual_bed_elevation_m": 194.4453,
+      "conditioned_visual_surface_normalized": 0.03886085,
+      "conditioned_visual_bed_normalized": 0.03778875
+    },
+    {
+      "station_m": 8444.92956574661,
+      "lon": -71.9837181,
+      "lat": -43.3399814,
+      "x_m": 7546.789000062306,
+      "y_m": 5147.744891999516,
+      "unreal_local_cm": [
+        754678.9000062306,
+        514774.4891999516
+      ],
+      "conditioned_visual_surface_elevation_m": 195.518,
+      "conditioned_visual_bed_elevation_m": 193.718,
+      "conditioned_visual_surface_normalized": 0.03842766,
+      "conditioned_visual_bed_normalized": 0.03735556
+    },
+    {
+      "station_m": 8582.295497539515,
+      "lon": -71.9849646,
+      "lat": -43.3408206,
+      "x_m": 7445.8550638261595,
+      "y_m": 5241.164635999681,
+      "unreal_local_cm": [
+        744585.506382616,
+        524116.4635999681
+      ],
+      "conditioned_visual_surface_elevation_m": 195.0574,
+      "conditioned_visual_bed_elevation_m": 193.2574,
+      "conditioned_visual_surface_normalized": 0.03815332,
+      "conditioned_visual_bed_normalized": 0.03708122
+    },
+    {
+      "station_m": 8705.847538299915,
+      "lon": -71.986226,
+      "lat": -43.3414475,
+      "x_m": 7343.714616839107,
+      "y_m": 5310.951143999717,
+      "unreal_local_cm": [
+        734371.4616839107,
+        531095.1143999717
+      ],
+      "conditioned_visual_surface_elevation_m": 194.8632,
+      "conditioned_visual_bed_elevation_m": 193.0632,
+      "conditioned_visual_surface_normalized": 0.03803765,
+      "conditioned_visual_bed_normalized": 0.03696555
+    },
+    {
+      "station_m": 8813.547837894619,
+      "lon": -71.9874644,
+      "lat": -43.3418038,
+      "x_m": 7243.436568997465,
+      "y_m": 5350.614459999713,
+      "unreal_local_cm": [
+        724343.6568997465,
+        535061.4459999714
+      ],
+      "conditioned_visual_surface_elevation_m": 194.5,
+      "conditioned_visual_bed_elevation_m": 192.7,
+      "conditioned_visual_surface_normalized": 0.03782133,
+      "conditioned_visual_bed_normalized": 0.03674923
+    },
+    {
+      "station_m": 8930.076492651695,
+      "lon": -71.9888546,
+      "lat": -43.3420795,
+      "x_m": 7130.866686802097,
+      "y_m": 5381.305383999268,
+      "unreal_local_cm": [
+        713086.6686802098,
+        538130.5383999269
+      ],
+      "conditioned_visual_surface_elevation_m": 194.0,
+      "conditioned_visual_bed_elevation_m": 192.2,
+      "conditioned_visual_surface_normalized": 0.03752352,
+      "conditioned_visual_bed_normalized": 0.03645142
+    },
+    {
+      "station_m": 9431.92598327345,
+      "lon": -71.9948834,
+      "lat": -43.3431497,
+      "x_m": 6642.691384126884,
+      "y_m": 5500.440047999369,
+      "unreal_local_cm": [
+        664269.1384126884,
+        550044.0047999369
+      ],
+      "conditioned_visual_surface_elevation_m": 192.5,
+      "conditioned_visual_bed_elevation_m": 190.7,
+      "conditioned_visual_surface_normalized": 0.0366301,
+      "conditioned_visual_bed_normalized": 0.035558
+    },
+    {
+      "station_m": 9491.919757333619,
+      "lon": -71.9956237,
+      "lat": -43.3431849,
+      "x_m": 6582.746423842111,
+      "y_m": 5504.358511999284,
+      "unreal_local_cm": [
+        658274.6423842111,
+        550435.8511999284
+      ],
+      "conditioned_visual_surface_elevation_m": 192.5,
+      "conditioned_visual_bed_elevation_m": 190.7,
+      "conditioned_visual_surface_normalized": 0.0366301,
+      "conditioned_visual_bed_normalized": 0.035558
+    },
+    {
+      "station_m": 9585.47421001018,
+      "lon": -71.9967778,
+      "lat": -43.3431265,
+      "x_m": 6489.29447373257,
+      "y_m": 5497.857423999245,
+      "unreal_local_cm": [
+        648929.447373257,
+        549785.7423999244
+      ],
+      "conditioned_visual_surface_elevation_m": 192.5,
+      "conditioned_visual_bed_elevation_m": 190.7,
+      "conditioned_visual_surface_normalized": 0.0366301,
+      "conditioned_visual_bed_normalized": 0.035558
+    },
+    {
+      "station_m": 9629.503081766552,
+      "lon": -71.9972545,
+      "lat": -43.3429352,
+      "x_m": 6450.6942271194,
+      "y_m": 5476.561907999541,
+      "unreal_local_cm": [
+        645069.42271194,
+        547656.1907999541
+      ],
+      "conditioned_visual_surface_elevation_m": 192.0,
+      "conditioned_visual_bed_elevation_m": 190.2,
+      "conditioned_visual_surface_normalized": 0.0363323,
+      "conditioned_visual_bed_normalized": 0.0352602
+    },
+    {
+      "station_m": 9712.244501736348,
+      "lon": -71.9980867,
+      "lat": -43.3425023,
+      "x_m": 6383.307767643541,
+      "y_m": 5428.371479999558,
+      "unreal_local_cm": [
+        638330.7767643541,
+        542837.1479999558
+      ],
+      "conditioned_visual_surface_elevation_m": 191.5,
+      "conditioned_visual_bed_elevation_m": 189.7,
+      "conditioned_visual_surface_normalized": 0.03603449,
+      "conditioned_visual_bed_normalized": 0.03496239
+    },
+    {
+      "station_m": 9891.249198745181,
+      "lon": -71.9995773,
+      "lat": -43.3413122,
+      "x_m": 6262.608108314172,
+      "y_m": 5295.889547999302,
+      "unreal_local_cm": [
+        626260.8108314172,
+        529588.9547999302
+      ],
+      "conditioned_visual_surface_elevation_m": 190.7456,
+      "conditioned_visual_bed_elevation_m": 188.9456,
+      "conditioned_visual_surface_normalized": 0.03558516,
+      "conditioned_visual_bed_normalized": 0.03451306
+    },
+    {
+      "station_m": 9956.498742915155,
+      "lon": -72.0002639,
+      "lat": -43.341004,
+      "x_m": 6207.0114451617055,
+      "y_m": 5261.58072399939,
+      "unreal_local_cm": [
+        620701.1445161706,
+        526158.0723999391
+      ],
+      "conditioned_visual_surface_elevation_m": 190.4355,
+      "conditioned_visual_bed_elevation_m": 188.6355,
+      "conditioned_visual_surface_normalized": 0.03540046,
+      "conditioned_visual_bed_normalized": 0.03432836
+    },
+    {
+      "station_m": 9994.873309567638,
+      "lon": -72.0007306,
+      "lat": -43.3409416,
+      "x_m": 6169.22093730606,
+      "y_m": 5254.634355999685,
+      "unreal_local_cm": [
+        616922.0937306059,
+        525463.4355999685
+      ],
+      "conditioned_visual_surface_elevation_m": 190.2253,
+      "conditioned_visual_bed_elevation_m": 188.4253,
+      "conditioned_visual_surface_normalized": 0.03527527,
+      "conditioned_visual_bed_normalized": 0.03420317
+    },
+    {
+      "station_m": 10034.470626201684,
+      "lon": -72.0012188,
+      "lat": -43.3409689,
+      "x_m": 6129.6894911196105,
+      "y_m": 5257.673391999606,
+      "unreal_local_cm": [
+        612968.9491119611,
+        525767.3391999606
+      ],
+      "conditioned_visual_surface_elevation_m": 190.035,
+      "conditioned_visual_bed_elevation_m": 188.235,
+      "conditioned_visual_surface_normalized": 0.03516192,
+      "conditioned_visual_bed_normalized": 0.03408982
+    },
+    {
+      "station_m": 10081.792517774044,
+      "lon": -72.0017177,
+      "lat": -43.3411913,
+      "x_m": 6089.291624462461,
+      "y_m": 5282.430959999428,
+      "unreal_local_cm": [
+        608929.1624462461,
+        528243.0959999427
+      ],
+      "conditioned_visual_surface_elevation_m": 189.8102,
+      "conditioned_visual_bed_elevation_m": 188.0102,
+      "conditioned_visual_surface_normalized": 0.03502803,
+      "conditioned_visual_bed_normalized": 0.03395593
+    },
+    {
+      "station_m": 10122.897267671087,
+      "lon": -72.0020771,
+      "lat": -43.3414527,
+      "x_m": 6060.189613485476,
+      "y_m": 5311.530007999362,
+      "unreal_local_cm": [
+        606018.9613485476,
+        531153.0007999362
+      ],
+      "conditioned_visual_surface_elevation_m": 189.5377,
+      "conditioned_visual_bed_elevation_m": 187.7377,
+      "conditioned_visual_surface_normalized": 0.03486572,
+      "conditioned_visual_bed_normalized": 0.03379362
+    },
+    {
+      "station_m": 10154.068904392558,
+      "lon": -72.002281,
+      "lat": -43.3416906,
+      "x_m": 6043.679040201154,
+      "y_m": 5338.013035999574,
+      "unreal_local_cm": [
+        604367.9040201154,
+        533801.3035999574
+      ],
+      "conditioned_visual_surface_elevation_m": 189.4426,
+      "conditioned_visual_bed_elevation_m": 187.6426,
+      "conditioned_visual_surface_normalized": 0.03480908,
+      "conditioned_visual_bed_normalized": 0.03373698
+    },
+    {
+      "station_m": 10255.388589566397,
+      "lon": -72.0028067,
+      "lat": -43.3425177,
+      "x_m": 6001.111073671404,
+      "y_m": 5430.085807999818,
+      "unreal_local_cm": [
+        600111.1073671404,
+        543008.5807999818
+      ],
+      "conditioned_visual_surface_elevation_m": 188.4761,
+      "conditioned_visual_bed_elevation_m": 186.6761,
+      "conditioned_visual_surface_normalized": 0.03423342,
+      "conditioned_visual_bed_normalized": 0.03316132
+    },
+    {
+      "station_m": 10324.25883669707,
+      "lon": -72.0032794,
+      "lat": -43.3430329,
+      "x_m": 5962.834722560783,
+      "y_m": 5487.437871999292,
+      "unreal_local_cm": [
+        596283.4722560783,
+        548743.7871999292
+      ],
+      "conditioned_visual_surface_elevation_m": 187.7758,
+      "conditioned_visual_bed_elevation_m": 185.9758,
+      "conditioned_visual_surface_normalized": 0.03381632,
+      "conditioned_visual_bed_normalized": 0.03274422
+    },
+    {
+      "station_m": 10372.467118373106,
+      "lon": -72.0037193,
+      "lat": -43.3433255,
+      "x_m": 5927.214314577739,
+      "y_m": 5520.010103999474,
+      "unreal_local_cm": [
+        592721.4314577739,
+        552001.0103999474
+      ],
+      "conditioned_visual_surface_elevation_m": 187.4618,
+      "conditioned_visual_bed_elevation_m": 185.6618,
+      "conditioned_visual_surface_normalized": 0.03362929,
+      "conditioned_visual_bed_normalized": 0.03255719
+    },
+    {
+      "station_m": 10462.81341039152,
+      "lon": -72.0047808,
+      "lat": -43.3435789,
+      "x_m": 5841.260545371309,
+      "y_m": 5548.218591999284,
+      "unreal_local_cm": [
+        584126.0545371309,
+        554821.8591999285
+      ],
+      "conditioned_visual_surface_elevation_m": 186.5078,
+      "conditioned_visual_bed_elevation_m": 184.7078,
+      "conditioned_visual_surface_normalized": 0.03306108,
+      "conditioned_visual_bed_normalized": 0.03198898
+    },
+    {
+      "station_m": 10590.845479264102,
+      "lon": -72.0063579,
+      "lat": -43.3436803,
+      "x_m": 5713.556645782055,
+      "y_m": 5559.506439999894,
+      "unreal_local_cm": [
+        571355.6645782056,
+        555950.6439999894
+      ],
+      "conditioned_visual_surface_elevation_m": 185.5,
+      "conditioned_visual_bed_elevation_m": 183.7,
+      "conditioned_visual_surface_normalized": 0.03246082,
+      "conditioned_visual_bed_normalized": 0.03138872
+    },
+    {
+      "station_m": 10735.798877225747,
+      "lon": -72.0081496,
+      "lat": -43.3436413,
+      "x_m": 5568.47575243663,
+      "y_m": 5555.164959999781,
+      "unreal_local_cm": [
+        556847.5752436629,
+        555516.495999978
+      ],
+      "conditioned_visual_surface_elevation_m": 184.0,
+      "conditioned_visual_bed_elevation_m": 182.2,
+      "conditioned_visual_surface_normalized": 0.03156741,
+      "conditioned_visual_bed_normalized": 0.03049531
+    },
+    {
+      "station_m": 10834.9419783228,
+      "lon": -72.0093459,
+      "lat": -43.3438364,
+      "x_m": 5471.606704766911,
+      "y_m": 5576.8834919996825,
+      "unreal_local_cm": [
+        547160.6704766911,
+        557688.3491999683
+      ],
+      "conditioned_visual_surface_elevation_m": 182.7271,
+      "conditioned_visual_bed_elevation_m": 180.9271,
+      "conditioned_visual_surface_normalized": 0.03080925,
+      "conditioned_visual_bed_normalized": 0.02973715
+    },
+    {
+      "station_m": 10973.218929477089,
+      "lon": -72.0109713,
+      "lat": -43.3442226,
+      "x_m": 5339.991766974252,
+      "y_m": 5619.875275999819,
+      "unreal_local_cm": [
+        533999.1766974252,
+        561987.5275999819
+      ],
+      "conditioned_visual_surface_elevation_m": 181.1929,
+      "conditioned_visual_bed_elevation_m": 179.3929,
+      "conditioned_visual_surface_normalized": 0.02989547,
+      "conditioned_visual_bed_normalized": 0.02882337
+    },
+    {
+      "station_m": 11103.476852559763,
+      "lon": -72.0125485,
+      "lat": -43.3444606,
+      "x_m": 5212.279769996744,
+      "y_m": 5646.36943599937,
+      "unreal_local_cm": [
+        521227.9769996744,
+        564636.943599937
+      ],
+      "conditioned_visual_surface_elevation_m": 180.1283,
+      "conditioned_visual_bed_elevation_m": 178.3283,
+      "conditioned_visual_surface_normalized": 0.02926138,
+      "conditioned_visual_bed_normalized": 0.02818928
+    },
+    {
+      "station_m": 11140.941047566857,
+      "lon": -72.0130098,
+      "lat": -43.3444918,
+      "x_m": 5174.92652107,
+      "y_m": 5649.842619999617,
+      "unreal_local_cm": [
+        517492.65210699994,
+        564984.2619999617
+      ],
+      "conditioned_visual_surface_elevation_m": 179.8589,
+      "conditioned_visual_bed_elevation_m": 178.0589,
+      "conditioned_visual_surface_normalized": 0.02910092,
+      "conditioned_visual_bed_normalized": 0.02802882
+    },
+    {
+      "station_m": 11174.870469073723,
+      "lon": -72.0133638,
+      "lat": -43.3446556,
+      "x_m": 5146.261769023067,
+      "y_m": 5668.076835999932,
+      "unreal_local_cm": [
+        514626.17690230673,
+        566807.6835999932
+      ],
+      "conditioned_visual_surface_elevation_m": 179.6533,
+      "conditioned_visual_bed_elevation_m": 177.8533,
+      "conditioned_visual_surface_normalized": 0.02897846,
+      "conditioned_visual_bed_normalized": 0.02790636
+    },
+    {
+      "station_m": 11208.252090558117,
+      "lon": -72.013557,
+      "lat": -43.3449209,
+      "x_m": 5130.617616209445,
+      "y_m": 5697.610031999403,
+      "unreal_local_cm": [
+        513061.76162094454,
+        569761.0031999403
+      ],
+      "conditioned_visual_surface_elevation_m": 179.4261,
+      "conditioned_visual_bed_elevation_m": 177.6261,
+      "conditioned_visual_surface_normalized": 0.02884314,
+      "conditioned_visual_bed_normalized": 0.02777104
+    },
+    {
+      "station_m": 11279.427605419689,
+      "lon": -72.0135838,
+      "lat": -43.3455607,
+      "x_m": 5128.447516336843,
+      "y_m": 5768.83256799961,
+      "unreal_local_cm": [
+        512844.7516336843,
+        576883.256799961
+      ],
+      "conditioned_visual_surface_elevation_m": 178.9549,
+      "conditioned_visual_bed_elevation_m": 177.1549,
+      "conditioned_visual_surface_normalized": 0.02856249,
+      "conditioned_visual_bed_normalized": 0.02749039
+    },
+    {
+      "station_m": 11336.773223728065,
+      "lon": -72.0136213,
+      "lat": -43.3460757,
+      "x_m": 5125.410995993541,
+      "y_m": 5826.162367999615,
+      "unreal_local_cm": [
+        512541.09959935414,
+        582616.2367999614
+      ],
+      "conditioned_visual_surface_elevation_m": 178.5037,
+      "conditioned_visual_bed_elevation_m": 176.7037,
+      "conditioned_visual_surface_normalized": 0.02829375,
+      "conditioned_visual_bed_normalized": 0.02722165
+    },
+    {
+      "station_m": 11402.923227289451,
+      "lon": -72.0139915,
+      "lat": -43.3466062,
+      "x_m": 5095.434467156453,
+      "y_m": 5885.217627999217,
+      "unreal_local_cm": [
+        509543.4467156453,
+        588521.7627999217
+      ],
+      "conditioned_visual_surface_elevation_m": 178.0,
+      "conditioned_visual_bed_elevation_m": 176.2,
+      "conditioned_visual_surface_normalized": 0.02799374,
+      "conditioned_visual_bed_normalized": 0.02692164
+    },
+    {
+      "station_m": 11446.244912589767,
+      "lon": -72.0142443,
+      "lat": -43.3469497,
+      "x_m": 5074.964271343803,
+      "y_m": 5923.4560479999645,
+      "unreal_local_cm": [
+        507496.4271343803,
+        592345.6047999965
+      ],
+      "conditioned_visual_surface_elevation_m": 177.4971,
+      "conditioned_visual_bed_elevation_m": 175.6971,
+      "conditioned_visual_surface_normalized": 0.02769421,
+      "conditioned_visual_bed_normalized": 0.0266221
+    },
+    {
+      "station_m": 11524.162043933053,
+      "lon": -72.0144099,
+      "lat": -43.34764,
+      "x_m": 5061.554997504212,
+      "y_m": 6000.300243999425,
+      "unreal_local_cm": [
+        506155.4997504212,
+        600030.0243999425
+      ],
+      "conditioned_visual_surface_elevation_m": 176.7077,
+      "conditioned_visual_bed_elevation_m": 174.9077,
+      "conditioned_visual_surface_normalized": 0.02722403,
+      "conditioned_visual_bed_normalized": 0.02615193
+    },
+    {
+      "station_m": 11586.46940525484,
+      "lon": -72.0144803,
+      "lat": -43.348198,
+      "x_m": 5055.8544366450815,
+      "y_m": 6062.416803999209,
+      "unreal_local_cm": [
+        505585.4436645082,
+        606241.6803999209
+      ],
+      "conditioned_visual_surface_elevation_m": 176.1937,
+      "conditioned_visual_bed_elevation_m": 174.3937,
+      "conditioned_visual_surface_normalized": 0.02691789,
+      "conditioned_visual_bed_normalized": 0.02584578
+    },
+    {
+      "station_m": 11658.02584239405,
+      "lon": -72.0144877,
+      "lat": -43.3488415,
+      "x_m": 5055.255229963755,
+      "y_m": 6134.051223999483,
+      "unreal_local_cm": [
+        505525.52299637545,
+        613405.1223999483
+      ],
+      "conditioned_visual_surface_elevation_m": 175.5314,
+      "conditioned_visual_bed_elevation_m": 173.7314,
+      "conditioned_visual_surface_normalized": 0.02652341,
+      "conditioned_visual_bed_normalized": 0.02545131
+    },
+    {
+      "station_m": 11780.801454619992,
+      "lon": -72.0145018,
+      "lat": -43.3499456,
+      "x_m": 5054.113498314277,
+      "y_m": 6256.95963599939,
+      "unreal_local_cm": [
+        505411.34983142774,
+        625695.963599939
+      ],
+      "conditioned_visual_surface_elevation_m": 174.1416,
+      "conditioned_visual_bed_elevation_m": 172.3416,
+      "conditioned_visual_surface_normalized": 0.02569563,
+      "conditioned_visual_bed_normalized": 0.02462353
+    },
+    {
+      "station_m": 11839.471962724014,
+      "lon": -72.0145494,
+      "lat": -43.3504721,
+      "x_m": 5050.259141824047,
+      "y_m": 6315.569615999327,
+      "unreal_local_cm": [
+        505025.9141824047,
+        631556.9615999326
+      ],
+      "conditioned_visual_surface_elevation_m": 173.5517,
+      "conditioned_visual_bed_elevation_m": 171.7517,
+      "conditioned_visual_surface_normalized": 0.02534428,
+      "conditioned_visual_bed_normalized": 0.02427218
+    },
+    {
+      "station_m": 11899.713032714748,
+      "lon": -72.014764,
+      "lat": -43.3509909,
+      "x_m": 5032.882148069027,
+      "y_m": 6373.322431999529,
+      "unreal_local_cm": [
+        503288.2148069027,
+        637332.2431999529
+      ],
+      "conditioned_visual_surface_elevation_m": 173.0787,
+      "conditioned_visual_bed_elevation_m": 171.2787,
+      "conditioned_visual_surface_normalized": 0.02506256,
+      "conditioned_visual_bed_normalized": 0.02399045
+    },
+    {
+      "station_m": 11962.580685352594,
+      "lon": -72.0152575,
+      "lat": -43.3514278,
+      "x_m": 4992.921540340778,
+      "y_m": 6421.95813999997,
+      "unreal_local_cm": [
+        499292.1540340778,
+        642195.813999997
+      ],
+      "conditioned_visual_surface_elevation_m": 172.5,
+      "conditioned_visual_bed_elevation_m": 170.7,
+      "conditioned_visual_surface_normalized": 0.02471788,
+      "conditioned_visual_bed_normalized": 0.02364577
+    },
+    {
+      "station_m": 12027.425351815029,
+      "lon": -72.0159173,
+      "lat": -43.3517593,
+      "x_m": 4939.494977060915,
+      "y_m": 6458.860719999344,
+      "unreal_local_cm": [
+        493949.49770609144,
+        645886.0719999344
+      ],
+      "conditioned_visual_surface_elevation_m": 171.97,
+      "conditioned_visual_bed_elevation_m": 170.17,
+      "conditioned_visual_surface_normalized": 0.0244022,
+      "conditioned_visual_bed_normalized": 0.0233301
+    },
+    {
+      "station_m": 12070.196943813204,
+      "lon": -72.0163411,
+      "lat": -43.3519895,
+      "x_m": 4905.178248478623,
+      "y_m": 6484.486583999821,
+      "unreal_local_cm": [
+        490517.82484786224,
+        648448.6583999821
+      ],
+      "conditioned_visual_surface_elevation_m": 171.5,
+      "conditioned_visual_bed_elevation_m": 169.7,
+      "conditioned_visual_surface_normalized": 0.02412226,
+      "conditioned_visual_bed_normalized": 0.02305016
+    },
+    {
+      "station_m": 12126.67926039213,
+      "lon": -72.0168132,
+      "lat": -43.3523639,
+      "x_m": 4866.950481694074,
+      "y_m": 6526.164791999635,
+      "unreal_local_cm": [
+        486695.0481694074,
+        652616.4791999635
+      ],
+      "conditioned_visual_surface_elevation_m": 171.0,
+      "conditioned_visual_bed_elevation_m": 169.2,
+      "conditioned_visual_surface_normalized": 0.02382446,
+      "conditioned_visual_bed_normalized": 0.02275236
+    },
+    {
+      "station_m": 12206.568966503728,
+      "lon": -72.0174676,
+      "lat": -43.3529022,
+      "x_m": 4813.9611773431125,
+      "y_m": 6586.088347999894,
+      "unreal_local_cm": [
+        481396.11773431126,
+        658608.8347999894
+      ],
+      "conditioned_visual_surface_elevation_m": 171.0,
+      "conditioned_visual_bed_elevation_m": 169.2,
+      "conditioned_visual_surface_normalized": 0.02382446,
+      "conditioned_visual_bed_normalized": 0.02275236
+    },
+    {
+      "station_m": 12288.877840509493,
+      "lon": -72.0182562,
+      "lat": -43.3533703,
+      "x_m": 4750.105178854934,
+      "y_m": 6638.197239999792,
+      "unreal_local_cm": [
+        475010.5178854934,
+        663819.7239999792
+      ],
+      "conditioned_visual_surface_elevation_m": 170.5799,
+      "conditioned_visual_bed_elevation_m": 168.7799,
+      "conditioned_visual_surface_normalized": 0.02357424,
+      "conditioned_visual_bed_normalized": 0.02250214
+    },
+    {
+      "station_m": 12349.824023328372,
+      "lon": -72.0189428,
+      "lat": -43.3535965,
+      "x_m": 4694.508515701318,
+      "y_m": 6663.377823999811,
+      "unreal_local_cm": [
+        469450.85157013184,
+        666337.782399981
+      ],
+      "conditioned_visual_surface_elevation_m": 169.7358,
+      "conditioned_visual_bed_elevation_m": 167.9358,
+      "conditioned_visual_surface_normalized": 0.02307149,
+      "conditioned_visual_bed_normalized": 0.02199939
+    },
+    {
+      "station_m": 12411.613947778666,
+      "lon": -72.0196778,
+      "lat": -43.3537487,
+      "x_m": 4634.992716958343,
+      "y_m": 6680.320727999273,
+      "unreal_local_cm": [
+        463499.27169583435,
+        668032.0727999273
+      ],
+      "conditioned_visual_surface_elevation_m": 168.5,
+      "conditioned_visual_bed_elevation_m": 166.7,
+      "conditioned_visual_surface_normalized": 0.02233543,
+      "conditioned_visual_bed_normalized": 0.02126333
+    },
+    {
+      "station_m": 12472.086411685299,
+      "lon": -72.0204234,
+      "lat": -43.3537916,
+      "x_m": 4574.6185951306215,
+      "y_m": 6685.096355999713,
+      "unreal_local_cm": [
+        457461.85951306217,
+        668509.6355999713
+      ],
+      "conditioned_visual_surface_elevation_m": 168.4508,
+      "conditioned_visual_bed_elevation_m": 166.6508,
+      "conditioned_visual_surface_normalized": 0.02230613,
+      "conditioned_visual_bed_normalized": 0.02123402
+    },
+    {
+      "station_m": 12767.896476363383,
+      "lon": -72.024082,
+      "lat": -43.3537994,
+      "x_m": 4278.36757297551,
+      "y_m": 6685.964651999577,
+      "unreal_local_cm": [
+        427836.75729755097,
+        668596.4651999577
+      ],
+      "conditioned_visual_surface_elevation_m": 164.4844,
+      "conditioned_visual_bed_elevation_m": 162.6844,
+      "conditioned_visual_surface_normalized": 0.01994369,
+      "conditioned_visual_bed_normalized": 0.01887159
+    },
+    {
+      "station_m": 12859.953870130634,
+      "lon": -72.0251817,
+      "lat": -43.3540139,
+      "x_m": 4189.320601712601,
+      "y_m": 6709.842791999405,
+      "unreal_local_cm": [
+        418932.06017126015,
+        670984.2791999405
+      ],
+      "conditioned_visual_surface_elevation_m": 163.6383,
+      "conditioned_visual_bed_elevation_m": 161.8383,
+      "conditioned_visual_surface_normalized": 0.01943975,
+      "conditioned_visual_bed_normalized": 0.01836764
+    },
+    {
+      "station_m": 12924.633778693817,
+      "lon": -72.0259031,
+      "lat": -43.3542653,
+      "x_m": 4130.906047681286,
+      "y_m": 6737.828639999777,
+      "unreal_local_cm": [
+        413090.60476812854,
+        673782.8639999777
+      ],
+      "conditioned_visual_surface_elevation_m": 163.2317,
+      "conditioned_visual_bed_elevation_m": 161.4317,
+      "conditioned_visual_surface_normalized": 0.01919757,
+      "conditioned_visual_bed_normalized": 0.01812547
+    },
+    {
+      "station_m": 12983.906480620059,
+      "lon": -72.0265603,
+      "lat": -43.3545015,
+      "x_m": 4077.690016477618,
+      "y_m": 6764.122423999359,
+      "unreal_local_cm": [
+        407769.0016477618,
+        676412.2423999358
+      ],
+      "conditioned_visual_surface_elevation_m": 162.9162,
+      "conditioned_visual_bed_elevation_m": 161.1162,
+      "conditioned_visual_surface_normalized": 0.01900965,
+      "conditioned_visual_bed_normalized": 0.01793755
+    },
+    {
+      "station_m": 13124.214978000413,
+      "lon": -72.0280624,
+      "lat": -43.3551334,
+      "x_m": 3956.0591575761177,
+      "y_m": 6834.465531999571,
+      "unreal_local_cm": [
+        395605.9157576118,
+        683446.5531999571
+      ],
+      "conditioned_visual_surface_elevation_m": 161.7115,
+      "conditioned_visual_bed_elevation_m": 159.9115,
+      "conditioned_visual_surface_normalized": 0.01829212,
+      "conditioned_visual_bed_normalized": 0.01722002
+    },
+    {
+      "station_m": 13213.921288022142,
+      "lon": -72.0290868,
+      "lat": -43.3554433,
+      "x_m": 3873.1095191634245,
+      "y_m": 6868.963599999322,
+      "unreal_local_cm": [
+        387310.9519163424,
+        686896.3599999321
+      ],
+      "conditioned_visual_surface_elevation_m": 161.0,
+      "conditioned_visual_bed_elevation_m": 159.2,
+      "conditioned_visual_surface_normalized": 0.01786834,
+      "conditioned_visual_bed_normalized": 0.01679624
+    },
+    {
+      "station_m": 13268.171688619868,
+      "lon": -72.0297547,
+      "lat": -43.3554901,
+      "x_m": 3819.027067489058,
+      "y_m": 6874.173375999298,
+      "unreal_local_cm": [
+        381902.7067489058,
+        687417.3375999298
+      ],
+      "conditioned_visual_surface_elevation_m": 160.6744,
+      "conditioned_visual_bed_elevation_m": 158.8744,
+      "conditioned_visual_surface_normalized": 0.01767441,
+      "conditioned_visual_bed_normalized": 0.01660231
+    },
+    {
+      "station_m": 13402.556834817233,
+      "lon": -72.0313668,
+      "lat": -43.3551958,
+      "x_m": 3688.4890822444454,
+      "y_m": 6841.411899999277,
+      "unreal_local_cm": [
+        368848.90822444455,
+        684141.1899999277
+      ],
+      "conditioned_visual_surface_elevation_m": 159.5479,
+      "conditioned_visual_bed_elevation_m": 157.7479,
+      "conditioned_visual_surface_normalized": 0.01700346,
+      "conditioned_visual_bed_normalized": 0.01593136
+    },
+    {
+      "station_m": 13503.232820451827,
+      "lon": -72.032547,
+      "lat": -43.3549071,
+      "x_m": 3592.9237139766287,
+      "y_m": 6809.2738159994215,
+      "unreal_local_cm": [
+        359292.37139766285,
+        680927.3815999421
+      ],
+      "conditioned_visual_surface_elevation_m": 158.8951,
+      "conditioned_visual_bed_elevation_m": 157.0951,
+      "conditioned_visual_surface_normalized": 0.01661464,
+      "conditioned_visual_bed_normalized": 0.01554254
+    },
+    {
+      "station_m": 13589.180053837285,
+      "lon": -72.0335956,
+      "lat": -43.3547802,
+      "x_m": 3508.014507768681,
+      "y_m": 6795.147307999652,
+      "unreal_local_cm": [
+        350801.4507768681,
+        679514.7307999652
+      ],
+      "conditioned_visual_surface_elevation_m": 158.3473,
+      "conditioned_visual_bed_elevation_m": 156.5473,
+      "conditioned_visual_surface_normalized": 0.01628837,
+      "conditioned_visual_bed_normalized": 0.01521626
+    },
+    {
+      "station_m": 13666.851965405283,
+      "lon": -72.0345344,
+      "lat": -43.354632,
+      "x_m": 3431.996233128488,
+      "y_m": 6778.649683999857,
+      "unreal_local_cm": [
+        343199.6233128488,
+        677864.9683999857
+      ],
+      "conditioned_visual_surface_elevation_m": 157.872,
+      "conditioned_visual_bed_elevation_m": 156.072,
+      "conditioned_visual_surface_normalized": 0.01600527,
+      "conditioned_visual_bed_normalized": 0.01493317
+    },
+    {
+      "station_m": 13744.077772714129,
+      "lon": -72.0354116,
+      "lat": -43.3543572,
+      "x_m": 3360.965949239747,
+      "y_m": 6748.058947999892,
+      "unreal_local_cm": [
+        336096.59492397466,
+        674805.8947999892
+      ],
+      "conditioned_visual_surface_elevation_m": 157.474,
+      "conditioned_visual_bed_elevation_m": 155.674,
+      "conditioned_visual_surface_normalized": 0.01576822,
+      "conditioned_visual_bed_normalized": 0.01469612
+    },
+    {
+      "station_m": 13801.741690309425,
+      "lon": -72.0359159,
+      "lat": -43.3539905,
+      "x_m": 3320.130823652545,
+      "y_m": 6707.237903999812,
+      "unreal_local_cm": [
+        332013.0823652545,
+        670723.7903999812
+      ],
+      "conditioned_visual_surface_elevation_m": 157.1377,
+      "conditioned_visual_bed_elevation_m": 155.3377,
+      "conditioned_visual_surface_normalized": 0.01556791,
+      "conditioned_visual_bed_normalized": 0.01449581
+    },
+    {
+      "station_m": 13855.024448719107,
+      "lon": -72.036192,
+      "lat": -43.3535554,
+      "x_m": 3297.7739365331745,
+      "y_m": 6658.80257199934,
+      "unreal_local_cm": [
+        329777.3936533175,
+        665880.257199934
+      ],
+      "conditioned_visual_surface_elevation_m": 156.8492,
+      "conditioned_visual_bed_elevation_m": 155.0492,
+      "conditioned_visual_surface_normalized": 0.01539608,
+      "conditioned_visual_bed_normalized": 0.01432398
+    },
+    {
+      "station_m": 13966.82924931412,
+      "lon": -72.0368572,
+      "lat": -43.3526739,
+      "x_m": 3243.9101143232588,
+      "y_m": 6560.673991999515,
+      "unreal_local_cm": [
+        324391.0114323259,
+        656067.3991999516
+      ],
+      "conditioned_visual_surface_elevation_m": 156.0,
+      "conditioned_visual_bed_elevation_m": 154.2,
+      "conditioned_visual_surface_normalized": 0.01489029,
+      "conditioned_visual_bed_normalized": 0.01381819
+    },
+    {
+      "station_m": 14026.406542450646,
+      "lon": -72.0371392,
+      "lat": -43.3521789,
+      "x_m": 3221.075481336017,
+      "y_m": 6505.570591999426,
+      "unreal_local_cm": [
+        322107.5481336017,
+        650557.0591999426
+      ],
+      "conditioned_visual_surface_elevation_m": 155.8883,
+      "conditioned_visual_bed_elevation_m": 154.0883,
+      "conditioned_visual_surface_normalized": 0.01482376,
+      "conditioned_visual_bed_normalized": 0.01375166
+    },
+    {
+      "station_m": 14081.477401409531,
+      "lon": -72.0375259,
+      "lat": -43.3517712,
+      "x_m": 3189.762883547462,
+      "y_m": 6460.185427999796,
+      "unreal_local_cm": [
+        318976.2883547462,
+        646018.5427999796
+      ],
+      "conditioned_visual_surface_elevation_m": 155.5,
+      "conditioned_visual_bed_elevation_m": 153.7,
+      "conditioned_visual_surface_normalized": 0.01459248,
+      "conditioned_visual_bed_normalized": 0.01352038
+    },
+    {
+      "station_m": 14152.055945336506,
+      "lon": -72.038255,
+      "lat": -43.3514222,
+      "x_m": 3130.7248306712077,
+      "y_m": 6421.334747999803,
+      "unreal_local_cm": [
+        313072.4830671208,
+        642133.4747999803
+      ],
+      "conditioned_visual_surface_elevation_m": 155.0294,
+      "conditioned_visual_bed_elevation_m": 153.2294,
+      "conditioned_visual_surface_normalized": 0.01431219,
+      "conditioned_visual_bed_normalized": 0.01324009
+    },
+    {
+      "station_m": 14224.053725715474,
+      "lon": -72.0390708,
+      "lat": -43.3511627,
+      "x_m": 3064.666342759712,
+      "y_m": 6392.447207999968,
+      "unreal_local_cm": [
+        306466.63427597116,
+        639244.7207999968
+      ],
+      "conditioned_visual_surface_elevation_m": 154.5451,
+      "conditioned_visual_bed_elevation_m": 152.7451,
+      "conditioned_visual_surface_normalized": 0.01402373,
+      "conditioned_visual_bed_normalized": 0.01295163
+    },
+    {
+      "station_m": 14316.885160068914,
+      "lon": -72.0401915,
+      "lat": -43.3509814,
+      "x_m": 2973.918920103819,
+      "y_m": 6372.2648919998255,
+      "unreal_local_cm": [
+        297391.8920103819,
+        637226.4891999826
+      ],
+      "conditioned_visual_surface_elevation_m": 154.0763,
+      "conditioned_visual_bed_elevation_m": 152.2763,
+      "conditioned_visual_surface_normalized": 0.01374451,
+      "conditioned_visual_bed_normalized": 0.01267241
+    },
+    {
+      "station_m": 14442.83664202153,
+      "lon": -72.0417365,
+      "lat": -43.350837,
+      "x_m": 2848.814281928965,
+      "y_m": 6356.190283999438,
+      "unreal_local_cm": [
+        284881.42819289654,
+        635619.0283999438
+      ],
+      "conditioned_visual_surface_elevation_m": 153.358,
+      "conditioned_visual_bed_elevation_m": 151.558,
+      "conditioned_visual_surface_normalized": 0.01331668,
+      "conditioned_visual_bed_normalized": 0.01224458
+    },
+    {
+      "station_m": 14525.252309115209,
+      "lon": -72.0427555,
+      "lat": -43.3508543,
+      "x_m": 2766.301902446324,
+      "y_m": 6358.116119999796,
+      "unreal_local_cm": [
+        276630.1902446324,
+        635811.6119999796
+      ],
+      "conditioned_visual_surface_elevation_m": 152.7669,
+      "conditioned_visual_bed_elevation_m": 150.9669,
+      "conditioned_visual_surface_normalized": 0.01296461,
+      "conditioned_visual_bed_normalized": 0.01189251
+    },
+    {
+      "station_m": 14611.139198558863,
+      "lon": -72.0438125,
+      "lat": -43.3509307,
+      "x_m": 2680.7125156814122,
+      "y_m": 6366.620967999522,
+      "unreal_local_cm": [
+        268071.2515681412,
+        636662.0967999522
+      ],
+      "conditioned_visual_surface_elevation_m": 152.1477,
+      "conditioned_visual_bed_elevation_m": 150.3477,
+      "conditioned_visual_surface_normalized": 0.01259581,
+      "conditioned_visual_bed_normalized": 0.01152371
+    },
+    {
+      "station_m": 14729.310173104586,
+      "lon": -72.0452553,
+      "lat": -43.3511001,
+      "x_m": 2563.8834076176295,
+      "y_m": 6385.478575999211,
+      "unreal_local_cm": [
+        256388.34076176296,
+        638547.8575999211
+      ],
+      "conditioned_visual_surface_elevation_m": 151.4053,
+      "conditioned_visual_bed_elevation_m": 149.6053,
+      "conditioned_visual_surface_normalized": 0.01215363,
+      "conditioned_visual_bed_normalized": 0.01108153
+    },
+    {
+      "station_m": 14785.266225229658,
+      "lon": -72.045942,
+      "lat": -43.3511625,
+      "x_m": 2508.2786470769092,
+      "y_m": 6392.4249439997075,
+      "unreal_local_cm": [
+        250827.86470769093,
+        639242.4943999707
+      ],
+      "conditioned_visual_surface_elevation_m": 151.1256,
+      "conditioned_visual_bed_elevation_m": 149.3256,
+      "conditioned_visual_surface_normalized": 0.01198704,
+      "conditioned_visual_bed_normalized": 0.01091494
+    },
+    {
+      "station_m": 14856.483890629768,
+      "lon": -72.0468166,
+      "lat": -43.3510867,
+      "x_m": 2437.458895265516,
+      "y_m": 6383.986887999971,
+      "unreal_local_cm": [
+        243745.8895265516,
+        638398.6887999971
+      ],
+      "conditioned_visual_surface_elevation_m": 150.7482,
+      "conditioned_visual_bed_elevation_m": 148.9482,
+      "conditioned_visual_surface_normalized": 0.01176225,
+      "conditioned_visual_bed_normalized": 0.01069015
+    },
+    {
+      "station_m": 14912.467596427854,
+      "lon": -72.0474925,
+      "lat": -43.3509775,
+      "x_m": 2382.72865258375,
+      "y_m": 6371.830743999498,
+      "unreal_local_cm": [
+        238272.86525837498,
+        637183.0743999497
+      ],
+      "conditioned_visual_surface_elevation_m": 150.4382,
+      "conditioned_visual_bed_elevation_m": 148.6382,
+      "conditioned_visual_surface_normalized": 0.01157761,
+      "conditioned_visual_bed_normalized": 0.01050551
+    },
+    {
+      "station_m": 14962.262946446554,
+      "lon": -72.0480401,
+      "lat": -43.3507726,
+      "x_m": 2338.38735817363,
+      "y_m": 6349.021275999504,
+      "unreal_local_cm": [
+        233838.73581736302,
+        634902.1275999504
+      ],
+      "conditioned_visual_surface_elevation_m": 150.0099,
+      "conditioned_visual_bed_elevation_m": 148.2099,
+      "conditioned_visual_surface_normalized": 0.01132251,
+      "conditioned_visual_bed_normalized": 0.01025041
+    },
+    {
+      "station_m": 15025.765248991385,
+      "lon": -72.0487046,
+      "lat": -43.3504682,
+      "x_m": 2284.5802176768907,
+      "y_m": 6315.135467999789,
+      "unreal_local_cm": [
+        228458.02176768906,
+        631513.5467999789
+      ],
+      "conditioned_visual_surface_elevation_m": 149.7252,
+      "conditioned_visual_bed_elevation_m": 147.9252,
+      "conditioned_visual_surface_normalized": 0.01115294,
+      "conditioned_visual_bed_normalized": 0.01008084
+    },
+    {
+      "station_m": 15096.147860046714,
+      "lon": -72.0494557,
+      "lat": -43.3501483,
+      "x_m": 2223.7607395320133,
+      "y_m": 6279.524199999686,
+      "unreal_local_cm": [
+        222376.07395320132,
+        627952.4199999686
+      ],
+      "conditioned_visual_surface_elevation_m": 149.3062,
+      "conditioned_visual_bed_elevation_m": 147.5062,
+      "conditioned_visual_surface_normalized": 0.01090338,
+      "conditioned_visual_bed_normalized": 0.00983128
+    },
+    {
+      "station_m": 15174.28039440041,
+      "lon": -72.0503679,
+      "lat": -43.3499165,
+      "x_m": 2149.8963699890646,
+      "y_m": 6253.7202239995,
+      "unreal_local_cm": [
+        214989.63699890647,
+        625372.0223999501
+      ],
+      "conditioned_visual_surface_elevation_m": 148.8483,
+      "conditioned_visual_bed_elevation_m": 147.0483,
+      "conditioned_visual_surface_normalized": 0.01063065,
+      "conditioned_visual_bed_normalized": 0.00955855
+    },
+    {
+      "station_m": 15247.68601070759,
+      "lon": -72.0512588,
+      "lat": -43.3497896,
+      "x_m": 2077.756744001562,
+      "y_m": 6239.593715999731,
+      "unreal_local_cm": [
+        207775.6744001562,
+        623959.3715999731
+      ],
+      "conditioned_visual_surface_elevation_m": 148.4709,
+      "conditioned_visual_bed_elevation_m": 146.6709,
+      "conditioned_visual_surface_normalized": 0.01040587,
+      "conditioned_visual_bed_normalized": 0.00933377
+    },
+    {
+      "station_m": 15280.779286944864,
+      "lon": -72.0516661,
+      "lat": -43.3497604,
+      "x_m": 2044.776084370736,
+      "y_m": 6236.343171999712,
+      "unreal_local_cm": [
+        204477.6084370736,
+        623634.3171999712
+      ],
+      "conditioned_visual_surface_elevation_m": 148.3252,
+      "conditioned_visual_bed_elevation_m": 146.5252,
+      "conditioned_visual_surface_normalized": 0.01031909,
+      "conditioned_visual_bed_normalized": 0.00924699
+    },
+    {
+      "station_m": 15316.435857625793,
+      "lon": -72.0521059,
+      "lat": -43.3497838,
+      "x_m": 2009.1637737759463,
+      "y_m": 6238.948059999304,
+      "unreal_local_cm": [
+        200916.37737759462,
+        623894.8059999304
+      ],
+      "conditioned_visual_surface_elevation_m": 148.0677,
+      "conditioned_visual_bed_elevation_m": 146.2677,
+      "conditioned_visual_surface_normalized": 0.01016572,
+      "conditioned_visual_bed_normalized": 0.00909362
+    },
+    {
+      "station_m": 15338.386089911084,
+      "lon": -72.0523634,
+      "lat": -43.3498463,
+      "x_m": 1988.3130007464204,
+      "y_m": 6245.905559999931,
+      "unreal_local_cm": [
+        198831.30007464203,
+        624590.5559999931
+      ],
+      "conditioned_visual_surface_elevation_m": 148.0,
+      "conditioned_visual_bed_elevation_m": 146.2,
+      "conditioned_visual_surface_normalized": 0.01012539,
+      "conditioned_visual_bed_normalized": 0.00905329
+    },
+    {
+      "station_m": 15363.89906575845,
+      "lon": -72.0526209,
+      "lat": -43.3499789,
+      "x_m": 1967.4622277180451,
+      "y_m": 6260.666591999997,
+      "unreal_local_cm": [
+        196746.22277180452,
+        626066.6591999996
+      ],
+      "conditioned_visual_surface_elevation_m": 148.0,
+      "conditioned_visual_bed_elevation_m": 146.2,
+      "conditioned_visual_surface_normalized": 0.01012539,
+      "conditioned_visual_bed_normalized": 0.00905329
+    },
+    {
+      "station_m": 15410.456636548499,
+      "lon": -72.0528784,
+      "lat": -43.3503534,
+      "x_m": 1946.6114546885196,
+      "y_m": 6302.355931999941,
+      "unreal_local_cm": [
+        194661.14546885196,
+        630235.5931999942
+      ],
+      "conditioned_visual_surface_elevation_m": 147.6245,
+      "conditioned_visual_bed_elevation_m": 145.8245,
+      "conditioned_visual_surface_normalized": 0.00990174,
+      "conditioned_visual_bed_normalized": 0.00882964
+    },
+    {
+      "station_m": 15482.380727640524,
+      "lon": -72.0532858,
+      "lat": -43.3509284,
+      "x_m": 1913.6226976705902,
+      "y_m": 6366.364931999693,
+      "unreal_local_cm": [
+        191362.269767059,
+        636636.4931999693
+      ],
+      "conditioned_visual_surface_elevation_m": 147.2366,
+      "conditioned_visual_bed_elevation_m": 145.4366,
+      "conditioned_visual_surface_normalized": 0.0096707,
+      "conditioned_visual_bed_normalized": 0.0085986
+    },
+    {
+      "station_m": 15549.635107779004,
+      "lon": -72.0538122,
+      "lat": -43.3513967,
+      "x_m": 1870.998049427663,
+      "y_m": 6418.496087999852,
+      "unreal_local_cm": [
+        187099.80494276632,
+        641849.6087999851
+      ],
+      "conditioned_visual_surface_elevation_m": 146.9976,
+      "conditioned_visual_bed_elevation_m": 145.1976,
+      "conditioned_visual_surface_normalized": 0.00952835,
+      "conditioned_visual_bed_normalized": 0.00845625
+    },
+    {
+      "station_m": 15610.661629519727,
+      "lon": -72.0544234,
+      "lat": -43.3517187,
+      "x_m": 1821.5068165125156,
+      "y_m": 6454.3411279995225,
+      "unreal_local_cm": [
+        182150.68165125157,
+        645434.1127999523
+      ],
+      "conditioned_visual_surface_elevation_m": 146.5,
+      "conditioned_visual_bed_elevation_m": 144.7,
+      "conditioned_visual_surface_normalized": 0.00923198,
+      "conditioned_visual_bed_normalized": 0.00815988
+    },
+    {
+      "station_m": 15679.763775919482,
+      "lon": -72.0552285,
+      "lat": -43.3519272,
+      "x_m": 1756.3147490728702,
+      "y_m": 6477.551347999454,
+      "unreal_local_cm": [
+        175631.47490728702,
+        647755.1347999454
+      ],
+      "conditioned_visual_surface_elevation_m": 146.5,
+      "conditioned_visual_bed_elevation_m": 144.7,
+      "conditioned_visual_surface_normalized": 0.00923198,
+      "conditioned_visual_bed_normalized": 0.00815988
+    },
+    {
+      "station_m": 15766.769268043807,
+      "lon": -72.0563009,
+      "lat": -43.3519917,
+      "x_m": 1669.4783646203828,
+      "y_m": 6484.731487999519,
+      "unreal_local_cm": [
+        166947.83646203828,
+        648473.1487999519
+      ],
+      "conditioned_visual_surface_elevation_m": 145.5,
+      "conditioned_visual_bed_elevation_m": 143.7,
+      "conditioned_visual_surface_normalized": 0.00863637,
+      "conditioned_visual_bed_normalized": 0.00756427
+    },
+    {
+      "station_m": 15848.344621965818,
+      "lon": -72.0573098,
+      "lat": -43.3519896,
+      "x_m": 1587.7838212835188,
+      "y_m": 6484.497715999951,
+      "unreal_local_cm": [
+        158778.3821283519,
+        648449.7715999951
+      ],
+      "conditioned_visual_surface_elevation_m": 145.0,
+      "conditioned_visual_bed_elevation_m": 143.2,
+      "conditioned_visual_surface_normalized": 0.00833856,
+      "conditioned_visual_bed_normalized": 0.00726646
+    },
+    {
+      "station_m": 15906.691630316776,
+      "lon": -72.0580273,
+      "lat": -43.3519336,
+      "x_m": 1529.6850653664976,
+      "y_m": 6478.263795999871,
+      "unreal_local_cm": [
+        152968.50653664977,
+        647826.3795999871
+      ],
+      "conditioned_visual_surface_elevation_m": 144.8631,
+      "conditioned_visual_bed_elevation_m": 143.0631,
+      "conditioned_visual_surface_normalized": 0.00825702,
+      "conditioned_visual_bed_normalized": 0.00718492
+    },
+    {
+      "station_m": 15936.77551712958,
+      "lon": -72.058394,
+      "lat": -43.3519794,
+      "x_m": 1499.99194509529,
+      "y_m": 6483.362251999338,
+      "unreal_local_cm": [
+        149999.194509529,
+        648336.2251999337
+      ],
+      "conditioned_visual_surface_elevation_m": 144.8631,
+      "conditioned_visual_bed_elevation_m": 143.0631,
+      "conditioned_visual_surface_normalized": 0.00825702,
+      "conditioned_visual_bed_normalized": 0.00718492
+    }
+  ],
+  "visual_channel_conditioning": {
+    "path": "hydrology/visual_channel_conditioning.json",
+    "status": "bounded_visual_terrain_conditioning_review_gated",
+    "surface_authority": "render_only_not_solver_or_surveyed_bathymetry"
+  }
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_corridor_visual_review.v13",
+  "river_id": "futaleufu_terminator",
+  "status": "source_masked_corridor_placement_validated_visual_substitution_rejected_not_lifelike",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "runtime_far_lod_retained": true,
+  "placement_pipeline_retained": true,
+  "decision": "retain_source_masked_hism_placement_and_runtime_far_lod_reject_coigue_corridor_visual_promotion",
+  "comparison_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v13_corridor_comparison_report.json",
+  "authority_boundary": {
+    "source_map_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_water_modified": false,
+    "geoclaw_reference_modified": false,
+    "review_components": "transient non-colliding HISM components tagged RaftSim_ExternalReviewOnly",
+    "replaced_for_capture": "four visible temporary PVE foliage actors only"
+  },
+  "placement_contract_result": {
+    "source_vegetation_and_water_masks_used": true,
+    "source_landscape_height_used": true,
+    "centerline_progress_window": [0.55, 0.91],
+    "river_setback_m": 65.0,
+    "maximum_lateral_offset_m": 300.0,
+    "minimum_spacing_m": 15.0,
+    "minimum_vegetation_mask": 0.34,
+    "maximum_water_mask": 0.28,
+    "elevation_band_m": [100.0, 900.0],
+    "maximum_slope_degrees": 39.0,
+    "aspect_thinning_applied": true,
+    "macro_and_micro_canopy_gaps_applied": true,
+    "accepted_trees_per_view": 1200,
+    "guide_seat_representation_counts": {
+      "near_full": 50,
+      "mid": 126,
+      "runtime_far": 1024
+    },
+    "river_eye_representation_counts": {
+      "near_full": 40,
+      "mid": 157,
+      "runtime_far": 1003
+    },
+    "placement_pipeline_gate_passed": true,
+    "corridor_visual_gate_passed": false
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_pre_native_coigue_corridor_review_guide_seat_downstream.png",
+      "baseline_sha256": "75904495f4209742d0155c6211e8a4fdd227142d34f0646ba3d3a23a540fc150",
+      "comparison": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_coigue_corridor_review_guide_seat_downstream.png",
+      "comparison_sha256": "1bbe22f82fbd4efe8e3c7a950039f04774fb08dda278a13fc70c21f0a40ef2b6",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.04751953125,
+      "baseline_green_dominant_fraction": 0.00509765625,
+      "comparison_green_dominant_fraction": 0.000010850694444444445
+    },
+    "river_eye": {
+      "baseline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_pre_native_coigue_corridor_review_river_eye_downstream.png",
+      "baseline_sha256": "6395614fc215b7e15318c1f6cc187217717f5e3db0343cf98b0a6716d7586f2b",
+      "comparison": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_coigue_corridor_review_river_eye_downstream.png",
+      "comparison_sha256": "5857f463d231628ee2813284849202c94bcf474d746b1bb2f59e50e483abc8e6",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.060665147569444446,
+      "baseline_green_dominant_fraction": 0.003581814236111111,
+      "comparison_green_dominant_fraction": 0.0003493923611111111
+    }
+  },
+  "accepted_findings": [
+    "The physical-corridor transform can map the source vegetation and water masks into Unreal world coordinates while retaining Landscape height authority.",
+    "Slope, elevation, aspect, riparian setback, natural-gap, and 15 m spacing rules produce a deterministic 1,200-tree review layer in both camera views.",
+    "The eight independent coigue forms and full, intermediate, and V12 runtime-far representations can be placed through transient HISM components without collision or saved-map changes.",
+    "The runtime-far family remains the retained 94-percent-reduced technical LOD candidate; this review does not revoke the isolated V12 resource result."
+  ],
+  "rejection_reasons": [
+    "The replacement reduces green-dominant image coverage from 0.5098 percent to 0.0011 percent in the guide-seat view and from 0.3582 percent to 0.0349 percent in the river-eye view.",
+    "The accepted trees read as bare dark trunks, black crown clumps, and elongated black ground/shadow marks instead of continuous Patagonian temperate-rainforest canopy.",
+    "The source-authorized placement around these cameras begins in the 300 m representation band, leaving the river-adjacent slopes visually empty rather than supplying a convincing riparian transition.",
+    "The smooth 30 m terrain, flat provisional water response, sparse boulder detail, and absent understory remain dominant and prevent a lifelike corridor even if the tree material is repaired.",
+    "There is still only one native species family, no sapling, shrub, fern, bamboo, deadwood, or epiphyte strata, and no guide/ecology approval.",
+    "Moving-camera LOD transitions, temporal wind, masked overdraw, streaming, packaged desktop, and on-device VR performance remain unvalidated."
+  ],
+  "next_iteration_requirements": [
+    "Compile and persist explicit InstancedStaticMeshes material usage before placement, then isolate the corridor leaf-opacity, transmission, shadow, and distance-mip failure under source-map lighting.",
+    "Author distance-stable opaque or alpha-preserving crown clusters that retain green mass at 300-1000 m without black cards, shadow carpets, or bare-trunk silhouettes.",
+    "Add at least one second ecology-reviewed native canopy species plus near-bank sapling, shrub, fern/bamboo, epiphyte, and deadwood strata using the same source masks and terrain bands.",
+    "Expand source-conditioned placement beyond the 300 m review strip only after validating the vegetation-mask interpretation against aerial imagery and guide/ecology references.",
+    "Repeat paired guide-seat, river-eye, and moving-camera captures, then profile masked overdraw, draw calls, streaming, culling, packaged desktop, and on-device VR cost before any promotion."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "raftsim.unreal.installed_engine_growth_data_source.v1",
+  "candidate_id": "ue_5_8_pve_futaleufu_european_beech",
+  "river_id": "futaleufu_terminator",
+  "status": "installed_engine_sample_hash_locked_local_visual_rejected_no_corridor_substitution",
+  "production_promoted": false,
+  "engine_version": "5.8",
+  "source_root": "Engine/Plugins/Experimental/ProceduralVegetationEditor/Content/SampleAssets/Tree_European_Beech_01/Instances",
+  "source_files": [
+    {
+      "variant": "Beech_01",
+      "relative_path": "Beech_01.json",
+      "sha256": "d7d6dcc33b896c8ef9b76c2cc61526d705abaf7178e336e80b60e4c9c0596a2f",
+      "bytes": 13365438,
+      "structural_report": "docs/environment-captures/photoreal_river_previews/pve_futaleufu_european_beech_beech_01_structural_report.json"
+    },
+    {
+      "variant": "Beech_02",
+      "relative_path": "Beech_02.json",
+      "sha256": "3d7753063fdcc480f64691098884777047b2e91d9f04a29b740a80b37a7a5de0",
+      "bytes": 15304769,
+      "structural_report": "docs/environment-captures/photoreal_river_previews/pve_futaleufu_european_beech_beech_02_structural_report.json"
+    },
+    {
+      "variant": "Beech_03",
+      "relative_path": "Beech_03.json",
+      "sha256": "b90d24aeb812c3d3827286d91c98bd2038093af11b2cf374e3b9e3fec5d1244d",
+      "bytes": 9114879,
+      "structural_report": "docs/environment-captures/photoreal_river_previews/pve_futaleufu_european_beech_beech_03_structural_report.json"
+    },
+    {
+      "variant": "Beech_04",
+      "relative_path": "Beech_04.json",
+      "sha256": "3a7e08714032ede9d91a6e2bf807fba53ab9f740bc8115680d65e9388f8ad4cd",
+      "bytes": 13862432,
+      "structural_report": "docs/environment-captures/photoreal_river_previews/pve_futaleufu_european_beech_beech_04_structural_report.json"
+    }
+  ],
+  "evaluation_contract": {
+    "command": "RaftSim.EvaluateProceduralBeechCandidate <Beech_01|Beech_02|Beech_03|Beech_04>",
+    "source_graph": "/ProceduralVegetationEditor/SampleAssets/StarterContent/DeciduousTree_01/PVE_Sample_Deciduous_Tree_01",
+    "implementation": "RaftSimEditor duplicates the source graph transiently, loads all four growth JSON files through the reflected UE 5.8 PVE growth-data asset, substitutes one named output at the mesher input, executes PCG, records the final mesh collection, and writes an ignored local-only Nanite trunk asset plus foliage transform template for visual review.",
+    "expected_variant_count": 4,
+    "content_copied_into_repository": false,
+    "local_review_export_complete": true,
+    "local_review_export_git_ignored": true,
+    "required_rhi": "offscreen_metal",
+    "null_rhi_supported": false,
+    "rhi_reason": "UE 5.8 PVE growth executes FPVLightDetectionCS; NullRHI has no Metal shader permutation and asserts before graph completion."
+  },
+  "rights_boundary": {
+    "license_review_sources": [
+      "https://www.unrealengine.com/license",
+      "https://www.unrealengine.com/eula-reference/content"
+    ],
+    "current_policy": "installed Unreal Engine sample evaluation only; do not copy, redistribute, or open-source the growth data, twig meshes, materials, or derived assets without explicit item-level license review",
+    "open_source_redistribution_approved": false
+  },
+  "species_boundary": {
+    "candidate_species": "Fagus sylvatica structure analog",
+    "native_futaleufu_species": false,
+    "nothofagus_identity": false,
+    "ecology_approved": false
+  },
+  "visual_review": {
+    "status": "rejected_at_isolated_visual_gate_no_corridor_substitution",
+    "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/ue_pve_futaleufu_european_beech_visual_review.json",
+    "local_capture_count": 12,
+    "local_capture_files_committed": false
+  },
+  "next_steps": [
+    "Do not substitute these four rejected variants into the Futaleufu corridor.",
+    "Acquire rights-clear native Patagonian or ecology-reviewed Nothofagus-family assets with broad layered distance-stable crowns.",
+    "Require ecology, rights, art, guide, gameplay, seasonal-flow, and desktop/VR performance approval before any future foliage promotion."
+  ]
+}

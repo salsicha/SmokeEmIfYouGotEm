@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_pine_tree_01_1k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "South Fork American dense conifer canopy silhouette, distance stability, and Nanite performance comparison",
+  "source": {
+    "title": "Pine Tree 01",
+    "publisher": "Poly Haven",
+    "authors": ["Rico Cilliers", "Rob Tuytel"],
+    "asset_url": "https://polyhaven.com/a/pine_tree_01",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "manual download from the asset website",
+    "public_api_used": false,
+    "downloaded_package": "1K FBX",
+    "archive_bytes": 704315360,
+    "archive_sha256": "6d20a1efbbce1b9b074c52f7e7fc9837126603af6cdc10d5763981fa903121e1",
+    "publisher_set_width_m": 26.7,
+    "publisher_triangle_count_label": "17M",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "south_fork_species_approval": "not_reviewed_use_as_dense_conifer_structure_analog_only",
+    "river_guide_visual_approval": "not_reviewed",
+    "performance_approval": "not_measured",
+    "seasonal_state_approval": "not_reviewed",
+    "allowed_now": [
+      "isolated Unreal import",
+      "material, pivot, scale, Nanite, and distance-stability validation",
+      "South Fork visual comparison captures"
+    ],
+    "blocked_now": [
+      "claiming exact South Fork species identity",
+      "automatic production foliage replacement",
+      "claiming lifelike environment completion",
+      "shipping before ecology, guide, art, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "pine_tree_01_1k.fbx": "b220661091fb81046d9af751259c5d3e4f1cde3b79b48cdaddc79b4762515dc3",
+    "textures/pine_tree_01_bark_diff_1k.png": "91e79e9bd1d5d68922262b4eee752808c49c55c2941b531a65b586dae8984bc9",
+    "textures/pine_tree_01_bark_disp_1k.png": "8cce79758590f833bd8435c428110bcd656ff8e242c899acbd416b6eeb7e8606",
+    "textures/pine_tree_01_bark_nor_gl_1k.png": "d0cdc8ff2f74da8023a1f18512f9db643284d94a698a4ac491f63c4c11c95211",
+    "textures/pine_tree_01_bark_rough_1k.png": "63c3785c47a2f4193e5054d9f8481da0bd41bc2bfc1a993cd8785fad6339fe97",
+    "textures/pine_tree_01_trunk_a_diff_1k.png": "50e8911ac39d8eeb720d7412495d00f8639f2a0ad01dec1c22aa79efc16e9f08",
+    "textures/pine_tree_01_trunk_a_nor_gl_1k.png": "e1dfe1dcfd4d92eb7dd732cff98ac32c8a3aa5a36b9eea220e22030ea604ec09",
+    "textures/pine_tree_01_trunk_a_rough_1k.png": "ebda61e833608c3df8d65018330c9e0bb80ec39b30d9416de0cc088c520ca8b6",
+    "textures/pine_tree_01_trunk_b_diff_1k.png": "41bd8a65e0a827646b3a33dc1607eba2082ddc25fe714752259447c49d0600cc",
+    "textures/pine_tree_01_trunk_b_nor_gl_1k.png": "fe5f1dafe611a7f04142abf7878622a6212ed7c1737711d548ec3301b3210cf7",
+    "textures/pine_tree_01_trunk_b_rough_1k.png": "ff399f6d054f903deee0e4d455c09f12ac3441f5c9547a0e9d06c163e6958dee",
+    "textures/pine_tree_01_trunk_c_diff_1k.png": "edbceb8657a036e98831a3550433ab2d78928fcf9060e400ca84748cedcaf962",
+    "textures/pine_tree_01_trunk_c_nor_gl_1k.png": "08a40a7486ad3a8d97cf3da0afe5951f1a038cb51395020e2c4a2113f46d1610",
+    "textures/pine_tree_01_trunk_c_rough_1k.png": "48fcced840b4beed4e03e09a352a67dd36185c9cd4247090069391bfb9746de9",
+    "textures/pine_tree_01_twig_diff_1k.png": "d02c031de64b8ad671f3dd0da19870fa4783d912ae6674aeab0702871deeaeaa",
+    "textures/pine_tree_01_twig_nor_gl_1k.png": "4b79eda7fe8843d71f9289bd0d3897a1b0a7310b1872b390a589a04b510b0597",
+    "textures/pine_tree_01_twig_rough_1k.png": "c12da3dd6c1588f50307d96807d78115757f110bc562811369d90b86bd6fddc7"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_pine_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_PINE_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K",
+    "mesh_policy": "three source trees imported separately as static meshes",
+    "material_policy": "sixteen textures imported explicitly; GL normals corrected for Unreal; embedded twig diffuse alpha drives masked two-sided foliage; shared bark and needle plus three per-variant trunk materials authored locally",
+    "nanite_policy": "enabled with PreserveArea on every isolated static mesh",
+    "promotion_policy": "manual after distance-stability, ecology, guide, art, and performance review"
+  }
+}

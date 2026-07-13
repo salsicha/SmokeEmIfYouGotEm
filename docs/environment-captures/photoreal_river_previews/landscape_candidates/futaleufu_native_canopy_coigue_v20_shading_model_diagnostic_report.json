@@ -1,0 +1,89 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_shading_model_diagnostic.v20",
+	"river_id": "futaleufu_terminator",
+	"status": "same_texture_defaultlit_pairs_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"defaultlit_material": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/M_RaftSim_FutaleufuCoigue_Leaves_DefaultLitDiagnostic",
+	"control_boundary": "The source leaf textures, masked opacity graph, 4x opacity diagnostic, two-sided geometry, normal graph, base-color scales, saved corridor lighting, shadows, masks, placement, meshes, cameras, terrain, water, rocks, and physics authority remain fixed. DefaultLit omits only the TwoSidedFoliage-specific subsurface input.",
+	"twosidedfoliage_references":
+	{
+		"twosidedfoliage_basecolor_118_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+		"twosidedfoliage_basecolor_118_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+		"twosidedfoliage_basecolor_236_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_guide_seat_downstream.png",
+		"twosidedfoliage_basecolor_236_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_river_eye_downstream.png"
+	},
+	"captures":
+	{
+		"defaultlit_alpha4_basecolor_118_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v20_defaultlit_alpha4_basecolor_118_no_shadows_guide_seat_downstream.png",
+		"defaultlit_alpha4_basecolor_118_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v20_defaultlit_alpha4_basecolor_118_no_shadows_river_eye_downstream.png",
+		"defaultlit_alpha4_basecolor_236_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v20_defaultlit_alpha4_basecolor_236_no_shadows_guide_seat_downstream.png",
+		"defaultlit_alpha4_basecolor_236_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v20_defaultlit_alpha4_basecolor_236_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"defaultlit_alpha4_basecolor_118_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"defaultlit_alpha4_basecolor_118_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"defaultlit_alpha4_basecolor_236_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"defaultlit_alpha4_basecolor_236_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"render_modes":
+	{
+		"defaultlit_alpha4_basecolor_118_no_shadows":
+		{
+			"shading_model": "DefaultLit",
+			"masked": true,
+			"two_sided_geometry": true,
+			"LeafOpacityScale": 4,
+			"LeafBaseColorScale": 1.1799999999999999,
+			"leaf_cast_shadow": false,
+			"promotion_eligible": false
+		},
+		"defaultlit_alpha4_basecolor_236_no_shadows":
+		{
+			"shading_model": "DefaultLit",
+			"masked": true,
+			"two_sided_geometry": true,
+			"LeafOpacityScale": 4,
+			"LeafBaseColorScale": 2.3599999999999999,
+			"leaf_cast_shadow": false,
+			"promotion_eligible": false
+		}
+	}
+}

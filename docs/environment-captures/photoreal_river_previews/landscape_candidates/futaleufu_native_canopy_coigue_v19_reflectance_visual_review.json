@@ -1,0 +1,125 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_reflectance_review.v19",
+  "river_id": "futaleufu_terminator",
+  "status": "basecolor_response_confirmed_transmission_minor_combined_control_still_too_dark_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "neutral_material_defaults_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v19_reflectance_diagnostic_report.json",
+  "decision": "retain_neutral_reflectance_and_transmission_defaults_reject_all_v19_overrides_and_compare_same_texture_defaultlit_to_twosidedfoliage",
+  "diagnostic_conclusions": {
+    "base_color_reflectance_changes_crown_response": true,
+    "white_transmission_alone_restores_readable_crowns": false,
+    "base_color_and_transmission_interact": true,
+    "combined_override_is_promotion_eligible": false,
+    "same_texture_shading_model_comparison_required": true,
+    "alpha_scale_4_remains_promotion_eligible": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "saved_corridor_photometry_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "placement_counts_identical_between_render_modes": true
+  },
+  "metric_contract": {
+    "reference": "V18 alpha4 baseline with saved corridor lighting and leaf shadows disabled",
+    "restored_crown_mask": "pixel differs from the V15 shadowless native-opacity reference by summed absolute RGB greater than 8",
+    "green_dominant": "G exceeds R and B by 10 percent and G exceeds 25",
+    "dark": "Rec.709 luma is below 32/255"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_guide_seat_downstream.png",
+      "reference_sha256": "8e1195812e65c7cfea9998f422fe106952b59afe0673e5d163f5cb0af358bab0",
+      "basecolor_236": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_guide_seat_downstream.png",
+      "basecolor_236_sha256": "02b049440d095c753e457f306512732b021d42a1c859e8f1ad9287465f6af678",
+      "white_transmission": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_white_transmission_no_shadows_guide_seat_downstream.png",
+      "white_transmission_sha256": "6b0076a03735942667d7662b47a933c2a7040173293f561308d59e02b407bd93",
+      "combined": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_white_transmission_no_shadows_guide_seat_downstream.png",
+      "combined_sha256": "3914bee21e032998d9a34fdc09fcc9a0bd04c3e42af6f4f8d7751cb3e6eb5b4a",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_reference": {
+        "basecolor_236": 0.011719835069444445,
+        "white_transmission": 0.006751302083333333,
+        "combined": 0.014956597222222222
+      },
+      "mean_absolute_rgb_delta_vs_reference": {
+        "basecolor_236": [0.03111328125, 0.04974392361111111, 0.007663845486111111],
+        "white_transmission": [0.02331271701388889, 0.013930121527777778, 0.009174262152777777],
+        "combined": [0.06796223958333333, 0.07501519097222223, 0.02467556423611111]
+      },
+      "restored_crown_metrics": {
+        "reference_mean_rgb": [24.200439527129433, 34.20756289784783, 36.95278872385571],
+        "basecolor_236_mean_rgb": [26.188541982418915, 37.542891785389514, 37.369581691421644],
+        "white_transmission_mean_rgb": [25.70498635950288, 35.0895725977569, 37.50098514701425],
+        "combined_mean_rgb": [28.700894210366776, 39.270612306759624, 38.528645043952714],
+        "reference_green_dominant_fraction": 0.008790542588663231,
+        "basecolor_236_green_dominant_fraction": 0.19043649590785086,
+        "white_transmission_green_dominant_fraction": 0.010230372840254623,
+        "combined_green_dominant_fraction": 0.28334343740527435,
+        "reference_dark_fraction": 0.7821309487723552,
+        "basecolor_236_dark_fraction": 0.6445134889360412,
+        "white_transmission_dark_fraction": 0.7166565625947257,
+        "combined_dark_fraction": 0.43914822673537435
+      }
+    },
+    "river_eye": {
+      "reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v18_alpha4_baseline_no_shadows_river_eye_downstream.png",
+      "reference_sha256": "3517aca14513db08770f56189dc393064f45817a05f1b5fc28c1484390174e50",
+      "basecolor_236": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_no_shadows_river_eye_downstream.png",
+      "basecolor_236_sha256": "7b5aa24ada6d87fe11caac3673b8722db183a9ab90bf4deda35734b7fccd2a8b",
+      "white_transmission": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_white_transmission_no_shadows_river_eye_downstream.png",
+      "white_transmission_sha256": "920f7bb266dbd35b82755c4413c07f507111c4eef9155e33f81793d7e5b63ffb",
+      "combined": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v19_alpha4_basecolor_236_white_transmission_no_shadows_river_eye_downstream.png",
+      "combined_sha256": "65af7b0798372061177dd4dad4a87f8aa415f8a4c02612bd059d56c69027578c",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_vs_reference": {
+        "basecolor_236": 0.02628363715277778,
+        "white_transmission": 0.014039713541666667,
+        "combined": 0.032481553819444446
+      },
+      "mean_absolute_rgb_delta_vs_reference": {
+        "basecolor_236": [0.06856228298611111, 0.13153211805555556, 0.02203125],
+        "white_transmission": [0.04833875868055556, 0.036535373263888886, 0.023858506944444444],
+        "combined": [0.170068359375, 0.1955859375, 0.06692057291666667]
+      },
+      "restored_crown_metrics": {
+        "reference_mean_rgb": [20.855473454640148, 29.4460141271443, 30.446079229191756],
+        "basecolor_236_mean_rgb": [22.752970280915335, 33.28436574330263, 31.010448878617233],
+        "white_transmission_mean_rgb": [22.206471143517465, 30.481494743009666, 31.09550470362293],
+        "combined_mean_rgb": [25.77696038540412, 35.16246215943492, 32.324436053513885],
+        "reference_green_dominant_fraction": 0.018488981478467496,
+        "basecolor_236_green_dominant_fraction": 0.29680023436737085,
+        "white_transmission_green_dominant_fraction": 0.03131408482796784,
+        "combined_green_dominant_fraction": 0.374597181081345,
+        "reference_dark_fraction": 0.8507210051756128,
+        "basecolor_236_dark_fraction": 0.8057354903811725,
+        "white_transmission_dark_fraction": 0.8373099833989779,
+        "combined_dark_fraction": 0.7178151752872628
+      }
+    }
+  },
+  "accepted_findings": [
+    "Doubling LeafBaseColorScale produces the strongest independent green-response increase in both corridor views.",
+    "Neutral-white transmission alone changes fewer pixels and does not materially reduce the river-eye dark-crown fraction.",
+    "The combined control produces a measurable interaction, raising crown-mask green classification to 28.33 percent in guide-seat and 37.46 percent in river-eye.",
+    "All modes retain identical 1,200-tree placement counts, fixed saved lighting, neutral AO/normals/emissive, and unchanged physics authority."
+  ],
+  "rejection_reasons": [
+    "Even the combined control remains visually near-black at gameplay distance and leaves 43.91 percent of guide-seat and 71.78 percent of river-eye crown-mask pixels dark.",
+    "The combined mode changes two physical controls simultaneously and cannot identify whether the remaining loss belongs to the TwoSidedFoliage shading model.",
+    "Four-times opacity remains visually close to solid cards and does not preserve credible leaf-edge breakup.",
+    "None of the V19 modes makes the sparse single-species corridor lifelike or production-ready."
+  ],
+  "next_iteration_requirements": [
+    "Build a diagnostic masked DefaultLit leaf material from the same textures and opacity graph, with identical 1.18 and 2.36 base-color variants.",
+    "Compare DefaultLit to TwoSidedFoliage under the saved corridor rig to isolate shading-model response from texture reflectance.",
+    "Keep diagnostic materials in the review path and retain neutral production defaults until a physically plausible response is selected.",
+    "Then lower opacity amplification and validate leaf-shaped breakup before adding mixed native ecology."
+  ]
+}

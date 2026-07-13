@@ -1,0 +1,51 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_namaqualand_cliff_02_2k",
+  "status": "rights_reviewed_source_bundle_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "Zambezi Batoka Gorge large scanned-cliff scale, silhouette, Nanite, and material comparison; South African structure analog only, not basalt authority",
+  "source": {
+    "title": "Namaqualand Cliff 02",
+    "publisher": "Poly Haven",
+    "authors": ["Dario Barresi", "Rico Cilliers"],
+    "asset_url": "https://polyhaven.com/a/namaqualand_cliff_02",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://polyhaven.com/license",
+    "acquisition_method": "manual direct official download links exposed by the asset website",
+    "public_api_used": false,
+    "downloaded_package": "2K FBX plus diffuse, OpenGL normal, and packed AO-roughness-metallic JPG maps",
+    "publisher_width_m": 20.2,
+    "publisher_triangle_count": 364000,
+    "source_bundle_committed": false
+  },
+  "expected_source_files": {
+    "namaqualand_cliff_02_2k.fbx": "465bf72788387b5ef4306bd3858610c942a7cf127b8a84a555e6aa5cd39b209d",
+    "namaqualand_cliff_02_diff_2k.jpg": "9618e2a42155b93189e0bac9edebcc46a6af1357f4f6ed56f79ca1714690d4f0",
+    "namaqualand_cliff_02_nor_gl_2k.jpg": "634bc52174130d6992a7539d1f7bb923c4a103f117ab09966782c0e89eb571f6",
+    "namaqualand_cliff_02_arm_2k.jpg": "3b4d733be37186ab6b62b8ddde90f9dc439f5b42a17293f1b65844a0f0d9e02f"
+  },
+  "review_boundaries": {
+    "batoka_basalt_match": "not_established_namaqualand_weathered_cliff_structure_analog_only",
+    "zambezi_guide_and_geologist_approval": "not_reviewed",
+    "corridor_performance_approval": "not_measured",
+    "allowed_now": [
+      "isolated Unreal import",
+      "Nanite large-cliff comparison",
+      "bounded Zambezi comparison capture with baseline restoration"
+    ],
+    "blocked_now": [
+      "replacing source terrain or surveyed gorge geometry",
+      "claiming Batoka basalt lithology",
+      "default corridor inclusion",
+      "shipping before geology, guide, art, and performance review"
+    ]
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_zambezi_cliff_asset.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_ZAMBEZI_CLIFF_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K",
+    "mesh_policy": "single grounded static mesh, publisher-scale audit, Nanite enabled, collision disabled for isolated visual review",
+    "material_policy": "explicit CC0 diffuse, flipped OpenGL normal, packed AO and roughness; no emissive lift",
+    "promotion_policy": "manual only after paired baseline comparison plus geology, guide, art, rights, and desktop/VR performance review"
+  }
+}

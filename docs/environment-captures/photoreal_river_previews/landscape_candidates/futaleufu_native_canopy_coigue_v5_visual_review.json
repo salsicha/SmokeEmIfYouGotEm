@@ -1,0 +1,80 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_visual_review.v5",
+  "candidate_id": "first_party_futaleufu_coigue_adult_prototype_v5",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "status": "rejected_at_junction_photometry_and_variant_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "retain_parent_child_hierarchy_and_clearance_budget_for_v6_junction_and_variant_authoring",
+  "prototype_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "accepted_evidence": [
+    "Every near hierarchy now begins at one of 234 limb-attached parent shoots; six branchlets originate at distinct positions along each parent, tertiary branches originate along branchlets, and all 19656 leaf cards retain modeled petioles.",
+    "The 24 formerly unattached near apical bundles are now explicit far-only anchors, leaving the runtime report at zero floating near cards.",
+    "Reducing near anchors from fourteen to nine per main branch lowers the branchlet mesh to 149514 source triangles while the tangential closeup makes a parent shoot and its descendants readable instead of stacking the full tree behind them.",
+    "The removed near anchors are replaced by 370 interior far-only anchors, preserving the total 90432-card far-crown budget and continuous 60 m and 150 m silhouettes.",
+    "The final UE 5.8 Metal run has zero material compile errors, zero map-check errors, zero map-check warnings, and no corridor substitution."
+  ],
+  "hierarchy_contract": {
+    "near_parent_shoots": 234,
+    "branchlets_per_parent_shoot": 6,
+    "tertiary_branches_per_branchlet": 2,
+    "attached_leaf_cards_per_branchlet": 14,
+    "floating_near_cards": 0,
+    "far_only_apical_anchors": 24,
+    "far_only_interior_anchors": 370,
+    "scope": "single open-grown adult isolated prototype"
+  },
+  "rejection_reasons": [
+    "The closeup now exposes a cleaner hierarchy but also reveals an abrupt cylindrical main-limb cutoff and hard parent-shoot junction that do not yet read as naturally grown ramification.",
+    "Bark and interior foliage remain too dark under the fixed review photometry, obscuring fissure, taper, petiole, and leaf-surface detail.",
+    "The whole-tree crown is denser and less shelf-like, but one procedural envelope still lacks the asymmetry and damage variation required for a mature natural specimen.",
+    "Only one open-grown adult form exists; forest-grown adult, intermediate, juvenile, damaged, and deadwood variants remain absent.",
+    "No temporal wind and LOD capture, corridor ecology placement, guide or ecology review, or measured desktop and VR performance evidence exists."
+  ],
+  "review_contract": {
+    "engine_version": "5.8",
+    "rhi": "offscreen Metal",
+    "capture_resolution": [1280, 720],
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "material_compile_errors": 0,
+    "views": [
+      "turntable azimuth 35 degrees",
+      "turntable azimuth 145 degrees",
+      "tangential outer parent-shoot hierarchy closeup",
+      "60 m far-crown proxy",
+      "150 m far-crown proxy"
+    ],
+    "capture_storage": "local ignored Unreal Saved directory",
+    "capture_redistribution": "not approved; hashes and reproducible paths only are retained in the open-source repository"
+  },
+  "captures": [
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_035.png",
+      "sha256": "3ce3a66f24f3193add6b20225f3a21728c68c743773584c78c9232ea1c161c7b"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_145.png",
+      "sha256": "67ab8e7d38a2fa38245157c10e2ab3b2c0be483ff7d588f55990a171f1686574"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/bark_leaf_closeup.png",
+      "sha256": "b38216d7146ce14b533560ddfb55476a9c6116e5e0d80485eea537721dfa71b7"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_60m.png",
+      "sha256": "ac5985492335689fe48a26125a7885b67a7d7ab114621eb93f231314fef71bd4"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_150m.png",
+      "sha256": "f229dda57a42b93b7202007ed583b2923ebdf046ab2b7979563789c36fc80fbf"
+    }
+  ],
+  "next_iteration_requirements": [
+    "Blend primary-limb, secondary-twig, and parent-shoot radii through curved multi-segment junctions without visible cylindrical cutoffs.",
+    "Author open-grown adult, forest-grown adult, and intermediate forms with distinct live-crown ratio, branch angle, width, asymmetry, and damage parameters.",
+    "Rebalance bark and foliage photometry while preserving physically lit response and the fixed review exposure.",
+    "Repeat all five views per required crown form, then add temporal wind and LOD handoff evidence before corridor placement."
+  ]
+}

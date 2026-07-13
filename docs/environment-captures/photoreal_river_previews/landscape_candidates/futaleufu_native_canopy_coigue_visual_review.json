@@ -1,0 +1,67 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_visual_review.v1",
+  "candidate_id": "first_party_futaleufu_coigue_adult_prototype_v1",
+  "river_id": "futaleufu_terminator",
+  "species": "Nothofagus dombeyi",
+  "status": "rejected_at_closeup_material_gate_no_corridor_substitution",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "retain_as_structural_and_distance_silhouette_prototype_only",
+  "prototype_report": "docs/environment-captures/photoreal_river_previews/futaleufu_native_canopy_coigue_prototype_report.json",
+  "accepted_evidence": [
+    "Six project-owned 2048-pixel texture candidates import reproducibly with recorded hashes and no external vendored source data.",
+    "The isolated UE 5.8 command creates explicit bark and two-sided foliage materials plus separate trunk and foliage static meshes.",
+    "Both static meshes have positive bounds and Nanite PreserveArea enabled.",
+    "The adult prototype has a readable straight bole, open horizontal branch structure, and a continuous crown silhouette at the 60 m and 150 m proxy distances.",
+    "All five required 1280x720 review views were captured from the reproducible isolated review map."
+  ],
+  "rejection_reasons": [
+    "The 225-283 cm crossed foliage cards remain visibly flat and intersecting at close range instead of resolving as small coigue leaf sprays.",
+    "Hard card and atlas-cutout silhouettes form dark hanging sheets under the crown and remain visible in both turntable views.",
+    "The bark material renders too dark for its vertically fissured texture to remain readable at guide-seat distance.",
+    "The single adult form is too regular and top-heavy to establish a lifelike native forest band or production-ready species library.",
+    "Wind response, age and crown variants, forest strata, corridor ecology, guide review, and measured desktop or VR performance remain unproven."
+  ],
+  "review_contract": {
+    "engine_version": "5.8",
+    "rhi": "offscreen Metal",
+    "capture_resolution": [1280, 720],
+    "views": [
+      "turntable azimuth 35 degrees",
+      "turntable azimuth 145 degrees",
+      "bark and leaf closeup",
+      "60 m river-distance proxy",
+      "150 m river-distance proxy"
+    ],
+    "capture_storage": "local ignored Unreal Saved directory",
+    "capture_redistribution": "not approved; hashes and reproducible paths only are retained in the open-source repository"
+  },
+  "captures": [
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_035.png",
+      "sha256": "e673386ce0672206e979a1bf9b9169e182507503a67b71b6050738df24bb86c6"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/turntable_azimuth_145.png",
+      "sha256": "06195e3b378d939fdac65ccdb3e038e796b1fd5268755c28acfe811c97e2880b"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/bark_leaf_closeup.png",
+      "sha256": "ff08a0364b322cc6fe743b584537004f74b6cb05585fb1cb5c33efeb201ae0f1"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_60m.png",
+      "sha256": "acb49b0b4f211bfaf26ecd9ac2796307d9bfc8a464796b832bf8081d792aec71"
+    },
+    {
+      "path": "unreal/Saved/RaftSimNativeCanopyReview/FutaleufuCoigue/river_distance_150m.png",
+      "sha256": "a30d4c930dadb86ed51415a08ffb6b5d037fe5d7db2d18c97ab3e66d05dffe76"
+    }
+  ],
+  "next_iteration_requirements": [
+    "Replace metre-scale crossed cards with denser 0.55-1.10 m twig sprays whose planes follow branch direction and break up before the closeup gate.",
+    "Expose enough bark albedo and neutral fill for the fissured surface to remain readable without flattening branch self-shadow.",
+    "Add wind parameters and at least adult open-grown, adult forest-grown, and intermediate crown variants before corridor placement.",
+    "Repeat the same five-view isolated gate and require closeup acceptance before any bounded corridor comparison."
+  ]
+}

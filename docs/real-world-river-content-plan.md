@@ -422,6 +422,10 @@ Each real-world river section must pass:
 - Treat the current generated valley terrain, river ribbons, foam/hydraulic cues, boulder bars, foliage proxies, and light/fog variants as review blockouts only. Promotion to photoreal production requires reviewed DEM/aerial imports and rights-cleared or first-party terrain, rock, foliage, water-detail, mist/spray, and raft assets.
 - Validate performance against desktop/VR targets.
 
+## Five-River Named Rapid Review Track
+
+The detailed implementation and validation sequence is now `docs/named-rapid-realism-validation-plan.md`. The source catalog records 80 review markers across South Fork American, Colorado Grand Canyon, Pacuare, Zambezi, and Futaleufu. Generated Unreal manifests expose those markers plus 423 low/reference/high-flow simulator run definitions in the Rapid/River Editor. Published South Fork miles are retained, Colorado miles remain cross-check gated, and Pacuare/Zambezi/Futaleufu markers are visibly provisional order interpolations until GPS/aerial/guide stationing replaces them. No run is considered executed or validated until exact geometry, an accepted C++ water window, and a guide-reviewed line are bound and telemetry/video evidence passes.
+
 ## Reference Sources To Re-check
 
 These are planning references, not vendored dependencies. Re-check versions, licenses, quotas, coverage, and platform support before production decisions.

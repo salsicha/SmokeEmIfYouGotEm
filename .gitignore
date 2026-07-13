@@ -29,4 +29,7 @@ unreal/Plugins/*/Binaries/
 unreal/Plugins/*/Intermediate/
 unreal/Saved/
 
+# Locally regenerated from installed UE sample content; never open-source redistributed.
+unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/
+
 graphify-out/

@@ -1,0 +1,61 @@
+{
+  "schema": "raftsim.unreal.zambezi_cliff_corridor_visual_review.v1",
+  "reviewed_on": "2026-07-12",
+  "river_id": "zambezi_batoka_gorge",
+  "asset_id": "polyhaven_namaqualand_cliff_02_2k",
+  "status": "rights_clear_import_validated_corridor_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "decision": "retain_the_isolated_asset_and_transient_comparison_gate_reject_default_corridor_promotion",
+  "comparison_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/polyhaven_namaqualand_cliff_02_corridor_comparison_report.json",
+  "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/NamaqualandCliff02_2K/polyhaven_namaqualand_cliff_02_source_manifest.json",
+  "reviewed_evidence": {
+    "baseline_guide_seat": {
+      "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_pre_namaqualand_cliff_review_guide_seat_downstream.png",
+      "sha256": "fb7d4f055468d20dcdc3bc981917c6cfb6756a7d6be7a9ac48421da8b1eb502c"
+    },
+    "comparison_guide_seat": {
+      "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_namaqualand_cliff_review_guide_seat_downstream.png",
+      "sha256": "115147ea114db547d9e1c6751044b76774ca44a40756a1451825a33df810b623",
+      "changed_pixel_fraction_from_baseline": 0.019226345486111112,
+      "mean_absolute_rgb_difference": [
+        0.34222547743055554,
+        0.2440625,
+        0.1310177951388889
+      ]
+    },
+    "baseline_river_eye": {
+      "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_pre_namaqualand_cliff_review_river_eye_downstream.png",
+      "sha256": "48cbef47c76ff5cf7e64302f5240ca2a46b02f5a254f25850fe0368f18b41cca"
+    },
+    "comparison_river_eye": {
+      "capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_namaqualand_cliff_review_river_eye_downstream.png",
+      "sha256": "79e81385828b9a9590b9e93520a5a9e65fe0b477bee341d61e4c67f504adaf87",
+      "changed_pixel_fraction_from_baseline": 0.009418402777777777,
+      "mean_absolute_rgb_difference": [
+        0.18968207465277778,
+        0.13503038194444444,
+        0.08126627604166667
+      ]
+    }
+  },
+  "accepted_findings": [
+    "The 20.23 m effective-width asset loads at publisher scale, retains its explicit material, and renders through the UE 5.8 Metal Nanite path.",
+    "The new command produces paired guide-seat and river-eye evidence from the unchanged source map and adds only transient, non-colliding review actors.",
+    "Eight bounded 0.94-1.58x instances can be evaluated without saving a substituted corridor map or changing Landscape, water, collision, solver, or gameplay authority."
+  ],
+  "rejection_reasons": [
+    "The fragments read as small pasted-on rocks against hundred-metre smooth gorge walls; they do not replace or convincingly break up the 30 m DSM-derived canyon silhouette.",
+    "Several faces collapse to near-black under the fixed corridor photometry, leaving abrupt high-contrast marks instead of integrated weathered cliff structure; an isolated orientation, normal, Nanite-usage, and backface audit is required before reuse.",
+    "Only 1.92 percent of guide-seat pixels and 0.94 percent of river-eye pixels change, so this placement strategy cannot materially close the current lifelike terrain gap.",
+    "The repeated transforms are camera-relative review probes rather than source-aligned outcrops, joint sets, talus, bedding, or mapped Batoka landforms.",
+    "Namaqualand geology is not Batoka basalt authority, and no geologist, guide, hazard-readability, desktop, or VR performance approval exists."
+  ],
+  "next_iteration_requirements": [
+    "Keep the asset under ExternalReview and excluded from default Zambezi map generation.",
+    "Run a neutral isolated turntable that distinguishes mesh orientation, backface, normal-map, Nanite material-usage, and lighting failures before any further scene placement.",
+    "Acquire or author several source-matched jointed-basalt wall, column, ledge, overhang, and talus modules with measured metre scale and non-repeating silhouettes.",
+    "Bind any future cliff modules to geospatially reviewed wall masks, slope/aspect, river station, and terrain contact rather than camera-relative offsets.",
+    "Prefer the confirmed Batoka LiDAR/photogrammetry acquisition path for gorge-scale geometry, then rerun guide, geology, art, hazard, rights, and packaged desktop/VR review."
+  ]
+}

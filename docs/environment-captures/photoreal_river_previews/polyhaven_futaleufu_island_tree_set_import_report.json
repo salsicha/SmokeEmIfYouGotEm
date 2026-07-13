@@ -1,0 +1,351 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_futaleufu_island_tree_set_1k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "island_tree_01/island_tree_01_1k.fbx",
+      "sha256": "3f193c0ca27977b001682aa4ba3eef654b31c1af60a166af4024a11cc19a2948",
+      "bytes": 48055820
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_diff_1k.png",
+      "sha256": "519a34062e3eb42e14d9f2b6454669d8e71ccf0ab0b95fe05e00f31ee7ffdf29",
+      "bytes": 5136957
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_nor_gl_1k.png",
+      "sha256": "039b67b309fd3cf7333fbd8e2a8db0f253a87def5e7e9d88b06401d8f605ed1f",
+      "bytes": 5360645
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_rough_1k.png",
+      "sha256": "eab3874d010768431baac106ca2904e8bfb7736e6fa17fecf24855ca37bcf565",
+      "bytes": 1566548
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_branches_diff_1k.png",
+      "sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+      "bytes": 5300342
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_branches_nor_gl_1k.png",
+      "sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+      "bytes": 5400459
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_branches_rough_1k.png",
+      "sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+      "bytes": 1625206
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_leaves_alpha_1k.png",
+      "sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+      "bytes": 57438
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_leaves_diff_1k.png",
+      "sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+      "bytes": 1638916
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_leaves_nor_gl_1k.png",
+      "sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+      "bytes": 2886859
+    },
+    {
+      "relative_path": "island_tree_01/textures/island_tree_01_leaves_rough_1k.png",
+      "sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78",
+      "bytes": 879599
+    },
+    {
+      "relative_path": "island_tree_02/island_tree_02_1k.fbx",
+      "sha256": "ac2489d7c5b76cbe050a4f78d1984d614c2a7b0cfbe617b95836859613ab6d76",
+      "bytes": 32258924
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_diff_1k.png",
+      "sha256": "398424083d2db299f5445e7c6422498688643f634767383ba8cd8bbfbfb0b27b",
+      "bytes": 5059782
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_nor_gl_1k.png",
+      "sha256": "0c300f7a5da76c57b5e8475d32e3e60fa7605a29f52c1a38f2501f537aa2f3e2",
+      "bytes": 5318747
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_rough_1k.png",
+      "sha256": "59add752a4dc6d898c54bef061e31a92b1632be6cdb638b15ea446f2d2d03603",
+      "bytes": 1557456
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_branches_diff_1k.png",
+      "sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+      "bytes": 5300342
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_branches_nor_gl_1k.png",
+      "sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+      "bytes": 5400459
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_branches_rough_1k.png",
+      "sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+      "bytes": 1625206
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_leaves_alpha_1k.png",
+      "sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+      "bytes": 57438
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_leaves_diff_1k.png",
+      "sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+      "bytes": 1638916
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_leaves_nor_gl_1k.png",
+      "sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+      "bytes": 2886859
+    },
+    {
+      "relative_path": "island_tree_02/textures/island_tree_02_leaves_rough_1k.png",
+      "sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78",
+      "bytes": 879599
+    },
+    {
+      "relative_path": "island_tree_03/island_tree_03_1k.fbx",
+      "sha256": "32b2a158689fde1df5f55bad89b1eb4f131bacf534fac45155fc1d4c49afba49",
+      "bytes": 62536620
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_diff_1k.png",
+      "sha256": "264330f1ae3998fe5620ec85fd175628bfabd79f80d25f777e18274997fd916f",
+      "bytes": 4852190
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_nor_gl_1k.png",
+      "sha256": "886c7e7468e9485626510308d03160d7b73789d584165bfa412e7b36ee5dc5b6",
+      "bytes": 4995837
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_rough_1k.png",
+      "sha256": "7a49a0de9979eaf33a2226aebb6e540cb0bc2e5a2725b19046f1bf1026953fb8",
+      "bytes": 1416834
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_branches_diff_1k.png",
+      "sha256": "4485125d88b9dcce618220e8850f8b3ec586d9cdebe08e28aca777206eef56e2",
+      "bytes": 5300342
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_branches_nor_gl_1k.png",
+      "sha256": "e72c3bf652d998d75ef98fc51fb7a10de3b7efd072c191a8eb9c92b6f93340f0",
+      "bytes": 5400459
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_branches_rough_1k.png",
+      "sha256": "c6db3c33f23654a8d31dcf5609d19d97ab1036b36b3d9a6bcd50ecc975f8fb3c",
+      "bytes": 1625206
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_leaves_alpha_1k.png",
+      "sha256": "f4341f147988dbe6b58d9ca841a8f0e4bcff25bc40d05f9877da82006d489c39",
+      "bytes": 57438
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_leaves_diff_1k.png",
+      "sha256": "63d3563a22a62151f338ceb4e992de7c31b62e8e3582e2762d5071f02d286349",
+      "bytes": 1638916
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_leaves_nor_gl_1k.png",
+      "sha256": "e58402f30c7108ec6321e0c689009508f6ab138c81612d9a67238038ac108211",
+      "bytes": 2886859
+    },
+    {
+      "relative_path": "island_tree_03/textures/island_tree_03_leaves_rough_1k.png",
+      "sha256": "b7e9a1857f63617344968bb43693786bfed7dd15bedca3193ce333f233fbab78",
+      "bytes": 879599
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree01.SM_IslandTree01",
+      "tree_id": "island_tree_01",
+      "preconfiguration_triangle_count_lod0": 5821,
+      "nanite_fallback_triangle_count_lod0": 6037,
+      "height_cm": 1304.8511483806003,
+      "width_cm": 1249.9999999999998,
+      "publisher_width_cm": 1250.0,
+      "publisher_width_scale_ratio": 2.59824687914565,
+      "publisher_width_relative_error": 1.8189894035458566e-16,
+      "plausible_physical_height": true,
+      "plausible_crown_width": true,
+      "base_z_cm": -5.281690170837031,
+      "base_contact_tolerance_cm": 32.62127870951501,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        259.824687914565,
+        259.824687914565,
+        259.824687914565
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "island_tree_01",
+          "role": "trunk",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Trunk.M_IslandTree01_Trunk"
+        },
+        {
+          "index": 1,
+          "slot_name": "island_tree_01_leaves",
+          "role": "leaves",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Leaves.M_IslandTree01_Leaves"
+        },
+        {
+          "index": 2,
+          "slot_name": "island_tree_01_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Branches.M_IslandTree01_Branches"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree02.SM_IslandTree02",
+      "tree_id": "island_tree_02",
+      "preconfiguration_triangle_count_lod0": 5009,
+      "nanite_fallback_triangle_count_lod0": 5345,
+      "height_cm": 686.9585230404099,
+      "width_cm": 850.0000000000001,
+      "publisher_width_cm": 850.0,
+      "publisher_width_scale_ratio": 2.0200842414195423,
+      "publisher_width_relative_error": 1.3374922084896002e-16,
+      "plausible_physical_height": true,
+      "plausible_crown_width": true,
+      "base_z_cm": -3.436510511684436,
+      "base_contact_tolerance_cm": 17.17396307601025,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        202.00842414195424,
+        202.00842414195424,
+        202.00842414195424
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "island_tree_02",
+          "role": "trunk",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Trunk.M_IslandTree02_Trunk"
+        },
+        {
+          "index": 1,
+          "slot_name": "island_tree_02_leaves",
+          "role": "leaves",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Leaves.M_IslandTree02_Leaves"
+        },
+        {
+          "index": 2,
+          "slot_name": "island_tree_02_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Branches.M_IslandTree02_Branches"
+        }
+      ]
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree03.SM_IslandTree03",
+      "tree_id": "island_tree_03",
+      "preconfiguration_triangle_count_lod0": 2068,
+      "nanite_fallback_triangle_count_lod0": 1885,
+      "height_cm": 789.9705684257843,
+      "width_cm": 850.0000000000001,
+      "publisher_width_cm": 850.0,
+      "publisher_width_scale_ratio": 3.0339170903466326,
+      "publisher_width_relative_error": 1.3374922084896002e-16,
+      "plausible_physical_height": true,
+      "plausible_crown_width": true,
+      "base_z_cm": -4.085957505597605,
+      "base_contact_tolerance_cm": 19.74926421064461,
+      "pivot_meets_ground": true,
+      "pivot_within_footprint": true,
+      "lod0_build_scale": [
+        303.3917090346633,
+        303.3917090346633,
+        303.3917090346633
+      ],
+      "nanite_enabled": true,
+      "nanite_shape_preservation": "<NaniteShapePreservation.PRESERVE_AREA: 1>",
+      "material_slots": [
+        {
+          "index": 0,
+          "slot_name": "island_tree_03",
+          "role": "trunk",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Trunk.M_IslandTree03_Trunk"
+        },
+        {
+          "index": 1,
+          "slot_name": "island_tree_03_leaves",
+          "role": "leaves",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Leaves.M_IslandTree03_Leaves"
+        },
+        {
+          "index": 2,
+          "slot_name": "island_tree_03_branches",
+          "role": "branches",
+          "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Branches.M_IslandTree03_Branches"
+        }
+      ]
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01BranchesDiff1K.T_IslandTree01_IslandTree01BranchesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01BranchesNorGl1K.T_IslandTree01_IslandTree01BranchesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01BranchesRough1K.T_IslandTree01_IslandTree01BranchesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01Diff1K.T_IslandTree01_IslandTree01Diff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01LeavesAlpha1K.T_IslandTree01_IslandTree01LeavesAlpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01LeavesDiff1K.T_IslandTree01_IslandTree01LeavesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01LeavesNorGl1K.T_IslandTree01_IslandTree01LeavesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01LeavesRough1K.T_IslandTree01_IslandTree01LeavesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01NorGl1K.T_IslandTree01_IslandTree01NorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree01_IslandTree01Rough1K.T_IslandTree01_IslandTree01Rough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02BranchesDiff1K.T_IslandTree02_IslandTree02BranchesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02BranchesNorGl1K.T_IslandTree02_IslandTree02BranchesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02BranchesRough1K.T_IslandTree02_IslandTree02BranchesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02Diff1K.T_IslandTree02_IslandTree02Diff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02LeavesAlpha1K.T_IslandTree02_IslandTree02LeavesAlpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02LeavesDiff1K.T_IslandTree02_IslandTree02LeavesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02LeavesNorGl1K.T_IslandTree02_IslandTree02LeavesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02LeavesRough1K.T_IslandTree02_IslandTree02LeavesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02NorGl1K.T_IslandTree02_IslandTree02NorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree02_IslandTree02Rough1K.T_IslandTree02_IslandTree02Rough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03BranchesDiff1K.T_IslandTree03_IslandTree03BranchesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03BranchesNorGl1K.T_IslandTree03_IslandTree03BranchesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03BranchesRough1K.T_IslandTree03_IslandTree03BranchesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03Diff1K.T_IslandTree03_IslandTree03Diff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03LeavesAlpha1K.T_IslandTree03_IslandTree03LeavesAlpha1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03LeavesDiff1K.T_IslandTree03_IslandTree03LeavesDiff1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03LeavesNorGl1K.T_IslandTree03_IslandTree03LeavesNorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03LeavesRough1K.T_IslandTree03_IslandTree03LeavesRough1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03NorGl1K.T_IslandTree03_IslandTree03NorGl1K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/T_IslandTree03_IslandTree03Rough1K.T_IslandTree03_IslandTree03Rough1K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Branches.M_IslandTree01_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Leaves.M_IslandTree01_Leaves",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree01_Trunk.M_IslandTree01_Trunk",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Branches.M_IslandTree02_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Leaves.M_IslandTree02_Leaves",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree02_Trunk.M_IslandTree02_Trunk",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Branches.M_IslandTree03_Branches",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Leaves.M_IslandTree03_Leaves",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/M_IslandTree03_Trunk.M_IslandTree03_Trunk"
+  ]
+}

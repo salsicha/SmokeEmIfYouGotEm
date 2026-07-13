@@ -1,0 +1,118 @@
+{
+	"schema": "raftsim.unreal.futaleufu_native_canopy_lighting_diagnostic.v17",
+	"river_id": "futaleufu_terminator",
+	"status": "controlled_ao_normal_and_diagnostic_emissive_splits_captured_pending_human_review",
+	"production_promoted": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"placement_counts_identical_between_render_modes": true,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate",
+	"alpha4_reference_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_guide_seat_downstream.png",
+	"alpha4_reference_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v16_native_alpha_scale_4_no_shadows_river_eye_downstream.png",
+	"control_boundary": "The 4x restored-alpha silhouette, native masked TwoSidedFoliage graph, textures, source masks, transforms, meshes, cameras, exposure, terrain, water, rocks, and physics authority remain fixed. AO influence, normal strength, or diagnostic emissive changes independently; leaf shadows remain disabled.",
+	"retained_neutral_material_defaults":
+	{
+		"LeafOpacityScale": 1,
+		"LeafOpacityOverride": 0,
+		"LeafAOInfluence": 0.55000000000000004,
+		"LeafNormalStrength": 1,
+		"LeafDiagnosticEmissive": 0
+	},
+	"captures":
+	{
+		"alpha4_ao_off_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_ao_off_no_shadows_guide_seat_downstream.png",
+		"alpha4_ao_off_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_ao_off_no_shadows_river_eye_downstream.png",
+		"alpha4_flat_normal_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_flat_normal_no_shadows_guide_seat_downstream.png",
+		"alpha4_flat_normal_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_flat_normal_no_shadows_river_eye_downstream.png",
+		"alpha4_emissive_035_no_shadows_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_emissive_035_no_shadows_guide_seat_downstream.png",
+		"alpha4_emissive_035_no_shadows_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v17_alpha4_emissive_035_no_shadows_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"placement_stats":
+	{
+		"alpha4_ao_off_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_ao_off_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_flat_normal_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_flat_normal_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_emissive_035_no_shadows_guide_seat":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 50,
+			"mid_tree_count": 126,
+			"runtime_far_tree_count": 1024,
+			"hidden_fallback_pve_actor_count": 4
+		},
+		"alpha4_emissive_035_no_shadows_river_eye":
+		{
+			"candidate_count": 37956,
+			"accepted_tree_count": 1200,
+			"near_full_tree_count": 40,
+			"mid_tree_count": 157,
+			"runtime_far_tree_count": 1003,
+			"hidden_fallback_pve_actor_count": 4
+		}
+	},
+	"render_modes":
+	{
+		"alpha4_ao_off_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0,
+			"promotion_eligible": true
+		},
+		"alpha4_flat_normal_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 0,
+			"LeafDiagnosticEmissive": 0,
+			"promotion_eligible": true
+		},
+		"alpha4_emissive_035_no_shadows":
+		{
+			"LeafOpacityScale": 4,
+			"leaf_cast_shadow": false,
+			"LeafAOInfluence": 0.55000000000000004,
+			"LeafNormalStrength": 1,
+			"LeafDiagnosticEmissive": 0.34999999999999998,
+			"promotion_eligible": false
+		}
+	}
+}

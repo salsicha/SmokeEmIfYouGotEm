@@ -1,0 +1,83 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_render_diagnostic_review.v15",
+  "river_id": "futaleufu_terminator",
+  "status": "shadow_carpets_localized_to_leaf_shadows_masked_leaf_visibility_failure_localized_geometry_retained_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "runtime_far_lod_retained": true,
+  "placement_pipeline_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v15_leaf_shadow_opacity_diagnostic_report.json",
+  "decision": "retain_source_masked_geometry_and_disable_leaf_shadow_carpets_for_next_test_reject_native_masked_leaf_visual_promotion",
+  "diagnostic_conclusions": {
+    "placement_counts_identical_between_render_modes": true,
+    "leaf_shadows_cause_elongated_ground_smears": true,
+    "leaf_shadow_disable_restores_crown_visibility": false,
+    "opaque_leaf_override_reveals_retained_crown_geometry": true,
+    "near_mid_and_runtime_far_geometry_present": true,
+    "missing_hism_instances_or_distance_geometry_is_primary_cause": false,
+    "native_masked_leaf_material_path_is_primary_visibility_failure": true,
+    "exact_opacity_mip_vs_foliage_lighting_cause_still_requires_split_test": true
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_water_modified": false,
+    "geoclaw_reference_modified": false,
+    "diagnostic_components": "transient non-colliding HISM components tagged RaftSim_ExternalReviewOnly",
+    "fixed_between_modes": "camera, exposure, source masks, tree transforms, near/mid/far meshes, terrain, water, rocks, trunk material, collision, solver, and GeoClaw reference"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "native_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_guide_seat_downstream.png",
+      "native_reference_sha256": "1bbe22f82fbd4efe8e3c7a950039f04774fb08dda278a13fc70c21f0a40ef2b6",
+      "native_leaves_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_guide_seat_downstream.png",
+      "native_leaves_no_shadow_sha256": "39ff116db3b6d3682831acd5b913abaecaf25bfbafd208ccaa4f206bb24a5864",
+      "opaque_leaves_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_guide_seat_downstream.png",
+      "opaque_leaves_no_shadow_sha256": "f96734b75ea328e445c4377dd820b11c1177bb59fba772bdf776c8c4c003ff9a",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_native_to_shadowless": 0.00870876736111111,
+      "changed_pixel_fraction_shadowless_to_opaque": 0.02596462673611111,
+      "shadow_removal_brightened_pixel_fraction": 0.0027159288194444444,
+      "green_dominant_fraction": {
+        "native_reference": 0.000004340277777777778,
+        "native_leaves_no_shadow": 0.000004340277777777778,
+        "opaque_leaves_no_shadow": 0.013590494791666666
+      }
+    },
+    "river_eye": {
+      "native_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_river_eye_downstream.png",
+      "native_reference_sha256": "5857f463d231628ee2813284849202c94bcf474d746b1bb2f59e50e483abc8e6",
+      "native_leaves_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_native_leaf_shadows_disabled_river_eye_downstream.png",
+      "native_leaves_no_shadow_sha256": "ce250b0aebc1490bb6cd932372e836b5314e1050274d516177821233ba22b8c6",
+      "opaque_leaves_no_shadow": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v15_opaque_leaf_no_shadows_river_eye_downstream.png",
+      "opaque_leaves_no_shadow_sha256": "b844bd91748438e12c8fe46cc7e21370a5433a57c325785b4fe5023a4dc72b8a",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_native_to_shadowless": 0.022757161458333335,
+      "changed_pixel_fraction_shadowless_to_opaque": 0.05782660590277778,
+      "shadow_removal_brightened_pixel_fraction": 0.007651909722222222,
+      "green_dominant_fraction": {
+        "native_reference": 0.00013780381944444444,
+        "native_leaves_no_shadow": 0.00014105902777777776,
+        "opaque_leaves_no_shadow": 0.031685112847222224
+      }
+    }
+  },
+  "accepted_findings": [
+    "All four captures retain the same deterministic 1,200-tree placements and the V13/V14 near, mid, and runtime-far representation counts.",
+    "Disabling only native leaf shadows removes the long black ground carpets in both views, proving that leaf shadow casting is one independent visual defect.",
+    "The opaque leaf override reveals dense crowns registered to the existing trunks in both views, including near, mid, and runtime-far representation bands.",
+    "The source-masked HISM placement and retained crown geometry are therefore valid technical inputs for the next material split test."
+  ],
+  "rejection_reasons": [
+    "Native masked leaves remain almost entirely invisible after their shadows are disabled, so the corridor still reads as bare trunks on empty slopes.",
+    "The opaque green cards are a diagnostic visibility control, not a photoreal material and not eligible for production promotion.",
+    "The test does not yet distinguish alpha texture or mip loss from masked cutoff, two-sided foliage shading, or transmission response inside the native material.",
+    "Smooth 30 m terrain, provisional flat water, sparse rocks, and absent native understory remain separate lifelike blockers."
+  ],
+  "next_iteration_requirements": [
+    "Add a same-shader constant-opacity or alpha-floor diagnostic with leaf shadows disabled to split opacity and mip behavior from TwoSidedFoliage lighting and transmission.",
+    "Inspect the project-owned leaf atlas alpha distribution, imported texture alpha preservation, mip coverage, sampler type, opacity-mask clip value, and HISM distance behavior before retuning color or geometry.",
+    "Select a bounded alpha-preserving masked solution that restores crown mass without opaque card rectangles, shadow carpets, emissive fill, or synthetic cover geometry.",
+    "Repeat guide-seat and river-eye captures before adding the second native canopy species and understory strata."
+  ]
+}

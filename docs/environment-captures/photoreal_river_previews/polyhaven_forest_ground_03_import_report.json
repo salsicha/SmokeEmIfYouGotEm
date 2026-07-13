@@ -1,0 +1,29 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_forrest_ground_03_4k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "forrest_ground_03_diff_4k.png",
+      "sha256": "5e3abfb2403767a0abf5fc7d30b9f4b3be28dce2494df22401a7c92fc904a170",
+      "bytes": 40084401
+    },
+    {
+      "relative_path": "forrest_ground_03_nor_gl_4k.png",
+      "sha256": "09ad2277c51ae876113bbaae2e569fd5c80389bf454054696a08476fe7ee0813",
+      "bytes": 41850502
+    },
+    {
+      "relative_path": "forrest_ground_03_rough_4k.png",
+      "sha256": "3a0586ecd529ffd1a92e4357e9aa6a771c26f9980205bed1781849c1295553a3",
+      "bytes": 31538157
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_BaseColor_4K.T_ForestGround03_BaseColor_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_NormalGL_4K.T_ForestGround03_NormalGL_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_Roughness_4K.T_ForestGround03_Roughness_4K"
+  ]
+}

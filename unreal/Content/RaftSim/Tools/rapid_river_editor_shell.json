@@ -8,7 +8,10 @@
     "rapid_river_editor": "unreal/Content/RaftSim/River/rapid_river_editor.json",
     "south_fork_editor_pass": "unreal/Content/RaftSim/River/south_fork_first_river_editor_pass.json",
     "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json",
-    "round_trip_validation": "unreal/Content/RaftSim/River/round_trip_validation.json"
+    "round_trip_validation": "unreal/Content/RaftSim/River/round_trip_validation.json",
+    "named_rapid_editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
+    "named_rapid_editor_geometry": "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson",
+    "named_rapid_simulator_review_runs": "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json"
   },
   "panels": [
     "map_view",
@@ -107,5 +110,15 @@
     "requires_validation_overlay": true,
     "requires_round_trip_manifest": true,
     "requires_stitched_validation_export": true
+  },
+  "named_rapid_review": {
+    "river_count": 5,
+    "marker_count": 80,
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
+    "editor_geometry": "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson",
+    "candidate_geometry_count": 45,
+    "simulator_review_runs": "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json",
+    "status": "markers_and_run_definitions_ready_exact_geometry_guide_review_and_execution_evidence_pending"
   }
 }

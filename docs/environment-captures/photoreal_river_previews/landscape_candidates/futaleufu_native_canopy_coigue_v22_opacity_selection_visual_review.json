@@ -1,0 +1,85 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_opacity_selection_review.v22",
+  "river_id": "futaleufu_terminator",
+  "status": "alpha2_selected_as_lowest_current_corridor_candidate_shadow_and_production_promotion_pending",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "runtime_far_lod_retained": true,
+  "rgb_mip_padding_source_fix_retained": true,
+  "neutral_material_default_retained": true,
+  "selected_corridor_candidate_opacity_scale": 2.0,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v22_opacity_selection_diagnostic_report.json",
+  "decision": "select_alpha2_for_next_shadow_gate_reject_alpha3_as_redundant_and_alpha4_as_saturated",
+  "diagnostic_conclusions": {
+    "alpha2_preserves_registered_crown_continuity": true,
+    "alpha2_restores_leaf_shaped_color_breakup": true,
+    "alpha2_and_alpha3_are_pixel_identical": true,
+    "alpha2_is_lowest_tested_continuous_candidate": true,
+    "alpha2_is_production_promoted": false,
+    "leaf_shadow_gate_remains_open": true
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "saved_corridor_photometry_modified": false,
+    "collision_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "placement_counts_identical_between_render_modes": true
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "alpha4_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_guide_seat_downstream.png",
+      "alpha4_reference_sha256": "d011073d1016bc08e45ffc55e4a554e4d42e98e8bb70adab4b1ca69171a1cb40",
+      "alpha2": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_guide_seat_downstream.png",
+      "alpha2_sha256": "4dace4111947672c1fb21dec950c330573d660cb294dacef5d2561be77e58808",
+      "alpha3": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha3_no_shadows_guide_seat_downstream.png",
+      "alpha3_sha256": "4dace4111947672c1fb21dec950c330573d660cb294dacef5d2561be77e58808",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_alpha2_vs_alpha4": 0.03687282986111111,
+      "mean_absolute_rgb_delta_alpha2_vs_alpha4": [1.0843891059027777, 1.1328645833333333, 0.6893728298611111],
+      "changed_pixel_fraction_alpha2_vs_alpha3": 0.0,
+      "restored_crown_metrics_alpha2": {
+        "mean_rgb": [98.06466444197257, 117.78761586948461, 83.08490915832407],
+        "green_dominant_fraction": 0.8681497960697071,
+        "dark_fraction": 0.007415647015202077
+      }
+    },
+    "river_eye": {
+      "alpha4_reference": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v21_alpha_preserved_rgb_padded_alpha4_no_shadows_river_eye_downstream.png",
+      "alpha4_reference_sha256": "018e2ec019358264bcab7143af12888a13b2c92bda564014828b97d27ae59693",
+      "alpha2": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha2_no_shadows_river_eye_downstream.png",
+      "alpha2_sha256": "7e5fb81161194f1c868830a58d1f94ad48e8dbc1f1d6f1bc0a531c8611dc8b45",
+      "alpha3": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v22_rgb_padded_alpha3_no_shadows_river_eye_downstream.png",
+      "alpha3_sha256": "7e5fb81161194f1c868830a58d1f94ad48e8dbc1f1d6f1bc0a531c8611dc8b45",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_alpha2_vs_alpha4": 0.07373372395833333,
+      "mean_absolute_rgb_delta_alpha2_vs_alpha4": [2.5604014756944444, 2.668620876736111, 1.6443348524305557],
+      "changed_pixel_fraction_alpha2_vs_alpha3": 0.0,
+      "restored_crown_metrics_alpha2": {
+        "mean_rgb": [97.12405363788015, 115.99178750160401, 78.90667907096112],
+        "green_dominant_fraction": 0.8634672141665597,
+        "dark_fraction": 0.003528807904529706
+      }
+    }
+  },
+  "accepted_findings": [
+    "Alpha2 preserves visible near, mid, and runtime-far crown continuity in both fixed corridor views.",
+    "Alpha2 restores readable leaf-shaped olive breakup and raises crown-mask mean RGB above the alpha4 solid-card result.",
+    "Alpha2 and alpha3 captures are byte-for-byte identical in both views, so alpha3 adds no visual value.",
+    "Alpha2 is retained as a review-only corridor candidate while the source material default remains neutral at 1.0."
+  ],
+  "rejection_reasons": [
+    "Leaf shadows remain disabled, so grounding, contact response, and the V15 elongated-shadow regression are not yet resolved.",
+    "The retained trees still form a sparse single-species line rather than a continuous mixed Patagonian rainforest.",
+    "Some crowns remain too pale and regular, with obvious repeated forms and no temporal wind evidence.",
+    "Terrain, water, ecology, packaged desktop, and on-device VR gates remain open."
+  ],
+  "next_iteration_requirements": [
+    "Reintroduce leaf dynamic shadows at alpha2 with contact shadows and distance-field indirect effects disabled independently.",
+    "Compare bounded-shadow captures to the no-shadow alpha2 reference and reject any elongated ground-carpet recurrence.",
+    "If bounded shadows pass, persist alpha2 as an exposed corridor tuning value without changing the material default or physics authority.",
+    "Then add the second ecology-reviewed native canopy stratum and denser source-masked forest bands."
+  ]
+}

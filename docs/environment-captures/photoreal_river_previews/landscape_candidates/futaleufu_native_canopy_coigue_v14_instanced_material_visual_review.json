@@ -1,0 +1,62 @@
+{
+  "schema": "raftsim.unreal.futaleufu_native_canopy_instanced_material_review.v14",
+  "river_id": "futaleufu_terminator",
+  "status": "instanced_material_usage_persisted_visual_result_pixel_identical_corridor_promotion_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "runtime_far_lod_retained": true,
+  "placement_pipeline_retained": true,
+  "instanced_material_contract_retained": true,
+  "decision": "retain_explicit_instanced_material_usage_reject_late_shader_permutation_as_v13_visual_failure_cause",
+  "comparison_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v14_instanced_material_comparison_report.json",
+  "hypothesis": {
+    "statement": "The V13 black crowns, dark trunks, and ground smears were caused by InstancedStaticMeshes shader permutations being created only after HISM placement.",
+    "supported": false,
+    "test": "Persist InstancedStaticMeshes usage on the bark and leaf materials, finish material compilation, save both packages, then create the transient HISM corridor layer and repeat the same paired guide-seat and river-eye captures.",
+    "result": "Both V14 comparison captures are byte-for-byte identical to their V13 comparison captures, so late shader-permutation creation was not causal."
+  },
+  "material_contract": {
+    "bark_instanced_static_meshes_usage_persisted": true,
+    "leaf_instanced_static_meshes_usage_persisted": true,
+    "usage_enabled_before_hism_creation": true,
+    "bark_material": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/M_RaftSim_FutaleufuCoigue_Bark",
+    "leaf_material": "/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/M_RaftSim_FutaleufuCoigue_Leaves"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "v13": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_coigue_corridor_review_guide_seat_downstream.png",
+      "v13_sha256": "1bbe22f82fbd4efe8e3c7a950039f04774fb08dda278a13fc70c21f0a40ef2b6",
+      "v14": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_guide_seat_downstream.png",
+      "v14_sha256": "1bbe22f82fbd4efe8e3c7a950039f04774fb08dda278a13fc70c21f0a40ef2b6",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_v13_to_v14": 0.0,
+      "mean_absolute_rgb_delta_v13_to_v14": [0.0, 0.0, 0.0]
+    },
+    "river_eye": {
+      "v13": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_coigue_corridor_review_river_eye_downstream.png",
+      "v13_sha256": "5857f463d231628ee2813284849202c94bcf474d746b1bb2f59e50e483abc8e6",
+      "v14": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v14_instanced_material_review_river_eye_downstream.png",
+      "v14_sha256": "5857f463d231628ee2813284849202c94bcf474d746b1bb2f59e50e483abc8e6",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction_v13_to_v14": 0.0,
+      "mean_absolute_rgb_delta_v13_to_v14": [0.0, 0.0, 0.0]
+    }
+  },
+  "accepted_findings": [
+    "Bark and leaf materials now carry explicit InstancedStaticMeshes usage before HISM creation, closing a real editor-order and packaged-runtime readiness defect.",
+    "The source-masked placement pipeline remains deterministic at 1,200 trees per view with the V13 near, mid, and runtime-far representation counts.",
+    "Byte-identical V13 and V14 captures provide a bounded negative result instead of allowing shader-permutation timing to remain an untested explanation."
+  ],
+  "rejection_reasons": [
+    "Explicit instanced-material usage produces no visual change in either controlled view.",
+    "Bare dark trunks, black crown clumps, elongated ground or shadow smears, and visually empty slopes remain present exactly as in V13.",
+    "The coigue corridor layer remains less lifelike than the sparse fallback foliage and cannot be promoted.",
+    "Smooth 30 m terrain, provisional flat water, sparse rocks, and absent native understory remain independent scene blockers."
+  ],
+  "next_iteration_requirements": [
+    "Capture a shadow-disabled native-leaf diagnostic while leaving geometry, placement, exposure, terrain, water, and camera fixed.",
+    "Capture an opaque unlit or simple-lit leaf-card diagnostic with leaf shadows disabled to prove whether crown geometry survives at near, mid, and runtime-far distances.",
+    "Use those controlled results to isolate masked opacity and mip behavior from two-sided foliage transmission, lighting, shadowing, and distance-crown geometry before changing production materials.",
+    "Retain all diagnostic layers as transient review-only components and keep saved-map, collision, water, solver, and GeoClaw authority unchanged."
+  ]
+}

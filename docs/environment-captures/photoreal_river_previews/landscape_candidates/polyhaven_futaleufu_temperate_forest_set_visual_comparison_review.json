@@ -1,0 +1,72 @@
+{
+  "schema": "raftsim.unreal.biome_asset_visual_comparison_review.v1",
+  "asset_id": "polyhaven_futaleufu_temperate_forest_set_1k",
+  "river_id": "futaleufu_terminator",
+  "status": "rights_clear_import_validated_visual_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "reviewed_candidate": {
+    "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_temperate_forest_set_review_guide_seat_downstream.png",
+    "guide_seat_sha256": "7cbcd9c3559d739334b3543c5a46adc5b24632eacaac5f0e2a21d3242f13e08a",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_temperate_forest_set_review_river_eye_downstream.png",
+    "river_eye_sha256": "b5d0f6323d6cc7a83cf64a705a37e13b86f34a69619383fea391c8ef9c9ff600",
+    "pre_trial_baseline_guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_temperate_forest_set_guide_seat_downstream.png",
+    "pre_trial_baseline_guide_seat_sha256": "324a1441f877752f6b119d625169f6b34553596e010e543e504377d8eb824dac",
+    "pre_trial_baseline_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_pre_temperate_forest_set_river_eye_downstream.png",
+    "pre_trial_baseline_river_eye_sha256": "6e0c703739abd44607f4821b327fc276d223df534ad313aa138a06be5a4c783e",
+    "restored_active_guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_post_temperate_forest_set_restored_guide_seat_downstream.png",
+    "restored_active_guide_seat_sha256": "79fd0b0e38e6e95079c552519af90e16d432d9ea5d91b98219ac47c17943f266",
+    "restored_active_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_terminator_post_temperate_forest_set_restored_river_eye_downstream.png",
+    "restored_active_river_eye_sha256": "cfdd1ed62a3af8db8976bb8adbc15d3f49d729fd146f8a187876b38439babdf7"
+  },
+  "import_findings": {
+    "verified_source_file_count": 21,
+    "mesh_count": 10,
+    "texture_count": 18,
+    "material_count": 5,
+    "variant_counts": {
+      "medium_fir": 3,
+      "small_fir": 3,
+      "fern": 4
+    },
+    "height_ranges_cm": {
+      "medium_fir": [
+        588.85,
+        880.65
+      ],
+      "small_fir": [
+        73.57,
+        130.07
+      ],
+      "fern": [
+        21.31,
+        42.77
+      ]
+    },
+    "grounded_pivots_validated": true,
+    "nanite_enabled_for_all_meshes": true,
+    "explicit_material_roles_validated": true
+  },
+  "material_diagnostic": {
+    "initial_failure": "alpha_texture_samples_were_reclassified_as_color_by_the_shared_idempotent_sampler_repair",
+    "platform": "SF_METAL_SM6",
+    "fix": "recognize_alpha_texture_asset_names_as_mask_samplers_in_import_reviewed_biome_asset.py",
+    "clean_start_compile_after_fix": true,
+    "clean_comparison_separates_material_failure_from_asset_visual_decision": true
+  },
+  "visual_findings": [
+    "After the sampler repair, terrain and water return to the baseline shading, proving the final comparison is not a default-material failure.",
+    "The medium fir variants still collapse into pale branch silhouettes at guide-seat and river-eye distances instead of forming dense Patagonian canopy mass.",
+    "The small fir and fern strata are effectively invisible at this full-corridor capture scale and do not improve near-bank detail.",
+    "Replacing 9600 of 12000 generic placements reduces continuous green slope breakup without producing a more lifelike forest silhouette.",
+    "The set is a non-native structure analog with no Nothofagus identity, ecology, guide, art, gameplay, seasonal, or measured performance approval."
+  ],
+  "decision": "retain_import_pipeline_and_isolated_assets_reject_visual_promotion",
+  "active_map_policy": "futaleufu_temperate_forest_set_must_not_be_loaded_or_recorded_by_the_default_landscape_candidate_generator",
+  "next_asset_requirements": [
+    "Acquire multiple rights-cleared adult Patagonian broadleaf canopy species or exact reviewed Nothofagus-family assets with dense distance-stable crowns.",
+    "Require authored impostor or far-distance crown behavior that preserves canopy mass from river-camera distances.",
+    "Use sapling, fern, moss, deadfall, and root assets only for near-bank and forest-floor strata where their physical scale remains visible.",
+    "Provide crown, age, density, wind, wetness, and seasonal variants with source-mask-aware ecology and protected guide sightlines.",
+    "Pass ecology, guide, art, rights, gameplay, seasonal-flow, and measured desktop and VR performance review before promotion."
+  ]
+}

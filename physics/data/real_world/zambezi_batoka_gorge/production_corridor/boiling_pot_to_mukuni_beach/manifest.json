@@ -1,0 +1,213 @@
+{
+  "schema": "raftsim.international_production_corridor.v1",
+  "generated_at": "2026-07-13T01:18:25.979367+00:00",
+  "river_id": "zambezi_batoka_gorge",
+  "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
+  "status": "source_scale_technical_corridor_not_yet_lifelike",
+  "bounds_wgs84": [
+    25.826935535974975,
+    -18.02077352349982,
+    26.01842667723117,
+    -17.90811477650018
+  ],
+  "physical_size_m": {
+    "width": 20254.775910292545,
+    "height": 12527.081108492886
+  },
+  "route": {
+    "length_m": 29999.999842462035,
+    "point_count": 209,
+    "way_ids": [
+      765343870,
+      717945896,
+      31300625,
+      31300571
+    ],
+    "geometry_authority": "low_precision_osm_international_boundary_trace_cross_reference_not_surveyed_centerline",
+    "start_lon_lat": [
+      25.858278,
+      -17.926081
+    ],
+    "end_lon_lat": [
+      25.999539613206142,
+      -17.97797896594856
+    ],
+    "endpoint_evidence": [
+      {
+        "endpoint": "put_in",
+        "name": "Boiling Pot",
+        "policy": "nearest_named-mainstem vertex",
+        "confidence": "high",
+        "source": "OpenStreetMap route geometry plus published rafting access descriptions"
+      },
+      {
+        "endpoint": "take_out",
+        "name": "Mukuni Beach",
+        "policy": "30 km downstream station from Boiling Pot",
+        "confidence": "review_gated",
+        "source": "published Rapid 25 / Mukuni Beach stationing; exact beach bank point needs local guide review"
+      }
+    ],
+    "guide_approval": null
+  },
+  "source_records": [
+    {
+      "role": "named_route_cross_reference",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/hydrography/source/osm_batoka_river_ways.json",
+      "sha256": "07f68993aa150ce3184e21b6352c2844a35e4779ba9b8ad3febbf75d91ea78a5",
+      "provider": "OpenStreetMap contributors",
+      "license": "ODbL-1.0",
+      "query": "[out:json][timeout:60];way[waterway=river](-18.08,25.78,-17.86,26.08);out tags geom;",
+      "authority": "cross_reference_not_survey_authority"
+    },
+    {
+      "role": "sentinel_scene_search",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/source/earth_search_stac_response.json",
+      "sha256": "189d5317bf6b360b4498ca66c74a9ae13636d1be3d4eb30ecb8d6904268a6a0c",
+      "provider": "Element 84 Earth Search / Copernicus Sentinel-2",
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "authority": "visual_surface_reference"
+    },
+    {
+      "role": "route_visual",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/source/sentinel2_20260610_route_visual.png",
+      "sha256": "44250d8b88a2da926894a2a73e7a3ea329633139947fae68dc914ae07aa3fb8a",
+      "provider": "Copernicus Sentinel-2",
+      "scenes": [
+        {
+          "item_id": "S2C_35KLA_20260610_0_L2A",
+          "datetime_utc": "2026-06-10T08:35:11.763000Z",
+          "cloud_cover_percent": 3e-06,
+          "tile_id": "35KLA",
+          "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/LA/2026/6/S2C_35KLA_20260610_0_L2A/TCI.tif"
+        },
+        {
+          "item_id": "S2C_35KMA_20260610_0_L2A",
+          "datetime_utc": "2026-06-10T08:35:08.983000Z",
+          "cloud_cover_percent": 0.0,
+          "tile_id": "35KMA",
+          "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/MA/2026/6/S2C_35KMA_20260610_0_L2A/TCI.tif"
+        }
+      ],
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "authority": "visual_surface_reference_not_bed_geometry"
+    },
+    {
+      "role": "terrain",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/copernicus_dem_glo30_S18_E025.tif",
+      "sha256": "a98d34dd3e183aa975dbaf42d2dede383b029a63c1c690f69a014c279178a85a",
+      "provider": "Copernicus DEM GLO-30",
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_S18_00_E025_00_DEM/Copernicus_DSM_COG_10_S18_00_E025_00_DEM.tif",
+      "license": "Copernicus DEM ESA user license; attribution and redistribution review required",
+      "authority": "30m_surface_model_terrain_source"
+    },
+    {
+      "role": "terrain",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/copernicus_dem_glo30_S18_E026.tif",
+      "sha256": "bd3b5354662991ccb272d4636293b226e43a8f0a6a0b63ff4bde1773f37cd8a9",
+      "provider": "Copernicus DEM GLO-30",
+      "url": "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_S18_00_E026_00_DEM/Copernicus_DSM_COG_10_S18_00_E026_00_DEM.tif",
+      "license": "Copernicus DEM ESA user license; attribution and redistribution review required",
+      "authority": "30m_surface_model_terrain_source"
+    },
+    {
+      "role": "high_resolution_terrain_acquisition_lead",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json",
+      "sha256": "319a1fd9c57b8201e4279ed85532809e9ebdc3c91dc8f57f3bb1d05fd7195816",
+      "provider": "Zambezi River Authority / BGHES feasibility document set",
+      "license": "discovery metadata only; survey data access and rights pending",
+      "authority": "lead_only_no_geometry_or_media_imported",
+      "status": "high_resolution_surveys_confirmed_to_exist_data_access_rights_and_reach_coverage_pending"
+    }
+  ],
+  "environment_contract": {
+    "geology": "steep jointed basalt gorge",
+    "water": "warm brown-green high-volume river with flow-dependent wave trains, holes, boils, and laterals",
+    "ecology": "southern African gorge woodland and riparian scrub",
+    "atmosphere": "warm haze, waterfall moisture, localized spray and mist",
+    "procedural_layers": [
+      "basalt_strata",
+      "wet_basalt",
+      "talus",
+      "gorge_woodland",
+      "spray",
+      "mist",
+      "foam"
+    ]
+  },
+  "artifacts": {
+    "centerline_geojson": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_centerline.geojson",
+    "stationing": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
+    "centerline_local": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/centerline_local.json",
+    "heightfield": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/heightfield_2017.png",
+    "dem_relief": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/dem_relief_2048.png",
+    "terrain_normal": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/terrain_normal_2048.png",
+    "terrain_ao_roughness_height": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/terrain_ao_roughness_height_2048.png",
+    "visual_channel_conditioning": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrology/visual_channel_conditioning.json",
+    "channel_conditioning_summary": {
+      "status": "bounded_visual_terrain_conditioning_review_gated",
+      "parameters": {
+        "channel_half_width_m": 60.0,
+        "channel_feather_width_m": 90.0,
+        "profile_smoothing_radius_m": 500.0,
+        "maximum_downstream_slope": 0.025,
+        "bed_depth_below_visual_surface_m": 2.0,
+        "maximum_terrain_cut_m": 240.0,
+        "maximum_terrain_fill_m": 0.0,
+        "profile_policy": "raw_and_triangular_smoothed_lower_envelope_then_backward_nonrising_slope_bound",
+        "raster_policy": "smoothstep_core_and_feather_cut_or_fill_clamped_to_explicit_bounds"
+      },
+      "measurements": {
+        "route_sample_count": 209,
+        "modified_raster_sample_count": 139520,
+        "maximum_cut_m": 218.8192,
+        "maximum_fill_m": 0.0,
+        "raw_profile_total_upstream_rise_m": 1264.6834,
+        "conditioned_profile_maximum_upstream_rise_m": 0.0,
+        "conditioned_profile_maximum_downstream_slope": 0.025,
+        "conditioned_profile_total_drop_m": 95.0141
+      },
+      "authority": {
+        "scope": "Unreal visual terrain and render-water alignment only",
+        "changes_custom_cpp_solver_state": false,
+        "changes_collision_or_raft_forces": false,
+        "surveyed_bathymetry": false,
+        "may_hide_conservation_or_parity_failures": false
+      }
+    },
+    "source_minimum_elevation_m": 657.0,
+    "source_maximum_elevation_m": 1030.5301513671875,
+    "minimum_elevation_m": 657.0,
+    "maximum_elevation_m": 1030.5301513671875,
+    "relief_m": 373.5301513671875,
+    "source_albedo": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/source_albedo_2048.png",
+    "material_zones": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/material_zones_2048.png",
+    "water_mask": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/water_mask_2048.png",
+    "vegetation_mask": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/vegetation_mask_2048.png",
+    "unreal_texture_inputs": {
+      "physical_source_albedo": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/zambezi_batoka_gorge_source_albedo_2048.png",
+      "physical_normal": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/zambezi_batoka_gorge_normal_2048.png",
+      "physical_packed": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/zambezi_batoka_gorge_ao_roughness_height_2048.png",
+      "physical_material_zones": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/zambezi_batoka_gorge_material_zones_2048.png",
+      "atlas_albedo": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/zambezi_batoka_gorge_first_party_material_texture_atlas_albedo.png",
+      "atlas_normal": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/zambezi_batoka_gorge_first_party_material_texture_atlas_normal.png",
+      "atlas_packed": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/zambezi_batoka_gorge_first_party_material_texture_atlas_ao_roughness_height.png",
+      "source_macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/zambezi_batoka_gorge_source_conditioned_macro_albedo.png",
+      "source_normal_detail": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/zambezi_batoka_gorge_source_conditioned_normal_detail.png",
+      "source_packed": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/zambezi_batoka_gorge_source_conditioned_ao_roughness_height.png",
+      "source_material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/zambezi_batoka_gorge_source_conditioned_material_zones.png",
+      "detail_albedo": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/zambezi_batoka_gorge_terrain_bank_detail_v1_albedo.png",
+      "detail_normal": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/zambezi_batoka_gorge_terrain_bank_detail_v1_normal.png",
+      "detail_packed": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/zambezi_batoka_gorge_terrain_bank_detail_v1_ao_roughness_height.png"
+    },
+    "seasonal_flow_context": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrology/seasonal_flow_context.json",
+    "high_resolution_terrain_acquisition_lead": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json"
+  },
+  "promotion_gates": [
+    "local guide confirms exact put-in, take-out, line direction, rapid stations, access, and rescue routes",
+    "geospatial reviewer confirms DEM datum, route alignment, channel conditioning, and bank geometry",
+    "rights reviewer confirms Copernicus DEM redistribution/attribution and all public capture references",
+    "seasonal-flow reviewer confirms gauge-to-reach translation and flow-dependent visual/gameplay bands",
+    "Unreal map uses source-scale terrain and approved assets, passes desktop/VR budgets, and has human lifelike approval"
+  ]
+}

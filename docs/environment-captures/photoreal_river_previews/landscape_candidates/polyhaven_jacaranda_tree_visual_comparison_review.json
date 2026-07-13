@@ -1,0 +1,45 @@
+{
+  "schema": "raftsim.unreal.biome_asset_visual_comparison_review.v1",
+  "asset_id": "polyhaven_jacaranda_tree_1k",
+  "river_id": "zambezi_batoka_gorge",
+  "status": "rights_clear_import_validated_visual_comparison_rejected_not_lifelike",
+  "production_promoted": false,
+  "reviewed_candidate": {
+    "guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_jacaranda_review_guide_seat_downstream.png",
+    "guide_seat_sha256": "436a77345ca65e7ccdf8bc804f37140468c1cc97de4c78d28c009f0df18936a6",
+    "river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_jacaranda_review_river_eye_downstream.png",
+    "river_eye_sha256": "6af789629a8b95f71fa04c00ffd0c6db7a8b7bd268f1bcef00e4aa268558045f",
+    "restored_baseline_guide_seat_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_post_jacaranda_restored_guide_seat_downstream.png",
+    "restored_baseline_guide_seat_sha256": "1889911cb8cb042b21f5af9dfef9c1c00ace6f165f0ee5ef14d52b6d8c570cc3",
+    "restored_baseline_river_eye_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_gorge_post_jacaranda_restored_river_eye_downstream.png",
+    "restored_baseline_river_eye_sha256": "57c6faa1b427672c1a8568cc4faa96fcb3a55b44964d5c84060c60585ca5679e"
+  },
+  "import_findings": {
+    "source_triangle_count_lod0_measured": 3133049,
+    "publisher_triangle_count_label": "312K",
+    "triangle_count_discrepancy_recorded": true,
+    "nanite_fallback_triangle_count_lod0": 19287,
+    "physical_scale_and_grounded_pivot_validated": true,
+    "explicit_material_roles": [
+      "branches",
+      "leaves",
+      "trunk"
+    ]
+  },
+  "visual_findings": [
+    "The guide-seat comparison is obstructed by a large black and yellow leaf-card mass in the immediate gameplay view.",
+    "The river-eye comparison repeats sparse dark crowns and does not establish convincing southern African gorge woodland.",
+    "The candidate pass causes the terrain to render as a bright white fallback-like surface, so the comparison is not materially coherent.",
+    "A single tree structure analog cannot provide the species, crown, age, density, seasonal, or wind variation required for Batoka Gorge.",
+    "The candidate is not an exact approved Batoka Gorge species and has no ecology, guide, art, gameplay, or measured performance approval."
+  ],
+  "decision": "retain_import_pipeline_and_isolated_assets_reject_visual_promotion",
+  "active_map_policy": "jacaranda_asset_must_not_be_loaded_or_recorded_by_the_default_landscape_candidate_generator",
+  "next_asset_requirements": [
+    "Acquire several rights-cleared southern African gorge woodland and riparian species with exact source and license records.",
+    "Require distance-stable leaf materials with correct masked two-sided foliage shading under the recorded capture photometry.",
+    "Provide crown, age, density, wind, and seasonal variants so repetition is not visible from the guide seat or river eye.",
+    "Place species through source-mask-aware ecology zones with protected guide-seat sightlines and hazard readability.",
+    "Pass ecology, guide, art, rights, gameplay, and measured desktop and VR performance review before promotion."
+  ]
+}
