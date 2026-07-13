@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_visual_review.v2",
+  "generated_on": "2026-07-13",
+  "status": "v10_c2_gorge_scale_corridor_comparison_rejected_terrain_integration_required",
+  "decision": "retain_v10_surface_reference_stop_placing_sheet_modules_author_terrain_integrated_cliffs",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_map_modified": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_c2_corridor_comparison_report.json",
+  "source_report_sha256": "2ce6a630edac61e27577a35c82087c0958c43168dcf2d73498dbe0c05a1e4bb8",
+  "accepted_findings": [
+    "Scaling to 2.8-4.4x gives the modules a plausible 84-132 m gorge-scarp envelope.",
+    "Front-plane alignment and a 10 m buried base remove the detached miniature-panel failure from C1.",
+    "The V10 two-scale surface remains readable under the physical-corridor light rig."
+  ],
+  "rejection_reasons": [
+    "Vertical side seams and overlapping sheets remain obvious in both gameplay cameras.",
+    "Scaled talus produces oversized detached forms and long black shadows on the source slope.",
+    "Modules sit on top of rather than reshape or materially integrate with the low-resolution corridor terrain.",
+    "The smooth orange source canyon, broken sparse foliage, and flat water prevent a lifelike result regardless of module surface quality."
+  ],
+  "reviewed_evidence": {
+    "guide_seat": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_pre_comparison_guide_seat_downstream.png",
+      "baseline_sha256": "fb7d4f055468d20dcdc3bc981917c6cfb6756a7d6be7a9ac48421da8b1eb502c",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_transient_comparison_guide_seat_downstream.png",
+      "comparison_sha256": "cda53001b79eb4624956050d3f7177b66855d70ad7016086d81bf7588201037d",
+      "changed_pixel_fraction": 0.23654188368055556,
+      "mean_absolute_channel_delta": 15.589194516782408,
+      "maximum_channel_delta": 192
+    },
+    "river_eye": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_pre_comparison_river_eye_downstream.png",
+      "baseline_sha256": "48cbef47c76ff5cf7e64302f5240ca2a46b02f5a254f25850fe0368f18b41cca",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_transient_comparison_river_eye_downstream.png",
+      "comparison_sha256": "862bb84f37b3cd5ec76468bb09748e7fcb9dcf27093ec09fe3882fb24527ad35",
+      "changed_pixel_fraction": 0.2436935763888889,
+      "mean_absolute_channel_delta": 16.83227249710648,
+      "maximum_channel_delta": 175
+    }
+  },
+  "next_iteration_requirements": [
+    "Stop adding standalone cliff sheets to the corridor.",
+    "Author the accepted V10 macro/detail response into a terrain-integrated visual material and continuous cliff morphology layer.",
+    "Condition or replace the 30 m DSM corridor with reviewed higher-resolution terrain before final gorge silhouette approval.",
+    "Rebuild gorge woodland, water, mist, lighting, and hazard-readable river surfaces before any photoreal claim."
+  ],
+  "authority": "transient visual comparison only; source map, Landscape, centerline, bank, bed, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"
+}

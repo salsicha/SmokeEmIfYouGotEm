@@ -1,0 +1,68 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "ambientcg_rock037_2k",
+  "status": "rights_reviewed_source_maps_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "Batoka V6 dark fractured-rock close-range surface analog on project-owned isolated geometry",
+  "source": {
+    "title": "Rock 037",
+    "publisher": "ambientCG",
+    "asset_url": "https://ambientcg.com/view?id=Rock037",
+    "license": "CC0 1.0 Universal",
+    "license_url": "https://docs.ambientcg.com/license/",
+    "release_date": "2020-03-29",
+    "retrieved": "2026-07-13",
+    "technique": "publisher-described procedural PBR surface",
+    "publisher_tags": [
+      "Black",
+      "Cliff",
+      "Dirty",
+      "Leaks",
+      "Rock",
+      "Stone"
+    ],
+    "acquisition_method": "official ambientCG 2K-JPG download link",
+    "downloaded_package": "Rock037_2K-JPG.zip",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "batoka_basalt_match": "not_established_dark_fractured_surface_analog_only",
+    "geologist_review": "not_reviewed",
+    "guide_visual_review": "not_reviewed",
+    "performance_review": "not_measured",
+    "allowed_now": [
+      "hash-verified isolated Unreal Texture2D import",
+      "one-sided project-owned Batoka V6 module material comparison",
+      "fixed-camera turntable, closeup, and 60 m review captures"
+    ],
+    "blocked_now": [
+      "claiming the texture is sampled from Batoka basalt",
+      "using the texture as exact named-outcrop or lithology authority",
+      "replacing source DEM, riverbed, bank, collision, water, GeoClaw, forcing, or raft-contact authority",
+      "corridor substitution before the isolated morphology and closeup gates pass",
+      "production promotion before geology, guide, rights, art, repetition, and platform-performance review"
+    ]
+  },
+  "expected_source_files": {
+    "Rock037_2K-JPG_AmbientOcclusion.jpg": "2bbfaa7dcf74dd7e007373e1b5068132458ce1b2c1ba7bf99d86d58326290180",
+    "Rock037_2K-JPG_Color.jpg": "6416856bc34fcfe9100274beb679253d6440d1c5cfd37efc0f84450e7a5c66d2",
+    "Rock037_2K-JPG_Displacement.jpg": "aeb83afd914a593e271c11f46c69844245a5ddc1002b407902e7ee97aaf2305e",
+    "Rock037_2K-JPG_NormalDX.jpg": "7614883d4eba00cfef6df89166b8c54a109d1a577e57f187e7ed37309865ad87",
+    "Rock037_2K-JPG_Roughness.jpg": "c49ff1a57bd8d6db6c8a5dabf75dc39416c9468a6bdf1d6d938c50aef854fc9e"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_batoka_basalt_surface.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_BATOKA_BASALT_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K",
+    "texture_policy": "2K color remains sRGB; AO, displacement, and roughness import as linear masks; DirectX normal imports as a normal map without green-channel inversion",
+    "material_policy": "V6 C++ creates a one-sided isolated-review material that blends these maps with project-owned morphology and records all tiling and response values",
+    "promotion_policy": "manual only after isolated morphology, surface, geology, guide, rights, art, repetition, and performance review"
+  },
+  "additional_acquisition_lead": {
+    "title": "Basalt Cliff Rock Scan",
+    "provider": "Fab / PersScans",
+    "url": "https://www.fab.com/listings/a0a50ee1-67ef-41fd-b669-9f855ecccc7a",
+    "status": "link_only_not_acquired",
+    "reason": "The listing identifies a real-scale Icelandic basalt scan with 500,000 triangles and 8K-16K PBR maps, but purchase, license selection, source hash, regional morphology suitability, and redistribution terms remain unresolved."
+  }
+}

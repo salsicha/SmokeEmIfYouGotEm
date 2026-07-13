@@ -1,0 +1,65 @@
+{
+  "schema": "raftsim.environment.external_asset_source.v1",
+  "asset_id": "polyhaven_aerial_rocks_02_4k",
+  "status": "rights_reviewed_source_maps_ready_for_isolated_import",
+  "production_promoted": false,
+  "intended_review_use": "Batoka isolated-family 50 m macro rock-surface comparison on project-owned geometry",
+  "source": {
+    "title": "Aerial Rocks 02",
+    "publisher": "Poly Haven",
+    "asset_url": "https://polyhaven.com/a/aerial_rocks_02",
+    "license": "CC0",
+    "license_url": "https://polyhaven.com/license",
+    "author": "Rob Tuytel",
+    "retrieved": "2026-07-13",
+    "publisher_scale_m": 50,
+    "publisher_resolution": "4K JPG",
+    "publisher_density_px_per_cm": 0.8,
+    "publisher_tags": [
+      "terrain",
+      "outdoor",
+      "natural",
+      "rock",
+      "aerial",
+      "rough",
+      "moss",
+      "cliff",
+      "rock face"
+    ],
+    "acquisition_method": "individual official Poly Haven 4K JPG download links",
+    "source_bundle_committed": false
+  },
+  "review_boundaries": {
+    "batoka_basalt_match": "not_established_generic_large_scale_natural_rock_analog_only",
+    "capture_orientation": "publisher aerial source reoriented only for isolated vertical-wall comparison",
+    "geologist_review": "not_reviewed",
+    "guide_visual_review": "not_reviewed",
+    "performance_review": "not_measured",
+    "allowed_now": [
+      "hash-verified isolated Unreal Texture2D import",
+      "project-owned Batoka module macro-surface comparison",
+      "fixed-camera turntable, closeup, and 60 m review captures"
+    ],
+    "blocked_now": [
+      "claiming the source was captured at Batoka Gorge",
+      "claiming an exact basalt or named-outcrop match",
+      "using it as terrain, bed, bank, collision, water, GeoClaw, forcing, or raft-contact authority",
+      "corridor substitution before isolated visual acceptance",
+      "production promotion before geology, guide, rights, art, repetition, and performance review"
+    ]
+  },
+  "expected_source_files": {
+    "aerial_rocks_02_ao_4k.jpg": "ad455647f8d6bab2527ad596b548f5fd76d641b0343945afc5a549dec5ccf571",
+    "aerial_rocks_02_diff_4k.jpg": "51bbf941f0f096d627811055bc826d04ea6506c0387c72a57267fcda10ae7e83",
+    "aerial_rocks_02_disp_4k.jpg": "fffebf5a8dbe0d9f58bef24324815994f358501f7fd922f92576dfe35c567ee5",
+    "aerial_rocks_02_nor_dx_4k.jpg": "a67cf6332fa989d215d788f0badab34c89ff6f81756ff1391d0bd4bf27522135",
+    "aerial_rocks_02_rough_4k.jpg": "c089e713c509a4d347c664932dbabd703bf5abb1468a5059f187f6df5c92d4ae"
+  },
+  "import": {
+    "script": "unreal/Scripts/import_reviewed_batoka_macro_surface.py",
+    "source_root_environment_variable": "RAFTSIM_REVIEWED_BATOKA_MACRO_SOURCE_ROOT",
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K",
+    "texture_policy": "4K diffuse remains sRGB; AO, displacement, and roughness import as linear masks; DirectX normal imports without green-channel inversion",
+    "promotion_policy": "manual only after isolated surface, morphology, geology, guide, rights, art, repetition, and performance review"
+  }
+}

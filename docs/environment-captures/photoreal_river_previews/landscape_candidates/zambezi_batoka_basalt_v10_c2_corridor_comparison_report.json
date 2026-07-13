@@ -1,0 +1,352 @@
+{
+	"schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_comparison.v2",
+	"river_id": "zambezi_batoka_gorge",
+	"status": "paired_gorge_scale_slope_aligned_v10_corridor_comparison_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"source_map_modified": false,
+	"collision_or_gameplay_authority_modified": false,
+	"external_pixels_copied": true,
+	"external_geometry_copied": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+	"module_assets": [
+		"/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+		"/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+		"/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10.SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+		"/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10.SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10"
+	],
+	"isolated_family_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_isolated_family_report.json",
+	"isolated_visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_visual_review.json",
+	"rejected_namaqualand_control_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/polyhaven_namaqualand_cliff_02_corridor_comparison_report.json",
+	"authority_boundary": "transient visual comparison only; source map, Landscape, centerline, bank, bed, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged",
+	"instances_per_capture": 8,
+	"placement_revision": "C2 scales 30 m isolated modules to 84-132 m gorge scarps, aligns each front plane to the sampled Landscape slope, and buries the base by 10 m; all actors remain transient and non-colliding",
+	"rejected_c1_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_corridor_comparison_report.json",
+	"guide_seat_placements": [
+		{
+			"instance_index": 0,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+			"location_cm": [
+				307386.24505493819,
+				-327291.36421932402,
+				14599.588911782012
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				32.472470261173363
+			],
+			"scale": [
+				3.2000000476837158,
+				3.2000000476837158,
+				3.2000000476837158
+			]
+		},
+		{
+			"instance_index": 1,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+			"location_cm": [
+				288380.35125115694,
+				-345480.88195889507,
+				12168.517809189227
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				90.825425565383469
+			],
+			"scale": [
+				2.7999999523162842,
+				2.7999999523162842,
+				2.7999999523162842
+			]
+		},
+		{
+			"instance_index": 2,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10.SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+			"location_cm": [
+				290658.78747923131,
+				-316535.26866653364,
+				15249.532808676942
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				49.704842316891146
+			],
+			"scale": [
+				3.5999999046325684,
+				3.5999999046325684,
+				3.5999999046325684
+			]
+		},
+		{
+			"instance_index": 3,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10.SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10",
+			"location_cm": [
+				270109.64502640144,
+				-335341.93620977807,
+				12028.369947910309
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				67.491119974225782
+			],
+			"scale": [
+				3,
+				3,
+				3
+			]
+		},
+		{
+			"instance_index": 4,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+			"location_cm": [
+				272977.36230683024,
+				-306523.16649292165,
+				10785.627252578735
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				59.149600929689235
+			],
+			"scale": [
+				4,
+				4,
+				4
+			]
+		},
+		{
+			"instance_index": 5,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+			"location_cm": [
+				251230.23341895011,
+				-326362.69569128269,
+				12139.371235774226
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				68.526072144180205
+			],
+			"scale": [
+				3.4000000953674316,
+				3.4000000953674316,
+				3.4000000953674316
+			]
+		},
+		{
+			"instance_index": 6,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10.SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+			"location_cm": [
+				251159.34017071174,
+				-294611.85332474433,
+				20647.254510506409
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				43.18349926047668
+			],
+			"scale": [
+				4.4000000953674316,
+				4.4000000953674316,
+				4.4000000953674316
+			]
+		},
+		{
+			"instance_index": 7,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10.SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10",
+			"location_cm": [
+				225916.73686884018,
+				-314829.46003258496,
+				12143.18761078936
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				76.657562171969744
+			],
+			"scale": [
+				3.7999999523162842,
+				3.7999999523162842,
+				3.7999999523162842
+			]
+		}
+	],
+	"river_eye_placements": [
+		{
+			"instance_index": 0,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+			"location_cm": [
+				330958.53864659846,
+				15265.000377608161,
+				9232.0234820945116
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-44.235581098250066
+			],
+			"scale": [
+				3.2000000476837158,
+				3.2000000476837158,
+				3.2000000476837158
+			]
+		},
+		{
+			"instance_index": 1,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+			"location_cm": [
+				308886.59473061125,
+				29579.742661292195,
+				9296.6379263767267
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				14.117374205959891
+			],
+			"scale": [
+				2.7999999523162842,
+				2.7999999523162842,
+				2.7999999523162842
+			]
+		},
+		{
+			"instance_index": 2,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10.SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+			"location_cm": [
+				337580.63156490779,
+				34017.315271218118,
+				7147.0787071144414
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-27.003209042532461
+			],
+			"scale": [
+				3.5999999046325684,
+				3.5999999046325684,
+				3.5999999046325684
+			]
+		},
+		{
+			"instance_index": 3,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10.SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10",
+			"location_cm": [
+				314553.25765626103,
+				49692.073658516812,
+				12691.997877597809
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-9.2169313851978387
+			],
+			"scale": [
+				3,
+				3,
+				3
+			]
+		},
+		{
+			"instance_index": 4,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+			"location_cm": [
+				343259.33226693782,
+				53526.988369423263,
+				7094.5627994537354
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-17.558450429734393
+			],
+			"scale": [
+				4,
+				4,
+				4
+			]
+		},
+		{
+			"instance_index": 5,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10.SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+			"location_cm": [
+				318951.33320473455,
+				70130.172258985418,
+				9801.8458451492261
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-8.1819792152433877
+			],
+			"scale": [
+				3.4000000953674316,
+				3.4000000953674316,
+				3.4000000953674316
+			]
+		},
+		{
+			"instance_index": 6,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10.SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+			"location_cm": [
+				349835.30902198021,
+				77499.097184454411,
+				21092.281854256409
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-33.524552098946927
+			],
+			"scale": [
+				4.4000000953674316,
+				4.4000000953674316,
+				4.4000000953674316
+			]
+		},
+		{
+			"instance_index": 7,
+			"module_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10.SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10",
+			"location_cm": [
+				324355.70575361483,
+				97417.190962104942,
+				7903.2188607893604
+			],
+			"rotation_degrees": [
+				0,
+				0,
+				-0.050489187453862883
+			],
+			"scale": [
+				3.7999999523162842,
+				3.7999999523162842,
+				3.7999999523162842
+			]
+		}
+	],
+	"captures":
+	{
+		"baseline_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_pre_comparison_guide_seat_downstream.png",
+		"baseline_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_pre_comparison_river_eye_downstream.png",
+		"comparison_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_transient_comparison_guide_seat_downstream.png",
+		"comparison_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_c2_transient_comparison_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"open_promotion_gates": [
+		"paired_human_visual_review",
+		"module_perimeter_and_pasted_fragment_review",
+		"Batoka_geology_and_reach_specific_lithology_review",
+		"guide_and_hazard_readability_review",
+		"geospatial_and_source_terrain_review",
+		"rights_and_art_review",
+		"repetition_and_talus_review",
+		"desktop_console_handheld_and_VR_performance",
+		"separate_surveyed_collision_and_hydrodynamic_review"
+	]
+}
