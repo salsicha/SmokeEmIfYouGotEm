@@ -1,0 +1,238 @@
+{
+  "schema": "raftsim.environment.procedural_geology_authoring.v1",
+  "asset_family_id": "zambezi_batoka_basalt",
+  "status": "v10_surface_retained_corridor_c2_rejected_terrain_integration_required",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "river_id": "zambezi_batoka_gorge",
+  "target_reach": "Boiling Pot put-in to Mukuni Beach take-out",
+  "authorship": {
+    "geometry": "project-owned deterministic Unreal C++ procedural geometry",
+    "material": "project-owned two-scale Unreal material using rights-reviewed CC0 Poly Haven Aerial Rocks 02 macro maps and ambientCG Rock037 detail maps",
+    "external_pixels_copied": true,
+    "external_geometry_copied": false,
+    "third_party_asset_dependency": true,
+    "third_party_dependencies": [
+      "polyhaven_aerial_rocks_02_4k",
+      "ambientcg_rock037_2k"
+    ]
+  },
+  "provenance": [
+    {
+      "title": "Development of the Batoka Gorge Hydro-Electric Scheme - Project Overview Document",
+      "publisher": "Zambezi River Authority",
+      "published": "2017-03",
+      "retrieved": "2026-07-13",
+      "url": "https://www.zambezira.org/sites/default/files/BGHES_Project%20Overview%20Document.pdf",
+      "relevant_sections": [
+        "7.2 Regional Geology, pages 41-42",
+        "7.3 Project Geology, page 42",
+        "7.4 Dam Morphology, pages 43-46"
+      ],
+      "authoring_facts": [
+        "approximately 1000 m Karoo basalt lava pile forming a flat plateau incised by steep-sided gorges",
+        "strongly developed nearly vertical structural trends and subvertical joints",
+        "basalt outcrop on both abutments with less than 5 m overburden at the documented project site",
+        "blocky and gravelly talus and exposed riverbed basalt with no local alluvial cover at the documented project site",
+        "stacked very steep to subvertical scarps separated by ledges and moderate bush-covered slopes",
+        "massive non-amygdaloidal and autobrecciated flow units with irregular upper scarps, small gullies, debris, fragments, and boulders"
+      ]
+    },
+    {
+      "title": "Batoka Gorge Hydro-Electric Scheme Environmental and Social Impact Assessment - Cultural Heritage Specialist Study",
+      "publisher": "Environmental Resources Management",
+      "retrieved": "2026-07-13",
+      "url": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/annexes/annex-m---zam-cultural-heritage-report.pdf",
+      "relevant_section": "6.0 Topography and Geology, page 8 of the report body",
+      "authoring_facts": [
+        "dark fine-grained basalt forms both sides of Batoka Gorge",
+        "shallow or stripped soils reflect surface wash, talus creep, and fluvial incision",
+        "harder basalt forms ridges and plateaux",
+        "softer or brecciated basalt can decay to granular rubble and dark soil",
+        "Kalahari sand locally overlies basalt and cannot be assumed absent across the full playable reach"
+      ]
+    }
+  ],
+  "evidence_limits": [
+    "The official morphology descriptions are centered on the Batoka hydroelectric project area downstream of the playable reach and are regional morphology constraints, not surveyed geometry for Boiling Pot to Mukuni Beach.",
+    "No public figure, photograph, or map in the cited reports may be digitized into production geometry.",
+    "Lithology, flow-unit placement, ledge stationing, talus extent, vegetation density, and bank asymmetry remain provisional until reach-specific LiDAR, photogrammetry, aerial review, guide review, or field evidence is rights-cleared.",
+    "Generated appearance is an authored hypothesis for isolated review, not a claim that a module reproduces a named Batoka outcrop.",
+    "The existing CC0 Rock Ground and Namaqualand cliff assets are rights-cleared structure analogs, not verified Batoka lithology; neither may establish the production basalt surface without a separately recorded review decision.",
+    "Poly Haven Aerial Rocks 02 is a 50 m aerial natural-rock macro-surface analog, not a Batoka capture; its orientation, vegetation, and geology remain review limitations.",
+    "ambientCG Rock037 is a procedural dark fractured-rock detail analog, not a Batoka capture or exact basalt authority."
+  ],
+  "authority_boundary": {
+    "allowed_now": [
+      "isolated Unreal morphology and material review",
+      "fixed-camera turntable, closeup, and 60 m captures",
+      "non-colliding transient corridor comparison after isolated acceptance",
+      "Nanite and desktop performance measurement"
+    ],
+    "forbidden_now": [
+      "replacing the source DEM, reviewed centerline, surveyed bank, or riverbed geometry",
+      "changing Landscape collision, raft contact, custom C++ water, GeoClaw comparison, or feature-forcing authority",
+      "concealing terrain-resolution, channel, conservation, or raft-coupling failures",
+      "production placement, shipping, photoreal claims, or named-outcrop identity",
+      "using modules as hydrodynamic obstacles before surveyed geometry and gameplay collision review"
+    ]
+  },
+  "morphology_contract": {
+    "required": [
+      "dark blue-gray to brown-black massive basalt faces",
+      "strong irregular subvertical joint relief without uniform organ-pipe repetition",
+      "near-horizontal lava-flow breaks expressed as discontinuous ledges or recessed bands",
+      "bounded purple-red or brown weathered interflow and amygdaloidal accents",
+      "stacked scarps separated by ledges or moderate debris-bearing slope transitions",
+      "blocky and gravelly talus with varied fragment scale",
+      "irregular brecciated or indented forms and occasional shallow gullies",
+      "independent silhouettes, joint spacing, flow-break elevations, and talus fields across the family"
+    ],
+    "reject": [
+      "perfect hexagonal columns or a uniform honeycomb",
+      "identical repeated blocks, joint spacing, or horizontal bands",
+      "smooth tan canyon walls",
+      "pasted-on disconnected cliff fragments",
+      "continuous decorative stripes that imply unsupported exact flow contacts",
+      "emissive black surfaces, crushed unlit faces, visible backface holes, or floating talus",
+      "geometry that changes water, collision, or solver behavior during visual review"
+    ]
+  },
+  "module_family": [
+    {
+      "id": "lower_massive_scarp",
+      "intent": "tall massive lower cliff with two discontinuous flow breaks and heavy basal talus",
+      "target_bounds_m": [32.0, 15.0, 26.0]
+    },
+    {
+      "id": "jointed_mid_scarp",
+      "intent": "highly jointed middle scarp with narrow gullies and smaller ledges",
+      "target_bounds_m": [28.0, 14.0, 30.0]
+    },
+    {
+      "id": "irregular_brecciated_upper",
+      "intent": "indented upper scarp with brecciated flow-top rubble and asymmetric silhouette",
+      "target_bounds_m": [36.0, 17.0, 22.0]
+    },
+    {
+      "id": "talus_ledged_spur",
+      "intent": "pronounced rock spur with a ledged face, debris apron, and discontinuous outcrop",
+      "target_bounds_m": [30.0, 19.0, 24.0]
+    }
+  ],
+  "isolated_review_gate": {
+    "current_map": "/Game/RaftSim/Environment/GeneratedLocalReview/ZambeziBatokaBasalt/L_ZambeziBatokaBasalt_V10_IsolatedFamilyReview",
+    "console_command": "RaftSim.CreateZambeziBatokaBasaltFamily",
+    "capture_views_per_module": [
+      "turntable_azimuth_035",
+      "turntable_azimuth_145",
+      "joint_flow_break_closeup",
+      "river_distance_60m"
+    ],
+    "requirements": [
+      "all four independent modules save as project-owned Nanite static meshes",
+      "all sixteen fixed-camera captures use the exact authored review camera",
+      "no collision is enabled in the isolated review",
+      "no corridor asset or source map is modified",
+      "human visual review checks silhouette, joint hierarchy, flow-break restraint, talus grounding, material response, repetition, and river-distance readability"
+    ]
+  },
+  "iteration_history": [
+    {
+      "version": 1,
+      "status": "rejected",
+      "decision": "disconnected slabs, perforated joints, crushed closeups, and a sparse 60 m silhouette",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v1_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v1_visual_review.json"
+    },
+    {
+      "version": 2,
+      "status": "diagnostic_only_rejected",
+      "decision": "connected geometry survived conversion; a bounded two-sided diagnostic localized the missing face to winding or culling",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v2_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v2_visual_review.json"
+    },
+    {
+      "version": 3,
+      "status": "rejected",
+      "decision": "one-sided winding fixed; detached bright ledges, cubic talus, dark material response, and weak silhouette remained",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v3_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v3_visual_review.json"
+    },
+    {
+      "version": 4,
+      "status": "rejected",
+      "decision": "detached ledges and cubic talus removed; per-cell depth jumps and terrain-oriented normals produced a chaotic faceted mass",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v4_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v4_visual_review.json"
+    },
+    {
+      "version": 5,
+      "status": "rejected",
+      "decision": "connected surface and cliff normals are readable; regular flutes, smooth poured shading, overexposure, and absent surface detail fail the photoreal gate",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v5_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v5_visual_review.json"
+    },
+    {
+      "version": 6,
+      "status": "rejected",
+      "decision": "Rock037 adds credible micro-detail, but the 2.4 m repeat reads as masonry, small hard panels remain regular, and crest closures expose the sheet",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v6_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v6_visual_review.json"
+    },
+    {
+      "version": 7,
+      "status": "rejected",
+      "decision": "continuous 12 m projection and larger fracture domains remove wallpaper, but hard per-panel normals create a rectangular polygon mosaic",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v7_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v7_visual_review.json"
+    },
+    {
+      "version": 8,
+      "status": "rejected",
+      "decision": "shared vertices and coherent normals remove panel bands, but the generic Rock037 pattern repeats at cliff scale and the perimeter remains a procedural sheet",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_visual_review.json"
+    },
+    {
+      "version": 9,
+      "status": "rejected_closeup_distance_pass_retained",
+      "decision": "the unique CC0 50 m Aerial Rocks 02 macro surface passes river-distance repetition, but its 0.8 px/cm source is visibly soft in closeup",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v9_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v9_visual_review.json"
+    },
+    {
+      "version": 10,
+      "status": "conditionally_accepted_for_transient_corridor_comparison_only",
+      "decision": "the unique 50 m macro surface plus restrained 2.4 m detail restores closeup and 60 m breakup; exact lithology, exposed perimeter, talus, geology, guide, art, performance, and gameplay authority remain blocked",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_isolated_family_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_visual_review.json"
+    }
+  ],
+  "corridor_iteration_history": [
+    {
+      "version": 1,
+      "status": "rejected",
+      "decision": "0.72-1.02x modules read as small pasted rectangular panels that hover in front of the sampled slope",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_corridor_comparison_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_corridor_visual_review.json"
+    },
+    {
+      "version": 2,
+      "status": "rejected",
+      "decision": "2.8-4.4x slope-aligned modules reach gorge scale but expose vertical sheet seams, overlaps, oversized talus shadows, and no integration with the low-resolution source terrain",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_c2_corridor_comparison_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_c2_corridor_visual_review.json"
+    }
+  ],
+  "promotion_sequence": [
+    "source-bounded isolated morphology capture",
+    "human visual acceptance or deterministic revision",
+    "transient non-colliding Zambezi corridor comparison against the rejected Namaqualand control and untouched baseline",
+    "geologist, guide, geospatial, rights, and art review",
+    "reach-specific source conditioning and placement masks",
+    "desktop, console, handheld, and VR performance review",
+    "separate surveyed collision and hydrodynamic-authority review before any gameplay obstacle use"
+  ],
+  "next_step": "Stop placing standalone cliff sheets. Author the accepted V10 two-scale response into a continuous terrain-integrated visual material and cliff morphology layer, while retaining source Landscape, collision, centerline, water, GeoClaw, forcing, raft-contact, and gameplay authority. Condition or replace the 30 m DSM corridor with reviewed higher-resolution terrain before final gorge silhouette approval, then rebuild gorge woodland, water, mist, lighting, and hazard-readable river surfaces before any photoreal claim."
+}

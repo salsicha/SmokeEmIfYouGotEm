@@ -1,0 +1,331 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_visual_review.v8",
+  "generated_on": "2026-07-13",
+  "status": "v8_shared_surface_readable_rock037_macro_pattern_rejected_v9_nonrepeating_surface_required",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_isolated_family_report.json",
+  "source_report_sha256": "891ad34cf920fb25e58252f20ff66b807e14f421b4958050307498ef10363585",
+  "review_scope": {
+    "module_count": 4,
+    "capture_count": 16,
+    "views_per_module": 4,
+    "rhi": "offscreen Metal",
+    "authority": "visual morphology review only; no source terrain, centerline, bank, bed, collision, custom C++ water, GeoClaw, feature-forcing, raft-contact, or gameplay authority"
+  },
+  "accepted_findings": [
+    "Shared-vertex cliff normals remove the V7 rectangular lighting mosaic.",
+    "The denser connected heightfield preserves bounded joints, flow setbacks, gullies, and one-sided visibility.",
+    "Rock037 remains useful as a close-range detail analog under explicit CC0 provenance."
+  ],
+  "rejection_reasons": [
+    "Rock037's directional grain repeats at module scale and does not supply unique 20-50 m rock structure.",
+    "The central face is readable, but the isolated silhouette still exposes a thin procedural sheet.",
+    "Talus shape and grounding are not ready for production placement."
+  ],
+  "quantitative_review": {
+    "dark_pixel_definition": "max(R,G,B)<55 inside the neutral-review foreground mask",
+    "near_black_definition": "max(R,G,B)<24 inside the neutral-review foreground mask",
+    "edge_definition": "horizontal or vertical luma delta greater than 18",
+    "view_summaries": {
+      "turntable": {
+        "sample_count": 8,
+        "mean_dark_foreground_fraction": 0.5201602526420133,
+        "mean_near_black_foreground_fraction": 0.2768361609461647,
+        "mean_edge_fraction": 0.09011704323267433
+      },
+      "closeup": {
+        "sample_count": 4,
+        "mean_dark_foreground_fraction": 0.7882513569161871,
+        "mean_near_black_foreground_fraction": 0.5154329491663253,
+        "mean_edge_fraction": 0.2721566098196828
+      },
+      "river_distance_60m": {
+        "sample_count": 4,
+        "mean_dark_foreground_fraction": 0.7215325335803427,
+        "mean_near_black_foreground_fraction": 0.4239854383919411,
+        "mean_edge_fraction": 0.23156121008038238
+      }
+    },
+    "note": "Metrics hash-lock the evidence and expose photometric regressions; morphology acceptance remains a human visual decision."
+  },
+  "next_iteration_requirements": [
+    "Acquire a rights-reviewed nonrepeating natural rock surface at full cliff-module scale.",
+    "Keep the shared connected morphology and compare closeup plus 60 m readability.",
+    "Do not claim exact Batoka lithology without geologist and reach-specific evidence."
+  ],
+  "captures": [
+    {
+      "capture_id": "lower_massive_scarp_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_lower_massive_scarp_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "sha256": "73f81da360137923d89aba720b180e2061958e62b7eb63d35cfd0c0d680f1585",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        135.89666748046875,
+        139.64187622070312,
+        137.2369384765625
+      ],
+      "foreground_fraction": 0.41937825520833333,
+      "dark_foreground_fraction": 0.5203816827469152,
+      "near_black_foreground_fraction": 0.274264616467313,
+      "edge_fraction": 0.09591733651966108
+    },
+    {
+      "capture_id": "lower_massive_scarp_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_lower_massive_scarp_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "sha256": "93ade2879a23d7851ff9e2a93d93e5a8857a1ac98d39446ea3756d7d1bdaf0c5",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        134.38739013671875,
+        137.97418212890625,
+        135.50315856933594
+      ],
+      "foreground_fraction": 0.42822157118055554,
+      "dark_foreground_fraction": 0.521610342354852,
+      "near_black_foreground_fraction": 0.2690846803108585,
+      "edge_fraction": 0.09794970671301326
+    },
+    {
+      "capture_id": "lower_massive_scarp_joint_flow_break_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_lower_massive_scarp_joint_flow_break_closeup.png",
+      "view_group": "closeup",
+      "sha256": "f6f38bfec073e3dcfe422a8de5394d4294c5c961fb8673d55e339ae9f82707be",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        31.5600528717041,
+        28.162099838256836,
+        21.109375
+      ],
+      "foreground_fraction": 0.9999913194444444,
+      "dark_foreground_fraction": 0.7792949591576316,
+      "near_black_foreground_fraction": 0.487459743574163,
+      "edge_fraction": 0.2855431240495329
+    },
+    {
+      "capture_id": "lower_massive_scarp_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_lower_massive_scarp_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "sha256": "7382c17745af4caa218718080ec3f2889a1c23f1dd6d9405c621f8d74314df90",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        44.63747024536133,
+        41.541446685791016,
+        34.341285705566406
+      ],
+      "foreground_fraction": 0.9601052517361112,
+      "dark_foreground_fraction": 0.7217791379842298,
+      "near_black_foreground_fraction": 0.4137379595923751,
+      "edge_fraction": 0.24897403867043233
+    },
+    {
+      "capture_id": "jointed_mid_scarp_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_jointed_mid_scarp_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "sha256": "9c7b4f1fc36471276b6947f1bde9448a6e4fe97f1dacb5b9cebb9361c952becd",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        138.39889526367188,
+        141.72210693359375,
+        139.11279296875
+      ],
+      "foreground_fraction": 0.4089702690972222,
+      "dark_foreground_fraction": 0.5312079637682505,
+      "near_black_foreground_fraction": 0.2994080767934796,
+      "edge_fraction": 0.08570280252009559
+    },
+    {
+      "capture_id": "jointed_mid_scarp_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_jointed_mid_scarp_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "sha256": "84b019591d28aa01566ca1cf183eb62b975d510861954b914207fc37bc3ae880",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        140.5095672607422,
+        143.9288330078125,
+        141.3376007080078
+      ],
+      "foreground_fraction": 0.39334092881944444,
+      "dark_foreground_fraction": 0.5110440465320287,
+      "near_black_foreground_fraction": 0.26624883104415686,
+      "edge_fraction": 0.08634205952639583
+    },
+    {
+      "capture_id": "jointed_mid_scarp_joint_flow_break_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_jointed_mid_scarp_joint_flow_break_closeup.png",
+      "view_group": "closeup",
+      "sha256": "a4f8eaf39373d8cd8f09af577e698457fda0928b5f1336fb5b1ff05721b1b12f",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        31.43984031677246,
+        28.02927589416504,
+        21.07048988342285
+      ],
+      "foreground_fraction": 0.9999913194444444,
+      "dark_foreground_fraction": 0.7716299620656429,
+      "near_black_foreground_fraction": 0.5030686030260679,
+      "edge_fraction": 0.27962089941342605
+    },
+    {
+      "capture_id": "jointed_mid_scarp_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_jointed_mid_scarp_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "sha256": "7db5d8cef70334b24621ae616090b045fdd9694bdfe90efe462ba71e59698f96",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        58.670719146728516,
+        56.448097229003906,
+        50.004798889160156
+      ],
+      "foreground_fraction": 0.8809016927083333,
+      "dark_foreground_fraction": 0.715617259087085,
+      "near_black_foreground_fraction": 0.426663414790371,
+      "edge_fraction": 0.2130230284597002
+    },
+    {
+      "capture_id": "irregular_brecciated_upper_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_irregular_brecciated_upper_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "sha256": "ca5e78e7f87b697d12bcace182770d589b27eada01e6dcb41deecb5f8c17bf88",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        141.5494842529297,
+        146.2753143310547,
+        144.66171264648438
+      ],
+      "foreground_fraction": 0.389833984375,
+      "dark_foreground_fraction": 0.4867356396703324,
+      "near_black_foreground_fraction": 0.25955058994463787,
+      "edge_fraction": 0.07821366500108624
+    },
+    {
+      "capture_id": "irregular_brecciated_upper_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_irregular_brecciated_upper_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "sha256": "387838d8515fc0d16fd7d5154cd898d5520c1c0aa8a19918e7f37333440009f5",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        140.9576416015625,
+        145.48117065429688,
+        143.78639221191406
+      ],
+      "foreground_fraction": 0.39430338541666665,
+      "dark_foreground_fraction": 0.48507939128759736,
+      "near_black_foreground_fraction": 0.23659429263325904,
+      "edge_fraction": 0.08310938518357593
+    },
+    {
+      "capture_id": "irregular_brecciated_upper_joint_flow_break_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_irregular_brecciated_upper_joint_flow_break_closeup.png",
+      "view_group": "closeup",
+      "sha256": "32336698d6dfb59832cfc01169351e7565a59b3dfbee25b655cba7d32e87eb55",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        32.45829391479492,
+        28.843841552734375,
+        21.559783935546875
+      ],
+      "foreground_fraction": 0.9999978298611111,
+      "dark_foreground_fraction": 0.7639654165916159,
+      "near_black_foreground_fraction": 0.4797688363038982,
+      "edge_fraction": 0.27909461220942866
+    },
+    {
+      "capture_id": "irregular_brecciated_upper_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_irregular_brecciated_upper_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "sha256": "a29c1cf97f5a302a00319328b81aeb0eef82b39f09febad37a78db1a810245d2",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        38.76118087768555,
+        36.23988723754883,
+        29.544166564941406
+      ],
+      "foreground_fraction": 0.9872222222222222,
+      "dark_foreground_fraction": 0.7322789902222847,
+      "near_black_foreground_fraction": 0.4282762380416432,
+      "edge_fraction": 0.24306539213556377
+    },
+    {
+      "capture_id": "talus_ledged_spur_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_talus_ledged_spur_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "sha256": "a17a351286b93f029f2135666bc5c9ec1362d5b19db61afa893e59afcbc17065",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        133.8666534423828,
+        137.43003845214844,
+        135.0251922607422
+      ],
+      "foreground_fraction": 0.43219835069444446,
+      "dark_foreground_fraction": 0.5471939223828437,
+      "near_black_foreground_fraction": 0.2978554607671335,
+      "edge_fraction": 0.09609330871170975
+    },
+    {
+      "capture_id": "talus_ledged_spur_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_talus_ledged_spur_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "sha256": "1ea0e54db34687bd399a3daef9cf9888bd99e78a682485ebb8e62628786fba15",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        131.39443969726562,
+        134.934814453125,
+        132.5111541748047
+      ],
+      "foreground_fraction": 0.4400466579861111,
+      "dark_foreground_fraction": 0.558029032393286,
+      "near_black_foreground_fraction": 0.3116827396084794,
+      "edge_fraction": 0.09760808168585705
+    },
+    {
+      "capture_id": "talus_ledged_spur_joint_flow_break_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_talus_ledged_spur_joint_flow_break_closeup.png",
+      "view_group": "closeup",
+      "sha256": "82c665ad8eea3d89032033549a6ae07ee39c6e2431150f599a23edb7eb9a6532",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        25.704883575439453,
+        22.946592330932617,
+        17.275644302368164
+      ],
+      "foreground_fraction": 0.9999924045138889,
+      "dark_foreground_fraction": 0.8381150898498578,
+      "near_black_foreground_fraction": 0.5914346137611722,
+      "edge_fraction": 0.2443678036063437
+    },
+    {
+      "capture_id": "talus_ledged_spur_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v8_talus_ledged_spur_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "sha256": "7fe8fae7e750601879002fa87cd3e94aad18c6dda652bba7bbf7bff084104b11",
+      "width": 1280,
+      "height": 720,
+      "mean_rgb": [
+        54.39319610595703,
+        52.33451461791992,
+        45.96052169799805
+      ],
+      "foreground_fraction": 0.9087489149305555,
+      "dark_foreground_fraction": 0.7164547470277718,
+      "near_black_foreground_fraction": 0.427264141143375,
+      "edge_fraction": 0.22118238105583315
+    }
+  ]
+}

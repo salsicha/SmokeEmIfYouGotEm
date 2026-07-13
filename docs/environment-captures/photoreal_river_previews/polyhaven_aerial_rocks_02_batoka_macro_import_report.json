@@ -1,0 +1,51 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_aerial_rocks_02_4k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K",
+  "status": "isolated_review_macro_surface_candidate_imported",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "batoka_basalt_match": "not_established_generic_large_scale_natural_rock_analog_only",
+  "verified_source_files": [
+    {
+      "relative_path": "aerial_rocks_02_ao_4k.jpg",
+      "sha256": "ad455647f8d6bab2527ad596b548f5fd76d641b0343945afc5a549dec5ccf571",
+      "bytes": 6129791
+    },
+    {
+      "relative_path": "aerial_rocks_02_diff_4k.jpg",
+      "sha256": "51bbf941f0f096d627811055bc826d04ea6506c0387c72a57267fcda10ae7e83",
+      "bytes": 9637440
+    },
+    {
+      "relative_path": "aerial_rocks_02_disp_4k.jpg",
+      "sha256": "fffebf5a8dbe0d9f58bef24324815994f358501f7fd922f92576dfe35c567ee5",
+      "bytes": 926338
+    },
+    {
+      "relative_path": "aerial_rocks_02_nor_dx_4k.jpg",
+      "sha256": "a67cf6332fa989d215d788f0badab34c89ff6f81756ff1391d0bd4bf27522135",
+      "bytes": 14792495
+    },
+    {
+      "relative_path": "aerial_rocks_02_rough_4k.jpg",
+      "sha256": "c089e713c509a4d347c664932dbabd703bf5abb1468a5059f187f6df5c92d4ae",
+      "bytes": 5292573
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/T_RaftSim_Batoka_AerialRocks02_AO_4K.T_RaftSim_Batoka_AerialRocks02_AO_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/T_RaftSim_Batoka_AerialRocks02_Diffuse_4K.T_RaftSim_Batoka_AerialRocks02_Diffuse_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/T_RaftSim_Batoka_AerialRocks02_Displacement_4K.T_RaftSim_Batoka_AerialRocks02_Displacement_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/T_RaftSim_Batoka_AerialRocks02_NormalDX_4K.T_RaftSim_Batoka_AerialRocks02_NormalDX_4K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/T_RaftSim_Batoka_AerialRocks02_Roughness_4K.T_RaftSim_Batoka_AerialRocks02_Roughness_4K"
+  ],
+  "texture_contract": {
+    "diffuse_srgb": true,
+    "normal_space": "DirectX",
+    "normal_green_channel_flipped": false,
+    "ao_displacement_roughness_linear_masks": true,
+    "never_stream_for_isolated_review": true,
+    "publisher_scale_m": 50
+  }
+}

@@ -1,0 +1,248 @@
+{
+	"schema": "raftsim.unreal.zambezi_batoka_basalt_isolated_family.v10",
+	"status": "v10_shared_surface_two_scale_cc0_family_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"source_map_modified": false,
+	"collision_enabled": false,
+	"project_owned_geometry": true,
+	"external_pixels_copied": true,
+	"external_geometry_copied": false,
+	"isolated_review_diagnostic_ambient_scale": 0.028000000864267349,
+	"isolated_review_manual_exposure_bias": 0,
+	"isolated_review_skylight_intensity": 1.8999999761581421,
+	"isolated_review_front_fill_intensity": 1.3500000238418579,
+	"isolated_review_side_fill_intensity": 0.64999997615814209,
+	"isolated_review_two_sided_culling_diagnostic": false,
+	"front_winding_correction_applied": true,
+	"hard_macro_fracture_panel_normals_applied": false,
+	"shared_vertex_surface_normals_applied": true,
+	"smooth_joint_profiles_applied": true,
+	"detached_flow_break_geometry_present": false,
+	"rights_reviewed_external_surface_textures": true,
+	"surface_texture_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/polyhaven_aerial_rocks_02_source_manifest.json",
+	"surface_texture_import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_aerial_rocks_02_batoka_macro_import_report.json",
+	"surface_texture_asset_id": "polyhaven_aerial_rocks_02_4k",
+	"detail_texture_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/ambientcg_rock037_source_manifest.json",
+	"detail_texture_import_report": "docs/environment-captures/photoreal_river_previews/ambientcg_rock037_batoka_surface_import_report.json",
+	"detail_texture_asset_id": "ambientcg_rock037_2k",
+	"batoka_basalt_match": "not_established_generic_large_scale_natural_rock_analog_only",
+	"surface_texture_tile_cm": 5000,
+	"detail_texture_tile_cm": 240,
+	"surface_color_balance_rgb": [
+		0.77999997138977051,
+		0.57999998331069946,
+		0.72000002861022949
+	],
+	"vertex_tint_weight": 0.10000000149011612,
+	"detail_color_scale": 1.1799999475479126,
+	"detail_color_weight": 0.15999999642372131,
+	"detail_normal_weight": 0.41999998688697815,
+	"detail_roughness_weight": 0.2800000011920929,
+	"surface_ao_weight": 0.31999999284744263,
+	"surface_roughness_texture_weight": 0.63999998569488525,
+	"surface_roughness_floor": 0.72000002861022949,
+	"surface_displacement_weathering_tint_weight": 0.039999999105930328,
+	"surface_normal_convention": "DirectX",
+	"map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/ZambeziBatokaBasalt/L_ZambeziBatokaBasalt_V10_IsolatedFamilyReview",
+	"map_saved": true,
+	"source_manifest": "unreal/Content/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/zambezi_batoka_basalt_authoring_manifest.json",
+	"zra_source": "https://www.zambezira.org/sites/default/files/BGHES_Project%20Overview%20Document.pdf",
+	"erm_source": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/annexes/annex-m---zam-cultural-heritage-report.pdf",
+	"authority_boundary": "visual morphology review only; no source terrain, centerline, bank, bed, collision, custom C++ water, GeoClaw, feature-forcing, raft-contact, or gameplay authority",
+	"modules": [
+		{
+			"id": "lower_massive_scarp",
+			"display_name": "lower massive scarp",
+			"mesh_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_LowerMassiveScarp_V10",
+			"seed": 1301,
+			"wall_cell_count": 486,
+			"talus_rock_count": 48,
+			"source_vertices": 1780,
+			"source_triangles": 3276,
+			"render_vertices": 1294,
+			"render_triangles": 1703,
+			"nanite_enabled": true,
+			"collision_enabled": false,
+			"bounds_size_cm": [
+				3684.4122009277344,
+				1091.5226936340332,
+				2631.2361588478088
+			]
+		},
+		{
+			"id": "jointed_mid_scarp",
+			"display_name": "jointed middle scarp",
+			"mesh_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_JointedMidScarp_V10",
+			"seed": 2903,
+			"wall_cell_count": 792,
+			"talus_rock_count": 47,
+			"source_vertices": 2072,
+			"source_triangles": 3840,
+			"render_vertices": 1343,
+			"render_triangles": 1790,
+			"nanite_enabled": true,
+			"collision_enabled": false,
+			"bounds_size_cm": [
+				3349.412109375,
+				1194.3662567138672,
+				3022.1233038902283
+			]
+		},
+		{
+			"id": "irregular_brecciated_upper",
+			"display_name": "irregular brecciated upper scarp",
+			"mesh_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_IrregularBrecciatedUpper_V10",
+			"seed": 4703,
+			"wall_cell_count": 540,
+			"talus_rock_count": 59,
+			"source_vertices": 2123,
+			"source_triangles": 3912,
+			"render_vertices": 1740,
+			"render_triangles": 2338,
+			"nanite_enabled": true,
+			"collision_enabled": false,
+			"bounds_size_cm": [
+				3944.9061660766602,
+				1293.4638061523438,
+				2146.9482684135437
+			]
+		},
+		{
+			"id": "talus_ledged_spur",
+			"display_name": "talus-ledged rock spur",
+			"mesh_asset": "/Game/RaftSim/Environment/ProceduralGeology/ZambeziBatokaBasalt/Meshes/SM_RaftSim_ZambeziBatokaBasalt_TalusLedgedSpur_V10",
+			"seed": 6701,
+			"wall_cell_count": 432,
+			"talus_rock_count": 57,
+			"source_vertices": 1957,
+			"source_triangles": 3600,
+			"render_vertices": 1600,
+			"render_triangles": 2114,
+			"nanite_enabled": true,
+			"collision_enabled": false,
+			"bounds_size_cm": [
+				3366.4182167053223,
+				1366.1922950744629,
+				2422.8189539909363
+			]
+		}
+	],
+	"module_count": 4,
+	"captures": [
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_lower_massive_scarp_turntable_azimuth_035.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_lower_massive_scarp_turntable_azimuth_035",
+			"capture_id": "lower_massive_scarp_turntable_azimuth_035",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study lower_massive_scarp turntable azimuth 35",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_lower_massive_scarp_turntable_azimuth_145.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_lower_massive_scarp_turntable_azimuth_145",
+			"capture_id": "lower_massive_scarp_turntable_azimuth_145",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study lower_massive_scarp turntable azimuth 145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_lower_massive_scarp_joint_flow_break_closeup.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_lower_massive_scarp_joint_flow_break_closeup",
+			"capture_id": "lower_massive_scarp_joint_flow_break_closeup",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study lower_massive_scarp joint and flow-break closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_lower_massive_scarp_river_distance_60m.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_lower_massive_scarp_river_distance_60m",
+			"capture_id": "lower_massive_scarp_river_distance_60m",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study lower_massive_scarp 60 m river-distance proxy",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_jointed_mid_scarp_turntable_azimuth_035.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_jointed_mid_scarp_turntable_azimuth_035",
+			"capture_id": "jointed_mid_scarp_turntable_azimuth_035",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study jointed_mid_scarp turntable azimuth 35",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_jointed_mid_scarp_turntable_azimuth_145.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_jointed_mid_scarp_turntable_azimuth_145",
+			"capture_id": "jointed_mid_scarp_turntable_azimuth_145",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study jointed_mid_scarp turntable azimuth 145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_jointed_mid_scarp_joint_flow_break_closeup.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_jointed_mid_scarp_joint_flow_break_closeup",
+			"capture_id": "jointed_mid_scarp_joint_flow_break_closeup",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study jointed_mid_scarp joint and flow-break closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_jointed_mid_scarp_river_distance_60m.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_jointed_mid_scarp_river_distance_60m",
+			"capture_id": "jointed_mid_scarp_river_distance_60m",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study jointed_mid_scarp 60 m river-distance proxy",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_irregular_brecciated_upper_turntable_azimuth_035.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_irregular_brecciated_upper_turntable_azimuth_035",
+			"capture_id": "irregular_brecciated_upper_turntable_azimuth_035",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study irregular_brecciated_upper turntable azimuth 35",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_irregular_brecciated_upper_turntable_azimuth_145.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_irregular_brecciated_upper_turntable_azimuth_145",
+			"capture_id": "irregular_brecciated_upper_turntable_azimuth_145",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study irregular_brecciated_upper turntable azimuth 145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_irregular_brecciated_upper_joint_flow_break_closeup.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_irregular_brecciated_upper_joint_flow_break_closeup",
+			"capture_id": "irregular_brecciated_upper_joint_flow_break_closeup",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study irregular_brecciated_upper joint and flow-break closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_irregular_brecciated_upper_river_distance_60m.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_irregular_brecciated_upper_river_distance_60m",
+			"capture_id": "irregular_brecciated_upper_river_distance_60m",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study irregular_brecciated_upper 60 m river-distance proxy",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_talus_ledged_spur_turntable_azimuth_035.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_talus_ledged_spur_turntable_azimuth_035",
+			"capture_id": "talus_ledged_spur_turntable_azimuth_035",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study talus_ledged_spur turntable azimuth 35",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_talus_ledged_spur_turntable_azimuth_145.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_talus_ledged_spur_turntable_azimuth_145",
+			"capture_id": "talus_ledged_spur_turntable_azimuth_145",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study talus_ledged_spur turntable azimuth 145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_talus_ledged_spur_joint_flow_break_closeup.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_talus_ledged_spur_joint_flow_break_closeup",
+			"capture_id": "talus_ledged_spur_joint_flow_break_closeup",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study talus_ledged_spur joint and flow-break closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_talus_ledged_spur_river_distance_60m.png",
+			"camera": "RaftSim_ZambeziBatokaBasalt_talus_ledged_spur_river_distance_60m",
+			"capture_id": "talus_ledged_spur_river_distance_60m",
+			"description": "Batoka V10 shared morphology and two-scale CC0 surface study talus_ledged_spur 60 m river-distance proxy",
+			"captured": true
+		}
+	],
+	"capture_count": 16,
+	"promotion_boundary": "human isolated visual acceptance is required before a transient non-colliding corridor comparison; geologist, guide, geospatial, rights, performance, and surveyed gameplay-collision review remain separate later gates"
+}

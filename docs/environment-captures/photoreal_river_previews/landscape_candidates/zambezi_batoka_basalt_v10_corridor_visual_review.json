@@ -1,0 +1,48 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_visual_review.v1",
+  "generated_on": "2026-07-13",
+  "status": "v10_c1_transient_corridor_comparison_rejected_small_pasted_panels",
+  "decision": "retain_v10_isolated_surface_reject_c1_corridor_placement",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_map_modified": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_corridor_comparison_report.json",
+  "source_report_sha256": "896dd88d97d809325d3699a10e525058979b78b383067ce8e52fe55e02c54a5b",
+  "accepted_findings": [
+    "The dedicated command captures immutable paired guide-seat and river-eye evidence without saving the source map.",
+    "Eight actors per view are transient, non-colliding, and use the validated V10 Nanite modules.",
+    "The result confirms that isolated central-face quality alone cannot justify corridor placement."
+  ],
+  "rejection_reasons": [
+    "Modules scaled to 0.72-1.02x are much smaller than the corridor scarps and read as pasted rectangular panels.",
+    "Front planes hover away from the sampled slope, producing visible gaps and detached shadows.",
+    "The panels neither replace nor integrate with the smooth orange source-terrain approximation.",
+    "Foliage, water, terrain resolution, and canyon morphology remain far below lifelike quality."
+  ],
+  "reviewed_evidence": {
+    "guide_seat": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_pre_comparison_guide_seat_downstream.png",
+      "baseline_sha256": "fb7d4f055468d20dcdc3bc981917c6cfb6756a7d6be7a9ac48421da8b1eb502c",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_transient_comparison_guide_seat_downstream.png",
+      "comparison_sha256": "da50591a9844b1038c991546dc2a16cafb58407b5fc4118328e62b4a47be087a",
+      "changed_pixel_fraction": 0.027514105902777777,
+      "mean_absolute_channel_delta": 1.1309045862268519,
+      "maximum_channel_delta": 176
+    },
+    "river_eye": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_pre_comparison_river_eye_downstream.png",
+      "baseline_sha256": "48cbef47c76ff5cf7e64302f5240ca2a46b02f5a254f25850fe0368f18b41cca",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v10_transient_comparison_river_eye_downstream.png",
+      "comparison_sha256": "9e3bfc9ad72c7d432eff2f448a7ca11c4451534105d6073fa099488aaeed25d2",
+      "changed_pixel_fraction": 0.02365993923611111,
+      "mean_absolute_channel_delta": 0.8447641782407408,
+      "maximum_channel_delta": 161
+    }
+  },
+  "next_iteration_requirements": [
+    "Test gorge-scale visual placement while retaining transient and collision-off boundaries.",
+    "Align the actual front plane to the sampled slope and bury the basal perimeter.",
+    "Reject further module placement if side seams remain visible; move to terrain-integrated authoring instead."
+  ],
+  "authority": "transient visual comparison only; source map, Landscape, centerline, bank, bed, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"
+}

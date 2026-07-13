@@ -1,0 +1,299 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_morphology_donor_visual_review.v13",
+  "generated_on": "2026-07-13",
+  "status": "v13_cc0_fir_direct_donor_rejected_opaque_geometric_reconstruction_required",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "native_species_claim": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_morphology_donor_report.json",
+  "source_report_sha256": "ae8663143d99f034d153659d9b31b1a32cd20ffe7d36a474a5dfb0dad2b4de58",
+  "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+  "source_manifest_sha256": "f53ee4ba79ea68f76663d5c0ef4ab66809fda7ecd1853d617af321533f549660",
+  "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_fir_tree_01_import_report.json",
+  "import_report_sha256": "ae3e13e716bcf46d31f76918cd2c7339f30c73bb2b88ea4b3fa0303a71579cea",
+  "v10_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v10_visual_review.json",
+  "v10_review_sha256": "e7418305f11b3fb6d828cf8fc5ab0cc7b504ddd80529eb445b13ba85c5ae637c",
+  "v12_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v12_visual_review.json",
+  "v12_review_sha256": "1c9d5454b52d760126078326191ce847be510f4a8501ed90b7b28d451b79a89c",
+  "review_scope": {
+    "donor_species_identity": "fir tree; exact species not accepted as Austrocedrus chilensis",
+    "donor_mesh_count": 3,
+    "capture_count": 12,
+    "views_per_mesh": 4,
+    "rhi": "offscreen Metal",
+    "license": "CC0 1.0",
+    "minimum_effective_height_cm": 1405.5205553770065,
+    "maximum_effective_height_cm": 1892.5109282135963,
+    "total_source_triangles": 6982937,
+    "total_nanite_fallback_triangles": 3962,
+    "review_actor_scale": 1.0,
+    "review_culling_bounds_scale": 220
+  },
+  "accepted_findings": [
+    "The already rights-reviewed CC0 source supports a repeatable three-mesh, twelve-view isolated donor gate without purchase, new vendoring, corridor placement, or a native-species claim.",
+    "All three meshes preserve original bark and needle material slots, Nanite remains enabled, and effective 14.1-18.9 m heights agree with the import report.",
+    "Woody trunks and branches are connected, irregular, and materially more organic at close range than V10/V12 intersecting procedural cylinders and detached spray-card attachments.",
+    "The gate exposes a legacy import defect: BuildScale3D 100 affects rendered geometry while persisted culling bounds stay pre-build-scale, requiring a review-only expanded bounds override at actor scale one."
+  ],
+  "rejection_reasons": [
+    "Every turntable and 60 m view reads as a bare or nearly bare snag; the original needle stratum collapses instead of producing an evergreen crown.",
+    "The surviving woody hierarchy is sparse fir topology with long exposed limbs, not the flattened dense scale-leaf sprays and broad distance-stable Austrocedrus crown required by the source contract.",
+    "The legacy build-scale/culling-bounds mismatch is unsuitable for direct runtime reuse and would need a separately validated reimport or reconstruction pipeline.",
+    "Copying or relabeling this non-native geometry would not establish Austrocedrus morphology, form variation, ecology, seasonal response, wind, LOD, or desktop/VR performance.",
+    "The link-only Western Red Cedar and generic cypress listings remain unpurchased and unevaluated in-engine; neither can close this gate without license review and the same non-native reconstruction boundary."
+  ],
+  "quantitative_review": {
+    "green_dominant_definition": "G>=35, G>=1.08R, G>=1.05B, and G-min(R,B)>=7",
+    "view_summaries": {
+      "turntable": {
+        "sample_count": 6,
+        "minimum_green_dominant_fraction": 3.2552083333333335e-06,
+        "mean_green_dominant_fraction": 7.052951388888889e-06,
+        "maximum_green_dominant_fraction": 1.953125e-05,
+        "minimum_foreground_silhouette_fraction": 0.06016276041666667,
+        "mean_foreground_silhouette_fraction": 0.06306911892361111,
+        "maximum_foreground_silhouette_fraction": 0.06492296006944444
+      },
+      "branch_closeup": {
+        "sample_count": 3,
+        "minimum_green_dominant_fraction": 1.4105902777777777e-05,
+        "mean_green_dominant_fraction": 3.7977430555555556e-05,
+        "maximum_green_dominant_fraction": 6.727430555555556e-05,
+        "minimum_foreground_silhouette_fraction": 0.094931640625,
+        "mean_foreground_silhouette_fraction": 0.10161168981481482,
+        "maximum_foreground_silhouette_fraction": 0.10701931423611111
+      },
+      "river_distance_60m": {
+        "sample_count": 3,
+        "minimum_green_dominant_fraction": 5.4253472222222224e-06,
+        "mean_green_dominant_fraction": 7.2337962962962966e-06,
+        "maximum_green_dominant_fraction": 9.765625e-06,
+        "minimum_foreground_silhouette_fraction": 0.132470703125,
+        "mean_foreground_silhouette_fraction": 0.1404738136574074,
+        "maximum_foreground_silhouette_fraction": 0.15436414930555556
+      }
+    },
+    "direct_donor_acceptance": {
+      "all_twelve_captures_present": true,
+      "all_three_nanite_meshes_present": true,
+      "evergreen_crown_mass_present": false,
+      "native_morphology_established": false,
+      "runtime_bounds_contract_valid": false,
+      "direct_geometry_donor_passed": false
+    }
+  },
+  "captures": [
+    {
+      "capture_id": "polyhaven_fir_a_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.0646701388888889,
+      "sha256": "f16f3820ffe0537fd115755d0c810bb9ce825a0010a7167a3aa52c8c3658fab8",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 3,
+      "green_dominant_fraction": 3.2552083333333335e-06,
+      "dark_pixel_fraction": 0.0031184895833333334,
+      "mean_rgb": [
+        174.1692352294922,
+        190.0437469482422,
+        198.430419921875
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_a_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.06492296006944444,
+      "sha256": "f707246e2f2fbb54952f03f288331f73c8a49fd0a7a3b0fc742e19c1b00aeab6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 18,
+      "green_dominant_fraction": 1.953125e-05,
+      "dark_pixel_fraction": 0.0011588541666666668,
+      "mean_rgb": [
+        173.89474487304688,
+        189.7826690673828,
+        198.23779296875
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_a_branch_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_branch_closeup.png",
+      "view_group": "branch_closeup",
+      "foreground_silhouette_fraction": 0.10701931423611111,
+      "sha256": "29b1838346fc0ab8aebc724d3ce334207f7aae91f3ff7764a635f22dcd13e8f8",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 30,
+      "green_dominant_fraction": 3.255208333333333e-05,
+      "dark_pixel_fraction": 0.020795355902777778,
+      "mean_rgb": [
+        183.97572326660156,
+        195.3430938720703,
+        199.77552795410156
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_a_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "foreground_silhouette_fraction": 0.15436414930555556,
+      "sha256": "97c8a628f7f1b49b5edfc46414464ef58c802b32f2eecc83a6f455ee94a5de24",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 6,
+      "green_dominant_fraction": 6.510416666666667e-06,
+      "dark_pixel_fraction": 0.0059092881944444444,
+      "mean_rgb": [
+        173.1931915283203,
+        189.85983276367188,
+        196.98760986328125
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_b_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.062059461805555556,
+      "sha256": "96b12a8d8af69591bf9f22346b2f1c5a2b3635c679259b197fb714855f7979d4",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5,
+      "green_dominant_fraction": 5.4253472222222224e-06,
+      "dark_pixel_fraction": 0.004427083333333333,
+      "mean_rgb": [
+        176.163330078125,
+        191.10079956054688,
+        198.93055725097656
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_b_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.06296006944444445,
+      "sha256": "1b20ec2af7a6230bc291e04773b321527c5db5b16461ff8dbcbcca6301e7dab0",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 3,
+      "green_dominant_fraction": 3.2552083333333335e-06,
+      "dark_pixel_fraction": 0.0012749565972222222,
+      "mean_rgb": [
+        176.1275177001953,
+        190.97860717773438,
+        198.84449768066406
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_b_branch_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_branch_closeup.png",
+      "view_group": "branch_closeup",
+      "foreground_silhouette_fraction": 0.10288411458333334,
+      "sha256": "b30245731d8a5f5e4ddc0c7b2e506f824c6e5816252ac18f7841c0639a1c45e6",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 62,
+      "green_dominant_fraction": 6.727430555555556e-05,
+      "dark_pixel_fraction": 0.023980034722222224,
+      "mean_rgb": [
+        183.58822631835938,
+        194.65072631835938,
+        199.00958251953125
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_b_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "foreground_silhouette_fraction": 0.13458658854166666,
+      "sha256": "c190463990f120e29a685bf262c0914845b822daba285103e61ae652b18492c8",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 9,
+      "green_dominant_fraction": 9.765625e-06,
+      "dark_pixel_fraction": 0.005398220486111111,
+      "mean_rgb": [
+        177.59429931640625,
+        192.85256958007812,
+        198.9311065673828
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_c_turntable_azimuth_035",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_turntable_azimuth_035.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.06016276041666667,
+      "sha256": "bed534c80acffb352f4b75139172f1354c31130a5b0a9334a2c7f158074199d9",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 4,
+      "green_dominant_fraction": 4.340277777777778e-06,
+      "dark_pixel_fraction": 0.004213324652777778,
+      "mean_rgb": [
+        175.93148803710938,
+        190.99058532714844,
+        198.9339599609375
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_c_turntable_azimuth_145",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_turntable_azimuth_145.png",
+      "view_group": "turntable",
+      "foreground_silhouette_fraction": 0.06363932291666667,
+      "sha256": "56d257b372090808da37fbe5ffaee1672bd47cf608b8086ba1c74426d7eaf16d",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 6,
+      "green_dominant_fraction": 6.510416666666667e-06,
+      "dark_pixel_fraction": 0.002165798611111111,
+      "mean_rgb": [
+        175.97064208984375,
+        190.9152069091797,
+        198.79730224609375
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_c_branch_closeup",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_branch_closeup.png",
+      "view_group": "branch_closeup",
+      "foreground_silhouette_fraction": 0.094931640625,
+      "sha256": "d50311e26d012f3c1cb70857bc1f6babe77427372a69767a938a9f1c6c04e6ac",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 13,
+      "green_dominant_fraction": 1.4105902777777777e-05,
+      "dark_pixel_fraction": 0.018573133680555555,
+      "mean_rgb": [
+        183.06900024414062,
+        194.77496337890625,
+        199.54368591308594
+      ]
+    },
+    {
+      "capture_id": "polyhaven_fir_c_river_distance_60m",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_river_distance_60m.png",
+      "view_group": "river_distance_60m",
+      "foreground_silhouette_fraction": 0.132470703125,
+      "sha256": "a0e6fa1d8bebad4266db80733c784502cf91a7fcc893035028b4f7efa87b7178",
+      "width": 1280,
+      "height": 720,
+      "green_dominant_pixel_count": 5,
+      "green_dominant_fraction": 5.4253472222222224e-06,
+      "dark_pixel_fraction": 0.005791015625,
+      "mean_rgb": [
+        177.0717315673828,
+        192.5273895263672,
+        198.7452850341797
+      ]
+    }
+  ],
+  "decision": "reject_direct_fir_geometry_retain_connected_wood_lesson_and_author_project_owned_opaque_cypress_branchlets_plus_scale_leaf_clusters",
+  "next_iteration_requirements": [
+    "Build the next near-tier prototype from project-owned opaque geometric primary, secondary, and tertiary branchlets carrying bounded scale-leaf clusters; do not copy or relabel the fir geometry.",
+    "Retain V10 far fallback authority, V10 silhouette floors, V12 branch-scale/resource ceiling, V13 exterior closeups, and exact-camera checks as guardrails.",
+    "Require connected attachments, non-tiered broad crown mass, visible evergreen silhouette at turntable and 60 m, and no masked whole-spray cards before another corridor review.",
+    "Keep the Fab Western Red Cedar and generic cypress options link-only unless a later license and maintenance decision explicitly authorizes acquisition for non-native morphology study.",
+    "Repair and separately validate the legacy Poly Haven build-scale/culling-bounds import path before any of those assets are considered for runtime placement elsewhere."
+  ]
+}

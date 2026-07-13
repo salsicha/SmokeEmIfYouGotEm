@@ -1,0 +1,234 @@
+{
+	"schema": "raftsim.unreal.futaleufu_cordillera_cypress_morphology_donor.v13",
+	"status": "v13_non_native_cc0_morphology_donor_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"native_species_claim": false,
+	"source_species": "fir tree; exact species not accepted as Austrocedrus chilensis",
+	"intended_use": "connected branch-hierarchy and close-range geometry morphology donor only",
+	"license": "CC0 1.0",
+	"source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+	"import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_fir_tree_01_import_report.json",
+	"map_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/L_FutaleufuCordilleraCypress_V13_FirMorphologyDonorReview",
+	"map_saved": true,
+	"original_materials_retained": true,
+	"raw_bounds_to_effective_scale": 100,
+	"review_culling_bounds_scale": 220,
+	"legacy_import_bounds_note": "BuildScale3D 100 affects rendered Nanite geometry but persisted mesh/component bounds remain pre-build-scale; the isolated review uses actor scale 1 plus expanded culling bounds and does not mutate source assets",
+	"capture_count": 12,
+	"donors": [
+		{
+			"id": "polyhaven_fir_a",
+			"asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_a_LOD0.SM_FirTree01_fir_tree_01_a_LOD0",
+			"nanite_enabled": true,
+			"render_vertices": 869,
+			"render_triangles": 1306,
+			"material_slot_count": 4,
+			"raw_bounds_size": [
+				6.5337793827056885,
+				6.4268231391906738,
+				18.925109282135963
+			],
+			"bounds_size_cm": [
+				653.37793827056885,
+				642.68231391906738,
+				1892.5109282135963
+			],
+			"review_actor_scale": 1,
+			"review_culling_bounds_size_cm": [
+				1437.4314641952515,
+				1413.9010906219482,
+				4163.524042069912
+			],
+			"material_slots": [
+				{
+					"index": 0,
+					"slot_name": "fir_tree_01_bark",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 1,
+					"slot_name": "fir_tree_01_trunk_a",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 2,
+					"slot_name": "fir_tree_01_twig",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+				},
+				{
+					"index": 3,
+					"slot_name": "fir_tree_01_dead_branches",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				}
+			]
+		},
+		{
+			"id": "polyhaven_fir_b",
+			"asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_b_LOD0.SM_FirTree01_fir_tree_01_b_LOD0",
+			"nanite_enabled": true,
+			"render_vertices": 1066,
+			"render_triangles": 1623,
+			"material_slot_count": 4,
+			"raw_bounds_size": [
+				5.6125872135162354,
+				6.0566706657409668,
+				14.055205553770065
+			],
+			"bounds_size_cm": [
+				561.25872135162354,
+				605.66706657409668,
+				1405.5205553770065
+			],
+			"review_actor_scale": 1,
+			"review_culling_bounds_size_cm": [
+				1234.7691869735718,
+				1332.4675464630127,
+				3092.1452218294144
+			],
+			"material_slots": [
+				{
+					"index": 0,
+					"slot_name": "fir_tree_01_bark",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 1,
+					"slot_name": "fir_tree_01_twig",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+				},
+				{
+					"index": 2,
+					"slot_name": "fir_tree_01_dead_branches",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 3,
+					"slot_name": "fir_tree_01_trunk_b",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				}
+			]
+		},
+		{
+			"id": "polyhaven_fir_c",
+			"asset": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/SM_FirTree01_fir_tree_01_c_LOD0.SM_FirTree01_fir_tree_01_c_LOD0",
+			"nanite_enabled": true,
+			"render_vertices": 631,
+			"render_triangles": 1033,
+			"material_slot_count": 4,
+			"raw_bounds_size": [
+				6.3059391975402832,
+				5.9662373065948486,
+				14.520581595599651
+			],
+			"bounds_size_cm": [
+				630.59391975402832,
+				596.62373065948486,
+				1452.0581595599651
+			],
+			"review_actor_scale": 1,
+			"review_culling_bounds_size_cm": [
+				1387.3066234588623,
+				1312.5722074508667,
+				3194.5279510319233
+			],
+			"material_slots": [
+				{
+					"index": 0,
+					"slot_name": "fir_tree_01_bark",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 1,
+					"slot_name": "fir_tree_01_twig",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Needles.M_FirTree01_Needles"
+				},
+				{
+					"index": 2,
+					"slot_name": "fir_tree_01_dead_branches",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				},
+				{
+					"index": 3,
+					"slot_name": "fir_tree_01_trunk_c",
+					"material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/M_FirTree01_Bark.M_FirTree01_Bark"
+				}
+			]
+		}
+	],
+	"captures": [
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_turntable_azimuth_035.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_a_turntable_azimuth_035",
+			"capture_id": "polyhaven_fir_a_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_turntable_azimuth_145.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_a_turntable_azimuth_145",
+			"capture_id": "polyhaven_fir_a_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_branch_closeup.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_a_branch_closeup",
+			"capture_id": "polyhaven_fir_a_branch_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_a_river_distance_60m.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_a_river_distance_60m",
+			"capture_id": "polyhaven_fir_a_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_turntable_azimuth_035.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_b_turntable_azimuth_035",
+			"capture_id": "polyhaven_fir_b_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_turntable_azimuth_145.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_b_turntable_azimuth_145",
+			"capture_id": "polyhaven_fir_b_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_branch_closeup.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_b_branch_closeup",
+			"capture_id": "polyhaven_fir_b_branch_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_b_river_distance_60m.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_b_river_distance_60m",
+			"capture_id": "polyhaven_fir_b_river_distance_60m",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_turntable_azimuth_035.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_c_turntable_azimuth_035",
+			"capture_id": "polyhaven_fir_c_turntable_azimuth_035",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_turntable_azimuth_145.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_c_turntable_azimuth_145",
+			"capture_id": "polyhaven_fir_c_turntable_azimuth_145",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_branch_closeup.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_c_branch_closeup",
+			"capture_id": "polyhaven_fir_c_branch_closeup",
+			"captured": true
+		},
+		{
+			"path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_polyhaven_fir_c_river_distance_60m.png",
+			"camera": "RaftSim_FutaleufuCypressDonor_polyhaven_fir_c_river_distance_60m",
+			"capture_id": "polyhaven_fir_c_river_distance_60m",
+			"captured": true
+		}
+	],
+	"decision_boundary": "compare connected branch hierarchy and close-range geometric breakup against V10 and V12; either reconstruct project-owned Austrocedrus geometry from source morphology constraints or reject donor use and author opaque geometric branchlets plus scale-leaf clusters"
+}

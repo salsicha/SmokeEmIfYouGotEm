@@ -1,0 +1,50 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "ambientcg_rock037_2k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K",
+  "status": "isolated_review_surface_candidate_imported",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "batoka_basalt_match": "not_established_dark_fractured_surface_analog_only",
+  "verified_source_files": [
+    {
+      "relative_path": "Rock037_2K-JPG_AmbientOcclusion.jpg",
+      "sha256": "2bbfaa7dcf74dd7e007373e1b5068132458ce1b2c1ba7bf99d86d58326290180",
+      "bytes": 2114145
+    },
+    {
+      "relative_path": "Rock037_2K-JPG_Color.jpg",
+      "sha256": "6416856bc34fcfe9100274beb679253d6440d1c5cfd37efc0f84450e7a5c66d2",
+      "bytes": 5825412
+    },
+    {
+      "relative_path": "Rock037_2K-JPG_Displacement.jpg",
+      "sha256": "aeb83afd914a593e271c11f46c69844245a5ddc1002b407902e7ee97aaf2305e",
+      "bytes": 942946
+    },
+    {
+      "relative_path": "Rock037_2K-JPG_NormalDX.jpg",
+      "sha256": "7614883d4eba00cfef6df89166b8c54a109d1a577e57f187e7ed37309865ad87",
+      "bytes": 10123443
+    },
+    {
+      "relative_path": "Rock037_2K-JPG_Roughness.jpg",
+      "sha256": "c49ff1a57bd8d6db6c8a5dabf75dc39416c9468a6bdf1d6d938c50aef854fc9e",
+      "bytes": 2775481
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/T_RaftSim_Batoka_Rock037_AO_2K.T_RaftSim_Batoka_Rock037_AO_2K",
+    "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/T_RaftSim_Batoka_Rock037_Color_2K.T_RaftSim_Batoka_Rock037_Color_2K",
+    "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/T_RaftSim_Batoka_Rock037_Displacement_2K.T_RaftSim_Batoka_Rock037_Displacement_2K",
+    "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/T_RaftSim_Batoka_Rock037_NormalDX_2K.T_RaftSim_Batoka_Rock037_NormalDX_2K",
+    "/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/T_RaftSim_Batoka_Rock037_Roughness_2K.T_RaftSim_Batoka_Rock037_Roughness_2K"
+  ],
+  "texture_contract": {
+    "color_srgb": true,
+    "normal_space": "DirectX",
+    "normal_green_channel_flipped": false,
+    "ao_displacement_roughness_linear_masks": true,
+    "never_stream_for_isolated_review": true
+  }
+}
