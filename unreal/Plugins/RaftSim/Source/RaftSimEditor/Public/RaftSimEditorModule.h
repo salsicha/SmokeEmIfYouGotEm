@@ -34,6 +34,8 @@ private:
     void HandleCapturePhotorealEnvironmentPreviewsCommand(const TArray<FString>& Args);
     void HandleCreateLandscapeImportCandidateMapsCommand(const TArray<FString>& Args);
     void HandleCaptureZambeziCliffComparisonCommand(const TArray<FString>& Args);
+    void HandleCreateZambeziBatokaBasaltFamilyCommand(const TArray<FString>& Args);
+    void HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyRenderDiagnosticsCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyOpacityDiagnosticsCommand(const TArray<FString>& Args);
@@ -48,6 +50,7 @@ private:
     void HandleEvaluateProceduralBeechCandidateCommand(const TArray<FString>& Args);
     void HandleCreateFutaleufuNativeCanopyPrototypeCommand(const TArray<FString>& Args);
     void HandleCreateFutaleufuCordilleraCypressFamilyCommand(const TArray<FString>& Args);
+    void HandleCreateFutaleufuCordilleraCypressDonorReviewCommand(const TArray<FString>& Args);
     void HandleProceduralBeechPostProcess(const FPCGDataCollection& OutputData);
     bool TickProceduralBeechCandidate(float DeltaSeconds);
     void FinishProceduralBeechCandidate(bool bSuccess, const FString& Summary);
@@ -67,6 +70,8 @@ private:
     bool CapturePhotorealEnvironmentPreviews(FString& OutSummary);
     bool CreateLandscapeImportCandidateMaps(FString& OutSummary);
     bool CaptureZambeziCliffComparison(FString& OutSummary);
+    bool CreateZambeziBatokaBasaltFamily(FString& OutSummary);
+    bool CaptureZambeziBatokaBasaltCorridorComparison(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyCorridorComparison(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyRenderDiagnostics(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyOpacityDiagnostics(FString& OutSummary);
@@ -79,6 +84,7 @@ private:
     bool CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics(FString& OutSummary);
     bool CreateFutaleufuNativeCanopyPrototype(FString& OutSummary);
     bool CreateFutaleufuCordilleraCypressFamily(FString& OutSummary);
+    bool CreateFutaleufuCordilleraCypressDonorReview(FString& OutSummary);
 
     TArray<FRaftSimEditorToolDescriptor> ToolDescriptors;
     TMap<FName, TWeakPtr<SDockTab>> OpenedToolTabs;
@@ -91,6 +97,8 @@ private:
     TUniquePtr<FAutoConsoleCommand> CapturePhotorealEnvironmentPreviewsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateLandscapeImportCandidateMapsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureZambeziCliffComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreateZambeziBatokaBasaltFamilyConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand;
@@ -105,6 +113,7 @@ private:
     TUniquePtr<FAutoConsoleCommand> EvaluateProceduralBeechCandidateConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateFutaleufuNativeCanopyPrototypeConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressFamilyConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressDonorReviewConsoleCommand;
     FDelegateHandle PhotorealEnvironmentAutomationPostEngineInitHandle;
     FTSTicker::FDelegateHandle PhotorealEnvironmentAutomationTickerHandle;
     FTSTicker::FDelegateHandle ProceduralBeechCandidateTickerHandle;
@@ -117,7 +126,10 @@ private:
     bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
     bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
     bool bCreateLandscapeImportCandidateMapsOnStartup = false;
+    bool bCreateZambeziBatokaBasaltFamilyOnStartup = false;
+    bool bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup = false;
     bool bCreateFutaleufuCordilleraCypressFamilyOnStartup = false;
+    bool bCreateFutaleufuCordilleraCypressDonorReviewOnStartup = false;
     bool bExitAfterPhotorealEnvironmentAutomation = false;
     int32 PhotorealEnvironmentAutomationStartupAttempts = 0;
 };

@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.futaleufu_cordillera_cypress_authoring.v1",
   "river_id": "futaleufu_terminator",
-  "status": "v10_silhouette_and_resource_pass_closeup_topology_rejected_v11_pending",
+  "status": "v13_cc0_fir_direct_donor_rejected_v14_opaque_geometry_pending",
   "production_promoted": false,
   "corridor_substitution_allowed": false,
   "species": {
@@ -70,12 +70,53 @@
       "derivative_pixels_used": false
     }
   ],
+  "morphology_donor_audit": [
+    {
+      "id": "polyhaven_fir_tree_01_cc0",
+      "title": "Fir Tree 01",
+      "publisher": "Poly Haven",
+      "url": "https://polyhaven.com/a/fir_tree_01",
+      "retrieved": "2026-07-13",
+      "license": "CC0 1.0 Universal",
+      "local_source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FirTree01_1K/polyhaven_fir_tree_01_source_manifest.json",
+      "state": "v13_isolated_direct_donor_rejected_connected_wood_lesson_only",
+      "candidate_use": "connected trunk and branch hierarchy donor only; original needle identity and fir ecology are rejected for native cypress use",
+      "purchase_required": false,
+      "native_species_claim_allowed": false,
+      "v13_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_morphology_donor_report.json",
+      "v13_visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_morphology_donor_visual_review.json",
+      "v13_direct_geometry_donor_passed": false,
+      "legacy_import_bounds_contract_valid": false
+    },
+    {
+      "id": "fab_western_red_cedar_tree_01",
+      "title": "Western Red Cedar Tree #01",
+      "publisher": "Fab / Antonio Kowatsch",
+      "url": "https://www.fab.com/listings/76825b4a-4e6f-47b2-9fdd-0eee12f9bdaa",
+      "retrieved": "2026-07-13",
+      "state": "link_only_not_purchased_or_vendored",
+      "candidate_use": "Cupressaceae flattened scale-leaf morphology comparison and possible reconstruction donor after license and source review",
+      "purchase_required": true,
+      "native_species_claim_allowed": false
+    },
+    {
+      "id": "fab_cypress_tree_collection",
+      "title": "Cypress Tree Collection",
+      "publisher": "Fab / StudioD3D",
+      "url": "https://www.fab.com/listings/3d25cfab-0f3e-4df9-ac7e-90cec5bf682f",
+      "retrieved": "2026-07-13",
+      "state": "link_only_not_purchased_or_vendored",
+      "candidate_use": "photogrammetry quality and branch-material comparison only; generic cypress form is not accepted as Austrocedrus identity",
+      "purchase_required": true,
+      "native_species_claim_allowed": false
+    }
+  ],
   "provenance_and_rights_boundary": {
     "external_images_vendored": false,
     "external_geometry_vendored": false,
     "external_texture_pixels_vendored": false,
     "stored_material": "source URLs, publishers, retrieval dates, and bounded factual summaries only",
-    "future_asset_ownership": "project-authored geometry, textures, materials, wind data, and procedural recipes",
+    "future_asset_ownership": "project-authored assets or explicitly rights-reviewed donor geometry reconstructed to the native source contract with provenance retained",
     "field_reference_requirement": "guide or first-party field imagery should validate corridor frequency and visual phenotype before production promotion",
     "source_limit": "protected-area and species sources establish local plausibility, not exact tree locations along the runnable corridor"
   },
@@ -155,5 +196,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Build V11 with irregular grouped, curved, and variably ascending primary systems instead of evenly spaced horizontal shelves. Align one or two V10 broad cards to each authored branch system, preserve the V10 near/far foreground-silhouette floor and reduced card budget, move closeup evidence to exposed outer terminal attachments, retain exact actor-root fallback authority, and keep corridor placement closed until topology, overdraw, temporal, ecology, desktop, and VR gates pass."
+  "next_step": "Build V14 as project-owned opaque connected primary, secondary, and tertiary branchlets carrying bounded scale-leaf clusters. Do not copy or relabel the rejected fir geometry and do not return to masked whole-spray cards. Retain V10 far authority and silhouette floors, V12 branch-scale and resource ceilings, and V13 exact-camera, exterior-closeup, provenance, and culling-bounds evidence before any corridor review."
 }
