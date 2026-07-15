@@ -1,0 +1,271 @@
+{
+  "schema": "raftsim.chilko_production_corridor.v1",
+  "generated_on": "2026-07-15",
+  "river_id": "chilko_river_lava_canyon",
+  "display_name": "Chilko River: River Lodge to Chilko-Taseko Junction",
+  "status": "official_source_scale_corridor_generated_unreal_review_pending",
+  "bounds_wgs84": [
+    -124.14208758591647,
+    51.67680505650018,
+    -123.64847959408353,
+    52.02564381349982
+  ],
+  "physical_size_m": {
+    "width": 33903.75792067932,
+    "height": 38789.09999535428
+  },
+  "route": {
+    "length_m": 55845.69567955752,
+    "point_count": 811,
+    "geometry_authority": "official_bc_freshwater_atlas_areal_stream_skeleton_deterministically_stitched_between_nearest_review_seed_vertices_not_access_or_rapid_approval",
+    "source_feature_count": 160,
+    "all_source_segments_stitched": true,
+    "start_lon_lat": [
+      -124.10476102,
+      51.69477128
+    ],
+    "end_lon_lat": [
+      -123.67756745,
+      52.00767759
+    ],
+    "stitch_diagnostics": {
+      "source_feature_count": 160,
+      "stitched_feature_count": 160,
+      "source_endpoint_count": 2,
+      "endpoint_degree_counts": {
+        "1": 2,
+        "2": 159
+      },
+      "all_source_segments_used": true,
+      "maximum_join_gap_m": 0.0,
+      "full_chain_point_count": 813,
+      "clipped_point_count": 811,
+      "clipped_length_m": 55845.69567955752,
+      "put_in_seed_lon_lat": [
+        -124.10681,
+        51.69627
+      ],
+      "put_in_official_vertex_lon_lat": [
+        -124.10476102,
+        51.69477128
+      ],
+      "put_in_seed_offset_m": 218.43972731922648,
+      "take_out_seed_lon_lat": [
+        -123.677222,
+        52.006944
+      ],
+      "take_out_official_vertex_lon_lat": [
+        -123.67756745,
+        52.00767759
+      ],
+      "take_out_seed_offset_m": 84.92937221995732,
+      "exact_access_geometry_approved": false
+    },
+    "endpoint_evidence": [
+      {
+        "endpoint": "put_in",
+        "name": "Chilko River Lodge put-in",
+        "policy": "nearest official FWA route vertex to review seed",
+        "confidence": "review_gated",
+        "exact_access_geometry_approved": false
+      },
+      {
+        "endpoint": "take_out",
+        "name": "Chilko-Taseko Junction take-out",
+        "policy": "nearest official FWA route vertex to review seed",
+        "confidence": "review_gated",
+        "exact_access_geometry_approved": false
+      }
+    ],
+    "exact_access_geometry_approved": false,
+    "guide_approval": null
+  },
+  "terrain": {
+    "product": "NRCan CanElevation MRDEM-30 DTM",
+    "horizontal_source_crs": "EPSG:3979 NAD83(CSRS) Canada Atlas Lambert",
+    "horizontal_clip_crs": "EPSG:4326 WGS 84",
+    "vertical_datum": "CGVD2013 orthometric heights (EPSG:6647)",
+    "source_resolution_m": 30.0,
+    "per_pixel_source_classes": [
+      {
+        "value": 1,
+        "meaning": "adjusted_copernicus_glo_30",
+        "pixel_count": 1462383
+      }
+    ],
+    "source_minimum_elevation_m": 806.06640625,
+    "source_maximum_elevation_m": 1509.6015625,
+    "conditioned_minimum_elevation_m": 806.06640625,
+    "conditioned_maximum_elevation_m": 1509.6015625,
+    "relief_m": 703.53515625,
+    "authority": "official source-scale terrain fallback; not rapid-scale rock, bank, bathymetry, access, or hazard geometry"
+  },
+  "imagery": {
+    "scene": {
+      "item_id": "S2C_10UDC_20250825_0_L2A",
+      "datetime_utc": "2025-08-25T19:30:32.137000Z",
+      "platform": "sentinel-2c",
+      "tile": "MGRS-10UDC",
+      "catalog_cloud_cover_percent": 0.000644,
+      "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/10/U/DC/2025/8/S2C_10UDC_20250825_0_L2A/TCI.tif",
+      "scl_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/10/U/DC/2025/8/S2C_10UDC_20250825_0_L2A/SCL.tif"
+    },
+    "obscured_fraction_of_valid_clip": 0.0,
+    "authority": "seasonal surface-color, vegetation, water-extent, cloud and shadow review; not bed, bank, access, rapid, or bathymetry geometry"
+  },
+  "environment_contract": {
+    "geology": "Chilcotin plateau transition, glacial valley deposits, canyon bedrock, talus, gravel bars, and flow-exposed boulder controls",
+    "water": "cold turquoise river with flow-dependent constrictions, wave trains, holes, laterals, boils, eddy lines, and boulder push",
+    "ecology": "interior Douglas-fir and lodgepole-pine forest, aspen and willow riparian bands, open benches, and disturbance-dependent regeneration",
+    "atmosphere": "clear high-interior light with flow spray, canyon shadow, smoke and haze only when source and seasonal evidence support them",
+    "procedural_layers": [
+      "bedrock",
+      "talus",
+      "gravel_bars",
+      "wet_boulders",
+      "interior_conifer_forest",
+      "aspen_willow_riparian",
+      "foam",
+      "spray",
+      "mist"
+    ]
+  },
+  "source_records": [
+    {
+      "role": "official_hydrography",
+      "path": "physics/data/real_world/chilko_river_bc/hydrography/lodge_to_taseko_junction_candidate_segments.geojson",
+      "sha256": "3b7a9dc4a20aac476cc3962a0f8ab6e8040d288ccfaef2a07d7e691abbeaefec",
+      "provider": "British Columbia Freshwater Atlas",
+      "license": "Open Government Licence - British Columbia"
+    },
+    {
+      "role": "official_source_attachment",
+      "path": "physics/data/real_world/chilko_river_bc/source_manifest.json",
+      "sha256": "4f78b4467c335bf9972f11c5b5b91bf752d7d646b02b8991749129c3117a7a77",
+      "status": "first_official_source_attachment_complete_production_corridor_blocked"
+    },
+    {
+      "role": "official_terrain_clip",
+      "path": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_manifest.json",
+      "sha256": "872c4dd54d99a42e087258c782a7c40ebeee5810cdf907bdcc4a74a4852494fa",
+      "provider": "Natural Resources Canada CanElevation",
+      "license": "Open Government Licence - Canada"
+    },
+    {
+      "role": "route_window_imagery_and_scene_classification",
+      "path": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_chilko_corridor_manifest.json",
+      "sha256": "d406eae3348e9d5b41e7c3c85e0a22ef7db62521c36e0822b67f517289d8d6c2",
+      "provider": "Copernicus Sentinel-2 via Element 84 Earth Search",
+      "license": "Copernicus Sentinel Data Legal Notice"
+    },
+    {
+      "role": "official_monthly_flow_context",
+      "path": "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json",
+      "sha256": "8f67b619db34b072f517a3ae6d774fec4a98eb50a7ac2f063d67d162572cb788",
+      "provider": "Environment and Climate Change Canada",
+      "authority": "seasonal_context_not_gameplay_band_approval"
+    },
+    {
+      "role": "land_and_publication_review",
+      "path": "physics/data/real_world/chilko_river_bc/review/land_and_publication_source_review.json",
+      "sha256": "bcb379e4bc90d46519d9ce213bf12478a826aceb2130e826a13fff7f987f73a8",
+      "authority": "review_policy_not_access_permission"
+    }
+  ],
+  "artifacts": {
+    "centerline_geojson": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_centerline.geojson",
+    "stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+    "centerline_local": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json",
+    "heightfield": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_2017.png",
+    "dem_relief": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/dem_relief_2048.png",
+    "terrain_normal": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/terrain_normal_2048.png",
+    "terrain_ao_roughness_height": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/terrain_ao_roughness_height_2048.png",
+    "visual_channel_conditioning": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrology/visual_channel_conditioning.json",
+    "channel_conditioning_summary": {
+      "status": "bounded_visual_terrain_conditioning_review_gated",
+      "parameters": {
+        "channel_half_width_m": 45.0,
+        "channel_feather_width_m": 75.0,
+        "profile_smoothing_radius_m": 500.0,
+        "maximum_downstream_slope": 0.015,
+        "bed_depth_below_visual_surface_m": 1.5,
+        "maximum_terrain_cut_m": 70.0,
+        "maximum_terrain_fill_m": 0.0,
+        "profile_policy": "raw_and_triangular_smoothed_lower_envelope_then_backward_nonrising_slope_bound",
+        "raster_policy": "smoothstep_core_and_feather_cut_or_fill_clamped_to_explicit_bounds"
+      },
+      "measurements": {
+        "route_sample_count": 811,
+        "modified_raster_sample_count": 35795,
+        "maximum_cut_m": 56.0377,
+        "maximum_fill_m": 0.0,
+        "raw_profile_total_upstream_rise_m": 746.6955,
+        "conditioned_profile_maximum_upstream_rise_m": 0.0,
+        "conditioned_profile_maximum_downstream_slope": 0.015,
+        "conditioned_profile_total_drop_m": 326.6577
+      },
+      "authority": {
+        "scope": "Unreal visual terrain and render-water alignment only",
+        "changes_custom_cpp_solver_state": false,
+        "changes_collision_or_raft_forces": false,
+        "surveyed_bathymetry": false,
+        "may_hide_conservation_or_parity_failures": false
+      }
+    },
+    "source_minimum_elevation_m": 806.06640625,
+    "source_maximum_elevation_m": 1509.6015625,
+    "minimum_elevation_m": 806.06640625,
+    "maximum_elevation_m": 1509.6015625,
+    "relief_m": 703.53515625,
+    "heightfield_source_scale": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_1009.png",
+    "heightfield_source_scale_policy": {
+      "size": 1009,
+      "source_dtm_resolution_m": 30.0,
+      "landscape_spacing_m": {
+        "x": 33.63468047686441,
+        "y": 38.481249995391146
+      },
+      "resampling": "bilinear_then_full_uint16_range_normalization",
+      "reason": "1009 samples preserve the official source scale without embedding a 2017-grid Nanite representation that adds no terrain authority"
+    },
+    "source_albedo": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/source_albedo_2048.png",
+    "material_zones": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/material_zones_2048.png",
+    "water_mask": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/water_mask_2048.png",
+    "vegetation_mask": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/vegetation_mask_2048.png",
+    "unreal_texture_inputs": {
+      "physical_source_albedo": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/chilko_river_lava_canyon_source_albedo_2048.png",
+      "physical_normal": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/chilko_river_lava_canyon_normal_2048.png",
+      "physical_packed": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/chilko_river_lava_canyon_ao_roughness_height_2048.png",
+      "physical_material_zones": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/chilko_river_lava_canyon_material_zones_2048.png",
+      "atlas_albedo": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/chilko_river_lava_canyon_first_party_material_texture_atlas_albedo.png",
+      "atlas_normal": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/chilko_river_lava_canyon_first_party_material_texture_atlas_normal.png",
+      "atlas_packed": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/chilko_river_lava_canyon_first_party_material_texture_atlas_ao_roughness_height.png",
+      "source_macro_albedo": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/chilko_river_lava_canyon_source_conditioned_macro_albedo.png",
+      "source_normal_detail": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/chilko_river_lava_canyon_source_conditioned_normal_detail.png",
+      "source_packed": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/chilko_river_lava_canyon_source_conditioned_ao_roughness_height.png",
+      "source_material_zones": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/chilko_river_lava_canyon_source_conditioned_material_zones.png",
+      "detail_albedo": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/chilko_river_lava_canyon_terrain_bank_detail_v1_albedo.png",
+      "detail_normal": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/chilko_river_lava_canyon_terrain_bank_detail_v1_normal.png",
+      "detail_packed": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/chilko_river_lava_canyon_terrain_bank_detail_v1_ao_roughness_height.png"
+    },
+    "seasonal_flow_context": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrology/seasonal_flow_context.json",
+    "terrain_source_clip_manifest": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_manifest.json",
+    "imagery_source_clip_manifest": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_chilko_corridor_manifest.json",
+    "unreal_import_contract": "unreal/Content/RaftSim/River/chilko_heightfield_import_test.json"
+  },
+  "promotion_gates": {
+    "official_source_chain_stitched": true,
+    "source_scale_corridor_generated": true,
+    "exact_put_in_take_out_access": false,
+    "rapid_scale_terrain_and_bathymetry": false,
+    "named_rapid_stationing": false,
+    "numeric_flow_bands": false,
+    "guide_review": false,
+    "land_and_publication_review": false,
+    "unreal_landscape_import_review": false,
+    "lifelike_capture": false,
+    "desktop_console_handheld_vr_performance": false
+  },
+  "production_promoted": false,
+  "manifest_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json"
+}

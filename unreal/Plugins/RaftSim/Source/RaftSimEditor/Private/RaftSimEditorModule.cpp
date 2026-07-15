@@ -384,6 +384,27 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SurfaceTint = FLinearColor(0.012f, 0.20f, 0.24f, 0.0f);
         Settings.ReflectionTint = FLinearColor(0.40f, 0.60f, 0.68f, 0.0f);
     }
+    else if (RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        Settings.BaseColorScale = 1.06f;
+        Settings.EmissiveFillScale = 0.085f;
+        Settings.Roughness = 0.29f;
+        Settings.Specular = 0.48f;
+        Settings.Opacity = 0.36f;
+        Settings.NormalIntensity = 0.70f;
+        Settings.VertexTintWeight = 0.64f;
+        Settings.RenderWidthScale = 1.28f;
+        Settings.SolverFieldEnable = 0.0f;
+        Settings.SolverMacroNormalWeight = 0.0f;
+        Settings.SolverDepthColorWeight = 0.0f;
+        Settings.SolverFieldRoughnessWeight = 0.0f;
+        Settings.SolverFroudeAerationWeight = 0.0f;
+        Settings.SolverSpeedVisualGain = 0.0f;
+        Settings.SolverFroudeVisualGain = 0.0f;
+        Settings.SolverSurfaceReliefScale = 0.0f;
+        Settings.SurfaceTint = FLinearColor(0.018f, 0.24f, 0.27f, 0.0f);
+        Settings.ReflectionTint = FLinearColor(0.42f, 0.60f, 0.66f, 0.0f);
+    }
     return Settings;
 }
 
@@ -450,6 +471,18 @@ FRaftSimPhotographicCaptureSettings GetPhotographicCaptureSettings(const FString
         Settings.SunColor = FLinearColor(0.91f, 0.96f, 1.0f);
         Settings.FogColor = FLinearColor(0.46f, 0.58f, 0.60f);
     }
+    else if (RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        Settings.SunIntensity = 5.05f;
+        Settings.SkyLightIntensity = 1.60f;
+        Settings.FogDensity = 0.0030f;
+        Settings.ExposureBias = -0.16f;
+        Settings.Saturation = 1.04f;
+        Settings.Contrast = 1.03f;
+        Settings.Sharpen = 0.24f;
+        Settings.SunColor = FLinearColor(0.96f, 0.97f, 1.0f);
+        Settings.FogColor = FLinearColor(0.50f, 0.58f, 0.60f);
+    }
     return Settings;
 }
 
@@ -508,6 +541,17 @@ FRaftSimLandscapeCandidateFoliageSettings GetLandscapeCandidateFoliageSettings(
         Settings.ConiferBackTint = FLinearColor(0.34f, 0.68f, 0.30f);
         Settings.RoughnessStrength = 0.76f;
         Settings.NormalStrength = 0.60f;
+    }
+    else if (RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        Settings.BroadleafFrontTint = FLinearColor(0.78f, 1.08f, 0.58f);
+        Settings.BroadleafBackTint = FLinearColor(0.52f, 0.80f, 0.38f);
+        Settings.BroadleafTransmissionTint = FLinearColor(0.42f, 0.70f, 0.30f);
+        Settings.ConiferFrontTint = FLinearColor(0.62f, 0.92f, 0.46f);
+        Settings.ConiferBackTint = FLinearColor(0.40f, 0.68f, 0.30f);
+        Settings.ConiferTransmissionTint = FLinearColor(0.32f, 0.58f, 0.24f);
+        Settings.RoughnessStrength = 0.78f;
+        Settings.NormalStrength = 0.56f;
     }
     return Settings;
 }
@@ -1308,6 +1352,55 @@ TArray<FRaftSimEnvironmentPreviewSpec> GetEnvironmentPreviewSpecs()
     Futaleufu.FoamTrainCount = 32;
     Specs.Add(Futaleufu);
 
+    FRaftSimEnvironmentPreviewSpec Chilko;
+    Chilko.RiverId = TEXT("chilko_river_lava_canyon");
+    Chilko.DisplayName = TEXT("Chilko River Lodge to Chilko-Taseko Junction");
+    Chilko.MapPackagePath = TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/L_ChilkoRiver_PhotorealPreview");
+    Chilko.SourceManifest =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json");
+    Chilko.AerialDrapeImage =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/source_albedo_2048.png");
+    Chilko.TerrainReliefImage =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/dem_relief_2048.png");
+    Chilko.HeightfieldPreviewImage =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_2017.png");
+    Chilko.WaterMaskImage =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/water_mask_2048.png");
+    Chilko.VegetationMaskImage =
+        TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/vegetation_mask_2048.png");
+    Chilko.ElevationSample =
+        TEXT("physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_dtm.tif");
+    Chilko.SourceDrapeDescription =
+        TEXT("Deterministically stitched official BC Freshwater Atlas route with a bounded 30 m NRCan MRDEM DTM/source clip and cloud-free 10 m Copernicus Sentinel-2 true-color corridor window; exact access, rapid-scale terrain and bathymetry, named rapid stations, numeric gameplay flow bands, guide approval, and land/publication review remain explicit blockers.");
+    Chilko.FlowBandId = TEXT("summer_seasonal_context_review");
+    Chilko.FlowBandDisplayName = TEXT("Summer Seasonal Context Review");
+    Chilko.FlowBandSource =
+        TEXT("physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json");
+    Chilko.FlowVisualDescription =
+        TEXT("Official ECCC monthly history supports seasonal context only; no gameplay discharge threshold or rapid-specific stickiness, washout, or hazard response is approved.");
+    Chilko.FlowWidthScale = 1.10f;
+    Chilko.FlowFoamScale = 1.24f;
+    Chilko.FlowWetBankScale = 1.16f;
+    Chilko.FlowCurrentCueScale = 1.28f;
+    Chilko.FlowWaterLevelOffsetCm = 8.0f;
+    Chilko.WaterColor = FLinearColor(0.025f, 0.27f, 0.30f);
+    Chilko.TerrainColor = FLinearColor(0.24f, 0.27f, 0.19f);
+    Chilko.RockColor = FLinearColor(0.34f, 0.35f, 0.32f);
+    Chilko.FoliageColor = FLinearColor(0.10f, 0.24f, 0.09f);
+    Chilko.CanyonHeightCm = 3200.0f;
+    Chilko.RiverHalfWidthCm = 4500.0f;
+    Chilko.BankWidthCm = 16000.0f;
+    Chilko.BendAmplitudeCm = 620.0f;
+    Chilko.TerrainReliefAmplitudeCm = 1800.0f;
+    Chilko.HeightfieldPreviewAmplitudeCm = 70353.516f;
+    Chilko.HeightfieldLocalReliefAmplitudeCm = 22000.0f;
+    Chilko.HeightfieldSeamFeatherUv = 0.025f;
+    Chilko.TerrainNormalSofteningBlend = 0.30f;
+    Chilko.BoulderCount = 140;
+    Chilko.FoliageCount = 360;
+    Chilko.FoamTrainCount = 28;
+    Specs.Add(Chilko);
+
     return Specs;
 }
 
@@ -1416,6 +1509,26 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.bPhysicalScaleSourceCorridor = true;
             Candidate.bEnableLandscapeNanite = false;
         }
+        else if (PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+        {
+            Candidate.HeightfieldRelativePath =
+                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_1009.png");
+            Candidate.HeightfieldManifestRelativePath = PreviewSpec.SourceManifest;
+            Candidate.ImportContractRelativePath =
+                TEXT("unreal/Content/RaftSim/River/chilko_heightfield_import_test.json");
+            Candidate.LocalCenterlineRelativePath =
+                TEXT("physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json");
+            Candidate.MapPackagePath =
+                TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ChilkoRiver_PhysicalCorridorCandidate");
+            Candidate.LandscapeSize = 1009;
+            Candidate.HorizontalSpanXCm = 3390375.792f;
+            Candidate.HorizontalSpanYCm = 3878909.999f;
+            Candidate.TargetReliefCm = 70353.516f;
+            Candidate.bApplyPreviewAnalyticChannelBurn = false;
+            Candidate.bUseSolverVisualizationFields = false;
+            Candidate.bPhysicalScaleSourceCorridor = true;
+            Candidate.bEnableLandscapeNanite = true;
+        }
         else
         {
             continue;
@@ -1485,6 +1598,19 @@ FRaftSimLandscapeMaterialCandidateSettings GetLandscapeMaterialCandidateSettings
         Settings.RiverbedRoughness = 0.74f;
         Settings.RiverbedColorScale = FLinearColor(0.28f, 0.34f, 0.32f, 0.0f);
         Settings.WetBankColorScale = FLinearColor(0.44f, 0.52f, 0.48f, 0.0f);
+    }
+    else if (RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        Settings.DetailMappingScale = 124.0f;
+        Settings.DetailAlbedoWeight = 0.17f;
+        Settings.DetailNormalWeight = 0.34f;
+        Settings.DetailSurfaceResponseWeight = 0.30f;
+        Settings.EmissiveFillScale = 0.045f;
+        Settings.RiverbedBlendWeight = 0.82f;
+        Settings.WetBankBlendWeight = 0.70f;
+        Settings.RiverbedRoughness = 0.76f;
+        Settings.RiverbedColorScale = FLinearColor(0.30f, 0.35f, 0.32f, 0.0f);
+        Settings.WetBankColorScale = FLinearColor(0.42f, 0.49f, 0.42f, 0.0f);
     }
     return Settings;
 }
@@ -1823,6 +1949,10 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
     else if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
     {
         RiverAssetName = TEXT("Futaleufu");
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        RiverAssetName = TEXT("Chilko");
     }
     if (RiverAssetName.IsEmpty())
     {
@@ -2509,6 +2639,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     const bool bColorado = Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
     const bool bFutaleufu = Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
+    const bool bChilko = Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
     const bool bRockCanyon = bColorado || bZambezi;
     FString RiverAssetName = TEXT("AmericanSouthFork");
     if (bColorado)
@@ -2522,6 +2653,10 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     else if (bFutaleufu)
     {
         RiverAssetName = TEXT("Futaleufu");
+    }
+    else if (bChilko)
+    {
+        RiverAssetName = TEXT("Chilko");
     }
     if ((bBatokaTerrainIntegratedReview || bBatokaWorldAlignedReview) && !bZambezi)
     {
@@ -4086,6 +4221,10 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
     {
         RiverAssetName = TEXT("Futaleufu");
     }
+    else if (Spec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        RiverAssetName = TEXT("Chilko");
+    }
     if (RiverAssetName.IsEmpty())
     {
         OutSummary += FString::Printf(
@@ -4372,6 +4511,7 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFirstPartyMaterialTextureA
         {TEXT("pacuare"), TEXT("Pacuare")},
         {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
         {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
+        {TEXT("chilko_river_lava_canyon"), TEXT("Chilko")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -4441,6 +4581,7 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
         {TEXT("pacuare"), TEXT("Pacuare")},
         {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
         {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
+        {TEXT("chilko_river_lava_canyon"), TEXT("Chilko")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -4524,6 +4665,14 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetSourceConditionedMaterialT
                  "rio_azul_swinging_bridge_to_pasarela/derived"),
             TEXT("futaleufu_terminator"),
             TEXT("source_albedo_2048.png")
+        },
+        {
+            TEXT("chilko_river_lava_canyon"),
+            TEXT("Chilko"),
+            TEXT("physics/data/real_world/chilko_river_bc/production_corridor/"
+                 "chilko_river_lodge_to_taseko_junction/derived"),
+            TEXT("chilko_river_lava_canyon"),
+            TEXT("source_albedo_2048.png")
         }
     };
     for (const FPhysicalCorridorTextureSpec& Corridor : PhysicalCorridors)
@@ -4594,6 +4743,7 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetProductionDetailMaterialTe
         {TEXT("pacuare"), TEXT("Pacuare")},
         {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
         {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
+        {TEXT("chilko_river_lava_canyon"), TEXT("Chilko")},
     };
 
     TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> Specs;
@@ -5066,13 +5216,18 @@ UTexture2D* CreateOrUpdateFirstPartyMaterialTextureAsset(
 
 bool CreateFirstPartyMaterialTextureAtlasAssets(
     TMap<FString, UTexture2D*>& OutTextureAssetsByKey,
-    FString& OutSummary)
+    FString& OutSummary,
+    const FString& RiverIdFilter = FString())
 {
     bool bAllSaved = true;
     OutTextureAssetsByKey.Reset();
 
     for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec : GetFirstPartyMaterialTextureAtlasAssetSpecs())
     {
+        if (!RiverIdFilter.IsEmpty() && Spec.RiverId != RiverIdFilter)
+        {
+            continue;
+        }
         bool bSaved = false;
         UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(Spec, OutSummary, bSaved);
         bAllSaved &= bSaved && Texture != nullptr;
@@ -5087,12 +5242,17 @@ bool CreateFirstPartyMaterialTextureAtlasAssets(
 
 bool CreateSourceConditionedMaterialTextureAssets(
     TMap<FString, UTexture2D*>& InOutTextureAssetsByKey,
-    FString& OutSummary)
+    FString& OutSummary,
+    const FString& RiverIdFilter = FString())
 {
     bool bAllSaved = true;
 
     for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec : GetSourceConditionedMaterialTextureAssetSpecs())
     {
+        if (!RiverIdFilter.IsEmpty() && Spec.RiverId != RiverIdFilter)
+        {
+            continue;
+        }
         bool bSaved = false;
         UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(Spec, OutSummary, bSaved);
         bAllSaved &= bSaved && Texture != nullptr;
@@ -5107,12 +5267,17 @@ bool CreateSourceConditionedMaterialTextureAssets(
 
 bool CreateProductionDetailMaterialTextureAssets(
     TMap<FString, UTexture2D*>& InOutTextureAssetsByKey,
-    FString& OutSummary)
+    FString& OutSummary,
+    const FString& RiverIdFilter = FString())
 {
     bool bAllSaved = true;
 
     for (const FRaftSimFirstPartyMaterialTextureAssetSpec& Spec : GetProductionDetailMaterialTextureAssetSpecs())
     {
+        if (!RiverIdFilter.IsEmpty() && Spec.RiverId != RiverIdFilter)
+        {
+            continue;
+        }
         bool bSaved = false;
         UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(Spec, OutSummary, bSaved);
         bAllSaved &= bSaved && Texture != nullptr;
@@ -6575,6 +6740,7 @@ TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> GetFirstPartyMaterialIns
         {TEXT("pacuare"), TEXT("Pacuare")},
         {TEXT("zambezi_batoka_gorge"), TEXT("Zambezi")},
         {TEXT("futaleufu_terminator"), TEXT("Futaleufu")},
+        {TEXT("chilko_river_lava_canyon"), TEXT("Chilko")},
     };
 
     TArray<FRaftSimFirstPartyMaterialInstanceCandidateSpec> Specs;
@@ -6875,6 +7041,10 @@ FString GetFirstPartyMaterialRiverAssetName(const FString& RiverId)
     if (RiverId == TEXT("futaleufu_terminator"))
     {
         return TEXT("Futaleufu");
+    }
+    if (RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        return TEXT("Chilko");
     }
 
     return FString();
@@ -23412,12 +23582,17 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     TArray<float> StationsCm;
     TArray<float> ConditionedSurfaceWorldZ;
     int32 ConditionedProfileCenterCount = 0;
+    const bool bChilkoSourceScale =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon");
+    const float CenterSampleSpacingCm = bChilkoSourceScale ? 500.0f : 100.0f;
     for (int32 SegmentIndex = 0; SegmentIndex + 1 < SourcePoints.Num(); ++SegmentIndex)
     {
         const FRaftSimLandscapeCandidateCenterlinePoint& A = SourcePoints[SegmentIndex];
         const FRaftSimLandscapeCandidateCenterlinePoint& B = SourcePoints[SegmentIndex + 1];
         const float SegmentLengthCm = (B.LocalCm - A.LocalCm).Size();
-        const int32 Steps = FMath::Max(1, FMath::CeilToInt(SegmentLengthCm / 100.0f));
+        const int32 Steps = FMath::Max(
+            1,
+            FMath::CeilToInt(SegmentLengthCm / CenterSampleSpacingCm));
         for (int32 Step = 0; Step < Steps; ++Step)
         {
             const float T = static_cast<float>(Step) / static_cast<float>(Steps);
@@ -23465,7 +23640,7 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         ConditionedSurfaceWorldZ.Add(TerrainZ + 140.0f);
     }
 
-    constexpr int32 CrossSteps = 32;
+    const int32 CrossSteps = bChilkoSourceScale ? 16 : 32;
     TArray<FVector> Vertices;
     TArray<FVector2D> UVs;
     TArray<FLinearColor> VertexColors;
@@ -23563,9 +23738,11 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
         Normal = FMath::Lerp(Normal, FVector::UpVector, 0.24f).GetSafeNormal();
     }
     OutSummary += FString::Printf(
-        TEXT("Built source-aligned physical river ribbon with %d one-metre center samples (%d using the manifest-recorded conditioned visual surface), 32 cross steps, bounded render-only current relief below 20 centimetres, and sparse flow-scaled breaker coloration across %.1f m.\n"),
+        TEXT("Built source-aligned physical river ribbon with %d center samples at %.1f m spacing (%d using the manifest-recorded conditioned visual surface), %d cross steps, bounded render-only current relief below 20 centimetres, and sparse flow-scaled breaker coloration across %.1f m.\n"),
         Centers.Num(),
+        CenterSampleSpacingCm * 0.01f,
         ConditionedProfileCenterCount,
+        CrossSteps,
         Last.StationMeters);
     return AddPreviewProceduralMeshActor(
         World,
@@ -23626,9 +23803,12 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
     const bool bInternationalPhysicalCorridor =
         Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge") ||
         Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator");
-    const float TargetGridSpacingCm = bInternationalPhysicalCorridor
-        ? 1250.0f
-        : (Candidate.HorizontalSpanXCm > 500000.0f ? 2500.0f : 400.0f);
+    const float TargetGridSpacingCm =
+        Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon")
+        ? 3000.0f
+        : (bInternationalPhysicalCorridor
+               ? 1250.0f
+               : (Candidate.HorizontalSpanXCm > 500000.0f ? 2500.0f : 400.0f));
     constexpr float SurfaceLiftCm = 6.0f;
     constexpr int32 TileCountX = 4;
     const int32 TotalXSteps = FMath::CeilToInt(Candidate.HorizontalSpanXCm / TargetGridSpacingCm);
@@ -23881,6 +24061,11 @@ void RepositionLandscapeCandidatePhysicalCameras(
     {
         SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.815f, 0.825f, 330.0f, 170.0f);
         SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.644f, 0.654f, 270.0f, 160.0f);
+    }
+    else if (Candidate.PreviewSpec.RiverId == TEXT("chilko_river_lava_canyon"))
+    {
+        SetCamera(TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"), 0.250f, 0.254f, 280.0f, 150.0f);
+        SetCamera(TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"), 0.420f, 0.424f, 210.0f, 125.0f);
     }
     else
     {
@@ -25629,7 +25814,7 @@ void FRaftSimEditorModule::StartupModule()
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand));
     CreateLandscapeImportCandidateMapsConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CreateLandscapeImportCandidateMaps"),
-        TEXT("Import review-gated source DEMs as isolated Unreal Landscape candidate maps and capture them."),
+        TEXT("Import review-gated source DEMs as isolated Unreal Landscape candidate maps and capture them; optionally pass one river_id."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand));
     CaptureZambeziCliffComparisonConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CaptureZambeziCliffComparison"),
@@ -26147,10 +26332,13 @@ void FRaftSimEditorModule::HandleCapturePhotorealEnvironmentPreviewsCommand(cons
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
 }
 
-void FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand(const TArray<FString>&)
+void FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand(
+    const TArray<FString>& Args)
 {
     FString Summary;
-    CreateLandscapeImportCandidateMaps(Summary);
+    CreateLandscapeImportCandidateMaps(
+        Summary,
+        Args.IsEmpty() ? FString() : Args[0]);
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
 }
 
@@ -35187,7 +35375,9 @@ bool FRaftSimEditorModule::CreatePhotorealEnvironmentPreviewMaps(FString& OutSum
     return bAllSaved;
 }
 
-bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummary)
+bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
+    FString& OutSummary,
+    const FString& RiverIdFilter)
 {
     FScopedPhotorealPreviewWorldGcLeakFatalOverride WorldGcLeakFatalOverride;
 
@@ -35218,14 +35408,45 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
     FString EntriesJson;
     TMap<FString, UTexture2D*> SourceTextureAssetsByKey;
     bool bAllSucceeded =
-        CreateSourceConditionedMaterialTextureAssets(SourceTextureAssetsByKey, OutSummary);
+        CreateFirstPartyMaterialTextureAtlasAssets(
+            SourceTextureAssetsByKey,
+            OutSummary,
+            RiverIdFilter);
+    bAllSucceeded &=
+        CreateSourceConditionedMaterialTextureAssets(
+            SourceTextureAssetsByKey,
+            OutSummary,
+            RiverIdFilter);
+    bAllSucceeded &=
+        CreateProductionDetailMaterialTextureAssets(
+            SourceTextureAssetsByKey,
+            OutSummary,
+            RiverIdFilter);
     bAllSucceeded &= CreateSolverVisualizationFieldTextureAssets(OutSummary);
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
     {
         GShaderCompilingManager->FinishAllCompilation();
     }
-    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    TArray<FRaftSimLandscapeImportCandidateSpec> Candidates = GetLandscapeImportCandidateSpecs();
+    if (!RiverIdFilter.IsEmpty())
+    {
+        Candidates = Candidates.FilterByPredicate(
+            [&RiverIdFilter](const FRaftSimLandscapeImportCandidateSpec& Candidate)
+            {
+                return Candidate.PreviewSpec.RiverId == RiverIdFilter;
+            });
+        if (Candidates.IsEmpty())
+        {
+            OutSummary += FString::Printf(
+                TEXT("No source Landscape candidate is registered for river_id %s.\n"),
+                *RiverIdFilter);
+            return false;
+        }
+        OutSummary += FString::Printf(
+            TEXT("Limiting source Landscape creation to river_id %s.\n"),
+            *RiverIdFilter);
+    }
     for (int32 Index = 0; Index < Candidates.Num(); ++Index)
     {
         const FRaftSimLandscapeImportCandidateSpec& Candidate = Candidates[Index];
@@ -35789,9 +36010,16 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(FString& OutSummar
         TEXT("%s\n")
         TEXT("  ]\n")
         TEXT("}\n"),
-        bAllSucceeded ? TEXT("five_source_landscape_candidates_captured_review_gated") : TEXT("one_or_more_landscape_candidates_failed"),
+        bAllSucceeded
+            ? (RiverIdFilter.IsEmpty()
+                   ? TEXT("six_source_landscape_candidates_captured_review_gated")
+                   : TEXT("requested_source_landscape_candidate_captured_review_gated"))
+            : TEXT("one_or_more_landscape_candidates_failed"),
         *EntriesJson);
-    const FString ManifestPath = FPaths::Combine(CandidateCaptureRoot, TEXT("landscape_candidate_manifest.json"));
+    const FString ManifestFilename = RiverIdFilter.IsEmpty()
+        ? TEXT("landscape_candidate_manifest.json")
+        : FString::Printf(TEXT("landscape_candidate_manifest_%s.json"), *RiverIdFilter);
+    const FString ManifestPath = FPaths::Combine(CandidateCaptureRoot, ManifestFilename);
     const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestPath);
     OutSummary += FString::Printf(
         TEXT("%s source Landscape candidate manifest -> %s\n"),

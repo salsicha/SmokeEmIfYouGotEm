@@ -1,0 +1,38 @@
+{
+  "schema": "raftsim.unreal.chilko_landscape_import.v1",
+  "river_id": "chilko_river_lava_canyon",
+  "status": "source_scale_landscape_candidate_ready_for_isolated_review",
+  "activation": "enabled_for_isolated_editor_candidate_only",
+  "heightfield": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/derived/heightfield_1009.png",
+  "heightfield_size": 1009,
+  "bounds_wgs84": [
+    -124.14208758591647,
+    51.67680505650018,
+    -123.64847959408353,
+    52.02564381349982
+  ],
+  "horizontal_span_cm": {
+    "x": 3390375.7920679324,
+    "y": 3878909.999535428
+  },
+  "target_relief_cm": 70353.515625,
+  "local_centerline": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/centerline_local.json",
+  "source_manifest": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json",
+  "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ChilkoRiver_PhysicalCorridorCandidate",
+  "landscape_nanite_requested": true,
+  "authority": {
+    "visual_terrain_only": true,
+    "changes_solver_state": false,
+    "changes_collision_or_raft_forces": false,
+    "surveyed_bathymetry": false
+  },
+  "promotion_blockers": [
+    "exact put-in and take-out access geometry and permission",
+    "rapid-scale terrain, banks, boulders, and bathymetry",
+    "Bidwell, Lava Canyon, White Mile, Green Mile, and Miracle Canyon stationing",
+    "gauge-window routing and local guide flow review",
+    "Tŝilhqot'in land, stewardship, naming, and publication review",
+    "guide, geospatial, art, rights, hazard-readability, desktop, console, handheld, and VR approval"
+  ],
+  "production_promoted": false
+}

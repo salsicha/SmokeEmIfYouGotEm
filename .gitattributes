@@ -25,9 +25,11 @@ physics/data/real_world/*/terrain/production_import_pilot/*.png filter=lfs diff=
 physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/*.png filter=lfs diff=lfs merge=lfs -text
 physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles/*.png filter=lfs diff=lfs merge=lfs -text
 physics/data/real_world/south_fork_american_chili_bar/terrain/production_import_pilot/*.png filter=lfs diff=lfs merge=lfs -text
+physics/data/real_world/chilko_river_bc/**/*.png filter=lfs diff=lfs merge=lfs -text
 unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/*.png filter=lfs diff=lfs merge=lfs -text
 unreal/Content/RaftSim/Rendering/ProductionDetailTextures/*.png filter=lfs diff=lfs merge=lfs -text
 unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Sources/*.png filter=lfs diff=lfs merge=lfs -text
+unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/*.png filter=lfs diff=lfs merge=lfs -text
 *.uasset filter=lfs diff=lfs merge=lfs -text
 *.umap filter=lfs diff=lfs merge=lfs -text
 *.uexp filter=lfs diff=lfs merge=lfs -text

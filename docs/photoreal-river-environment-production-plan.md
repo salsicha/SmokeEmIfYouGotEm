@@ -254,15 +254,16 @@ Treat Chilko River Lodge to the Chilko-Taseko Junction as a source-first Canadia
 - Land and publication review: consult Tŝilhqot’in National Government title-land, place-name, fisheries, access, stewardship, and publication guidance before exposing detailed access, hazard, cultural, or sensitive-location geometry.
 - Rapid and media review: Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon are provisional guide/media leads only. Attach exact stationing and local review before generating production windows. Keep third-party footage and social media link-only until item-level rights are cleared.
 
-No Chilko corridor, flow band, rapid marker, or lifelike capture is currently approved.
+The first Chilko source-scale technical corridor and isolated Nanite Landscape candidate now exist, but no exact access geometry, gameplay flow band, rapid marker/window, photoreal capture, or lifelike environment is approved.
 
 Initial source slice:
 
 - `physics/data/real_world/chilko_river_bc/source_manifest.json` hash-locks the first official attachment and keeps every production promotion gate closed.
-- The British Columbia Freshwater Atlas response contains 545 named Chilko River features. The review-seed interval selects 160 official source segments totaling 56.160 km, but exact launch/ramp geometry and a single stitched downstream centerline remain blocked.
+- The British Columbia Freshwater Atlas response contains 545 named Chilko River features. The selected 160-segment interval is now deterministically stitched as one zero-gap chain and clipped to a 55.846 km official-vertex review route. Exact launch/ramp geometry and access approval remain blocked.
 - Environment and Climate Change Canada monthly means are attached for `08MA002` and `08MA001`. The former is upstream timing context; the latter is downstream of the Taseko confluence. `hydrology/seasonal_flow_context.json` deliberately emits no gameplay thresholds.
 - NRCan STAC metadata records MRDEM-30 as fallback and rejects two false-positive lidar project envelopes after their actual extent polygons show zero corridor intersections.
-- The August 25, 2025 Sentinel-2 L2A scene is the current cloud-screened imagery candidate. Its attached tile preview is source review evidence only; corridor COG extraction, cloud/shadow masking, orthophoto comparison, and production derivatives remain open.
+- Bounded COG range-reads attach a 30 m NRCan MRDEM-30 DTM plus per-pixel-source clip and 10 m/20 m Sentinel-2 true-color/scene-classification clips. Their manifests record CRS, CGVD2013 vertical datum, resolution, licenses, hashes, source classes, and zero obscured valid imagery pixels. They remain source-scale review evidence, not rapid geometry.
+- The deterministic corridor generator writes bounded visual channel conditioning, a 1009 source-scale heightfield, terrain/material/mask derivatives, an Unreal import contract, and an isolated UE 5.8 candidate. The candidate passes 64/64 Landscape and Nanite material binding with zero Nanite audit errors, but its two captures fail photoreal review for smooth 30 m terrain, weak near-field source albedo, generic sparse PVE vegetation, and water without validated Chilko solver fields. See `chilko_source_scale_landscape_review.json`; all exact-access, rapid, flow, guide, land/publication, art, lifelike, and performance gates stay closed.
 - Tŝilhqot’in fisheries, title-area, place-name, access, and publication sources are link-only. Consultation, permission, sensitive-location review, and exact access approval remain open.
 
 ## Unreal Construction Plan

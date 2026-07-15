@@ -1,0 +1,114 @@
+{
+  "schema": "raftsim.chilko.sentinel2_corridor_clip.v1",
+  "status": "route_window_tci_and_scl_attached_visual_review_gated",
+  "acquired_on": "2026-07-15",
+  "provider": "Copernicus Sentinel-2 via Element 84 Earth Search",
+  "license": "Copernicus Sentinel Data Legal Notice",
+  "attribution": "Contains modified Copernicus Sentinel data (2025)",
+  "scene": {
+    "item_id": "S2C_10UDC_20250825_0_L2A",
+    "datetime_utc": "2025-08-25T19:30:32.137000Z",
+    "platform": "sentinel-2c",
+    "tile": "MGRS-10UDC",
+    "catalog_cloud_cover_percent": 0.000644,
+    "visual_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/10/U/DC/2025/8/S2C_10UDC_20250825_0_L2A/TCI.tif",
+    "scl_url": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/10/U/DC/2025/8/S2C_10UDC_20250825_0_L2A/SCL.tif"
+  },
+  "tci_metadata": {
+    "source_crs": "EPSG:32610",
+    "source_shape": [
+      10980,
+      10980
+    ],
+    "source_band_count": 3,
+    "source_dtype": [
+      "uint8",
+      "uint8",
+      "uint8"
+    ],
+    "source_nodata": 0.0,
+    "source_block_shapes": [
+      [
+        1024,
+        1024
+      ],
+      [
+        1024,
+        1024
+      ],
+      [
+        1024,
+        1024
+      ]
+    ],
+    "target_crs": "EPSG:4326",
+    "target_bounds_wgs84": [
+      -124.14208758591647,
+      51.67680505650018,
+      -123.64847959408353,
+      52.02564381349982
+    ],
+    "target_shape": [
+      3879,
+      3391
+    ],
+    "effective_resolution_m": 10.0
+  },
+  "scl_metadata": {
+    "source_crs": "EPSG:32610",
+    "source_shape": [
+      5490,
+      5490
+    ],
+    "source_band_count": 1,
+    "source_dtype": [
+      "uint8"
+    ],
+    "source_nodata": 0.0,
+    "source_block_shapes": [
+      [
+        512,
+        512
+      ]
+    ],
+    "target_crs": "EPSG:4326",
+    "target_bounds_wgs84": [
+      -124.14208758591647,
+      51.67680505650018,
+      -123.64847959408353,
+      52.02564381349982
+    ],
+    "target_shape": [
+      1940,
+      1696
+    ],
+    "effective_resolution_m": 20.0
+  },
+  "scl_class_pixel_counts": {
+    "2": 12832,
+    "4": 2909993,
+    "5": 328024,
+    "6": 31316,
+    "7": 8075
+  },
+  "obscured_scl_codes": [
+    3,
+    8,
+    9,
+    10,
+    11
+  ],
+  "obscured_fraction_of_valid_clip": 0.0,
+  "outputs": {
+    "true_color": {
+      "path": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_chilko_corridor_tci.png",
+      "sha256": "fd84cfe776002c055a80c03b9929ace25eaaf06ffa12905fbd7d3043ef3c9575"
+    },
+    "scene_classification": {
+      "path": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_chilko_corridor_scl.png",
+      "sha256": "db2b101e8e9806f82d2b8f660aed66094f7c48eeb963985c52e3b6d7178ed5d3"
+    }
+  },
+  "authority": "seasonal surface-color, vegetation, water-extent, cloud and shadow review; not bed, bank, access, rapid, or bathymetry geometry",
+  "production_promoted": false
+}

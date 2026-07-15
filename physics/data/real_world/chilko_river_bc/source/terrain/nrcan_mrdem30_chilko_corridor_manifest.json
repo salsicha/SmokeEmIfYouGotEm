@@ -1,0 +1,99 @@
+{
+  "schema": "raftsim.chilko.mrdem30_corridor_clip.v1",
+  "status": "official_30m_dtm_and_source_clip_attached_review_gated",
+  "acquired_on": "2026-07-15",
+  "provider": "Natural Resources Canada CanElevation",
+  "license": "Open Government Licence - Canada",
+  "product": "MRDEM-30 DTM and MRDEM-30 SOURCE",
+  "source_urls": {
+    "dtm": "https://canelevation-dem.s3.ca-central-1.amazonaws.com/mrdem-30/mrdem-30-dtm.tif",
+    "per_pixel_source": "https://canelevation-dem.s3.ca-central-1.amazonaws.com/mrdem-30/mrdem-30-source.tif",
+    "product_specification": "https://download-telecharger.services.geo.ca/pub/elevation/dem_mne/MRDEM_MNEMR/CanElevation-MRDEM-Product-Specifications.pdf"
+  },
+  "horizontal_source_crs": "EPSG:3979 NAD83(CSRS) Canada Atlas Lambert",
+  "horizontal_clip_crs": "EPSG:4326 WGS 84",
+  "vertical_datum": "CGVD2013 orthometric heights (EPSG:6647)",
+  "metadata": {
+    "source_crs": "EPSG:3979",
+    "source_shape": [
+      166668,
+      185220
+    ],
+    "source_band_count": 1,
+    "source_dtype": [
+      "float32"
+    ],
+    "source_nodata": -32767.0,
+    "source_block_shapes": [
+      [
+        512,
+        512
+      ]
+    ],
+    "target_crs": "EPSG:4326",
+    "target_bounds_wgs84": [
+      -124.14208758591647,
+      51.67680505650018,
+      -123.64847959408353,
+      52.02564381349982
+    ],
+    "target_shape": [
+      1293,
+      1131
+    ],
+    "effective_resolution_m": 30.0
+  },
+  "source_metadata": {
+    "source_crs": "EPSG:3979",
+    "source_shape": [
+      166668,
+      185220
+    ],
+    "source_band_count": 1,
+    "source_dtype": [
+      "uint8"
+    ],
+    "source_nodata": 0.0,
+    "source_block_shapes": [
+      [
+        512,
+        512
+      ]
+    ],
+    "target_crs": "EPSG:4326",
+    "target_bounds_wgs84": [
+      -124.14208758591647,
+      51.67680505650018,
+      -123.64847959408353,
+      52.02564381349982
+    ],
+    "target_shape": [
+      1293,
+      1131
+    ],
+    "effective_resolution_m": 30.0
+  },
+  "elevation_range_m": [
+    805.837158203125,
+    1509.836669921875
+  ],
+  "per_pixel_source_classes": [
+    {
+      "value": 1,
+      "meaning": "adjusted_copernicus_glo_30",
+      "pixel_count": 1462383
+    }
+  ],
+  "outputs": {
+    "dtm": {
+      "path": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_dtm.tif",
+      "sha256": "589f3a58ec158e7b3f09f9b3823328b45e4bbade601a754147983055eed6faeb"
+    },
+    "per_pixel_source": {
+      "path": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_source.tif",
+      "sha256": "6e2997c4400e8ad918f1b6f4cd2e2215031a55e7600a361f7b32aeeefd8da0a4"
+    }
+  },
+  "authority": "official source-scale terrain fallback; not rapid-scale rock, bank, bathymetry, access, or hazard geometry",
+  "production_promoted": false
+}
