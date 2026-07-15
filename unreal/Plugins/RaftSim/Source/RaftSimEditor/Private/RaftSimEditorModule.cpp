@@ -5379,6 +5379,62 @@ bool CreateFutaleufuCordilleraCypressTextureAssets(
     return bAllSaved;
 }
 
+UMaterialExpressionCustom* AddComplementaryScreenDitherOpacity(
+    UMaterial* Material,
+    UMaterialExpression* BaseOpacity,
+    int32 BaseOpacityOutputIndex,
+    bool bKeepSourceSide,
+    float DefaultSourceCoverage,
+    int32 EditorX,
+    int32 EditorY)
+{
+    if (!Material || !BaseOpacity)
+    {
+        return nullptr;
+    }
+    UMaterialExpressionScalarParameter* SourceCoverage =
+        NewObject<UMaterialExpressionScalarParameter>(Material);
+    SourceCoverage->MaterialExpressionEditorX = EditorX - 260;
+    SourceCoverage->MaterialExpressionEditorY = EditorY + 120;
+    SourceCoverage->ParameterName = TEXT("ComplementarySourceCoverage");
+    SourceCoverage->DefaultValue = DefaultSourceCoverage;
+    SourceCoverage->SliderMin = 0.0f;
+    SourceCoverage->SliderMax = 1.0f;
+    Material->GetExpressionCollection().AddExpression(SourceCoverage);
+
+    UMaterialExpressionCustom* DitherMask = NewObject<UMaterialExpressionCustom>(Material);
+    DitherMask->MaterialExpressionEditorX = EditorX;
+    DitherMask->MaterialExpressionEditorY = EditorY;
+    DitherMask->Description = bKeepSourceSide
+        ? TEXT("Keep the source side of a deterministic complementary 4x4 screen dither")
+        : TEXT("Keep the HLOD side of a deterministic complementary 4x4 screen dither");
+    DitherMask->OutputType = CMOT_Float1;
+    DitherMask->Code = bKeepSourceSide
+        ? TEXT("float2 Cell = fmod(floor(Parameters.SvPosition.xy), 4.0);\n")
+          TEXT("float Rank = Cell.y < 0.5 ? (Cell.x < 0.5 ? 0.0 : (Cell.x < 1.5 ? 8.0 : (Cell.x < 2.5 ? 2.0 : 10.0))) :\n")
+          TEXT("             Cell.y < 1.5 ? (Cell.x < 0.5 ? 12.0 : (Cell.x < 1.5 ? 4.0 : (Cell.x < 2.5 ? 14.0 : 6.0))) :\n")
+          TEXT("             Cell.y < 2.5 ? (Cell.x < 0.5 ? 3.0 : (Cell.x < 1.5 ? 11.0 : (Cell.x < 2.5 ? 1.0 : 9.0))) :\n")
+          TEXT("                              (Cell.x < 0.5 ? 15.0 : (Cell.x < 1.5 ? 7.0 : (Cell.x < 2.5 ? 13.0 : 5.0)));\n")
+          TEXT("float Keep = Rank < saturate(SourceCoverage) * 16.0 ? 1.0 : 0.0;\n")
+          TEXT("return BaseOpacity * Keep;")
+        : TEXT("float2 Cell = fmod(floor(Parameters.SvPosition.xy), 4.0);\n")
+          TEXT("float Rank = Cell.y < 0.5 ? (Cell.x < 0.5 ? 0.0 : (Cell.x < 1.5 ? 8.0 : (Cell.x < 2.5 ? 2.0 : 10.0))) :\n")
+          TEXT("             Cell.y < 1.5 ? (Cell.x < 0.5 ? 12.0 : (Cell.x < 1.5 ? 4.0 : (Cell.x < 2.5 ? 14.0 : 6.0))) :\n")
+          TEXT("             Cell.y < 2.5 ? (Cell.x < 0.5 ? 3.0 : (Cell.x < 1.5 ? 11.0 : (Cell.x < 2.5 ? 1.0 : 9.0))) :\n")
+          TEXT("                              (Cell.x < 0.5 ? 15.0 : (Cell.x < 1.5 ? 7.0 : (Cell.x < 2.5 ? 13.0 : 5.0)));\n")
+          TEXT("float Keep = Rank >= saturate(SourceCoverage) * 16.0 ? 1.0 : 0.0;\n")
+          TEXT("return BaseOpacity * Keep;");
+    FCustomInput& BaseOpacityInput = DitherMask->Inputs.AddDefaulted_GetRef();
+    BaseOpacityInput.InputName = TEXT("BaseOpacity");
+    BaseOpacityInput.Input.Expression = BaseOpacity;
+    BaseOpacityInput.Input.OutputIndex = BaseOpacityOutputIndex;
+    FCustomInput& CoverageInput = DitherMask->Inputs.AddDefaulted_GetRef();
+    CoverageInput.InputName = TEXT("SourceCoverage");
+    CoverageInput.Input.Expression = SourceCoverage;
+    Material->GetExpressionCollection().AddExpression(DitherMask);
+    return DitherMask;
+}
+
 UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     const FString& AssetName,
     bool bLeafMaterial,
@@ -5386,7 +5442,8 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     FString& OutSummary,
     bool bDefaultLitLeafDiagnostic = false,
     const FString& LeafTextureKeyPrefix = FString(),
-    bool bFreezeWindForDeterministicReview = false)
+    bool bFreezeWindForDeterministicReview = false,
+    bool bEnableComplementaryTransition = false)
 {
     const FString PackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/%s"),
@@ -5451,12 +5508,14 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
         bLeafMaterial && !bDefaultLitLeafDiagnostic
             ? MSM_TwoSidedFoliage
             : MSM_DefaultLit);
-    Material->BlendMode = bLeafMaterial ? BLEND_Masked : BLEND_Opaque;
+    Material->BlendMode = bLeafMaterial || bEnableComplementaryTransition
+        ? BLEND_Masked
+        : BLEND_Opaque;
     Material->TwoSided = bLeafMaterial;
     Material->OpacityMaskClipValue = bNearCordilleraCypress
         ? 0.42f
         : (bLeafMaterial ? 0.50f : 0.3333f);
-    Material->DitheredLODTransition = bLeafMaterial;
+    Material->DitheredLODTransition = bLeafMaterial || bEnableComplementaryTransition;
 
     auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
     {
@@ -5560,7 +5619,19 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
         DiagnosticOpacity->A.Expression = ScaledOpacity;
         DiagnosticOpacity->B.Expression = FullOpacity;
         DiagnosticOpacity->Alpha.Expression = OpacityOverride;
-        ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, DiagnosticOpacity);
+        UMaterialExpression* FinalOpacity = DiagnosticOpacity;
+        if (bEnableComplementaryTransition)
+        {
+            FinalOpacity = AddComplementaryScreenDitherOpacity(
+                Material,
+                DiagnosticOpacity,
+                0,
+                true,
+                1.0f,
+                620,
+                -480);
+        }
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, FinalOpacity);
 
         UMaterialExpressionScalarParameter* NormalStrength =
             AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -120, 60);
@@ -5665,6 +5736,22 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     else
     {
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, NormalSample);
+        if (bEnableComplementaryTransition)
+        {
+            UMaterialExpressionConstant* FullOpacity =
+                AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -460);
+            FullOpacity->R = 1.0f;
+            UMaterialExpressionCustom* TransitionOpacity =
+                AddComplementaryScreenDitherOpacity(
+                    Material,
+                    FullOpacity,
+                    0,
+                    true,
+                    1.0f,
+                    360,
+                    -460);
+            ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, TransitionOpacity);
+        }
     }
 
     Material->PostEditChange();
@@ -5729,7 +5816,9 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
             ? (bDefaultLitLeafDiagnostic
                    ? TEXT("masked DefaultLit diagnostic")
                    : TEXT("masked TwoSidedFoliage"))
-            : TEXT("opaque DefaultLit bark"),
+            : (bEnableComplementaryTransition
+                   ? TEXT("masked complementary-transition DefaultLit bark")
+                   : TEXT("opaque DefaultLit bark")),
         *ObjectPath);
     return Material;
 }
@@ -29993,10 +30082,14 @@ bool CreateFutaleufuCypressPvePalette(
     const bool bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass =
         PaletteMode == TEXT(
             "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+    const bool bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass =
+        PaletteMode == TEXT(
+            "frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMass =
         PaletteMode == TEXT(
             "frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
-        bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass;
+        bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass ||
+        bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass;
     const bool bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMass =
         PaletteMode == TEXT(
             "frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
@@ -30089,9 +30182,11 @@ bool CreateFutaleufuCypressPvePalette(
     const FString LiveMaterialName = bFrozenWpoHlodCalibratedIrregularCrownMass
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMass
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMass
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
-                    ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V31_FrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
-                    : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V30_FrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass
+                    ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V32_FrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
+                        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V31_FrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
+                        : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V30_FrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")))
                 : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V29_FrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
             ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V28_FrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
@@ -30110,12 +30205,21 @@ bool CreateFutaleufuCypressPvePalette(
             : (bAuthoredScaleLeafHierarchy
             ? TEXT("Scale")
             : (bTwigHierarchy ? TEXT("Twig") : TEXT("Near"))),
-        bFrozenWpoHlodCalibratedIrregularCrownMass);
+        bFrozenWpoHlodCalibratedIrregularCrownMass,
+        bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass);
+    const FString BarkMaterialName =
+        bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass
+        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V32_ComplementaryTransitionBark")
+        : TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark");
     UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
-        TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark"),
+        BarkMaterialName,
         false,
         Textures,
-        OutSummary);
+        OutSummary,
+        false,
+        FString(),
+        false,
+        bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass);
     if (!LiveMaterial || !BarkMaterial)
     {
         return false;
@@ -30177,11 +30281,14 @@ bool CreateFutaleufuCypressPvePalette(
     const FString PaletteRoot = bFrozenWpoHlodCalibratedIrregularCrownMass
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMass
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMass
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass
                     ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                           "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
-                    : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                           "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/"))
+                           "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
+                        ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                               "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+                        : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                               "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")))
                 : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                        "PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
@@ -30745,9 +30852,11 @@ bool CreateFutaleufuCypressPvePalette(
         const FString PaletteAssetToken = bFrozenWpoHlodCalibratedIrregularCrownMass
             ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMass
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMass
-                    ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
-                        ? TEXT("V31_FrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
-                        : TEXT("V30_FrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve"))
+                    ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMass
+                        ? TEXT("V32_FrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+                        : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMass
+                            ? TEXT("V31_FrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+                            : TEXT("V30_FrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")))
                     : TEXT("V29_FrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve"))
                 : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
                 ? TEXT("V28_FrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
@@ -31318,6 +31427,7 @@ struct FRaftSimPveMultiViewAtlasBakeResult
     float PerspectiveHorizontalFovDegrees = 0.0f;
     bool bDepthParallaxEnabled = false;
     float DepthParallaxScaleCm = 0.0f;
+    bool bComplementaryTransitionEnabled = false;
     int32 ProxyVertexCount = 0;
     int32 ProxyTriangleCount = 0;
     float MinimumCoverage = 1.0f;
@@ -31554,6 +31664,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     float AtlasAzimuthOffsetDegrees,
     bool bUseDepthParallax,
     float DepthParallaxScaleCm,
+    bool bEnableComplementaryTransition,
     FString& OutSummary)
 {
     if (!BaseColorTexture || !NormalTexture || !OpacityTexture || !DepthTexture)
@@ -31737,7 +31848,19 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     {
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, BaseColorSample);
     }
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, OpacitySample);
+    UMaterialExpression* FinalOpacity = OpacitySample;
+    if (bEnableComplementaryTransition)
+    {
+        FinalOpacity = AddComplementaryScreenDitherOpacity(
+            Material,
+            OpacitySample,
+            0,
+            false,
+            0.0f,
+            -120,
+            -300);
+    }
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, FinalOpacity);
     ConnectPreviewMaterialVectorInput(EditorOnlyData->WorldPositionOffset, BillboardOffset);
 
     Material->PostEditChange();
@@ -31813,6 +31936,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     bool bUsePerspectiveCapture,
     float RequestedPerspectiveCaptureRadiusCm,
     bool bUseDepthParallax,
+    bool bEnableComplementaryTransition,
     int32 RequestedTileResolution,
     FRaftSimPveMultiViewAtlasBakeResult& OutResult,
     FString& OutSummary)
@@ -31885,6 +32009,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     OutResult.PerspectiveHorizontalFovDegrees = PerspectiveHorizontalFovDegrees;
     OutResult.bDepthParallaxEnabled = bUseDepthParallax;
     OutResult.DepthParallaxScaleCm = DepthParallaxScaleCm;
+    OutResult.bComplementaryTransitionEnabled = bEnableComplementaryTransition;
 
     FAssetCompilingManager::Get().FinishAllCompilation();
     if (GShaderCompilingManager)
@@ -32269,6 +32394,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         AzimuthOffsetDegrees,
         bUseDepthParallax,
         DepthParallaxScaleCm,
+        bEnableComplementaryTransition,
         OutSummary);
     OutResult.bMaterialSaved = OutResult.Material != nullptr;
     UStaticMesh* ProxyMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
@@ -32381,7 +32507,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("    \"depth\": {\"path\": \"%s\", \"md5\": \"%s\"}\n")
         TEXT("  },\n")
         TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material\": \"%s\"},\n")
-        TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s},\n")
+        TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s, \"complementary_screen_dither_enabled\": %s, \"complementary_source_coverage_parameter\": \"ComplementarySourceCoverage\"},\n")
         TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
@@ -32438,7 +32564,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         bUseDepthParallax ? TEXT(", \"depth\"") : TEXT(""),
         bUseDepthParallax ? TEXT("\"world_normal\"") : TEXT("\"world_normal\", \"depth\""),
         TEXT("false"),
-        bUseDepthParallax ? TEXT("false") : TEXT("true"));
+        bUseDepthParallax ? TEXT("false") : TEXT("true"),
+        bEnableComplementaryTransition ? TEXT("true") : TEXT("false"));
     const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestAbsolutePath);
     if (!bManifestSaved)
     {
@@ -32495,12 +32622,14 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT(
             "frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") &&
         PaletteMode != TEXT(
-            "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
+            "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") &&
+        PaletteMode != TEXT(
+            "frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, or frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, or frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
             *PaletteMode);
         return;
     }
@@ -32529,7 +32658,9 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode == TEXT(
             "frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
         PaletteMode == TEXT(
-            "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+        PaletteMode == TEXT(
+            "frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bAsyncSecondaryCrown =
         PaletteMode == TEXT("async_secondary_compound_branchlet_atlas") ||
         bIrregularCrownMass;
@@ -33253,11 +33384,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT(
             "frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+    const bool bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT(
+            "frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT(
              "frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
-         bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette);
+         bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette ||
+         bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette);
     const bool bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT(
@@ -33380,9 +33516,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
-                    : TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                        : TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")))
                 : TEXT("PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
@@ -33429,9 +33567,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
-                    : TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                        : TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")))
                 : TEXT("FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("FutaleufuCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
@@ -33482,9 +33622,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
-                    : TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                        : TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")))
                 : TEXT("FutaleufuPveCordilleraCypressFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
@@ -34183,6 +34325,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     bool bLocalMultiViewAtlasReviewCaptured = false;
     bool bLocalHandoffReviewCaptured =
         !bHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalComplementaryTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
@@ -34217,8 +34361,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("20m"), TEXT("28m"), TEXT("36m")};
     static const TCHAR* HandoffAuthorityTokens[] = {
         TEXT("source_only"), TEXT("hlod_only"), TEXT("combined")};
+    static const TCHAR* ComplementaryTransitionDistanceTokens[] = {
+        TEXT("24m"), TEXT("25m"), TEXT("26m")};
+    static const float ComplementaryTransitionRadiiCm[] = {
+        2400.0f, 2500.0f, 2600.0f};
+    static const float ComplementaryTransitionSourceCoverage[] = {
+        0.75f, 0.50f, 0.25f};
     TArray<FString> LocalHandoffCapturePaths;
     FString LocalHandoffCapturesJson;
+    TArray<FString> LocalComplementaryTransitionCapturePaths;
+    FString LocalComplementaryTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -34234,6 +34386,27 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 LocalHandoffCapturesJson += FString::Printf(
                     TEXT("%s\"%s\""),
                     LocalHandoffCapturesJson.IsEmpty() ? TEXT("") : TEXT(", "),
+                    *EscapeRaftSimJsonString(CapturePath));
+            }
+        }
+    }
+    if (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette)
+    {
+        for (const TCHAR* DistanceToken : ComplementaryTransitionDistanceTokens)
+        {
+            for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+            {
+                const FString CapturePath = FString::Printf(
+                    TEXT("%s_transition_%s_%s.png"),
+                    *LocalVisualCaptureBase,
+                    DistanceToken,
+                    AuthorityToken);
+                LocalComplementaryTransitionCapturePaths.Add(CapturePath);
+                LocalComplementaryTransitionCapturesJson += FString::Printf(
+                    TEXT("%s\"%s\""),
+                    LocalComplementaryTransitionCapturesJson.IsEmpty()
+                        ? TEXT("")
+                        : TEXT(", "),
                     *EscapeRaftSimJsonString(CapturePath));
             }
         }
@@ -34482,6 +34655,26 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                             CameraHeight),
                         50.0f);
                 }
+                if (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette)
+                {
+                    for (int32 TransitionIndex = 0; TransitionIndex < 3; ++TransitionIndex)
+                    {
+                        const float RadialDistanceCm =
+                            ComplementaryTransitionRadiiCm[TransitionIndex];
+                        const float AxialDistanceCm = FMath::Sqrt(
+                            FMath::Square(RadialDistanceCm) - FMath::Square(800.0f));
+                        const FString CameraLabel = FString::Printf(
+                            TEXT("RaftSim_PveTransition_%s"),
+                            ComplementaryTransitionDistanceTokens[TransitionIndex]);
+                        bHandoffCamerasComplete &= AddReviewCamera(
+                            *CameraLabel,
+                            FVector(
+                                Target.X - AxialDistanceCm,
+                                Target.Y - 800.0f,
+                                CameraHeight),
+                            50.0f);
+                    }
+                }
             }
             const FVector SprayCameraTarget = SprayReviewLocation + FVector(70.0f, 0.0f, 0.0f);
             ACameraActor* SprayCamera = ReviewWorld->SpawnActor<ACameraActor>(
@@ -34518,6 +34711,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? 2912.0439f
                         : 0.0f,
                     bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette,
+                    bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette,
                     bHighDetailHlodCalibratedIrregularCrownMassCypressPalette ||
                         bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
                         ? 1024
@@ -34847,13 +35041,158 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     }
                     bLocalHandoffReviewCaptured = bAllHandoffsCaptured;
                 }
+                if (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette)
+                {
+                    bool bAllTransitionCapturesProduced = true;
+                    for (int32 DistanceIndex = 0; DistanceIndex < 3; ++DistanceIndex)
+                    {
+                        for (int32 AuthorityIndex = 0; AuthorityIndex < 3; ++AuthorityIndex)
+                        {
+                            const FString AuthorityMode =
+                                HandoffAuthorityTokens[AuthorityIndex];
+                            const float ExpectedSourceCoverage =
+                                ComplementaryTransitionSourceCoverage[DistanceIndex];
+                            const FString CameraLabel = FString::Printf(
+                                TEXT("RaftSim_PveTransition_%s"),
+                                ComplementaryTransitionDistanceTokens[DistanceIndex]);
+                            const FString CaptureId = FString::Printf(
+                                TEXT("transition_%s_%s"),
+                                ComplementaryTransitionDistanceTokens[DistanceIndex],
+                                HandoffAuthorityTokens[AuthorityIndex]);
+                            const FString Description = FString::Printf(
+                                TEXT("V32 exact radial %s complementary transition mode %s at %.2f source coverage"),
+                                ComplementaryTransitionDistanceTokens[DistanceIndex],
+                                *AuthorityMode,
+                                ExpectedSourceCoverage);
+                            bAllTransitionCapturesProduced &= CapturePreviewImageForSpec(
+                                ReviewSpec,
+                                LocalCaptureRoot,
+                                LocalComplementaryTransitionCapturePaths[
+                                    DistanceIndex * 3 + AuthorityIndex],
+                                CameraLabel,
+                                CaptureId,
+                                Description,
+                                false,
+                                LocalVisualSummary,
+                                [AuthorityMode, ExpectedSourceCoverage](
+                                    UWorld* LoadedWorld,
+                                    ACameraActor* CaptureCamera,
+                                    FString& SetupSummary)
+                                {
+                                    AActor* SourceTrunkActor = nullptr;
+                                    AActor* SourceFoliageActor = nullptr;
+                                    AActor* LoadedAtlasActor = nullptr;
+                                    for (TActorIterator<AActor> It(LoadedWorld); It; ++It)
+                                    {
+                                        AActor* Actor = *It;
+                                        if (!Actor)
+                                        {
+                                            continue;
+                                        }
+                                        const FString Label = Actor->GetActorLabel();
+                                        if (Label == TEXT("RaftSim_PveReview_Trunk"))
+                                        {
+                                            SourceTrunkActor = Actor;
+                                        }
+                                        else if (Label == TEXT("RaftSim_PveReview_Foliage"))
+                                        {
+                                            SourceFoliageActor = Actor;
+                                        }
+                                        else if (Label ==
+                                                 TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+                                        {
+                                            LoadedAtlasActor = Actor;
+                                        }
+                                        else if (
+                                            Label ==
+                                                TEXT("RaftSim_PveCypressVolumetricFarProxy") ||
+                                            Label ==
+                                                TEXT("RaftSim_PveCypressNaniteWholeTree"))
+                                        {
+                                            Actor->SetActorHiddenInGame(true);
+                                        }
+                                    }
+                                    if (!SourceTrunkActor || !SourceFoliageActor ||
+                                        !LoadedAtlasActor || !CaptureCamera)
+                                    {
+                                        SetupSummary += TEXT(
+                                            "Complementary transition setup could not resolve source, HLOD, and camera actors.\n");
+                                        return false;
+                                    }
+                                    const bool bSourceOnly =
+                                        AuthorityMode == TEXT("source_only");
+                                    const bool bHlodOnly =
+                                        AuthorityMode == TEXT("hlod_only");
+                                    const bool bCombined =
+                                        AuthorityMode == TEXT("combined");
+                                    const bool bShowSource = bSourceOnly || bCombined;
+                                    const bool bShowHlod = bHlodOnly || bCombined;
+                                    const float SourceCoverage = bSourceOnly
+                                        ? 1.0f
+                                        : (bHlodOnly ? 0.0f : ExpectedSourceCoverage);
+                                    auto SetCoverage = [SourceCoverage](AActor* Actor)
+                                    {
+                                        TInlineComponentArray<UMeshComponent*> MeshComponents;
+                                        Actor->GetComponents(MeshComponents);
+                                        bool bUpdated = false;
+                                        for (UMeshComponent* Component : MeshComponents)
+                                        {
+                                            if (!Component)
+                                            {
+                                                continue;
+                                            }
+                                            for (int32 MaterialIndex = 0;
+                                                 MaterialIndex < Component->GetNumMaterials();
+                                                 ++MaterialIndex)
+                                            {
+                                                UMaterialInstanceDynamic* DynamicMaterial =
+                                                    Component->CreateDynamicMaterialInstance(
+                                                        MaterialIndex);
+                                                if (DynamicMaterial)
+                                                {
+                                                    DynamicMaterial->SetScalarParameterValue(
+                                                        TEXT("ComplementarySourceCoverage"),
+                                                        SourceCoverage);
+                                                    bUpdated = true;
+                                                }
+                                            }
+                                        }
+                                        return bUpdated;
+                                    };
+                                    const bool bSourceMaterialsUpdated =
+                                        SetCoverage(SourceTrunkActor) &&
+                                        SetCoverage(SourceFoliageActor);
+                                    const bool bHlodMaterialUpdated =
+                                        SetCoverage(LoadedAtlasActor);
+                                    SourceTrunkActor->SetActorHiddenInGame(!bShowSource);
+                                    SourceFoliageActor->SetActorHiddenInGame(!bShowSource);
+                                    LoadedAtlasActor->SetActorHiddenInGame(!bShowHlod);
+                                    const float HorizontalDistanceCm = FVector::Dist2D(
+                                        CaptureCamera->GetActorLocation(),
+                                        LoadedAtlasActor->GetActorLocation());
+                                    SetupSummary += FString::Printf(
+                                        TEXT("V32 transition %s at %.3f m radial distance sets source coverage %.2f and visibility source=%s HLOD=%s.\n"),
+                                        *AuthorityMode,
+                                        HorizontalDistanceCm / 100.0f,
+                                        SourceCoverage,
+                                        bShowSource ? TEXT("true") : TEXT("false"),
+                                        bShowHlod ? TEXT("true") : TEXT("false"));
+                                    return bSourceMaterialsUpdated && bHlodMaterialUpdated &&
+                                        (bSourceOnly || bHlodOnly || bCombined);
+                                });
+                        }
+                    }
+                    bLocalComplementaryTransitionReviewCaptured =
+                        bAllTransitionCapturesProduced;
+                }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
                 bLocalMultiViewAtlasReviewCaptured = bCaptureMultiViewAtlas;
                 bLocalVisualReviewCaptured =
                     bCaptureA && bCaptureB && bCaptureDistance && bCaptureSpray &&
                     bCaptureFarProxy && bCaptureNaniteWholeTree &&
-                    bCaptureMultiViewAtlas && bLocalHandoffReviewCaptured;
+                    bCaptureMultiViewAtlas && bLocalHandoffReviewCaptured &&
+                    bLocalComplementaryTransitionReviewCaptured;
             }
         }
     }
@@ -34887,9 +35226,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
-                    : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures at exact radial 24/25/26 m cameras; matched transition comparison and any art decision remain pending")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
+                        : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
                 : TEXT("V29 frozen-WPO 512-pixel atlas completed with a 16-degree frame phase aligned to the authored handoff approach; matched angular-registration comparison and any art decision remain pending"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("V28 frozen-WPO 1024-pixel-per-view deterministic atlas completed under the V27 validation contract; matched resolution comparison and any art decision remain pending")
@@ -34914,6 +35255,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"source_wpo_contract\": {\"frozen_for_deterministic_review\": %s, \"WindIntensity\": %.2f, \"WindWeight\": %.2f, \"WindSpeed\": %.2f},\n")
         TEXT("    \"deterministic_capture_contract\": {\"enabled\": %s, \"validation_only_not_art_review\": true, \"lighting\": false, \"post_processing\": false, \"atmosphere\": false, \"fog\": false, \"anti_aliasing\": false, \"temporal_aa\": false, \"motion_blur\": false, \"eye_adaptation\": false, \"ambient_occlusion\": false, \"global_illumination\": false, \"lumen_gi\": false, \"lumen_reflections\": false, \"screen_space_reflections\": false, \"reflection_environment\": false},\n")
         TEXT("    \"handoff_contract\": {\"enabled\": %s, \"distance_metric\": \"camera_to_hlod_actor_horizontal_distance\", \"source_selection_distance_cm\": 2500.0, \"source_authority_below_threshold\": true, \"single_representation_by_actor_visibility\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"complementary_transition_contract\": {\"enabled\": %s, \"pattern\": \"deterministic_4x4_screen_bayer\", \"parameter\": \"ComplementarySourceCoverage\", \"radial_band_cm\": [2300.0, 2700.0], \"sample_radii_cm\": [2400.0, 2500.0, 2600.0], \"source_coverage\": [0.75, 0.50, 0.25], \"source_and_hlod_visibility_overlap_inside_band\": true, \"pixel_ownership_complementary\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -34948,6 +35290,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.MaterialAssetPath),
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("camera-facing 32x32 tessellated grid with nearest-frame selection, inverse-opacity silhouette, bounded source-lit color gain, and depth-atlas vertex displacement; world normal retained but not sampled")
+            : LocalMultiViewAtlas.bComplementaryTransitionEnabled
+            ? TEXT("camera-facing flat registered-perspective proxy with nearest-frame selection, inverse-opacity silhouette, bounded source-lit color gain, and deterministic complementary 4x4 source/HLOD transition masking; world normal and depth retained but not sampled")
             : bDenseBotanicalFlattenedSprayCypressHierarchyPalette
             ? TEXT("camera-facing plane with nearest-frame selection, inverse-opacity silhouette, and bounded source-lit color gain; world normal and depth retained but not sampled")
             : TEXT("camera-facing plane with material-selected nearest azimuth/elevation frame and masked unlit baked color; world normal/depth retained for later relight/parallax work"),
@@ -34968,6 +35312,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bHlodCalibratedIrregularCrownMassCypressPalette ? TEXT("true") : TEXT("false"),
         LocalHandoffCapturePaths.Num(),
         *LocalHandoffCapturesJson,
+        LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
+        LocalComplementaryTransitionCapturePaths.Num(),
+        *LocalComplementaryTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -34982,6 +35329,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"captures\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
         TEXT("    \"handoff_capture_count\": %d,\n")
         TEXT("    \"handoff_captures\": [%s],\n")
+        TEXT("    \"complementary_transition_capture_count\": %d,\n")
+        TEXT("    \"complementary_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -35001,6 +35350,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *EscapeRaftSimJsonString(LocalMultiViewAtlasCapturePath),
         LocalHandoffCapturePaths.Num(),
         *LocalHandoffCapturesJson,
+        LocalComplementaryTransitionCapturePaths.Num(),
+        *LocalComplementaryTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
@@ -35045,9 +35396,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("_frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
-                    : TEXT("_frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("_frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("_frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                        : TEXT("_frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")))
                 : TEXT("_frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("_frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
@@ -35091,9 +35444,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("v31")
-                    : TEXT("v30"))
+                ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                    ? TEXT("v32")
+                    : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                        ? TEXT("v31")
+                        : TEXT("v30")))
                 : TEXT("v29"))
             : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
             ? TEXT("v28")
@@ -35299,9 +35654,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
                   ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
                       ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
-                          ? (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
-                              ? TEXT("ue_5_8_pve_cordillera_cypress_v31_frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
-                              : TEXT("ue_5_8_pve_cordillera_cypress_v30_frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
+                          ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                              ? TEXT("ue_5_8_pve_cordillera_cypress_v32_frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                              : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
+                                  ? TEXT("ue_5_8_pve_cordillera_cypress_v31_frozen_wpo_azimuth_registered_perspective_depth_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                                  : TEXT("ue_5_8_pve_cordillera_cypress_v30_frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")))
                           : TEXT("ue_5_8_pve_cordillera_cypress_v29_frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
                       : (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
                       ? TEXT("ue_5_8_pve_cordillera_cypress_v28_frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
