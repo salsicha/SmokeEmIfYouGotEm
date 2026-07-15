@@ -20618,6 +20618,106 @@ bool SetFutaleufuHlodSplitShadingOverrides(
     return bUpdated;
 }
 
+bool SetFutaleufuHlodProxyLayerMode(
+    UWorld* World,
+    bool bUseDualLayer,
+    FString& OutSummary)
+{
+    AActor* HlodActor = nullptr;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            HlodActor = *It;
+            break;
+        }
+    }
+    if (!HlodActor)
+    {
+        OutSummary += TEXT("V40 dual-layer review could not resolve the HLOD actor.\n");
+        return false;
+    }
+
+    int32 CombinedLayerCount = 0;
+    int32 TrunkLayerCount = 0;
+    int32 FoliageLayerCount = 0;
+    TInlineComponentArray<UMeshComponent*> MeshComponents;
+    HlodActor->GetComponents(MeshComponents);
+    for (UMeshComponent* Component : MeshComponents)
+    {
+        if (!Component)
+        {
+            continue;
+        }
+        if (Component->ComponentHasTag(TEXT("RaftSimHlodCombinedLayer")))
+        {
+            Component->SetVisibility(!bUseDualLayer, true);
+            ++CombinedLayerCount;
+        }
+        else if (Component->ComponentHasTag(TEXT("RaftSimHlodTrunkLayer")))
+        {
+            Component->SetVisibility(bUseDualLayer, true);
+            ++TrunkLayerCount;
+        }
+        else if (Component->ComponentHasTag(TEXT("RaftSimHlodFoliageLayer")))
+        {
+            Component->SetVisibility(bUseDualLayer, true);
+            ++FoliageLayerCount;
+        }
+    }
+    return CombinedLayerCount == 1 && TrunkLayerCount == 1 &&
+        FoliageLayerCount == 1;
+}
+
+bool SetFutaleufuHlodFoliageTransmissionTint(
+    UWorld* World,
+    const FLinearColor& TransmissionTint,
+    FString& OutSummary)
+{
+    AActor* HlodActor = nullptr;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            HlodActor = *It;
+            break;
+        }
+    }
+    if (!HlodActor)
+    {
+        OutSummary += TEXT(
+            "V40 dual-layer review could not resolve the foliage HLOD actor.\n");
+        return false;
+    }
+
+    TInlineComponentArray<UMeshComponent*> MeshComponents;
+    HlodActor->GetComponents(MeshComponents);
+    for (UMeshComponent* Component : MeshComponents)
+    {
+        if (!Component ||
+            !Component->ComponentHasTag(TEXT("RaftSimHlodFoliageLayer")))
+        {
+            continue;
+        }
+        UMaterialInstanceDynamic* DynamicMaterial =
+            Cast<UMaterialInstanceDynamic>(Component->GetMaterial(0));
+        if (!DynamicMaterial)
+        {
+            DynamicMaterial = Component->CreateDynamicMaterialInstance(0);
+        }
+        if (DynamicMaterial)
+        {
+            DynamicMaterial->SetVectorParameterValue(
+                TEXT("AtlasFoliageTransmissionTint"),
+                TransmissionTint);
+            return true;
+        }
+    }
+    OutSummary += TEXT(
+        "V40 dual-layer review could not update the foliage transmission material.\n");
+    return false;
+}
+
 bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FString& RelativeCaptureBase,
@@ -20637,7 +20737,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     float TransitionMode = 0.0f,
     bool bHlodFrameSearch = false,
     int32* OutAutomaticHlodFrame = nullptr,
-    bool bHlodSplitShadingSearch = false)
+    bool bHlodSplitShadingSearch = false,
+    bool bHlodDualLayerReview = false)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -21069,6 +21170,168 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             "V39 HLOD split-shading search saved one source reference and nine temporally independent exact material-identity gain presets at 24.5 m.\n");
         return bAllSearchFramesSaved &&
             OutRelativeCapturePaths.Num() - InitialCapturePathCount == 10;
+    }
+
+    if (bHlodDualLayerReview)
+    {
+        constexpr float SearchRadiusCm = 2450.0f;
+        constexpr float TrunkRoughness = 0.62f;
+        constexpr float FoliageRoughness = 0.72f;
+        constexpr float TrunkSpecular = 0.12f;
+        constexpr float FoliageSpecular = 0.18f;
+        const FLinearColor SourceTransmissionTint(0.78f, 1.0f, 0.58f, 1.0f);
+        bool bAllFramesSaved = true;
+        SetCameraState(SearchRadiusCm);
+        bAllFramesSaved &= SetFutaleufuHlodAtlasFrameOverride(
+            World,
+            -1.0f,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodProxyLayerMode(
+            World,
+            false,
+            OutSummary);
+        bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+            World,
+            ReferenceCamera,
+            TEXT("source_only"),
+            1.0f,
+            OutSummary,
+            static_cast<float>(PatternSize),
+            TransitionMode);
+        SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString SourcePath = FString::Printf(
+            TEXT("%s_hlod_dual_layer_source_reference.png"),
+            *RelativeCaptureBase);
+        const bool bSourceSaved = SaveCurrentFrame(SourcePath);
+        bAllFramesSaved &= bSourceSaved;
+        if (bSourceSaved)
+        {
+            OutRelativeCapturePaths.Add(SourcePath);
+        }
+
+        bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+            World,
+            ReferenceCamera,
+            TEXT("hlod_only"),
+            0.0f,
+            OutSummary,
+            static_cast<float>(PatternSize),
+            TransitionMode);
+        SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString CombinedPath = FString::Printf(
+            TEXT("%s_hlod_dual_layer_combined_default_lit_control.png"),
+            *RelativeCaptureBase);
+        const bool bCombinedSaved = SaveCurrentFrame(CombinedPath);
+        bAllFramesSaved &= bCombinedSaved;
+        if (bCombinedSaved)
+        {
+            OutRelativeCapturePaths.Add(CombinedPath);
+        }
+
+        bAllFramesSaved &= SetFutaleufuHlodProxyLayerMode(
+            World,
+            true,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodSplitShadingOverrides(
+            World,
+            1.0f,
+            1.0f,
+            TrunkRoughness,
+            FoliageRoughness,
+            TrunkSpecular,
+            FoliageSpecular,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodFoliageTransmissionTint(
+            World,
+            FLinearColor::Black,
+            OutSummary);
+        SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString NoTransmissionPath = FString::Printf(
+            TEXT("%s_hlod_dual_layer_two_sided_no_transmission.png"),
+            *RelativeCaptureBase);
+        const bool bNoTransmissionSaved = SaveCurrentFrame(NoTransmissionPath);
+        bAllFramesSaved &= bNoTransmissionSaved;
+        if (bNoTransmissionSaved)
+        {
+            OutRelativeCapturePaths.Add(NoTransmissionPath);
+        }
+
+        bAllFramesSaved &= SetFutaleufuHlodFoliageTransmissionTint(
+            World,
+            SourceTransmissionTint,
+            OutSummary);
+        SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString SourceTransmissionPath = FString::Printf(
+            TEXT("%s_hlod_dual_layer_two_sided_source_transmission.png"),
+            *RelativeCaptureBase);
+        const bool bSourceTransmissionSaved = SaveCurrentFrame(SourceTransmissionPath);
+        bAllFramesSaved &= bSourceTransmissionSaved;
+        if (bSourceTransmissionSaved)
+        {
+            OutRelativeCapturePaths.Add(SourceTransmissionPath);
+        }
+
+        bAllFramesSaved &= SetFutaleufuHlodSplitShadingOverrides(
+            World,
+            1.0f,
+            1.5f,
+            TrunkRoughness,
+            FoliageRoughness,
+            TrunkSpecular,
+            FoliageSpecular,
+            OutSummary);
+        SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString SourceTransmissionGainPath = FString::Printf(
+            TEXT("%s_hlod_dual_layer_two_sided_source_transmission_foliage_gain_150.png"),
+            *RelativeCaptureBase);
+        const bool bSourceTransmissionGainSaved =
+            SaveCurrentFrame(SourceTransmissionGainPath);
+        bAllFramesSaved &= bSourceTransmissionGainSaved;
+        if (bSourceTransmissionGainSaved)
+        {
+            OutRelativeCapturePaths.Add(SourceTransmissionGainPath);
+        }
+
+        bAllFramesSaved &= SetFutaleufuHlodSplitShadingOverrides(
+            World,
+            1.0f,
+            1.0f,
+            TrunkRoughness,
+            FoliageRoughness,
+            TrunkSpecular,
+            FoliageSpecular,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodProxyLayerMode(
+            World,
+            false,
+            OutSummary);
+        RestoreAntiAliasingMethod();
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        OutSummary += TEXT(
+            "V40 HLOD dual-layer review saved one source, one combined control, and three temporally independent bark/foliage layer captures at 24.5 m.\n");
+        return bAllFramesSaved &&
+            OutRelativeCapturePaths.Num() - InitialCapturePathCount == 5;
     }
 
     bool bAllFramesSaved = true;
@@ -32271,12 +32534,21 @@ bool ConfigureFutaleufuCypressPveGrower(
     return bConfigured;
 }
 
+enum class EPveAtlasMaterialLayer : uint8
+{
+    Combined,
+    Trunk,
+    Foliage,
+};
+
 struct FRaftSimPveMultiViewAtlasBakeResult
 {
     bool bAtlasFilesSaved = false;
     bool bTextureAssetsSaved = false;
     bool bMaterialSaved = false;
     bool bRelightableMaterialSaved = false;
+    bool bRelightableTrunkMaterialSaved = false;
+    bool bRelightableFoliageMaterialSaved = false;
     bool bProxyActorCreated = false;
     int32 ViewCount = 0;
     int32 TileResolution = 0;
@@ -32317,8 +32589,12 @@ struct FRaftSimPveMultiViewAtlasBakeResult
     FString MaterialIdentityAssetPath;
     FString MaterialAssetPath;
     FString RelightableMaterialAssetPath;
+    FString RelightableTrunkMaterialAssetPath;
+    FString RelightableFoliageMaterialAssetPath;
     UMaterial* Material = nullptr;
     UMaterial* RelightableMaterial = nullptr;
+    UMaterial* RelightableTrunkMaterial = nullptr;
+    UMaterial* RelightableFoliageMaterial = nullptr;
     AStaticMeshActor* ProxyActor = nullptr;
 
     bool IsReady() const
@@ -32340,6 +32616,16 @@ struct FRaftSimPveMultiViewAtlasBakeResult
             !MaterialIdentityDigest.IsEmpty() && !MaterialIdentityAssetPath.IsEmpty() &&
             !RelightableMaterialAssetPath.IsEmpty() &&
             RelightableMaterial != nullptr;
+    }
+
+    bool IsSplitRelightableReady() const
+    {
+        return IsRelightableReady() && bRelightableTrunkMaterialSaved &&
+            bRelightableFoliageMaterialSaved &&
+            !RelightableTrunkMaterialAssetPath.IsEmpty() &&
+            !RelightableFoliageMaterialAssetPath.IsEmpty() &&
+            RelightableTrunkMaterial != nullptr &&
+            RelightableFoliageMaterial != nullptr;
     }
 };
 
@@ -32547,6 +32833,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     float DepthParallaxScaleCm,
     bool bEnableComplementaryTransition,
     bool bUseLitShading,
+    EPveAtlasMaterialLayer MaterialLayer,
     FString& OutSummary)
 {
     if (!BaseColorTexture || !NormalTexture || !OpacityTexture || !DepthTexture ||
@@ -32584,7 +32871,12 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(bUseLitShading ? MSM_DefaultLit : MSM_Unlit);
+    const bool bTrunkLayer = MaterialLayer == EPveAtlasMaterialLayer::Trunk;
+    const bool bFoliageLayer = MaterialLayer == EPveAtlasMaterialLayer::Foliage;
+    Material->SetShadingModel(
+        bUseLitShading
+            ? (bFoliageLayer ? MSM_TwoSidedFoliage : MSM_DefaultLit)
+            : MSM_Unlit);
     Material->BlendMode = BLEND_Masked;
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = !bUseLitShading;
@@ -32795,17 +33087,37 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
         WorldNormalInput.InputName = TEXT("WorldNormal");
         WorldNormalInput.Input.Expression = WorldNormalSample;
         ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, DecodedWorldNormal);
+        if (bFoliageLayer)
+        {
+            UMaterialExpressionVectorParameter* AtlasFoliageTransmissionTint =
+                AddExpression(
+                    NewObject<UMaterialExpressionVectorParameter>(Material),
+                    180,
+                    20);
+            AtlasFoliageTransmissionTint->ParameterName =
+                TEXT("AtlasFoliageTransmissionTint");
+            AtlasFoliageTransmissionTint->DefaultValue =
+                FLinearColor(0.78f, 1.0f, 0.58f, 1.0f);
+            UMaterialExpressionMultiply* AtlasFoliageSubsurfaceColor =
+                AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 420, 20);
+            AtlasFoliageSubsurfaceColor->A.Expression = ConditionedColor;
+            AtlasFoliageSubsurfaceColor->B.Expression =
+                AtlasFoliageTransmissionTint;
+            ConnectPreviewMaterialColorInput(
+                EditorOnlyData->SubsurfaceColor,
+                AtlasFoliageSubsurfaceColor);
+        }
 
         UMaterialExpressionScalarParameter* AtlasTrunkRoughness =
             AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -60, 180);
         AtlasTrunkRoughness->ParameterName = TEXT("AtlasTrunkRoughness");
-        AtlasTrunkRoughness->DefaultValue = 0.68f;
+        AtlasTrunkRoughness->DefaultValue = bTrunkLayer ? 0.62f : 0.68f;
         AtlasTrunkRoughness->SliderMin = 0.0f;
         AtlasTrunkRoughness->SliderMax = 1.0f;
         UMaterialExpressionScalarParameter* AtlasFoliageRoughness =
             AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -60, 260);
         AtlasFoliageRoughness->ParameterName = TEXT("AtlasFoliageRoughness");
-        AtlasFoliageRoughness->DefaultValue = 0.68f;
+        AtlasFoliageRoughness->DefaultValue = bFoliageLayer ? 0.72f : 0.68f;
         AtlasFoliageRoughness->SliderMin = 0.0f;
         AtlasFoliageRoughness->SliderMax = 1.0f;
         UMaterialExpressionLinearInterpolate* Roughness =
@@ -32816,7 +33128,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
         UMaterialExpressionScalarParameter* AtlasTrunkSpecular =
             AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -60, 340);
         AtlasTrunkSpecular->ParameterName = TEXT("AtlasTrunkSpecular");
-        AtlasTrunkSpecular->DefaultValue = 0.18f;
+        AtlasTrunkSpecular->DefaultValue = bTrunkLayer ? 0.12f : 0.18f;
         AtlasTrunkSpecular->SliderMin = 0.0f;
         AtlasTrunkSpecular->SliderMax = 1.0f;
         UMaterialExpressionScalarParameter* AtlasFoliageSpecular =
@@ -32844,6 +33156,24 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, ConditionedColor);
     }
     UMaterialExpression* FinalOpacity = OpacitySample;
+    if (bTrunkLayer || bFoliageLayer)
+    {
+        UMaterialExpression* LayerIdentity = AtlasFoliageMask;
+        if (bTrunkLayer)
+        {
+            UMaterialExpressionOneMinus* AtlasTrunkMask = AddExpression(
+                NewObject<UMaterialExpressionOneMinus>(Material),
+                -180,
+                -260);
+            AtlasTrunkMask->Input.Expression = AtlasFoliageMask;
+            LayerIdentity = AtlasTrunkMask;
+        }
+        UMaterialExpressionMultiply* LayerOpacity =
+            AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 40, -280);
+        LayerOpacity->A.Expression = OpacitySample;
+        LayerOpacity->B.Expression = LayerIdentity;
+        FinalOpacity = LayerOpacity;
+    }
     if (bEnableComplementaryTransition)
     {
         FinalOpacity = AddComplementaryScreenDitherOpacity(
@@ -33507,6 +33837,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         DepthParallaxScaleCm,
         bEnableComplementaryTransition,
         false,
+        EPveAtlasMaterialLayer::Combined,
         OutSummary);
     OutResult.bMaterialSaved = OutResult.Material != nullptr;
     OutResult.RelightableMaterialAssetPath = FString::Printf(
@@ -33528,9 +33859,56 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         DepthParallaxScaleCm,
         bEnableComplementaryTransition,
         true,
+        EPveAtlasMaterialLayer::Combined,
         OutSummary);
     OutResult.bRelightableMaterialSaved =
         OutResult.RelightableMaterial != nullptr;
+    OutResult.RelightableTrunkMaterialAssetPath = FString::Printf(
+        TEXT("%s/M_%s_%s_MultiViewHlodV4LitTrunk"),
+        *AtlasPackageRoot,
+        *AssetToken,
+        *VariantLower);
+    OutResult.RelightableTrunkMaterial = CreateOrUpdateLocalPveAtlasMaterial(
+        OutResult.RelightableTrunkMaterialAssetPath,
+        AlbedoTexture,
+        NormalTexture,
+        OpacityTexture,
+        DepthTexture,
+        MaterialIdentityTexture,
+        true,
+        FLinearColor(1.55f, 1.55f, 1.55f, 1.0f),
+        AzimuthOffsetDegrees,
+        bUseDepthParallax,
+        DepthParallaxScaleCm,
+        bEnableComplementaryTransition,
+        true,
+        EPveAtlasMaterialLayer::Trunk,
+        OutSummary);
+    OutResult.bRelightableTrunkMaterialSaved =
+        OutResult.RelightableTrunkMaterial != nullptr;
+    OutResult.RelightableFoliageMaterialAssetPath = FString::Printf(
+        TEXT("%s/M_%s_%s_MultiViewHlodV4LitFoliage"),
+        *AtlasPackageRoot,
+        *AssetToken,
+        *VariantLower);
+    OutResult.RelightableFoliageMaterial = CreateOrUpdateLocalPveAtlasMaterial(
+        OutResult.RelightableFoliageMaterialAssetPath,
+        AlbedoTexture,
+        NormalTexture,
+        OpacityTexture,
+        DepthTexture,
+        MaterialIdentityTexture,
+        true,
+        FLinearColor(1.55f, 1.55f, 1.55f, 1.0f),
+        AzimuthOffsetDegrees,
+        bUseDepthParallax,
+        DepthParallaxScaleCm,
+        bEnableComplementaryTransition,
+        true,
+        EPveAtlasMaterialLayer::Foliage,
+        OutSummary);
+    OutResult.bRelightableFoliageMaterialSaved =
+        OutResult.RelightableFoliageMaterial != nullptr;
     UStaticMesh* ProxyMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
     if (bUseDepthParallax && OutResult.Material)
     {
@@ -33642,9 +34020,9 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("    \"depth\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
         TEXT("    \"material_identity\": {\"path\": \"%s\", \"md5\": \"%s\"}\n")
         TEXT("  },\n")
-        TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"albedo_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material_identity\": \"%s\", \"legacy_unlit_material\": \"%s\", \"relightable_lit_material\": \"%s\"},\n")
+        TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"albedo_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material_identity\": \"%s\", \"legacy_unlit_material\": \"%s\", \"relightable_lit_material\": \"%s\", \"relightable_trunk_material\": \"%s\", \"relightable_foliage_material\": \"%s\"},\n")
         TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\", \"material_identity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s, \"complementary_screen_dither_enabled\": %s, \"complementary_source_coverage_parameter\": \"ComplementarySourceCoverage\"},\n")
-        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"shading\": \"masked DefaultLit albedo plus captured world normal and frontmost material identity\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"default_gain_multipliers\": [1.0, 1.0], \"default_roughness\": [0.68, 0.68], \"default_specular\": [0.18, 0.18], \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
+        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"shading\": \"masked DefaultLit combined control plus disjoint DefaultLit trunk and TwoSidedFoliage layers using captured world normal and frontmost material identity\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"combined_default_roughness\": [0.68, 0.68], \"split_default_roughness\": [0.62, 0.72], \"combined_default_specular\": [0.18, 0.18], \"split_default_specular\": [0.12, 0.18], \"default_gain_multipliers\": [1.0, 1.0], \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
@@ -33697,6 +34075,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         *EscapeRaftSimJsonString(OutResult.MaterialIdentityAssetPath),
         *EscapeRaftSimJsonString(OutResult.MaterialAssetPath),
         *EscapeRaftSimJsonString(OutResult.RelightableMaterialAssetPath),
+        *EscapeRaftSimJsonString(OutResult.RelightableTrunkMaterialAssetPath),
+        *EscapeRaftSimJsonString(OutResult.RelightableFoliageMaterialAssetPath),
         bUseDepthParallax
             ? TEXT("camera-facing 32x32 tessellated XY grid with depth-atlas vertex displacement")
             : TEXT("camera-facing XY plane through world-position offset"),
@@ -33711,7 +34091,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("false"),
         bUseDepthParallax ? TEXT("false") : TEXT("true"),
         bEnableComplementaryTransition ? TEXT("true") : TEXT("false"),
-        OutResult.IsRelightableReady() ? TEXT("true") : TEXT("false"));
+        OutResult.IsRelightableReady() ? TEXT("true") : TEXT("false"),
+        OutResult.IsSplitRelightableReady() ? TEXT("true") : TEXT("false"));
     const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestAbsolutePath);
     if (!bManifestSaved)
     {
@@ -33723,7 +34104,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         AtlasResolution,
         OutResult.MinimumCoverage,
         OutResult.MaximumCoverage);
-    return bManifestSaved && OutResult.IsRelightableReady();
+    return bManifestSaved && OutResult.IsSplitRelightableReady();
 }
 } // namespace
 
@@ -35495,6 +35876,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalHlodSplitShadingSearchReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalHlodDualLayerReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     UStaticMesh* LocalMultiViewHlodMesh = nullptr;
     FTransform LocalMultiViewHlodTransform = FTransform::Identity;
@@ -35559,6 +35942,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     int32 LocalHlodFrameSearchAutomaticFrame = -1;
     TArray<FString> LocalHlodSplitShadingSearchCapturePaths;
     FString LocalHlodSplitShadingSearchCapturesJson;
+    TArray<FString> LocalHlodDualLayerCapturePaths;
+    FString LocalHlodDualLayerCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -36539,10 +36924,14 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     LitRiverReviewSpec.bDeterministicValidationCapture = false;
                     UMaterialInterface* ActiveLitRiverHlodMaterial =
                         LocalMultiViewAtlas.Material;
+                    UMaterialInterface* ActiveLitRiverHlodTrunkMaterial = nullptr;
+                    UMaterialInterface* ActiveLitRiverHlodFoliageMaterial = nullptr;
                     const auto SetupLitRiverView = [
                         TrunkMesh,
                         LocalHlodMesh = LocalMultiViewHlodMesh,
                         &ActiveLitRiverHlodMaterial,
+                        &ActiveLitRiverHlodTrunkMaterial,
+                        &ActiveLitRiverHlodFoliageMaterial,
                         LocalHlodTransform = LocalMultiViewHlodTransform,
                         &FoliageFacade,
                         GetLocalFoliageTransform](
@@ -36556,6 +36945,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     {
                         if (!World || !TrunkMesh || !LocalHlodMesh ||
                             !ActiveLitRiverHlodMaterial ||
+                            ((ActiveLitRiverHlodTrunkMaterial != nullptr) !=
+                             (ActiveLitRiverHlodFoliageMaterial != nullptr)) ||
                             !FoliageFacade.IsValid())
                         {
                             SetupSummary += TEXT(
@@ -36830,6 +37221,49 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         AtlasComponent->SetAffectDistanceFieldLighting(false);
                         AtlasComponent->SetAffectDynamicIndirectLighting(false);
                         AtlasComponent->BoundsScale = 2.5f;
+                        AtlasComponent->ComponentTags.Add(
+                            TEXT("RaftSimHlodCombinedLayer"));
+                        if (ActiveLitRiverHlodTrunkMaterial &&
+                            ActiveLitRiverHlodFoliageMaterial)
+                        {
+                            const auto AddAtlasLayer = [
+                                AtlasActor,
+                                AtlasComponent,
+                                LocalHlodMesh](
+                                const TCHAR* ComponentName,
+                                const TCHAR* ComponentTag,
+                                UMaterialInterface* LayerMaterial)
+                            {
+                                UStaticMeshComponent* LayerComponent =
+                                    NewObject<UStaticMeshComponent>(
+                                        AtlasActor,
+                                        ComponentName);
+                                AtlasActor->AddInstanceComponent(LayerComponent);
+                                LayerComponent->SetupAttachment(AtlasComponent);
+                                LayerComponent->SetStaticMesh(LocalHlodMesh);
+                                LayerComponent->SetMaterial(0, LayerMaterial);
+                                LayerComponent->SetMobility(EComponentMobility::Static);
+                                LayerComponent->SetCollisionEnabled(
+                                    ECollisionEnabled::NoCollision);
+                                LayerComponent->SetGenerateOverlapEvents(false);
+                                LayerComponent->SetCastShadow(false);
+                                LayerComponent->SetAffectDistanceFieldLighting(false);
+                                LayerComponent->SetAffectDynamicIndirectLighting(false);
+                                LayerComponent->BoundsScale = 2.5f;
+                                LayerComponent->ComponentTags.Add(ComponentTag);
+                                LayerComponent->SetVisibility(false, true);
+                                LayerComponent->RegisterComponent();
+                                return LayerComponent;
+                            };
+                            AddAtlasLayer(
+                                TEXT("V40HlodTrunkLayer"),
+                                TEXT("RaftSimHlodTrunkLayer"),
+                                ActiveLitRiverHlodTrunkMaterial);
+                            AddAtlasLayer(
+                                TEXT("V40HlodFoliageLayer"),
+                                TEXT("RaftSimHlodFoliageLayer"),
+                                ActiveLitRiverHlodFoliageMaterial);
+                        }
 
                         const FVector HlodTarget = AtlasActor->GetActorLocation();
                         FVector BankOutward = BestTreeXY - DesiredCrossSection;
@@ -36985,6 +37419,41 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 : TEXT(", "),
                             *EscapeRaftSimJsonString(CapturePath));
                     }
+                    ActiveLitRiverHlodTrunkMaterial =
+                        LocalMultiViewAtlas.RelightableTrunkMaterial;
+                    ActiveLitRiverHlodFoliageMaterial =
+                        LocalMultiViewAtlas.RelightableFoliageMaterial;
+                    const bool bAllHlodDualLayerCapturesProduced =
+                        LocalMultiViewAtlas.IsSplitRelightableReady() &&
+                        CaptureFutaleufuComplementaryTransitionMotionSequence(
+                            LitRiverReviewSpec,
+                            LocalVisualCaptureBase,
+                            TEXT("hlod_dual_layer_review"),
+                            8,
+                            LocalHlodDualLayerCapturePaths,
+                            LocalVisualSummary,
+                            true,
+                            SetupLitRiverView,
+                            1.0f,
+                            false,
+                            nullptr,
+                            false,
+                            true);
+                    bLocalHlodDualLayerReviewCaptured =
+                        bAllHlodDualLayerCapturesProduced &&
+                        LocalHlodDualLayerCapturePaths.Num() == 5;
+                    for (const FString& CapturePath :
+                         LocalHlodDualLayerCapturePaths)
+                    {
+                        LocalHlodDualLayerCapturesJson += FString::Printf(
+                            TEXT("%s\"%s\""),
+                            LocalHlodDualLayerCapturesJson.IsEmpty()
+                                ? TEXT("")
+                                : TEXT(", "),
+                            *EscapeRaftSimJsonString(CapturePath));
+                    }
+                    ActiveLitRiverHlodTrunkMaterial = nullptr;
+                    ActiveLitRiverHlodFoliageMaterial = nullptr;
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -37000,7 +37469,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalLitRiverViewMotionTransitionReviewCaptured &&
                     bLocalTemporalLitRiverViewMotionTransitionReviewCaptured &&
                     bLocalHlodFrameSearchReviewCaptured &&
-                    bLocalHlodSplitShadingSearchReviewCaptured;
+                    bLocalHlodSplitShadingSearchReviewCaptured &&
+                    bLocalHlodDualLayerReviewCaptured;
             }
         }
     }
@@ -37035,7 +37505,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, and a V39 exact material-identity split-shading search; V33-V39 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V39 remains review-only pending measured split-photometry and silhouette decisions")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, a V39 exact material-identity split-shading search, and a V40 disjoint DefaultLit-bark/TwoSidedFoliage dual-layer review; V33-V40 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V40 remains review-only pending measured dual-layer photometry and silhouette decisions")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -37057,7 +37527,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
         TEXT("    \"material_identity_contract\": {\"source\": \"frontmost owner from separate trunk and foliage opacity plus scene-depth passes\", \"encoding\": \"black_trunk_white_foliage\", \"fallback_pixels\": %lld},\n")
         TEXT("    \"material_asset\": \"%s\",\n")
-        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_identity_output\": \"%s\", \"material_identity_md5\": \"%s\", \"material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"material_identity_sampled\": true, \"emissive_connected\": false, \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"default_gain_multipliers\": [1.0, 1.0], \"default_roughness\": [0.68, 0.68], \"default_specular\": [0.18, 0.18], \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"], \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
+        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_identity_output\": \"%s\", \"material_identity_md5\": \"%s\", \"material_asset\": \"%s\", \"trunk_material_asset\": \"%s\", \"foliage_material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"split_shading_models\": {\"trunk\": \"DefaultLit\", \"foliage\": \"TwoSidedFoliage\"}, \"split_layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"material_identity_sampled\": true, \"emissive_connected\": false, \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"default_gain_multipliers\": [1.0, 1.0], \"default_roughness\": [0.68, 0.68], \"default_specular\": [0.18, 0.18], \"split_default_roughness\": [0.62, 0.72], \"split_default_specular\": [0.12, 0.18], \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"], \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("    \"runtime_representation\": \"%s\",\n")
         TEXT("    \"atlas_color_gain\": [%.6f, %.6f, %.6f],\n")
         TEXT("    \"exact_source_camera_60m_capture\": \"%s\",\n")
@@ -37073,6 +37543,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"temporal_lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement as V36 with a separate relightable HLOD material\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"transition\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_modes_retained\": true, \"source_material\": \"masked source bark and foliage with ComplementaryTransitionMode=1\", \"hlod_shading\": \"DefaultLit albedo plus captured world normal, no emissive connection\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_frame_search_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement and relightable HLOD as V37\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"lighting\": true, \"temporal_aa\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_override_value\": -1.0, \"calculated_automatic_row_zero_frame\": %d, \"tested_row_zero_frames\": [0, 1, 2, 3, 4, 5, 6, 7], \"source_reference_count\": 1, \"automatic_selection_count\": 1, \"override_capture_count\": 8, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_split_shading_search_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement, automatic frame, and relightable HLOD as V38\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_preset\": 8, \"temporal_history_reset_per_preset\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"fixed_roughness\": [0.68, 0.68], \"fixed_specular\": [0.18, 0.18], \"gain_presets\": [{\"id\": \"baseline\", \"trunk\": 1.0, \"foliage\": 1.0}, {\"id\": \"foliage_gain_150\", \"trunk\": 1.0, \"foliage\": 1.5}, {\"id\": \"foliage_gain_200\", \"trunk\": 1.0, \"foliage\": 2.0}, {\"id\": \"foliage_gain_250\", \"trunk\": 1.0, \"foliage\": 2.5}, {\"id\": \"trunk_gain_150\", \"trunk\": 1.5, \"foliage\": 1.0}, {\"id\": \"trunk_gain_200\", \"trunk\": 2.0, \"foliage\": 1.0}, {\"id\": \"trunk_gain_250\", \"trunk\": 2.5, \"foliage\": 1.0}, {\"id\": \"balanced_gain_175\", \"trunk\": 1.75, \"foliage\": 1.75}, {\"id\": \"balanced_gain_200\", \"trunk\": 2.0, \"foliage\": 2.0}], \"source_reference_count\": 1, \"preset_capture_count\": 9, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"hlod_dual_layer_review_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement with one combined control component plus disjoint trunk and foliage components sharing one proxy mesh\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"automatic_atlas_frame\": true, \"component_layers\": [\"combined_control\", \"trunk\", \"foliage\"], \"combined_control_shading_model\": \"DefaultLit\", \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"source_transmission_tint\": [0.78, 1.0, 0.58], \"split_roughness\": [0.62, 0.72], \"split_specular\": [0.12, 0.18], \"variants\": [\"source_reference\", \"combined_default_lit_control\", \"two_sided_no_transmission\", \"two_sided_source_transmission\", \"two_sided_source_transmission_foliage_gain_150\"], \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -37109,11 +37580,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         static_cast<long long>(LocalMultiViewAtlas.MaterialIdentityFallbackPixelCount),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.MaterialAssetPath),
         LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
+        LocalMultiViewAtlas.IsSplitRelightableReady() ? TEXT("true") : TEXT("false"),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.AlbedoRelativePath),
         *LocalMultiViewAtlas.AlbedoDigest,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.MaterialIdentityRelativePath),
         *LocalMultiViewAtlas.MaterialIdentityDigest,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.RelightableMaterialAssetPath),
+        *EscapeRaftSimJsonString(
+            LocalMultiViewAtlas.RelightableTrunkMaterialAssetPath),
+        *EscapeRaftSimJsonString(
+            LocalMultiViewAtlas.RelightableFoliageMaterialAssetPath),
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("camera-facing 32x32 tessellated grid with nearest-frame selection, inverse-opacity silhouette, bounded source-lit color gain, and depth-atlas vertex displacement; world normal retained but not sampled")
             : LocalMultiViewAtlas.bComplementaryTransitionEnabled
@@ -37163,6 +37639,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
         LocalHlodSplitShadingSearchCapturePaths.Num(),
         *LocalHlodSplitShadingSearchCapturesJson,
+        LocalMultiViewAtlas.IsSplitRelightableReady() ? TEXT("true") : TEXT("false"),
+        LocalHlodDualLayerCapturePaths.Num(),
+        *LocalHlodDualLayerCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -37193,6 +37672,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"hlod_frame_search_captures\": [%s],\n")
         TEXT("    \"hlod_split_shading_search_capture_count\": %d,\n")
         TEXT("    \"hlod_split_shading_search_captures\": [%s],\n")
+        TEXT("    \"hlod_dual_layer_capture_count\": %d,\n")
+        TEXT("    \"hlod_dual_layer_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -37228,6 +37709,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalHlodFrameSearchCapturesJson,
         LocalHlodSplitShadingSearchCapturePaths.Num(),
         *LocalHlodSplitShadingSearchCapturesJson,
+        LocalHlodDualLayerCapturePaths.Num(),
+        *LocalHlodDualLayerCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
