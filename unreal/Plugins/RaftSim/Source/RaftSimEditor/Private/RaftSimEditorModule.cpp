@@ -4870,6 +4870,21 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFutaleufuCordilleraCypress
         TEXT("cordillera_cypress_scale_leaf_ao_roughness_subsurface"),
         TEXT("cordillera_cypress_scale_leaf_v19_ao_roughness_subsurface.png"),
         TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
+    AddSpec(
+        TEXT("BotanicalSprayAlbedoOpacity"),
+        TEXT("cordillera_cypress_botanical_spray_albedo_opacity"),
+        TEXT("cordillera_cypress_botanical_spray_v20_albedo_opacity.png"),
+        TC_Default, true, TEXTUREGROUP_World, TA_Clamp, true);
+    AddSpec(
+        TEXT("BotanicalSprayNormal"),
+        TEXT("cordillera_cypress_botanical_spray_normal"),
+        TEXT("cordillera_cypress_botanical_spray_v20_normal.png"),
+        TC_Normalmap, false, TEXTUREGROUP_WorldNormalMap, TA_Clamp, false);
+    AddSpec(
+        TEXT("BotanicalSprayAORoughnessSubsurface"),
+        TEXT("cordillera_cypress_botanical_spray_ao_roughness_subsurface"),
+        TEXT("cordillera_cypress_botanical_spray_v20_ao_roughness_subsurface.png"),
+        TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
     return Specs;
 }
 
@@ -5205,14 +5220,22 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
         return nullptr;
     }
 
-    const FString LeafAlbedoKey = LeafTextureKeyPrefix + TEXT("LeafAlbedoOpacity");
-    const FString LeafNormalKey = LeafTextureKeyPrefix + TEXT("LeafNormal");
-    const FString LeafPackedKey = LeafTextureKeyPrefix + TEXT("LeafAORoughnessSubsurface");
+    const bool bBotanicalSprayTexturePrefix =
+        LeafTextureKeyPrefix.Equals(TEXT("BotanicalSpray"), ESearchCase::CaseSensitive);
+    const FString LeafAlbedoKey = LeafTextureKeyPrefix +
+        (bBotanicalSprayTexturePrefix ? TEXT("AlbedoOpacity") : TEXT("LeafAlbedoOpacity"));
+    const FString LeafNormalKey = LeafTextureKeyPrefix +
+        (bBotanicalSprayTexturePrefix ? TEXT("Normal") : TEXT("LeafNormal"));
+    const FString LeafPackedKey = LeafTextureKeyPrefix +
+        (bBotanicalSprayTexturePrefix
+             ? TEXT("AORoughnessSubsurface")
+             : TEXT("LeafAORoughnessSubsurface"));
     const bool bNearCordilleraCypress =
         bLeafMaterial &&
         (LeafTextureKeyPrefix.Equals(TEXT("Near"), ESearchCase::CaseSensitive) ||
          LeafTextureKeyPrefix.Equals(TEXT("Twig"), ESearchCase::CaseSensitive) ||
-         LeafTextureKeyPrefix.Equals(TEXT("Scale"), ESearchCase::CaseSensitive));
+         LeafTextureKeyPrefix.Equals(TEXT("Scale"), ESearchCase::CaseSensitive) ||
+         LeafTextureKeyPrefix.Equals(TEXT("BotanicalSpray"), ESearchCase::CaseSensitive));
     const bool bFarCordilleraCypress =
         bLeafMaterial && LeafTextureKeyPrefix.Equals(TEXT("Far"), ESearchCase::CaseSensitive);
     const bool bCordilleraCypressBark =
@@ -25698,7 +25721,7 @@ void FRaftSimEditorModule::StartupModule()
     EvaluateFutaleufuCordilleraCypressPveCandidateConsoleCommand =
         MakeUnique<FAutoConsoleCommand>(
             TEXT("RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate"),
-            TEXT("Build one project-owned cordilleran-cypress PVE form; optional second argument is flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, or compact_connected_twig_hierarchy."),
+            TEXT("Build one project-owned cordilleran-cypress PVE form with a named retained or experimental foliage palette."),
             FConsoleCommandWithArgsDelegate::CreateRaw(
                 this,
                 &FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateCommand));
@@ -29633,6 +29656,8 @@ bool CreateFutaleufuCypressPvePalette(
     FString& OutSummary)
 {
     const bool bCurvedShells = PaletteMode == TEXT("curved_shells");
+    const bool bBotanicalFlattenedSprayHierarchy =
+        PaletteMode == TEXT("botanical_flattened_spray_hierarchy");
     const bool bDenseAuthoredScaleLeafHierarchy =
         PaletteMode == TEXT("dense_authored_scale_leaf_hierarchy");
     const bool bAuthoredScaleLeafHierarchy =
@@ -29642,7 +29667,8 @@ bool CreateFutaleufuCypressPvePalette(
         PaletteMode == TEXT("compact_connected_twig_hierarchy");
     const bool bConnectedTwigHierarchy =
         PaletteMode == TEXT("connected_twig_hierarchy") ||
-        bCompactConnectedTwigHierarchy || bAuthoredScaleLeafHierarchy;
+        bCompactConnectedTwigHierarchy || bAuthoredScaleLeafHierarchy ||
+        bBotanicalFlattenedSprayHierarchy;
     const bool bTwigHierarchy =
         PaletteMode == TEXT("twig_hierarchy") || bConnectedTwigHierarchy;
     TMap<FString, UTexture2D*> Textures;
@@ -29650,7 +29676,9 @@ bool CreateFutaleufuCypressPvePalette(
     {
         return false;
     }
-    const FString LiveMaterialName = bDenseAuthoredScaleLeafHierarchy
+    const FString LiveMaterialName = bBotanicalFlattenedSprayHierarchy
+        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V20_BotanicalFlattenedSprayHierarchyLiveTwigs")
+        : (bDenseAuthoredScaleLeafHierarchy
         ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V19_1_DenseAuthoredScaleLeafHierarchyLiveTwigs")
         : (bAuthoredScaleLeafHierarchy
         ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V19_AuthoredScaleLeafHierarchyLiveTwigs")
@@ -29662,16 +29690,18 @@ bool CreateFutaleufuCypressPvePalette(
                ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V18_TwigHierarchyLiveTwigs")
         : (bCurvedShells
                ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V17_CurvedShellLiveTwigs")
-               : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V16_PveLiveTwigs"))))));
+               : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V16_PveLiveTwigs")))))));
     UMaterial* LiveMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
         LiveMaterialName,
         true,
         Textures,
         OutSummary,
         false,
-        bAuthoredScaleLeafHierarchy
+        bBotanicalFlattenedSprayHierarchy
+            ? TEXT("BotanicalSpray")
+            : (bAuthoredScaleLeafHierarchy
             ? TEXT("Scale")
-            : (bTwigHierarchy ? TEXT("Twig") : TEXT("Near")));
+            : (bTwigHierarchy ? TEXT("Twig") : TEXT("Near"))));
     UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
         TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark"),
         false,
@@ -29682,7 +29712,10 @@ bool CreateFutaleufuCypressPvePalette(
         return false;
     }
 
-    const FString PaletteRoot = bDenseAuthoredScaleLeafHierarchy
+    const FString PaletteRoot = bBotanicalFlattenedSprayHierarchy
+        ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+               "PVEFutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy/Palette/")
+        : (bDenseAuthoredScaleLeafHierarchy
         ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                "PVEFutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy/Palette/")
         : (bAuthoredScaleLeafHierarchy
@@ -29701,7 +29734,7 @@ bool CreateFutaleufuCypressPvePalette(
                ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                       "PVEFutaleufuCordilleraCypressCurvedShell/Palette/")
                : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                      "PVEFutaleufuCordilleraCypress/Palette/"))))));
+                      "PVEFutaleufuCordilleraCypress/Palette/")))))));
     OutLiveTwigPaths.Reset();
     for (int32 TwigIndex = 0; TwigIndex < 3; ++TwigIndex)
     {
@@ -29715,7 +29748,94 @@ bool CreateFutaleufuCypressPvePalette(
         TArray<FVector2D> BarkUVs;
         const float LengthCm = 88.0f + static_cast<float>(TwigIndex) * 10.0f;
         const float WidthCm = 50.0f + static_cast<float>(TwigIndex) * 6.0f;
-        if (bAuthoredScaleLeafHierarchy)
+        if (bBotanicalFlattenedSprayHierarchy)
+        {
+            const FVector MainStart(-4.0f, 0.0f, -0.5f);
+            const FVector MainEnd(
+                52.0f + TwigIndex * 5.0f,
+                TwigIndex == 1 ? 1.5f : -1.0f,
+                5.0f + TwigIndex * 1.2f);
+            const FVector MainAxis = (MainEnd - MainStart).GetSafeNormal();
+            const FVector MainRight = FVector::RightVector.RotateAngleAxis(
+                static_cast<float>(TwigIndex - 1) * 12.0f,
+                MainAxis);
+            AppendNativeCanopyTaperedSegment(
+                MainStart,
+                MainEnd,
+                1.08f + TwigIndex * 0.10f,
+                0.20f,
+                7,
+                BarkVertices,
+                BarkTriangles,
+                BarkNormals,
+                BarkUVs);
+            AppendNativeCanopyAtlasCurvedCard(
+                MainStart - MainAxis * 1.0f,
+                MainAxis,
+                MainRight,
+                24.0f + TwigIndex * 1.8f,
+                FVector::Distance(MainStart, MainEnd) + 3.0f,
+                3.2f + TwigIndex * 0.5f,
+                TwigIndex % 2 == 0 ? -1.5f : 1.5f,
+                6,
+                TwigIndex * 5,
+                Vertices,
+                Triangles,
+                Normals,
+                UVs);
+
+            for (int32 PairIndex = 0; PairIndex < 4; ++PairIndex)
+            {
+                for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+                {
+                    const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+                    const FVector BranchStart = FMath::Lerp(
+                        MainStart, MainEnd, 0.16f + PairIndex * 0.19f);
+                    const FVector BranchAxis = FVector(
+                        0.72f + PairIndex * 0.045f,
+                        Side * (0.66f - PairIndex * 0.075f),
+                        (PairIndex == 1 ? 0.14f : -0.025f) + TwigIndex * 0.025f)
+                                                   .GetSafeNormal();
+                    const float BranchLength =
+                        31.0f - PairIndex * 2.2f + TwigIndex * 1.5f;
+                    AppendNativeCanopyTaperedSegment(
+                        BranchStart - BranchAxis * 0.4f,
+                        BranchStart + BranchAxis * BranchLength * 0.82f,
+                        0.58f - PairIndex * 0.055f,
+                        0.10f,
+                        6,
+                        BarkVertices,
+                        BarkTriangles,
+                        BarkNormals,
+                        BarkUVs);
+                    FVector BranchRight = FVector::CrossProduct(
+                        FVector::UpVector, BranchAxis).GetSafeNormal();
+                    if (BranchRight.IsNearlyZero())
+                    {
+                        BranchRight = MainRight;
+                    }
+                    BranchRight = BranchRight.RotateAngleAxis(
+                        Side * (10.0f + PairIndex * 6.0f) + TwigIndex * 3.0f,
+                        BranchAxis);
+                    const int32 CardIndex = 1 + PairIndex * 2 + SideIndex;
+                    AppendNativeCanopyAtlasCurvedCard(
+                        BranchStart + BranchAxis * 1.5f,
+                        BranchAxis,
+                        BranchRight,
+                        18.0f - PairIndex * 0.8f + TwigIndex * 0.8f,
+                        BranchLength,
+                        2.4f + PairIndex * 0.35f,
+                        Side * (1.2f + PairIndex * 0.28f),
+                        5,
+                        (TwigIndex * 5 + CardIndex * 3) % 16,
+                        Vertices,
+                        Triangles,
+                        Normals,
+                        UVs);
+                }
+            }
+        }
+        else if (bAuthoredScaleLeafHierarchy)
         {
             const FVector MainStart(-4.0f, 0.0f, -0.5f);
             const FVector MainEnd(
@@ -29975,13 +30095,15 @@ bool CreateFutaleufuCypressPvePalette(
             }
         }
         const FString PaletteAssetToken = bConnectedTwigHierarchy
-            ? (bDenseAuthoredScaleLeafHierarchy
+            ? (bBotanicalFlattenedSprayHierarchy
+                   ? TEXT("V20_BotanicalFlattenedSprayHierarchy_Pve")
+                   : (bDenseAuthoredScaleLeafHierarchy
                    ? TEXT("V19_1_DenseAuthoredScaleLeafHierarchy_Pve")
                    : (bAuthoredScaleLeafHierarchy
                    ? TEXT("V19_AuthoredScaleLeafHierarchy_Pve")
                    : (bCompactConnectedTwigHierarchy
                    ? TEXT("V18_2_CompactConnectedTwigHierarchy_Pve")
-                   : TEXT("V18_1_ConnectedTwigHierarchy_Pve"))))
+                   : TEXT("V18_1_ConnectedTwigHierarchy_Pve")))))
             : (bTwigHierarchy
                    ? TEXT("V18_TwigHierarchy_Pve")
                    : (bCurvedShells ? TEXT("V17_CurvedShell_Pve") : TEXT("V16_Pve")));
@@ -31418,12 +31540,13 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT("connected_twig_hierarchy") &&
         PaletteMode != TEXT("compact_connected_twig_hierarchy") &&
         PaletteMode != TEXT("authored_scale_leaf_hierarchy") &&
-        PaletteMode != TEXT("dense_authored_scale_leaf_hierarchy"))
+        PaletteMode != TEXT("dense_authored_scale_leaf_hierarchy") &&
+        PaletteMode != TEXT("botanical_flattened_spray_hierarchy"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, or dense_authored_scale_leaf_hierarchy."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, or botanical_flattened_spray_hierarchy."),
             *PaletteMode);
         return;
     }
@@ -32074,6 +32197,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const bool bCurvedCypressShellPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("curved_shells");
+    const bool bBotanicalFlattenedSprayCypressHierarchyPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT("botanical_flattened_spray_hierarchy");
     const bool bAuthoredScaleLeafCypressHierarchyPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT("authored_scale_leaf_hierarchy") ||
@@ -32081,6 +32207,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const bool bDenseAuthoredScaleLeafCypressHierarchyPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("dense_authored_scale_leaf_hierarchy");
+    const bool bTraditionalRasterCypressFoliagePalette =
+        bAuthoredScaleLeafCypressHierarchyPalette ||
+        bBotanicalFlattenedSprayCypressHierarchyPalette;
     const bool bCompactConnectedCypressTwigHierarchyPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("compact_connected_twig_hierarchy");
@@ -32088,13 +32217,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT("connected_twig_hierarchy") ||
          bCompactConnectedCypressTwigHierarchyPalette ||
-         bAuthoredScaleLeafCypressHierarchyPalette);
+         bAuthoredScaleLeafCypressHierarchyPalette ||
+         bBotanicalFlattenedSprayCypressHierarchyPalette);
     const bool bCypressTwigHierarchyPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT("twig_hierarchy") ||
          bConnectedCypressTwigHierarchyPalette);
     const FString LocalReviewNamespace = bProceduralCypressPveCandidate
-        ? (bDenseAuthoredScaleLeafCypressHierarchyPalette
+        ? (bBotanicalFlattenedSprayCypressHierarchyPalette
+               ? TEXT("PVEFutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy")
+               : (bDenseAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("PVEFutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy")
                : (bAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("PVEFutaleufuCordilleraCypressAuthoredScaleLeafHierarchy")
@@ -32106,10 +32238,12 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? TEXT("PVEFutaleufuCordilleraCypressTwigHierarchy")
                : (bCurvedCypressShellPalette
                       ? TEXT("PVEFutaleufuCordilleraCypressCurvedShell")
-                      : TEXT("PVEFutaleufuCordilleraCypress")))))))
+                      : TEXT("PVEFutaleufuCordilleraCypress"))))))))
         : TEXT("PVEFutaleufuEuropeanBeech");
     const FString LocalSavedNamespace = bProceduralCypressPveCandidate
-        ? (bDenseAuthoredScaleLeafCypressHierarchyPalette
+        ? (bBotanicalFlattenedSprayCypressHierarchyPalette
+               ? TEXT("FutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy")
+               : (bDenseAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("FutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy")
                : (bAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy")
@@ -32121,13 +32255,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? TEXT("FutaleufuCordilleraCypressTwigHierarchy")
                : (bCurvedCypressShellPalette
                       ? TEXT("FutaleufuCordilleraCypressCurvedShell")
-                      : TEXT("FutaleufuCordilleraCypress")))))))
+                      : TEXT("FutaleufuCordilleraCypress"))))))))
         : TEXT("FutaleufuEuropeanBeech");
     const FString CandidateAssetToken = bProceduralCypressPveCandidate
         ? CypressSpec->AssetToken
         : ProceduralBeechVariant;
     const FString CandidateAssetPrefix = bProceduralCypressPveCandidate
-        ? (bDenseAuthoredScaleLeafCypressHierarchyPalette
+        ? (bBotanicalFlattenedSprayCypressHierarchyPalette
+               ? TEXT("FutaleufuPveCordilleraCypressBotanicalFlattenedSprayHierarchy")
+               : (bDenseAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("FutaleufuPveCordilleraCypressDenseAuthoredScaleLeafHierarchy")
                : (bAuthoredScaleLeafCypressHierarchyPalette
                ? TEXT("FutaleufuPveCordilleraCypressAuthoredScaleLeafHierarchy")
@@ -32139,7 +32275,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? TEXT("FutaleufuPveCordilleraCypressTwigHierarchy")
                : (bCurvedCypressShellPalette
                       ? TEXT("FutaleufuPveCordilleraCypressCurvedShell")
-                      : TEXT("FutaleufuPveCordilleraCypress")))))))
+                      : TEXT("FutaleufuPveCordilleraCypress"))))))))
         : TEXT("FutaleufuPveEuropean");
 
     const FManagedArrayCollection& Collection = *ProceduralBeechOutputCollection;
@@ -32529,7 +32665,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             CopyOptions.bApplyNaniteSettings = true;
             CopyOptions.NewNaniteSettings = ImpostorSourceMesh->GetNaniteSettings();
             CopyOptions.NewNaniteSettings.bEnabled =
-                !bAuthoredScaleLeafCypressHierarchyPalette;
+                !bTraditionalRasterCypressFoliagePalette;
             CopyOptions.NewNaniteSettings.ShapePreservation =
                 ENaniteShapePreservation::None;
             EGeometryScriptOutcomePins SourceCopyOutcome = EGeometryScriptOutcomePins::Failure;
@@ -32575,7 +32711,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ImpostorSourceMesh->GetNaniteSettings().ShapePreservation ==
                         ENaniteShapePreservation::PreserveArea;
                     const bool bExpectedWholeTreeRenderer =
-                        bAuthoredScaleLeafCypressHierarchyPalette
+                        bTraditionalRasterCypressFoliagePalette
                         ? !bLocalImpostorSourceNaniteEnabled
                         : bLocalImpostorSourceNaniteEnabled;
                     bLocalImpostorSourceValidated =
@@ -32859,7 +32995,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                  ? TEXT("_volumetric_far_proxy_60m.png")
                  : TEXT("_river_distance_60m.png")),
         LocalVisualCaptureBase +
-            (bAuthoredScaleLeafCypressHierarchyPalette
+            (bTraditionalRasterCypressFoliagePalette
                  ? TEXT("_merged_raster_whole_tree_60m.png")
                  : TEXT("_nanite_whole_tree_60m.png"))};
     if (bLocalTrunkValidated && bLocalTemplateSaved && GEditor && FoliageFacade.IsValid())
@@ -33334,9 +33470,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         }
     }
     const TCHAR* LocalMultiViewAtlasHumanAcceptance =
-        bAuthoredScaleLeafCypressHierarchyPalette
+        bBotanicalFlattenedSprayCypressHierarchyPalette
+        ? TEXT("V20 botanical flattened-spray source and HLOD capture completed under the measured dimorphic-scale contract; visual promotion remains rejected pending the committed V20 closeup, silhouette, repetition, handoff, temporal, and platform review")
+        : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("authored scale-leaf source and HLOD capture completed without whole-spray crop boundaries; visual promotion remains rejected pending the committed V19 review because botanical scale-leaf read, silhouette, handoff, temporal, and platform gates remain open")
-        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open");
+        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open"));
     const FString LocalMultiViewAtlasJson = FString::Printf(
         TEXT("{\n")
         TEXT("    \"status\": \"%s\",\n")
@@ -33384,7 +33522,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
-            ? TEXT("isolated_source_views_plus_exact_camera_far_proxy_nanite_and_multi_view_atlas_comparisons_ready_for_human_review")
+            ? (bTraditionalRasterCypressFoliagePalette
+                ? TEXT("isolated_source_views_plus_exact_camera_far_proxy_merged_raster_and_multi_view_atlas_comparisons_ready_for_human_review")
+                : TEXT("isolated_source_views_plus_exact_camera_far_proxy_nanite_and_multi_view_atlas_comparisons_ready_for_human_review"))
             : TEXT("isolated_visual_capture_failed"),
         *EscapeRaftSimJsonString(LocalVisualMapPackagePath),
         LocalVisualFoliageMeshCount,
@@ -33403,7 +33543,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
              "pve_futaleufu_european_beech_%s_structural_report.json"),
         *ProceduralBeechVariant.ToLower());
     const FString CypressPaletteReportSuffix =
-        bDenseAuthoredScaleLeafCypressHierarchyPalette
+        bBotanicalFlattenedSprayCypressHierarchyPalette
+        ? TEXT("_botanical_flattened_spray_hierarchy")
+        : (bDenseAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("_dense_authored_scale_leaf_hierarchy")
         : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("_authored_scale_leaf_hierarchy")
@@ -33413,9 +33555,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? TEXT("_connected_twig_hierarchy")
         : (bCypressTwigHierarchyPalette
                ? TEXT("_twig_hierarchy")
-               : (bCurvedCypressShellPalette ? TEXT("_curved_shells") : TEXT(""))))));
+               : (bCurvedCypressShellPalette ? TEXT("_curved_shells") : TEXT("")))))));
     const FString CypressCandidateVersion =
-        bDenseAuthoredScaleLeafCypressHierarchyPalette
+        bBotanicalFlattenedSprayCypressHierarchyPalette
+        ? TEXT("v20")
+        : (bDenseAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("v19_1")
         : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("v19")
@@ -33425,7 +33569,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? TEXT("v18_1")
         : (bCypressTwigHierarchyPalette
                ? TEXT("v18")
-               : TEXT("v17")))));
+               : TEXT("v17"))))));
     const FString ReportRelativePath = bProceduralCypressPveCandidate
         ? FString::Printf(
               TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
@@ -33608,7 +33752,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("  \"species_boundary\": \"project-owned Austrocedrus-oriented topology and palette; exact-camera card-edge, all-form, ecology, temporal, and runtime gates remain required\",\n")
               TEXT("  \"promotion_gates\": [\"all_eight_v17_forms_generated\", \"V13_exact_camera_visual_review\", \"branch_spray_closeup\", \"card_edges_not_visible_at_60m\", \"V10_far_authority\", \"packaged_desktop_and_target_vr_profile\", \"ecology_and_rights_review\"]\n")
               TEXT("}\n"),
-              bDenseAuthoredScaleLeafCypressHierarchyPalette
+              bBotanicalFlattenedSprayCypressHierarchyPalette
+                  ? TEXT("ue_5_8_pve_cordillera_cypress_v20_botanical_flattened_spray_hierarchy")
+                  : (bDenseAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("ue_5_8_pve_cordillera_cypress_v19_1_dense_authored_scale_leaf_hierarchy")
                   : (bAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("ue_5_8_pve_cordillera_cypress_v19_authored_scale_leaf_hierarchy")
@@ -33618,12 +33764,14 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? TEXT("ue_5_8_pve_cordillera_cypress_v18_1_connected_twig_hierarchy")
                   : (bCypressTwigHierarchyPalette
                   ? TEXT("ue_5_8_pve_cordillera_cypress_v18_twig_hierarchy")
-                  : TEXT("ue_5_8_pve_cordillera_cypress_v17_project_graph"))))),
+                  : TEXT("ue_5_8_pve_cordillera_cypress_v17_project_graph")))))),
               *EscapeRaftSimJsonString(CypressSpec->Id),
               *EscapeRaftSimJsonString(CypressSpec->DisplayName),
               *EscapeRaftSimJsonString(CypressSpec->LifeStage),
               *EscapeRaftSimJsonString(ProceduralCypressPaletteMode),
-              bDenseAuthoredScaleLeafCypressHierarchyPalette
+              bBotanicalFlattenedSprayCypressHierarchyPalette
+                  ? TEXT("[\"V20 botanical flattened-spray hierarchy live twig A\", \"V20 botanical flattened-spray hierarchy live twig B\", \"V20 botanical flattened-spray hierarchy live twig C\", \"V16 dead twig\"]")
+                  : (bDenseAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("[\"V19.1 dense authored scale-leaf hierarchy live twig A\", \"V19.1 dense authored scale-leaf hierarchy live twig B\", \"V19.1 dense authored scale-leaf hierarchy live twig C\", \"V16 dead twig\"]")
                   : (bAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("[\"V19 authored scale-leaf hierarchy live twig A\", \"V19 authored scale-leaf hierarchy live twig B\", \"V19 authored scale-leaf hierarchy live twig C\", \"V16 dead twig\"]")
@@ -33635,7 +33783,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? TEXT("[\"V18 twig-hierarchy live twig A\", \"V18 twig-hierarchy live twig B\", \"V18 twig-hierarchy live twig C\", \"V16 dead twig\"]")
                   : (bCurvedCypressShellPalette
                          ? TEXT("[\"V17 curved-shell live twig A\", \"V17 curved-shell live twig B\", \"V17 curved-shell live twig C\", \"V16 dead twig\"]")
-                         : TEXT("[\"V16 live twig A\", \"V16 live twig B\", \"V16 live twig C\", \"V16 dead twig\"]")))))),
+                         : TEXT("[\"V16 live twig A\", \"V16 live twig B\", \"V16 live twig C\", \"V16 dead twig\"]"))))))),
               CypressSpec->WholeTreeScale,
               CypressSpec->LiveTwigScale,
               CypressSpec->LiveTwigScale * 1.50f,
@@ -33680,17 +33828,21 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               LocalImpostorSourceBoundsSize.Y,
               LocalImpostorSourceBoundsSize.Z,
               bLocalImpostorSourceNaniteEnabled ? TEXT("true") : TEXT("false"),
-              bAuthoredScaleLeafCypressHierarchyPalette
+              bBotanicalFlattenedSprayCypressHierarchyPalette
+                  ? TEXT("traditional raster preserves V20 botanical spray alpha; woody source remains separately Nanite-enabled")
+                  : (bAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("traditional raster preserves V19 micro-foliage; woody source remains separately Nanite-enabled")
-                  : TEXT("Nanite merged-source diagnostic"),
-              bAuthoredScaleLeafCypressHierarchyPalette
+                  : TEXT("Nanite merged-source diagnostic")),
+              bTraditionalRasterCypressFoliagePalette
                   ? TEXT("not_applicable_traditional_raster_micro_foliage")
                   : TEXT("none"),
-              bAuthoredScaleLeafCypressHierarchyPalette
+              bBotanicalFlattenedSprayCypressHierarchyPalette
+                  ? TEXT("Nanite is deliberately disabled for the merged V20 masked botanical sprays so the measured millimetre-scale alpha detail remains available to the exact source and HLOD review")
+                  : (bAuthoredScaleLeafCypressHierarchyPalette
                   ? TEXT("Nanite is deliberately disabled for the merged V19 micro-foliage source because the first pass collapsed leaf-scale cards; exact source and HLOD review remain required")
-                  : TEXT("rejected; exact 60 m capture over-expanded merged masked spray boundaries into a distorted dark crown mass"),
+                  : TEXT("rejected; exact 60 m capture over-expanded merged masked spray boundaries into a distorted dark crown mass")),
               bLocalNaniteWholeTreeReviewCaptured ? TEXT("true") : TEXT("false"),
-              bAuthoredScaleLeafCypressHierarchyPalette
+              bTraditionalRasterCypressFoliagePalette
                   ? TEXT("pending human review of the exact 60 m merged-raster capture; renderer validity does not imply art acceptance")
                   : TEXT("rejected; Nanite shape preservation None collapses masked sprays into a bare trunk with detached cards at the exact 60 m camera"),
               bLocalFarProxyValidated && bLocalFarProxyReviewCaptured
