@@ -29987,9 +29987,13 @@ bool CreateFutaleufuCypressPvePalette(
     const bool bHighDetailHlodCalibratedIrregularCrownMass =
         PaletteMode == TEXT(
             "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+    const bool bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass =
+        PaletteMode == TEXT(
+            "frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bFrozenWpoHlodCalibratedIrregularCrownMass =
         PaletteMode == TEXT(
-            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+        bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass;
     const bool bHlodCalibratedIrregularCrownMassCompoundBranchletAtlas =
         PaletteMode ==
             TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
@@ -30071,7 +30075,9 @@ bool CreateFutaleufuCypressPvePalette(
                ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V17_CurvedShellLiveTwigs")
                : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V16_PveLiveTwigs")))))));
     const FString LiveMaterialName = bFrozenWpoHlodCalibratedIrregularCrownMass
-        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V27_FrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
+            ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V28_FrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs")
+            : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V27_FrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlasLiveTwigs"))
         : UnfrozenLiveMaterialName;
     UMaterial* LiveMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
         LiveMaterialName,
@@ -30151,8 +30157,11 @@ bool CreateFutaleufuCypressPvePalette(
                : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                       "PVEFutaleufuCordilleraCypress/Palette/")))))));
     const FString PaletteRoot = bFrozenWpoHlodCalibratedIrregularCrownMass
-        ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-               "PVEFutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
+            ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                   "PVEFutaleufuCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+            : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                   "PVEFutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/"))
         : UnfrozenPaletteRoot;
     OutLiveTwigPaths.Reset();
     for (int32 TwigIndex = 0; TwigIndex < 3; ++TwigIndex)
@@ -30707,7 +30716,9 @@ bool CreateFutaleufuCypressPvePalette(
                    ? TEXT("V18_TwigHierarchy_Pve")
                    : (bCurvedShells ? TEXT("V17_CurvedShell_Pve") : TEXT("V16_Pve")));
         const FString PaletteAssetToken = bFrozenWpoHlodCalibratedIrregularCrownMass
-            ? TEXT("V27_FrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+            ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMass
+                ? TEXT("V28_FrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+                : TEXT("V27_FrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve"))
             : UnfrozenPaletteAssetToken;
         const FString AssetName = FString::Printf(
             TEXT("SM_RaftSim_FutaleufuCordilleraCypress_%sLiveTwig_%c"),
@@ -32247,12 +32258,14 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT(
             "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") &&
         PaletteMode != TEXT(
-            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
+            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") &&
+        PaletteMode != TEXT(
+            "frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, or frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, or frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
             *PaletteMode);
         return;
     }
@@ -32273,7 +32286,9 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode == TEXT(
             "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
         PaletteMode == TEXT(
-            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+        PaletteMode == TEXT(
+            "frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bAsyncSecondaryCrown =
         PaletteMode == TEXT("async_secondary_compound_branchlet_atlas") ||
         bIrregularCrownMass;
@@ -32989,10 +33004,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT(
             "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
-    const bool bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette =
+    const bool bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT(
-            "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            "frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+    const bool bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette =
+        bProceduralCypressPveCandidate &&
+        (ProceduralCypressPaletteMode == TEXT(
+             "frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+         bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette);
     const bool bHlodCalibratedIrregularCrownMassCypressPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode ==
@@ -33102,7 +33122,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         : TEXT("PVEFutaleufuEuropeanBeech");
     const FString LocalReviewNamespace =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("PVEFutaleufuCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+            : TEXT("PVEFutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
         : UnfrozenLocalReviewNamespace;
     const FString UnfrozenLocalSavedNamespace = bProceduralCypressPveCandidate
         ? (bBotanicalFlattenedSprayCypressHierarchyPalette
@@ -33143,7 +33165,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         : TEXT("FutaleufuEuropeanBeech");
     const FString LocalSavedNamespace =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("FutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("FutaleufuCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+            : TEXT("FutaleufuCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
         : UnfrozenLocalSavedNamespace;
     const FString CandidateAssetToken = bProceduralCypressPveCandidate
         ? CypressSpec->AssetToken
@@ -33188,7 +33212,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
 
     const FString CandidateAssetPrefix =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("FutaleufuPveCordilleraCypressFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+            : TEXT("FutaleufuPveCordilleraCypressFrozenWpoHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
         : UnfrozenCandidateAssetPrefix;
 
     const FManagedArrayCollection& Collection = *ProceduralBeechOutputCollection;
@@ -34210,7 +34236,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? FLinearColor(2.60f, 1.63f, 1.60f, 1.0f)
                         : FLinearColor(1.10f, 1.38f, 0.90f, 1.0f),
                     bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette,
-                    bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                    bHighDetailHlodCalibratedIrregularCrownMassCypressPalette ||
+                        bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
                         ? 1024
                         : 512,
                     LocalMultiViewAtlas,
@@ -34576,7 +34603,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open"))))))))))));
     const TCHAR* LocalMultiViewAtlasHumanAcceptance =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("V27 frozen-WPO 512-pixel-per-view deterministic atlas baseline completed over V24 source geometry and V25 photometry/authority; repeatability and no-pop promotion remain pending committed comparison")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("V28 frozen-WPO 1024-pixel-per-view deterministic atlas completed under the V27 validation contract; matched resolution comparison and any art decision remain pending")
+            : TEXT("V27 frozen-WPO 512-pixel-per-view deterministic atlas baseline completed over V24 source geometry and V25 photometry/authority; repeatability and no-pop promotion remain pending committed comparison"))
         : UnfrozenLocalMultiViewAtlasHumanAcceptance;
     const FString LocalMultiViewAtlasJson = FString::Printf(
         TEXT("{\n")
@@ -34707,7 +34736,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                : (bCurvedCypressShellPalette ? TEXT("_curved_shells") : TEXT("")))))));
     const FString CypressPaletteReportSuffix =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("_frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("_frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+            : TEXT("_frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
         : UnfrozenCypressPaletteReportSuffix;
     const FString UnfrozenCypressCandidateVersion =
         bBotanicalFlattenedSprayCypressHierarchyPalette
@@ -34745,7 +34776,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                : TEXT("v17"))))));
     const FString CypressCandidateVersion =
         bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-        ? TEXT("v27")
+        ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+            ? TEXT("v28")
+            : TEXT("v27"))
         : UnfrozenCypressCandidateVersion;
     const FString ReportRelativePath = bProceduralCypressPveCandidate
         ? FString::Printf(
@@ -34945,7 +34978,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("  \"promotion_gates\": [\"all_eight_v17_forms_generated\", \"V13_exact_camera_visual_review\", \"branch_spray_closeup\", \"card_edges_not_visible_at_60m\", \"V10_far_authority\", \"packaged_desktop_and_target_vr_profile\", \"ecology_and_rights_review\"]\n")
               TEXT("}\n"),
               bFrozenWpoHlodCalibratedIrregularCrownMassCypressPalette
-                  ? TEXT("ue_5_8_pve_cordillera_cypress_v27_frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                  ? (bFrozenWpoHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                      ? TEXT("ue_5_8_pve_cordillera_cypress_v28_frozen_wpo_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                      : TEXT("ue_5_8_pve_cordillera_cypress_v27_frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
                   : bBotanicalFlattenedSprayCypressHierarchyPalette
                   ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
