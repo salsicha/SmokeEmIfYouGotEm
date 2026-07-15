@@ -1,8 +1,26 @@
 {
   "schema": "raftsim.real_world.named_rapid_source_catalog.v1",
   "status": "review_baseline_not_guide_approved",
-  "accessed_on": "2026-07-12",
+  "accessed_on": "2026-07-14",
   "rights_policy": "Link-only factual indexing. Do not vendor guide text, photos, video, maps, or social-media content without item-level permission.",
+  "portfolio": {
+    "source": "physics/data/real_world/river_portfolio_plan.json",
+    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "runnable_river_ids": [
+      "south_fork_american_chili_bar",
+      "colorado_river_grand_canyon_rowing",
+      "pacuare_river_costa_rica",
+      "futaleufu_river_chile",
+      "chilko_river_lava_canyon"
+    ],
+    "additional_active_environment_river_ids": [
+      "zambezi_batoka_gorge"
+    ],
+    "runnable_river_count": 5,
+    "additional_active_environment_count": 1,
+    "total_river_count": 6,
+    "zambezi_evidence_retained": true
+  },
   "stationing_policy": {
     "published": "Preserve a source-published river mile or kilometer and convert it to meters from the authored put-in.",
     "ordered_only": "Generate a visibly provisional station from published downstream order so the editor can display a marker; replace it with GPS, imagery, or guide-reviewed stationing before terrain or solver promotion.",
@@ -96,11 +114,39 @@
       "url": "https://exchile.com/adventures/futaleufu-fasttrack-rafting/",
       "source_kind": "outfitter_feature_description",
       "rights_status": "link_only_factual_index"
+    },
+    {
+      "source_id": "chilko_bc_whitewater_bidwell",
+      "river_id": "chilko_river_lava_canyon",
+      "title": "BC Whitewater Chilko-Chilcotin-Fraser Route Notes",
+      "url": "https://www.bcwhitewater.org/reaches/807-chilcotin-river-chilko-chilcotin-fraser",
+      "source_kind": "community_guide_route_and_flow_reference",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Bidwell Rapid class, scout recognition, and low/medium/high 08MA002 flow-photo context; no copied media or exact geometry."
+    },
+    {
+      "source_id": "chilko_mens_journal_lava_canyon",
+      "river_id": "chilko_river_lava_canyon",
+      "title": "Rafting Chilko River, North America's Most Notorious Rapids",
+      "url": "https://www.mensjournal.com/travel/chilko-river-north-america-longest-stretch-whitewater",
+      "source_kind": "guide_trip_feature_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Published downstream-name evidence for Bidwell, Lava Canyon, White Mile, Green Mile, and Miracle Canyon; no exact stations."
+    },
+    {
+      "source_id": "chilko_american_whitewater_white_mile_accident",
+      "river_id": "chilko_river_lava_canyon",
+      "title": "American Whitewater Accident Report 86686: Chilko White Mile",
+      "url": "https://www.americanwhitewater.org/accident/aug-1-1987-chilko/",
+      "source_kind": "safety_incident_and_high_flow_behavior_reference",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "White Mile high-flow flip, midstream-rock, cold-water, and long-swim consequence evidence; historical report is not an exact line or station source."
     }
   ],
   "rivers": [
     {
       "river_id": "south_fork_american_chili_bar",
+      "portfolio_role": "runnable_river",
       "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
       "run_length_m": 33796.224,
       "stationing_authority": "published_river_miles",
@@ -137,6 +183,7 @@
     },
     {
       "river_id": "colorado_river_grand_canyon_rowing",
+      "portfolio_role": "runnable_river",
       "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
       "run_length_m": 451420.0,
       "stationing_authority": "published_river_miles_secondary_index_pending_nps_usgs_crosscheck",
@@ -168,6 +215,7 @@
     },
     {
       "river_id": "pacuare_river_costa_rica",
+      "portfolio_role": "runnable_river",
       "display_name": "Pacuare River: Tres Equis to Siquirres",
       "run_length_m": 26250.0,
       "stationing_authority": "published_map_order_only",
@@ -198,6 +246,7 @@
     },
     {
       "river_id": "zambezi_batoka_gorge",
+      "portfolio_role": "additional_active_environment",
       "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
       "run_length_m": 27358.848,
       "stationing_authority": "published_rapid_number_order_only",
@@ -238,6 +287,7 @@
     },
     {
       "river_id": "futaleufu_river_chile",
+      "portfolio_role": "runnable_river",
       "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",
       "run_length_m": 10000.0,
       "stationing_authority": "published_order_only_route_length_approximate",
@@ -254,6 +304,62 @@
         {"name": "Son of Terminator", "order": 3, "class": "IV-V", "feature_tags": ["holes", "wave_train", "continuous_whitewater"], "review_priority": "critical"},
         {"name": "Khyber Pass", "aliases": ["Kyber Pass", "Kipper Pass"], "order": 4, "class": "IV+", "feature_tags": ["hydraulic_holes", "large_waves", "multiple_moves"], "review_priority": "critical"},
         {"name": "Himalayas", "order": 5, "class": "IV", "feature_tags": ["very_large_standing_waves", "wave_train", "surf", "flip_hazard"], "review_priority": "critical"}
+      ]
+    },
+    {
+      "river_id": "chilko_river_lava_canyon",
+      "portfolio_role": "runnable_river",
+      "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+      "run_length_m": 55845.69567955752,
+      "stationing_authority": "published_downstream_names_only_order_interpolation_pending_exact_gps_aerial_and_guide_review",
+      "editor_geometry_source": {
+        "path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "format": "route_stationing_json",
+        "status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+        "binding_enabled": true
+      },
+      "source_ids": [
+        "chilko_bc_whitewater_bidwell",
+        "chilko_mens_journal_lava_canyon",
+        "chilko_american_whitewater_white_mile_accident"
+      ],
+      "rapids": [
+        {
+          "name": "Bidwell Rapids",
+          "aliases": ["Bidwell Rapid"],
+          "order": 1,
+          "class": "IV (guide-published, all reviewed levels)",
+          "feature_tags": ["blind_corner", "scout", "s_bend", "breaking_waves", "terminal_hole", "midstream_boulder", "flip_hazard", "swimmer_hazard", "flow_sensitive"],
+          "review_priority": "critical"
+        },
+        {
+          "name": "Lava Canyon",
+          "order": 2,
+          "class": "III-V (flow-dependent reach, exact feature scope pending)",
+          "feature_tags": ["continuous_whitewater", "basalt_canyon", "constriction", "wave_train", "boulders", "wood_hazard", "cold_water", "limited_recovery", "flow_sensitive"],
+          "review_priority": "critical"
+        },
+        {
+          "name": "White Mile",
+          "order": 3,
+          "class": "IV-V (flow-dependent)",
+          "feature_tags": ["continuous_whitewater", "large_waves", "midstream_rock", "broach_hazard", "flip_hazard", "swimmer_hazard", "cold_water", "limited_recovery", "high_flow_sensitive"],
+          "review_priority": "critical"
+        },
+        {
+          "name": "Green Mile",
+          "order": 4,
+          "class": "guide review required",
+          "feature_tags": ["continuous_whitewater", "wave_train", "boulders", "cold_water", "limited_recovery", "flow_sensitive"],
+          "review_priority": "high"
+        },
+        {
+          "name": "Miracle Canyon",
+          "order": 5,
+          "class": "guide review required",
+          "feature_tags": ["canyon_constriction", "continuous_whitewater", "wave_train", "boulders", "cold_water", "limited_recovery", "flow_sensitive"],
+          "review_priority": "high"
+        }
       ]
     }
   ]

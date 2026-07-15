@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.named_rapid_editor_data_asset_generation_report.v1",
-  "run_date": "2026-07-12",
-  "status": "compiled_and_saved_shutdown_required_manual_interrupt_after_quit",
+  "run_date": "2026-07-14",
+  "status": "compiled_saved_captured_and_validated_shutdown_completed_after_manual_interrupt",
   "production_promoted": false,
   "editor_version": "Unreal Engine 5.8",
   "compile": {
@@ -13,9 +13,16 @@
     "editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
     "editor_geometry": "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson",
     "simulator_review_runs": "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json",
-    "marker_count": 80,
-    "candidate_geometry_count": 45,
-    "run_definition_count": 423
+    "catalog_river_count": 6,
+    "runnable_river_count": 5,
+    "additional_active_environment_count": 1,
+    "marker_count": 85,
+    "candidate_geometry_count": 50,
+    "run_definition_count": 453,
+    "chilko_marker_count": 5,
+    "chilko_run_definition_count": 30,
+    "zambezi_marker_count_retained": 25,
+    "zambezi_run_definition_count_retained": 123
   },
   "saved_assets": [
     "unreal/Content/RaftSim/Tools/Reviewed/DA_RaftSimToolRegistry.uasset",
@@ -26,18 +33,23 @@
   ],
   "live_browser": {
     "status": "loaded_and_captured",
-    "marker_count": 80,
-    "run_definition_count": 423,
-    "filters": ["text", "river", "flow", "priority", "station_authority", "exact_or_candidate_geometry", "guide_review", "execution_status"],
+    "portfolio_summary": "5 runnable rivers / 1 additional active environment",
+    "marker_count": 85,
+    "run_definition_count": 453,
+    "filters": ["text", "river", "flow", "priority", "station_authority", "exact_or_candidate_geometry", "guide_review", "execution_status", "portfolio_role"],
+    "row_portfolio_badges": ["RUNNABLE", "ADDITIONAL ACTIVE ENVIRONMENT"],
     "provisional_station_badge": true,
     "capture": "docs/tool-captures/milestone25a/RapidRiverEditor.png",
+    "capture_sha256": "848d69cedd337cc21e08d6d660a24486981e5d23941a2e694a5faf7a6f171ace",
+    "capture_dimensions_px": [2000, 1169],
     "capture_fix": "activate each dock tab in its parent and tick Slate before capture so hidden-tab layout does not produce clipped or blank evidence"
   },
   "automation": {
     "command": "RaftSim.CreateReviewedDataAssets",
-    "save_result": "all_five_assets_saved",
+    "save_result": "all_five_assets_saved_and_validated",
+    "asset_validation_result": "5 reviewed assets validated with no reported asset errors",
     "helper_fix": "load existing reviewed asset before updating and saving its package",
-    "shutdown_result": "Quit was logged after successful saves, but the macOS offscreen process remained alive until an interrupt and then exited with code 0"
+    "shutdown_result": "Quit was logged after successful saves, captures, and validation; the macOS offscreen process remained alive until an interrupt and then exited with code 0"
   },
   "platform_sdk_observation": {
     "valid_on_host": ["Mac", "IOS", "TVOS", "VisionOS"],

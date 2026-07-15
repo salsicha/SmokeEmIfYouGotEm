@@ -3,11 +3,32 @@
   "$id": "https://raftsim.local/schemas/named_rapid_source_catalog.schema.json",
   "title": "RaftSim Named Rapid Source Catalog",
   "type": "object",
-  "required": ["schema", "status", "rights_policy", "sources", "rivers"],
+  "required": ["schema", "status", "rights_policy", "portfolio", "sources", "rivers"],
   "properties": {
     "schema": {"const": "raftsim.real_world.named_rapid_source_catalog.v1"},
     "status": {"const": "review_baseline_not_guide_approved"},
     "rights_policy": {"type": "string", "minLength": 20},
+    "portfolio": {
+      "type": "object",
+      "required": [
+        "source",
+        "status",
+        "runnable_river_ids",
+        "additional_active_environment_river_ids",
+        "runnable_river_count",
+        "additional_active_environment_count",
+        "total_river_count",
+        "zambezi_evidence_retained"
+      ],
+      "properties": {
+        "runnable_river_ids": {"type": "array", "minItems": 5, "maxItems": 5, "uniqueItems": true},
+        "additional_active_environment_river_ids": {"type": "array", "minItems": 1, "maxItems": 1, "uniqueItems": true},
+        "runnable_river_count": {"const": 5},
+        "additional_active_environment_count": {"const": 1},
+        "total_river_count": {"const": 6},
+        "zambezi_evidence_retained": {"const": true}
+      }
+    },
     "sources": {
       "type": "array",
       "minItems": 5,
@@ -18,12 +39,13 @@
     },
     "rivers": {
       "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
+      "minItems": 6,
+      "maxItems": 6,
       "items": {
         "type": "object",
-        "required": ["river_id", "display_name", "run_length_m", "stationing_authority", "source_ids", "rapids"],
+        "required": ["river_id", "portfolio_role", "display_name", "run_length_m", "stationing_authority", "source_ids", "rapids"],
         "properties": {
+          "portfolio_role": {"enum": ["runnable_river", "additional_active_environment"]},
           "run_length_m": {"type": "number", "exclusiveMinimum": 0},
           "rapids": {"type": "array", "minItems": 1}
         }

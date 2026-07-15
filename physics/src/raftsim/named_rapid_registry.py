@@ -18,13 +18,15 @@ SIMULATOR_RUNS_RELATIVE_PATH = (
 
 MILES_TO_METERS = 1609.344
 FLOW_BANDS = ("low_review", "reference_review", "high_review")
-REQUIRED_RIVERS = {
+RUNNABLE_RIVERS = {
     "south_fork_american_chili_bar",
     "colorado_river_grand_canyon_rowing",
     "pacuare_river_costa_rica",
-    "zambezi_batoka_gorge",
     "futaleufu_river_chile",
+    "chilko_river_lava_canyon",
 }
+ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS = {"zambezi_batoka_gorge"}
+REQUIRED_RIVERS = RUNNABLE_RIVERS | ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS
 
 
 def _slug(value: str) -> str:
@@ -62,8 +64,36 @@ def validate_source_catalog(catalog: dict[str, Any]) -> None:
     if river_ids != REQUIRED_RIVERS:
         raise ValueError(f"Named-rapid river set mismatch: {sorted(river_ids)}")
 
+    portfolio = catalog.get("portfolio", {})
+    runnable_ids = set(portfolio.get("runnable_river_ids", []))
+    additional_ids = set(portfolio.get("additional_active_environment_river_ids", []))
+    if runnable_ids != RUNNABLE_RIVERS:
+        raise ValueError(f"Runnable named-rapid river set mismatch: {sorted(runnable_ids)}")
+    if additional_ids != ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS:
+        raise ValueError(
+            "Additional active-environment named-rapid river set mismatch: "
+            f"{sorted(additional_ids)}"
+        )
+    if runnable_ids & additional_ids or runnable_ids | additional_ids != river_ids:
+        raise ValueError("Named-rapid portfolio roles must be disjoint and cover every river")
+    if portfolio.get("runnable_river_count") != len(runnable_ids):
+        raise ValueError("Named-rapid runnable river count does not match its ID list")
+    if portfolio.get("additional_active_environment_count") != len(additional_ids):
+        raise ValueError("Named-rapid additional active-environment count does not match its ID list")
+    if portfolio.get("total_river_count") != len(river_ids):
+        raise ValueError("Named-rapid total river count does not match the catalog")
+    if portfolio.get("zambezi_evidence_retained") is not True:
+        raise ValueError("Named-rapid portfolio must explicitly retain Zambezi evidence")
+
     feature_ids: set[str] = set()
     for river in rivers:
+        expected_role = (
+            "runnable_river"
+            if river["river_id"] in RUNNABLE_RIVERS
+            else "additional_active_environment"
+        )
+        if river.get("portfolio_role") != expected_role:
+            raise ValueError(f"Named-rapid portfolio role mismatch: {river['river_id']}")
         if river["run_length_m"] <= 0:
             raise ValueError(f"Run length must be positive: {river['river_id']}")
         if not set(river["source_ids"]).issubset(source_ids):
@@ -279,6 +309,7 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
         rivers.append(
             {
                 "river_id": river["river_id"],
+                "portfolio_role": river["portfolio_role"],
                 "display_name": river["display_name"],
                 "run_length_m": river["run_length_m"],
                 "stationing_authority": river["stationing_authority"],
@@ -292,6 +323,7 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
         "status": "editor_review_markers_ready_exact_geometry_and_guide_review_required",
         "source_catalog": SOURCE_CATALOG_RELATIVE_PATH,
         "production_promoted": False,
+        "portfolio": catalog["portfolio"],
         "editor_contract": {
             "show_provisional_station_badge": True,
             "show_source_and_rights_panel": True,
@@ -321,6 +353,7 @@ def build_editor_geometry_geojson(editor_markers: dict[str, Any]) -> dict[str, A
                     "properties": {
                         "feature_id": marker["feature_id"],
                         "river_id": river["river_id"],
+                        "portfolio_role": river["portfolio_role"],
                         "display_name": marker["display_name"],
                         "difficulty_label": marker["difficulty_label"],
                         "review_priority": marker["review_priority"],
@@ -339,6 +372,7 @@ def build_editor_geometry_geojson(editor_markers: dict[str, Any]) -> dict[str, A
         "schema": "raftsim.unreal.named_rapid_editor_geometry.geojson.v1",
         "status": "candidate_centerline_projections_for_editor_review_not_exact_geometry",
         "production_promoted": False,
+        "portfolio": editor_markers["portfolio"],
         "source_markers": EDITOR_MARKERS_RELATIVE_PATH,
         "feature_count": len(features),
         "features": features,
@@ -398,6 +432,7 @@ def build_simulator_review_runs(editor_markers: dict[str, Any]) -> dict[str, Any
                         {
                             "run_id": run_id,
                             "river_id": river["river_id"],
+                            "portfolio_role": river["portfolio_role"],
                             "feature_id": marker["feature_id"],
                             "display_name": marker["display_name"],
                             "flow_band": flow_band,
@@ -454,6 +489,7 @@ def build_simulator_review_runs(editor_markers: dict[str, Any]) -> dict[str, Any
         "schema": "raftsim.unreal.named_rapid_simulator_review_runs.v1",
         "status": "review_run_definitions_ready_execution_evidence_pending",
         "production_promoted": False,
+        "portfolio": editor_markers["portfolio"],
         "editor_markers": EDITOR_MARKERS_RELATIVE_PATH,
         "run_count": len(runs),
         "pass_policy": {

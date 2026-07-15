@@ -112,12 +112,15 @@
     "requires_stitched_validation_export": true
   },
   "named_rapid_review": {
-    "river_count": 5,
-    "marker_count": 80,
+    "river_count": 6,
+    "runnable_river_count": 5,
+    "additional_active_environment_count": 1,
+    "marker_count": 85,
     "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
     "editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
     "editor_geometry": "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson",
-    "candidate_geometry_count": 45,
+    "candidate_geometry_count": 50,
+    "run_definition_count": 453,
     "simulator_review_runs": "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json",
     "status": "markers_and_run_definitions_ready_exact_geometry_guide_review_and_execution_evidence_pending"
   }

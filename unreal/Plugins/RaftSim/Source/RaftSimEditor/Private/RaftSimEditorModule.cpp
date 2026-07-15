@@ -25356,6 +25356,7 @@ struct FRaftSimNamedRapidEditorRow
 {
     FString RiverId;
     FString RiverDisplayName;
+    FString PortfolioRole;
     FString FeatureId;
     FString DisplayName;
     FString DifficultyLabel;
@@ -25387,6 +25388,7 @@ struct FRaftSimNamedRapidPanelState : public TSharedFromThis<FRaftSimNamedRapidP
     TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> GeometryOptions;
     TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> GuideOptions;
     TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> ExecutionOptions;
+    TArray<TSharedPtr<FRaftSimNamedRapidFilterOption>> PortfolioOptions;
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedRiver;
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedFlow;
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedPriority;
@@ -25394,10 +25396,13 @@ struct FRaftSimNamedRapidPanelState : public TSharedFromThis<FRaftSimNamedRapidP
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedGeometry;
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedGuide;
     TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedExecution;
+    TSharedPtr<FRaftSimNamedRapidFilterOption> SelectedPortfolio;
     TSharedPtr<SListView<TSharedPtr<FRaftSimNamedRapidEditorRow>>> ListView;
     FString SearchText;
     FString LoadError;
     int32 SourceRunCount = 0;
+    int32 RunnableRiverCount = 0;
+    int32 AdditionalActiveEnvironmentCount = 0;
 
     void ApplyFilters()
     {
@@ -25409,6 +25414,11 @@ struct FRaftSimNamedRapidPanelState : public TSharedFromThis<FRaftSimNamedRapidP
                 continue;
             }
             if (SelectedRiver.IsValid() && !SelectedRiver->Value.IsEmpty() && Row->RiverId != SelectedRiver->Value)
+            {
+                continue;
+            }
+            if (SelectedPortfolio.IsValid() && !SelectedPortfolio->Value.IsEmpty() &&
+                Row->PortfolioRole != SelectedPortfolio->Value)
             {
                 continue;
             }
@@ -25453,10 +25463,11 @@ struct FRaftSimNamedRapidPanelState : public TSharedFromThis<FRaftSimNamedRapidP
             if (!SearchText.IsEmpty())
             {
                 const FString SearchCorpus = FString::Printf(
-                    TEXT("%s %s %s %s %s"),
+                    TEXT("%s %s %s %s %s %s"),
                     *Row->DisplayName,
                     *Row->FeatureId,
                     *Row->RiverDisplayName,
+                    *Row->PortfolioRole,
                     *Row->DifficultyLabel,
                     *Row->FeatureTags);
                 if (!SearchCorpus.Contains(SearchText, ESearchCase::IgnoreCase))
@@ -25572,6 +25583,15 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
             }
             const FString RiverId = River->GetStringField(TEXT("river_id"));
             const FString RiverDisplayName = River->GetStringField(TEXT("display_name"));
+            const FString PortfolioRole = River->GetStringField(TEXT("portfolio_role"));
+            if (PortfolioRole == TEXT("runnable_river"))
+            {
+                ++State->RunnableRiverCount;
+            }
+            else if (PortfolioRole == TEXT("additional_active_environment"))
+            {
+                ++State->AdditionalActiveEnvironmentCount;
+            }
             TSharedPtr<FRaftSimNamedRapidFilterOption> RiverOption = MakeShared<FRaftSimNamedRapidFilterOption>();
             RiverOption->Label = RiverDisplayName;
             RiverOption->Value = RiverId;
@@ -25592,6 +25612,7 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
                 TSharedPtr<FRaftSimNamedRapidEditorRow> Row = MakeShared<FRaftSimNamedRapidEditorRow>();
                 Row->RiverId = RiverId;
                 Row->RiverDisplayName = RiverDisplayName;
+                Row->PortfolioRole = PortfolioRole;
                 Row->FeatureId = Marker->GetStringField(TEXT("feature_id"));
                 Row->DisplayName = Marker->GetStringField(TEXT("display_name"));
                 Row->DifficultyLabel = Marker->GetStringField(TEXT("difficulty_label"));
@@ -25642,6 +25663,12 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
         MakeNamedRapidFilterOption(
             TEXT("Blocked pending geometry/water/line"),
             TEXT("blocked_until_exact_geometry_validated_cpp_window_and_guide_line"))};
+    State->PortfolioOptions = {
+        MakeNamedRapidFilterOption(TEXT("All portfolio roles"), TEXT("")),
+        MakeNamedRapidFilterOption(TEXT("Runnable rivers"), TEXT("runnable_river")),
+        MakeNamedRapidFilterOption(
+            TEXT("Additional active environments"),
+            TEXT("additional_active_environment"))};
     State->SelectedRiver = State->RiverOptions[0];
     State->SelectedFlow = State->FlowOptions[0];
     State->SelectedPriority = State->PriorityOptions[0];
@@ -25649,6 +25676,7 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
     State->SelectedGeometry = State->GeometryOptions[0];
     State->SelectedGuide = State->GuideOptions[0];
     State->SelectedExecution = State->ExecutionOptions[0];
+    State->SelectedPortfolio = State->PortfolioOptions[0];
     State->ApplyFilters();
 
     const auto GenerateOptionWidget = [](TSharedPtr<FRaftSimNamedRapidFilterOption> Option)
@@ -25710,14 +25738,26 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
             .OnGenerateWidget_Lambda(GenerateOptionWidget)
             .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedExecution = Value; State->ApplyFilters(); })
             [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedExecution); })]];
+    FilterGrid->AddSlot(1, 2)[
+        SNew(SComboBox<TSharedPtr<FRaftSimNamedRapidFilterOption>>)
+            .OptionsSource(&State->PortfolioOptions)
+            .InitiallySelectedItem(State->SelectedPortfolio)
+            .OnGenerateWidget_Lambda(GenerateOptionWidget)
+            .OnSelectionChanged_Lambda([State](TSharedPtr<FRaftSimNamedRapidFilterOption> Value, ESelectInfo::Type) { State->SelectedPortfolio = Value; State->ApplyFilters(); })
+            [SNew(STextBlock).Text_Lambda([State, MakeComboContent]() { return MakeComboContent(State->SelectedPortfolio); })]];
 
     return SNew(SVerticalBox)
         + SVerticalBox::Slot().AutoHeight().Padding(0.0f, 6.0f)[
             SNew(STextBlock)
                 .Text_Lambda([State]()
                 {
+                    const TCHAR* EnvironmentSuffix =
+                        State->AdditionalActiveEnvironmentCount == 1 ? TEXT("") : TEXT("s");
                     return FText::FromString(FString::Printf(
-                        TEXT("Showing %d of %d named rapids and %d of %d review runs"),
+                        TEXT("Portfolio: %d runnable rivers / %d additional active environment%s | Showing %d of %d named rapids and %d of %d review runs"),
+                        State->RunnableRiverCount,
+                        State->AdditionalActiveEnvironmentCount,
+                        EnvironmentSuffix,
                         State->FilteredRows.Num(),
                         State->AllRows.Num(),
                         State->DisplayedRunCount(),
@@ -25738,6 +25778,9 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
                         [State](TSharedPtr<FRaftSimNamedRapidEditorRow> Row, const TSharedRef<STableViewBase>& OwnerTable)
                         {
                             const bool bProvisional = Row->StationKind.StartsWith(TEXT("provisional_"));
+                            const TCHAR* PortfolioLabel = Row->PortfolioRole == TEXT("runnable_river")
+                                ? TEXT("RUNNABLE")
+                                : TEXT("ADDITIONAL ACTIVE ENVIRONMENT");
                             const FString FlowFilter = State->SelectedFlow.IsValid() ? State->SelectedFlow->Value : FString();
                             int32 VisibleRuns = 0;
                             if (!FlowFilter.IsEmpty())
@@ -25758,7 +25801,11 @@ TSharedRef<SWidget> BuildNamedRapidReviewPanel()
                                     [SNew(SVerticalBox)
                                         + SVerticalBox::Slot().AutoHeight()[
                                             SNew(STextBlock)
-                                                .Text(FText::FromString(FString::Printf(TEXT("%s  |  %s"), *Row->DisplayName, *Row->RiverDisplayName)))
+                                                .Text(FText::FromString(FString::Printf(
+                                                    TEXT("%s  |  %s  |  %s"),
+                                                    *Row->DisplayName,
+                                                    *Row->RiverDisplayName,
+                                                    PortfolioLabel)))
                                                 .Font(FCoreStyle::GetDefaultFontStyle("Bold", 10))]
                                         + SVerticalBox::Slot().AutoHeight()[
                                             SNew(STextBlock)
