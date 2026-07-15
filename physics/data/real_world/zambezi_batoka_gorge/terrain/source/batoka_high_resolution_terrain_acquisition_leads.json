@@ -1,16 +1,85 @@
 {
-  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v3",
-  "reviewed_on": "2026-07-14",
+  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v4",
+  "reviewed_on": "2026-07-15",
   "river_id": "zambezi_batoka_gorge",
   "reach": "Boiling Pot to Mukuni Beach",
-  "status": "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent",
+  "status": "survey_products_disambiguated_vol3_coverage_index_request_ready_not_sent",
   "production_promoted": false,
   "policy": {
     "link_only_until_access_and_rights_clear": true,
     "report_figures_are_not_geometry_authority": true,
     "no_pdf_figure_digitization_or_photogrammetric_derivative": true,
     "no_lidar_dtm_dsm_ortho_or_breakline_data_downloaded": true,
-    "replacement_requires_crs_vertical_datum_coverage_accuracy_terms_attribution_and_guide_geospatial_review": true
+    "replacement_requires_crs_vertical_datum_coverage_accuracy_terms_attribution_and_guide_geospatial_review": true,
+    "known_out_of_reach_products_cannot_satisfy_replacement_gate": true
+  },
+  "coverage_audit": {
+    "reviewed_on": "2026-07-15",
+    "game_reach": {
+      "name": "Boiling Pot to Mukuni Beach",
+      "current_review_geometry": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_centerline.geojson",
+      "current_review_geometry_sha256": "9a67f6604c5fc8d89deef6611c6c8e337a00fa0d87ac6b386d02446f6380854c",
+      "geometry_authority": "low_precision_osm_international_boundary_trace_cross_reference_not_surveyed_centerline",
+      "start_wgs84_lon_lat": [
+        25.858278,
+        -17.926081
+      ],
+      "end_wgs84_lon_lat": [
+        25.999539613206142,
+        -17.97797896594856
+      ],
+      "station_length_m": 29999.999842462035,
+      "request_bounds_wgs84": {
+        "west": 25.826935535974975,
+        "south": -18.02077352349982,
+        "east": 26.01842667723117,
+        "north": -17.90811477650018
+      }
+    },
+    "batoka_dam": {
+      "official_location_wgs84_lon_lat": [
+        26.107883333333334,
+        -17.927375
+      ],
+      "official_location_source": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/cesmp-dam-and-associated-infrastructure.pdf",
+      "reported_distance_downstream_of_victoria_falls_km": 47.0,
+      "nearest_current_review_route_point_wgs84_lon_lat": [
+        25.999539613206142,
+        -17.97797896594856
+      ],
+      "straight_line_separation_from_current_review_route_m": 12767.5,
+      "separation_authority": "diagnostic_haversine_measurement_against_non_authoritative_osm_review_route"
+    },
+    "product_disposition": [
+      {
+        "product_id": "vol3_230_gen_r_sp_001",
+        "coverage_status": "unknown_may_include_upstream_reservoir_or_site_coverage",
+        "priority": "request_report_and_coverage_index_first",
+        "can_satisfy_game_reach_replacement_gate": false,
+        "reason": "Public material names the report but does not publish its footprint, payload, datum details, accuracy, or reuse terms."
+      },
+      {
+        "product_id": "dam_safety_0_3m_lidar_dtm",
+        "coverage_status": "documented_downstream_from_batoka_dam_to_lake_kariba",
+        "priority": "exclude_from_primary_game_reach_request",
+        "can_satisfy_game_reach_replacement_gate": false,
+        "reason": "The dam-safety report explicitly applies this terrain database to a roughly 120 km downstream dam-break model, outside the upstream playable reach."
+      },
+      {
+        "product_id": "2014_ebee_drone_dsm",
+        "coverage_status": "documented_13_square_kilometre_batoka_dam_site_survey",
+        "priority": "exclude_from_primary_game_reach_request",
+        "can_satisfy_game_reach_replacement_gate": false,
+        "reason": "The approximately 5 cm DSM is a local dam-site survey and no public evidence places it within Boiling Pot to Mukuni Beach."
+      },
+      {
+        "product_id": "kariba_rehabilitation_additional_lidar",
+        "coverage_status": "separate_kariba_dam_rehabilitation_product",
+        "priority": "exclude_from_batoka_game_reach_request",
+        "can_satisfy_game_reach_replacement_gate": false,
+        "reason": "World Bank completion reporting attributes the additional LiDAR to the Kariba Dam Rehabilitation Project, not the upstream Batoka game reach."
+      }
+    ]
   },
   "discovered_sources": [
     {
@@ -29,25 +98,32 @@
       "source_id": "bghes_dam_safety_plan_346_gen_r_sp_001",
       "provider": "Zambezi River Authority / Studio Pietrangeli / ERM-hosted BGHES documents",
       "url": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/annexes/annex-o---emergency-response-plans.pdf",
-      "source_class": "official_feasibility_document_and_lidar_existence_evidence",
+      "source_class": "official_downstream_dam_break_lidar_non_candidate",
       "observed_evidence": [
         "Section E.8.2 states that a 0.3 m LiDAR DTM and 30 m SRTM DEM were used.",
         "The LiDAR DTM is described as covering the main Zambezi channel and close surroundings.",
         "The documented coordinate reference is WGS 84 / UTM zone 35S.",
-        "The displayed downstream HEC-RAS study does not establish that the complete Boiling Pot to Mukuni Beach game reach is included in the distributable LiDAR product."
+        "Sections E.8.1 through E.8.3 explicitly apply the terrain database to a roughly 120 km dam-break model running downstream from the proposed Batoka dam to Lake Kariba.",
+        "The proposed dam is downstream of the complete Boiling Pot to Mukuni Beach game reach, so this published 0.3 m terrain product is not evidence of playable-reach coverage."
       ],
+      "coverage_status": "documented_downstream_from_batoka_dam_to_lake_kariba",
+      "acquisition_disposition": "exclude_from_primary_game_reach_request",
       "data_attached": false,
       "rights_status": "public_report_only_underlying_lidar_access_license_and_redistribution_unknown"
     },
     {
       "source_id": "bghes_lidar_topographic_survey_report_230_gen_r_sp_001",
       "provider": "Zambezi River Authority / BGHES feasibility design team",
-      "url": "https://www.zambezira.org/sites/default/files/ACCESS%20ROAD%20ESMP_V5.0_COMP_2021-11-10.pdf",
+      "url": "https://www.erm.com/contentassets/6bdbb76b347f4e9fb9b9c14054806210/cesmp-dam-and-associated-infrastructure.pdf",
       "source_class": "official_volume_index_lead",
       "observed_evidence": [
         "The published feasibility-design volume list names Vol.3 as 230 GEN R SP 001 - LIDAR TOPOGRAPHIC SURVEY REPORT.",
-        "No direct public download for Vol.3 or its terrain payload was found during this review."
+        "No direct public download for Vol.3, its coverage index, or its terrain payload was found during this review.",
+        "Public documents do not establish whether Vol.3 covers the upstream game reach, only the dam site, the future reservoir, the downstream study, or some combination of those areas.",
+        "Vol.3 must remain distinct from the downstream 0.3 m dam-break terrain database until report identifiers and footprints prove otherwise."
       ],
+      "coverage_status": "unknown_may_include_upstream_reservoir_or_site_coverage",
+      "acquisition_disposition": "request_report_and_coverage_index_before_payload",
       "data_attached": false,
       "rights_status": "volume_existence_confirmed_report_and_payload_access_terms_pending"
     },
@@ -57,9 +133,12 @@
       "url": "https://www.pietrangeli.com/wp-content/uploads/2022/04/029-INNOVATIVE-APPLICATIONS-OF-DRONE-TECHNOLOGY-IN-THE-ENGINEERING-OF-LARGE-DAMS-Pietrangeli-G-Pittalis-G-Milesi-V-Cifra-R-2015.pdf",
       "source_class": "engineering_photogrammetry_existence_evidence",
       "observed_evidence": [
-        "The Batoka case study reports a drone-derived DSM at approximately 5 cm ground resolution.",
-        "The paper demonstrates local high-resolution survey capability but does not establish full game-reach coverage or grant access to source photos, point clouds, DSM, orthophotos, or meshes."
+        "The Batoka case study reports a roughly 13 square kilometre drone survey at the project area and a DSM at approximately 5 cm ground resolution.",
+        "The public paper describes a dam-site engineering comparison rather than upstream full-reach capture.",
+        "The paper grants neither access nor reuse rights for source photos, point clouds, DSM, orthophotos, or meshes."
       ],
+      "coverage_status": "documented_13_square_kilometre_batoka_dam_site_survey",
+      "acquisition_disposition": "exclude_from_primary_game_reach_request",
       "data_attached": false,
       "rights_status": "public_paper_only_underlying_survey_data_and_derivative_rights_unknown"
     },
@@ -71,9 +150,12 @@
       "source_class": "official_project_record_and_survey_custodian_lead",
       "observed_evidence": [
         "Project P133380 funded engineering studies for the proposed Batoka Gorge HES.",
-        "The September 2018 implementation report records initial dam-break mapping and additional LiDAR advancing.",
+        "The project completion report says the dam-break analysis was completed under the Kariba project and attributes additional LiDAR to the Kariba Dam Rehabilitation Project.",
+        "That separate downstream LiDAR activity is not evidence of Boiling Pot to Mukuni Beach coverage and must not be conflated with feasibility Vol.3.",
         "The public project and document records do not expose a LiDAR point cloud, DTM, orthophoto, breakline package, coverage polygon, or redistribution license."
       ],
+      "coverage_status": "p133380_vol3_disposition_unknown_kariba_additional_lidar_separate",
+      "acquisition_disposition": "request_vol3_record_disposition_and_upstream_coverage_only",
       "data_attached": false,
       "rights_status": "project_metadata_public_underlying_survey_access_and_redistribution_unknown"
     },
@@ -141,11 +223,17 @@
     ],
     "request_products": [
       "Vol.3 230 GEN R SP 001 LiDAR Topographic Survey Report",
+      "Vol.3 coverage polygon or sheet index proving whether Boiling Pot to Mukuni Beach is included",
       "classified ground point cloud or bare-earth DTM for Boiling Pot to Mukuni Beach",
       "survey breaklines and Zambezi main-channel centerline",
       "orthophoto or source-image mosaic with acquisition metadata",
       "cross sections, control points, and vertical-datum transformation metadata",
       "explicit commercial game-use, derivative, screenshot, attribution, storage, and redistribution terms"
+    ],
+    "excluded_primary_products": [
+      "the 0.3 m dam-break terrain database documented for the downstream Batoka dam-to-Lake Kariba model",
+      "the approximately 13 square kilometre 2014 eBee DSM centered on the Batoka dam project area",
+      "additional LiDAR attributed to the separate Kariba Dam Rehabilitation Project"
     ],
     "minimum_metadata": [
       "spatial coverage polygon",
