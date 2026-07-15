@@ -806,7 +806,7 @@ def build_zambezi_batoka_v13_visual_morphology_review(
         ],
         next_iteration_requirements=[
             "Do not increase procedural displacement as a substitute for missing survey or photogrammetry.",
-            "Acquire rights-cleared 0.3 m LiDAR, drone photogrammetry, commercial stereo terrain, or another reviewed higher-resolution terrain product with full reach coverage and datum metadata.",
+            "Request feasibility Vol.3 and its coverage index first; use its terrain only if it intersects Boiling Pot to Mukuni Beach, otherwise acquire a rights-cleared full-reach stereo or field-capture product with datum metadata.",
             "Retain V12 world-aligned projection and the source/collision/hydrodynamic authority boundary while the terrain acquisition gate remains open.",
             "Resume continuous morphology and scene dressing only after a higher-resolution terrain candidate passes geospatial and rights review.",
         ],

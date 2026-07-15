@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from hashlib import sha256
 import json
 from pathlib import Path
 
@@ -126,8 +127,11 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     )
     assert FUTALEUFU.terrain_acquisition_lead_file is None
     assert lead["production_promoted"] is False
+    assert lead["schema"] == (
+        "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v4"
+    )
     assert lead["status"] == (
-        "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent"
+        "survey_products_disambiguated_vol3_coverage_index_request_ready_not_sent"
     )
     assert lead["policy"]["report_figures_are_not_geometry_authority"] is True
     assert lead["policy"]["no_lidar_dtm_dsm_ortho_or_breakline_data_downloaded"] is True
@@ -138,6 +142,42 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert "world_bank_p133380_batoka_engineering_and_lidar_records" in sources
     assert "zamcom_zamwis_public_catalog_audit" in sources
     assert all(source["data_attached"] is False for source in sources.values())
+    coverage_audit = lead["coverage_audit"]
+    game_reach = coverage_audit["game_reach"]
+    assert game_reach["station_length_m"] == pytest.approx(30_000.0)
+    assert game_reach["geometry_authority"].endswith("not_surveyed_centerline")
+    assert coverage_audit["batoka_dam"][
+        "straight_line_separation_from_current_review_route_m"
+    ] == pytest.approx(12_767.5)
+    dispositions = {
+        product["product_id"]: product
+        for product in coverage_audit["product_disposition"]
+    }
+    assert dispositions["vol3_230_gen_r_sp_001"]["coverage_status"].startswith(
+        "unknown_"
+    )
+    assert dispositions["vol3_230_gen_r_sp_001"]["priority"] == (
+        "request_report_and_coverage_index_first"
+    )
+    for excluded_product in (
+        "dam_safety_0_3m_lidar_dtm",
+        "2014_ebee_drone_dsm",
+        "kariba_rehabilitation_additional_lidar",
+    ):
+        assert (
+            dispositions[excluded_product]["can_satisfy_game_reach_replacement_gate"]
+            is False
+        )
+        assert dispositions[excluded_product]["priority"].startswith("exclude_")
+    assert sources["bghes_dam_safety_plan_346_gen_r_sp_001"][
+        "coverage_status"
+    ] == "documented_downstream_from_batoka_dam_to_lake_kariba"
+    assert sources["pietrangeli_batoka_drone_photogrammetry_case_study"][
+        "coverage_status"
+    ] == "documented_13_square_kilometre_batoka_dam_site_survey"
+    assert sources["world_bank_p133380_batoka_engineering_and_lidar_records"][
+        "coverage_status"
+    ].endswith("kariba_additional_lidar_separate")
     zamwis_audit = sources["zamcom_zamwis_public_catalog_audit"]["catalog_result"]
     assert zamwis_audit["public_thematic_layer_count"] == 65
     assert zamwis_audit["batoka_high_resolution_terrain_found"] is False
@@ -175,6 +215,9 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert "commercial desktop, console, handheld, and VR game use" in request_text
     assert "World Bank Records Request Addendum" in request_text
     assert "information disclosure is not a game-use license" in request_text
+    assert "coverage polygon or sheet index" in request_text
+    assert "downstream Batoka dam-to-Lake Kariba dam-break model" in request_text
+    assert "We are specifically trying to establish whether Vol.3" in request_text
     assert "The request has not been sent." in request_text
     acquisition_records = [
         record
@@ -184,6 +227,9 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert len(acquisition_records) == 1
     assert acquisition_records[0]["authority"] == "lead_only_no_geometry_or_media_imported"
     assert acquisition_records[0]["status"] == lead["status"]
+    assert acquisition_records[0]["sha256"] == sha256(
+        ZAMBEZI_TERRAIN_ACQUISITION_LEAD_PATH.read_bytes()
+    ).hexdigest()
     assert corridor["artifacts"]["high_resolution_terrain_acquisition_lead"].endswith(
         "batoka_high_resolution_terrain_acquisition_leads.json"
     )
