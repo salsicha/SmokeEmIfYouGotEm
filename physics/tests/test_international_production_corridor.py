@@ -27,6 +27,9 @@ ZAMBEZI_CORRIDOR_MANIFEST_PATH = (
     / "physics/data/real_world/zambezi_batoka_gorge/production_corridor/"
     "boiling_pot_to_mukuni_beach/manifest.json"
 )
+ZAMBEZI_TERRAIN_ACQUISITION_REQUEST_PATH = (
+    REPO_ROOT / "docs/batoka-high-resolution-terrain-acquisition-request.md"
+)
 PHOTOREAL_SOURCE_PLAN_PATH = (
     REPO_ROOT / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
 )
@@ -123,6 +126,9 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     )
     assert FUTALEUFU.terrain_acquisition_lead_file is None
     assert lead["production_promoted"] is False
+    assert lead["status"] == (
+        "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent"
+    )
     assert lead["policy"]["report_figures_are_not_geometry_authority"] is True
     assert lead["policy"]["no_lidar_dtm_dsm_ortho_or_breakline_data_downloaded"] is True
     sources = {source["source_id"]: source for source in lead["discovered_sources"]}
@@ -133,6 +139,29 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert "classified ground point cloud or bare-earth DTM" in " ".join(
         lead["acquisition_request"]["request_products"]
     )
+    assert lead["acquisition_request"]["request_template"] == (
+        "docs/batoka-high-resolution-terrain-acquisition-request.md"
+    )
+    assert ZAMBEZI_TERRAIN_ACQUISITION_REQUEST_PATH.is_file()
+    contacts = {
+        contact["provider"]: contact
+        for contact in lead["acquisition_request"]["contact_routes"]
+    }
+    assert contacts["Zambezi River Authority"]["email"] == "info@zambezira.org"
+    assert contacts["Studio Ing. G. Pietrangeli S.r.l."]["email"] == (
+        "info@pietrangeli.it"
+    )
+    assert lead["acquisition_request"]["outreach_status"]["sent"] is False
+    request_text = ZAMBEZI_TERRAIN_ACQUISITION_REQUEST_PATH.read_text(encoding="utf-8")
+    for bound in (
+        "25.826935535974975",
+        "-18.02077352349982",
+        "26.01842667723117",
+        "-17.90811477650018",
+    ):
+        assert bound in request_text
+    assert "commercial desktop, console, handheld, and VR game use" in request_text
+    assert "The request has not been sent." in request_text
     acquisition_records = [
         record
         for record in corridor["source_records"]
@@ -140,6 +169,7 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     ]
     assert len(acquisition_records) == 1
     assert acquisition_records[0]["authority"] == "lead_only_no_geometry_or_media_imported"
+    assert acquisition_records[0]["status"] == lead["status"]
     assert corridor["artifacts"]["high_resolution_terrain_acquisition_lead"].endswith(
         "batoka_high_resolution_terrain_acquisition_leads.json"
     )

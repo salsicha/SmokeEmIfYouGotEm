@@ -1,0 +1,50 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_visual_review.v5",
+  "generated_on": "2026-07-13",
+  "status": "v13_bounded_visual_morphology_rejected_insufficient_source_resolution",
+  "decision": "retain_v12_projection_reject_small_procedural_offsets_require_higher_resolution_terrain",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_map_modified": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_comparison_report.json",
+  "source_report_sha256": "b293bdfcdaf68835b77a6fae7a0560ef4b284eac0cc5aa1559c1cafea477e235",
+  "accepted_findings": [
+    "The transient command preserves the V12 material and applies deterministic authored morphology only to the four collision-free dense render tiles.",
+    "A 220 m fully protected river corridor fading to 650 m keeps the visual experiment away from the authored channel, banks, solver, and raft-contact authority.",
+    "The report accounts for all 1,631,500 vertices per comparison, including 76,403 river-protected and 1,471,404 low-slope-rejected vertices.",
+    "The bounded pass modifies 69,987 vertices with a 29.35 cm mean absolute offset and measured -3.94 m to +2.93 m extrema under a 4.5 m cap."
+  ],
+  "rejection_reasons": [
+    "The paired exact-camera images show no meaningful gorge-silhouette improvement: 5.22 and 7.84 percent of pixels change, but mean absolute channel deltas are only 0.19 and 0.25 levels.",
+    "Only 4.29 percent of visual vertices move, while the 30 m DSM continues to define rounded canyon masses without stacked scarps, ledges, gullies, or talus fields.",
+    "Increasing procedural offsets enough to replace the missing silhouette would invent unsupported wall and bank geometry rather than recover source detail.",
+    "Foliage, water, atmosphere, lighting, and exact Batoka lithology remain separate unresolved scene blockers."
+  ],
+  "reviewed_evidence": {
+    "guide_seat": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_pre_morphology_guide_seat_downstream.png",
+      "baseline_sha256": "d840652779bdb5fc0c62b600344f000073e56fb223145916dd86db1cdeb66992",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_guide_seat_downstream.png",
+      "comparison_sha256": "12c7523b0649aa9adcb12ce985009f549140ec090e84d993ff91b48bf6e4809f",
+      "changed_pixel_fraction": 0.05220703125,
+      "mean_absolute_channel_delta": 0.19130172164351852,
+      "maximum_channel_delta": 165
+    },
+    "river_eye": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_pre_morphology_river_eye_downstream.png",
+      "baseline_sha256": "b85c7ff34c61275945928025396199ab7079d3e2c4ce36f1a2d221a44291362b",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_river_eye_downstream.png",
+      "comparison_sha256": "c510688dec9dec22debf9861fd6a9362514bd9c6c1125bf83ff2787135e398a9",
+      "changed_pixel_fraction": 0.07840277777777778,
+      "mean_absolute_channel_delta": 0.24961697048611112,
+      "maximum_channel_delta": 118
+    }
+  },
+  "next_iteration_requirements": [
+    "Do not increase procedural displacement as a substitute for missing survey or photogrammetry.",
+    "Acquire rights-cleared 0.3 m LiDAR, drone photogrammetry, commercial stereo terrain, or another reviewed higher-resolution terrain product with full reach coverage and datum metadata.",
+    "Retain V12 world-aligned projection and the source/collision/hydrodynamic authority boundary while the terrain acquisition gate remains open.",
+    "Resume continuous morphology and scene dressing only after a higher-resolution terrain candidate passes geospatial and rights review."
+  ],
+  "authority": "transient authored visual hypothesis on the continuous dense render mesh only; saved map, 30 m source DSM, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"
+}

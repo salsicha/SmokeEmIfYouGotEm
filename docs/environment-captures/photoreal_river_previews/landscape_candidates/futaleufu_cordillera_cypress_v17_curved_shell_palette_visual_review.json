@@ -1,0 +1,106 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_palette_review.v1",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v17_open_grown_conical_curved_shells",
+  "status": "curved_shell_mechanism_retained_visual_and_corridor_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "project-owned V17 PVE tree graph and seed",
+      "three V10 broad-spray source textures",
+      "3626 foliage instances",
+      "material defaults and photographic capture settings",
+      "exact source camera and multi-view HLOD baker"
+    ],
+    "changed": "each foliage mesh uses three six-segment curved shells instead of three flat cards",
+    "flat_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v17_pve_open_grown_conical_report.json",
+    "curved_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v17_pve_open_grown_conical_curved_shells_report.json"
+  },
+  "structural_evidence": {
+    "flat_foliage_instance_count": 3626,
+    "curved_foliage_instance_count": 3626,
+    "flat_atlas_coverage_fraction_range": [
+      0.156597137,
+      0.17206192
+    ],
+    "curved_atlas_coverage_fraction_range": [
+      0.153343201,
+      0.169071198
+    ],
+    "flat_triangles_per_live_twig_mesh": 6,
+    "curved_triangles_per_live_twig_mesh": 36,
+    "estimated_flat_live_foliage_triangles": 21756,
+    "estimated_curved_live_foliage_triangles": 130536
+  },
+  "capture_comparisons": {
+    "exact_60m_source": {
+      "flat": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypress/open_grown_conical_river_distance_60m.png",
+        "sha256": "6020aa62b5fff08f033f98ba516585f3c5b3d9ec01689f1c4bdfa91bac04f9a0"
+      },
+      "curved": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCurvedShell/open_grown_conical_river_distance_60m.png",
+        "sha256": "78f8d2184b8fedc4957d380486b4ab19a8db573e4e5132d8c57ea852ee1cb0f0"
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.07108181423611111,
+      "mean_absolute_channel_delta": 3.445864800347222,
+      "dark_chromatic_foreground_mask": {
+        "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+        "flat_pixels": 66004,
+        "curved_pixels": 64145,
+        "intersection_over_union": 0.7625096488495863
+      }
+    },
+    "branch_spray_closeup": {
+      "flat": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypress/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "17fe554b485f9bc3c042d2fbdfcd450f9802a532bf0b38f1c0ec136c82392a9c"
+      },
+      "curved": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCurvedShell/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "2812caf472dee9156489ddc64bc1b9270ded8dbecdb1096ca57078746b8e7e01"
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.09263671875,
+      "mean_absolute_channel_delta": 7.156888382523148,
+      "dark_chromatic_foreground_mask": {
+        "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+        "flat_pixels": 65719,
+        "curved_pixels": 64715,
+        "intersection_over_union": 0.5180159210465062
+      }
+    },
+    "exact_60m_hlod": {
+      "flat": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypress/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "73126022d90615a1cfe0055f7f1401870300fe7e2f0513035e11e57a04060f10"
+      },
+      "curved": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCurvedShell/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "d2000809eccc004709fad05dd42c95891ce6f6a0ef383fcb87a15821bb055568"
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.06648763020833333,
+      "mean_absolute_channel_delta": 3.4672808159722224,
+      "dark_chromatic_foreground_mask": {
+        "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+        "flat_pixels": 69080,
+        "curved_pixels": 65848,
+        "intersection_over_union": 0.7817687218561411
+      }
+    }
+  },
+  "human_review": {
+    "accepted": [
+      "The branch closeup follows a bent surface and no longer exposes the baseline's large flat polygon faces.",
+      "The exact 60 m source and HLOD retain green response, branch detail, and nearly the same foreground coverage.",
+      "The isolated palette and capture namespaces preserve a rerunnable flat baseline."
+    ],
+    "rejected": [
+      "Each shell still carries one complete broad-spray image, so repeated whole-spray motifs remain visible.",
+      "The PVE crown still reads as coarse horizontal shelves rather than a continuous irregular Austrocedrus crown.",
+      "The HLOD faithfully bakes those source limitations and is not photoreal production art.",
+      "The 20/28/36 m authority, moving-camera temporal, wind, packaged desktop, and target-VR gates have not run."
+    ],
+    "decision": "Retain curved_shells as the preferred V17 source-palette experiment, but do not regenerate the other seven forms or place it in the corridor. Next decompose the whole-spray source into connected branch-scale twig hierarchy before repeating this paired gate."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false
+}

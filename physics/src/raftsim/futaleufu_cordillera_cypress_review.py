@@ -122,6 +122,22 @@ V13_REVIEW_RELATIVE_PATH = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "futaleufu_cordillera_cypress_v13_morphology_donor_visual_review.json"
 )
+V14_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v14_opaque_near_family_report.json"
+)
+V14_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v14_opaque_near_visual_review.json"
+)
+V15_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v15_volumetric_near_family_report.json"
+)
+V15_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "futaleufu_cordillera_cypress_v15_volumetric_near_visual_review.json"
+)
 GENERATED_ON = "2026-07-13"
 
 
@@ -2114,6 +2130,358 @@ def build_futaleufu_cordillera_cypress_v13_visual_review(repo_root: Path) -> dic
 def write_futaleufu_cordillera_cypress_v13_visual_review(repo_root: Path) -> dict:
     review = build_futaleufu_cordillera_cypress_v13_visual_review(repo_root)
     output_path = repo_root.resolve() / V13_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return review
+
+
+def build_futaleufu_cordillera_cypress_v14_visual_review(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    report_path = repo_root / V14_REPORT_RELATIVE_PATH
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    v10_path = repo_root / V10_REVIEW_RELATIVE_PATH
+    v12_path = repo_root / V12_REVIEW_RELATIVE_PATH
+    v13_path = repo_root / V13_REVIEW_RELATIVE_PATH
+
+    captures = []
+    capture_by_id = {}
+    for capture in report["captures"]:
+        relative_path = Path(capture["path"])
+        capture_id = capture["capture_id"]
+        metrics = _capture_metrics(repo_root / relative_path)
+        entry = {
+            "capture_id": capture_id,
+            "path": str(relative_path),
+            "authority_mode": capture["authority_mode"],
+            "foreground_silhouette_fraction": _foreground_silhouette_fraction(
+                repo_root / relative_path
+            ),
+            **metrics,
+        }
+        captures.append(entry)
+        capture_by_id[capture_id] = entry
+
+    def image_delta(first: Path, second: Path) -> dict:
+        with Image.open(first) as image:
+            first_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        with Image.open(second) as image:
+            second_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        delta = np.abs(first_rgb - second_rgb)
+        return {
+            "byte_identical": bool(np.count_nonzero(delta) == 0),
+            "changed_pixel_fraction": float(np.mean(np.any(delta > 0, axis=2))),
+            "mean_absolute_rgb_delta": float(np.mean(delta)),
+            "maximum_channel_delta": int(np.max(delta)),
+        }
+
+    triplets = []
+    silhouette_ratios = []
+    combined_matches_near_count = 0
+    combined_matches_far_count = 0
+    for form_id in ("open_grown_conical", "closed_grove_columnar", "grove_intermediate"):
+        for distance in ("20m", "28m", "36m"):
+            base = f"{form_id}_handoff_{distance}"
+            near = capture_by_id[f"{base}_near_only"]
+            far = capture_by_id[f"{base}_far_only"]
+            combined = capture_by_id[f"{base}_combined"]
+            near_path = repo_root / near["path"]
+            far_path = repo_root / far["path"]
+            combined_path = repo_root / combined["path"]
+            combined_vs_near = image_delta(combined_path, near_path)
+            combined_vs_far = image_delta(combined_path, far_path)
+            combined_matches_near_count += int(combined_vs_near["byte_identical"])
+            combined_matches_far_count += int(combined_vs_far["byte_identical"])
+            silhouette_ratio = (
+                near["foreground_silhouette_fraction"]
+                / max(far["foreground_silhouette_fraction"], 1.0e-9)
+            )
+            silhouette_ratios.append(silhouette_ratio)
+            triplets.append({
+                "form_id": form_id,
+                "distance": distance,
+                "near_to_far_foreground_silhouette_ratio": silhouette_ratio,
+                "combined_vs_near": combined_vs_near,
+                "combined_vs_far": combined_vs_far,
+            })
+
+    clusters = [
+        form["near_opaque_scale_leaf_source_clusters"] for form in report["forms"]
+    ]
+    triangles = [
+        form["near_opaque_scale_leaf_source_triangles"] for form in report["forms"]
+    ]
+    closeups = [capture for capture in captures if "bark_spray_closeup" in capture["capture_id"]]
+    combined_differs_from_both_count = (
+        len(triplets) - combined_matches_near_count - combined_matches_far_count
+    )
+    authority_passed = (
+        combined_matches_far_count == len(triplets)
+        and combined_matches_near_count == 0
+        and combined_differs_from_both_count == 0
+        and report["near_representation_eligible"] is False
+    )
+    return {
+        "schema": "raftsim.unreal.futaleufu_cordillera_cypress_opaque_near_visual_review.v14",
+        "generated_on": GENERATED_ON,
+        "status": "v14_opaque_topology_and_v12_resource_ceiling_rejected",
+        "production_promoted": False,
+        "corridor_substitution_performed": False,
+        "source_report": str(V14_REPORT_RELATIVE_PATH),
+        "source_report_sha256": _sha256(report_path),
+        "v10_review": str(V10_REVIEW_RELATIVE_PATH),
+        "v10_review_sha256": _sha256(v10_path),
+        "v12_review": str(V12_REVIEW_RELATIVE_PATH),
+        "v12_review_sha256": _sha256(v12_path),
+        "v13_review": str(V13_REVIEW_RELATIVE_PATH),
+        "v13_review_sha256": _sha256(v13_path),
+        "review_scope": {
+            "form_count": report["form_count"],
+            "capture_count": len(captures),
+            "rhi": "offscreen Metal",
+            "minimum_near_clusters_per_form": min(clusters),
+            "maximum_near_clusters_per_form": max(clusters),
+            "minimum_near_triangles_per_form": min(triangles),
+            "maximum_near_triangles_per_form": max(triangles),
+            "near_branch_system_sampling_probability": report[
+                "near_branch_system_sampling_probability"
+            ],
+            "masked_whole_spray_cards_used": report["masked_whole_spray_cards_used"],
+            "direct_fir_geometry_copied": report["direct_fir_geometry_copied"],
+            "near_representation_eligible": report["near_representation_eligible"],
+        },
+        "accepted_findings": [
+            "V14 is fully project-owned and uses no copied fir geometry or masked whole-spray cards.",
+            "Every selected cluster shares one welded root vertex, so the three opaque lobes are topologically connected at the authored branch attachment.",
+            "The 139-305 cluster and 834-1,830 triangle ranges remain inside the retained V12 near-source resource envelope.",
+            "All 67 exact-camera captures complete, and all nine combined handoff views remain byte-identical to the retained far fallback.",
+        ],
+        "rejection_reasons": [
+            "Near-only closeups expose flat fluorescent triangular blades with no rounded twig, scale-leaf volume, surface variation, or botanical detail.",
+            "At 20-36 m the welded lobes read as angular paper fans distributed on the same tiered primary skeleton rather than broad irregular evergreen crown mass.",
+            "The opaque constant-color material makes topology easy to diagnose but is intentionally incapable of establishing photoreal bark-to-scale-leaf response.",
+            "Keeping opaque near geometry under the V12 1,900-triangle ceiling leaves too few facets for branch-distance morphology; the card-derived ceiling is now a failed representation constraint, not a valid production budget.",
+            "No wind, shadow, LOD, Nanite, corridor ecology, packaged desktop, or on-device VR evidence exists for this rejected near mesh.",
+        ],
+        "quantitative_review": {
+            "near_to_far_foreground_silhouette": {
+                "minimum": min(silhouette_ratios),
+                "mean": sum(silhouette_ratios) / len(silhouette_ratios),
+                "maximum": max(silhouette_ratios),
+                "required_minimum": 1.0,
+                "all_handoff_views_passed": min(silhouette_ratios) >= 1.0,
+            },
+            "closeup_green_dominant_fraction": {
+                "sample_count": len(closeups),
+                "minimum": min(capture["green_dominant_fraction"] for capture in closeups),
+                "mean": sum(capture["green_dominant_fraction"] for capture in closeups)
+                / len(closeups),
+                "maximum": max(capture["green_dominant_fraction"] for capture in closeups),
+                "acceptance_metric": False,
+            },
+            "authority_result": {
+                "triplet_count": len(triplets),
+                "combined_matches_near_count": combined_matches_near_count,
+                "combined_matches_far_count": combined_matches_far_count,
+                "combined_differs_from_both_count": combined_differs_from_both_count,
+                "actor_root_authority_passed": authority_passed,
+                "triplets": triplets,
+            },
+        },
+        "captures": captures,
+        "decision": "reject_v14_retain_connected_attachment_and_exact_authority_lift_card_derived_triangle_ceiling",
+        "next_iteration_requirements": [
+            "Build V15 from rounded opaque twig segments and many bounded scale-leaf volumes, with a measured Nanite near-tier budget derived from representative desktop and VR profiling instead of the failed V12 card ceiling.",
+            "Keep V10 far fallback authority, V10 silhouette floors, V13 exterior closeups, exact-camera checks, project ownership, and the no-masked-whole-spray-card boundary.",
+            "Break the tiered crown by grouping irregular ascending and descending branch systems before adding density; require broad evergreen mass in both turntables and at 60 m.",
+            "Add bark-to-green twig color transition, bounded material variation, rounded tips, and connected secondary/tertiary attachments before enabling shadows or corridor placement.",
+            "Profile static and moving-camera cost on packaged desktop and target VR before setting V15 production triangle, instance, and transition ceilings.",
+        ],
+    }
+
+
+def write_futaleufu_cordillera_cypress_v14_visual_review(repo_root: Path) -> dict:
+    review = build_futaleufu_cordillera_cypress_v14_visual_review(repo_root)
+    output_path = repo_root.resolve() / V14_REVIEW_RELATIVE_PATH
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+    return review
+
+
+def build_futaleufu_cordillera_cypress_v15_visual_review(repo_root: Path) -> dict:
+    repo_root = repo_root.resolve()
+    report_path = repo_root / V15_REPORT_RELATIVE_PATH
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    v13_path = repo_root / V13_REVIEW_RELATIVE_PATH
+    v14_path = repo_root / V14_REVIEW_RELATIVE_PATH
+
+    captures = []
+    capture_by_id = {}
+    near_fixed_groups: dict[str, list[float]] = {
+        "turntable": [],
+        "closeup": [],
+        "river_distance_60m": [],
+    }
+    for capture in report["captures"]:
+        relative_path = Path(capture["path"])
+        capture_id = capture["capture_id"]
+        metrics = _capture_metrics(repo_root / relative_path)
+        foreground = _foreground_silhouette_fraction(repo_root / relative_path)
+        entry = {
+            "capture_id": capture_id,
+            "path": str(relative_path),
+            "authority_mode": capture["authority_mode"],
+            "foreground_silhouette_fraction": foreground,
+            **metrics,
+        }
+        captures.append(entry)
+        capture_by_id[capture_id] = entry
+        if capture["authority_mode"] == "near_only" and "handoff" not in capture_id:
+            group = (
+                "turntable" if "turntable" in capture_id
+                else "closeup" if "bark_spray_closeup" in capture_id
+                else "river_distance_60m"
+            )
+            near_fixed_groups[group].append(foreground)
+
+    def image_delta(first: Path, second: Path) -> dict:
+        with Image.open(first) as image:
+            first_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        with Image.open(second) as image:
+            second_rgb = np.asarray(image.convert("RGB"), dtype=np.int16)
+        delta = np.abs(first_rgb - second_rgb)
+        return {
+            "byte_identical": bool(np.count_nonzero(delta) == 0),
+            "changed_pixel_fraction": float(np.mean(np.any(delta > 0, axis=2))),
+            "mean_absolute_rgb_delta": float(np.mean(delta)),
+            "maximum_channel_delta": int(np.max(delta)),
+        }
+
+    triplets = []
+    silhouette_ratios = []
+    combined_matches_near_count = 0
+    combined_matches_far_count = 0
+    for form_id in ("open_grown_conical", "closed_grove_columnar", "grove_intermediate"):
+        for distance in ("20m", "28m", "36m"):
+            base = f"{form_id}_handoff_{distance}"
+            near = capture_by_id[f"{base}_near_only"]
+            far = capture_by_id[f"{base}_far_only"]
+            combined = capture_by_id[f"{base}_combined"]
+            near_path = repo_root / near["path"]
+            far_path = repo_root / far["path"]
+            combined_path = repo_root / combined["path"]
+            combined_vs_near = image_delta(combined_path, near_path)
+            combined_vs_far = image_delta(combined_path, far_path)
+            combined_matches_near_count += int(combined_vs_near["byte_identical"])
+            combined_matches_far_count += int(combined_vs_far["byte_identical"])
+            silhouette_ratio = (
+                near["foreground_silhouette_fraction"]
+                / max(far["foreground_silhouette_fraction"], 1.0e-9)
+            )
+            silhouette_ratios.append(silhouette_ratio)
+            triplets.append({
+                "form_id": form_id,
+                "distance": distance,
+                "near_to_far_foreground_silhouette_ratio": silhouette_ratio,
+                "combined_vs_near": combined_vs_near,
+                "combined_vs_far": combined_vs_far,
+            })
+
+    systems = [
+        form["near_volumetric_scale_leaf_source_branch_systems"]
+        for form in report["forms"]
+    ]
+    triangles = [
+        form["near_volumetric_scale_leaf_source_triangles"]
+        for form in report["forms"]
+    ]
+    combined_differs_from_both_count = (
+        len(triplets) - combined_matches_near_count - combined_matches_far_count
+    )
+    authority_passed = (
+        combined_matches_far_count == len(triplets)
+        and combined_matches_near_count == 0
+        and combined_differs_from_both_count == 0
+        and report["near_representation_eligible"] is False
+    )
+    fixed_summaries = {
+        group: {
+            "sample_count": len(values),
+            "minimum_foreground_silhouette_fraction": min(values),
+            "mean_foreground_silhouette_fraction": sum(values) / len(values),
+            "maximum_foreground_silhouette_fraction": max(values),
+        }
+        for group, values in near_fixed_groups.items()
+    }
+    return {
+        "schema": "raftsim.unreal.futaleufu_cordillera_cypress_volumetric_near_visual_review.v15",
+        "generated_on": GENERATED_ON,
+        "status": "v15_dense_raster_micro_foliage_visible_morphology_rejected",
+        "production_promoted": False,
+        "corridor_substitution_performed": False,
+        "source_report": str(V15_REPORT_RELATIVE_PATH),
+        "source_report_sha256": _sha256(report_path),
+        "v13_review": str(V13_REVIEW_RELATIVE_PATH),
+        "v13_review_sha256": _sha256(v13_path),
+        "v14_review": str(V14_REVIEW_RELATIVE_PATH),
+        "v14_review_sha256": _sha256(v14_path),
+        "review_scope": {
+            "form_count": report["form_count"],
+            "capture_count": len(captures),
+            "rhi": "offscreen Metal",
+            "minimum_selected_branch_systems_per_form": min(systems),
+            "maximum_selected_branch_systems_per_form": max(systems),
+            "minimum_near_triangles_per_form": min(triangles),
+            "maximum_near_triangles_per_form": max(triangles),
+            "woody_nanite_enabled": report["woody_nanite_enabled"],
+            "micro_foliage_nanite_enabled": report["micro_foliage_nanite_enabled"],
+            "nanite_shape_preservation": report["nanite_shape_preservation"],
+            "near_representation_eligible": report["near_representation_eligible"],
+        },
+        "accepted_findings": [
+            "A dense 50 percent branch-system sample produces 625-1,316 selected systems and 160,000-336,896 micro-foliage triangles per form without capture or map-save failure.",
+            "Nanite PreserveArea is invalid for the thin open procedural twig and lobe segments because it expands them into visible shards; Nanite with shape preservation disabled keeps woody geometry stable.",
+            "Nanite culls most disconnected micro-foliage volumes at turntable and 60 m, while the traditional raster near mesh renders the complete authored density; the split is retained as an engine-authoring lesson.",
+            "All 67 captures complete, fixed near-only turntable/closeup/60 m evidence is explicit, and all nine combined handoff views remain byte-identical to far-only.",
+        ],
+        "rejection_reasons": [
+            "The dense raster result reads as rows of large faceted pods on an evenly tiered primary skeleton, not flattened cypress sprays or broad irregular Austrocedrus crown mass.",
+            "Exterior closeups expose simple six/eight-sided fusiform primitives with constant color and deep self-darkening rather than scale leaves, twig transition, bark detail, or botanical surface response.",
+            "Increasing primitive density improves occupancy but does not improve morphology; continuing to tune the same hand-built lobe representation would spend more geometry on the wrong shape language.",
+            "The 160k-337k traditional-raster near tier has not passed packaged desktop or target-VR profiling and cannot be treated as a production budget.",
+            "No wind, bounded shadow, LOD transition, mixed ecology, corridor placement, or rights/ecology human review has passed.",
+        ],
+        "quantitative_review": {
+            "fixed_near_view_summaries": fixed_summaries,
+            "near_to_far_foreground_silhouette": {
+                "minimum": min(silhouette_ratios),
+                "mean": sum(silhouette_ratios) / len(silhouette_ratios),
+                "maximum": max(silhouette_ratios),
+                "required_minimum": 1.0,
+                "all_handoff_views_passed": min(silhouette_ratios) >= 1.0,
+            },
+            "authority_result": {
+                "triplet_count": len(triplets),
+                "combined_matches_near_count": combined_matches_near_count,
+                "combined_matches_far_count": combined_matches_far_count,
+                "combined_differs_from_both_count": combined_differs_from_both_count,
+                "actor_root_authority_passed": authority_passed,
+                "triplets": triplets,
+            },
+        },
+        "captures": captures,
+        "decision": "reject_v15_primitive_morphology_retain_nanite_woody_raster_micro_foliage_split",
+        "next_iteration_requirements": [
+            "Stop hand-building cypress foliage from generic primitive lobes; use Unreal Procedural Vegetation, SpeedTree, or a separately licensed and reviewed Cupressaceae morphology source as the reconstruction workflow.",
+            "Preserve project ownership/native identity boundaries, V10 far fallback authority and silhouette floors, V13 exterior evidence, exact cameras, and the V15 Nanite-woody/traditional-micro-foliage rendering split where the selected authoring tool supports it.",
+            "Require flattened branch-scale sprays, connected green twig hierarchy, non-tiered broad crown mass, true scale-leaf closeup detail, and at least five adult plus three intermediate forms before corridor placement.",
+            "Establish packaged desktop and target-VR cost from the authored tool output before setting triangle, instance, wind, shadow, and handoff ceilings.",
+        ],
+    }
+
+
+def write_futaleufu_cordillera_cypress_v15_visual_review(repo_root: Path) -> dict:
+    review = build_futaleufu_cordillera_cypress_v15_visual_review(repo_root)
+    output_path = repo_root.resolve() / V15_REVIEW_RELATIVE_PATH
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
     return review

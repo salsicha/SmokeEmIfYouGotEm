@@ -1,0 +1,91 @@
+{
+  "schema": "raftsim.unreal.futaleufu_world_stable_canopy_review.v26",
+  "reviewed_on": "2026-07-13",
+  "river_id": "futaleufu_terminator",
+  "status": "world_stability_validated_feather_settings_and_scene_quality_failed_candidate_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "world_stable_coordinate_contract_retained": true,
+  "spatial_occupancy_field_mechanism_retained": true,
+  "v26_occupancy_feather_settings_retained": false,
+  "alpha2_no_shadow_candidate_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v26_world_stable_comparison_report.json",
+  "decision": "retain_curvilinear_world_coordinates_and_identical_placement_fingerprint_reject_v26_feather_density_and_visual_candidate",
+  "diagnostic_conclusions": {
+    "world_stable_profile_reached_target_count_in_both_views": true,
+    "guide_and_river_eye_placement_fingerprints_match": true,
+    "corrected_curvilinear_domain_covers_both_review_reaches": true,
+    "spatial_occupancy_feather_resolves_source_mask_bands": false,
+    "world_stable_profile_produces_continuous_lifelike_mixed_forest": false,
+    "terrain_water_and_atmosphere_remain_dominant_blockers": true,
+    "world_stable_profile_is_production_promoted": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "landscape_or_collision_modified": false,
+    "hydrodynamic_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "fixed_between_variants": "6.5 m spacing, 24 m river setback, project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, terrain, water, rocks, cameras, lighting, physics, and saved map",
+    "changed_in_world_stable_variant": "a corridor-anchored 6.0 km by 2.2 km curvilinear centerline domain and 24000-tree target replace each camera's 2.2 km square and 9000-tree target; a 512-cell chamfer signed-distance occupancy field with 180 m feather replaces scalar source-mask luma feathering"
+  },
+  "world_stability_evidence": {
+    "guide_seat_fingerprint_fnv1a64": "f30715fa74aee851",
+    "river_eye_fingerprint_fnv1a64": "f30715fa74aee851",
+    "fingerprints_match": true,
+    "candidate_count_each": 148909,
+    "accepted_tree_count_each": 24000,
+    "rejected_river_setback_count_each": 3262,
+    "rejected_stand_density_count_each": 61886,
+    "rejected_slope_count_each": 13082,
+    "rejected_spacing_count_each": 12474,
+    "minimum_accepted_river_distance_m_each": 93.18484497070312
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "camera_local": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v26_camera_local_area_alpha2_guide_seat_downstream.png",
+      "camera_local_sha256": "412ac510dd9cc7bab1d6264b1257c460476c0d29cb78abb3e63d02534b165553",
+      "world_stable": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v26_world_stable_occupancy_alpha2_guide_seat_downstream.png",
+      "world_stable_sha256": "3796eb8494f6053a842e384b54195dd47970270e84e39aaa12195797f4a62de0",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.11932942708333333,
+      "mean_absolute_rgb_delta": [3.3524674479166667, 3.0123882378472224, 2.737587890625],
+      "camera_local_dark_fraction": 0.06056966145833333,
+      "world_stable_dark_fraction": 0.03416775173611111,
+      "world_stable_near_mid_runtime_far_counts": [105, 893, 23002]
+    },
+    "river_eye": {
+      "camera_local": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v26_camera_local_area_alpha2_river_eye_downstream.png",
+      "camera_local_sha256": "e695ec7c936f2fb60ba2a52b0603cca0d4c4025f8ae71ba7e1440cb4e385f01f",
+      "world_stable": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v26_world_stable_occupancy_alpha2_river_eye_downstream.png",
+      "world_stable_sha256": "e87e00c067bfab8bac7d3d9a07ef71c7b3bff7fbdde934b9a9b3f820dbae2981",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.14450737847222223,
+      "mean_absolute_rgb_delta": [2.897183159722222, 2.6541623263888887, 2.0798046875],
+      "camera_local_dark_fraction": 0.055681423611111114,
+      "world_stable_dark_fraction": 0.06671875,
+      "world_stable_near_mid_runtime_far_counts": [146, 1144, 22710]
+    }
+  },
+  "accepted_findings": [
+    "The corrected curvilinear domain follows the river bend and supplies visible canopy in both guide-seat and river-eye frames; the rejected initial straight-domain capture was overwritten and is not retained as evidence.",
+    "Both world-stable runs evaluate the same 148909 candidates, accept the same 24000 transforms, record identical rejection counts and minimum river distance, and produce the same f30715fa74aee851 placement fingerprint.",
+    "The world-stable coordinate contract separates forest identity from camera position while still selecting near, mid, and runtime-far representations independently for each viewpoint.",
+    "The 512-cell signed-distance field is a reusable deterministic mechanism for spatial mask treatment, even though the current 180 m feather and density response fail the visual gate."
+  ],
+  "rejection_reasons": [
+    "The 180 m spatial feather adds scattered edge patches and diagonal contour traces without removing the dominant hard forest bands inherited from source occupancy and coarse terrain.",
+    "Guide-seat dark coverage improves while river-eye dark coverage regresses, so the settings do not provide a consistent photometric or compositional gain across the corridor.",
+    "Only 998 guide-seat and 1290 river-eye trees use near or mid representations; most of the 24000-tree workload is runtime-far and has not been profiled as streamed world cells from a moving boat.",
+    "A single repeated coigue family cannot provide age, crown, species, riparian, understory, epiphyte, snag, or deadwood diversity and still exposes uniform trunk walls at stand edges.",
+    "Smooth 30 m terrain, tan provisional ground, flat tiled water, sparse boulder and gravel structure, clear atmosphere, and absent mist or spray remain dominant scene failures."
+  ],
+  "next_iteration_requirements": [
+    "Keep the curvilinear world coordinate and fingerprint contract, but retune occupancy with narrower ecology-reviewed transitions, stronger world-space edge breakup, and explicit treeline, aspect, elevation, and river-distance controls.",
+    "Partition accepted transforms into deterministic streamed world cells and prove identity, culling, and no popping across a moving guide-seat camera before increasing density.",
+    "Add ecology-reviewed age and vertical strata: coigue adults and intermediates, a second accepted native canopy family, riparian shrubs, bamboo or fern understory, epiphyte cues, snags, and deadwood.",
+    "Pair the next ecology pass with world-aligned terrain detail, source-consistent forest-floor color, improved turquoise water response, boulder and gravel-bar structure, humid mountain atmosphere, valley cloud, and spray.",
+    "Profile HISM culling, masked overdraw, memory, streaming, and packaged desktop, console, handheld, and VR cost before production promotion."
+  ]
+}

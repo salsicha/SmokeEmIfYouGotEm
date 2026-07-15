@@ -1,0 +1,448 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v18",
+  "generated_on": "2026-07-14",
+  "status": "v18_branch_scale_twig_atlas_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "derivation": "fixed peripheral twig crops from three project-owned V10 alpha sources",
+    "external_photo_pixels_vendored": false,
+    "botanical_measurement_claimed": false,
+    "sources": [
+      {
+        "id": "a",
+        "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_a_alpha_source_v10.png",
+        "sha256": "2e1b5fd89a3cddeb9a8a5aad18cb2eb7eb997a9beb6cf67732ca0a43512a2e2c",
+        "width": 1042,
+        "height": 1509
+      },
+      {
+        "id": "b",
+        "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_b_alpha_source_v10.png",
+        "sha256": "aedc4ff1c20bbcf25153b395c2006ac76e5be6c5244aee857d1a55c068aa282b",
+        "width": 1080,
+        "height": 1456
+      },
+      {
+        "id": "c",
+        "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Sources/cordillera_cypress_broad_spray_c_alpha_source_v10.png",
+        "sha256": "810b5211f505ea8a09cc1761ae1fa5e42c7f35fd699ab5ab44de80aed07182d8",
+        "width": 1348,
+        "height": 1167
+      }
+    ]
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v18_assets.py",
+    "generator_sha256": "a3fc2e3c4b499b653c77958a3e515be3eea2eb420b64c4a9b8a6956528e2d3de",
+    "atlas_grid": [
+      4,
+      4
+    ],
+    "tile_size": 512,
+    "whole_spray_image_tiles": false,
+    "crop_records": [
+      {
+        "tile": 0,
+        "source": "a",
+        "box": [
+          400,
+          20,
+          600,
+          330
+        ],
+        "rotation_degrees": 0.0,
+        "normalized_size": [
+          200,
+          305
+        ],
+        "tile_position": [
+          156,
+          185
+        ],
+        "nonzero_alpha_fraction": 0.11457443237304688,
+        "opaque_alpha_fraction": 0.094696044921875
+      },
+      {
+        "tile": 1,
+        "source": "a",
+        "box": [
+          60,
+          540,
+          470,
+          780
+        ],
+        "rotation_degrees": -70.3,
+        "normalized_size": [
+          349,
+          438
+        ],
+        "tile_position": [
+          81,
+          52
+        ],
+        "nonzero_alpha_fraction": 0.24977493286132812,
+        "opaque_alpha_fraction": 0.19556808471679688
+      },
+      {
+        "tile": 2,
+        "source": "a",
+        "box": [
+          570,
+          470,
+          920,
+          730
+        ],
+        "rotation_degrees": 57.2,
+        "normalized_size": [
+          381,
+          381
+        ],
+        "tile_position": [
+          65,
+          109
+        ],
+        "nonzero_alpha_fraction": 0.22239303588867188,
+        "opaque_alpha_fraction": 0.16977691650390625
+      },
+      {
+        "tile": 3,
+        "source": "a",
+        "box": [
+          80,
+          880,
+          480,
+          1160
+        ],
+        "rotation_degrees": -62.0,
+        "normalized_size": [
+          388,
+          454
+        ],
+        "tile_position": [
+          62,
+          36
+        ],
+        "nonzero_alpha_fraction": 0.326324462890625,
+        "opaque_alpha_fraction": 0.23272323608398438
+      },
+      {
+        "tile": 4,
+        "source": "a",
+        "box": [
+          560,
+          800,
+          1015,
+          1070
+        ],
+        "rotation_degrees": 62.9,
+        "normalized_size": [
+          336,
+          454
+        ],
+        "tile_position": [
+          88,
+          36
+        ],
+        "nonzero_alpha_fraction": 0.2602996826171875,
+        "opaque_alpha_fraction": 0.16839218139648438
+      },
+      {
+        "tile": 5,
+        "source": "a",
+        "box": [
+          580,
+          1060,
+          950,
+          1320
+        ],
+        "rotation_degrees": 64.8,
+        "normalized_size": [
+          297,
+          399
+        ],
+        "tile_position": [
+          107,
+          91
+        ],
+        "nonzero_alpha_fraction": 0.17504119873046875,
+        "opaque_alpha_fraction": 0.12834548950195312
+      },
+      {
+        "tile": 6,
+        "source": "b",
+        "box": [
+          580,
+          30,
+          1040,
+          500
+        ],
+        "rotation_degrees": 43.3,
+        "normalized_size": [
+          266,
+          454
+        ],
+        "tile_position": [
+          123,
+          36
+        ],
+        "nonzero_alpha_fraction": 0.18375015258789062,
+        "opaque_alpha_fraction": 0.09067535400390625
+      },
+      {
+        "tile": 7,
+        "source": "b",
+        "box": [
+          30,
+          580,
+          430,
+          880
+        ],
+        "rotation_degrees": -69.8,
+        "normalized_size": [
+          413,
+          429
+        ],
+        "tile_position": [
+          49,
+          61
+        ],
+        "nonzero_alpha_fraction": 0.34051513671875,
+        "opaque_alpha_fraction": 0.26848602294921875
+      },
+      {
+        "tile": 8,
+        "source": "b",
+        "box": [
+          560,
+          500,
+          980,
+          760
+        ],
+        "rotation_degrees": 72.5,
+        "normalized_size": [
+          304,
+          433
+        ],
+        "tile_position": [
+          104,
+          57
+        ],
+        "nonzero_alpha_fraction": 0.2299652099609375,
+        "opaque_alpha_fraction": 0.1681365966796875
+      },
+      {
+        "tile": 9,
+        "source": "b",
+        "box": [
+          90,
+          880,
+          440,
+          1220
+        ],
+        "rotation_degrees": -134.0,
+        "normalized_size": [
+          406,
+          448
+        ],
+        "tile_position": [
+          53,
+          42
+        ],
+        "nonzero_alpha_fraction": 0.23242950439453125,
+        "opaque_alpha_fraction": 0.16104888916015625
+      },
+      {
+        "tile": 10,
+        "source": "b",
+        "box": [
+          500,
+          900,
+          780,
+          1280
+        ],
+        "rotation_degrees": 158.5,
+        "normalized_size": [
+          398,
+          425
+        ],
+        "tile_position": [
+          57,
+          65
+        ],
+        "nonzero_alpha_fraction": 0.186920166015625,
+        "opaque_alpha_fraction": 0.12129974365234375
+      },
+      {
+        "tile": 11,
+        "source": "c",
+        "box": [
+          500,
+          20,
+          730,
+          350
+        ],
+        "rotation_degrees": -9.5,
+        "normalized_size": [
+          252,
+          330
+        ],
+        "tile_position": [
+          130,
+          160
+        ],
+        "nonzero_alpha_fraction": 0.13829421997070312,
+        "opaque_alpha_fraction": 0.1021728515625
+      },
+      {
+        "tile": 12,
+        "source": "c",
+        "box": [
+          160,
+          280,
+          550,
+          650
+        ],
+        "rotation_degrees": -50.5,
+        "normalized_size": [
+          454,
+          435
+        ],
+        "tile_position": [
+          29,
+          55
+        ],
+        "nonzero_alpha_fraction": 0.2952880859375,
+        "opaque_alpha_fraction": 0.21444320678710938
+      },
+      {
+        "tile": 13,
+        "source": "c",
+        "box": [
+          700,
+          250,
+          1240,
+          650
+        ],
+        "rotation_degrees": 59.9,
+        "normalized_size": [
+          415,
+          454
+        ],
+        "tile_position": [
+          48,
+          36
+        ],
+        "nonzero_alpha_fraction": 0.19890213012695312,
+        "opaque_alpha_fraction": 0.09566497802734375
+      },
+      {
+        "tile": 14,
+        "source": "c",
+        "box": [
+          230,
+          670,
+          630,
+          970
+        ],
+        "rotation_degrees": -59.0,
+        "normalized_size": [
+          360,
+          360
+        ],
+        "tile_position": [
+          76,
+          130
+        ],
+        "nonzero_alpha_fraction": 0.2576713562011719,
+        "opaque_alpha_fraction": 0.209320068359375
+      },
+      {
+        "tile": 15,
+        "source": "c",
+        "box": [
+          650,
+          620,
+          1340,
+          930
+        ],
+        "rotation_degrees": 74.5,
+        "normalized_size": [
+          284,
+          454
+        ],
+        "tile_position": [
+          114,
+          36
+        ],
+        "nonzero_alpha_fraction": 0.22375106811523438,
+        "opaque_alpha_fraction": 0.12833786010742188
+      }
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "53267f9fffc8e8ee9f7f5dc75798c554db3b0c2f471a287a38435f799f4bf15e",
+      "nontransparent_rgb_sha256": "ee80b98213e43660a04cc466261589ebfa1282b495c29b39c1ae6e4d87471860",
+      "padded_transparent_pixel_count": 927999,
+      "transparent_nonzero_rgb_pixel_count": 825519
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 953128,
+    "nonzero_fraction": 0.22724342346191406,
+    "opaque_pixel_count": 668228,
+    "opaque_fraction": 0.1593179702758789,
+    "transparent_corners": true
+  },
+  "maps": {
+    "twig_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_twig_v18_albedo_opacity.png",
+      "sha256": "fae73ff3421568964f6eaf07a0e7564df5860ed4a6e93f57f08f364e88a2de7e",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v18_isolated_review_candidate_not_production_promoted"
+    },
+    "twig_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_twig_v18_normal.png",
+      "sha256": "31a7488ec9b8c6952309afca7216691ecab40fa32303d7dbb372d2b9ce901c00",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v18_isolated_review_candidate_not_production_promoted"
+    },
+    "twig_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_twig_v18_ao_roughness_subsurface.png",
+      "sha256": "61554af15e43b2a571fa6b77b8cdc127677f6b29b817e340f89d87447b3e50a0",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v18_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "unreal_contract": {
+    "texture_key_prefix": "Twig",
+    "intended_geometry": "connected branch-scale hierarchy of small curved cards",
+    "near_representation_eligible": false,
+    "required_before_eligibility": [
+      "isolated exact-camera palette review",
+      "no visible cut boundaries or repeated whole-spray motifs",
+      "60 m silhouette does not regress against curved-shell V17",
+      "masked overdraw and packaged desktop/target-VR cost pass"
+    ]
+  }
+}

@@ -56,6 +56,7 @@
 #include "LandscapeNaniteComponent.h"
 #include "LandscapeProxy.h"
 #include "GeometryScript/MeshAssetFunctions.h"
+#include "GeometryScript/MeshBasicEditFunctions.h"
 #include "Materials/MaterialExpressionLandscapeLayerCoords.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAbs.h"
@@ -64,24 +65,30 @@
 #include "Materials/MaterialExpressionConstant.h"
 #include "Materials/MaterialExpressionConstant2Vector.h"
 #include "Materials/MaterialExpressionConstant3Vector.h"
+#include "Materials/MaterialExpressionCameraPositionWS.h"
+#include "Materials/MaterialExpressionCustom.h"
 #include "Materials/MaterialExpressionFrac.h"
 #include "Materials/MaterialExpressionFresnel.h"
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMaterialFunctionCall.h"
 #include "Materials/MaterialExpressionMultiply.h"
 #include "Materials/MaterialExpressionOneMinus.h"
+#include "Materials/MaterialExpressionObjectPositionWS.h"
 #include "Materials/MaterialExpressionSaturate.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSubtract.h"
 #include "Materials/MaterialExpressionTextureCoordinate.h"
+#include "Materials/MaterialExpressionTextureObjectParameter.h"
 #include "Materials/MaterialExpressionTextureSampleParameter2D.h"
 #include "Materials/MaterialExpressionTwoSidedSign.h"
 #include "Materials/MaterialExpressionVertexColor.h"
 #include "Materials/MaterialExpressionVertexNormalWS.h"
 #include "Materials/MaterialExpressionVectorParameter.h"
+#include "Materials/MaterialExpressionWorldPosition.h"
 #include "Materials/MaterialInstanceConstant.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialFunctionInterface.h"
+#include "MaterialShared.h"
 #include "MeshUtilities.h"
 #include "MeshDescription.h"
 #include "Misc/CommandLine.h"
@@ -90,6 +97,7 @@
 #include "Misc/PackageName.h"
 #include "Misc/Parse.h"
 #include "Misc/Paths.h"
+#include "Misc/SecureHash.h"
 #include "Modules/ModuleManager.h"
 #include "NaniteSceneProxy.h"
 #include "PlanarCut.h"
@@ -103,9 +111,11 @@
 #include "ProceduralMeshComponent.h"
 #include "ProceduralMeshConversion.h"
 #include "ProceduralVegetation.h"
+#include "DataTypes/PVFoliageInfo.h"
 #include "DataTypes/PVMeshData.h"
 #include "Facades/PVFoliageFacade.h"
 #include "GeometryCollection/GeometryCollection.h"
+#include "Utils/PVFloatRamp.h"
 #include "RaftSimEditorToolRegistry.h"
 #include "RaftSimFeatureTuningEditorShell.h"
 #include "RaftSimRapidRiverEditorShell.h"
@@ -1956,9 +1966,9 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_DefaultLit);
+    Material->SetShadingModel(MSM_Unlit);
     Material->BlendMode = BLEND_Opaque;
-    Material->TwoSided = false;
+    Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
 
     UMaterialExpressionLandscapeLayerCoords* MacroCoordinates =
@@ -2492,7 +2502,9 @@ UMaterialInterface* LoadOrCreatePreviewTerrainVertexColorMaterial()
 }
 
 UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
-    const FRaftSimLandscapeImportCandidateSpec& Candidate)
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    bool bBatokaTerrainIntegratedReview = false,
+    bool bBatokaWorldAlignedReview = false)
 {
     const bool bColorado = Candidate.PreviewSpec.RiverId == TEXT("colorado_river");
     const bool bZambezi = Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
@@ -2511,9 +2523,17 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     {
         RiverAssetName = TEXT("Futaleufu");
     }
-    const FString MaterialAssetName = FString::Printf(
-        TEXT("M_RaftSim_%s_PhysicalSourceTerrainRender"),
-        *RiverAssetName);
+    if ((bBatokaTerrainIntegratedReview || bBatokaWorldAlignedReview) && !bZambezi)
+    {
+        return nullptr;
+    }
+    const FString MaterialAssetName = bBatokaWorldAlignedReview
+        ? TEXT("M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview")
+        : (bBatokaTerrainIntegratedReview
+               ? TEXT("M_RaftSim_Zambezi_BatokaV11_TerrainIntegratedReview")
+               : FString::Printf(
+                     TEXT("M_RaftSim_%s_PhysicalSourceTerrainRender"),
+                     *RiverAssetName));
     const FString MaterialPackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Materials/LandscapeCandidates/%s"),
         *MaterialAssetName);
@@ -2566,6 +2586,47 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         nullptr,
         TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockGround_4K/"
              "T_RockGround_Roughness_4K.T_RockGround_Roughness_4K"));
+    UTexture2D* BatokaMacroAo = nullptr;
+    UTexture2D* BatokaDetailAlbedo = nullptr;
+    UTexture2D* BatokaDetailNormal = nullptr;
+    UTexture2D* BatokaDetailRoughness = nullptr;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        RockGroundAlbedo = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                 "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K."
+                 "T_RaftSim_Batoka_AerialRocks02_Diffuse_4K"));
+        RockGroundNormal = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                 "T_RaftSim_Batoka_AerialRocks02_NormalDX_4K."
+                 "T_RaftSim_Batoka_AerialRocks02_NormalDX_4K"));
+        RockGroundRoughness = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                 "T_RaftSim_Batoka_AerialRocks02_Roughness_4K."
+                 "T_RaftSim_Batoka_AerialRocks02_Roughness_4K"));
+        BatokaMacroAo = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/AerialRocks02_4K/"
+                 "T_RaftSim_Batoka_AerialRocks02_AO_4K."
+                 "T_RaftSim_Batoka_AerialRocks02_AO_4K"));
+        BatokaDetailAlbedo = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+                 "T_RaftSim_Batoka_Rock037_Color_2K.T_RaftSim_Batoka_Rock037_Color_2K"));
+        BatokaDetailNormal = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+                 "T_RaftSim_Batoka_Rock037_NormalDX_2K."
+                 "T_RaftSim_Batoka_Rock037_NormalDX_2K"));
+        BatokaDetailRoughness = LoadObject<UTexture2D>(
+            nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/AmbientCG/Rock037_2K/"
+                 "T_RaftSim_Batoka_Rock037_Roughness_2K."
+                 "T_RaftSim_Batoka_Rock037_Roughness_2K"));
+    }
     if (bColorado || bZambezi)
     {
         ForestFloorAlbedo = RockGroundAlbedo;
@@ -2574,7 +2635,10 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     }
     if (!SourceAlbedo || !SourceNormal || !SourcePacked || !ForestFloorAlbedo ||
         !ForestFloorNormal || !ForestFloorRoughness || !RockGroundAlbedo ||
-        !RockGroundNormal || !RockGroundRoughness)
+        !RockGroundNormal || !RockGroundRoughness ||
+        (bBatokaTerrainIntegratedReview &&
+         (!BatokaMacroAo || !BatokaDetailAlbedo || !BatokaDetailNormal ||
+          !BatokaDetailRoughness)))
     {
         return nullptr;
     }
@@ -2601,12 +2665,15 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     Material->SetShadingModel(MSM_DefaultLit);
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = true;
+    Material->bTangentSpaceNormal = !bBatokaWorldAlignedReview;
 
     UMaterialExpressionTextureCoordinate* Coordinates =
         NewObject<UMaterialExpressionTextureCoordinate>(Material);
     Material->GetExpressionCollection().AddExpression(Coordinates);
     const float DetailTileSizeCm = bZambezi ? 1800.0f : (bFutaleufu ? 1400.0f : 200.0f);
-    const float RockTileSizeCm = bZambezi ? 1200.0f : (bFutaleufu ? 900.0f : 150.0f);
+    const float RockTileSizeCm = bBatokaTerrainIntegratedReview
+        ? 5000.0f
+        : (bZambezi ? 1200.0f : (bFutaleufu ? 900.0f : 150.0f));
     UMaterialExpressionTextureCoordinate* DetailCoordinates =
         NewObject<UMaterialExpressionTextureCoordinate>(Material);
     DetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / DetailTileSizeCm;
@@ -2617,6 +2684,14 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     RockCoordinates->UTiling = Candidate.HorizontalSpanXCm / RockTileSizeCm;
     RockCoordinates->VTiling = Candidate.HorizontalSpanYCm / RockTileSizeCm;
     Material->GetExpressionCollection().AddExpression(RockCoordinates);
+    UMaterialExpressionTextureCoordinate* BatokaDetailCoordinates = nullptr;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        BatokaDetailCoordinates = NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        BatokaDetailCoordinates->UTiling = Candidate.HorizontalSpanXCm / 240.0f;
+        BatokaDetailCoordinates->VTiling = Candidate.HorizontalSpanYCm / 240.0f;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailCoordinates);
+    }
 
     auto AddTextureSample = [Material](
                                 const TCHAR* ParameterName,
@@ -2679,6 +2754,175 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
         RockGroundRoughness,
         SAMPLERTYPE_Masks,
         RockCoordinates);
+    UMaterialExpressionTextureSampleParameter2D* BatokaMacroAoSample = nullptr;
+    UMaterialExpressionTextureSampleParameter2D* BatokaDetailAlbedoSample = nullptr;
+    UMaterialExpressionTextureSampleParameter2D* BatokaDetailNormalSample = nullptr;
+    UMaterialExpressionTextureSampleParameter2D* BatokaDetailRoughnessSample = nullptr;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        BatokaMacroAoSample = AddTextureSample(
+            TEXT("BatokaAerialRocks02AO"),
+            BatokaMacroAo,
+            SAMPLERTYPE_Masks,
+            RockCoordinates);
+        BatokaDetailAlbedoSample = AddTextureSample(
+            TEXT("BatokaRock037DetailAlbedo"),
+            BatokaDetailAlbedo,
+            SAMPLERTYPE_Color,
+            BatokaDetailCoordinates);
+        BatokaDetailNormalSample = AddTextureSample(
+            TEXT("BatokaRock037DetailNormal"),
+            BatokaDetailNormal,
+            SAMPLERTYPE_Normal,
+            BatokaDetailCoordinates);
+        BatokaDetailRoughnessSample = AddTextureSample(
+            TEXT("BatokaRock037DetailRoughness"),
+            BatokaDetailRoughness,
+            SAMPLERTYPE_Masks,
+            BatokaDetailCoordinates);
+    }
+
+    struct FMaterialExpressionOutputRef
+    {
+        UMaterialExpression* Expression = nullptr;
+        int32 OutputIndex = 0;
+    };
+    auto MakeOutputRef = [](UMaterialExpression* Expression)
+    {
+        FMaterialExpressionOutputRef Result;
+        Result.Expression = Expression;
+        return Result;
+    };
+    FMaterialExpressionOutputRef BatokaMacroAlbedoRef = MakeOutputRef(RockGroundAlbedoSample);
+    FMaterialExpressionOutputRef BatokaMacroNormalRef = MakeOutputRef(RockGroundNormalSample);
+    FMaterialExpressionOutputRef BatokaMacroRoughnessRef = MakeOutputRef(RockGroundRoughnessSample);
+    FMaterialExpressionOutputRef BatokaMacroAoRef = MakeOutputRef(BatokaMacroAoSample);
+    FMaterialExpressionOutputRef BatokaDetailAlbedoRef = MakeOutputRef(BatokaDetailAlbedoSample);
+    FMaterialExpressionOutputRef BatokaDetailNormalRef = MakeOutputRef(BatokaDetailNormalSample);
+    FMaterialExpressionOutputRef BatokaDetailRoughnessRef =
+        MakeOutputRef(BatokaDetailRoughnessSample);
+    if (bBatokaWorldAlignedReview)
+    {
+        auto AddWorldAlignedProjection = [Material](
+                                             const TCHAR* ParameterName,
+                                             UTexture2D* Texture,
+                                             EMaterialSamplerType SamplerType,
+                                             float TileSizeCm,
+                                             bool bNormalProjection)
+        {
+            FMaterialExpressionOutputRef Result;
+            UMaterialExpressionTextureObjectParameter* TextureObject =
+                NewObject<UMaterialExpressionTextureObjectParameter>(Material);
+            TextureObject->ParameterName = ParameterName;
+            TextureObject->Texture = Texture;
+            TextureObject->SamplerType = SamplerType;
+            TextureObject->Group = TEXT("BatokaV12WorldAlignedTerrainReview");
+            Material->GetExpressionCollection().AddExpression(TextureObject);
+
+            UMaterialExpressionConstant3Vector* TextureSize =
+                NewObject<UMaterialExpressionConstant3Vector>(Material);
+            TextureSize->Constant = FLinearColor(
+                TileSizeCm,
+                TileSizeCm,
+                TileSizeCm,
+                1.0f);
+            Material->GetExpressionCollection().AddExpression(TextureSize);
+
+            const TCHAR* FunctionPath = bNormalProjection
+                ? TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/"
+                       "WorldAlignedNormal.WorldAlignedNormal")
+                : TEXT("/Engine/Functions/Engine_MaterialFunctions01/Texturing/"
+                       "WorldAlignedTexture.WorldAlignedTexture");
+            UMaterialFunctionInterface* ProjectionFunction =
+                LoadObject<UMaterialFunctionInterface>(nullptr, FunctionPath);
+            UMaterialExpressionMaterialFunctionCall* ProjectionCall =
+                NewObject<UMaterialExpressionMaterialFunctionCall>(Material);
+            Material->GetExpressionCollection().AddExpression(ProjectionCall);
+            if (!ProjectionFunction || !ProjectionCall->SetMaterialFunction(ProjectionFunction))
+            {
+                return Result;
+            }
+            for (int32 InputIndex = 0;
+                 InputIndex < ProjectionCall->FunctionInputs.Num();
+                 ++InputIndex)
+            {
+                const FString InputName = ProjectionCall->GetInputName(InputIndex).ToString();
+                FExpressionInput& Input = ProjectionCall->FunctionInputs[InputIndex].Input;
+                if (InputName.Contains(TEXT("TextureObject"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = TextureObject;
+                }
+                else if (InputName.Contains(TEXT("TextureSize"), ESearchCase::IgnoreCase))
+                {
+                    Input.Expression = TextureSize;
+                }
+            }
+            for (int32 OutputIndex = 0;
+                 OutputIndex < ProjectionCall->FunctionOutputs.Num();
+                 ++OutputIndex)
+            {
+                const FString OutputName =
+                    ProjectionCall->FunctionOutputs[OutputIndex].Output.OutputName.ToString();
+                if (OutputName.Equals(TEXT("XYZ Texture"), ESearchCase::IgnoreCase))
+                {
+                    Result.Expression = ProjectionCall;
+                    Result.OutputIndex = OutputIndex;
+                    break;
+                }
+            }
+            return Result;
+        };
+
+        BatokaMacroAlbedoRef = AddWorldAlignedProjection(
+            TEXT("BatokaAerialRocks02WorldAlignedAlbedo"),
+            RockGroundAlbedo,
+            SAMPLERTYPE_Color,
+            5000.0f,
+            false);
+        BatokaMacroNormalRef = AddWorldAlignedProjection(
+            TEXT("BatokaAerialRocks02WorldAlignedNormal"),
+            RockGroundNormal,
+            SAMPLERTYPE_Normal,
+            5000.0f,
+            true);
+        BatokaMacroRoughnessRef = AddWorldAlignedProjection(
+            TEXT("BatokaAerialRocks02WorldAlignedRoughness"),
+            RockGroundRoughness,
+            SAMPLERTYPE_Masks,
+            5000.0f,
+            false);
+        BatokaMacroAoRef = AddWorldAlignedProjection(
+            TEXT("BatokaAerialRocks02WorldAlignedAO"),
+            BatokaMacroAo,
+            SAMPLERTYPE_Masks,
+            5000.0f,
+            false);
+        BatokaDetailAlbedoRef = AddWorldAlignedProjection(
+            TEXT("BatokaRock037WorldAlignedDetailAlbedo"),
+            BatokaDetailAlbedo,
+            SAMPLERTYPE_Color,
+            240.0f,
+            false);
+        BatokaDetailNormalRef = AddWorldAlignedProjection(
+            TEXT("BatokaRock037WorldAlignedDetailNormal"),
+            BatokaDetailNormal,
+            SAMPLERTYPE_Normal,
+            240.0f,
+            true);
+        BatokaDetailRoughnessRef = AddWorldAlignedProjection(
+            TEXT("BatokaRock037WorldAlignedDetailRoughness"),
+            BatokaDetailRoughness,
+            SAMPLERTYPE_Masks,
+            240.0f,
+            false);
+        if (!BatokaMacroAlbedoRef.Expression || !BatokaMacroNormalRef.Expression ||
+            !BatokaMacroRoughnessRef.Expression || !BatokaMacroAoRef.Expression ||
+            !BatokaDetailAlbedoRef.Expression || !BatokaDetailNormalRef.Expression ||
+            !BatokaDetailRoughnessRef.Expression)
+        {
+            return nullptr;
+        }
+    }
 
     UMaterialExpressionVertexNormalWS* VertexNormalWs =
         NewObject<UMaterialExpressionVertexNormalWS>(Material);
@@ -2739,10 +2983,55 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     RockDetailedBaseColor->B.Expression = RockGroundAlbedoSample;
     RockDetailedBaseColor->Alpha.Expression = RockAlbedoWeight;
     Material->GetExpressionCollection().AddExpression(RockDetailedBaseColor);
+    UMaterialExpression* RockSurfaceBaseColor = RockDetailedBaseColor;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        UMaterialExpressionConstant3Vector* BatokaMacroColorBalance =
+            NewObject<UMaterialExpressionConstant3Vector>(Material);
+        BatokaMacroColorBalance->Constant = FLinearColor(0.78f, 0.58f, 0.72f, 1.0f);
+        Material->GetExpressionCollection().AddExpression(BatokaMacroColorBalance);
+        UMaterialExpressionMultiply* BalancedBatokaMacro =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        BalancedBatokaMacro->A.Expression = BatokaMacroAlbedoRef.Expression;
+        BalancedBatokaMacro->A.OutputIndex = BatokaMacroAlbedoRef.OutputIndex;
+        BalancedBatokaMacro->B.Expression = BatokaMacroColorBalance;
+        Material->GetExpressionCollection().AddExpression(BalancedBatokaMacro);
+        UMaterialExpressionConstant* BatokaMacroWeight =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaMacroWeight->R = 0.56f;
+        Material->GetExpressionCollection().AddExpression(BatokaMacroWeight);
+        UMaterialExpressionLinearInterpolate* BatokaMacroBaseColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaMacroBaseColor->A.Expression = BaseColor;
+        BatokaMacroBaseColor->B.Expression = BalancedBatokaMacro;
+        BatokaMacroBaseColor->Alpha.Expression = BatokaMacroWeight;
+        Material->GetExpressionCollection().AddExpression(BatokaMacroBaseColor);
+        UMaterialExpressionConstant* BatokaDetailColorScale =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaDetailColorScale->R = 1.18f;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailColorScale);
+        UMaterialExpressionMultiply* ScaledBatokaDetail =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        ScaledBatokaDetail->A.Expression = BatokaDetailAlbedoRef.Expression;
+        ScaledBatokaDetail->A.OutputIndex = BatokaDetailAlbedoRef.OutputIndex;
+        ScaledBatokaDetail->B.Expression = BatokaDetailColorScale;
+        Material->GetExpressionCollection().AddExpression(ScaledBatokaDetail);
+        UMaterialExpressionConstant* BatokaDetailColorWeight =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaDetailColorWeight->R = 0.16f;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailColorWeight);
+        UMaterialExpressionLinearInterpolate* BatokaTwoScaleBaseColor =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaTwoScaleBaseColor->A.Expression = BatokaMacroBaseColor;
+        BatokaTwoScaleBaseColor->B.Expression = ScaledBatokaDetail;
+        BatokaTwoScaleBaseColor->Alpha.Expression = BatokaDetailColorWeight;
+        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleBaseColor);
+        RockSurfaceBaseColor = BatokaTwoScaleBaseColor;
+    }
     UMaterialExpressionLinearInterpolate* DetailedBaseColor =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
     DetailedBaseColor->A.Expression = ForestDetailedBaseColor;
-    DetailedBaseColor->B.Expression = RockDetailedBaseColor;
+    DetailedBaseColor->B.Expression = RockSurfaceBaseColor;
     DetailedBaseColor->Alpha.Expression = RockSlopeMask;
     Material->GetExpressionCollection().AddExpression(DetailedBaseColor);
 
@@ -2763,7 +3052,12 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     Material->GetExpressionCollection().AddExpression(ForestFloorRoughnessMask);
     UMaterialExpressionComponentMask* RockGroundRoughnessMask =
         NewObject<UMaterialExpressionComponentMask>(Material);
-    RockGroundRoughnessMask->Input.Expression = RockGroundRoughnessSample;
+    RockGroundRoughnessMask->Input.Expression = bBatokaTerrainIntegratedReview
+        ? BatokaMacroRoughnessRef.Expression
+        : RockGroundRoughnessSample;
+    RockGroundRoughnessMask->Input.OutputIndex = bBatokaTerrainIntegratedReview
+        ? BatokaMacroRoughnessRef.OutputIndex
+        : 0;
     RockGroundRoughnessMask->R = true;
     Material->GetExpressionCollection().AddExpression(RockGroundRoughnessMask);
     UMaterialExpressionConstant* DetailRoughnessWeight = NewObject<UMaterialExpressionConstant>(Material);
@@ -2784,10 +3078,31 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     RockDetailedRoughness->B.Expression = RockGroundRoughnessMask;
     RockDetailedRoughness->Alpha.Expression = RockRoughnessWeight;
     Material->GetExpressionCollection().AddExpression(RockDetailedRoughness);
+    UMaterialExpression* RockSurfaceRoughness = RockDetailedRoughness;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        UMaterialExpressionComponentMask* BatokaDetailRoughnessMask =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        BatokaDetailRoughnessMask->Input.Expression = BatokaDetailRoughnessRef.Expression;
+        BatokaDetailRoughnessMask->Input.OutputIndex = BatokaDetailRoughnessRef.OutputIndex;
+        BatokaDetailRoughnessMask->R = true;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessMask);
+        UMaterialExpressionConstant* BatokaDetailRoughnessWeight =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaDetailRoughnessWeight->R = 0.28f;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailRoughnessWeight);
+        UMaterialExpressionLinearInterpolate* BatokaTwoScaleRoughness =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaTwoScaleRoughness->A.Expression = RockDetailedRoughness;
+        BatokaTwoScaleRoughness->B.Expression = BatokaDetailRoughnessMask;
+        BatokaTwoScaleRoughness->Alpha.Expression = BatokaDetailRoughnessWeight;
+        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleRoughness);
+        RockSurfaceRoughness = BatokaTwoScaleRoughness;
+    }
     UMaterialExpressionLinearInterpolate* DetailedRoughness =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
     DetailedRoughness->A.Expression = ForestDetailedRoughness;
-    DetailedRoughness->B.Expression = RockDetailedRoughness;
+    DetailedRoughness->B.Expression = RockSurfaceRoughness;
     DetailedRoughness->Alpha.Expression = RockSlopeMask;
     Material->GetExpressionCollection().AddExpression(DetailedRoughness);
 
@@ -2796,7 +3111,9 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     FlatNormal->Constant = FLinearColor(0.0f, 0.0f, 1.0f);
     Material->GetExpressionCollection().AddExpression(FlatNormal);
     UMaterialExpressionConstant* DetailNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
-    DetailNormalWeight->R = bZambezi ? 0.30f : (bFutaleufu ? 0.34f : 0.34f);
+    DetailNormalWeight->R = bBatokaWorldAlignedReview
+        ? 0.0f
+        : (bZambezi ? 0.30f : (bFutaleufu ? 0.34f : 0.34f));
     Material->GetExpressionCollection().AddExpression(DetailNormalWeight);
     UMaterialExpressionLinearInterpolate* ForestDetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
@@ -2810,13 +3127,34 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     UMaterialExpressionLinearInterpolate* RockDetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
     RockDetailedNormal->A.Expression = FlatNormal;
-    RockDetailedNormal->B.Expression = RockGroundNormalSample;
+    RockDetailedNormal->B.Expression = bBatokaTerrainIntegratedReview
+        ? BatokaMacroNormalRef.Expression
+        : RockGroundNormalSample;
+    RockDetailedNormal->B.OutputIndex = bBatokaTerrainIntegratedReview
+        ? BatokaMacroNormalRef.OutputIndex
+        : 0;
     RockDetailedNormal->Alpha.Expression = RockNormalWeight;
     Material->GetExpressionCollection().AddExpression(RockDetailedNormal);
+    UMaterialExpression* RockSurfaceNormal = RockDetailedNormal;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        UMaterialExpressionConstant* BatokaDetailNormalWeight =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaDetailNormalWeight->R = 0.42f;
+        Material->GetExpressionCollection().AddExpression(BatokaDetailNormalWeight);
+        UMaterialExpressionLinearInterpolate* BatokaTwoScaleNormal =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaTwoScaleNormal->A.Expression = RockDetailedNormal;
+        BatokaTwoScaleNormal->B.Expression = BatokaDetailNormalRef.Expression;
+        BatokaTwoScaleNormal->B.OutputIndex = BatokaDetailNormalRef.OutputIndex;
+        BatokaTwoScaleNormal->Alpha.Expression = BatokaDetailNormalWeight;
+        Material->GetExpressionCollection().AddExpression(BatokaTwoScaleNormal);
+        RockSurfaceNormal = BatokaTwoScaleNormal;
+    }
     UMaterialExpressionLinearInterpolate* DetailedNormal =
         NewObject<UMaterialExpressionLinearInterpolate>(Material);
     DetailedNormal->A.Expression = ForestDetailedNormal;
-    DetailedNormal->B.Expression = RockDetailedNormal;
+    DetailedNormal->B.Expression = RockSurfaceNormal;
     DetailedNormal->Alpha.Expression = RockSlopeMask;
     Material->GetExpressionCollection().AddExpression(DetailedNormal);
     UMaterialExpressionConstant* SourceNormalWeight = NewObject<UMaterialExpressionConstant>(Material);
@@ -2841,6 +3179,33 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     ValidatedAmbientOcclusion->B.Expression = AmbientOcclusion;
     ValidatedAmbientOcclusion->Alpha.Expression = SourceAoWeight;
     Material->GetExpressionCollection().AddExpression(ValidatedAmbientOcclusion);
+    UMaterialExpression* FinalAmbientOcclusion = ValidatedAmbientOcclusion;
+    if (bBatokaTerrainIntegratedReview)
+    {
+        UMaterialExpressionComponentMask* BatokaMacroAoMask =
+            NewObject<UMaterialExpressionComponentMask>(Material);
+        BatokaMacroAoMask->Input.Expression = BatokaMacroAoRef.Expression;
+        BatokaMacroAoMask->Input.OutputIndex = BatokaMacroAoRef.OutputIndex;
+        BatokaMacroAoMask->R = true;
+        Material->GetExpressionCollection().AddExpression(BatokaMacroAoMask);
+        UMaterialExpressionConstant* BatokaMacroAoWeight =
+            NewObject<UMaterialExpressionConstant>(Material);
+        BatokaMacroAoWeight->R = 0.32f;
+        Material->GetExpressionCollection().AddExpression(BatokaMacroAoWeight);
+        UMaterialExpressionLinearInterpolate* BatokaRockAo =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaRockAo->A.Expression = ValidatedAmbientOcclusion;
+        BatokaRockAo->B.Expression = BatokaMacroAoMask;
+        BatokaRockAo->Alpha.Expression = BatokaMacroAoWeight;
+        Material->GetExpressionCollection().AddExpression(BatokaRockAo);
+        UMaterialExpressionLinearInterpolate* BatokaSlopeAo =
+            NewObject<UMaterialExpressionLinearInterpolate>(Material);
+        BatokaSlopeAo->A.Expression = ValidatedAmbientOcclusion;
+        BatokaSlopeAo->B.Expression = BatokaRockAo;
+        BatokaSlopeAo->Alpha.Expression = RockSlopeMask;
+        Material->GetExpressionCollection().AddExpression(BatokaSlopeAo);
+        FinalAmbientOcclusion = BatokaSlopeAo;
+    }
 
     UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
     Specular->R = bRockCanyon ? 0.10f : 0.16f;
@@ -2858,7 +3223,7 @@ UMaterialInterface* LoadOrCreatePhysicalSourceTerrainRenderMaterial(
     ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, ValidatedNormal);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, DetailedRoughness);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, ValidatedAmbientOcclusion);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, FinalAmbientOcclusion);
     ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, Emissive);
 
     Material->PostEditChange();
@@ -4479,6 +4844,19 @@ TArray<FRaftSimFirstPartyMaterialTextureAssetSpec> GetFutaleufuCordilleraCypress
         TEXT("cordillera_cypress_near_spray_ao_roughness_subsurface"),
         TEXT("cordillera_cypress_spray_v10_ao_roughness_subsurface.png"),
         TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
+    AddSpec(
+        TEXT("TwigLeafAlbedoOpacity"), TEXT("cordillera_cypress_twig_albedo_opacity"),
+        TEXT("cordillera_cypress_twig_v18_albedo_opacity.png"),
+        TC_Default, true, TEXTUREGROUP_World, TA_Clamp, true);
+    AddSpec(
+        TEXT("TwigLeafNormal"), TEXT("cordillera_cypress_twig_normal"),
+        TEXT("cordillera_cypress_twig_v18_normal.png"),
+        TC_Normalmap, false, TEXTUREGROUP_WorldNormalMap, TA_Clamp, false);
+    AddSpec(
+        TEXT("TwigLeafAORoughnessSubsurface"),
+        TEXT("cordillera_cypress_twig_ao_roughness_subsurface"),
+        TEXT("cordillera_cypress_twig_v18_ao_roughness_subsurface.png"),
+        TC_Masks, false, TEXTUREGROUP_World, TA_Clamp, false);
     return Specs;
 }
 
@@ -4818,9 +5196,13 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     const FString LeafNormalKey = LeafTextureKeyPrefix + TEXT("LeafNormal");
     const FString LeafPackedKey = LeafTextureKeyPrefix + TEXT("LeafAORoughnessSubsurface");
     const bool bNearCordilleraCypress =
-        bLeafMaterial && LeafTextureKeyPrefix.Equals(TEXT("Near"), ESearchCase::CaseSensitive);
+        bLeafMaterial &&
+        (LeafTextureKeyPrefix.Equals(TEXT("Near"), ESearchCase::CaseSensitive) ||
+         LeafTextureKeyPrefix.Equals(TEXT("Twig"), ESearchCase::CaseSensitive));
     const bool bFarCordilleraCypress =
         bLeafMaterial && LeafTextureKeyPrefix.Equals(TEXT("Far"), ESearchCase::CaseSensitive);
+    const bool bCordilleraCypressBark =
+        !bLeafMaterial && AssetName.Contains(TEXT("CordilleraCypress"), ESearchCase::CaseSensitive);
     UTexture2D* Albedo = Textures.FindRef(bLeafMaterial ? LeafAlbedoKey : TEXT("BarkAlbedo"));
     UTexture2D* Normal = Textures.FindRef(bLeafMaterial ? LeafNormalKey : TEXT("BarkNormal"));
     UTexture2D* Packed = Textures.FindRef(
@@ -4839,7 +5221,9 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
             : MSM_DefaultLit);
     Material->BlendMode = bLeafMaterial ? BLEND_Masked : BLEND_Opaque;
     Material->TwoSided = bLeafMaterial;
-    Material->OpacityMaskClipValue = bLeafMaterial ? 0.50f : 0.3333f;
+    Material->OpacityMaskClipValue = bNearCordilleraCypress
+        ? 0.42f
+        : (bLeafMaterial ? 0.50f : 0.3333f);
     Material->DitheredLODTransition = bLeafMaterial;
 
     auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
@@ -4883,7 +5267,7 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     AmbientOcclusionInfluence->ParameterName =
         bLeafMaterial ? TEXT("LeafAOInfluence") : TEXT("BarkAOInfluence");
     AmbientOcclusionInfluence->DefaultValue = bNearCordilleraCypress
-        ? 0.20f
+        ? 0.08f
         : (bFarCordilleraCypress ? 0.45f : (bLeafMaterial ? 0.55f : 0.28f));
     UMaterialExpressionLinearInterpolate* ConditionedAmbientOcclusion =
         AddExpression(NewObject<UMaterialExpressionLinearInterpolate>(Material), 340, 300);
@@ -4903,8 +5287,10 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     BaseColorScale->ParameterName =
         bLeafMaterial ? TEXT("LeafBaseColorScale") : TEXT("BarkBaseColorScale");
     BaseColorScale->DefaultValue = bNearCordilleraCypress
-        ? 1.42f
-        : (bFarCordilleraCypress ? 0.88f : (bLeafMaterial ? 1.18f : 1.72f));
+        ? 2.10f
+        : (bFarCordilleraCypress
+               ? 0.88f
+               : (bLeafMaterial ? 1.18f : (bCordilleraCypressBark ? 1.20f : 1.72f)));
     UMaterialExpressionMultiply* ConditionedBaseColor =
         AddExpression(NewObject<UMaterialExpressionMultiply>(Material), 120, -240);
     ConditionedBaseColor->A.Expression = AlbedoSample;
@@ -4970,7 +5356,7 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
             AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -120, -80);
         TransmissionTint->ParameterName = TEXT("LeafTransmissionTint");
         TransmissionTint->DefaultValue = bNearCordilleraCypress
-            ? FLinearColor(0.68f, 0.88f, 0.46f)
+            ? FLinearColor(0.78f, 1.0f, 0.58f)
             : (bFarCordilleraCypress
                    ? FLinearColor(0.48f, 0.72f, 0.30f)
                    : FLinearColor(0.55f, 0.78f, 0.36f));
@@ -4987,7 +5373,7 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
             AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), 360, -220);
         DiagnosticEmissive->ParameterName = TEXT("LeafDiagnosticEmissive");
         DiagnosticEmissive->DefaultValue = bNearCordilleraCypress
-            ? 0.05f
+            ? 0.0f
             : (bFarCordilleraCypress ? 0.018f : 0.0f);
         DiagnosticEmissive->SliderMin = 0.0f;
         DiagnosticEmissive->SliderMax = 0.35f;
@@ -5054,6 +5440,7 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
     if (GShaderCompilingManager)
     {
         GShaderCompilingManager->FinishAllCompilation();
+        GShaderCompilingManager->ProcessAsyncResults(false, true);
     }
     if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
     {
@@ -5093,7 +5480,8 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
 
 UMaterial* CreateOrUpdateFutaleufuCypressNearSprayMaterial(
     const FString& AssetName,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bVolumetricScaleLeaves = false)
 {
     const FString PackagePath = FString::Printf(
         TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/%s"),
@@ -5139,18 +5527,20 @@ UMaterial* CreateOrUpdateFutaleufuCypressNearSprayMaterial(
     UMaterialExpressionVectorParameter* BaseColor =
         AddExpression(NewObject<UMaterialExpressionVectorParameter>(Material), -300, -120);
     BaseColor->ParameterName = TEXT("NearSprayBaseColor");
-    BaseColor->DefaultValue = FLinearColor(0.095f, 0.255f, 0.055f);
+    BaseColor->DefaultValue = bVolumetricScaleLeaves
+        ? FLinearColor(0.055f, 0.20f, 0.035f)
+        : FLinearColor(0.16f, 0.42f, 0.08f);
     UMaterialExpressionScalarParameter* Roughness =
         AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -300, 20);
     Roughness->ParameterName = TEXT("NearSprayRoughness");
-    Roughness->DefaultValue = 0.78f;
+    Roughness->DefaultValue = bVolumetricScaleLeaves ? 0.90f : 0.78f;
     UMaterialExpressionScalarParameter* Specular =
         AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -300, 120);
     Specular->ParameterName = TEXT("NearSpraySpecular");
-    Specular->DefaultValue = 0.14f;
+    Specular->DefaultValue = bVolumetricScaleLeaves ? 0.06f : 0.14f;
     UMaterialExpressionConstant* AmbientOcclusion =
         AddExpression(NewObject<UMaterialExpressionConstant>(Material), -300, 220);
-    AmbientOcclusion->R = 0.92f;
+    AmbientOcclusion->R = 1.0f;
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
     ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, BaseColor);
     ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
@@ -5178,6 +5568,95 @@ UMaterial* CreateOrUpdateFutaleufuCypressNearSprayMaterial(
     }
     OutSummary += FString::Printf(
         TEXT("Saved opaque geometric cypress near-spray material %s.\n"), *ObjectPath);
+    return Material;
+}
+
+UMaterial* CreateOrUpdateFutaleufuCypressFarProxyMaterial(FString& OutSummary)
+{
+    static const FString AssetName = TEXT("M_RaftSim_FutaleufuCordilleraCypress_V18_FarProxy");
+    const FString PackagePath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/Materials/%s"),
+        *AssetName);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, *ObjectPath);
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create cypress far-proxy material package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package, *AssetName, RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create cypress far-proxy material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_DefaultLit);
+    Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = false;
+    Material->DitheredLODTransition = true;
+
+    UMaterialExpressionVertexColor* VertexColor =
+        NewObject<UMaterialExpressionVertexColor>(Material);
+    VertexColor->MaterialExpressionEditorX = -300;
+    VertexColor->MaterialExpressionEditorY = -120;
+    Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
+    Roughness->R = 0.94f;
+    Roughness->MaterialExpressionEditorX = -300;
+    Roughness->MaterialExpressionEditorY = 20;
+    Material->GetExpressionCollection().AddExpression(Roughness);
+    UMaterialExpressionConstant* Specular = NewObject<UMaterialExpressionConstant>(Material);
+    Specular->R = 0.035f;
+    Specular->MaterialExpressionEditorX = -300;
+    Specular->MaterialExpressionEditorY = 120;
+    Material->GetExpressionCollection().AddExpression(Specular);
+    UMaterialExpressionConstant* AmbientOcclusion = NewObject<UMaterialExpressionConstant>(Material);
+    AmbientOcclusion->R = 0.82f;
+    AmbientOcclusion->MaterialExpressionEditorX = -300;
+    AmbientOcclusion->MaterialExpressionEditorY = 220;
+    Material->GetExpressionCollection().AddExpression(AmbientOcclusion);
+
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
+
+    Material->PostEditChange();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    Material->MarkPackageDirty();
+    const FString Filename =
+        FPackageName::LongPackageNameToFilename(PackagePath, FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Failed to save cypress far-proxy material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Saved matte vertex-color cypress far-proxy material %s.\n"), *ObjectPath);
     return Material;
 }
 
@@ -8005,6 +8484,90 @@ AActor* AddPreviewProceduralMeshActor(
     return Actor;
 }
 
+AActor* AddPreviewTwoSectionProceduralMeshActor(
+    UWorld* World,
+    const FString& Label,
+    const TArray<FVector>& FirstVertices,
+    const TArray<int32>& FirstTriangles,
+    const TArray<FVector>& FirstNormals,
+    const TArray<FVector2D>& FirstUVs,
+    UMaterialInterface* FirstMaterial,
+    const TArray<FVector>& SecondVertices,
+    const TArray<int32>& SecondTriangles,
+    const TArray<FVector>& SecondNormals,
+    const TArray<FVector2D>& SecondUVs,
+    UMaterialInterface* SecondMaterial)
+{
+    if (!World || FirstVertices.IsEmpty() || FirstTriangles.IsEmpty() ||
+        SecondVertices.IsEmpty() || SecondTriangles.IsEmpty() || !FirstMaterial ||
+        !SecondMaterial)
+    {
+        return nullptr;
+    }
+
+    AActor* Actor = World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity);
+    if (!Actor)
+    {
+        return nullptr;
+    }
+
+    Actor->SetActorLabel(Label);
+    UProceduralMeshComponent* MeshComponent =
+        NewObject<UProceduralMeshComponent>(Actor, *FString::Printf(TEXT("%s_Mesh"), *Label));
+    if (!MeshComponent)
+    {
+        Actor->Destroy();
+        return nullptr;
+    }
+
+    Actor->SetRootComponent(MeshComponent);
+    Actor->AddInstanceComponent(MeshComponent);
+    MeshComponent->RegisterComponent();
+    MeshComponent->SetMobility(EComponentMobility::Static);
+    MeshComponent->SetCastShadow(false);
+    MeshComponent->bUseComplexAsSimpleCollision = false;
+    MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+    auto CreateSection = [MeshComponent](
+                             int32 SectionIndex,
+                             const TArray<FVector>& Vertices,
+                             const TArray<int32>& Triangles,
+                             const TArray<FVector>& Normals,
+                             const TArray<FVector2D>& UVs,
+                             UMaterialInterface* Material)
+    {
+        TArray<FLinearColor> VertexColors;
+        VertexColors.Init(FLinearColor::White, Vertices.Num());
+        TArray<FProcMeshTangent> Tangents;
+        Tangents.Init(FProcMeshTangent(1.0f, 0.0f, 0.0f), Vertices.Num());
+        MeshComponent->CreateMeshSection_LinearColor(
+            SectionIndex,
+            Vertices,
+            Triangles,
+            Normals,
+            UVs,
+            VertexColors,
+            Tangents,
+            false);
+        MeshComponent->SetMaterial(SectionIndex, Material);
+    };
+    CreateSection(
+        0,
+        FirstVertices,
+        FirstTriangles,
+        FirstNormals,
+        FirstUVs,
+        FirstMaterial);
+    CreateSection(
+        1,
+        SecondVertices,
+        SecondTriangles,
+        SecondNormals,
+        SecondUVs,
+        SecondMaterial);
+    return Actor;
+}
+
 void AppendNativeCanopyTaperedSegment(
     const FVector& Start,
     const FVector& End,
@@ -8092,6 +8655,70 @@ void AppendNativeCanopyLeafCard(
         FVector2D(MaxU, MinV),
         FVector2D(MinU, MinV)});
     Triangles.Append({BaseIndex, BaseIndex + 2, BaseIndex + 1, BaseIndex, BaseIndex + 3, BaseIndex + 2});
+}
+
+void AppendNativeCanopyAtlasCurvedCard(
+    const FVector& Start,
+    const FVector& Axis,
+    const FVector& Right,
+    float Width,
+    float Length,
+    float Camber,
+    float LateralSweep,
+    int32 SegmentCount,
+    int32 AtlasTile,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs)
+{
+    if (SegmentCount < 2 || Width <= 0.0f || Length <= 0.0f)
+    {
+        return;
+    }
+    const FVector CardAxis = Axis.GetSafeNormal();
+    const FVector CardRight =
+        (Right - CardAxis * FVector::DotProduct(Right, CardAxis)).GetSafeNormal();
+    if (CardAxis.IsNearlyZero() || CardRight.IsNearlyZero())
+    {
+        return;
+    }
+    const FVector BaseNormal = FVector::CrossProduct(CardRight, CardAxis).GetSafeNormal();
+    const int32 Tile = FMath::Abs(AtlasTile) % 16;
+    const int32 Column = Tile % 4;
+    const int32 Row = Tile / 4;
+    constexpr float Inset = 0.012f;
+    const float MinU = (static_cast<float>(Column) + Inset) / 4.0f;
+    const float MaxU = (static_cast<float>(Column + 1) - Inset) / 4.0f;
+    const float MinV = (static_cast<float>(Row) + Inset) / 4.0f;
+    const float MaxV = (static_cast<float>(Row + 1) - Inset) / 4.0f;
+    const int32 BaseIndex = Vertices.Num();
+    for (int32 SegmentIndex = 0; SegmentIndex <= SegmentCount; ++SegmentIndex)
+    {
+        const float T = static_cast<float>(SegmentIndex) / SegmentCount;
+        const float CamberPhase = FMath::Sin(PI * T);
+        const float SweepPhase = FMath::Sin(2.0f * PI * T);
+        const FVector Center =
+            Start + CardAxis * (Length * T) + BaseNormal * (Camber * CamberPhase) +
+            CardRight * (LateralSweep * SweepPhase);
+        const FVector Tangent =
+            (CardAxis * Length + BaseNormal * (Camber * PI * FMath::Cos(PI * T)) +
+             CardRight * (LateralSweep * 2.0f * PI * FMath::Cos(2.0f * PI * T)))
+                .GetSafeNormal();
+        const FVector SurfaceNormal =
+            FVector::CrossProduct(CardRight, Tangent).GetSafeNormal();
+        const float HalfWidth = Width * 0.5f * (0.94f + 0.06f * CamberPhase);
+        Vertices.Append({Center - CardRight * HalfWidth, Center + CardRight * HalfWidth});
+        Normals.Append({SurfaceNormal, SurfaceNormal});
+        const float V = FMath::Lerp(MaxV, MinV, T);
+        UVs.Append({FVector2D(MinU, V), FVector2D(MaxU, V)});
+    }
+    for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+    {
+        const int32 A = BaseIndex + SegmentIndex * 2;
+        const int32 B = A + 2;
+        Triangles.Append({A, B + 1, A + 1, A, B, B + 1});
+    }
 }
 
 void AppendNativeCanopyCurvedSprayRibbon(
@@ -8859,8 +9486,203 @@ struct FFutaleufuCordilleraCypressForm
     float DamagedBranchLengthScale = 1.0f;
 };
 
+void AppendFutaleufuCordilleraCypressOpaqueScaleLeafCluster(
+    const FVector& Base,
+    const FVector& Direction,
+    float WidthCm,
+    float LengthCm,
+    float FoldCm,
+    float RollDegrees,
+    TArray<FVector>& Vertices,
+    TArray<int32>& Triangles,
+    TArray<FVector>& Normals,
+    TArray<FVector2D>& UVs)
+{
+    const FVector Axis = Direction.GetSafeNormal();
+    if (Axis.IsNearlyZero() || WidthCm < 1.0f || LengthCm < 1.0f)
+    {
+        return;
+    }
+    FVector Right = FVector::CrossProduct(Axis, FVector::UpVector).GetSafeNormal();
+    if (Right.IsNearlyZero())
+    {
+        Right = FVector::RightVector;
+    }
+    Right = Right.RotateAngleAxis(RollDegrees, Axis).GetSafeNormal();
+    const FVector FoldNormal = FVector::CrossProduct(Axis, Right).GetSafeNormal();
+    const int32 BaseIndex = Vertices.Num();
+    Vertices.Add(Base);
+    UVs.Add(FVector2D(0.5f, 1.0f));
+    const FVector LobeDirections[] = {
+        Axis,
+        (Axis * 0.88f + Right * 0.36f + FoldNormal * 0.10f).GetSafeNormal(),
+        (Axis * 0.86f - Right * 0.38f - FoldNormal * 0.08f).GetSafeNormal()};
+    const float LobeLengthScales[] = {1.0f, 0.78f, 0.84f};
+    const float LobeHalfWidthScales[] = {0.30f, 0.24f, 0.24f};
+    for (int32 LobeIndex = 0; LobeIndex < 3; ++LobeIndex)
+    {
+        const FVector LobeDirection = LobeDirections[LobeIndex];
+        FVector LobeRight = FVector::CrossProduct(LobeDirection, FoldNormal).GetSafeNormal();
+        if (LobeRight.IsNearlyZero())
+        {
+            LobeRight = Right;
+        }
+        const float LobeLength = LengthCm * LobeLengthScales[LobeIndex];
+        const float HalfWidth = WidthCm * LobeHalfWidthScales[LobeIndex];
+        const FVector Shoulder = Base + LobeDirection * LobeLength * 0.48f;
+        const FVector FoldOffset = FoldNormal * FoldCm * (LobeIndex == 0 ? 1.0f : -0.55f);
+        const int32 LobeBaseIndex = Vertices.Num();
+        Vertices.Append({
+            Shoulder - LobeRight * HalfWidth - FoldOffset,
+            Base + LobeDirection * LobeLength,
+            Shoulder + LobeRight * HalfWidth - FoldOffset});
+        UVs.Append({
+            FVector2D(0.0f, 0.55f),
+            FVector2D(0.5f, 0.0f),
+            FVector2D(1.0f, 0.55f)});
+        Triangles.Append({
+            BaseIndex, LobeBaseIndex, LobeBaseIndex + 1,
+            BaseIndex, LobeBaseIndex + 1, LobeBaseIndex + 2});
+    }
+
+    TArray<FVector> ClusterNormals;
+    ClusterNormals.Init(FVector::ZeroVector, 10);
+    for (int32 TriangleIndex = 0; TriangleIndex < 6; ++TriangleIndex)
+    {
+        const int32 TriangleOffset = Triangles.Num() - 18 + TriangleIndex * 3;
+        const int32 A = Triangles[TriangleOffset] - BaseIndex;
+        const int32 B = Triangles[TriangleOffset + 1] - BaseIndex;
+        const int32 C = Triangles[TriangleOffset + 2] - BaseIndex;
+        const FVector FaceNormal = FVector::CrossProduct(
+            Vertices[BaseIndex + B] - Vertices[BaseIndex + A],
+            Vertices[BaseIndex + C] - Vertices[BaseIndex + A]).GetSafeNormal();
+        ClusterNormals[A] += FaceNormal;
+        ClusterNormals[B] += FaceNormal;
+        ClusterNormals[C] += FaceNormal;
+    }
+    for (const FVector& ClusterNormal : ClusterNormals)
+    {
+        Normals.Add(ClusterNormal.GetSafeNormal());
+    }
+}
+
+void AppendFutaleufuCordilleraCypressVolumetricScaleLeafCluster(
+    const FVector& Base,
+    const FVector& Direction,
+    float WidthCm,
+    float LengthCm,
+    int32 Seed,
+    TArray<FVector>& WoodyVertices,
+    TArray<int32>& WoodyTriangles,
+    TArray<FVector>& WoodyNormals,
+    TArray<FVector2D>& WoodyUVs,
+    TArray<FVector>& FoliageVertices,
+    TArray<int32>& FoliageTriangles,
+    TArray<FVector>& FoliageNormals,
+    TArray<FVector2D>& FoliageUVs)
+{
+    const FVector Axis = Direction.GetSafeNormal();
+    if (Axis.IsNearlyZero() || WidthCm < 1.0f || LengthCm < 1.0f)
+    {
+        return;
+    }
+    auto Noise01 = [Seed](int32 Offset)
+    {
+        return FMath::Abs(FMath::Frac(
+            FMath::Sin(static_cast<float>(Seed + Offset) * 12.9898f + 78.233f) *
+            43758.5453f));
+    };
+    FVector BasisA = FVector::CrossProduct(Axis, FVector::UpVector).GetSafeNormal();
+    if (BasisA.IsNearlyZero())
+    {
+        BasisA = FVector::RightVector;
+    }
+    const FVector BasisB = FVector::CrossProduct(Axis, BasisA).GetSafeNormal();
+    const FVector CentralEnd = Base + Axis * LengthCm * 0.64f;
+    AppendNativeCanopyTaperedSegment(
+        Base,
+        CentralEnd,
+        2.8f,
+        0.9f,
+        6,
+        WoodyVertices,
+        WoodyTriangles,
+        WoodyNormals,
+        WoodyUVs);
+
+    for (int32 ShootIndex = 0; ShootIndex < 4; ++ShootIndex)
+    {
+        const float Angle =
+            2.0f * PI * static_cast<float>(ShootIndex) / 4.0f +
+            (Noise01(ShootIndex * 17 + 1) - 0.5f) * 0.52f;
+        const FVector Radial =
+            (BasisA * FMath::Cos(Angle) + BasisB * FMath::Sin(Angle)).GetSafeNormal();
+        const float AttachT = 0.20f + ShootIndex * 0.15f;
+        const FVector ShootBase = FMath::Lerp(Base, CentralEnd, AttachT);
+        const FVector ShootDirection = (
+            Axis * FMath::Lerp(0.48f, 0.66f, Noise01(ShootIndex * 19 + 3)) +
+            Radial * FMath::Lerp(0.68f, 0.86f, Noise01(ShootIndex * 19 + 5)) +
+            FVector::UpVector * ((Noise01(ShootIndex * 19 + 7) - 0.42f) * 0.28f))
+                                                   .GetSafeNormal();
+        const float ShootLength = LengthCm * FMath::Lerp(
+            0.30f, 0.44f, Noise01(ShootIndex * 23 + 9));
+        const FVector ShootEnd = ShootBase + ShootDirection * ShootLength;
+        AppendNativeCanopyTaperedSegment(
+            ShootBase,
+            ShootEnd,
+            1.5f,
+            0.42f,
+            6,
+            WoodyVertices,
+            WoodyTriangles,
+            WoodyNormals,
+            WoodyUVs);
+
+        for (int32 LobeIndex = 0; LobeIndex < 2; ++LobeIndex)
+        {
+            const float LobeT = 0.34f + LobeIndex * 0.38f;
+            const float SideSign = (ShootIndex + LobeIndex) % 2 == 0 ? 1.0f : -1.0f;
+            const FVector LobeBase = FMath::Lerp(ShootBase, ShootEnd, LobeT);
+            const FVector LobeDirection = (
+                ShootDirection * 0.76f +
+                Radial * SideSign * FMath::Lerp(
+                    0.22f, 0.40f, Noise01(ShootIndex * 29 + LobeIndex * 7 + 11)) +
+                BasisB * ((Noise01(ShootIndex * 31 + LobeIndex * 11 + 13) - 0.5f) * 0.32f))
+                                                      .GetSafeNormal();
+            const float LobeLength = LengthCm * FMath::Lerp(
+                0.28f, 0.44f, Noise01(ShootIndex * 37 + LobeIndex * 13 + 17));
+            const FVector LobeMid = LobeBase + LobeDirection * LobeLength * 0.46f;
+            const FVector LobeEnd = LobeBase + LobeDirection * LobeLength;
+            const float LobeRadius = WidthCm * FMath::Lerp(
+                0.16f, 0.24f, Noise01(ShootIndex * 41 + LobeIndex * 17 + 19));
+            AppendNativeCanopyTaperedSegment(
+                LobeBase,
+                LobeMid,
+                LobeRadius * 0.48f,
+                LobeRadius,
+                8,
+                FoliageVertices,
+                FoliageTriangles,
+                FoliageNormals,
+                FoliageUVs);
+            AppendNativeCanopyTaperedSegment(
+                LobeMid,
+                LobeEnd,
+                LobeRadius,
+                LobeRadius * 0.18f,
+                8,
+                FoliageVertices,
+                FoliageTriangles,
+                FoliageNormals,
+                FoliageUVs);
+        }
+    }
+}
+
 void BuildFutaleufuCordilleraCypressGeometry(
     const FFutaleufuCordilleraCypressForm& Form,
+    bool bOpaqueNearGeometry,
+    bool bVolumetricNearGeometry,
     TArray<FVector>& WoodyVertices,
     TArray<int32>& WoodyTriangles,
     TArray<FVector>& WoodyNormals,
@@ -9022,19 +9844,55 @@ void BuildFutaleufuCordilleraCypressGeometry(
             AxisA = FVector::RightVector;
         }
         const FVector AxisB = FVector::CrossProduct(Axis, AxisA).GetSafeNormal();
-        constexpr float NearBranchSystemSamplingProbability = 0.34f;
+        const float NearBranchSystemSamplingProbability = bVolumetricNearGeometry
+            ? 0.50f
+            : (bOpaqueNearGeometry ? 0.11f : 0.34f);
         if (Noise01(Seed + 997) < NearBranchSystemSamplingProbability)
         {
             const float FrondRollDegrees =
                 (Noise01(Seed + 2) - 0.5f) * 34.0f;
-            const FVector FrondStart = Center - Axis * LengthCm * 0.47f;
-            AddNearSpray(
-                FrondStart,
-                Axis,
-                WidthCm * FMath::Lerp(1.52f, 1.78f, Noise01(Seed + 4)),
-                LengthCm * FMath::Lerp(1.36f, 1.58f, Noise01(Seed + 6)),
-                Seed,
-                FrondRollDegrees);
+            if (bVolumetricNearGeometry)
+            {
+                AppendFutaleufuCordilleraCypressVolumetricScaleLeafCluster(
+                    Center,
+                    Axis,
+                    WidthCm,
+                    LengthCm,
+                    Seed,
+                    WoodyVertices,
+                    WoodyTriangles,
+                    WoodyNormals,
+                    WoodyUVs,
+                    NearSprayVertices,
+                    NearSprayTriangles,
+                    NearSprayNormals,
+                    NearSprayUVs);
+            }
+            else if (bOpaqueNearGeometry)
+            {
+                AppendFutaleufuCordilleraCypressOpaqueScaleLeafCluster(
+                    Center,
+                    Axis,
+                    WidthCm * FMath::Lerp(1.34f, 1.56f, Noise01(Seed + 4)),
+                    LengthCm * FMath::Lerp(1.28f, 1.46f, Noise01(Seed + 6)),
+                    WidthCm * FMath::Lerp(0.10f, 0.16f, Noise01(Seed + 8)),
+                    FrondRollDegrees,
+                    NearSprayVertices,
+                    NearSprayTriangles,
+                    NearSprayNormals,
+                    NearSprayUVs);
+            }
+            else
+            {
+                const FVector FrondStart = Center - Axis * LengthCm * 0.47f;
+                AddNearSpray(
+                    FrondStart,
+                    Axis,
+                    WidthCm * FMath::Lerp(1.52f, 1.78f, Noise01(Seed + 4)),
+                    LengthCm * FMath::Lerp(1.36f, 1.58f, Noise01(Seed + 6)),
+                    Seed,
+                    FrondRollDegrees);
+            }
         }
         constexpr int32 ShootCount = 5;
         for (int32 ShootIndex = 0; ShootIndex < ShootCount; ++ShootIndex)
@@ -9285,6 +10143,21 @@ void BuildFutaleufuCordilleraCypressGeometry(
         const FVector Center = LeanAtZ(Form.HeightCm * (0.78f + T * 0.18f)) +
             FVector(0.0f, 0.0f, Form.HeightCm * (0.78f + T * 0.18f)) +
             Radial * Form.CrownRadiusCm * FMath::Lerp(0.24f, 0.05f, T);
+        if (bOpaqueNearGeometry)
+        {
+            const FVector LeaderRoot = LeanAtZ(Form.HeightCm * (0.76f + T * 0.17f)) +
+                FVector(0.0f, 0.0f, Form.HeightCm * (0.76f + T * 0.17f));
+            AppendNativeCanopyTaperedSegment(
+                LeaderRoot,
+                Center,
+                FMath::Lerp(2.4f, 0.9f, T),
+                0.35f,
+                5,
+                WoodyVertices,
+                WoodyTriangles,
+                WoodyNormals,
+                WoodyUVs);
+        }
         AddTerminalCluster(
             Center,
             Direction,
@@ -9395,8 +10268,28 @@ UStaticMesh* ConvertNativeCanopyProceduralActorToStaticMesh(
     SourceModel.BuildSettings.DstLightmapIndex = 1;
     Mesh->CreateMeshDescription(0, MoveTemp(MeshDescription));
     Mesh->CommitMeshDescription(0);
+    TArray<UMaterialInterface*> SectionMaterials;
+    for (int32 SectionIndex = 0; SectionIndex < Component->GetNumSections(); ++SectionIndex)
+    {
+        UMaterialInterface* SectionMaterial = Component->GetMaterial(SectionIndex);
+        if (!SectionMaterial)
+        {
+            SectionMaterial = Material
+                ? Material
+                : UMaterial::GetDefaultMaterial(MD_Surface);
+        }
+        SectionMaterials.AddUnique(SectionMaterial);
+    }
+    if (SectionMaterials.IsEmpty())
+    {
+        SectionMaterials.Add(
+            Material ? Material : UMaterial::GetDefaultMaterial(MD_Surface));
+    }
     Mesh->GetStaticMaterials().Empty();
-    Mesh->GetStaticMaterials().Add(FStaticMaterial(Material));
+    for (UMaterialInterface* SectionMaterial : SectionMaterials)
+    {
+        Mesh->GetStaticMaterials().Add(FStaticMaterial(SectionMaterial));
+    }
     Mesh->SetImportVersion(EImportStaticMeshVersion::LastVersion);
     Mesh->SetLightMapCoordinateIndex(1);
     Mesh->GetNaniteSettings().bEnabled = bEnableNanite;
@@ -20105,7 +20998,11 @@ UMaterialInterface* LoadOrCreateZambeziBatokaBasaltReviewMaterial(FString& OutSu
 
 struct FFutaleufuCanopyCorridorComparisonStats
 {
+    bool bDenseLocalReview = false;
+    bool bAreaSampledReview = false;
+    bool bWorldStableReview = false;
     int32 CandidateCount = 0;
+    int32 TargetTreeCount = 0;
     int32 AcceptedTreeCount = 0;
     int32 NearTreeCount = 0;
     int32 MidTreeCount = 0;
@@ -20114,6 +21011,8 @@ struct FFutaleufuCanopyCorridorComparisonStats
     int32 RejectedNaturalGapCount = 0;
     int32 RejectedVegetationMaskCount = 0;
     int32 RejectedWaterMaskCount = 0;
+    int32 RejectedRiverSetbackCount = 0;
+    int32 RejectedStandDensityCount = 0;
     int32 RejectedElevationCount = 0;
     int32 RejectedSlopeCount = 0;
     int32 RejectedDryAspectCount = 0;
@@ -20124,6 +21023,19 @@ struct FFutaleufuCanopyCorridorComparisonStats
     float MaximumAcceptedElevationCm = TNumericLimits<float>::Lowest();
     double AcceptedVegetationMaskSum = 0.0;
     double AcceptedWaterMaskSum = 0.0;
+    float ProgressMinimum = 0.0f;
+    float ProgressMaximum = 0.0f;
+    float MinimumSpacingCm = 0.0f;
+    float RiverSetbackCm = 0.0f;
+    float MaximumLateralOffsetCm = 0.0f;
+    float SamplingHalfExtentCm = 0.0f;
+    float SamplingAlongHalfExtentCm = 0.0f;
+    float SamplingCrossHalfExtentCm = 0.0f;
+    int32 OccupancyFieldResolution = 0;
+    float OccupancyFeatherDistanceCm = 0.0f;
+    float MinimumAcceptedRiverDistanceCm = TNumericLimits<float>::Max();
+    float MaximumAcceptedRiverDistanceCm = TNumericLimits<float>::Lowest();
+    uint64 PlacementFingerprint = 1469598103934665603ull;
 };
 
 struct FFutaleufuCanopyCorridorVariant
@@ -20291,7 +21203,10 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
     const FRaftSimLandscapeImportCandidateSpec& Candidate,
     EFutaleufuCanopyCorridorRenderMode RenderMode,
     FFutaleufuCanopyCorridorComparisonStats& OutStats,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bDenseLocalReview = false,
+    bool bAreaSampledReview = false,
+    bool bWorldStableReview = false)
 {
     OutStats = FFutaleufuCanopyCorridorComparisonStats();
     if (!World || !Camera || Candidate.PreviewSpec.RiverId != TEXT("futaleufu_terminator"))
@@ -20638,11 +21553,46 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
             EHeightfieldSource::Editor).Get(TNumericLimits<float>::Lowest());
     };
 
-    constexpr int32 TargetTreeCount = 1200;
-    constexpr int32 MaximumCandidateCount = 60000;
-    constexpr float MinimumSpacingCm = 1500.0f;
-    constexpr float RiverSetbackCm = 6500.0f;
-    constexpr float MaximumLateralOffsetCm = 30000.0f;
+    const bool bLocalReview =
+        bDenseLocalReview || bAreaSampledReview || bWorldStableReview;
+    float CameraProgress = 0.73f;
+    if (bLocalReview)
+    {
+        float BestDistanceSquared = TNumericLimits<float>::Max();
+        const FVector2D CameraXY(Camera->GetActorLocation().X, Camera->GetActorLocation().Y);
+        constexpr int32 CameraProgressSampleCount = 512;
+        for (int32 SampleIndex = 0; SampleIndex <= CameraProgressSampleCount; ++SampleIndex)
+        {
+            const float Progress =
+                static_cast<float>(SampleIndex) / static_cast<float>(CameraProgressSampleCount);
+            const float DistanceSquared = FVector2D::DistSquared(
+                CameraXY,
+                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, Progress));
+            if (DistanceSquared < BestDistanceSquared)
+            {
+                BestDistanceSquared = DistanceSquared;
+                CameraProgress = Progress;
+            }
+        }
+    }
+    const int32 TargetTreeCount = bWorldStableReview ? 24000 : (bLocalReview ? 9000 : 1200);
+    const int32 MaximumCandidateCount = bWorldStableReview ? 480000 : (bLocalReview ? 240000 : 60000);
+    const float MinimumSpacingCm = bLocalReview ? 650.0f : 1500.0f;
+    const float RiverSetbackCm = bLocalReview ? 2400.0f : 6500.0f;
+    const float MaximumLateralOffsetCm = bLocalReview ? 75000.0f : 30000.0f;
+    const float SamplingHalfExtentCm = bAreaSampledReview ? 110000.0f : 0.0f;
+    const float SamplingAlongHalfExtentCm = bWorldStableReview ? 300000.0f : 0.0f;
+    const float SamplingCrossHalfExtentCm = bWorldStableReview ? 110000.0f : 0.0f;
+    const float ProgressMinimum = bWorldStableReview
+        ? 0.54f
+        : (bLocalReview
+        ? FMath::Max(0.0f, CameraProgress - 0.06f)
+        : 0.55f);
+    const float ProgressMaximum = bWorldStableReview
+        ? 0.92f
+        : (bLocalReview
+        ? FMath::Min(1.0f, CameraProgress + 0.06f)
+        : 0.91f);
     constexpr float MinimumElevationCm = 10000.0f;
     constexpr float MaximumElevationCm = 90000.0f;
     constexpr float MaximumSlopeDegrees = 39.0f;
@@ -20651,40 +21601,291 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
     constexpr float SlopeSampleOffsetCm = 1500.0f;
     TMap<FIntPoint, TArray<FVector2D>> SpatialBuckets;
     const FVector CameraLocation = Camera->GetActorLocation();
+    const FVector2D CameraXY(CameraLocation.X, CameraLocation.Y);
+    TArray<FVector2D> CenterlineReviewSamples;
+    if (bAreaSampledReview || bWorldStableReview)
+    {
+        constexpr int32 CenterlineReviewSampleCount = 512;
+        CenterlineReviewSamples.Reserve(CenterlineReviewSampleCount + 1);
+        for (int32 SampleIndex = 0; SampleIndex <= CenterlineReviewSampleCount; ++SampleIndex)
+        {
+            CenterlineReviewSamples.Add(SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Centerline,
+                static_cast<float>(SampleIndex) /
+                    static_cast<float>(CenterlineReviewSampleCount)));
+        }
+    }
+    constexpr int32 OccupancyFieldResolution = 512;
+    constexpr float OccupancyFeatherDistanceCm = 18000.0f;
+    TArray<float> SpatialVegetationOccupancy;
+    if (bWorldStableReview)
+    {
+        const int32 FieldCellCount = OccupancyFieldResolution * OccupancyFieldResolution;
+        TArray<float> DistanceToInside;
+        TArray<float> DistanceToOutside;
+        DistanceToInside.SetNumUninitialized(FieldCellCount);
+        DistanceToOutside.SetNumUninitialized(FieldCellCount);
+        constexpr float InfiniteDistance = 1.0e12f;
+        for (int32 Y = 0; Y < OccupancyFieldResolution; ++Y)
+        {
+            const float V = static_cast<float>(Y) /
+                static_cast<float>(OccupancyFieldResolution - 1);
+            for (int32 X = 0; X < OccupancyFieldResolution; ++X)
+            {
+                const float U = static_cast<float>(X) /
+                    static_cast<float>(OccupancyFieldResolution - 1);
+                const int32 Index = Y * OccupancyFieldResolution + X;
+                const bool bInside = VegetationMask.SampleLuma(U, V) >= 0.34f;
+                DistanceToInside[Index] = bInside ? 0.0f : InfiniteDistance;
+                DistanceToOutside[Index] = bInside ? InfiniteDistance : 0.0f;
+            }
+        }
+        const float StepX = Candidate.HorizontalSpanXCm /
+            static_cast<float>(OccupancyFieldResolution - 1);
+        const float StepY = Candidate.HorizontalSpanYCm /
+            static_cast<float>(OccupancyFieldResolution - 1);
+        const float StepDiagonal = FMath::Sqrt(StepX * StepX + StepY * StepY);
+        auto RelaxDistanceField = [=](TArray<float>& Distances)
+        {
+            auto Relax = [&Distances](int32 Index, int32 NeighborIndex, float Step)
+            {
+                Distances[Index] = FMath::Min(
+                    Distances[Index],
+                    Distances[NeighborIndex] + Step);
+            };
+            for (int32 Y = 0; Y < OccupancyFieldResolution; ++Y)
+            {
+                for (int32 X = 0; X < OccupancyFieldResolution; ++X)
+                {
+                    const int32 Index = Y * OccupancyFieldResolution + X;
+                    if (X > 0)
+                    {
+                        Relax(Index, Index - 1, StepX);
+                    }
+                    if (Y > 0)
+                    {
+                        Relax(Index, Index - OccupancyFieldResolution, StepY);
+                        if (X > 0)
+                        {
+                            Relax(Index, Index - OccupancyFieldResolution - 1, StepDiagonal);
+                        }
+                        if (X + 1 < OccupancyFieldResolution)
+                        {
+                            Relax(Index, Index - OccupancyFieldResolution + 1, StepDiagonal);
+                        }
+                    }
+                }
+            }
+            for (int32 Y = OccupancyFieldResolution - 1; Y >= 0; --Y)
+            {
+                for (int32 X = OccupancyFieldResolution - 1; X >= 0; --X)
+                {
+                    const int32 Index = Y * OccupancyFieldResolution + X;
+                    if (X + 1 < OccupancyFieldResolution)
+                    {
+                        Relax(Index, Index + 1, StepX);
+                    }
+                    if (Y + 1 < OccupancyFieldResolution)
+                    {
+                        Relax(Index, Index + OccupancyFieldResolution, StepY);
+                        if (X > 0)
+                        {
+                            Relax(Index, Index + OccupancyFieldResolution - 1, StepDiagonal);
+                        }
+                        if (X + 1 < OccupancyFieldResolution)
+                        {
+                            Relax(Index, Index + OccupancyFieldResolution + 1, StepDiagonal);
+                        }
+                    }
+                }
+            }
+        };
+        RelaxDistanceField(DistanceToInside);
+        RelaxDistanceField(DistanceToOutside);
+        SpatialVegetationOccupancy.SetNumUninitialized(FieldCellCount);
+        for (int32 Index = 0; Index < FieldCellCount; ++Index)
+        {
+            const float SignedDistanceCm =
+                DistanceToOutside[Index] - DistanceToInside[Index];
+            SpatialVegetationOccupancy[Index] = SmoothPreviewStep(
+                -OccupancyFeatherDistanceCm,
+                OccupancyFeatherDistanceCm,
+                SignedDistanceCm);
+        }
+    }
+    auto SampleSpatialVegetationOccupancy =
+        [&Candidate, &SpatialVegetationOccupancy](const FVector2D& WorldXY)
+    {
+        if (SpatialVegetationOccupancy.IsEmpty())
+        {
+            return 0.0f;
+        }
+        constexpr float LandscapeMinX = -5800.0f;
+        const float U = FMath::Clamp(
+            (WorldXY.X - LandscapeMinX) / Candidate.HorizontalSpanXCm,
+            0.0f,
+            1.0f);
+        const float V = FMath::Clamp(
+            (WorldXY.Y + Candidate.HorizontalSpanYCm * 0.5f) /
+                Candidate.HorizontalSpanYCm,
+            0.0f,
+            1.0f);
+        const float PixelX = U * static_cast<float>(OccupancyFieldResolution - 1);
+        const float PixelY = V * static_cast<float>(OccupancyFieldResolution - 1);
+        const int32 X0 = FMath::FloorToInt(PixelX);
+        const int32 Y0 = FMath::FloorToInt(PixelY);
+        const int32 X1 = FMath::Min(X0 + 1, OccupancyFieldResolution - 1);
+        const int32 Y1 = FMath::Min(Y0 + 1, OccupancyFieldResolution - 1);
+        const float FracX = PixelX - static_cast<float>(X0);
+        const float FracY = PixelY - static_cast<float>(Y0);
+        const float Top = FMath::Lerp(
+            SpatialVegetationOccupancy[Y0 * OccupancyFieldResolution + X0],
+            SpatialVegetationOccupancy[Y0 * OccupancyFieldResolution + X1],
+            FracX);
+        const float Bottom = FMath::Lerp(
+            SpatialVegetationOccupancy[Y1 * OccupancyFieldResolution + X0],
+            SpatialVegetationOccupancy[Y1 * OccupancyFieldResolution + X1],
+            FracX);
+        return FMath::Lerp(Top, Bottom, FracY);
+    };
+    OutStats.bDenseLocalReview = bDenseLocalReview;
+    OutStats.bAreaSampledReview = bAreaSampledReview;
+    OutStats.bWorldStableReview = bWorldStableReview;
+    OutStats.TargetTreeCount = TargetTreeCount;
+    OutStats.ProgressMinimum = ProgressMinimum;
+    OutStats.ProgressMaximum = ProgressMaximum;
+    OutStats.MinimumSpacingCm = MinimumSpacingCm;
+    OutStats.RiverSetbackCm = RiverSetbackCm;
+    OutStats.MaximumLateralOffsetCm = MaximumLateralOffsetCm;
+    OutStats.SamplingHalfExtentCm = SamplingHalfExtentCm;
+    OutStats.SamplingAlongHalfExtentCm = SamplingAlongHalfExtentCm;
+    OutStats.SamplingCrossHalfExtentCm = SamplingCrossHalfExtentCm;
+    OutStats.OccupancyFieldResolution = bWorldStableReview
+        ? OccupancyFieldResolution
+        : 0;
+    OutStats.OccupancyFeatherDistanceCm = bWorldStableReview
+        ? OccupancyFeatherDistanceCm
+        : 0.0f;
 
     for (int32 CandidateIndex = 0;
          CandidateIndex < MaximumCandidateCount && OutStats.AcceptedTreeCount < TargetTreeCount;
          ++CandidateIndex)
     {
         ++OutStats.CandidateCount;
-        const float Progress = FMath::Lerp(0.55f, 0.91f, Halton(CandidateIndex, 2));
-        const bool bMacroGap =
-            (Progress > 0.675f && Progress < 0.692f) ||
-            (Progress > 0.752f && Progress < 0.770f) ||
-            (Progress > 0.842f && Progress < 0.854f);
-        const bool bMicroGap = FMath::Frac(Halton(CandidateIndex, 7) + Progress * 11.0f) < 0.075f;
-        if (bMacroGap || bMicroGap)
+        float Progress = FMath::Lerp(
+            ProgressMinimum,
+            ProgressMaximum,
+            Halton(CandidateIndex, 2));
+        FVector2D WorldXY;
+        float RiverDistanceCm = RiverSetbackCm;
+        if (bWorldStableReview)
         {
-            ++OutStats.RejectedNaturalGapCount;
-            continue;
+            Progress = FMath::Lerp(
+                ProgressMinimum,
+                ProgressMaximum,
+                FMath::Frac(Halton(CandidateIndex, 2) + 0.381966011f));
+            FVector2D DomainTangent;
+            const FVector2D DomainCenter = SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Centerline,
+                Progress,
+                &DomainTangent);
+            const FVector2D DomainNormal(-DomainTangent.Y, DomainTangent.X);
+            const float CrossOffset = FMath::Lerp(
+                -SamplingCrossHalfExtentCm,
+                SamplingCrossHalfExtentCm,
+                FMath::Frac(Halton(CandidateIndex, 3) + 0.618033989f));
+            WorldXY = DomainCenter + DomainNormal * CrossOffset;
         }
+        else if (bAreaSampledReview)
+        {
+            const float SampleX = FMath::Frac(Halton(CandidateIndex, 2) + 0.381966011f);
+            const float SampleY = FMath::Frac(Halton(CandidateIndex, 3) + 0.618033989f);
+            WorldXY = CameraXY + FVector2D(
+                FMath::Lerp(-SamplingHalfExtentCm, SamplingHalfExtentCm, SampleX),
+                FMath::Lerp(-SamplingHalfExtentCm, SamplingHalfExtentCm, SampleY));
 
-        FVector2D Tangent;
-        const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
-            Candidate,
-            Centerline,
-            Progress,
-            &Tangent);
-        const FVector2D Normal(-Tangent.Y, Tangent.X);
-        const float Side = Halton(CandidateIndex, 3) < 0.5f ? -1.0f : 1.0f;
-        const float LateralT = FMath::Pow(Halton(CandidateIndex, 5), 0.72f);
-        const float LateralOffset = FMath::Lerp(
-            RiverSetbackCm,
-            MaximumLateralOffsetCm,
-            LateralT);
-        const FVector2D WorldXY = Center + Normal * Side * LateralOffset;
+        }
+        if (bAreaSampledReview || bWorldStableReview)
+        {
+            float BestDistanceSquared = TNumericLimits<float>::Max();
+            int32 BestSegmentIndex = 0;
+            float BestSegmentT = 0.0f;
+            for (int32 SegmentIndex = 0;
+                 SegmentIndex + 1 < CenterlineReviewSamples.Num();
+                 ++SegmentIndex)
+            {
+                const FVector2D SegmentStart = CenterlineReviewSamples[SegmentIndex];
+                const FVector2D Segment =
+                    CenterlineReviewSamples[SegmentIndex + 1] - SegmentStart;
+                const float SegmentLengthSquared = Segment.SizeSquared();
+                const float SegmentT = SegmentLengthSquared > UE_SMALL_NUMBER
+                    ? FMath::Clamp(
+                          FVector2D::DotProduct(WorldXY - SegmentStart, Segment) /
+                              SegmentLengthSquared,
+                          0.0f,
+                          1.0f)
+                    : 0.0f;
+                const float DistanceSquared = FVector2D::DistSquared(
+                    WorldXY,
+                    SegmentStart + Segment * SegmentT);
+                if (DistanceSquared < BestDistanceSquared)
+                {
+                    BestDistanceSquared = DistanceSquared;
+                    BestSegmentIndex = SegmentIndex;
+                    BestSegmentT = SegmentT;
+                }
+            }
+            RiverDistanceCm = FMath::Sqrt(BestDistanceSquared);
+            Progress = (static_cast<float>(BestSegmentIndex) + BestSegmentT) /
+                static_cast<float>(CenterlineReviewSamples.Num() - 1);
+            if (RiverDistanceCm < RiverSetbackCm)
+            {
+                ++OutStats.RejectedRiverSetbackCount;
+                continue;
+            }
+        }
+        else
+        {
+            const bool bMacroGap =
+                (Progress > 0.675f && Progress < 0.692f) ||
+                (Progress > 0.752f && Progress < 0.770f) ||
+                (Progress > 0.842f && Progress < 0.854f);
+            const float MicroGapThreshold = bDenseLocalReview ? 0.035f : 0.075f;
+            const bool bMicroGap =
+                FMath::Frac(Halton(CandidateIndex, 7) + Progress * 11.0f) <
+                MicroGapThreshold;
+            if (bMacroGap || bMicroGap)
+            {
+                ++OutStats.RejectedNaturalGapCount;
+                continue;
+            }
+
+            FVector2D Tangent;
+            const FVector2D Center = SampleLandscapeCandidateCenterlineWorld(
+                Candidate,
+                Centerline,
+                Progress,
+                &Tangent);
+            const FVector2D Normal(-Tangent.Y, Tangent.X);
+            const float Side = Halton(CandidateIndex, 3) < 0.5f ? -1.0f : 1.0f;
+            const float LateralT = FMath::Pow(Halton(CandidateIndex, 5), 0.72f);
+            const float LateralOffset = FMath::Lerp(
+                RiverSetbackCm,
+                MaximumLateralOffsetCm,
+                LateralT);
+            WorldXY = Center + Normal * Side * LateralOffset;
+            RiverDistanceCm = LateralOffset;
+        }
         const float VegetationT = SampleSourceMask(VegetationMask, WorldXY);
-        if (VegetationT < 0.34f)
+        const float SpatialOccupancyT = bWorldStableReview
+            ? SampleSpatialVegetationOccupancy(WorldXY)
+            : VegetationT;
+        const float VegetationThreshold = bWorldStableReview
+            ? 0.10f
+            : (bAreaSampledReview ? 0.27f : 0.34f);
+        if (SpatialOccupancyT < VegetationThreshold)
         {
             ++OutStats.RejectedVegetationMaskCount;
             continue;
@@ -20694,6 +21895,35 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
         {
             ++OutStats.RejectedWaterMaskCount;
             continue;
+        }
+        if (bAreaSampledReview || bWorldStableReview)
+        {
+            const float BroadStandNoise =
+                0.5f + 0.5f * FMath::PerlinNoise2D(WorldXY * 0.0000065f + FVector2D(17.0f, -31.0f));
+            const float MidStandNoise =
+                0.5f + 0.5f * FMath::PerlinNoise2D(WorldXY * 0.000018f + FVector2D(-43.0f, 29.0f));
+            const float StandNoise = FMath::Clamp(
+                BroadStandNoise * 0.68f + MidStandNoise * 0.32f,
+                0.0f,
+                1.0f);
+            const float MaskFeather = bWorldStableReview
+                ? SpatialOccupancyT
+                : SmoothPreviewStep(0.27f, 0.68f, VegetationT);
+            const float RiverGradient = SmoothPreviewStep(
+                RiverSetbackCm,
+                RiverSetbackCm + 18000.0f,
+                RiverDistanceCm);
+            const float StandProbability = FMath::Clamp(
+                (0.34f + StandNoise * 0.58f) *
+                    FMath::Lerp(0.30f, 1.0f, MaskFeather) *
+                    FMath::Lerp(0.72f, 1.0f, RiverGradient),
+                0.0f,
+                0.96f);
+            if (StandNoise < 0.20f || Halton(CandidateIndex, 23) > StandProbability)
+            {
+                ++OutStats.RejectedStandDensityCount;
+                continue;
+            }
         }
 
         const float GroundZ = LandscapeHeight(WorldXY);
@@ -20766,7 +21996,9 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
             0,
             Variants.Num() - 1);
         FFutaleufuCanopyCorridorVariant& Variant = Variants[VariantIndex];
-        const float UniformScale = 0.72f + Halton(CandidateIndex, 17) * 0.31f;
+        const float UniformScale = bLocalReview
+            ? 0.78f + Halton(CandidateIndex, 17) * 0.34f
+            : 0.72f + Halton(CandidateIndex, 17) * 0.31f;
         const FRotator Rotation(
             0.0f,
             FMath::Fmod(Halton(CandidateIndex, 19) * 360.0f + Progress * 137.5f, 360.0f),
@@ -20812,6 +22044,21 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
             GroundZ);
         OutStats.AcceptedVegetationMaskSum += VegetationT;
         OutStats.AcceptedWaterMaskSum += WaterT;
+        OutStats.MinimumAcceptedRiverDistanceCm = FMath::Min(
+            OutStats.MinimumAcceptedRiverDistanceCm,
+            RiverDistanceCm);
+        OutStats.MaximumAcceptedRiverDistanceCm = FMath::Max(
+            OutStats.MaximumAcceptedRiverDistanceCm,
+            RiverDistanceCm);
+        auto MixFingerprint = [&OutStats](uint64 Value)
+        {
+            OutStats.PlacementFingerprint ^= Value;
+            OutStats.PlacementFingerprint *= 1099511628211ull;
+        };
+        MixFingerprint(static_cast<uint64>(CandidateIndex));
+        MixFingerprint(static_cast<uint64>(FMath::RoundToInt(WorldXY.X)));
+        MixFingerprint(static_cast<uint64>(FMath::RoundToInt(WorldXY.Y)));
+        MixFingerprint(static_cast<uint64>(VariantIndex));
     }
 
     const bool bComplete =
@@ -20821,14 +22068,22 @@ bool AddFutaleufuCanopyCorridorComparisonInstances(
         OutStats.FarTreeCount > 0 &&
         OutStats.HiddenFallbackActorCount >= 4;
     OutSummary += FString::Printf(
-        TEXT("Futaleufu source-masked canopy comparison placed %d/%d transient non-colliding trees "
-             "(%d near full, %d mid, %d runtime far) in %s render mode, hid %d fallback PVE actors, and evaluated %d candidates.\n"),
+        TEXT("Futaleufu %s source-masked canopy comparison placed %d/%d transient non-colliding trees "
+             "(%d near full, %d mid, %d runtime far) in %s render mode across progress %.4f-%.4f, "
+             "hid %d fallback PVE actors, and evaluated %d candidates.\n"),
+        bAreaSampledReview
+            ? TEXT("2D area-sampled camera-local")
+            : (bWorldStableReview
+                   ? TEXT("spatial-occupancy world-stable")
+                   : (bDenseLocalReview ? TEXT("dense centerline camera-local") : TEXT("retained sparse route-wide"))),
         OutStats.AcceptedTreeCount,
         TargetTreeCount,
         OutStats.NearTreeCount,
         OutStats.MidTreeCount,
         OutStats.FarTreeCount,
         GetFutaleufuCanopyCorridorRenderModeToken(RenderMode),
+        ProgressMinimum,
+        ProgressMaximum,
         OutStats.HiddenFallbackActorCount,
         OutStats.CandidateCount);
     return bComplete;
@@ -24306,6 +25561,27 @@ void FRaftSimEditorModule::StartupModule()
             FConsoleCommandWithArgsDelegate::CreateRaw(
                 this,
                 &FRaftSimEditorModule::HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand));
+    CaptureZambeziBatokaTerrainIntegratedComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureZambeziBatokaTerrainIntegratedComparison"),
+            TEXT("Capture paired baseline and transient V11 Batoka material views on the continuous Zambezi visual terrain."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureZambeziBatokaTerrainIntegratedComparisonCommand));
+    CaptureZambeziBatokaWorldAlignedTerrainComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureZambeziBatokaWorldAlignedTerrainComparison"),
+            TEXT("Capture paired baseline and transient V12 world-aligned Batoka material views on the continuous Zambezi visual terrain."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureZambeziBatokaWorldAlignedTerrainComparisonCommand));
+    CaptureZambeziBatokaVisualMorphologyComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureZambeziBatokaVisualMorphologyComparison"),
+            TEXT("Capture paired V12-material baseline and bounded render-only V13 Batoka morphology views."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureZambeziBatokaVisualMorphologyComparisonCommand));
     CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand =
         MakeUnique<FAutoConsoleCommand>(
             TEXT("RaftSim.CaptureFutaleufuNativeCanopyCorridorComparison"),
@@ -24313,6 +25589,27 @@ void FRaftSimEditorModule::StartupModule()
             FConsoleCommandWithArgsDelegate::CreateRaw(
                 this,
                 &FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand));
+    CaptureFutaleufuDenseCanopyComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuDenseCanopyComparison"),
+            TEXT("Capture paired retained-sparse and dense camera-local source-masked Futaleufu canopy views."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuDenseCanopyComparisonCommand));
+    CaptureFutaleufuAreaSampledCanopyComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuAreaSampledCanopyComparison"),
+            TEXT("Capture paired centerline and 2D area-sampled camera-local Futaleufu canopy views."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuAreaSampledCanopyComparisonCommand));
+    CaptureFutaleufuWorldStableCanopyComparisonConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CaptureFutaleufuWorldStableCanopyComparison"),
+            TEXT("Capture paired camera-local and spatial-occupancy world-stable Futaleufu canopy views."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCaptureFutaleufuWorldStableCanopyComparisonCommand));
     CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand =
         MakeUnique<FAutoConsoleCommand>(
             TEXT("RaftSim.CaptureFutaleufuNativeCanopyRenderDiagnostics"),
@@ -24384,6 +25681,13 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("RaftSim.EvaluateProceduralBeechCandidate"),
         TEXT("Execute one installed UE PVE European Beech growth-data variant and record structural review evidence."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleEvaluateProceduralBeechCandidateCommand));
+    EvaluateFutaleufuCordilleraCypressPveCandidateConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate"),
+            TEXT("Build one project-owned cordilleran-cypress PVE form; optional second argument is flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, or compact_connected_twig_hierarchy."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateCommand));
     CreateFutaleufuNativeCanopyPrototypeConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CreateFutaleufuNativeCanopyPrototype"),
         TEXT("Create the project-owned coigue texture, material, Nanite mesh, map, and capture review assets."),
@@ -24396,6 +25700,20 @@ void FRaftSimEditorModule::StartupModule()
         FConsoleCommandWithArgsDelegate::CreateRaw(
             this,
             &FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressFamilyCommand));
+    CreateFutaleufuCordilleraCypressOpaqueNearReviewConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CreateFutaleufuCordilleraCypressOpaqueNearReview"),
+            TEXT("Create the V14 project-owned opaque connected-scale-leaf cypress review family."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressOpaqueNearReviewCommand));
+    CreateFutaleufuCordilleraCypressVolumetricNearReviewConsoleCommand =
+        MakeUnique<FAutoConsoleCommand>(
+            TEXT("RaftSim.CreateFutaleufuCordilleraCypressVolumetricNearReview"),
+            TEXT("Create the V15 rounded volumetric scale-leaf cypress review family."),
+            FConsoleCommandWithArgsDelegate::CreateRaw(
+                this,
+                &FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressVolumetricNearReviewCommand));
     CreateFutaleufuCordilleraCypressDonorReviewConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CreateFutaleufuCordilleraCypressDonorReview"),
         TEXT("Create the non-native CC0 connected-geometry morphology-donor review map and captures."),
@@ -24415,8 +25733,40 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(
             FCommandLine::Get(),
             TEXT("RaftSimCaptureZambeziBatokaBasaltCorridorComparison"));
+    bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureZambeziBatokaTerrainIntegratedComparison"));
+    bCaptureZambeziBatokaWorldAlignedTerrainComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureZambeziBatokaWorldAlignedTerrainComparison"));
+    bCaptureZambeziBatokaVisualMorphologyComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureZambeziBatokaVisualMorphologyComparison"));
+    bCaptureFutaleufuDenseCanopyComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureFutaleufuDenseCanopyComparison"));
+    bCaptureFutaleufuAreaSampledCanopyComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureFutaleufuAreaSampledCanopyComparison"));
+    bCaptureFutaleufuWorldStableCanopyComparisonOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCaptureFutaleufuWorldStableCanopyComparison"));
     bCreateFutaleufuCordilleraCypressFamilyOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateFutaleufuCordilleraCypressFamily"));
+    bCreateFutaleufuCordilleraCypressOpaqueNearReviewOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCreateFutaleufuCordilleraCypressOpaqueNearReview"));
+    bCreateFutaleufuCordilleraCypressVolumetricNearReviewOnStartup =
+        FParse::Param(
+            FCommandLine::Get(),
+            TEXT("RaftSimCreateFutaleufuCordilleraCypressVolumetricNearReview"));
     bCreateFutaleufuCordilleraCypressDonorReviewOnStartup =
         FParse::Param(
             FCommandLine::Get(),
@@ -24429,7 +25779,15 @@ void FRaftSimEditorModule::StartupModule()
         bCreateLandscapeImportCandidateMapsOnStartup ||
         bCreateZambeziBatokaBasaltFamilyOnStartup ||
         bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup ||
+        bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup ||
+        bCaptureZambeziBatokaWorldAlignedTerrainComparisonOnStartup ||
+        bCaptureZambeziBatokaVisualMorphologyComparisonOnStartup ||
+        bCaptureFutaleufuDenseCanopyComparisonOnStartup ||
+        bCaptureFutaleufuAreaSampledCanopyComparisonOnStartup ||
+        bCaptureFutaleufuWorldStableCanopyComparisonOnStartup ||
         bCreateFutaleufuCordilleraCypressFamilyOnStartup ||
+        bCreateFutaleufuCordilleraCypressOpaqueNearReviewOnStartup ||
+        bCreateFutaleufuCordilleraCypressVolumetricNearReviewOnStartup ||
         bCreateFutaleufuCordilleraCypressDonorReviewOnStartup)
     {
         PhotorealEnvironmentAutomationPostEngineInitHandle =
@@ -24463,7 +25821,13 @@ void FRaftSimEditorModule::ShutdownModule()
     CaptureZambeziCliffComparisonConsoleCommand.Reset();
     CreateZambeziBatokaBasaltFamilyConsoleCommand.Reset();
     CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand.Reset();
+    CaptureZambeziBatokaTerrainIntegratedComparisonConsoleCommand.Reset();
+    CaptureZambeziBatokaWorldAlignedTerrainComparisonConsoleCommand.Reset();
+    CaptureZambeziBatokaVisualMorphologyComparisonConsoleCommand.Reset();
     CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand.Reset();
+    CaptureFutaleufuDenseCanopyComparisonConsoleCommand.Reset();
+    CaptureFutaleufuAreaSampledCanopyComparisonConsoleCommand.Reset();
+    CaptureFutaleufuWorldStableCanopyComparisonConsoleCommand.Reset();
     CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand.Reset();
     CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand.Reset();
     CaptureFutaleufuNativeCanopyLightingDiagnosticsConsoleCommand.Reset();
@@ -24475,8 +25839,11 @@ void FRaftSimEditorModule::ShutdownModule()
     CaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsConsoleCommand.Reset();
     InspectProceduralVegetationSampleConsoleCommand.Reset();
     EvaluateProceduralBeechCandidateConsoleCommand.Reset();
+    EvaluateFutaleufuCordilleraCypressPveCandidateConsoleCommand.Reset();
     CreateFutaleufuNativeCanopyPrototypeConsoleCommand.Reset();
     CreateFutaleufuCordilleraCypressFamilyConsoleCommand.Reset();
+    CreateFutaleufuCordilleraCypressOpaqueNearReviewConsoleCommand.Reset();
+    CreateFutaleufuCordilleraCypressVolumetricNearReviewConsoleCommand.Reset();
     CreateFutaleufuCordilleraCypressDonorReviewConsoleCommand.Reset();
 
     if (ProceduralBeechCandidateTickerHandle.IsValid())
@@ -24742,11 +26109,101 @@ void FRaftSimEditorModule::HandleCaptureZambeziBatokaBasaltCorridorComparisonCom
     }
 }
 
+void FRaftSimEditorModule::HandleCaptureZambeziBatokaTerrainIntegratedComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureZambeziBatokaTerrainIntegratedComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureZambeziBatokaWorldAlignedTerrainComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureZambeziBatokaWorldAlignedTerrainComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureZambeziBatokaVisualMorphologyComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureZambeziBatokaVisualMorphologyComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
 void FRaftSimEditorModule::HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand(
     const TArray<FString>&)
 {
     FString Summary;
     const bool bSucceeded = CaptureFutaleufuNativeCanopyCorridorComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuDenseCanopyComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuDenseCanopyComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuAreaSampledCanopyComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuAreaSampledCanopyComparison(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureFutaleufuWorldStableCanopyComparisonCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureFutaleufuWorldStableCanopyComparison(Summary);
     if (bSucceeded)
     {
         UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
@@ -25033,6 +26490,52 @@ void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressFamilyCommand(
     }
 }
 
+void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressOpaqueNearReviewCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CreateFutaleufuCordilleraCypressOpaqueNearReview(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("Futaleufu V14 opaque cypress review completed.\n%s"),
+            *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Futaleufu V14 opaque cypress review failed.\n%s"),
+            *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressVolumetricNearReviewCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CreateFutaleufuCordilleraCypressVolumetricNearReview(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("Futaleufu V15 volumetric cypress review completed.\n%s"),
+            *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Futaleufu V15 volumetric cypress review failed.\n%s"),
+            *Summary);
+    }
+}
+
 void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressDonorReviewCommand(
     const TArray<FString>&)
 {
@@ -25058,6 +26561,26 @@ void FRaftSimEditorModule::HandleCreateFutaleufuCordilleraCypressDonorReviewComm
 
 bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSummary)
 {
+    return CreateFutaleufuCordilleraCypressReview(false, false, OutSummary);
+}
+
+bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressOpaqueNearReview(
+    FString& OutSummary)
+{
+    return CreateFutaleufuCordilleraCypressReview(true, false, OutSummary);
+}
+
+bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressVolumetricNearReview(
+    FString& OutSummary)
+{
+    return CreateFutaleufuCordilleraCypressReview(true, true, OutSummary);
+}
+
+bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressReview(
+    bool bOpaqueNearGeometry,
+    bool bVolumetricNearGeometry,
+    FString& OutSummary)
+{
     OutSummary.Reset();
     TMap<FString, UTexture2D*> Textures;
     if (!CreateFutaleufuCordilleraCypressTextureAssets(Textures, OutSummary))
@@ -25067,13 +26590,20 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
     }
     UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
         TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark"), false, Textures, OutSummary);
-    UMaterial* NearSprayMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
-        TEXT("M_RaftSim_FutaleufuCordilleraCypress_V12_NearSprays"),
-        true,
-        Textures,
-        OutSummary,
-        false,
-        TEXT("Near"));
+    UMaterial* NearSprayMaterial = bOpaqueNearGeometry
+        ? CreateOrUpdateFutaleufuCypressNearSprayMaterial(
+              bVolumetricNearGeometry
+                  ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V15_VolumetricNearGeometry")
+                  : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V14_OpaqueNearGeometry"),
+              OutSummary,
+              bVolumetricNearGeometry)
+        : CreateOrUpdateFutaleufuNativeCanopyMaterial(
+              TEXT("M_RaftSim_FutaleufuCordilleraCypress_V12_NearSprays"),
+              true,
+              Textures,
+              OutSummary,
+              false,
+              TEXT("Near"));
     UMaterial* FarSprayMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
         TEXT("M_RaftSim_FutaleufuCordilleraCypress_V12_FarSprays"),
         true,
@@ -25215,6 +26745,8 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
     {
         BuildFutaleufuCordilleraCypressGeometry(
             Variant.Form,
+            bOpaqueNearGeometry,
+            bVolumetricNearGeometry,
             Variant.WoodyVertices,
             Variant.WoodyTriangles,
             Variant.WoodyNormals,
@@ -25273,16 +26805,24 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
             return false;
         }
         const FString AssetStem = FString::Printf(
-            TEXT("SM_RaftSim_FutaleufuCordilleraCypress_%s_V12"),
-            *Variant.Form.AssetToken);
+            TEXT("SM_RaftSim_FutaleufuCordilleraCypress_%s_%s"),
+            *Variant.Form.AssetToken,
+            bVolumetricNearGeometry
+                ? TEXT("V15")
+                : (bOpaqueNearGeometry ? TEXT("V14") : TEXT("V12")));
         Variant.WoodyPackagePath = MeshRoot + AssetStem + TEXT("_Woody");
-        Variant.NearSprayPackagePath = MeshRoot + AssetStem + TEXT("_NearTexturedSprays");
+        Variant.NearSprayPackagePath = MeshRoot + AssetStem +
+            (bVolumetricNearGeometry
+                 ? TEXT("_NearVolumetricScaleLeafClusters")
+                 : (bOpaqueNearGeometry
+                        ? TEXT("_NearOpaqueScaleLeafClusters")
+                        : TEXT("_NearTexturedSprays")));
         Variant.SprayPackagePath = MeshRoot + AssetStem + TEXT("_FarSprays");
         Variant.WoodyMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
             WoodyProceduralActor,
             Variant.WoodyPackagePath,
             BarkMaterial,
-            false,
+            bVolumetricNearGeometry,
             ENaniteShapePreservation::None,
             OutSummary);
         Variant.NearSprayMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
@@ -25329,8 +26869,13 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
         WoodyActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         WoodyActor->GetStaticMeshComponent()->SetCastShadow(true);
         NearSprayActor->SetActorLabel(FString::Printf(
-            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_NearTexturedSprays"),
-            *Variant.Form.AssetToken));
+            TEXT("RaftSim_FutaleufuCordilleraCypress_%s_%s"),
+            *Variant.Form.AssetToken,
+            bVolumetricNearGeometry
+                ? TEXT("NearVolumetricScaleLeafClusters")
+                : (bOpaqueNearGeometry
+                       ? TEXT("NearOpaqueScaleLeafClusters")
+                       : TEXT("NearTexturedSprays"))));
         NearSprayActor->GetStaticMeshComponent()->SetStaticMesh(Variant.NearSprayMesh);
         NearSprayActor->GetStaticMeshComponent()->SetMaterial(0, NearSprayMaterial);
         NearSprayActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -25377,8 +26922,14 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
     ReviewSpec.RiverId = TEXT("futaleufu_cordillera_cypress");
     ReviewSpec.DisplayName = TEXT("Futaleufu project-owned cordilleran-cypress family");
     ReviewSpec.MapPackagePath =
-        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
-             "L_FutaleufuCordilleraCypress_V12_SparseBranchSprayReview");
+        bVolumetricNearGeometry
+            ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+                   "L_FutaleufuCordilleraCypress_V15_VolumetricNearGeometryReview")
+            : bOpaqueNearGeometry
+            ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+                   "L_FutaleufuCordilleraCypress_V14_OpaqueNearGeometryReview")
+            : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/FutaleufuNativeCanopy/"
+                   "L_FutaleufuCordilleraCypress_V12_SparseBranchSprayReview");
     ReviewSpec.FoliageColor = FLinearColor(0.13f, 0.28f, 0.10f);
     ReviewSpec.RockColor = FLinearColor(0.31f, 0.30f, 0.27f);
     AddPreviewLightRig(World, ReviewSpec);
@@ -25455,6 +27006,9 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
     };
     TArray<FCypressCaptureRequest> CaptureRequests;
     bool bCamerasComplete = true;
+    const TCHAR* CaptureVersion = bVolumetricNearGeometry
+        ? TEXT("v15")
+        : (bOpaqueNearGeometry ? TEXT("v14") : TEXT("v12"));
     for (const FCypressRuntime& Variant : Variants)
     {
         const FVector CrownTarget = Variant.WorldOffset + FVector(
@@ -25493,10 +27047,14 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
             Request.CaptureId = Variant.Form.Id + TEXT("_") + View.CaptureSuffix;
             Request.RelativePath = FString::Printf(
                 TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-                     "futaleufu_cordillera_cypress_v12_%s_%s.png"),
+                     "futaleufu_cordillera_cypress_%s_%s_%s.png"),
+                CaptureVersion,
                 *Variant.Form.Id,
                 View.CaptureSuffix);
-            if (Request.CaptureId.Contains(TEXT("bark_spray_closeup")))
+            if (Request.CaptureId.Contains(TEXT("bark_spray_closeup")) ||
+                (bVolumetricNearGeometry &&
+                 (Request.CaptureId.Contains(TEXT("turntable")) ||
+                  Request.CaptureId.Contains(TEXT("river_distance_60m")))))
             {
                 Request.AuthorityMode = TEXT("near_only");
             }
@@ -25537,7 +27095,8 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
                         AuthorityTokens[AuthorityIndex]);
                     Request.RelativePath = FString::Printf(
                         TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-                             "futaleufu_cordillera_cypress_v12_%s_handoff_%s_%s.png"),
+                             "futaleufu_cordillera_cypress_%s_%s_handoff_%s_%s.png"),
+                        CaptureVersion,
                         *Variant.Form.Id,
                         TransitionTokens[TransitionIndex],
                         AuthorityTokens[AuthorityIndex]);
@@ -25562,6 +27121,7 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
         const FVector WoodyBounds = Variant.WoodyMesh->GetBoundingBox().GetSize();
         const FVector NearSprayBounds = Variant.NearSprayMesh->GetBoundingBox().GetSize();
         const FVector SprayBounds = Variant.SprayMesh->GetBoundingBox().GetSize();
+        const int32 NearTriangleCount = Variant.NearSprayTriangles.Num() / 3;
         bGeometryValidated &=
             Variant.Form.HeightCm >= 250.0f &&
             Variant.Form.HeightCm <= 2500.0f &&
@@ -25569,11 +27129,18 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
             Variant.NearSprayMesh->GetNumVertices(0) > 500 &&
             Variant.SprayMesh->GetNumVertices(0) > 500 &&
             Variant.NearSprayTriangles.Num() % 3 == 0 &&
+            (bVolumetricNearGeometry
+                 ? (NearTriangleCount >= 150000 &&
+                    NearTriangleCount <= 400000 &&
+                    NearTriangleCount % 256 == 0)
+                 : (NearTriangleCount >= 800 &&
+                    NearTriangleCount <= 1900 &&
+                    (!bOpaqueNearGeometry || NearTriangleCount % 6 == 0))) &&
             Variant.SprayTriangles.Num() % 6 == 0 &&
             WoodyBounds.Z >= Variant.Form.HeightCm * 0.92f &&
             NearSprayBounds.X >= Variant.Form.CrownRadiusCm * 0.65f &&
             SprayBounds.X >= Variant.Form.CrownRadiusCm * 0.65f &&
-            !Variant.WoodyMesh->IsNaniteEnabled() &&
+            Variant.WoodyMesh->IsNaniteEnabled() == bVolumetricNearGeometry &&
             !Variant.NearSprayMesh->IsNaniteEnabled() &&
             !Variant.SprayMesh->IsNaniteEnabled();
     }
@@ -25600,7 +27167,10 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
                 Request.Description,
                 false,
                 OutSummary,
-                [AuthorityMode](UWorld* CaptureWorld, ACameraActor* CaptureCamera, FString& SetupSummary)
+                [AuthorityMode, bOpaqueNearGeometry, bVolumetricNearGeometry](
+                    UWorld* CaptureWorld,
+                    ACameraActor* CaptureCamera,
+                    FString& SetupSummary)
                 {
                     const bool bNearOnly = AuthorityMode == TEXT("near_only");
                     const bool bFarOnly = AuthorityMode == TEXT("far_only");
@@ -25618,7 +27188,12 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
                             continue;
                         }
                         const FString Label = Actor->GetActorLabel();
-                        if (Label.Contains(TEXT("_NearTexturedSprays")))
+                        const bool bNearActor = bVolumetricNearGeometry
+                            ? Label.Contains(TEXT("_NearVolumetricScaleLeafClusters"))
+                            : (bOpaqueNearGeometry
+                                   ? Label.Contains(TEXT("_NearOpaqueScaleLeafClusters"))
+                                   : Label.Contains(TEXT("_NearTexturedSprays")));
+                        if (bNearActor)
                         {
                             ++NearActorCount;
                             const float RootDistance = CaptureCamera
@@ -25665,11 +27240,20 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
 
     TSharedRef<FJsonObject> ReportObject = MakeShared<FJsonObject>();
     ReportObject->SetStringField(
-        TEXT("schema"), TEXT("raftsim.unreal.futaleufu_cordillera_cypress_isolated_family.v12"));
+        TEXT("schema"),
+        bVolumetricNearGeometry
+            ? TEXT("raftsim.unreal.futaleufu_cordillera_cypress_volumetric_near_family.v15")
+            : bOpaqueNearGeometry
+            ? TEXT("raftsim.unreal.futaleufu_cordillera_cypress_opaque_near_family.v14")
+            : TEXT("raftsim.unreal.futaleufu_cordillera_cypress_isolated_family.v12"));
     ReportObject->SetStringField(
         TEXT("status"),
         bCaptured
-            ? TEXT("v12_sparse_branch_scale_near_candidate_family_captured_pending_human_review")
+            ? (bVolumetricNearGeometry
+                   ? TEXT("v15_volumetric_scale_leaf_family_captured_pending_human_review")
+                   : bOpaqueNearGeometry
+                   ? TEXT("v14_opaque_connected_scale_leaf_family_captured_pending_human_review")
+                   : TEXT("v12_sparse_branch_scale_near_candidate_family_captured_pending_human_review"))
             : TEXT("isolated_unreal_family_capture_incomplete"));
     ReportObject->SetBoolField(TEXT("production_promoted"), false);
     ReportObject->SetBoolField(TEXT("corridor_substitution_performed"), false);
@@ -25698,9 +27282,54 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
              "futaleufu_cordillera_cypress_texture_manifest.json"));
     ReportObject->SetStringField(
         TEXT("foliage_representation"),
-        TEXT("V12 restored V10 primary distribution with one enlarged flattened V10 broad-spray card on a deterministic 34 percent sample of terminal systems; retained V3 far atlas and geometry remain separate and actor-root fallback remains authoritative"));
-    ReportObject->SetNumberField(TEXT("near_textured_cards_per_selected_terminal_system"), 1);
-    ReportObject->SetNumberField(TEXT("near_terminal_system_sampling_probability"), 0.34f);
+        bVolumetricNearGeometry
+            ? TEXT("V15 adds project-owned connected brown central and secondary twigs carrying eight overlapping fusiform opaque scale-leaf volumes on a deterministic 50 percent sample of branch systems; V10 far atlas geometry remains separate and actor-root fallback remains authoritative pending review")
+            : bOpaqueNearGeometry
+            ? TEXT("V14 retains the V10 primary distribution but replaces masked whole-spray cards with one project-owned welded three-lobe opaque six-triangle scale-leaf cluster attached directly to a deterministic 11 percent sample of branch systems; V10 far atlas geometry remains separate and actor-root fallback remains authoritative pending review")
+            : TEXT("V12 restored V10 primary distribution with one enlarged flattened V10 broad-spray card on a deterministic 34 percent sample of terminal systems; retained V3 far atlas and geometry remain separate and actor-root fallback remains authoritative"));
+    if (bVolumetricNearGeometry)
+    {
+        ReportObject->SetNumberField(TEXT("near_scale_leaf_volumes_per_selected_branch_system"), 8);
+        ReportObject->SetNumberField(TEXT("near_triangles_per_selected_branch_system"), 256);
+        ReportObject->SetNumberField(TEXT("near_branch_system_sampling_probability"), 0.50f);
+        ReportObject->SetNumberField(TEXT("provisional_near_source_triangle_floor"), 150000);
+        ReportObject->SetNumberField(TEXT("provisional_near_source_triangle_ceiling"), 400000);
+        ReportObject->SetBoolField(TEXT("masked_whole_spray_cards_used"), false);
+        ReportObject->SetBoolField(TEXT("direct_fir_geometry_copied"), false);
+        ReportObject->SetBoolField(TEXT("rounded_fusiform_scale_leaf_volumes"), true);
+        ReportObject->SetBoolField(TEXT("woody_nanite_enabled"), true);
+        ReportObject->SetBoolField(TEXT("micro_foliage_nanite_enabled"), false);
+        ReportObject->SetStringField(TEXT("nanite_shape_preservation"), TEXT("None"));
+        ReportObject->SetStringField(
+            TEXT("nanite_shape_preservation_reason"),
+            TEXT("PreserveArea expanded thin open twig and scale-leaf segments into visible shards during the first V15 diagnostic render"));
+        ReportObject->SetStringField(
+            TEXT("micro_foliage_raster_reason"),
+            TEXT("Nanite culled most tiny disconnected scale-leaf volumes during the dense V15 diagnostic render; woody geometry remains Nanite while micro-foliage uses the traditional near raster path"));
+        ReportObject->SetStringField(
+            TEXT("resource_contract"),
+            TEXT("provisional 150k-400k traditional-raster micro-foliage gate with Nanite woody geometry pending packaged desktop and target-VR profiling"));
+        ReportObject->SetStringField(
+            TEXT("fixed_near_evidence_authority"),
+            TEXT("near-only at turntable, exterior closeup, and 60 m; 150 m remains combined far fallback"));
+    }
+    else if (bOpaqueNearGeometry)
+    {
+        ReportObject->SetNumberField(TEXT("near_opaque_clusters_per_selected_branch_system"), 1);
+        ReportObject->SetNumberField(TEXT("near_triangles_per_opaque_cluster"), 6);
+        ReportObject->SetNumberField(TEXT("near_branch_system_sampling_probability"), 0.11f);
+        ReportObject->SetNumberField(TEXT("near_source_triangle_ceiling"), 1900);
+        ReportObject->SetBoolField(TEXT("masked_whole_spray_cards_used"), false);
+        ReportObject->SetBoolField(TEXT("direct_fir_geometry_copied"), false);
+        ReportObject->SetStringField(
+            TEXT("retained_resource_contract"),
+            TEXT("V12 886-1890 near-source triangle envelope with fewer welded six-triangle opaque clusters replacing two-triangle cards"));
+    }
+    else
+    {
+        ReportObject->SetNumberField(TEXT("near_textured_cards_per_selected_terminal_system"), 1);
+        ReportObject->SetNumberField(TEXT("near_terminal_system_sampling_probability"), 0.34f);
+    }
     ReportObject->SetNumberField(TEXT("far_cards_per_terminal_cluster"), 3);
     ReportObject->SetNumberField(TEXT("near_max_draw_distance_cm"), 2800.0f);
     ReportObject->SetNumberField(TEXT("far_min_draw_distance_cm"), 2800.0f);
@@ -25716,7 +27345,11 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
         TEXT("near_candidate_closeup_authority"), TEXT("near_only"));
     ReportObject->SetStringField(
         TEXT("shadow_policy"),
-        TEXT("initial isolated spray shadows disabled; production shadow treatment remains gated by V23"));
+        bVolumetricNearGeometry
+            ? TEXT("initial isolated volumetric-foliage shadows disabled until morphology and silhouette pass; bounded shadows remain a separate gate")
+            : bOpaqueNearGeometry
+            ? TEXT("initial isolated opaque-cluster shadows disabled so topology and silhouette are reviewed before a bounded shadow pass")
+            : TEXT("initial isolated spray shadows disabled; production shadow treatment remains gated by V23"));
 
     TArray<TSharedPtr<FJsonValue>> FormValues;
     for (const FCypressRuntime& Variant : Variants)
@@ -25732,21 +27365,51 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
         FormObject->SetNumberField(TEXT("crown_radius_cm"), Variant.Form.CrownRadiusCm);
         FormObject->SetNumberField(TEXT("branch_count"), Variant.Form.BranchCount);
         FormObject->SetStringField(TEXT("woody_asset"), Variant.WoodyPackagePath);
-        FormObject->SetStringField(TEXT("near_textured_spray_asset"), Variant.NearSprayPackagePath);
+        FormObject->SetStringField(
+            bVolumetricNearGeometry
+                ? TEXT("near_volumetric_scale_leaf_asset")
+                : (bOpaqueNearGeometry
+                       ? TEXT("near_opaque_scale_leaf_asset")
+                       : TEXT("near_textured_spray_asset")),
+            Variant.NearSprayPackagePath);
         FormObject->SetStringField(TEXT("far_spray_asset"), Variant.SprayPackagePath);
         FormObject->SetNumberField(TEXT("woody_source_vertices"), Variant.WoodyVertices.Num());
         FormObject->SetNumberField(TEXT("woody_source_triangles"), Variant.WoodyTriangles.Num() / 3);
         FormObject->SetNumberField(
-            TEXT("near_textured_spray_source_vertices"), Variant.NearSprayVertices.Num());
+            bVolumetricNearGeometry
+                ? TEXT("near_volumetric_scale_leaf_source_vertices")
+                : bOpaqueNearGeometry
+                ? TEXT("near_opaque_scale_leaf_source_vertices")
+                : TEXT("near_textured_spray_source_vertices"),
+            Variant.NearSprayVertices.Num());
         FormObject->SetNumberField(
-            TEXT("near_textured_spray_source_triangles"), Variant.NearSprayTriangles.Num() / 3);
+            bVolumetricNearGeometry
+                ? TEXT("near_volumetric_scale_leaf_source_triangles")
+                : bOpaqueNearGeometry
+                ? TEXT("near_opaque_scale_leaf_source_triangles")
+                : TEXT("near_textured_spray_source_triangles"),
+            Variant.NearSprayTriangles.Num() / 3);
         FormObject->SetNumberField(
-            TEXT("near_textured_spray_source_cards"), Variant.NearSprayTriangles.Num() / 6);
+            bVolumetricNearGeometry
+                ? TEXT("near_volumetric_scale_leaf_source_branch_systems")
+                : bOpaqueNearGeometry
+                ? TEXT("near_opaque_scale_leaf_source_clusters")
+                : TEXT("near_textured_spray_source_cards"),
+            bVolumetricNearGeometry
+                ? Variant.NearSprayTriangles.Num() / (256 * 3)
+                : (bOpaqueNearGeometry
+                       ? Variant.NearSprayTriangles.Num() / 18
+                       : Variant.NearSprayTriangles.Num() / 6));
         FormObject->SetNumberField(TEXT("far_spray_source_cards"), Variant.SprayTriangles.Num() / 6);
         FormObject->SetNumberField(TEXT("far_spray_source_triangles"), Variant.SprayTriangles.Num() / 3);
         FormObject->SetBoolField(TEXT("woody_nanite_enabled"), Variant.WoodyMesh->IsNaniteEnabled());
         FormObject->SetBoolField(
-            TEXT("near_textured_spray_nanite_enabled"), Variant.NearSprayMesh->IsNaniteEnabled());
+            bVolumetricNearGeometry
+                ? TEXT("near_volumetric_scale_leaf_nanite_enabled")
+                : bOpaqueNearGeometry
+                ? TEXT("near_opaque_scale_leaf_nanite_enabled")
+                : TEXT("near_textured_spray_nanite_enabled"),
+            Variant.NearSprayMesh->IsNaniteEnabled());
         FormObject->SetBoolField(TEXT("far_spray_nanite_enabled"), Variant.SprayMesh->IsNaniteEnabled());
         FormValues.Add(MakeShared<FJsonValueObject>(FormObject));
     }
@@ -25775,8 +27438,14 @@ bool FRaftSimEditorModule::CreateFutaleufuCordilleraCypressFamily(FString& OutSu
     SerializedReport += TEXT("\n");
     const FString ReportPath = FPaths::Combine(
         GetRepoRoot(),
-        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
-             "futaleufu_cordillera_cypress_v12_isolated_family_report.json"));
+        bVolumetricNearGeometry
+            ? TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                   "futaleufu_cordillera_cypress_v15_volumetric_near_family_report.json")
+            : bOpaqueNearGeometry
+            ? TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                   "futaleufu_cordillera_cypress_v14_opaque_near_family_report.json")
+            : TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                   "futaleufu_cordillera_cypress_v12_isolated_family_report.json"));
     IFileManager::Get().MakeDirectory(*FPaths::GetPath(ReportPath), true);
     const bool bReportSaved = bSerialized &&
         FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
@@ -27329,14 +28998,2676 @@ bool FRaftSimEditorModule::CreateFutaleufuNativeCanopyPrototype(FString& OutSumm
     return bCaptured && bReportSaved;
 }
 
+namespace
+{
+struct FFutaleufuCypressPveFormSpec
+{
+    FString Id;
+    FString DisplayName;
+    FString AssetToken;
+    FString LifeStage;
+    int32 Seed = 0;
+    float WholeTreeScale = 1.0f;
+    float LiveTwigScale = 1.0f;
+    float BranchScale = 0.8f;
+    float PrimaryAxilAngle = 72.0f;
+    float AxillaryParentGrowth = 1.4f;
+    float AxillaryChildGrowth = 1.2f;
+    int32 GraftDensity = 20;
+    float GraftRelativeStart = 0.1f;
+    bool bAllowSenescence = false;
+    float ApicalRandomAngle = 2.0f;
+    float AxillaryRandomAngle = 5.0f;
+    float GravityStrength = 0.2f;
+    float GravityAngleCorrection = 0.65f;
+};
+
+const TArray<FFutaleufuCypressPveFormSpec>& GetFutaleufuCypressPveFormSpecs()
+{
+    static const TArray<FFutaleufuCypressPveFormSpec> Specs = {
+        {TEXT("open_grown_conical"), TEXT("open-grown conical adult"),
+         TEXT("OpenGrownConicalAdult"), TEXT("adult"), 18427, 1.13f, 0.82f,
+         0.86f, 18.0f, 1.65f, 1.35f, 36, 0.04f, false, 0.5f, 4.0f, 0.20f, 0.68f},
+        {TEXT("closed_grove_columnar"), TEXT("closed-grove columnar adult"),
+         TEXT("ClosedGroveColumnarAdult"), TEXT("adult"), 22409, 1.18f, 0.74f,
+         0.65f, 32.0f, 1.35f, 1.15f, 34, 0.10f, false, 0.4f, 2.0f, 0.14f, 0.76f},
+        {TEXT("rocky_slope_asymmetric"), TEXT("rocky-slope asymmetric adult"),
+         TEXT("RockySlopeAsymmetricAdult"), TEXT("adult"), 30881, 1.04f, 0.79f,
+         0.82f, 12.0f, 1.45f, 1.20f, 30, 0.08f, false, 2.0f, 14.0f, 0.30f, 0.54f},
+        {TEXT("storm_damaged"), TEXT("storm-damaged adult"),
+         TEXT("StormDamagedAdult"), TEXT("adult"), 41719, 1.09f, 0.67f,
+         0.78f, 8.0f, 1.10f, 0.90f, 24, 0.16f, true, 4.0f, 18.0f, 0.42f, 0.36f},
+        {TEXT("coigue_transition_edge"), TEXT("coigue-transition edge adult"),
+         TEXT("CoigueTransitionEdgeAdult"), TEXT("adult"), 52967, 1.00f, 0.76f,
+         0.90f, 20.0f, 1.55f, 1.30f, 36, 0.04f, false, 1.2f, 7.0f, 0.22f, 0.64f},
+        {TEXT("grove_intermediate"), TEXT("grove intermediate"),
+         TEXT("GroveIntermediate"), TEXT("intermediate"), 64109, 0.60f, 0.68f,
+         0.76f, 24.0f, 1.40f, 1.20f, 28, 0.06f, false, 0.7f, 5.0f, 0.18f, 0.70f},
+        {TEXT("suppressed_intermediate"), TEXT("suppressed intermediate"),
+         TEXT("SuppressedIntermediate"), TEXT("intermediate"), 75211, 0.40f, 0.61f,
+         0.58f, 32.0f, 0.95f, 0.80f, 18, 0.18f, true, 0.8f, 4.0f, 0.16f, 0.72f},
+        {TEXT("released_intermediate"), TEXT("released intermediate"),
+         TEXT("ReleasedIntermediate"), TEXT("intermediate"), 86369, 0.70f, 0.72f,
+         0.82f, 18.0f, 1.70f, 1.40f, 34, 0.03f, false, 1.8f, 9.0f, 0.24f, 0.60f}};
+    return Specs;
+}
+
+const FFutaleufuCypressPveFormSpec* FindFutaleufuCypressPveFormSpec(const FString& Id)
+{
+    return GetFutaleufuCypressPveFormSpecs().FindByPredicate(
+        [&Id](const FFutaleufuCypressPveFormSpec& Spec) { return Spec.Id == Id; });
+}
+
+bool SetPveFoliagePaletteMeshes(
+    UPCGSettings* Settings,
+    const TArray<FString>& MeshObjectPaths)
+{
+    FArrayProperty* PaletteProperty = Settings
+        ? FindFProperty<FArrayProperty>(Settings->GetClass(), TEXT("FoliageInfos"))
+        : nullptr;
+    FStructProperty* InfoProperty = PaletteProperty
+        ? CastField<FStructProperty>(PaletteProperty->Inner)
+        : nullptr;
+    if (!PaletteProperty || !InfoProperty ||
+        InfoProperty->Struct != FPVFoliageInfo::StaticStruct())
+    {
+        return false;
+    }
+
+    FScriptArrayHelper Palette(
+        PaletteProperty,
+        PaletteProperty->ContainerPtrToValuePtr<void>(Settings));
+    Palette.Resize(MeshObjectPaths.Num());
+    for (int32 Index = 0; Index < MeshObjectPaths.Num(); ++Index)
+    {
+        FPVFoliageInfo* Info = reinterpret_cast<FPVFoliageInfo*>(Palette.GetRawPtr(Index));
+        *Info = FPVFoliageInfo();
+        Info->Mesh = TSoftObjectPtr<UObject>(FSoftObjectPath(MeshObjectPaths[Index]));
+        Info->Attributes.Scale = MeshObjectPaths.Num() > 1
+            ? static_cast<float>(Index) / static_cast<float>(MeshObjectPaths.Num() - 1)
+            : 0.5f;
+        Info->Attributes.Light = 0.42f + static_cast<float>(Index) * 0.16f;
+        Info->Attributes.Health = 0.82f;
+    }
+    Settings->Modify();
+    return true;
+}
+
+bool SetPveNestedFloat(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* NestedStructName,
+    const TCHAR* ValueName,
+    float Value)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FStructProperty* NestedProperty = RootProperty
+        ? FindFProperty<FStructProperty>(RootProperty->Struct, NestedStructName)
+        : nullptr;
+    void* NestedValue = NestedProperty
+        ? NestedProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    FFloatProperty* FloatProperty = NestedProperty
+        ? FindFProperty<FFloatProperty>(NestedProperty->Struct, ValueName)
+        : nullptr;
+    if (FloatProperty && NestedValue)
+    {
+        FloatProperty->SetPropertyValue_InContainer(NestedValue, Value);
+        Object->Modify();
+        return true;
+    }
+
+    if (!RootProperty)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find root struct %s on %s."),
+            RootStructName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    FString RootText;
+    if (!RootProperty->ExportText_InContainer(
+            0, RootText, Object, Object, Object, PPF_Copy))
+    {
+        return false;
+    }
+    const FString FieldPrefix = FString::Printf(TEXT("%s="), ValueName);
+    const int32 FieldStart = RootText.Find(FieldPrefix, ESearchCase::CaseSensitive);
+    const int32 ValueStart = FieldStart == INDEX_NONE
+        ? INDEX_NONE
+        : FieldStart + FieldPrefix.Len();
+    const int32 ValueEnd = ValueStart == INDEX_NONE
+        ? INDEX_NONE
+        : RootText.Find(TEXT(","), ESearchCase::CaseSensitive, ESearchDir::FromStart, ValueStart);
+    if (ValueStart == INDEX_NONE || ValueEnd == INDEX_NONE)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find %s in %s text: %s"),
+            ValueName,
+            RootStructName,
+            *RootText.Left(500));
+        return false;
+    }
+    RootText = RootText.Left(ValueStart) + FString::Printf(TEXT("%.6f"), Value) +
+        RootText.Mid(ValueEnd);
+    if (!RootProperty->ImportText_InContainer(*RootText, Object, Object, PPF_Copy))
+    {
+        return false;
+    }
+    Object->Modify();
+    return true;
+}
+
+bool SetPveNestedInt(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* NestedStructName,
+    const TCHAR* ValueName,
+    int64 Value)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FStructProperty* NestedProperty = RootProperty
+        ? FindFProperty<FStructProperty>(RootProperty->Struct, NestedStructName)
+        : nullptr;
+    void* NestedValue = NestedProperty
+        ? NestedProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    FNumericProperty* NumericProperty = NestedProperty
+        ? FindFProperty<FNumericProperty>(NestedProperty->Struct, ValueName)
+        : nullptr;
+    if (!NumericProperty || !NestedValue || !NumericProperty->IsInteger())
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find integer %s.%s.%s on %s."),
+            RootStructName,
+            NestedStructName,
+            ValueName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    NumericProperty->SetIntPropertyValue(
+        NumericProperty->ContainerPtrToValuePtr<void>(NestedValue),
+        static_cast<uint64>(Value));
+    Object->Modify();
+    return true;
+}
+
+bool SetPvePropertyText(
+    UObject* Object,
+    const TCHAR* ValueName,
+    const FString& ValueText)
+{
+    FProperty* Property = Object
+        ? FindFProperty<FProperty>(Object->GetClass(), ValueName)
+        : nullptr;
+    void* Value = Property
+        ? Property->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    if (!Property || !Value ||
+        !Property->ImportText_Direct(*ValueText, Value, Object, PPF_Copy))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not import %s=%s on %s."),
+            ValueName,
+            *ValueText,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    Object->Modify();
+    return true;
+}
+
+bool SetPveNestedText(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* NestedStructName,
+    const TCHAR* ValueName,
+    const FString& ValueText)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FStructProperty* NestedProperty = RootProperty
+        ? FindFProperty<FStructProperty>(RootProperty->Struct, NestedStructName)
+        : nullptr;
+    void* NestedValue = NestedProperty
+        ? NestedProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    FProperty* ValueProperty = NestedProperty
+        ? FindFProperty<FProperty>(NestedProperty->Struct, ValueName)
+        : nullptr;
+    void* Value = ValueProperty && NestedValue
+        ? ValueProperty->ContainerPtrToValuePtr<void>(NestedValue)
+        : nullptr;
+    if (!ValueProperty || !Value ||
+        !ValueProperty->ImportText_Direct(*ValueText, Value, Object, PPF_Copy))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not import %s.%s.%s=%s on %s."),
+            RootStructName,
+            NestedStructName,
+            ValueName,
+            *ValueText,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    Object->Modify();
+    return true;
+}
+
+bool SetPveStructText(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* ValueName,
+    const FString& ValueText)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FProperty* ValueProperty = RootProperty
+        ? FindFProperty<FProperty>(RootProperty->Struct, ValueName)
+        : nullptr;
+    void* Value = ValueProperty && RootValue
+        ? ValueProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    if (!ValueProperty || !Value ||
+        !ValueProperty->ImportText_Direct(*ValueText, Value, Object, PPF_Copy))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not import %s.%s=%s on %s."),
+            RootStructName,
+            ValueName,
+            *ValueText,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    Object->Modify();
+    return true;
+}
+
+bool SetPveStructBool(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* ValueName,
+    bool Value)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FBoolProperty* BoolProperty = RootProperty
+        ? FindFProperty<FBoolProperty>(RootProperty->Struct, ValueName)
+        : nullptr;
+    if (!BoolProperty || !RootValue)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find bool %s.%s on %s."),
+            RootStructName,
+            ValueName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    BoolProperty->SetPropertyValue_InContainer(RootValue, Value);
+    Object->Modify();
+    return true;
+}
+
+bool SetPveNestedBool(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* NestedStructName,
+    const TCHAR* ValueName,
+    bool Value)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FStructProperty* NestedProperty = RootProperty
+        ? FindFProperty<FStructProperty>(RootProperty->Struct, NestedStructName)
+        : nullptr;
+    void* NestedValue = NestedProperty
+        ? NestedProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    FBoolProperty* BoolProperty = NestedProperty
+        ? FindFProperty<FBoolProperty>(NestedProperty->Struct, ValueName)
+        : nullptr;
+    if (!BoolProperty || !NestedValue)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find bool %s.%s.%s on %s."),
+            RootStructName,
+            NestedStructName,
+            ValueName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    BoolProperty->SetPropertyValue_InContainer(NestedValue, Value);
+    Object->Modify();
+    return true;
+}
+
+bool SetPveNestedRamp(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* NestedStructName,
+    const TCHAR* ValueName,
+    const TArray<FVector2f>& Points)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FStructProperty* NestedProperty = RootProperty
+        ? FindFProperty<FStructProperty>(RootProperty->Struct, NestedStructName)
+        : nullptr;
+    void* NestedValue = NestedProperty
+        ? NestedProperty->ContainerPtrToValuePtr<void>(RootValue)
+        : nullptr;
+    FStructProperty* RampProperty = NestedProperty
+        ? FindFProperty<FStructProperty>(NestedProperty->Struct, ValueName)
+        : nullptr;
+    FPVFloatRamp* Ramp = RampProperty &&
+            RampProperty->Struct == FPVFloatRamp::StaticStruct() && NestedValue
+        ? RampProperty->ContainerPtrToValuePtr<FPVFloatRamp>(NestedValue)
+        : nullptr;
+    if (!Ramp || Points.Num() < 2)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find ramp %s.%s.%s on %s."),
+            RootStructName,
+            NestedStructName,
+            ValueName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+
+    FRichCurve* Curve = Ramp->GetRichCurve();
+    Curve->Reset();
+    for (const FVector2f& Point : Points)
+    {
+        const FKeyHandle Handle = Curve->AddKey(Point.X, Point.Y);
+        Curve->SetKeyInterpMode(Handle, RCIM_Linear);
+    }
+    Object->Modify();
+    return true;
+}
+
+bool SetPveStructFloat(
+    UObject* Object,
+    const TCHAR* RootStructName,
+    const TCHAR* ValueName,
+    float Value)
+{
+    FStructProperty* RootProperty = Object
+        ? FindFProperty<FStructProperty>(Object->GetClass(), RootStructName)
+        : nullptr;
+    void* RootValue = RootProperty
+        ? RootProperty->ContainerPtrToValuePtr<void>(Object)
+        : nullptr;
+    FFloatProperty* FloatProperty = RootProperty
+        ? FindFProperty<FFloatProperty>(RootProperty->Struct, ValueName)
+        : nullptr;
+    if (!FloatProperty || !RootValue)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE override could not find float %s.%s on %s."),
+            RootStructName,
+            ValueName,
+            Object ? *Object->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    FloatProperty->SetPropertyValue_InContainer(RootValue, Value);
+    Object->Modify();
+    return true;
+}
+
+bool SetPveGrowerSeed(UPCGSettings* Settings, int32 Seed)
+{
+    FStructProperty* ParamsProperty = Settings
+        ? FindFProperty<FStructProperty>(Settings->GetClass(), TEXT("GrowerParams"))
+        : nullptr;
+    FNumericProperty* SeedProperty = ParamsProperty
+        ? FindFProperty<FNumericProperty>(ParamsProperty->Struct, TEXT("RandomSeed"))
+        : nullptr;
+    void* Params = ParamsProperty
+        ? ParamsProperty->ContainerPtrToValuePtr<void>(Settings)
+        : nullptr;
+    if (!SeedProperty || !Params)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE grower override could not find GrowerParams.RandomSeed on %s."),
+            Settings ? *Settings->GetClass()->GetName() : TEXT("None"));
+        return false;
+    }
+    void* SeedValue = SeedProperty->ContainerPtrToValuePtr<void>(Params);
+    SeedProperty->SetIntPropertyValue(SeedValue, static_cast<uint64>(Seed));
+    Settings->Modify();
+    return true;
+}
+
+bool RedirectPveExport(
+    UPCGSettings* Settings,
+    const FFutaleufuCypressPveFormSpec& Spec)
+{
+    FStructProperty* ExportProperty = Settings
+        ? FindFProperty<FStructProperty>(Settings->GetClass(), TEXT("ExportSettings"))
+        : nullptr;
+    if (!ExportProperty)
+    {
+        return false;
+    }
+    FString ExportText;
+    if (!ExportProperty->ExportText_InContainer(
+            0, ExportText, Settings, Settings, Settings, PPF_Copy))
+    {
+        return false;
+    }
+    ExportText.ReplaceInline(
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01"),
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypress"));
+    ExportText.ReplaceInline(
+        TEXT("MeshName=\"PVE_Conifer_01\""),
+        *FString::Printf(TEXT("MeshName=\"PVE_CordilleraCypress_%s\""), *Spec.AssetToken));
+    if (!ExportProperty->ImportText_InContainer(
+            *ExportText, Settings, Settings, PPF_Copy))
+    {
+        return false;
+    }
+    Settings->Modify();
+    return true;
+}
+
+bool CreateFutaleufuCypressPvePalette(
+    UWorld* World,
+    const FString& PaletteMode,
+    TArray<FString>& OutLiveTwigPaths,
+    FString& OutDeadTwigPath,
+    FString& OutSummary)
+{
+    const bool bCurvedShells = PaletteMode == TEXT("curved_shells");
+    const bool bCompactConnectedTwigHierarchy =
+        PaletteMode == TEXT("compact_connected_twig_hierarchy");
+    const bool bConnectedTwigHierarchy =
+        PaletteMode == TEXT("connected_twig_hierarchy") ||
+        bCompactConnectedTwigHierarchy;
+    const bool bTwigHierarchy =
+        PaletteMode == TEXT("twig_hierarchy") || bConnectedTwigHierarchy;
+    TMap<FString, UTexture2D*> Textures;
+    if (!World || !CreateFutaleufuCordilleraCypressTextureAssets(Textures, OutSummary))
+    {
+        return false;
+    }
+    const FString LiveMaterialName = bCompactConnectedTwigHierarchy
+        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V18_2_CompactConnectedTwigHierarchyLiveTwigs")
+        : (bConnectedTwigHierarchy
+        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V18_1_ConnectedTwigHierarchyLiveTwigs")
+        : (bTwigHierarchy
+               ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V18_TwigHierarchyLiveTwigs")
+        : (bCurvedShells
+               ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V17_CurvedShellLiveTwigs")
+               : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V16_PveLiveTwigs"))));
+    UMaterial* LiveMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        LiveMaterialName,
+        true,
+        Textures,
+        OutSummary,
+        false,
+        bTwigHierarchy ? TEXT("Twig") : TEXT("Near"));
+    UMaterial* BarkMaterial = CreateOrUpdateFutaleufuNativeCanopyMaterial(
+        TEXT("M_RaftSim_FutaleufuCordilleraCypress_Bark"),
+        false,
+        Textures,
+        OutSummary);
+    if (!LiveMaterial || !BarkMaterial)
+    {
+        return false;
+    }
+
+    const FString PaletteRoot = bCompactConnectedTwigHierarchy
+        ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+               "PVEFutaleufuCordilleraCypressCompactConnectedTwigHierarchy/Palette/")
+        : (bConnectedTwigHierarchy
+               ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                      "PVEFutaleufuCordilleraCypressConnectedTwigHierarchy/Palette/")
+        : (bTwigHierarchy
+               ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                      "PVEFutaleufuCordilleraCypressTwigHierarchy/Palette/")
+        : (bCurvedShells
+               ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                      "PVEFutaleufuCordilleraCypressCurvedShell/Palette/")
+               : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                      "PVEFutaleufuCordilleraCypress/Palette/"))));
+    OutLiveTwigPaths.Reset();
+    for (int32 TwigIndex = 0; TwigIndex < 3; ++TwigIndex)
+    {
+        TArray<FVector> Vertices;
+        TArray<int32> Triangles;
+        TArray<FVector> Normals;
+        TArray<FVector2D> UVs;
+        TArray<FVector> BarkVertices;
+        TArray<int32> BarkTriangles;
+        TArray<FVector> BarkNormals;
+        TArray<FVector2D> BarkUVs;
+        const float LengthCm = 88.0f + static_cast<float>(TwigIndex) * 10.0f;
+        const float WidthCm = 50.0f + static_cast<float>(TwigIndex) * 6.0f;
+        if (bConnectedTwigHierarchy)
+        {
+            const FVector MainStart(-4.0f, 0.0f, -0.5f);
+            const FVector MainEnd(
+                (bCompactConnectedTwigHierarchy ? 50.0f : 60.0f) + TwigIndex * 5.0f,
+                TwigIndex == 1 ? 1.5f : -1.0f,
+                5.0f + TwigIndex * 1.2f);
+            AppendNativeCanopyTaperedSegment(
+                MainStart,
+                MainEnd,
+                (bCompactConnectedTwigHierarchy ? 1.05f : 1.75f) + TwigIndex * 0.12f,
+                bCompactConnectedTwigHierarchy ? 0.22f : 0.34f,
+                7,
+                BarkVertices,
+                BarkTriangles,
+                BarkNormals,
+                BarkUVs);
+
+            const FVector MainAxis = (MainEnd - MainStart).GetSafeNormal();
+            const FVector MainRight = FVector::RightVector.RotateAngleAxis(
+                static_cast<float>(TwigIndex - 1) * 17.0f,
+                MainAxis);
+            AppendNativeCanopyAtlasCurvedCard(
+                MainStart - MainAxis * 1.5f,
+                MainAxis,
+                MainRight,
+                (bCompactConnectedTwigHierarchy ? 38.0f : 31.0f) + TwigIndex * 2.5f,
+                FVector::Distance(MainStart, MainEnd) + 4.0f,
+                5.8f + TwigIndex * 0.8f,
+                TwigIndex % 2 == 0 ? -2.4f : 2.4f,
+                5,
+                TwigIndex * 5,
+                Vertices,
+                Triangles,
+                Normals,
+                UVs);
+
+            for (int32 PairIndex = 0; PairIndex < 4; ++PairIndex)
+            {
+                for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+                {
+                    const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+                    const FVector BranchStart(
+                        8.0f + PairIndex * 12.0f,
+                        0.0f,
+                        0.5f + PairIndex * 1.0f);
+                    const FVector BranchAxis = FVector(
+                        0.72f + PairIndex * 0.04f,
+                        Side * (0.64f - PairIndex * 0.07f),
+                        (PairIndex == 1 ? 0.17f : -0.035f) + TwigIndex * 0.03f)
+                                                   .GetSafeNormal();
+                    const float BranchLength =
+                        36.0f - PairIndex * 2.5f + TwigIndex * 2.0f;
+                    const float WoodyBranchLength = bCompactConnectedTwigHierarchy
+                        ? 8.0f + PairIndex * 0.6f
+                        : BranchLength * 0.88f;
+                    const FVector BranchEnd = BranchStart + BranchAxis * WoodyBranchLength;
+                    AppendNativeCanopyTaperedSegment(
+                        BranchStart - BranchAxis *
+                            (bCompactConnectedTwigHierarchy ? 0.5f : 1.0f),
+                        BranchEnd,
+                        (bCompactConnectedTwigHierarchy ? 0.62f : 1.05f) -
+                            PairIndex * 0.07f,
+                        bCompactConnectedTwigHierarchy ? 0.12f : 0.16f,
+                        6,
+                        BarkVertices,
+                        BarkTriangles,
+                        BarkNormals,
+                        BarkUVs);
+
+                    FVector BranchRight =
+                        FVector::CrossProduct(FVector::UpVector, BranchAxis).GetSafeNormal();
+                    if (BranchRight.IsNearlyZero())
+                    {
+                        BranchRight = FVector::RightVector;
+                    }
+                    BranchRight = BranchRight.RotateAngleAxis(
+                        Side * (15.0f + PairIndex * 8.0f) + TwigIndex * 4.0f,
+                        BranchAxis);
+                    const int32 CardIndex = 1 + PairIndex * 2 + SideIndex;
+                    AppendNativeCanopyAtlasCurvedCard(
+                        BranchStart + BranchAxis *
+                            (bCompactConnectedTwigHierarchy ? 4.0f : -2.0f),
+                        BranchAxis,
+                        BranchRight,
+                        26.0f - PairIndex * 1.2f + TwigIndex * 1.2f,
+                        BranchLength,
+                        4.0f + PairIndex * 0.55f,
+                        Side * (1.8f + PairIndex * 0.4f),
+                        4,
+                        (TwigIndex * 5 + CardIndex * 3) % 16,
+                        Vertices,
+                        Triangles,
+                        Normals,
+                        UVs);
+                }
+            }
+        }
+        else if (bTwigHierarchy)
+        {
+            const FVector CentralAxis = FVector::ForwardVector;
+            const FVector CentralRight = FVector::RightVector.RotateAngleAxis(
+                static_cast<float>(TwigIndex - 1) * 14.0f,
+                CentralAxis);
+            AppendNativeCanopyAtlasCurvedCard(
+                FVector::ZeroVector,
+                CentralAxis,
+                CentralRight,
+                18.0f + TwigIndex * 1.5f,
+                46.0f + TwigIndex * 4.0f,
+                4.2f + TwigIndex * 0.7f,
+                TwigIndex % 2 == 0 ? -1.8f : 1.8f,
+                4,
+                TwigIndex * 5,
+                Vertices,
+                Triangles,
+                Normals,
+                UVs);
+            for (int32 PairIndex = 0; PairIndex < 3; ++PairIndex)
+            {
+                for (int32 SideIndex = 0; SideIndex < 2; ++SideIndex)
+                {
+                    const float Side = SideIndex == 0 ? -1.0f : 1.0f;
+                    const FVector Axis = FVector(
+                        0.78f + PairIndex * 0.045f,
+                        Side * (0.52f - PairIndex * 0.065f),
+                        (PairIndex == 1 ? 0.13f : -0.06f) + TwigIndex * 0.025f)
+                                             .GetSafeNormal();
+                    FVector Right = FVector::CrossProduct(FVector::UpVector, Axis).GetSafeNormal();
+                    if (Right.IsNearlyZero())
+                    {
+                        Right = FVector::RightVector;
+                    }
+                    Right = Right.RotateAngleAxis(
+                        Side * (18.0f + PairIndex * 9.0f) + TwigIndex * 4.0f,
+                        Axis);
+                    const int32 CardIndex = 1 + PairIndex * 2 + SideIndex;
+                    AppendNativeCanopyAtlasCurvedCard(
+                        FVector(7.0f + PairIndex * 9.0f, 0.0f, PairIndex * 0.8f),
+                        Axis,
+                        Right,
+                        13.5f - PairIndex * 0.8f + TwigIndex * 0.6f,
+                        32.0f - PairIndex * 2.2f + TwigIndex * 1.8f,
+                        3.2f + PairIndex * 0.5f,
+                        Side * (1.5f + PairIndex * 0.35f),
+                        4,
+                        (TwigIndex * 5 + CardIndex * 3) % 16,
+                        Vertices,
+                        Triangles,
+                        Normals,
+                        UVs);
+                }
+            }
+        }
+        else
+        {
+            for (int32 PlaneIndex = 0; PlaneIndex < 3; ++PlaneIndex)
+            {
+                const float RollDegrees =
+                    static_cast<float>(PlaneIndex - 1) * (32.0f + TwigIndex * 4.0f);
+                const FVector Right = FVector::RightVector.RotateAngleAxis(
+                    RollDegrees,
+                    FVector::ForwardVector);
+                if (bCurvedShells)
+                {
+                    const float ShellLength = LengthCm * (PlaneIndex == 1 ? 1.0f : 0.88f);
+                    AppendNativeCanopyAtlasCurvedCard(
+                        FVector(0.0f, 0.0f, static_cast<float>(PlaneIndex - 1) * 2.5f),
+                        FVector::ForwardVector,
+                        Right,
+                        WidthCm * (PlaneIndex == 1 ? 0.92f : 0.68f),
+                        ShellLength,
+                        (6.5f + TwigIndex * 1.2f) * (PlaneIndex == 1 ? 1.0f : 0.72f),
+                        (2.4f + TwigIndex * 0.6f) * (PlaneIndex == 0 ? -1.0f : 1.0f),
+                        6,
+                        TwigIndex * 4 + PlaneIndex,
+                        Vertices,
+                        Triangles,
+                        Normals,
+                        UVs);
+                }
+                else
+                {
+                    AppendNativeCanopyLeafCard(
+                        FVector(LengthCm * 0.5f, 0.0f, static_cast<float>(PlaneIndex - 1) * 2.5f),
+                        Right,
+                        FVector::ForwardVector,
+                        WidthCm * (PlaneIndex == 1 ? 1.0f : 0.74f),
+                        LengthCm * (PlaneIndex == 1 ? 1.0f : 0.86f),
+                        TwigIndex * 4 + PlaneIndex,
+                        Vertices,
+                        Triangles,
+                        Normals,
+                        UVs);
+                }
+            }
+        }
+        const FString PaletteAssetToken = bConnectedTwigHierarchy
+            ? (bCompactConnectedTwigHierarchy
+                   ? TEXT("V18_2_CompactConnectedTwigHierarchy_Pve")
+                   : TEXT("V18_1_ConnectedTwigHierarchy_Pve"))
+            : (bTwigHierarchy
+                   ? TEXT("V18_TwigHierarchy_Pve")
+                   : (bCurvedShells ? TEXT("V17_CurvedShell_Pve") : TEXT("V16_Pve")));
+        const FString AssetName = FString::Printf(
+            TEXT("SM_RaftSim_FutaleufuCordilleraCypress_%sLiveTwig_%c"),
+            *PaletteAssetToken,
+            TCHAR('A' + TwigIndex));
+        const FString PackagePath = PaletteRoot + AssetName;
+        AActor* Actor = bConnectedTwigHierarchy
+            ? AddPreviewTwoSectionProceduralMeshActor(
+                  World,
+                  AssetName + TEXT("_Source"),
+                  BarkVertices,
+                  BarkTriangles,
+                  BarkNormals,
+                  BarkUVs,
+                  BarkMaterial,
+                  Vertices,
+                  Triangles,
+                  Normals,
+                  UVs,
+                  LiveMaterial)
+            : AddPreviewProceduralMeshActor(
+                  World,
+                  AssetName + TEXT("_Source"),
+                  Vertices,
+                  Triangles,
+                  Normals,
+                  UVs,
+                  FLinearColor::White,
+                  LiveMaterial,
+                  nullptr,
+                  false);
+        UStaticMesh* Mesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            Actor,
+            PackagePath,
+            LiveMaterial,
+            false,
+            ENaniteShapePreservation::None,
+            OutSummary);
+        if (Actor)
+        {
+            Actor->Destroy();
+        }
+        if (!Mesh)
+        {
+            return false;
+        }
+        if (bConnectedTwigHierarchy && Mesh->GetStaticMaterials().Num() != 2)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Connected live twig %s did not preserve its bark and foliage material slots.\n"),
+                *PackagePath);
+            return false;
+        }
+        OutLiveTwigPaths.Add(PackagePath + TEXT(".") + AssetName);
+    }
+
+    TArray<FVector> DeadVertices;
+    TArray<int32> DeadTriangles;
+    TArray<FVector> DeadNormals;
+    TArray<FVector2D> DeadUVs;
+    AppendNativeCanopyTaperedSegment(
+        FVector::ZeroVector,
+        FVector(54.0f, 0.0f, 5.0f),
+        2.2f,
+        0.35f,
+        7,
+        DeadVertices,
+        DeadTriangles,
+        DeadNormals,
+        DeadUVs);
+    for (int32 SideIndex = 0; SideIndex < 4; ++SideIndex)
+    {
+        const float Side = SideIndex % 2 == 0 ? -1.0f : 1.0f;
+        const FVector BranchStart(17.0f + SideIndex * 8.0f, 0.0f, 2.0f + SideIndex * 0.8f);
+        AppendNativeCanopyTaperedSegment(
+            BranchStart,
+            BranchStart + FVector(14.0f, Side * (9.0f + SideIndex * 1.5f), 6.0f),
+            1.0f,
+            0.18f,
+            6,
+            DeadVertices,
+            DeadTriangles,
+            DeadNormals,
+            DeadUVs);
+    }
+    const FString DeadAssetName =
+        TEXT("SM_RaftSim_FutaleufuCordilleraCypress_V16_PveDeadTwig");
+    const FString DeadPackagePath = PaletteRoot + DeadAssetName;
+    AActor* DeadActor = AddPreviewProceduralMeshActor(
+        World,
+        DeadAssetName + TEXT("_Source"),
+        DeadVertices,
+        DeadTriangles,
+        DeadNormals,
+        DeadUVs,
+        FLinearColor::White,
+        BarkMaterial,
+        nullptr,
+        false);
+    UStaticMesh* DeadMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+        DeadActor,
+        DeadPackagePath,
+        BarkMaterial,
+        true,
+        ENaniteShapePreservation::None,
+        OutSummary);
+    if (DeadActor)
+    {
+        DeadActor->Destroy();
+    }
+    if (!DeadMesh)
+    {
+        return false;
+    }
+    OutDeadTwigPath = DeadPackagePath + TEXT(".") + DeadAssetName;
+    return true;
+}
+
+UPCGSettings* FindPveSettingsByClassName(
+    const UPCGGraph* Graph,
+    const TCHAR* ClassName)
+{
+    if (!Graph)
+    {
+        return nullptr;
+    }
+    for (UPCGNode* Node : Graph->GetNodes())
+    {
+        UPCGSettings* Settings = Node ? Node->GetSettings() : nullptr;
+        if (Settings && Settings->GetClass()->GetName() == ClassName)
+        {
+            return Settings;
+        }
+    }
+    return nullptr;
+}
+
+UPCGNode* AddProjectPveNode(
+    UPCGGraph* Graph,
+    const TCHAR* ClassName,
+    UPCGSettings*& OutSettings)
+{
+    const FString ClassPath = FString::Printf(
+        TEXT("/Script/ProceduralVegetation.%s"), ClassName);
+    UClass* SettingsClass = FindObject<UClass>(nullptr, *ClassPath);
+    OutSettings = nullptr;
+    return Graph && SettingsClass
+        ? Graph->AddNodeOfType(SettingsClass, OutSettings)
+        : nullptr;
+}
+
+bool ConfigureFutaleufuCypressPveGrower(
+    UPCGSettings* Settings,
+    const FFutaleufuCypressPveFormSpec& Spec,
+    bool bBranchletGrower)
+{
+    if (!Settings)
+    {
+        return false;
+    }
+
+    bool bConfigured = SetPveGrowerSeed(
+        Settings, Spec.Seed + (bBranchletGrower ? 7919 : 0));
+    bConfigured &= SetPveStructText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("GrowthCycles"),
+        bBranchletGrower ? TEXT("6") : TEXT("44"));
+    bConfigured &= SetPveStructBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("bSenescence"),
+        bBranchletGrower ? false : Spec.bAllowSenescence);
+    bConfigured &= SetPveStructBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("bBranchPhyllotaxySameAsTrunk"),
+        false);
+    bConfigured &= SetPveStructBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("bBranchPhototropismSameAsTrunk"),
+        false);
+    bConfigured &= SetPveStructBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("bBranchDirectionalSameAsTrunk"),
+        false);
+    bConfigured &= SetPveStructBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("bBranchAuxinConditionSameAsTrunk"),
+        false);
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Bifurcation"),
+        TEXT("bEnableBifurcation"),
+        false);
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchBifurcation"),
+        TEXT("bEnableBifurcation"),
+        false);
+
+    bConfigured &= SetPveNestedInt(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("MaxGeneration"),
+        2);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("IncrementalRadius"),
+        bBranchletGrower ? 0.0022f : 0.0062f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("PlantTargetLength"),
+        bBranchletGrower ? 1.45f : 22.5f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("BranchTargetLength"),
+        bBranchletGrower ? 0.56f : 6.1f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("SegmentLength"),
+        bBranchletGrower ? 0.24f : 0.56f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("BranchScale"),
+        bBranchletGrower ? 0.74f : Spec.BranchScale);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("LengthBias"),
+        bBranchletGrower ? 0.88f : 0.94f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryParentGrowth"),
+        bBranchletGrower ? 0.78f : FMath::Min(2.0f, Spec.AxillaryParentGrowth * 0.95f));
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryChildGrowth"),
+        bBranchletGrower ? 0.28f : 0.0f);
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("bAxillaryRetry"),
+        true);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalParentGrowth"),
+        bBranchletGrower ? 1.15f : 1.25f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalChildGrowth"),
+        bBranchletGrower ? 0.76f : 0.82f);
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryRampBasis"),
+        TEXT("PlantTargetLength"));
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalRampBasis"),
+        TEXT("PlantTargetLength"));
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("bAxillaryUseChildGradient"),
+        true);
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("bApicalUseChildGradient"),
+        true);
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryChildRampBasis"),
+        TEXT("BranchTargetLength"));
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalChildRampBasis"),
+        TEXT("BranchTargetLength"));
+    bConfigured &= SetPveNestedRamp(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryPriorityGradient"),
+        bBranchletGrower
+            ? TArray<FVector2f>{{0.0f, 0.15f}, {0.22f, 0.86f}, {0.82f, 0.72f}, {1.0f, 0.34f}}
+            : TArray<FVector2f>{{0.0f, 0.0f}, {0.12f, 0.0f}, {0.18f, 0.64f}, {0.72f, 0.84f}, {1.0f, 0.56f}});
+    bConfigured &= SetPveNestedRamp(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("AxillaryPriorityChildGradient"),
+        TArray<FVector2f>{{0.0f, 0.12f}, {0.18f, 0.82f}, {0.78f, 0.68f}, {1.0f, 0.28f}});
+    bConfigured &= SetPveNestedRamp(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalPriorityGradient"),
+        TArray<FVector2f>{{0.0f, 1.0f}, {0.86f, 1.0f}, {1.0f, 0.08f}});
+    bConfigured &= SetPveNestedRamp(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("TrunkGrowth"),
+        TEXT("ApicalPriorityChildGradient"),
+        TArray<FVector2f>{{0.0f, 1.0f}, {0.72f, 0.78f}, {1.0f, 0.05f}});
+
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("AxilAngle"),
+        bBranchletGrower ? 12.0f : Spec.PrimaryAxilAngle);
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("Type"),
+        bBranchletGrower ? TEXT("Alternate") : TEXT("Spiral"));
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("Formation"),
+        TEXT("Pentasticious"));
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("AdditionalAngle"),
+        bBranchletGrower ? 4.0f : 7.5f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("Offset"),
+        FMath::Fmod(static_cast<float>(Spec.Seed) * 0.013f, 360.0f));
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("Flatten"),
+        bBranchletGrower ? 0.88f : 0.0f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phyllotaxy"),
+        TEXT("Stagger"),
+        bBranchletGrower ? 0.04f : 0.035f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhyllotaxy"),
+        TEXT("AxilAngle"),
+        bBranchletGrower ? 58.0f : 54.0f);
+    bConfigured &= SetPveNestedText(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhyllotaxy"),
+        TEXT("Type"),
+        TEXT("Alternate"));
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhyllotaxy"),
+        TEXT("Flatten"),
+        bBranchletGrower ? 0.92f : 0.78f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhyllotaxy"),
+        TEXT("Stagger"),
+        bBranchletGrower ? 0.04f : 0.08f);
+    bConfigured &= SetPveNestedBool(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhyllotaxy"),
+        TEXT("bReset"),
+        true);
+
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Auxin"),
+        TEXT("AuxinFalloff"),
+        bBranchletGrower ? 0.42f : 0.35f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Auxin"),
+        TEXT("ApicalDominance"),
+        bBranchletGrower ? 0.32f : 0.42f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Auxin"),
+        TEXT("RadicalAuxin"),
+        bBranchletGrower ? 0.04f : 0.38f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchAuxin"),
+        TEXT("AuxinFalloff"),
+        bBranchletGrower ? 0.42f : 0.35f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchAuxin"),
+        TEXT("ApicalDominance"),
+        bBranchletGrower ? 0.24f : 0.48f);
+
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phototropism"),
+        TEXT("Apical"),
+        bBranchletGrower ? 0.08f : 0.02f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phototropism"),
+        TEXT("Axillary"),
+        bBranchletGrower ? 0.18f : 0.08f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Phototropism"),
+        TEXT("LightRequirement"),
+        bBranchletGrower ? 0.08f : 0.12f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhototropism"),
+        TEXT("Apical"),
+        bBranchletGrower ? 0.08f : 0.04f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhototropism"),
+        TEXT("Axillary"),
+        bBranchletGrower ? 0.16f : 0.08f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchPhototropism"),
+        TEXT("LightRequirement"),
+        0.08f);
+
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Directional"),
+        TEXT("ApicalRandomAngle"),
+        bBranchletGrower ? 1.5f : Spec.ApicalRandomAngle);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Directional"),
+        TEXT("AxillaryRandomAngle"),
+        bBranchletGrower ? 5.0f : Spec.AxillaryRandomAngle);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchDirectional"),
+        TEXT("ApicalRandomAngle"),
+        bBranchletGrower ? 2.5f : FMath::Max(1.0f, Spec.ApicalRandomAngle * 0.75f));
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("BranchDirectional"),
+        TEXT("AxillaryRandomAngle"),
+        bBranchletGrower ? 7.0f : Spec.AxillaryRandomAngle);
+    bConfigured &= SetPveNestedInt(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Foliage"),
+        TEXT("Density"),
+        bBranchletGrower ? 2 : 1);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Foliage"),
+        TEXT("EthyleneBuildup"),
+        0.04f);
+    bConfigured &= SetPveNestedFloat(
+        Settings,
+        TEXT("GrowerParams"),
+        TEXT("Foliage"),
+        TEXT("EthyleneThreshold"),
+        0.82f);
+    return bConfigured;
+}
+
+struct FRaftSimPveMultiViewAtlasBakeResult
+{
+    bool bAtlasFilesSaved = false;
+    bool bTextureAssetsSaved = false;
+    bool bMaterialSaved = false;
+    bool bProxyActorCreated = false;
+    int32 ViewCount = 0;
+    int32 TileResolution = 0;
+    int32 AtlasResolution = 0;
+    float OrthoWidthCm = 0.0f;
+    float MinimumCoverage = 1.0f;
+    float MaximumCoverage = 0.0f;
+    FString OpacitySource;
+    FString ManifestRelativePath;
+    FString BaseColorRelativePath;
+    FString NormalRelativePath;
+    FString OpacityRelativePath;
+    FString DepthRelativePath;
+    FString BaseColorDigest;
+    FString NormalDigest;
+    FString OpacityDigest;
+    FString DepthDigest;
+    FString BaseColorAssetPath;
+    FString NormalAssetPath;
+    FString OpacityAssetPath;
+    FString DepthAssetPath;
+    FString MaterialAssetPath;
+    UMaterial* Material = nullptr;
+    AStaticMeshActor* ProxyActor = nullptr;
+
+    bool IsReady() const
+    {
+        return bAtlasFilesSaved && bTextureAssetsSaved && bMaterialSaved &&
+            bProxyActorCreated && ViewCount == 16 && TileResolution == 512 &&
+            AtlasResolution == 2048 && MinimumCoverage >= 0.002f &&
+            MaximumCoverage <= 0.85f;
+    }
+};
+
+bool SavePveAtlasPng(
+    const FString& AbsolutePath,
+    int32 Width,
+    int32 Height,
+    const TArray<FColor>& Pixels)
+{
+    if (Width <= 0 || Height <= 0 || Pixels.Num() != Width * Height)
+    {
+        return false;
+    }
+    TArray64<uint8> CompressedPng;
+    FImageUtils::PNGCompressImageArray(
+        Width,
+        Height,
+        MakeArrayView(Pixels),
+        CompressedPng);
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(AbsolutePath), true);
+    return !CompressedPng.IsEmpty() &&
+        FFileHelper::SaveArrayToFile(CompressedPng, *AbsolutePath);
+}
+
+void DilatePveAtlasTileRgb(
+    TArray<FColor>& Pixels,
+    int32 AtlasWidth,
+    int32 TileOriginX,
+    int32 TileOriginY,
+    int32 TileSize,
+    int32 Iterations)
+{
+    if (Pixels.Num() != AtlasWidth * AtlasWidth || TileSize <= 0 || Iterations <= 0)
+    {
+        return;
+    }
+    TArray<uint8> Filled;
+    Filled.SetNumZeroed(TileSize * TileSize);
+    for (int32 Y = 0; Y < TileSize; ++Y)
+    {
+        for (int32 X = 0; X < TileSize; ++X)
+        {
+            Filled[Y * TileSize + X] =
+                Pixels[(TileOriginY + Y) * AtlasWidth + TileOriginX + X].A > 0 ? 1 : 0;
+        }
+    }
+    static const FIntPoint Neighbors[] = {
+        FIntPoint(-1, 0), FIntPoint(1, 0), FIntPoint(0, -1), FIntPoint(0, 1),
+        FIntPoint(-1, -1), FIntPoint(1, -1), FIntPoint(-1, 1), FIntPoint(1, 1)};
+    for (int32 Iteration = 0; Iteration < Iterations; ++Iteration)
+    {
+        const TArray<uint8> PreviousFilled = Filled;
+        const TArray<FColor> PreviousPixels = Pixels;
+        bool bChanged = false;
+        for (int32 Y = 0; Y < TileSize; ++Y)
+        {
+            for (int32 X = 0; X < TileSize; ++X)
+            {
+                const int32 LocalIndex = Y * TileSize + X;
+                if (PreviousFilled[LocalIndex])
+                {
+                    continue;
+                }
+                int32 Red = 0;
+                int32 Green = 0;
+                int32 Blue = 0;
+                int32 Count = 0;
+                for (const FIntPoint& Offset : Neighbors)
+                {
+                    const int32 NeighborX = X + Offset.X;
+                    const int32 NeighborY = Y + Offset.Y;
+                    if (NeighborX < 0 || NeighborY < 0 ||
+                        NeighborX >= TileSize || NeighborY >= TileSize ||
+                        !PreviousFilled[NeighborY * TileSize + NeighborX])
+                    {
+                        continue;
+                    }
+                    const FColor& Neighbor = PreviousPixels[
+                        (TileOriginY + NeighborY) * AtlasWidth + TileOriginX + NeighborX];
+                    Red += Neighbor.R;
+                    Green += Neighbor.G;
+                    Blue += Neighbor.B;
+                    ++Count;
+                }
+                if (Count > 0)
+                {
+                    FColor& Pixel = Pixels[
+                        (TileOriginY + Y) * AtlasWidth + TileOriginX + X];
+                    Pixel.R = static_cast<uint8>(Red / Count);
+                    Pixel.G = static_cast<uint8>(Green / Count);
+                    Pixel.B = static_cast<uint8>(Blue / Count);
+                    Filled[LocalIndex] = 1;
+                    bChanged = true;
+                }
+            }
+        }
+        if (!bChanged)
+        {
+            break;
+        }
+    }
+}
+
+UTexture2D* CreateOrUpdateLocalPveAtlasTexture(
+    const FString& PackagePath,
+    const TArray<FColor>& Pixels,
+    int32 Resolution,
+    TextureCompressionSettings CompressionSettings,
+    bool bSrgb,
+    bool bScaleAlphaCoverage,
+    FString& OutSummary)
+{
+    if (Pixels.Num() != Resolution * Resolution || Resolution <= 0)
+    {
+        OutSummary += FString::Printf(TEXT("Invalid local PVE atlas pixels for %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    const FString AssetName = FPackageName::GetLongPackageAssetName(PackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UTexture2D* Texture = LoadObject<UTexture2D>(nullptr, *ObjectPath);
+    UPackage* Package = Texture ? Texture->GetOutermost() : CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create local PVE atlas package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    if (!Texture)
+    {
+        Texture = NewObject<UTexture2D>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Texture)
+        {
+            FAssetRegistryModule::AssetCreated(Texture);
+        }
+    }
+    if (!Texture)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create local PVE atlas texture %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    Texture->Modify();
+    Texture->Source.Init(Resolution, Resolution, 1, 1, TSF_BGRA8);
+    uint8* MipData = Texture->Source.LockMip(0);
+    for (int64 PixelIndex = 0; PixelIndex < Pixels.Num(); ++PixelIndex)
+    {
+        const FColor& Pixel = Pixels[PixelIndex];
+        *MipData++ = Pixel.B;
+        *MipData++ = Pixel.G;
+        *MipData++ = Pixel.R;
+        *MipData++ = Pixel.A;
+    }
+    Texture->Source.UnlockMip(0);
+    Texture->SRGB = bSrgb;
+    Texture->CompressionSettings = CompressionSettings;
+    Texture->CompressionNoAlpha = !bScaleAlphaCoverage;
+    Texture->MipGenSettings = TMGS_Sharpen4;
+    Texture->LODGroup = bSrgb
+        ? TEXTUREGROUP_Impostor
+        : TEXTUREGROUP_ImpostorNormalDepth;
+    Texture->AddressX = TA_Clamp;
+    Texture->AddressY = TA_Clamp;
+    Texture->VirtualTextureStreaming = false;
+    // Exact-camera review runs immediately after generation, so the atlas must not
+    // briefly fall back to a low resident mip while texture streaming catches up.
+    Texture->NeverStream = true;
+    Texture->bDoScaleMipsForAlphaCoverage = bScaleAlphaCoverage;
+    Texture->AlphaCoverageThresholds = bScaleAlphaCoverage
+        ? FVector4(0.0f, 0.0f, 0.0f, 0.38f)
+        : FVector4::Zero();
+    Texture->SetModernSettingsForNewOrChangedTexture();
+    Texture->PostEditChange();
+    Texture->MarkPackageDirty();
+    Package->MarkPackageDirty();
+
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Texture, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Could not save local PVE atlas texture %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(TEXT("Saved local PVE atlas texture %s.\n"), *ObjectPath);
+    return Texture;
+}
+
+UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
+    const FString& PackagePath,
+    UTexture2D* BaseColorTexture,
+    UTexture2D* NormalTexture,
+    UTexture2D* OpacityTexture,
+    FString& OutSummary)
+{
+    if (!BaseColorTexture || !NormalTexture || !OpacityTexture)
+    {
+        OutSummary += TEXT("Local PVE atlas material is missing color or normal texture.\n");
+        return nullptr;
+    }
+    const FString AssetName = FPackageName::GetLongPackageAssetName(PackagePath);
+    const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, *AssetName);
+    UMaterial* Material = LoadObject<UMaterial>(nullptr, *ObjectPath);
+    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*PackagePath);
+    if (!Package)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create local PVE atlas material package %s.\n"), *PackagePath);
+        return nullptr;
+    }
+    if (!Material)
+    {
+        Material = NewObject<UMaterial>(
+            Package,
+            *AssetName,
+            RF_Public | RF_Standalone | RF_Transactional);
+        if (Material)
+        {
+            FAssetRegistryModule::AssetCreated(Material);
+        }
+    }
+    if (!Material)
+    {
+        OutSummary += FString::Printf(TEXT("Could not create local PVE atlas material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+
+    Material->Modify();
+    Material->GetExpressionCollection().Empty();
+    Material->SetShadingModel(MSM_Unlit);
+    Material->BlendMode = BLEND_Masked;
+    Material->TwoSided = true;
+    Material->DitheredLODTransition = true;
+    Material->OpacityMaskClipValue = 0.38f;
+
+    auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
+    {
+        Expression->MaterialExpressionEditorX = EditorX;
+        Expression->MaterialExpressionEditorY = EditorY;
+        Material->GetExpressionCollection().AddExpression(Expression);
+        return Expression;
+    };
+    UMaterialExpressionTextureCoordinate* TexCoord =
+        AddExpression(NewObject<UMaterialExpressionTextureCoordinate>(Material), -1400, -480);
+    UMaterialExpressionWorldPosition* WorldPosition =
+        AddExpression(NewObject<UMaterialExpressionWorldPosition>(Material), -1400, 520);
+    WorldPosition->WorldPositionShaderOffset = WPT_ExcludeAllShaderOffsets;
+    UMaterialExpressionObjectPositionWS* ObjectPosition =
+        AddExpression(NewObject<UMaterialExpressionObjectPositionWS>(Material), -1400, 700);
+    UMaterialExpressionCameraPositionWS* CameraPosition =
+        AddExpression(NewObject<UMaterialExpressionCameraPositionWS>(Material), -1400, 880);
+
+    UMaterialExpressionCustom* AtlasUv =
+        AddExpression(NewObject<UMaterialExpressionCustom>(Material), -1060, -420);
+    AtlasUv->Description = TEXT("Select nearest 8x2 upper-hemisphere frame in a 4x4 atlas");
+    AtlasUv->OutputType = CMOT_Float2;
+    AtlasUv->Code =
+        TEXT("float3 ViewToCamera = normalize((float3)(CameraPos - ObjectPos));\n")
+        TEXT("float Azimuth = atan2(ViewToCamera.y, ViewToCamera.x);\n")
+        TEXT("float NormalizedAzimuth = frac(Azimuth / 6.28318530718 + 1.0);\n")
+        TEXT("float AzimuthFrame = floor(NormalizedAzimuth * 8.0 + 0.5);\n")
+        TEXT("AzimuthFrame -= floor(AzimuthFrame / 8.0) * 8.0;\n")
+        TEXT("float ElevationFrame = ViewToCamera.z > 0.2164396149 ? 1.0 : 0.0;\n")
+        TEXT("float Frame = ElevationFrame * 8.0 + AzimuthFrame;\n")
+        TEXT("float2 Cell = float2(Frame - floor(Frame / 4.0) * 4.0, floor(Frame / 4.0));\n")
+        TEXT("float2 PlaneUv = float2(UV.x, 1.0 - UV.y);\n")
+        TEXT("return (clamp(PlaneUv, 0.001, 0.999) + Cell) * 0.25;");
+    FCustomInput& AtlasUvInput = AtlasUv->Inputs.AddDefaulted_GetRef();
+    AtlasUvInput.InputName = TEXT("UV");
+    AtlasUvInput.Input.Expression = TexCoord;
+    FCustomInput& AtlasObjectInput = AtlasUv->Inputs.AddDefaulted_GetRef();
+    AtlasObjectInput.InputName = TEXT("ObjectPos");
+    AtlasObjectInput.Input.Expression = ObjectPosition;
+    FCustomInput& AtlasCameraInput = AtlasUv->Inputs.AddDefaulted_GetRef();
+    AtlasCameraInput.InputName = TEXT("CameraPos");
+    AtlasCameraInput.Input.Expression = CameraPosition;
+
+    UMaterialExpressionCustom* BillboardOffset =
+        AddExpression(NewObject<UMaterialExpressionCustom>(Material), -900, 620);
+    BillboardOffset->Description = TEXT("Rotate the source XY plane toward the active camera");
+    BillboardOffset->OutputType = CMOT_Float3;
+    BillboardOffset->Code =
+        TEXT("float3 ViewToCamera = normalize((float3)(CameraPos - ObjectPos));\n")
+        TEXT("float3 Forward = -ViewToCamera;\n")
+        TEXT("float3 Right = normalize(cross(float3(0.0, 0.0, 1.0), Forward));\n")
+        TEXT("float3 Up = normalize(cross(Forward, Right));\n")
+        TEXT("float3 LocalDelta = (float3)(WorldPos - ObjectPos);\n")
+        TEXT("float3 BillboardPos = (float3)ObjectPos + Right * LocalDelta.x + Up * LocalDelta.y;\n")
+        TEXT("return BillboardPos - (float3)WorldPos;");
+    FCustomInput& BillboardWorldInput = BillboardOffset->Inputs.AddDefaulted_GetRef();
+    BillboardWorldInput.InputName = TEXT("WorldPos");
+    BillboardWorldInput.Input.Expression = WorldPosition;
+    FCustomInput& BillboardObjectInput = BillboardOffset->Inputs.AddDefaulted_GetRef();
+    BillboardObjectInput.InputName = TEXT("ObjectPos");
+    BillboardObjectInput.Input.Expression = ObjectPosition;
+    FCustomInput& BillboardCameraInput = BillboardOffset->Inputs.AddDefaulted_GetRef();
+    BillboardCameraInput.InputName = TEXT("CameraPos");
+    BillboardCameraInput.Input.Expression = CameraPosition;
+
+    UMaterialExpressionTextureSampleParameter2D* BaseColorSample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -620, -520);
+    BaseColorSample->ParameterName = TEXT("AtlasBaseColorOpacity");
+    BaseColorSample->Texture = BaseColorTexture;
+    BaseColorSample->SamplerType = SAMPLERTYPE_Color;
+    BaseColorSample->Coordinates.Expression = AtlasUv;
+    UMaterialExpressionTextureSampleParameter2D* OpacitySample =
+        AddExpression(NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -620, -320);
+    OpacitySample->ParameterName = TEXT("AtlasOpacity");
+    OpacitySample->Texture = OpacityTexture;
+    OpacitySample->SamplerType = SAMPLERTYPE_LinearGrayscale;
+    OpacitySample->Coordinates.Expression = AtlasUv;
+    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, BaseColorSample);
+    ConnectPreviewMaterialScalarInput(EditorOnlyData->OpacityMask, OpacitySample);
+    ConnectPreviewMaterialVectorInput(EditorOnlyData->WorldPositionOffset, BillboardOffset);
+
+    Material->PostEditChange();
+    Material->MarkPackageDirty();
+    Package->MarkPackageDirty();
+    Material->ForceRecompileForRendering();
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    FMaterialResource* MaterialResource = Material->GetMaterialResource(GMaxRHIShaderPlatform);
+    if (MaterialResource && !MaterialResource->IsGameThreadShaderMapComplete())
+    {
+        MaterialResource->SubmitCompileJobs_GameThread(EShaderCompileJobPriority::High);
+        MaterialResource->FinishCompilation();
+        if (GShaderCompilingManager)
+        {
+            GShaderCompilingManager->ProcessAsyncResults(false, true);
+        }
+        MaterialResource->IsCompilationFinished();
+    }
+    MaterialResource = Material->GetMaterialResource(GMaxRHIShaderPlatform);
+    if (!MaterialResource ||
+        Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ||
+        !MaterialResource->GetCompileErrors().IsEmpty())
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("Local PVE atlas material shader gate failed for %s (resource=%s, compiling_or_error=%s, valid_shader_map=%s, errors=%d)."),
+            *ObjectPath,
+            MaterialResource ? TEXT("true") : TEXT("false"),
+            Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ? TEXT("true") : TEXT("false"),
+            MaterialResource && MaterialResource->HasValidGameThreadShaderMap() ? TEXT("true") : TEXT("false"),
+            MaterialResource ? MaterialResource->GetCompileErrors().Num() : -1);
+        OutSummary += FString::Printf(
+            TEXT("Local PVE atlas material failed shader validation for %s: %s\n"),
+            *ObjectPath,
+            MaterialResource
+                ? *FString::Join(MaterialResource->GetCompileErrors(), TEXT(" | "))
+                : TEXT("no material resource"));
+        return nullptr;
+    }
+    const FString Filename = FPackageName::LongPackageNameToFilename(
+        PackagePath,
+        FPackageName::GetAssetPackageExtension());
+    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
+    FSavePackageArgs SaveArgs;
+    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+    SaveArgs.SaveFlags = SAVE_NoError;
+    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
+    {
+        OutSummary += FString::Printf(TEXT("Could not save local PVE atlas material %s.\n"), *ObjectPath);
+        return nullptr;
+    }
+    OutSummary += FString::Printf(TEXT("Saved local PVE atlas material %s.\n"), *ObjectPath);
+    return Material;
+}
+
+bool BakeFutaleufuCypressMultiViewAtlas(
+    UWorld* World,
+    AActor* TrunkActor,
+    AActor* FoliageActor,
+    const FString& VariantId,
+    const FString& AssetToken,
+    const FString& LocalSavedNamespace,
+    const FString& LocalReviewNamespace,
+    FRaftSimPveMultiViewAtlasBakeResult& OutResult,
+    FString& OutSummary)
+{
+    OutResult = FRaftSimPveMultiViewAtlasBakeResult();
+    if (!World || !TrunkActor || !FoliageActor)
+    {
+        OutSummary += TEXT("Multi-view atlas bake requires the live trunk and foliage actors.\n");
+        return false;
+    }
+    constexpr int32 TileResolution = 512;
+    constexpr int32 AtlasGrid = 4;
+    constexpr int32 AtlasResolution = TileResolution * AtlasGrid;
+    constexpr int32 AzimuthViewCount = 8;
+    constexpr int32 ElevationViewCount = 2;
+    constexpr int32 ViewCount = AzimuthViewCount * ElevationViewCount;
+    static const float ElevationDegrees[ElevationViewCount] = {0.0f, 25.0f};
+    OutResult.TileResolution = TileResolution;
+    OutResult.AtlasResolution = AtlasResolution;
+    OutResult.ViewCount = ViewCount;
+
+    FBox SourceBounds(EForceInit::ForceInit);
+    SourceBounds += TrunkActor->GetComponentsBoundingBox(true);
+    SourceBounds += FoliageActor->GetComponentsBoundingBox(true);
+    if (!SourceBounds.IsValid)
+    {
+        OutSummary += TEXT("Multi-view atlas source bounds are invalid.\n");
+        return false;
+    }
+    const FVector Target = SourceBounds.GetCenter();
+    const FVector SourceSize = SourceBounds.GetSize();
+    const float OrthoWidth = FMath::Max3(SourceSize.X, SourceSize.Y, SourceSize.Z) * 1.12f;
+    const float CaptureRadius = FMath::Max(OrthoWidth * 2.25f, 5000.0f);
+    OutResult.OrthoWidthCm = OrthoWidth;
+
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+
+    UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>(
+        GetTransientPackage(), NAME_None, RF_Transient);
+    UTextureRenderTarget2D* ColorRenderTarget = NewObject<UTextureRenderTarget2D>(
+        GetTransientPackage(), NAME_None, RF_Transient);
+    ASceneCapture2D* SceneCapture = World->SpawnActor<ASceneCapture2D>(
+        ASceneCapture2D::StaticClass(), Target, FRotator::ZeroRotator);
+    if (!RenderTarget || !ColorRenderTarget || !SceneCapture ||
+        !SceneCapture->GetCaptureComponent2D())
+    {
+        OutSummary += TEXT("Could not allocate multi-view atlas scene capture.\n");
+        if (SceneCapture)
+        {
+            SceneCapture->Destroy();
+        }
+        return false;
+    }
+    RenderTarget->RenderTargetFormat = RTF_RGBA16f;
+    RenderTarget->ClearColor = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    RenderTarget->InitAutoFormat(TileResolution, TileResolution);
+    RenderTarget->UpdateResourceImmediate(true);
+    ColorRenderTarget->RenderTargetFormat = RTF_RGBA8_SRGB;
+    ColorRenderTarget->ClearColor = FLinearColor::Transparent;
+    ColorRenderTarget->InitAutoFormat(TileResolution, TileResolution);
+    ColorRenderTarget->UpdateResourceImmediate(true);
+
+    USceneCaptureComponent2D* CaptureComponent = SceneCapture->GetCaptureComponent2D();
+    CaptureComponent->TextureTarget = RenderTarget;
+    CaptureComponent->ProjectionType = ECameraProjectionMode::Orthographic;
+    CaptureComponent->OrthoWidth = OrthoWidth;
+    CaptureComponent->PrimitiveRenderMode =
+        ESceneCapturePrimitiveRenderMode::PRM_RenderScenePrimitives;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (Actor && Actor != TrunkActor && Actor != FoliageActor &&
+            Actor->FindComponentByClass<UMeshComponent>())
+        {
+            CaptureComponent->HiddenActors.Add(Actor);
+        }
+    }
+    CaptureComponent->bCaptureEveryFrame = false;
+    CaptureComponent->bCaptureOnMovement = false;
+    CaptureComponent->bAlwaysPersistRenderingState = true;
+    CaptureComponent->bExcludeFromSceneTextureExtents = true;
+    CaptureComponent->ShowFlags.SetSelection(false);
+    CaptureComponent->ShowFlags.SetModeWidgets(false);
+    CaptureComponent->ShowFlags.SetCompositeEditorPrimitives(false);
+    CaptureComponent->ShowFlags.SetAtmosphere(false);
+    CaptureComponent->ShowFlags.SetFog(false);
+    const FRaftSimPhotographicCaptureSettings AtlasCaptureSettings =
+        GetPhotographicCaptureSettings(TEXT("futaleufu_terminator"));
+    CaptureComponent->PostProcessSettings.bOverride_AutoExposureMethod = true;
+    CaptureComponent->PostProcessSettings.AutoExposureMethod = AEM_Manual;
+    CaptureComponent->PostProcessSettings.bOverride_AutoExposureBias = true;
+    CaptureComponent->PostProcessSettings.AutoExposureBias = AtlasCaptureSettings.ExposureBias;
+    CaptureComponent->PostProcessSettings.bOverride_AutoExposureApplyPhysicalCameraExposure = true;
+    CaptureComponent->PostProcessSettings.AutoExposureApplyPhysicalCameraExposure = 0;
+    CaptureComponent->PostProcessSettings.bOverride_ColorSaturation = true;
+    CaptureComponent->PostProcessSettings.ColorSaturation = FVector4(
+        AtlasCaptureSettings.Saturation,
+        AtlasCaptureSettings.Saturation,
+        AtlasCaptureSettings.Saturation,
+        1.0f);
+    CaptureComponent->PostProcessSettings.bOverride_ColorContrast = true;
+    CaptureComponent->PostProcessSettings.ColorContrast = FVector4(
+        AtlasCaptureSettings.Contrast,
+        AtlasCaptureSettings.Contrast,
+        AtlasCaptureSettings.Contrast,
+        1.0f);
+    CaptureComponent->PostProcessBlendWeight = 1.0f;
+
+    TArray<FColor> BaseColorAtlas;
+    TArray<FColor> NormalAtlas;
+    TArray<FColor> OpacityAtlas;
+    TArray<FColor> DepthAtlas;
+    BaseColorAtlas.Init(FColor(0, 0, 0, 0), AtlasResolution * AtlasResolution);
+    NormalAtlas.Init(FColor(128, 128, 255, 0), AtlasResolution * AtlasResolution);
+    OpacityAtlas.Init(FColor::Black, AtlasResolution * AtlasResolution);
+    DepthAtlas.Init(FColor(0, 0, 0, 0), AtlasResolution * AtlasResolution);
+    bool bUsedInverseOpacity = true;
+    bool bAllPassesCaptured = true;
+
+    auto CapturePass = [CaptureComponent, RenderTarget](
+                           ESceneCaptureSource Source,
+                           TArray<FLinearColor>& OutPixels)
+    {
+        CaptureComponent->CaptureSource = Source;
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FTextureRenderTargetResource* Resource = RenderTarget->GameThread_GetRenderTargetResource();
+        return Resource && Resource->ReadLinearColorPixels(
+            OutPixels,
+            FReadSurfaceDataFlags(RCM_MinMax, CubeFace_MAX)) &&
+            OutPixels.Num() == TileResolution * TileResolution;
+    };
+    auto CaptureColorPass = [CaptureComponent, ColorRenderTarget, RenderTarget](
+                                TArray<FColor>& OutPixels)
+    {
+        CaptureComponent->TextureTarget = ColorRenderTarget;
+        CaptureComponent->CaptureSource = SCS_FinalColorLDR;
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+        FTextureRenderTargetResource* Resource =
+            ColorRenderTarget->GameThread_GetRenderTargetResource();
+        const bool bRead = Resource && Resource->ReadPixels(
+            OutPixels,
+            FReadSurfaceDataFlags(RCM_UNorm, CubeFace_MAX)) &&
+            OutPixels.Num() == TileResolution * TileResolution;
+        CaptureComponent->TextureTarget = RenderTarget;
+        return bRead;
+    };
+
+    for (int32 ElevationIndex = 0; ElevationIndex < ElevationViewCount; ++ElevationIndex)
+    {
+        const float ElevationRadians = FMath::DegreesToRadians(ElevationDegrees[ElevationIndex]);
+        for (int32 AzimuthIndex = 0; AzimuthIndex < AzimuthViewCount; ++AzimuthIndex)
+        {
+            const int32 ViewIndex = ElevationIndex * AzimuthViewCount + AzimuthIndex;
+            const float AzimuthRadians = 2.0f * PI * static_cast<float>(AzimuthIndex) /
+                static_cast<float>(AzimuthViewCount);
+            const FVector CameraDirection(
+                FMath::Cos(AzimuthRadians) * FMath::Cos(ElevationRadians),
+                FMath::Sin(AzimuthRadians) * FMath::Cos(ElevationRadians),
+                FMath::Sin(ElevationRadians));
+            const FVector CameraLocation = Target + CameraDirection * CaptureRadius;
+            SceneCapture->SetActorLocationAndRotation(
+                CameraLocation,
+                (Target - CameraLocation).Rotation());
+
+            TArray<FLinearColor> SceneColorPixels;
+            TArray<FLinearColor> BaseColorPixels;
+            TArray<FLinearColor> NormalPixels;
+            TArray<FLinearColor> DepthPixels;
+            TArray<FColor> FinalColorPixels;
+            const bool bViewCaptured =
+                CapturePass(SCS_SceneColorHDR, SceneColorPixels) &&
+                CapturePass(SCS_BaseColor, BaseColorPixels) &&
+                CapturePass(SCS_Normal, NormalPixels) &&
+                CapturePass(SCS_SceneDepth, DepthPixels) &&
+                CaptureColorPass(FinalColorPixels);
+            bAllPassesCaptured &= bViewCaptured;
+            if (!bViewCaptured)
+            {
+                continue;
+            }
+
+            TArray<float> Opacity;
+            Opacity.SetNumUninitialized(TileResolution * TileResolution);
+            int32 InverseOpacityCoveredPixels = 0;
+            for (int32 PixelIndex = 0; PixelIndex < Opacity.Num(); ++PixelIndex)
+            {
+                Opacity[PixelIndex] = FMath::Clamp(1.0f - SceneColorPixels[PixelIndex].A, 0.0f, 1.0f);
+                InverseOpacityCoveredPixels += Opacity[PixelIndex] > 0.02f ? 1 : 0;
+            }
+            float Coverage = static_cast<float>(InverseOpacityCoveredPixels) /
+                static_cast<float>(Opacity.Num());
+            if (Coverage < 0.002f || Coverage > 0.85f)
+            {
+                bUsedInverseOpacity = false;
+                int32 BaseColorCoveredPixels = 0;
+                for (int32 PixelIndex = 0; PixelIndex < Opacity.Num(); ++PixelIndex)
+                {
+                    const FLinearColor& Base = BaseColorPixels[PixelIndex];
+                    const float BaseMagnitude = FMath::Abs(Base.R) + FMath::Abs(Base.G) + FMath::Abs(Base.B);
+                    Opacity[PixelIndex] = BaseMagnitude > 0.002f ? 1.0f : 0.0f;
+                    BaseColorCoveredPixels += Opacity[PixelIndex] > 0.02f ? 1 : 0;
+                }
+                Coverage = static_cast<float>(BaseColorCoveredPixels) /
+                    static_cast<float>(Opacity.Num());
+            }
+            OutResult.MinimumCoverage = FMath::Min(OutResult.MinimumCoverage, Coverage);
+            OutResult.MaximumCoverage = FMath::Max(OutResult.MaximumCoverage, Coverage);
+
+            float MinimumDepth = TNumericLimits<float>::Max();
+            float MaximumDepth = TNumericLimits<float>::Lowest();
+            for (int32 PixelIndex = 0; PixelIndex < Opacity.Num(); ++PixelIndex)
+            {
+                const float Depth = DepthPixels[PixelIndex].R;
+                if (Opacity[PixelIndex] > 0.02f && FMath::IsFinite(Depth) && Depth > 0.0f)
+                {
+                    MinimumDepth = FMath::Min(MinimumDepth, Depth);
+                    MaximumDepth = FMath::Max(MaximumDepth, Depth);
+                }
+            }
+            const float DepthRange = MaximumDepth > MinimumDepth
+                ? MaximumDepth - MinimumDepth
+                : 1.0f;
+            const int32 TileOriginX = (ViewIndex % AtlasGrid) * TileResolution;
+            const int32 TileOriginY = (ViewIndex / AtlasGrid) * TileResolution;
+            for (int32 Y = 0; Y < TileResolution; ++Y)
+            {
+                for (int32 X = 0; X < TileResolution; ++X)
+                {
+                    const int32 TileIndex = Y * TileResolution + X;
+                    const int32 AtlasIndex =
+                        (TileOriginY + Y) * AtlasResolution + TileOriginX + X;
+                    const uint8 Alpha = static_cast<uint8>(
+                        FMath::RoundToInt(Opacity[TileIndex] * 255.0f));
+                    FColor BaseColor = FinalColorPixels[TileIndex];
+                    BaseColor.A = Alpha;
+                    BaseColorAtlas[AtlasIndex] = BaseColor;
+                    FColor NormalColor = NormalPixels[TileIndex].GetClamped().ToFColor(false);
+                    NormalColor.A = Alpha;
+                    NormalAtlas[AtlasIndex] = NormalColor;
+                    OpacityAtlas[AtlasIndex] = FColor(Alpha, Alpha, Alpha, 255);
+                    const float NormalizedDepth = FMath::Clamp(
+                        1.0f - ((DepthPixels[TileIndex].R - MinimumDepth) / DepthRange),
+                        0.0f,
+                        1.0f);
+                    const uint8 DepthValue = static_cast<uint8>(
+                        FMath::RoundToInt(NormalizedDepth * 255.0f));
+                    DepthAtlas[AtlasIndex] = FColor(DepthValue, DepthValue, DepthValue, Alpha);
+                }
+            }
+            DilatePveAtlasTileRgb(
+                BaseColorAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
+            DilatePveAtlasTileRgb(
+                NormalAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
+            DilatePveAtlasTileRgb(
+                DepthAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
+        }
+    }
+    SceneCapture->Destroy();
+    RenderTarget->ReleaseResource();
+    ColorRenderTarget->ReleaseResource();
+    OutResult.OpacitySource = bUsedInverseOpacity
+        ? TEXT("SceneColorHDR inverse opacity alpha")
+        : TEXT("SceneColorHDR inverse opacity with BaseColor occupancy fallback");
+    if (!bAllPassesCaptured || OutResult.MinimumCoverage < 0.002f ||
+        OutResult.MaximumCoverage > 0.85f)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Multi-view atlas capture failed pass or coverage checks (%.6f to %.6f).\n"),
+            OutResult.MinimumCoverage,
+            OutResult.MaximumCoverage);
+        return false;
+    }
+
+    const FString VariantLower = VariantId.ToLower();
+    const FString OutputDirectory = FPaths::Combine(
+        FPaths::ProjectSavedDir(), TEXT("RaftSimPveReview"), LocalSavedNamespace);
+    const FString RelativeOutputRoot = FString::Printf(
+        TEXT("unreal/Saved/RaftSimPveReview/%s/%s_multiview_atlas"),
+        *LocalSavedNamespace,
+        *VariantLower);
+    OutResult.BaseColorRelativePath = RelativeOutputRoot + TEXT("_base_color_opacity.png");
+    OutResult.NormalRelativePath = RelativeOutputRoot + TEXT("_world_normal.png");
+    OutResult.OpacityRelativePath = RelativeOutputRoot + TEXT("_opacity.png");
+    OutResult.DepthRelativePath = RelativeOutputRoot + TEXT("_depth.png");
+    const FString BaseColorAbsolutePath = FPaths::Combine(
+        OutputDirectory, VariantLower + TEXT("_multiview_atlas_base_color_opacity.png"));
+    const FString NormalAbsolutePath = FPaths::Combine(
+        OutputDirectory, VariantLower + TEXT("_multiview_atlas_world_normal.png"));
+    const FString OpacityAbsolutePath = FPaths::Combine(
+        OutputDirectory, VariantLower + TEXT("_multiview_atlas_opacity.png"));
+    const FString DepthAbsolutePath = FPaths::Combine(
+        OutputDirectory, VariantLower + TEXT("_multiview_atlas_depth.png"));
+    OutResult.bAtlasFilesSaved =
+        SavePveAtlasPng(BaseColorAbsolutePath, AtlasResolution, AtlasResolution, BaseColorAtlas) &&
+        SavePveAtlasPng(NormalAbsolutePath, AtlasResolution, AtlasResolution, NormalAtlas) &&
+        SavePveAtlasPng(OpacityAbsolutePath, AtlasResolution, AtlasResolution, OpacityAtlas) &&
+        SavePveAtlasPng(DepthAbsolutePath, AtlasResolution, AtlasResolution, DepthAtlas);
+    if (!OutResult.bAtlasFilesSaved)
+    {
+        OutSummary += TEXT("One or more multi-view atlas PNG files failed to save.\n");
+        return false;
+    }
+    OutResult.BaseColorDigest = LexToString(FMD5Hash::HashFile(*BaseColorAbsolutePath));
+    OutResult.NormalDigest = LexToString(FMD5Hash::HashFile(*NormalAbsolutePath));
+    OutResult.OpacityDigest = LexToString(FMD5Hash::HashFile(*OpacityAbsolutePath));
+    OutResult.DepthDigest = LexToString(FMD5Hash::HashFile(*DepthAbsolutePath));
+
+    const FString AtlasPackageRoot = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/%s/MultiViewAtlas"),
+        *LocalReviewNamespace);
+    OutResult.BaseColorAssetPath = FString::Printf(
+        TEXT("%s/T_%s_%s_MultiViewBaseColorOpacity"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    OutResult.NormalAssetPath = FString::Printf(
+        TEXT("%s/T_%s_%s_MultiViewWorldNormal"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    OutResult.OpacityAssetPath = FString::Printf(
+        TEXT("%s/T_%s_%s_MultiViewOpacity"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    OutResult.DepthAssetPath = FString::Printf(
+        TEXT("%s/T_%s_%s_MultiViewDepth"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    UTexture2D* BaseColorTexture = CreateOrUpdateLocalPveAtlasTexture(
+        OutResult.BaseColorAssetPath,
+        BaseColorAtlas,
+        AtlasResolution,
+        TC_Default,
+        true,
+        true,
+        OutSummary);
+    UTexture2D* NormalTexture = CreateOrUpdateLocalPveAtlasTexture(
+        OutResult.NormalAssetPath,
+        NormalAtlas,
+        AtlasResolution,
+        TC_VectorDisplacementmap,
+        false,
+        false,
+        OutSummary);
+    UTexture2D* OpacityTexture = CreateOrUpdateLocalPveAtlasTexture(
+        OutResult.OpacityAssetPath,
+        OpacityAtlas,
+        AtlasResolution,
+        TC_Grayscale,
+        false,
+        false,
+        OutSummary);
+    UTexture2D* DepthTexture = CreateOrUpdateLocalPveAtlasTexture(
+        OutResult.DepthAssetPath,
+        DepthAtlas,
+        AtlasResolution,
+        TC_Grayscale,
+        false,
+        false,
+        OutSummary);
+    OutResult.bTextureAssetsSaved =
+        BaseColorTexture && NormalTexture && OpacityTexture && DepthTexture;
+    if (!OutResult.bTextureAssetsSaved)
+    {
+        return false;
+    }
+    TArray<UTexture*> AtlasTextures = {
+        BaseColorTexture, NormalTexture, OpacityTexture, DepthTexture};
+    FTextureCompilingManager::Get().FinishCompilation(AtlasTextures);
+    for (UTexture* Texture : AtlasTextures)
+    {
+        Texture->UpdateResource();
+    }
+    FlushRenderingCommands();
+
+    OutResult.MaterialAssetPath = FString::Printf(
+        TEXT("%s/M_%s_%s_MultiViewHlodV2"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    OutResult.Material = CreateOrUpdateLocalPveAtlasMaterial(
+        OutResult.MaterialAssetPath,
+        BaseColorTexture,
+        NormalTexture,
+        OpacityTexture,
+        OutSummary);
+    OutResult.bMaterialSaved = OutResult.Material != nullptr;
+    UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
+    OutResult.ProxyActor = PlaneMesh && OutResult.Material
+        ? World->SpawnActor<AStaticMeshActor>(
+              AStaticMeshActor::StaticClass(),
+              FTransform(
+                  FRotator::ZeroRotator,
+                  Target,
+                  FVector(OrthoWidth / 100.0f, OrthoWidth / 100.0f, 1.0f)))
+        : nullptr;
+    if (OutResult.ProxyActor && OutResult.ProxyActor->GetStaticMeshComponent())
+    {
+        OutResult.ProxyActor->SetActorLabel(TEXT("RaftSim_PveCypressMultiViewAtlasHlod"));
+        UStaticMeshComponent* Component = OutResult.ProxyActor->GetStaticMeshComponent();
+        Component->SetStaticMesh(PlaneMesh);
+        Component->SetMaterial(0, OutResult.Material);
+        Component->SetMobility(EComponentMobility::Static);
+        Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        Component->SetCastShadow(false);
+        Component->BoundsScale = 2.5f;
+        OutResult.ProxyActor->SetActorHiddenInGame(true);
+        OutResult.bProxyActorCreated = true;
+    }
+
+    OutResult.ManifestRelativePath = FString::Printf(
+        TEXT("unreal/Saved/RaftSimPveReview/%s/%s_multiview_atlas_manifest.json"),
+        *LocalSavedNamespace,
+        *VariantLower);
+    const FString ManifestAbsolutePath = FPaths::Combine(
+        OutputDirectory,
+        VariantLower + TEXT("_multiview_atlas_manifest.json"));
+    const FString Manifest = FString::Printf(
+        TEXT("{\n")
+        TEXT("  \"schema\": \"raftsim.unreal.pve_multiview_atlas.v1\",\n")
+        TEXT("  \"variant\": \"%s\",\n")
+        TEXT("  \"status\": \"%s\",\n")
+        TEXT("  \"view_contract\": {\"type\": \"bounded_upper_hemisphere\", \"azimuth_degrees\": [0, 45, 90, 135, 180, 225, 270, 315], \"elevation_degrees\": [0, 25], \"view_count\": 16},\n")
+        TEXT("  \"atlas_contract\": {\"grid\": [4, 4], \"tile_resolution\": 512, \"atlas_resolution\": 2048, \"padding_pixels\": 12, \"orthographic_width_cm\": %.6f},\n")
+        TEXT("  \"capture_contract\": {\"base_color\": \"SCS_FinalColorLDR lit RGB with Futaleufu photographic post process\", \"normal\": \"SCS_Normal world space\", \"opacity\": \"%s\", \"depth\": \"SCS_SceneDepth normalized per view, near white\", \"primitive_filter\": \"all non-source mesh actors hidden while retaining the review light rig\"},\n")
+        TEXT("  \"coverage_fraction_range\": [%.9f, %.9f],\n")
+        TEXT("  \"outputs\": {\n")
+        TEXT("    \"base_color_opacity\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
+        TEXT("    \"world_normal\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
+        TEXT("    \"opacity\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
+        TEXT("    \"depth\": {\"path\": \"%s\", \"md5\": \"%s\"}\n")
+        TEXT("  },\n")
+        TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material\": \"%s\"},\n")
+        TEXT("  \"runtime_contract\": {\"geometry\": \"camera-facing XY plane through world-position offset\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"masked unlit baked FinalColorLDR\", \"material_inputs\": [\"base_color_opacity\", \"opacity\"], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_and_depth_reserved_for_future_relight_and_parallax\": true},\n")
+        TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
+        TEXT("}\n"),
+        *EscapeRaftSimJsonString(VariantId),
+        OutResult.IsReady() ? TEXT("generated_and_proxy_ready_for_exact_camera_review") : TEXT("generation_failed"),
+        OrthoWidth,
+        *EscapeRaftSimJsonString(OutResult.OpacitySource),
+        OutResult.MinimumCoverage,
+        OutResult.MaximumCoverage,
+        *EscapeRaftSimJsonString(OutResult.BaseColorRelativePath),
+        *OutResult.BaseColorDigest,
+        *EscapeRaftSimJsonString(OutResult.NormalRelativePath),
+        *OutResult.NormalDigest,
+        *EscapeRaftSimJsonString(OutResult.OpacityRelativePath),
+        *OutResult.OpacityDigest,
+        *EscapeRaftSimJsonString(OutResult.DepthRelativePath),
+        *OutResult.DepthDigest,
+        *EscapeRaftSimJsonString(OutResult.BaseColorAssetPath),
+        *EscapeRaftSimJsonString(OutResult.NormalAssetPath),
+        *EscapeRaftSimJsonString(OutResult.OpacityAssetPath),
+        *EscapeRaftSimJsonString(OutResult.DepthAssetPath),
+        *EscapeRaftSimJsonString(OutResult.MaterialAssetPath));
+    const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestAbsolutePath);
+    if (!bManifestSaved)
+    {
+        OutSummary += TEXT("Multi-view atlas manifest failed to save.\n");
+    }
+    OutSummary += FString::Printf(
+        TEXT("Multi-view atlas generated 16 views at 512 px into 2048 px outputs; coverage %.6f to %.6f.\n"),
+        OutResult.MinimumCoverage,
+        OutResult.MaximumCoverage);
+    return bManifestSaved && OutResult.IsReady();
+}
+} // namespace
+
+void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateCommand(
+    const TArray<FString>& Args)
+{
+    if (ProceduralBeechExecutionSource)
+    {
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("A PVE candidate evaluation is already running."));
+        return;
+    }
+
+    const FString Variant = Args.IsEmpty() ? TEXT("open_grown_conical") : Args[0];
+    const FString PaletteMode = Args.Num() > 1
+        ? Args[1].ToLower()
+        : TEXT("flat_cards");
+    if (PaletteMode != TEXT("flat_cards") && PaletteMode != TEXT("curved_shells") &&
+        PaletteMode != TEXT("twig_hierarchy") &&
+        PaletteMode != TEXT("connected_twig_hierarchy") &&
+        PaletteMode != TEXT("compact_connected_twig_hierarchy"))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, or compact_connected_twig_hierarchy."),
+            *PaletteMode);
+        return;
+    }
+    const FFutaleufuCypressPveFormSpec* Spec = FindFutaleufuCypressPveFormSpec(Variant);
+    if (!Spec)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Unsupported V17 cypress PVE form %s; use one of the eight ids in the authoring manifest."),
+            *Variant);
+        return;
+    }
+
+    UWorld* PaletteWorld = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    TArray<FString> LiveTwigPaths;
+    FString DeadTwigPath;
+    FString PaletteSummary;
+    if (!CreateFutaleufuCypressPvePalette(
+            PaletteWorld,
+            PaletteMode,
+            LiveTwigPaths,
+            DeadTwigPath,
+            PaletteSummary))
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("Could not create the retained project-owned PVE palette.\n%s"),
+            *PaletteSummary);
+        return;
+    }
+
+    const FString SamplePath =
+        TEXT("/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/"
+             "PVE_Sample_Conifer_Tree_01.PVE_Sample_Conifer_Tree_01");
+    UProceduralVegetation* Sample = LoadObject<UProceduralVegetation>(nullptr, *SamplePath);
+    if (!Sample)
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("Could not load the installed UE 5.8 conifer PVE graph."));
+        return;
+    }
+
+    UPCGGraph* SampleGraph = Cast<UPCGGraph>(Sample->GetGraph());
+    UPCGSettings* SampleMesherSettings = FindPveSettingsByClassName(
+        SampleGraph, TEXT("PVMeshBuilderSettings"));
+    UPCGSettings* SampleProfileSettings = FindPveSettingsByClassName(
+        SampleGraph, TEXT("PVPlantProfileLoaderSettings"));
+    if (!SampleGraph || !SampleMesherSettings || !SampleProfileSettings)
+    {
+        UE_LOG(
+            LogRaftSimEditor,
+            Error,
+            TEXT("The installed PVE sample no longer exposes the bounded mesher/profile donor contract."));
+        return;
+    }
+
+    ProceduralBeechCandidateAsset = NewObject<UProceduralVegetation>(
+        GetTransientPackage(),
+        UProceduralVegetation::StaticClass(),
+        TEXT("RaftSimFutaleufuCordilleraCypressPveCandidate"),
+        RF_Transient);
+    if (!ProceduralBeechCandidateAsset)
+    {
+        UE_LOG(LogRaftSimEditor, Error, TEXT("Could not create the project-owned cypress PVE asset."));
+        return;
+    }
+    ProceduralBeechCandidateAsset->CreateGraph();
+    ProceduralBeechCandidateAsset->AddToRoot();
+    ProceduralBeechVariant = Spec->Id;
+    ProceduralCypressPaletteMode = PaletteMode;
+    bProceduralCypressPveCandidate = true;
+    UPCGGraph* Graph = Cast<UPCGGraph>(ProceduralBeechCandidateAsset->GetGraph());
+    if (!Graph || !Graph->GetOutputNode())
+    {
+        FinishProceduralBeechCandidate(false, TEXT("project-owned V17 PVE graph was not created"));
+        return;
+    }
+
+    UPCGSettings* BranchGrowerSettings = nullptr;
+    UPCGSettings* MainGrowerSettings = nullptr;
+    UPCGSettings* GraftPaletteSettings = nullptr;
+    UPCGSettings* GraftDistributorSettings = nullptr;
+    UPCGSettings* ScaleSettings = nullptr;
+    UPCGSettings* GravitySettings = nullptr;
+    UPCGSettings* MesherSettings = nullptr;
+    UPCGSettings* ProfileSettings = nullptr;
+    UPCGSettings* BoneReductionSettings = nullptr;
+    UPCGSettings* DeadPaletteSettings = nullptr;
+    UPCGSettings* DeadDistributorSettings = nullptr;
+    UPCGSettings* LivePaletteSettings = nullptr;
+    UPCGSettings* LiveDistributorSettings = nullptr;
+
+    UPCGNode* BranchGrowerNode = AddProjectPveNode(
+        Graph, TEXT("PVGrowerSettings"), BranchGrowerSettings);
+    UPCGNode* GraftPaletteNode = AddProjectPveNode(
+        Graph, TEXT("PVGraftPaletteSettings"), GraftPaletteSettings);
+    UPCGNode* MainGrowerNode = AddProjectPveNode(
+        Graph, TEXT("PVGrowerSettings"), MainGrowerSettings);
+    UPCGNode* GraftDistributorNode = AddProjectPveNode(
+        Graph, TEXT("PVGraftDistributorSettings"), GraftDistributorSettings);
+    UPCGNode* ScaleNode = AddProjectPveNode(
+        Graph, TEXT("PVScaleSettings"), ScaleSettings);
+    UPCGNode* GravityNode = AddProjectPveNode(
+        Graph, TEXT("PVGravitySettings"), GravitySettings);
+    UPCGNode* MesherNode = Graph->AddNodeCopy(SampleMesherSettings, MesherSettings);
+    UPCGNode* ProfileNode = Graph->AddNodeCopy(SampleProfileSettings, ProfileSettings);
+    UPCGNode* BoneReductionNode = AddProjectPveNode(
+        Graph, TEXT("PVBoneReductionSettings"), BoneReductionSettings);
+    UPCGNode* DeadPaletteNode = AddProjectPveNode(
+        Graph, TEXT("PVFoliagePaletteSettings"), DeadPaletteSettings);
+    UPCGNode* DeadDistributorNode = AddProjectPveNode(
+        Graph, TEXT("PVFoliageDistributorSettings"), DeadDistributorSettings);
+    UPCGNode* LivePaletteNode = AddProjectPveNode(
+        Graph, TEXT("PVFoliagePaletteSettings"), LivePaletteSettings);
+    UPCGNode* LiveDistributorNode = AddProjectPveNode(
+        Graph, TEXT("PVFoliageDistributorSettings"), LiveDistributorSettings);
+
+    const bool bNodesCreated = BranchGrowerNode && GraftPaletteNode && MainGrowerNode &&
+        GraftDistributorNode && ScaleNode && GravityNode && MesherNode && ProfileNode &&
+        BoneReductionNode && DeadPaletteNode && DeadDistributorNode && LivePaletteNode &&
+        LiveDistributorNode;
+    bool bConfigured = bNodesCreated;
+    bConfigured &= ConfigureFutaleufuCypressPveGrower(
+        BranchGrowerSettings, *Spec, true);
+    bConfigured &= ConfigureFutaleufuCypressPveGrower(
+        MainGrowerSettings, *Spec, false);
+    bConfigured &= SetPveFoliagePaletteMeshes(
+        DeadPaletteSettings, TArray<FString>{DeadTwigPath});
+    bConfigured &= SetPveFoliagePaletteMeshes(LivePaletteSettings, LiveTwigPaths);
+    bConfigured &= SetPvePropertyText(
+        ScaleSettings, TEXT("Scale"), FString::Printf(TEXT("%.6f"), Spec->WholeTreeScale));
+    bConfigured &= SetPveStructFloat(
+        GravitySettings,
+        TEXT("GravitySettings"),
+        TEXT("Gravity"),
+        Spec->GravityStrength * (Spec->bAllowSenescence ? 0.55f : 0.05f));
+    bConfigured &= SetPveStructFloat(
+        GravitySettings,
+        TEXT("GravitySettings"),
+        TEXT("AngleCorrection"),
+        Spec->bAllowSenescence
+            ? FMath::Max(Spec->GravityAngleCorrection, 0.52f)
+            : FMath::Max(Spec->GravityAngleCorrection, 0.92f));
+    bConfigured &= SetPvePropertyText(
+        BoneReductionSettings, TEXT("Strength"), TEXT("0.720000"));
+    bConfigured &= SetPveNestedFloat(
+        MesherSettings,
+        TEXT("MesherSettings"),
+        TEXT("BranchRadius"),
+        TEXT("MinRadius"),
+        0.0008f);
+
+    bConfigured &= SetPvePropertyText(
+        GraftDistributorSettings, TEXT("Mode"), TEXT("ParametricSettings"));
+    bConfigured &= SetPvePropertyText(
+        GraftDistributorSettings,
+        TEXT("RandomSeed"),
+        FString::FromInt(Spec->Seed + 700001));
+    bConfigured &= SetPvePropertyText(
+        GraftDistributorSettings, TEXT("bRecomputeLight"), TEXT("True"));
+    bConfigured &= SetPveNestedInt(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("BranchDensity"),
+        FMath::Clamp(Spec->GraftDensity, 18, 36));
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("RelativeStart"),
+        Spec->GraftRelativeStart);
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("RelativeEnd"),
+        1.0f);
+    bConfigured &= SetPveNestedBool(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("LimitStartGeneration"),
+        true);
+    bConfigured &= SetPveNestedInt(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("StartGeneration"),
+        2);
+    bConfigured &= SetPveNestedBool(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("LimitEndGeneration"),
+        true);
+    bConfigured &= SetPveNestedInt(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("EndGeneration"),
+        2);
+    bConfigured &= SetPveNestedText(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("SpacingBasis"),
+        TEXT("Branch"));
+    bConfigured &= SetPveNestedBool(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("PhyllotaxySettings"),
+        TEXT("ResetPhyllotaxy"),
+        true);
+    bConfigured &= SetPveNestedText(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("PhyllotaxySettings"),
+        TEXT("PhyllotaxyType"),
+        TEXT("Spiral"));
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("PhyllotaxySettings"),
+        TEXT("PhyllotaxyAdditionalAngle"),
+        17.5f);
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("AngleSettings"),
+        TEXT("AxilAngle"),
+        72.0f);
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("AngleSettings"),
+        TEXT("RandomizeAxilAngleMinimum"),
+        -8.0f);
+    bConfigured &= SetPveNestedFloat(
+        GraftDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("AngleSettings"),
+        TEXT("RandomizeAxilAngleMaximum"),
+        8.0f);
+
+    bConfigured &= SetPvePropertyText(
+        DeadDistributorSettings, TEXT("Mode"), TEXT("ParametricSettings"));
+    bConfigured &= SetPvePropertyText(
+        DeadDistributorSettings,
+        TEXT("RandomSeed"),
+        FString::FromInt(Spec->Seed + 101012));
+    bConfigured &= SetPveNestedInt(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("BranchDensity"),
+        Spec->bAllowSenescence ? 6 : 0);
+    bConfigured &= SetPveNestedFloat(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("RelativeStart"),
+        0.62f);
+    bConfigured &= SetPveNestedFloat(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("ScaleSettings"),
+        TEXT("BaseScale"),
+        0.38f);
+    bConfigured &= SetPveNestedBool(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("LimitStartGeneration"),
+        true);
+    bConfigured &= SetPveNestedInt(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("StartGeneration"),
+        2);
+    bConfigured &= SetPveNestedBool(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("LimitEndGeneration"),
+        true);
+    bConfigured &= SetPveNestedInt(
+        DeadDistributorSettings,
+        TEXT("ParametricSettings"),
+        TEXT("SpacingSettings"),
+        TEXT("EndGeneration"),
+        2);
+
+    bConfigured &= SetPvePropertyText(
+        LiveDistributorSettings, TEXT("Mode"), TEXT("HormoneBasedSettings"));
+    bConfigured &= SetPvePropertyText(
+        LiveDistributorSettings,
+        TEXT("RandomSeed"),
+        FString::FromInt(Spec->Seed + 100003));
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("ScaleSettings"),
+        TEXT("BaseScale"),
+        Spec->LiveTwigScale * 1.50f);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("ScaleSettings"),
+        TEXT("MinScale"),
+        0.80f);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("ScaleSettings"),
+        TEXT("MaxScale"),
+        1.35f);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("DistributionSettings"),
+        TEXT("EthyleneThreshold"),
+        0.72f);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("DistributionSettings"),
+        TEXT("InstanceSpacing"),
+        0.055f);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("DistributionSettings"),
+        TEXT("InstanceSpacingRampEffect"),
+        0.45f);
+    bConfigured &= SetPveNestedBool(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("AngleSettings"),
+        TEXT("OverrideAxilAngle"),
+        true);
+    bConfigured &= SetPveNestedFloat(
+        LiveDistributorSettings,
+        TEXT("HormoneBasedSettings"),
+        TEXT("AngleSettings"),
+        TEXT("AxilAngle"),
+        18.0f);
+
+    for (UPCGNode* Node : Graph->GetNodes())
+    {
+        if (Node)
+        {
+            Node->UpdateAfterSettingsChangeDuringCreation();
+        }
+    }
+
+    auto AddRequiredEdge = [Graph](
+                               UPCGNode* FromNode,
+                               const FName& FromPin,
+                               UPCGNode* ToNode,
+                               const FName& ToPin)
+    {
+        return Graph->AddEdge(FromNode, FromPin, ToNode, ToPin) != nullptr;
+    };
+    bool bGraphWired = bConfigured;
+    bGraphWired &= AddRequiredEdge(BranchGrowerNode, TEXT("Out"), GraftPaletteNode, TEXT("Graft 1"));
+    bGraphWired &= AddRequiredEdge(MainGrowerNode, TEXT("Out"), GraftDistributorNode, TEXT("Skeleton"));
+    bGraphWired &= AddRequiredEdge(GraftPaletteNode, TEXT("Out"), GraftDistributorNode, TEXT("Graft"));
+    bGraphWired &= AddRequiredEdge(GraftDistributorNode, TEXT("Out"), ScaleNode, TEXT("In"));
+    bGraphWired &= AddRequiredEdge(ScaleNode, TEXT("Out"), GravityNode, TEXT("In"));
+    bGraphWired &= AddRequiredEdge(GravityNode, TEXT("Out"), MesherNode, TEXT("In"));
+    bGraphWired &= AddRequiredEdge(ProfileNode, TEXT("plantProfile_10"), MesherNode, TEXT("Profile"));
+    bGraphWired &= AddRequiredEdge(MesherNode, TEXT("Out"), BoneReductionNode, TEXT("In"));
+    if (Spec->bAllowSenescence)
+    {
+        bGraphWired &= AddRequiredEdge(BoneReductionNode, TEXT("Out"), DeadDistributorNode, TEXT("In"));
+        bGraphWired &= AddRequiredEdge(DeadPaletteNode, TEXT("Out"), DeadDistributorNode, TEXT("Foliage"));
+        bGraphWired &= AddRequiredEdge(DeadDistributorNode, TEXT("Out"), LiveDistributorNode, TEXT("In"));
+    }
+    else
+    {
+        bGraphWired &= AddRequiredEdge(BoneReductionNode, TEXT("Out"), LiveDistributorNode, TEXT("In"));
+    }
+    bGraphWired &= AddRequiredEdge(LivePaletteNode, TEXT("Out"), LiveDistributorNode, TEXT("Foliage"));
+    bGraphWired &= AddRequiredEdge(LiveDistributorNode, TEXT("Out"), Graph->GetOutputNode(), TEXT("Out"));
+    if (!bGraphWired)
+    {
+        FinishProceduralBeechCandidate(
+            false,
+            TEXT("project-owned V17 cypress graph configuration or wiring failed"));
+        return;
+    }
+
+    FPCGGenerationPostProcessCallback PostProcessCallback;
+    PostProcessCallback.BindRaw(this, &FRaftSimEditorModule::HandleProceduralBeechPostProcess);
+    FPCGDefaultExecutionSourceParams ExecutionParams;
+    ExecutionParams.GraphInterface = Graph;
+    ExecutionParams.Seed = Spec->Seed;
+    ExecutionParams.PostProcessCallback = MoveTemp(PostProcessCallback);
+    ProceduralBeechExecutionSource =
+        IPCGBaseSubsystem::CreateExecutionSource<UPCGDefaultExecutionSource>(ExecutionParams);
+    if (!ProceduralBeechExecutionSource)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("could not create the V17 PCG execution source"));
+        return;
+    }
+    ProceduralBeechExecutionSource->AddToRoot();
+    ProceduralBeechOutputCollection.Reset();
+    ProceduralBeechStartSeconds = FPlatformTime::Seconds();
+    ProceduralBeechExecutionSource->Generate();
+    ProceduralBeechCandidateTickerHandle = FTSTicker::GetCoreTicker().AddTicker(
+        FTickerDelegate::CreateRaw(this, &FRaftSimEditorModule::TickProceduralBeechCandidate),
+        0.25f);
+    UE_LOG(
+        LogRaftSimEditor,
+        Display,
+        TEXT("Started V17 project-graph PVE cypress generation for %s with project-owned live/dead twig palettes.\n%s"),
+        *Spec->Id,
+        *PaletteSummary);
+}
+
 void FRaftSimEditorModule::HandleEvaluateProceduralBeechCandidateCommand(const TArray<FString>& Args)
 {
     if (ProceduralBeechExecutionSource)
     {
-        UE_LOG(LogRaftSimEditor, Warning, TEXT("A PVE beech candidate evaluation is already running."));
+        UE_LOG(LogRaftSimEditor, Warning, TEXT("A PVE candidate evaluation is already running."));
         return;
     }
 
+    bProceduralCypressPveCandidate = false;
     ProceduralBeechVariant = Args.IsEmpty() ? TEXT("Beech_01") : Args[0];
     const TSet<FString> AllowedVariants = {TEXT("Beech_01"), TEXT("Beech_02"), TEXT("Beech_03"), TEXT("Beech_04")};
     if (!AllowedVariants.Contains(ProceduralBeechVariant))
@@ -27544,6 +31875,65 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         return false;
     }
 
+    const FFutaleufuCypressPveFormSpec* CypressSpec = bProceduralCypressPveCandidate
+        ? FindFutaleufuCypressPveFormSpec(ProceduralBeechVariant)
+        : nullptr;
+    if (bProceduralCypressPveCandidate && !CypressSpec)
+    {
+        FinishProceduralBeechCandidate(false, TEXT("V16 cypress form context was lost after graph execution"));
+        return false;
+    }
+    const bool bCurvedCypressShellPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT("curved_shells");
+    const bool bCompactConnectedCypressTwigHierarchyPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT("compact_connected_twig_hierarchy");
+    const bool bConnectedCypressTwigHierarchyPalette =
+        bProceduralCypressPveCandidate &&
+        (ProceduralCypressPaletteMode == TEXT("connected_twig_hierarchy") ||
+         bCompactConnectedCypressTwigHierarchyPalette);
+    const bool bCypressTwigHierarchyPalette =
+        bProceduralCypressPveCandidate &&
+        (ProceduralCypressPaletteMode == TEXT("twig_hierarchy") ||
+         bConnectedCypressTwigHierarchyPalette);
+    const FString LocalReviewNamespace = bProceduralCypressPveCandidate
+        ? (bCompactConnectedCypressTwigHierarchyPalette
+               ? TEXT("PVEFutaleufuCordilleraCypressCompactConnectedTwigHierarchy")
+               : (bConnectedCypressTwigHierarchyPalette
+               ? TEXT("PVEFutaleufuCordilleraCypressConnectedTwigHierarchy")
+               : (bCypressTwigHierarchyPalette
+               ? TEXT("PVEFutaleufuCordilleraCypressTwigHierarchy")
+               : (bCurvedCypressShellPalette
+                      ? TEXT("PVEFutaleufuCordilleraCypressCurvedShell")
+                      : TEXT("PVEFutaleufuCordilleraCypress")))))
+        : TEXT("PVEFutaleufuEuropeanBeech");
+    const FString LocalSavedNamespace = bProceduralCypressPveCandidate
+        ? (bCompactConnectedCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuCordilleraCypressCompactConnectedTwigHierarchy")
+               : (bConnectedCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuCordilleraCypressConnectedTwigHierarchy")
+               : (bCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuCordilleraCypressTwigHierarchy")
+               : (bCurvedCypressShellPalette
+                      ? TEXT("FutaleufuCordilleraCypressCurvedShell")
+                      : TEXT("FutaleufuCordilleraCypress")))))
+        : TEXT("FutaleufuEuropeanBeech");
+    const FString CandidateAssetToken = bProceduralCypressPveCandidate
+        ? CypressSpec->AssetToken
+        : ProceduralBeechVariant;
+    const FString CandidateAssetPrefix = bProceduralCypressPveCandidate
+        ? (bCompactConnectedCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuPveCordilleraCypressCompactConnectedTwigHierarchy")
+               : (bConnectedCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuPveCordilleraCypressConnectedTwigHierarchy")
+               : (bCypressTwigHierarchyPalette
+               ? TEXT("FutaleufuPveCordilleraCypressTwigHierarchy")
+               : (bCurvedCypressShellPalette
+                      ? TEXT("FutaleufuPveCordilleraCypressCurvedShell")
+                      : TEXT("FutaleufuPveCordilleraCypress")))))
+        : TEXT("FutaleufuPveEuropean");
+
     const FManagedArrayCollection& Collection = *ProceduralBeechOutputCollection;
     const int32 TransformCount = Collection.NumElements(FGeometryCollection::TransformGroup);
     const int32 VertexCount = Collection.NumElements(FGeometryCollection::VerticesGroup);
@@ -27574,9 +31964,10 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     int32 LocalTrunkNonNullMaterialCount = 0;
     FVector LocalTrunkBoundsSize = FVector::ZeroVector;
     const FString LocalTrunkAssetPath = FString::Printf(
-        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/"
-             "SM_FutaleufuPveEuropean%s_Trunk"),
-        *ProceduralBeechVariant);
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/%s/SM_%s_%s_Trunk"),
+        *LocalReviewNamespace,
+        *CandidateAssetPrefix,
+        *CandidateAssetToken);
     const FString LocalTrunkPackagePath = LocalTrunkAssetPath;
     const FString TrunkAssetName = FPackageName::GetShortName(LocalTrunkPackagePath);
     const FString LocalTrunkObjectPath = FString::Printf(
@@ -27622,6 +32013,13 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             DynamicMesh->SetMesh(MoveTemp(CombinedMesh));
 
             TArray<TObjectPtr<UMaterialInterface>> Materials;
+            UMaterialInterface* CypressBarkMaterial = bProceduralCypressPveCandidate
+                ? LoadObject<UMaterialInterface>(
+                      nullptr,
+                      TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+                           "Materials/M_RaftSim_FutaleufuCordilleraCypress_Bark."
+                           "M_RaftSim_FutaleufuCordilleraCypress_Bark"))
+                : nullptr;
             if (Collection.HasAttribute(TEXT("MaterialPath"), FGeometryCollection::MaterialGroup))
             {
                 const TManagedArray<FString>& MaterialPaths = Collection.GetAttribute<FString>(
@@ -27629,7 +32027,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     FGeometryCollection::MaterialGroup);
                 for (const FString& MaterialPath : MaterialPaths)
                 {
-                    Materials.Add(LoadObject<UMaterialInterface>(nullptr, *MaterialPath));
+                    Materials.Add(CypressBarkMaterial
+                        ? CypressBarkMaterial
+                        : LoadObject<UMaterialInterface>(nullptr, *MaterialPath));
                 }
             }
             FGeometryScriptCopyMeshToAssetOptions CopyOptions;
@@ -27641,7 +32041,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             CopyOptions.bApplyNaniteSettings = true;
             CopyOptions.NewNaniteSettings = TrunkMesh->GetNaniteSettings();
             CopyOptions.NewNaniteSettings.bEnabled = true;
-            CopyOptions.NewNaniteSettings.ShapePreservation = ENaniteShapePreservation::PreserveArea;
+            CopyOptions.NewNaniteSettings.ShapePreservation = bProceduralCypressPveCandidate
+                ? ENaniteShapePreservation::None
+                : ENaniteShapePreservation::PreserveArea;
             EGeometryScriptOutcomePins CopyOutcome = EGeometryScriptOutcomePins::Failure;
             UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshToStaticMesh(
                 DynamicMesh,
@@ -27685,9 +32087,12 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalTrunkPreserveArea =
                         TrunkMesh->GetNaniteSettings().ShapePreservation ==
                         ENaniteShapePreservation::PreserveArea;
+                    const bool bShapePreservationValid = bProceduralCypressPveCandidate
+                        ? !bLocalTrunkPreserveArea
+                        : bLocalTrunkPreserveArea;
                     bLocalTrunkValidated =
                         bLocalTrunkNaniteEnabled &&
-                        bLocalTrunkPreserveArea &&
+                        bShapePreservationValid &&
                         LocalTrunkVertexCount > 0 &&
                         LocalTrunkTriangleCount > 0 &&
                         LocalTrunkMaterialSlotCount > 0 &&
@@ -27700,13 +32105,37 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         }
     }
 
+    auto GetLocalFoliageTransform = [
+                                        &FoliageFacade,
+                                        this,
+                                        TrunkMesh](int32 EntryIndex)
+    {
+        FTransform Transform = FoliageFacade.GetFoliageTransform(EntryIndex);
+        if (!bProceduralCypressPveCandidate || !TrunkMesh)
+        {
+            return Transform;
+        }
+        const FBox Bounds = TrunkMesh->GetBoundingBox();
+        const float Height = Bounds.GetSize().Z;
+        const float CrownT = Height > UE_SMALL_NUMBER
+            ? (Transform.GetLocation().Z - Bounds.Min.Z) / Height
+            : 0.0f;
+        if (CrownT > 0.86f)
+        {
+            const float UpperCrownT = FMath::Clamp((CrownT - 0.86f) / 0.14f, 0.0f, 1.0f);
+            Transform.SetScale3D(
+                Transform.GetScale3D() * FMath::Lerp(0.92f, 0.68f, UpperCrownT));
+        }
+        return Transform;
+    };
+
     FString FoliageInstancesJson;
     if (FoliageFacade.IsValid())
     {
         for (int32 Index = 0; Index < FoliageFacade.NumFoliageEntries(); ++Index)
         {
             const PV::Facades::FFoliageEntryData Entry = FoliageFacade.GetFoliageEntry(Index);
-            const FTransform Transform = FoliageFacade.GetFoliageTransform(Index);
+            const FTransform Transform = GetLocalFoliageTransform(Index);
             const FVector Location = Transform.GetLocation();
             const FQuat Rotation = Transform.GetRotation();
             const FVector Scale = Transform.GetScale3D();
@@ -27729,7 +32158,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     }
     const FString LocalTemplateDirectory = FPaths::Combine(
         FPaths::ProjectSavedDir(),
-        TEXT("RaftSimPveReview/FutaleufuEuropeanBeech"));
+        TEXT("RaftSimPveReview"),
+        LocalSavedNamespace);
     IFileManager::Get().MakeDirectory(*LocalTemplateDirectory, true);
     const FString LocalTemplatePath = FPaths::Combine(
         LocalTemplateDirectory,
@@ -27748,25 +32178,474 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *FoliageInstancesJson);
     const bool bLocalTemplateSaved = FFileHelper::SaveStringToFile(LocalTemplate, *LocalTemplatePath);
     const FString LocalTemplateReportPath = FString::Printf(
-        TEXT("unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/%s_foliage_template.json"),
+        TEXT("unreal/Saved/RaftSimPveReview/%s/%s_foliage_template.json"),
+        *LocalSavedNamespace,
         *ProceduralBeechVariant.ToLower());
+
+    bool bLocalImpostorSourceExported = false;
+    bool bLocalImpostorSourceValidated = false;
+    int32 LocalImpostorSourceVertexCount = 0;
+    int32 LocalImpostorSourceTriangleCount = 0;
+    int32 LocalImpostorSourceMaterialSlotCount = 0;
+    FVector LocalImpostorSourceBoundsSize = FVector::ZeroVector;
+    bool bLocalImpostorSourceNaniteEnabled = false;
+    bool bLocalImpostorSourcePreserveArea = false;
+    UStaticMesh* LocalImpostorSourceMesh = nullptr;
+    const FString LocalImpostorSourceAssetPath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/%s/Impostor/"
+             "SM_%s_%s_ImpostorSource"),
+        *LocalReviewNamespace,
+        *CandidateAssetPrefix,
+        *CandidateAssetToken);
+    if (bProceduralCypressPveCandidate && bLocalTrunkValidated && FoliageFacade.IsValid())
+    {
+        UDynamicMesh* CombinedSourceMesh = NewObject<UDynamicMesh>(GetTransientPackage());
+        EGeometryScriptOutcomePins TrunkCopyOutcome = EGeometryScriptOutcomePins::Failure;
+        UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshFromStaticMeshV2(
+            TrunkMesh,
+            CombinedSourceMesh,
+            FGeometryScriptCopyMeshFromAssetOptions(),
+            FGeometryScriptMeshReadLOD(),
+            TrunkCopyOutcome,
+            false,
+            nullptr);
+
+        TArray<UMaterialInterface*> CombinedSourceMaterials;
+        TArray<FName> CombinedSourceMaterialNames;
+        UGeometryScriptLibrary_StaticMeshFunctions::GetMaterialListFromStaticMesh(
+            TrunkMesh,
+            CombinedSourceMaterials,
+            CombinedSourceMaterialNames,
+            nullptr);
+
+        TArray<TObjectPtr<UDynamicMesh>> FoliageSourceMeshes;
+        TArray<TArray<UMaterialInterface*>> FoliageSourceMaterials;
+        FoliageSourceMeshes.SetNum(FoliageFacade.NumFoliageInfo());
+        FoliageSourceMaterials.SetNum(FoliageFacade.NumFoliageInfo());
+        bool bFoliageSourcesValid = TrunkCopyOutcome == EGeometryScriptOutcomePins::Success;
+        for (int32 MeshIndex = 0; MeshIndex < FoliageFacade.NumFoliageInfo(); ++MeshIndex)
+        {
+            const FString FoliageMeshPath = FoliageFacade.GetFoliageInfo(MeshIndex).Mesh.ToString();
+            UStaticMesh* FoliageMesh = LoadObject<UStaticMesh>(nullptr, *FoliageMeshPath);
+            UDynamicMesh* FoliageDynamicMesh = FoliageMesh
+                ? NewObject<UDynamicMesh>(GetTransientPackage())
+                : nullptr;
+            EGeometryScriptOutcomePins FoliageCopyOutcome = EGeometryScriptOutcomePins::Failure;
+            if (FoliageMesh && FoliageDynamicMesh)
+            {
+                UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshFromStaticMeshV2(
+                    FoliageMesh,
+                    FoliageDynamicMesh,
+                    FGeometryScriptCopyMeshFromAssetOptions(),
+                    FGeometryScriptMeshReadLOD(),
+                    FoliageCopyOutcome,
+                    false,
+                    nullptr);
+                TArray<FName> FoliageMaterialNames;
+                UGeometryScriptLibrary_StaticMeshFunctions::GetMaterialListFromStaticMesh(
+                    FoliageMesh,
+                    FoliageSourceMaterials[MeshIndex],
+                    FoliageMaterialNames,
+                    nullptr);
+            }
+            bFoliageSourcesValid &=
+                FoliageCopyOutcome == EGeometryScriptOutcomePins::Success &&
+                !FoliageSourceMaterials[MeshIndex].IsEmpty();
+            FoliageSourceMeshes[MeshIndex] = FoliageDynamicMesh;
+        }
+
+        if (bFoliageSourcesValid)
+        {
+            FGeometryScriptAppendMeshOptions AppendOptions;
+            AppendOptions.CombineMode = EGeometryScriptCombineAttributesMode::EnableAllMatching;
+            for (int32 EntryIndex = 0; EntryIndex < FoliageFacade.NumFoliageEntries(); ++EntryIndex)
+            {
+                const PV::Facades::FFoliageEntryData Entry =
+                    FoliageFacade.GetFoliageEntry(EntryIndex);
+                if (!FoliageSourceMeshes.IsValidIndex(Entry.NameId) ||
+                    !FoliageSourceMeshes[Entry.NameId])
+                {
+                    bFoliageSourcesValid = false;
+                    break;
+                }
+                TArray<UMaterialInterface*> AppendedMaterials;
+                UGeometryScriptLibrary_MeshBasicEditFunctions::AppendMeshWithMaterials(
+                    CombinedSourceMesh,
+                    CombinedSourceMaterials,
+                    FoliageSourceMeshes[Entry.NameId],
+                    FoliageSourceMaterials[Entry.NameId],
+                    AppendedMaterials,
+                    GetLocalFoliageTransform(EntryIndex),
+                    true,
+                    AppendOptions,
+                    true,
+                    nullptr);
+                CombinedSourceMaterials = MoveTemp(AppendedMaterials);
+            }
+        }
+
+        const FString ImpostorSourceAssetName =
+            FPackageName::GetShortName(LocalImpostorSourceAssetPath);
+        const FString ImpostorSourceObjectPath = FString::Printf(
+            TEXT("%s.%s"),
+            *LocalImpostorSourceAssetPath,
+            *ImpostorSourceAssetName);
+        UStaticMesh* ImpostorSourceMesh = LoadObject<UStaticMesh>(
+            nullptr,
+            *ImpostorSourceObjectPath);
+        const bool bNewImpostorSourceMesh = ImpostorSourceMesh == nullptr;
+        UPackage* ImpostorSourcePackage = ImpostorSourceMesh
+            ? ImpostorSourceMesh->GetOutermost()
+            : CreatePackage(*LocalImpostorSourceAssetPath);
+        if (bFoliageSourcesValid && ImpostorSourcePackage && !ImpostorSourceMesh)
+        {
+            ImpostorSourceMesh = NewObject<UStaticMesh>(
+                ImpostorSourcePackage,
+                *ImpostorSourceAssetName,
+                RF_Public | RF_Standalone);
+        }
+        if (bFoliageSourcesValid && ImpostorSourceMesh)
+        {
+            TArray<TObjectPtr<UMaterialInterface>> SourceMaterialObjects;
+            SourceMaterialObjects.Reserve(CombinedSourceMaterials.Num());
+            for (UMaterialInterface* Material : CombinedSourceMaterials)
+            {
+                SourceMaterialObjects.Add(Material);
+            }
+            FGeometryScriptCopyMeshToAssetOptions CopyOptions;
+            CopyOptions.bEmitTransaction = false;
+            CopyOptions.bDeferMeshPostEditChange = false;
+            CopyOptions.bEnableRecomputeTangents = false;
+            CopyOptions.bReplaceMaterials = true;
+            CopyOptions.NewMaterials = MoveTemp(SourceMaterialObjects);
+            CopyOptions.bApplyNaniteSettings = true;
+            CopyOptions.NewNaniteSettings = ImpostorSourceMesh->GetNaniteSettings();
+            CopyOptions.NewNaniteSettings.bEnabled = true;
+            CopyOptions.NewNaniteSettings.ShapePreservation =
+                ENaniteShapePreservation::None;
+            EGeometryScriptOutcomePins SourceCopyOutcome = EGeometryScriptOutcomePins::Failure;
+            UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshToStaticMesh(
+                CombinedSourceMesh,
+                ImpostorSourceMesh,
+                CopyOptions,
+                FGeometryScriptMeshWriteLOD(),
+                SourceCopyOutcome,
+                false,
+                nullptr);
+            if (SourceCopyOutcome == EGeometryScriptOutcomePins::Success)
+            {
+                ImpostorSourceMesh->Modify();
+                ImpostorSourceMesh->MarkPackageDirty();
+                if (bNewImpostorSourceMesh)
+                {
+                    FAssetRegistryModule::AssetCreated(ImpostorSourceMesh);
+                }
+                FAssetCompilingManager::Get().FinishAllCompilation();
+                const FString ImpostorSourceFilename = FPackageName::LongPackageNameToFilename(
+                    LocalImpostorSourceAssetPath,
+                    FPackageName::GetAssetPackageExtension());
+                FSavePackageArgs SaveArgs;
+                SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
+                SaveArgs.SaveFlags = SAVE_NoError;
+                bLocalImpostorSourceExported = UPackage::SavePackage(
+                    ImpostorSourcePackage,
+                    ImpostorSourceMesh,
+                    *ImpostorSourceFilename,
+                    SaveArgs);
+                if (bLocalImpostorSourceExported)
+                {
+                    LocalImpostorSourceMesh = ImpostorSourceMesh;
+                    LocalImpostorSourceVertexCount = ImpostorSourceMesh->GetNumVertices(0);
+                    LocalImpostorSourceTriangleCount = ImpostorSourceMesh->GetNumTriangles(0);
+                    LocalImpostorSourceMaterialSlotCount =
+                        ImpostorSourceMesh->GetStaticMaterials().Num();
+                    LocalImpostorSourceBoundsSize =
+                        ImpostorSourceMesh->GetBoundingBox().GetSize();
+                    bLocalImpostorSourceNaniteEnabled = ImpostorSourceMesh->IsNaniteEnabled();
+                    bLocalImpostorSourcePreserveArea =
+                        ImpostorSourceMesh->GetNaniteSettings().ShapePreservation ==
+                        ENaniteShapePreservation::PreserveArea;
+                    bLocalImpostorSourceValidated =
+                        bLocalImpostorSourceNaniteEnabled &&
+                        !bLocalImpostorSourcePreserveArea &&
+                        LocalImpostorSourceVertexCount > LocalTrunkVertexCount &&
+                        LocalImpostorSourceTriangleCount > LocalTrunkTriangleCount &&
+                        LocalImpostorSourceMaterialSlotCount >= 2 &&
+                        LocalImpostorSourceBoundsSize.X >= LocalTrunkBoundsSize.X * 0.90f &&
+                        LocalImpostorSourceBoundsSize.X <= LocalTrunkBoundsSize.X * 1.25f &&
+                        LocalImpostorSourceBoundsSize.Y >= LocalTrunkBoundsSize.Y * 0.90f &&
+                        LocalImpostorSourceBoundsSize.Y <= LocalTrunkBoundsSize.Y * 1.25f &&
+                        LocalImpostorSourceBoundsSize.Z >= LocalTrunkBoundsSize.Z * 0.95f &&
+                        LocalImpostorSourceBoundsSize.Z <= LocalTrunkBoundsSize.Z * 1.10f;
+                }
+            }
+        }
+    }
+
+    bool bLocalFarProxyExported = false;
+    bool bLocalFarProxyValidated = false;
+    int32 LocalFarProxySourceFoliageCount = 0;
+    int32 LocalFarProxyClusterCount = 0;
+    int32 LocalFarProxyVertexCount = 0;
+    int32 LocalFarProxyTriangleCount = 0;
+    FVector LocalFarProxyBoundsSize = FVector::ZeroVector;
+    FString LocalFarProxySummary;
+    UStaticMesh* LocalFarProxyMesh = nullptr;
+    const FString LocalFarProxyAssetPath = FString::Printf(
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/%s/FarProxy/"
+             "SM_%s_%s_VolumetricFarProxy"),
+        *LocalReviewNamespace,
+        *CandidateAssetPrefix,
+        *CandidateAssetToken);
+    if (bProceduralCypressPveCandidate && bLocalTrunkValidated &&
+        FoliageFacade.IsValid() && GEditor)
+    {
+        UWorld* BuildWorld = GEditor->GetEditorWorldContext().World();
+        UMaterialInterface* FarProxyMaterial =
+            CreateOrUpdateFutaleufuCypressFarProxyMaterial(LocalFarProxySummary);
+        TArray<FVector> FarProxyVertices;
+        TArray<int32> FarProxyTriangles;
+        TArray<FVector2D> FarProxyUVs;
+        TArray<FLinearColor> FarProxyVertexColors;
+
+        auto AppendFarScaleSpray = [&FarProxyVertices,
+                                    &FarProxyTriangles,
+                                    &FarProxyUVs,
+                                    &FarProxyVertexColors](
+                                       const FVector& Center,
+                                       const FVector& Axis,
+                                       const FVector& Side,
+                                       const FVector& Binormal,
+                                       float AverageScale,
+                                       int32 Seed)
+        {
+            constexpr int32 RingCount = 3;
+            constexpr int32 SegmentCount = 4;
+            static const float RingAxialUnits[RingCount] = {-0.52f, 0.02f, 0.72f};
+            static const float RingRadiusScales[RingCount] = {0.18f, 1.0f, 0.24f};
+            const float ScaleRoot = FMath::Sqrt(AverageScale);
+            const float AxialRadiusCm = FMath::Clamp(
+                43.0f * AverageScale, 30.0f, 80.0f);
+            const float SideRadiusCm = FMath::Clamp(
+                16.0f * ScaleRoot, 10.0f, 28.0f);
+            const float BinormalRadiusCm = FMath::Clamp(
+                5.2f * ScaleRoot, 4.0f, 9.0f);
+            const int32 BaseIndex = FarProxyVertices.Num();
+            const float ClusterTone = 0.88f + 0.10f * FMath::Sin(Seed * 0.019f);
+            const FLinearColor CrownColor(
+                0.036f * ClusterTone,
+                0.128f * (0.94f + 0.06f * FMath::Sin(Seed * 0.031f)),
+                0.019f * ClusterTone,
+                1.0f);
+            for (int32 RingIndex = 0; RingIndex < RingCount; ++RingIndex)
+            {
+                const float RingT = static_cast<float>(RingIndex) /
+                    static_cast<float>(RingCount - 1);
+                const float AxialUnit = RingAxialUnits[RingIndex];
+                const float RingRadius = RingRadiusScales[RingIndex];
+                for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+                {
+                    const float SegmentT = static_cast<float>(SegmentIndex) /
+                        static_cast<float>(SegmentCount);
+                    const float Angle = SegmentT * 2.0f * PI + PI * 0.25f;
+                    const float Lobe = 0.88f + 0.12f * FMath::Sin(
+                        static_cast<float>(Seed) * 0.017f + RingIndex * 1.31f +
+                        SegmentIndex * 1.77f);
+                    const FVector Radial =
+                        Side * FMath::Cos(Angle) * SideRadiusCm +
+                        Binormal * FMath::Sin(Angle) * BinormalRadiusCm;
+                    FarProxyVertices.Add(
+                        Center + Axis * AxialUnit * AxialRadiusCm +
+                        Radial * RingRadius * Lobe);
+                    FarProxyUVs.Add(FVector2D(SegmentT, RingT));
+                    const float ColorNoise = 0.82f + 0.16f * FMath::Sin(
+                        static_cast<float>(Seed) * 0.031f + RingIndex * 0.73f +
+                        SegmentIndex * 1.19f);
+                    FarProxyVertexColors.Add(ScalePreviewColor(
+                        CrownColor,
+                        ColorNoise * FMath::Lerp(0.88f, 1.04f, RingT)));
+                }
+            }
+            for (int32 RingIndex = 0; RingIndex < RingCount - 1; ++RingIndex)
+            {
+                const int32 CurrentRing = BaseIndex + RingIndex * SegmentCount;
+                const int32 NextRing = CurrentRing + SegmentCount;
+                for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+                {
+                    const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+                    const int32 A = CurrentRing + SegmentIndex;
+                    const int32 B = CurrentRing + NextSegment;
+                    const int32 C = NextRing + SegmentIndex;
+                    const int32 D = NextRing + NextSegment;
+                    FarProxyTriangles.Append({A, C, B, B, C, D});
+                }
+            }
+            const int32 FirstRing = BaseIndex;
+            const int32 LastRing = BaseIndex + (RingCount - 1) * SegmentCount;
+            const int32 TopIndex = FarProxyVertices.Num();
+            FarProxyVertices.Add(Center + Axis * AxialRadiusCm * 0.92f);
+            FarProxyUVs.Add(FVector2D(0.5f, 1.0f));
+            FarProxyVertexColors.Add(ScalePreviewColor(CrownColor, 0.98f));
+            const int32 BottomIndex = FarProxyVertices.Num();
+            FarProxyVertices.Add(Center - Axis * AxialRadiusCm * 0.68f);
+            FarProxyUVs.Add(FVector2D(0.5f, 0.0f));
+            FarProxyVertexColors.Add(ScalePreviewColor(CrownColor, 0.70f));
+            for (int32 SegmentIndex = 0; SegmentIndex < SegmentCount; ++SegmentIndex)
+            {
+                const int32 NextSegment = (SegmentIndex + 1) % SegmentCount;
+                FarProxyTriangles.Append({
+                    LastRing + SegmentIndex,
+                    TopIndex,
+                    LastRing + NextSegment,
+                    BottomIndex,
+                    FirstRing + NextSegment,
+                    FirstRing + SegmentIndex});
+            }
+            return true;
+        };
+        constexpr int32 FarProxyFoliageStride = 4;
+        LocalFarProxySourceFoliageCount = FoliageFacade.NumFoliageEntries();
+        for (int32 EntryIndex = 0;
+             EntryIndex < FoliageFacade.NumFoliageEntries();
+             EntryIndex += FarProxyFoliageStride)
+        {
+            const FTransform Transform = GetLocalFoliageTransform(EntryIndex);
+            const FVector Scale = Transform.GetScale3D();
+            FVector Axis = Transform.TransformVectorNoScale(FVector::ForwardVector).GetSafeNormal();
+            FVector Side = Transform.TransformVectorNoScale(FVector::RightVector).GetSafeNormal();
+            FVector Binormal = FVector::CrossProduct(Axis, Side).GetSafeNormal();
+            if (Axis.IsNearlyZero() || Side.IsNearlyZero() || Binormal.IsNearlyZero())
+            {
+                continue;
+            }
+            const float Roll = 0.28f * FMath::Sin((EntryIndex + 17011) * 0.037f);
+            const FVector RolledSide = Side * FMath::Cos(Roll) + Binormal * FMath::Sin(Roll);
+            const FVector RolledBinormal =
+                FVector::CrossProduct(Axis, RolledSide).GetSafeNormal();
+            const float AverageScale = FMath::Max(
+                0.20f,
+                (FMath::Abs(Scale.X) + FMath::Abs(Scale.Y) + FMath::Abs(Scale.Z)) / 3.0f);
+            const FVector Center = Transform.GetLocation();
+            if (AppendFarScaleSpray(
+                    Center,
+                    Axis,
+                    RolledSide,
+                    RolledBinormal,
+                    AverageScale,
+                    EntryIndex + 17011))
+            {
+                ++LocalFarProxyClusterCount;
+            }
+            const float FanJitter = 0.10f * FMath::Sin((EntryIndex + 17011) * 0.071f);
+            for (int32 FanSide = -1; FanSide <= 1; FanSide += 2)
+            {
+                const FVector LateralAxis = (
+                    Axis * 0.80f + RolledSide * (0.52f * static_cast<float>(FanSide)) +
+                    RolledBinormal * FanJitter).GetSafeNormal();
+                FVector LateralSide = RolledSide -
+                    LateralAxis * FVector::DotProduct(RolledSide, LateralAxis);
+                LateralSide.Normalize();
+                const FVector LateralBinormal =
+                    FVector::CrossProduct(LateralAxis, LateralSide).GetSafeNormal();
+                if (LateralAxis.IsNearlyZero() || LateralSide.IsNearlyZero() ||
+                    LateralBinormal.IsNearlyZero())
+                {
+                    continue;
+                }
+                if (AppendFarScaleSpray(
+                        Center + Axis * (10.0f * AverageScale),
+                        LateralAxis,
+                        LateralSide,
+                        LateralBinormal,
+                        AverageScale * 0.78f,
+                        EntryIndex + 17011 + FanSide * 97))
+                {
+                    ++LocalFarProxyClusterCount;
+                }
+            }
+        }
+
+        const TArray<FVector> FarProxyNormals = ComputePreviewMeshNormals(
+            FarProxyVertices,
+            FarProxyTriangles);
+
+        AActor* FarProxySourceActor =
+            BuildWorld && FarProxyMaterial && LocalFarProxyClusterCount > 0
+            ? AddPreviewProceduralMeshActor(
+                  BuildWorld,
+                  TEXT("RaftSim_PveCypressVolumetricFarProxy_Source"),
+                  FarProxyVertices,
+                  FarProxyTriangles,
+                  FarProxyNormals,
+                  FarProxyUVs,
+                  FLinearColor::White,
+                  FarProxyMaterial,
+                  &FarProxyVertexColors,
+                  false)
+            : nullptr;
+        LocalFarProxyMesh = ConvertNativeCanopyProceduralActorToStaticMesh(
+            FarProxySourceActor,
+            LocalFarProxyAssetPath,
+            FarProxyMaterial,
+            false,
+            ENaniteShapePreservation::None,
+            LocalFarProxySummary);
+        if (FarProxySourceActor)
+        {
+            FarProxySourceActor->Destroy();
+        }
+        if (LocalFarProxyMesh)
+        {
+            LocalFarProxyVertexCount = LocalFarProxyMesh->GetNumVertices(0);
+            LocalFarProxyTriangleCount = LocalFarProxyMesh->GetNumTriangles(0);
+            LocalFarProxyBoundsSize = LocalFarProxyMesh->GetBoundingBox().GetSize();
+            bLocalFarProxyExported = true;
+            bLocalFarProxyValidated =
+                bLocalFarProxyExported &&
+                LocalFarProxySourceFoliageCount == FoliageFacade.NumFoliageEntries() &&
+                LocalFarProxyClusterCount >= 2000 &&
+                LocalFarProxyTriangleCount >= 8000 &&
+                LocalFarProxyTriangleCount <= 100000 &&
+                LocalFarProxyTriangleCount < TriangleCount &&
+                LocalFarProxyBoundsSize.X >= LocalTrunkBoundsSize.X * 0.85f &&
+                LocalFarProxyBoundsSize.Y >= LocalTrunkBoundsSize.Y * 0.85f &&
+                LocalFarProxyBoundsSize.Z >= LocalTrunkBoundsSize.Z * 0.70f &&
+                LocalFarProxyBoundsSize.Z <= LocalTrunkBoundsSize.Z * 1.10f;
+        }
+    }
 
     bool bLocalVisualMapSaved = false;
     bool bLocalVisualReviewCaptured = false;
+    bool bLocalFarProxyReviewCaptured = false;
+    bool bLocalNaniteWholeTreeReviewCaptured = false;
+    bool bLocalMultiViewAtlasReviewCaptured = false;
+    FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
     const FString LocalVisualMapPackagePath = FString::Printf(
-        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/"
-             "L_FutaleufuPveEuropean%s_IsolatedReview"),
-        *ProceduralBeechVariant);
+        TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/%s/"
+             "L_%s_%s_IsolatedReview"),
+        *LocalReviewNamespace,
+        *CandidateAssetPrefix,
+        *CandidateAssetToken);
     const FString LocalVisualCaptureBase = FString::Printf(
-        TEXT("unreal/Saved/RaftSimPveReview/FutaleufuEuropeanBeech/%s"),
+        TEXT("unreal/Saved/RaftSimPveReview/%s/%s"),
+        *LocalSavedNamespace,
         *ProceduralBeechVariant.ToLower());
+    FString LocalMultiViewAtlasCapturePath =
+        LocalVisualCaptureBase + TEXT("_multiview_atlas_hlod_60m.png");
     FString LocalVisualSummary;
+    LocalVisualSummary += LocalFarProxySummary;
     TArray<FString> LocalVisualCapturePaths = {
         LocalVisualCaptureBase + TEXT("_turntable_azimuth_035.png"),
         LocalVisualCaptureBase + TEXT("_turntable_azimuth_145.png"),
-        LocalVisualCaptureBase + TEXT("_river_distance_60m.png")};
+        LocalVisualCaptureBase + TEXT("_river_distance_60m.png"),
+        LocalVisualCaptureBase + TEXT("_branch_spray_closeup.png"),
+        LocalVisualCaptureBase +
+            (bProceduralCypressPveCandidate
+                 ? TEXT("_volumetric_far_proxy_60m.png")
+                 : TEXT("_river_distance_60m.png")),
+        LocalVisualCaptureBase + TEXT("_nanite_whole_tree_60m.png")};
     if (bLocalTrunkValidated && bLocalTemplateSaved && GEditor && FoliageFacade.IsValid())
     {
         UWorld* ReviewWorld = UEditorLoadingAndSavingUtils::NewBlankMap(false);
@@ -27781,6 +32660,42 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 TrunkActor->GetStaticMeshComponent()->SetStaticMesh(TrunkMesh);
                 TrunkActor->GetStaticMeshComponent()->SetMobility(EComponentMobility::Static);
                 TrunkActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            }
+
+            AStaticMeshActor* FarProxyActor =
+                bProceduralCypressPveCandidate && LocalFarProxyMesh
+                ? ReviewWorld->SpawnActor<AStaticMeshActor>(
+                      AStaticMeshActor::StaticClass(),
+                      FTransform::Identity)
+                : nullptr;
+            if (FarProxyActor && FarProxyActor->GetStaticMeshComponent())
+            {
+                FarProxyActor->SetActorLabel(TEXT("RaftSim_PveCypressVolumetricFarProxy"));
+                FarProxyActor->GetStaticMeshComponent()->SetStaticMesh(LocalFarProxyMesh);
+                FarProxyActor->GetStaticMeshComponent()->SetMobility(EComponentMobility::Static);
+                FarProxyActor->GetStaticMeshComponent()->SetCollisionEnabled(
+                    ECollisionEnabled::NoCollision);
+                FarProxyActor->GetStaticMeshComponent()->SetCastShadow(false);
+                FarProxyActor->SetActorHiddenInGame(true);
+            }
+
+            AStaticMeshActor* NaniteWholeTreeActor =
+                bProceduralCypressPveCandidate && LocalImpostorSourceMesh
+                ? ReviewWorld->SpawnActor<AStaticMeshActor>(
+                      AStaticMeshActor::StaticClass(),
+                      FTransform::Identity)
+                : nullptr;
+            if (NaniteWholeTreeActor && NaniteWholeTreeActor->GetStaticMeshComponent())
+            {
+                NaniteWholeTreeActor->SetActorLabel(TEXT("RaftSim_PveCypressNaniteWholeTree"));
+                NaniteWholeTreeActor->GetStaticMeshComponent()->SetStaticMesh(
+                    LocalImpostorSourceMesh);
+                NaniteWholeTreeActor->GetStaticMeshComponent()->SetMobility(
+                    EComponentMobility::Static);
+                NaniteWholeTreeActor->GetStaticMeshComponent()->SetCollisionEnabled(
+                    ECollisionEnabled::NoCollision);
+                NaniteWholeTreeActor->GetStaticMeshComponent()->SetCastShadow(true);
+                NaniteWholeTreeActor->SetActorHiddenInGame(true);
             }
 
             AActor* FoliageActor = ReviewWorld->SpawnActor<AActor>();
@@ -27811,6 +32726,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     Component->SetStaticMesh(FoliageMesh);
                     Component->SetMobility(EComponentMobility::Static);
                     Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                    if (bProceduralCypressPveCandidate)
+                    {
+                        Component->SetCastShadow(false);
+                        Component->bCastStaticShadow = false;
+                        Component->bCastDynamicShadow = false;
+                        Component->SetCastContactShadow(false);
+                        Component->SetAffectDistanceFieldLighting(false);
+                        Component->SetAffectDynamicIndirectLighting(false);
+                    }
                     Component->RegisterComponent();
                     FoliageComponents.Add(Component);
                     ++LocalVisualFoliageMeshCount;
@@ -27823,7 +32747,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         continue;
                     }
                     FoliageComponents[Entry.NameId]->AddInstance(
-                        FoliageFacade.GetFoliageTransform(EntryIndex));
+                        GetLocalFoliageTransform(EntryIndex));
                     ++LocalVisualFoliageInstanceCount;
                 }
             }
@@ -27831,7 +32755,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             UStaticMesh* PlaneMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
             AStaticMeshActor* GroundActor = ReviewWorld->SpawnActor<AStaticMeshActor>(
                 AStaticMeshActor::StaticClass(),
-                FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, -2.0f), FVector(100.0f, 100.0f, 1.0f)));
+                FTransform(FRotator::ZeroRotator, FVector(0.0f, 0.0f, 40.0f), FVector(100.0f, 100.0f, 1.0f)));
             if (GroundActor && GroundActor->GetStaticMeshComponent())
             {
                 GroundActor->SetActorLabel(TEXT("RaftSim_PveReview_NeutralGround"));
@@ -27847,7 +32771,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
 
             FRaftSimEnvironmentPreviewSpec ReviewSpec;
             ReviewSpec.RiverId = TEXT("futaleufu_terminator");
-            ReviewSpec.DisplayName = ProceduralBeechVariant + TEXT(" isolated PVE review");
+            ReviewSpec.DisplayName = bProceduralCypressPveCandidate
+                ? CypressSpec->DisplayName + TEXT(" V17 project-graph PVE review")
+                : ProceduralBeechVariant + TEXT(" isolated PVE review");
             ReviewSpec.MapPackagePath = LocalVisualMapPackagePath;
             ReviewSpec.FoliageColor = FLinearColor(0.15f, 0.32f, 0.12f);
             ReviewSpec.RockColor = FLinearColor(0.38f, 0.36f, 0.31f);
@@ -27855,6 +32781,32 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
 
             const FBox TrunkBounds = TrunkMesh->GetBoundingBox();
             const FVector Target = TrunkBounds.GetCenter();
+            UStaticMesh* LiveSprayReviewMesh = nullptr;
+            for (int32 MeshIndex = 0; MeshIndex < FoliageFacade.NumFoliageInfo(); ++MeshIndex)
+            {
+                const FString MeshPath = FoliageFacade.GetFoliageInfo(MeshIndex).Mesh.ToString();
+                if (MeshPath.Contains(TEXT("PveLiveTwig"), ESearchCase::CaseSensitive))
+                {
+                    LiveSprayReviewMesh = LoadObject<UStaticMesh>(nullptr, *MeshPath);
+                    if (LiveSprayReviewMesh)
+                    {
+                        break;
+                    }
+                }
+            }
+            const FVector SprayReviewLocation = Target + FVector(10000.0f, 0.0f, 180.0f);
+            AStaticMeshActor* SprayReviewActor = LiveSprayReviewMesh
+                ? ReviewWorld->SpawnActor<AStaticMeshActor>(
+                      AStaticMeshActor::StaticClass(),
+                      FTransform(FRotator::ZeroRotator, SprayReviewLocation, FVector(3.0f)))
+                : nullptr;
+            if (SprayReviewActor && SprayReviewActor->GetStaticMeshComponent())
+            {
+                SprayReviewActor->SetActorLabel(TEXT("RaftSim_PveBranchSprayCloseup"));
+                SprayReviewActor->GetStaticMeshComponent()->SetStaticMesh(LiveSprayReviewMesh);
+                SprayReviewActor->GetStaticMeshComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                SprayReviewActor->GetStaticMeshComponent()->SetCastShadow(false);
+            }
             const float ReviewDistance = FMath::Max(
                 TrunkBounds.GetSize().Z * 2.40f,
                 FMath::Max(TrunkBounds.GetSize().X, TrunkBounds.GetSize().Y) * 2.25f);
@@ -27918,12 +32870,44 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 TEXT("RaftSim_PveRiverDistance60m"),
                 FVector(Target.X - 6000.0f, Target.Y - 800.0f, CameraHeight),
                 50.0f);
+            const FVector SprayCameraTarget = SprayReviewLocation + FVector(70.0f, 0.0f, 0.0f);
+            ACameraActor* SprayCamera = ReviewWorld->SpawnActor<ACameraActor>(
+                ACameraActor::StaticClass(),
+                FTransform(
+                    (SprayCameraTarget - (SprayReviewLocation + FVector(-240.0f, -180.0f, 280.0f))).Rotation(),
+                    SprayReviewLocation + FVector(-240.0f, -180.0f, 280.0f)));
+            const bool bCameraSpray = SprayCamera && SprayCamera->GetCameraComponent();
+            if (bCameraSpray)
+            {
+                SprayCamera->SetActorLabel(TEXT("RaftSim_PveBranchSprayCloseupCamera"));
+                SprayCamera->GetCameraComponent()->FieldOfView = 42.0f;
+            }
+
+            const bool bMultiViewAtlasReady = !bProceduralCypressPveCandidate ||
+                BakeFutaleufuCypressMultiViewAtlas(
+                    ReviewWorld,
+                    TrunkActor,
+                    FoliageActor,
+                    ProceduralBeechVariant,
+                    CandidateAssetToken,
+                    LocalSavedNamespace,
+                    LocalReviewNamespace,
+                    LocalMultiViewAtlas,
+                    LocalVisualSummary);
 
             const bool bSceneComplete =
                 TrunkActor && TrunkActor->GetStaticMeshComponent() &&
                 LocalVisualFoliageMeshCount == FoliageMeshCount &&
                 LocalVisualFoliageInstanceCount == FoliageInstanceCount &&
-                PlaneMesh && GroundActor && bCameraA && bCameraB && bCameraDistance;
+                PlaneMesh && GroundActor && SprayReviewActor &&
+                bCameraA && bCameraB && bCameraDistance && bCameraSpray &&
+                (!bProceduralCypressPveCandidate ||
+                 (bLocalFarProxyValidated && FarProxyActor &&
+                  FarProxyActor->GetStaticMeshComponent() &&
+                  bLocalImpostorSourceValidated && NaniteWholeTreeActor &&
+                  NaniteWholeTreeActor->GetStaticMeshComponent() &&
+                  bMultiViewAtlasReady && LocalMultiViewAtlas.ProxyActor &&
+                  LocalMultiViewAtlas.ProxyActor->GetStaticMeshComponent()));
             bLocalVisualMapSaved = bSceneComplete &&
                 SavePreviewWorld(ReviewWorld, LocalVisualMapPackagePath, LocalVisualSummary);
             if (bLocalVisualMapSaved)
@@ -27935,7 +32919,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 }
                 const FString LocalCaptureRoot = FPaths::Combine(
                     FPaths::ProjectSavedDir(),
-                    TEXT("RaftSimPveReview/FutaleufuEuropeanBeech"));
+                    TEXT("RaftSimPveReview"),
+                    LocalSavedNamespace);
                 bool bCaptureA = CapturePreviewImageForSpec(
                     ReviewSpec,
                     LocalCaptureRoot,
@@ -27963,10 +32948,210 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     TEXT("PVE 60 m river-distance proxy"),
                     false,
                     LocalVisualSummary);
-                bLocalVisualReviewCaptured = bCaptureA && bCaptureB && bCaptureDistance;
+                bool bCaptureSpray = CapturePreviewImageForSpec(
+                    ReviewSpec,
+                    LocalCaptureRoot,
+                    LocalVisualCapturePaths[3],
+                    TEXT("RaftSim_PveBranchSprayCloseupCamera"),
+                    TEXT("branch_spray_closeup"),
+                    TEXT("PVE branch-spray material and alpha closeup"),
+                    false,
+                    LocalVisualSummary);
+                bool bCaptureFarProxy = !bProceduralCypressPveCandidate;
+                if (bProceduralCypressPveCandidate)
+                {
+                    bCaptureFarProxy = CapturePreviewImageForSpec(
+                        ReviewSpec,
+                        LocalCaptureRoot,
+                        LocalVisualCapturePaths[4],
+                        TEXT("RaftSim_PveRiverDistance60m"),
+                        TEXT("volumetric_far_proxy_60m"),
+                        TEXT("PVE volumetric far proxy at the exact source 60 m camera"),
+                        false,
+                        LocalVisualSummary,
+                        [](UWorld* LoadedWorld, ACameraActor*, FString& SetupSummary)
+                        {
+                            AActor* SourceFoliageActor = nullptr;
+                            AActor* LoadedFarProxyActor = nullptr;
+                            for (TActorIterator<AActor> It(LoadedWorld); It; ++It)
+                            {
+                                AActor* Actor = *It;
+                                if (!Actor)
+                                {
+                                    continue;
+                                }
+                                if (Actor->GetActorLabel() == TEXT("RaftSim_PveReview_Foliage"))
+                                {
+                                    SourceFoliageActor = Actor;
+                                }
+                                else if (Actor->GetActorLabel() ==
+                                         TEXT("RaftSim_PveCypressVolumetricFarProxy"))
+                                {
+                                    LoadedFarProxyActor = Actor;
+                                }
+                            }
+                            if (!SourceFoliageActor || !LoadedFarProxyActor)
+                            {
+                                SetupSummary += TEXT(
+                                    "Exact-camera far-proxy setup could not resolve source and proxy actors.\n");
+                                return false;
+                            }
+                            SourceFoliageActor->SetActorHiddenInGame(true);
+                            LoadedFarProxyActor->SetActorHiddenInGame(false);
+                            return true;
+                        });
+                }
+                bool bCaptureNaniteWholeTree = !bProceduralCypressPveCandidate;
+                if (bProceduralCypressPveCandidate)
+                {
+                    bCaptureNaniteWholeTree = CapturePreviewImageForSpec(
+                        ReviewSpec,
+                        LocalCaptureRoot,
+                        LocalVisualCapturePaths[5],
+                        TEXT("RaftSim_PveRiverDistance60m"),
+                        TEXT("nanite_whole_tree_60m"),
+                        TEXT("PVE merged Nanite whole tree at the exact source 60 m camera"),
+                        false,
+                        LocalVisualSummary,
+                        [](UWorld* LoadedWorld, ACameraActor*, FString& SetupSummary)
+                        {
+                            AActor* SourceTrunkActor = nullptr;
+                            AActor* SourceFoliageActor = nullptr;
+                            AActor* LoadedNaniteWholeTreeActor = nullptr;
+                            for (TActorIterator<AActor> It(LoadedWorld); It; ++It)
+                            {
+                                AActor* Actor = *It;
+                                if (!Actor)
+                                {
+                                    continue;
+                                }
+                                if (Actor->GetActorLabel() == TEXT("RaftSim_PveReview_Trunk"))
+                                {
+                                    SourceTrunkActor = Actor;
+                                }
+                                else if (Actor->GetActorLabel() == TEXT("RaftSim_PveReview_Foliage"))
+                                {
+                                    SourceFoliageActor = Actor;
+                                }
+                                else if (Actor->GetActorLabel() ==
+                                         TEXT("RaftSim_PveCypressNaniteWholeTree"))
+                                {
+                                    LoadedNaniteWholeTreeActor = Actor;
+                                }
+                            }
+                            if (!SourceTrunkActor || !SourceFoliageActor ||
+                                !LoadedNaniteWholeTreeActor)
+                            {
+                                SetupSummary += TEXT(
+                                    "Exact-camera Nanite whole-tree setup could not resolve source and candidate actors.\n");
+                                return false;
+                            }
+                            SourceTrunkActor->SetActorHiddenInGame(true);
+                            SourceFoliageActor->SetActorHiddenInGame(true);
+                            LoadedNaniteWholeTreeActor->SetActorHiddenInGame(false);
+                            return true;
+                        });
+                }
+                bool bCaptureMultiViewAtlas = !bProceduralCypressPveCandidate;
+                if (bProceduralCypressPveCandidate)
+                {
+                    bCaptureMultiViewAtlas = CapturePreviewImageForSpec(
+                        ReviewSpec,
+                        LocalCaptureRoot,
+                        LocalMultiViewAtlasCapturePath,
+                        TEXT("RaftSim_PveRiverDistance60m"),
+                        TEXT("multiview_atlas_hlod_60m"),
+                        TEXT("PVE project-owned multi-view atlas HLOD at the exact source 60 m camera"),
+                        false,
+                        LocalVisualSummary,
+                        [](UWorld* LoadedWorld, ACameraActor*, FString& SetupSummary)
+                        {
+                            AActor* SourceTrunkActor = nullptr;
+                            AActor* SourceFoliageActor = nullptr;
+                            AActor* LoadedAtlasActor = nullptr;
+                            for (TActorIterator<AActor> It(LoadedWorld); It; ++It)
+                            {
+                                AActor* Actor = *It;
+                                if (!Actor)
+                                {
+                                    continue;
+                                }
+                                const FString Label = Actor->GetActorLabel();
+                                if (Label == TEXT("RaftSim_PveReview_Trunk"))
+                                {
+                                    SourceTrunkActor = Actor;
+                                }
+                                else if (Label == TEXT("RaftSim_PveReview_Foliage"))
+                                {
+                                    SourceFoliageActor = Actor;
+                                }
+                                else if (Label == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+                                {
+                                    LoadedAtlasActor = Actor;
+                                }
+                                else if (Label == TEXT("RaftSim_PveCypressVolumetricFarProxy") ||
+                                         Label == TEXT("RaftSim_PveCypressNaniteWholeTree"))
+                                {
+                                    Actor->SetActorHiddenInGame(true);
+                                }
+                            }
+                            if (!SourceTrunkActor || !SourceFoliageActor || !LoadedAtlasActor)
+                            {
+                                SetupSummary += TEXT(
+                                    "Exact-camera multi-view atlas setup could not resolve source and HLOD actors.\n");
+                                return false;
+                            }
+                            SourceTrunkActor->SetActorHiddenInGame(true);
+                            SourceFoliageActor->SetActorHiddenInGame(true);
+                            LoadedAtlasActor->SetActorHiddenInGame(false);
+                            return true;
+                        });
+                }
+                bLocalFarProxyReviewCaptured = bCaptureFarProxy;
+                bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
+                bLocalMultiViewAtlasReviewCaptured = bCaptureMultiViewAtlas;
+                bLocalVisualReviewCaptured =
+                    bCaptureA && bCaptureB && bCaptureDistance && bCaptureSpray &&
+                    bCaptureFarProxy && bCaptureNaniteWholeTree &&
+                    bCaptureMultiViewAtlas;
             }
         }
     }
+    const FString LocalMultiViewAtlasJson = FString::Printf(
+        TEXT("{\n")
+        TEXT("    \"status\": \"%s\",\n")
+        TEXT("    \"manifest\": \"%s\",\n")
+        TEXT("    \"view_contract\": {\"azimuth_count\": 8, \"elevation_count\": 2, \"view_count\": %d, \"tile_resolution\": %d, \"atlas_resolution\": %d},\n")
+        TEXT("    \"orthographic_width_cm\": %.6f,\n")
+        TEXT("    \"coverage_fraction_range\": [%.9f, %.9f],\n")
+        TEXT("    \"opacity_source\": \"%s\",\n")
+        TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\"],\n")
+        TEXT("    \"material_asset\": \"%s\",\n")
+        TEXT("    \"runtime_representation\": \"camera-facing plane with material-selected nearest azimuth/elevation frame and masked unlit baked color; world normal/depth retained for later relight/parallax work\",\n")
+        TEXT("    \"exact_source_camera_60m_capture\": \"%s\",\n")
+        TEXT("    \"exact_source_camera_60m_capture_produced\": %s,\n")
+        TEXT("    \"human_visual_acceptance\": \"representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open\",\n")
+        TEXT("    \"depth_usage\": \"captured and reserved for later parallax/depth refinement; not sampled by this first HLOD material\",\n")
+        TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
+        TEXT("  }"),
+        LocalMultiViewAtlas.IsReady() && bLocalMultiViewAtlasReviewCaptured
+            ? TEXT("generated_and_exact_camera_representation_accepted_visual_promotion_rejected")
+            : TEXT("generation_validation_or_exact_camera_capture_failed"),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath),
+        LocalMultiViewAtlas.ViewCount,
+        LocalMultiViewAtlas.TileResolution,
+        LocalMultiViewAtlas.AtlasResolution,
+        LocalMultiViewAtlas.OrthoWidthCm,
+        LocalMultiViewAtlas.MinimumCoverage,
+        LocalMultiViewAtlas.MaximumCoverage,
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.OpacitySource),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.BaseColorRelativePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.NormalRelativePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.OpacityRelativePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.DepthRelativePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.MaterialAssetPath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlasCapturePath),
+        bLocalMultiViewAtlasReviewCaptured ? TEXT("true") : TEXT("false"));
     const FString LocalVisualReviewJson = FString::Printf(
         TEXT("{\n")
         TEXT("    \"status\": \"%s\",\n")
@@ -27974,24 +33159,52 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"map_asset\": \"%s\",\n")
         TEXT("    \"foliage_mesh_count\": %d,\n")
         TEXT("    \"foliage_instance_count\": %d,\n")
-        TEXT("    \"captures\": [\"%s\", \"%s\", \"%s\"]\n")
+        TEXT("    \"captures\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
+        TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
-            ? TEXT("isolated_three_view_capture_ready_for_human_material_review")
+            ? TEXT("isolated_source_views_plus_exact_camera_far_proxy_nanite_and_multi_view_atlas_comparisons_ready_for_human_review")
             : TEXT("isolated_visual_capture_failed"),
         *EscapeRaftSimJsonString(LocalVisualMapPackagePath),
         LocalVisualFoliageMeshCount,
         LocalVisualFoliageInstanceCount,
         *EscapeRaftSimJsonString(LocalVisualCapturePaths[0]),
         *EscapeRaftSimJsonString(LocalVisualCapturePaths[1]),
-        *EscapeRaftSimJsonString(LocalVisualCapturePaths[2]));
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[2]),
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[3]),
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[4]),
+        *EscapeRaftSimJsonString(LocalVisualCapturePaths[5]),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlasCapturePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
-    const FString ReportRelativePath = FString::Printf(
+    const FString BeechReportRelativePath = FString::Printf(
         TEXT("docs/environment-captures/photoreal_river_previews/"
              "pve_futaleufu_european_beech_%s_structural_report.json"),
         *ProceduralBeechVariant.ToLower());
+    const FString CypressPaletteReportSuffix = bCompactConnectedCypressTwigHierarchyPalette
+        ? TEXT("_compact_connected_twig_hierarchy")
+        : (bConnectedCypressTwigHierarchyPalette
+        ? TEXT("_connected_twig_hierarchy")
+        : (bCypressTwigHierarchyPalette
+               ? TEXT("_twig_hierarchy")
+               : (bCurvedCypressShellPalette ? TEXT("_curved_shells") : TEXT(""))));
+    const FString CypressCandidateVersion = bCompactConnectedCypressTwigHierarchyPalette
+        ? TEXT("v18_2")
+        : (bConnectedCypressTwigHierarchyPalette
+        ? TEXT("v18_1")
+        : (bCypressTwigHierarchyPalette
+               ? TEXT("v18")
+               : TEXT("v17")));
+    const FString ReportRelativePath = bProceduralCypressPveCandidate
+        ? FString::Printf(
+              TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+                   "futaleufu_cordillera_cypress_%s_pve_%s%s_report.json"),
+              *CypressCandidateVersion,
+              *ProceduralBeechVariant.ToLower(),
+              *CypressPaletteReportSuffix)
+        : BeechReportRelativePath;
     const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
-    const FString Report = FString::Printf(
+    const FString BeechReport = FString::Printf(
         TEXT("{\n")
         TEXT("  \"schema\": \"raftsim.unreal.pve_growth_candidate_structural_review.v1\",\n")
         TEXT("  \"river_id\": \"futaleufu_terminator\",\n")
@@ -28054,30 +33267,244 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalTrunkBoundsSize.Y,
         LocalTrunkBoundsSize.Z,
         *LocalVisualReviewJson);
+    const FString CypressReport = bProceduralCypressPveCandidate
+        ? FString::Printf(
+              TEXT("{\n")
+              TEXT("  \"schema\": \"raftsim.unreal.futaleufu_cordillera_cypress_pve_review.v2\",\n")
+              TEXT("  \"river_id\": \"futaleufu_terminator\",\n")
+              TEXT("  \"candidate\": \"%s\",\n")
+              TEXT("  \"variant\": \"%s\",\n")
+              TEXT("  \"display_name\": \"%s\",\n")
+              TEXT("  \"life_stage\": \"%s\",\n")
+              TEXT("  \"status\": \"generated_local_isolated_review_not_visual_or_production_promoted\",\n")
+              TEXT("  \"engine_version\": \"5.8\",\n")
+              TEXT("  \"source_graph\": \"RaftSim-created transient UProceduralVegetationGraph\",\n")
+              TEXT("  \"palette_mode\": \"%s\",\n")
+              TEXT("  \"rendering_setting_donors\": [\"installed UE 5.8 conifer PVMeshBuilderSettings\", \"installed UE 5.8 conifer PVPlantProfileLoaderSettings\"],\n")
+              TEXT("  \"workflow\": {\n")
+              TEXT("    \"tree_level_authority\": \"project-authored PVE grower, grafting, gravity, bone reduction, and hormone-driven foliage topology\",\n")
+              TEXT("    \"project_owned_palette\": %s,\n")
+              TEXT("    \"whole_tree_scale\": %.6f,\n")
+              TEXT("    \"authored_live_twig_scale\": %.6f,\n")
+              TEXT("    \"effective_live_twig_scale\": %.6f,\n")
+              TEXT("    \"branch_scale\": %.6f,\n")
+              TEXT("    \"primary_axil_elevation_degrees\": %.6f,\n")
+              TEXT("    \"axillary_parent_growth\": %.6f,\n")
+              TEXT("    \"axillary_child_growth\": %.6f,\n")
+              TEXT("    \"authored_graft_density\": %d,\n")
+              TEXT("    \"effective_graft_density\": %d,\n")
+              TEXT("    \"graft_relative_start\": %.6f,\n")
+              TEXT("    \"senescence_enabled\": %s,\n")
+              TEXT("    \"apical_random_angle_degrees\": %.6f,\n")
+              TEXT("    \"axillary_random_angle_degrees\": %.6f,\n")
+              TEXT("    \"effective_gravity_strength\": %.6f,\n")
+              TEXT("    \"effective_gravity_angle_correction\": %.6f,\n")
+              TEXT("    \"main_growth_cycles\": 44,\n")
+              TEXT("    \"branchlet_growth_cycles\": 6,\n")
+              TEXT("    \"maximum_generation\": 2,\n")
+              TEXT("    \"main_target_length_m\": 22.5,\n")
+              TEXT("    \"branchlet_target_length_m\": 1.45,\n")
+              TEXT("    \"mesher_minimum_radius_m\": 0.0008,\n")
+              TEXT("    \"trunk_and_branch_bifurcation_enabled\": false,\n")
+              TEXT("    \"sample_graph_topology_duplicated\": false,\n")
+              TEXT("    \"manual_edit_or_export_nodes_present\": false,\n")
+              TEXT("    \"live_foliage_shadows_enabled_in_isolated_review\": false,\n")
+              TEXT("    \"live_foliage_material_defaults\": {\"base_color_scale\": 2.10, \"ao_influence\": 0.08, \"opacity_clip\": 0.42, \"diagnostic_emissive\": 0.0},\n")
+              TEXT("    \"live_foliage_distribution\": {\"ethylene_threshold\": 0.72, \"instance_spacing\": 0.055, \"spacing_ramp_effect\": 0.45},\n")
+              TEXT("    \"graft_angle_jitter_degrees\": [-8.0, 8.0],\n")
+              TEXT("    \"graft_phyllotaxy_additional_angle_degrees\": 17.5,\n")
+              TEXT("    \"upper_crown_spray_taper\": {\"start_normalized_height\": 0.86, \"scale_range\": [0.92, 0.68]},\n")
+              TEXT("    \"seed\": %d,\n")
+              TEXT("    \"epic_sample_content_copied_into_repository\": false,\n")
+              TEXT("    \"local_generated_assets_git_ignored\": true\n")
+              TEXT("  },\n")
+              TEXT("  \"generated_collection\": {\n")
+              TEXT("    \"transform_count\": %d,\n")
+              TEXT("    \"vertex_count\": %d,\n")
+              TEXT("    \"triangle_count\": %d,\n")
+              TEXT("    \"foliage_mesh_count\": %d,\n")
+              TEXT("    \"foliage_instance_count\": %d,\n")
+              TEXT("    \"foliage_meshes\": [%s]\n")
+              TEXT("  },\n")
+              TEXT("  \"local_review_export\": {\n")
+              TEXT("    \"status\": \"%s\",\n")
+              TEXT("    \"trunk_asset\": \"%s\",\n")
+              TEXT("    \"foliage_template\": \"%s\",\n")
+              TEXT("    \"nanite_woody_enabled\": %s,\n")
+              TEXT("    \"nanite_shape_preservation\": \"none\",\n")
+              TEXT("    \"bounds_size_cm\": [%.6f, %.6f, %.6f]\n")
+              TEXT("  },\n")
+              TEXT("  \"local_impostor_source\": {\n")
+              TEXT("    \"status\": \"%s\",\n")
+              TEXT("    \"asset\": \"%s\",\n")
+              TEXT("    \"source_assembly\": \"V17 trunk plus all foliage instances merged through Geometry Script\",\n")
+              TEXT("    \"vertex_count_lod0\": %d,\n")
+              TEXT("    \"triangle_count_lod0\": %d,\n")
+              TEXT("    \"material_slot_count\": %d,\n")
+              TEXT("    \"bounds_size_cm\": [%.6f, %.6f, %.6f],\n")
+              TEXT("    \"nanite_enabled\": %s,\n")
+              TEXT("    \"nanite_shape_preservation\": \"none\",\n")
+              TEXT("    \"preserve_area_evaluation\": \"rejected; exact 60 m capture over-expanded merged masked spray boundaries into a distorted dark crown mass\",\n")
+              TEXT("    \"exact_camera_60m_capture_produced\": %s,\n")
+              TEXT("    \"human_visual_acceptance\": \"rejected; Nanite shape preservation None collapses masked sprays into a bare trunk with detached cards at the exact 60 m camera\",\n")
+              TEXT("    \"visual_role\": \"merged whole-tree near/mid representation candidate and source for any later HLOD or atlas bake\",\n")
+              TEXT("    \"next_distance_representation\": \"project-owned multi-view atlas/HLOD baker or a separately rights-reviewed distance-stable native asset\",\n")
+              TEXT("    \"git_policy\": \"local_generated_source_is_ignored\",\n")
+              TEXT("    \"bake_contract\": {\"plugin\": \"ImpostorBaker\", \"type\": \"upper_hemisphere\", \"frames_xy\": 12, \"resolution\": 2048, \"capture\": \"GBuffer\", \"required_maps\": [\"base_color\", \"normal\", \"opacity_mask\", \"depth\"]}\n")
+              TEXT("  },\n")
+              TEXT("  \"local_far_proxy\": {\n")
+              TEXT("    \"status\": \"%s\",\n")
+              TEXT("    \"asset\": \"%s\",\n")
+              TEXT("    \"representation\": \"closed three-wedge scale-spray fans aligned to every fourth authored PVE foliage transform; each fan has one axial and two lateral sprays and is paired with the original woody trunk\",\n")
+              TEXT("    \"source_foliage_count\": %d,\n")
+              TEXT("    \"sample_stride\": 4,\n")
+              TEXT("    \"scale_spray_wedge_count\": %d,\n")
+              TEXT("    \"material_response\": \"opaque DefaultLit vertex color; roughness 0.94, specular 0.035, ambient occlusion 0.82, no emissive\",\n")
+              TEXT("    \"vertex_count_lod0\": %d,\n")
+              TEXT("    \"triangle_count_lod0\": %d,\n")
+              TEXT("    \"bounds_size_cm\": [%.6f, %.6f, %.6f],\n")
+              TEXT("    \"nanite_enabled\": false,\n")
+              TEXT("    \"planar_cards_present\": false,\n")
+              TEXT("    \"exact_source_camera_60m_capture_produced\": %s,\n")
+              TEXT("    \"human_visual_acceptance\": \"rejected; exact 60 m capture reads as detached geometric shards and cannot be promoted\",\n")
+              TEXT("    \"built_in_impostor_baker_evaluation\": \"rejected for this merged source after both 12x12/2048 and 8x8/1024 profiles produced zero output assets at 600 seconds and the Epic utility widget crashed in DeleteLoadedAsset during shutdown\",\n")
+              TEXT("    \"git_policy\": \"local generated proxy and comparison capture are ignored\"\n")
+              TEXT("  },\n")
+              TEXT("  \"local_multi_view_atlas_hlod\": %s,\n")
+              TEXT("  \"local_visual_review\": %s,\n")
+              TEXT("  \"rights_boundary\": \"only installed-engine mesher and plant-profile settings are copied into the transient local graph; no Epic graph topology, preset, twig geometry, materials, textures, or generated derivative is committed\",\n")
+              TEXT("  \"species_boundary\": \"project-owned Austrocedrus-oriented topology and palette; exact-camera card-edge, all-form, ecology, temporal, and runtime gates remain required\",\n")
+              TEXT("  \"promotion_gates\": [\"all_eight_v17_forms_generated\", \"V13_exact_camera_visual_review\", \"branch_spray_closeup\", \"card_edges_not_visible_at_60m\", \"V10_far_authority\", \"packaged_desktop_and_target_vr_profile\", \"ecology_and_rights_review\"]\n")
+              TEXT("}\n"),
+              bCompactConnectedCypressTwigHierarchyPalette
+                  ? TEXT("ue_5_8_pve_cordillera_cypress_v18_2_compact_connected_twig_hierarchy")
+                  : (bConnectedCypressTwigHierarchyPalette
+                  ? TEXT("ue_5_8_pve_cordillera_cypress_v18_1_connected_twig_hierarchy")
+                  : (bCypressTwigHierarchyPalette
+                  ? TEXT("ue_5_8_pve_cordillera_cypress_v18_twig_hierarchy")
+                  : TEXT("ue_5_8_pve_cordillera_cypress_v17_project_graph"))),
+              *EscapeRaftSimJsonString(CypressSpec->Id),
+              *EscapeRaftSimJsonString(CypressSpec->DisplayName),
+              *EscapeRaftSimJsonString(CypressSpec->LifeStage),
+              *EscapeRaftSimJsonString(ProceduralCypressPaletteMode),
+              bCompactConnectedCypressTwigHierarchyPalette
+                  ? TEXT("[\"V18.2 compact connected two-material twig hierarchy live twig A\", \"V18.2 compact connected two-material twig hierarchy live twig B\", \"V18.2 compact connected two-material twig hierarchy live twig C\", \"V16 dead twig\"]")
+                  : (bConnectedCypressTwigHierarchyPalette
+                  ? TEXT("[\"V18.1 connected two-material twig hierarchy live twig A\", \"V18.1 connected two-material twig hierarchy live twig B\", \"V18.1 connected two-material twig hierarchy live twig C\", \"V16 dead twig\"]")
+                  : (bCypressTwigHierarchyPalette
+                  ? TEXT("[\"V18 twig-hierarchy live twig A\", \"V18 twig-hierarchy live twig B\", \"V18 twig-hierarchy live twig C\", \"V16 dead twig\"]")
+                  : (bCurvedCypressShellPalette
+                         ? TEXT("[\"V17 curved-shell live twig A\", \"V17 curved-shell live twig B\", \"V17 curved-shell live twig C\", \"V16 dead twig\"]")
+                         : TEXT("[\"V16 live twig A\", \"V16 live twig B\", \"V16 live twig C\", \"V16 dead twig\"]")))),
+              CypressSpec->WholeTreeScale,
+              CypressSpec->LiveTwigScale,
+              CypressSpec->LiveTwigScale * 1.50f,
+              CypressSpec->BranchScale,
+              CypressSpec->PrimaryAxilAngle,
+              CypressSpec->AxillaryParentGrowth,
+              CypressSpec->AxillaryChildGrowth,
+              CypressSpec->GraftDensity,
+              FMath::Clamp(CypressSpec->GraftDensity, 18, 36),
+              CypressSpec->GraftRelativeStart,
+              CypressSpec->bAllowSenescence ? TEXT("true") : TEXT("false"),
+              CypressSpec->ApicalRandomAngle,
+              CypressSpec->AxillaryRandomAngle,
+              CypressSpec->GravityStrength * (CypressSpec->bAllowSenescence ? 0.55f : 0.05f),
+              CypressSpec->bAllowSenescence
+                  ? FMath::Max(CypressSpec->GravityAngleCorrection, 0.52f)
+                  : FMath::Max(CypressSpec->GravityAngleCorrection, 0.92f),
+              CypressSpec->Seed,
+              TransformCount,
+              VertexCount,
+              TriangleCount,
+              FoliageMeshCount,
+              FoliageInstanceCount,
+              *FoliageMeshesJson,
+              bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved
+                  ? TEXT("nanite_woody_asset_and_project_palette_template_generated_locally")
+                  : TEXT("local_export_failed"),
+              *EscapeRaftSimJsonString(LocalTrunkAssetPath),
+              *EscapeRaftSimJsonString(LocalTemplateReportPath),
+              bLocalTrunkNaniteEnabled ? TEXT("true") : TEXT("false"),
+              LocalTrunkBoundsSize.X,
+              LocalTrunkBoundsSize.Y,
+              LocalTrunkBoundsSize.Z,
+              bLocalImpostorSourceValidated
+                  ? TEXT("merged_source_validated_ready_for_upper_hemisphere_bake")
+                  : TEXT("merged_source_generation_or_validation_failed"),
+              *EscapeRaftSimJsonString(LocalImpostorSourceAssetPath),
+              LocalImpostorSourceVertexCount,
+              LocalImpostorSourceTriangleCount,
+              LocalImpostorSourceMaterialSlotCount,
+              LocalImpostorSourceBoundsSize.X,
+              LocalImpostorSourceBoundsSize.Y,
+              LocalImpostorSourceBoundsSize.Z,
+              bLocalImpostorSourceNaniteEnabled ? TEXT("true") : TEXT("false"),
+              bLocalNaniteWholeTreeReviewCaptured ? TEXT("true") : TEXT("false"),
+              bLocalFarProxyValidated && bLocalFarProxyReviewCaptured
+                  ? TEXT("structurally_valid_exact_camera_comparison_produced_visual_acceptance_pending")
+                  : TEXT("generation_validation_or_exact_camera_capture_failed"),
+              *EscapeRaftSimJsonString(LocalFarProxyAssetPath),
+              LocalFarProxySourceFoliageCount,
+              LocalFarProxyClusterCount,
+              LocalFarProxyVertexCount,
+              LocalFarProxyTriangleCount,
+              LocalFarProxyBoundsSize.X,
+              LocalFarProxyBoundsSize.Y,
+              LocalFarProxyBoundsSize.Z,
+              bLocalFarProxyReviewCaptured ? TEXT("true") : TEXT("false"),
+              *LocalMultiViewAtlasJson,
+              *LocalVisualReviewJson)
+        : FString();
+    const FString& Report = bProceduralCypressPveCandidate ? CypressReport : BeechReport;
     const bool bSaved = FFileHelper::SaveStringToFile(Report, *ReportPath);
+    const bool bRequiredImpostorSourceValid =
+        !bProceduralCypressPveCandidate ||
+        (bLocalImpostorSourceValidated && bLocalNaniteWholeTreeReviewCaptured);
+    const bool bRequiredFarProxyValid =
+        !bProceduralCypressPveCandidate ||
+        (bLocalFarProxyValidated && bLocalFarProxyReviewCaptured);
+    const bool bRequiredMultiViewAtlasValid =
+        !bProceduralCypressPveCandidate ||
+        (LocalMultiViewAtlas.IsReady() && bLocalMultiViewAtlasReviewCaptured);
     FinishProceduralBeechCandidate(
-        bSaved && bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved,
+        bSaved && bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved &&
+            bRequiredImpostorSourceValid && bRequiredFarProxyValid &&
+            bRequiredMultiViewAtlasValid,
         FString::Printf(
-            TEXT("%s %s: %d vertices, %d triangles, %d foliage meshes, %d foliage instances -> %s"),
+            TEXT("%s %s: %d vertices, %d triangles, %d foliage meshes, %d foliage instances, impostor source %s, volumetric far proxy %s -> %s"),
             bSaved ? TEXT("Recorded") : TEXT("Failed to record"),
             *ProceduralBeechVariant,
             VertexCount,
             TriangleCount,
             FoliageMeshCount,
             FoliageInstanceCount,
+            bRequiredImpostorSourceValid ? TEXT("valid") : TEXT("invalid"),
+            bRequiredFarProxyValid ? TEXT("valid") : TEXT("invalid"),
             *ReportRelativePath));
     return false;
 }
 
 void FRaftSimEditorModule::FinishProceduralBeechCandidate(bool bSuccess, const FString& Summary)
 {
+    const bool bWasCypressCandidate = bProceduralCypressPveCandidate;
     if (bSuccess)
     {
-        UE_LOG(LogRaftSimEditor, Display, TEXT("PVE beech candidate evaluation finished: %s"), *Summary);
+        UE_LOG(
+            LogRaftSimEditor,
+            Display,
+            TEXT("PVE %s candidate evaluation finished: %s"),
+            bWasCypressCandidate ? TEXT("cordilleran-cypress") : TEXT("beech"),
+            *Summary);
     }
     else
     {
-        UE_LOG(LogRaftSimEditor, Warning, TEXT("PVE beech candidate evaluation stopped: %s"), *Summary);
+        UE_LOG(
+            LogRaftSimEditor,
+            Warning,
+            TEXT("PVE %s candidate evaluation stopped: %s"),
+            bWasCypressCandidate ? TEXT("cordilleran-cypress") : TEXT("beech"),
+            *Summary);
     }
     ProceduralBeechOutputCollection.Reset();
     if (ProceduralBeechExecutionSource)
@@ -28096,10 +33523,16 @@ void FRaftSimEditorModule::FinishProceduralBeechCandidate(bool bSuccess, const F
         ProceduralBeechGrowthAsset->RemoveFromRoot();
         ProceduralBeechGrowthAsset = nullptr;
     }
+    ProceduralCypressPaletteMode.Reset();
+    bProceduralCypressPveCandidate = false;
     if (!IsEngineExitRequested() &&
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterPveGeneration")))
     {
-        FPlatformMisc::RequestExit(!bSuccess, TEXT("RaftSim PVE beech candidate evaluation finished"));
+        FPlatformMisc::RequestExit(
+            !bSuccess,
+            bWasCypressCandidate
+                ? TEXT("RaftSim PVE cordilleran-cypress candidate evaluation finished")
+                : TEXT("RaftSim PVE beech candidate evaluation finished"));
     }
 }
 
@@ -28164,9 +33597,49 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
         bSucceeded &= CaptureZambeziBatokaBasaltCorridorComparison(Summary);
     }
 
+    if (bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup)
+    {
+        bSucceeded &= CaptureZambeziBatokaTerrainIntegratedComparison(Summary);
+    }
+
+    if (bCaptureZambeziBatokaWorldAlignedTerrainComparisonOnStartup)
+    {
+        bSucceeded &= CaptureZambeziBatokaWorldAlignedTerrainComparison(Summary);
+    }
+
+    if (bCaptureZambeziBatokaVisualMorphologyComparisonOnStartup)
+    {
+        bSucceeded &= CaptureZambeziBatokaVisualMorphologyComparison(Summary);
+    }
+
+    if (bCaptureFutaleufuDenseCanopyComparisonOnStartup)
+    {
+        bSucceeded &= CaptureFutaleufuDenseCanopyComparison(Summary);
+    }
+
+    if (bCaptureFutaleufuAreaSampledCanopyComparisonOnStartup)
+    {
+        bSucceeded &= CaptureFutaleufuAreaSampledCanopyComparison(Summary);
+    }
+
+    if (bCaptureFutaleufuWorldStableCanopyComparisonOnStartup)
+    {
+        bSucceeded &= CaptureFutaleufuWorldStableCanopyComparison(Summary);
+    }
+
     if (bCreateFutaleufuCordilleraCypressFamilyOnStartup)
     {
         bSucceeded &= CreateFutaleufuCordilleraCypressFamily(Summary);
+    }
+
+    if (bCreateFutaleufuCordilleraCypressOpaqueNearReviewOnStartup)
+    {
+        bSucceeded &= CreateFutaleufuCordilleraCypressOpaqueNearReview(Summary);
+    }
+
+    if (bCreateFutaleufuCordilleraCypressVolumetricNearReviewOnStartup)
+    {
+        bSucceeded &= CreateFutaleufuCordilleraCypressVolumetricNearReview(Summary);
     }
 
     if (bCreateFutaleufuCordilleraCypressDonorReviewOnStartup)
@@ -30446,6 +35919,754 @@ bool FRaftSimEditorModule::CaptureZambeziBatokaBasaltCorridorComparison(
     return bAllCaptured && bReportSaved;
 }
 
+struct FZambeziBatokaVisualMorphologyStats
+{
+    int32 VisualTileCount = 0;
+    int64 TotalVertexCount = 0;
+    int64 ModifiedVertexCount = 0;
+    int64 ProtectedRiverCorridorVertexCount = 0;
+    int64 RejectedLowSlopeVertexCount = 0;
+    double AbsoluteOffsetSumCm = 0.0;
+    float MinimumOffsetCm = TNumericLimits<float>::Max();
+    float MaximumOffsetCm = TNumericLimits<float>::Lowest();
+};
+
+bool ApplyZambeziBatokaVisualTerrainTreatment(
+    UWorld* World,
+    UMaterialInterface* TerrainReviewMaterial,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    bool bApplyVisualMorphology,
+    FZambeziBatokaVisualMorphologyStats* OutStats,
+    FString& OutSummary)
+{
+    if (!World || !TerrainReviewMaterial)
+    {
+        return false;
+    }
+
+    FZambeziBatokaVisualMorphologyStats LocalStats;
+    TArray<FVector2D> CenterlineWorldPoints;
+    if (bApplyVisualMorphology)
+    {
+        TArray<FRaftSimLandscapeCandidateCenterlinePoint> Centerline;
+        if (!LoadLandscapeCandidateLocalCenterline(Candidate, Centerline, OutSummary))
+        {
+            return false;
+        }
+        for (int32 Index = 0; Index < Centerline.Num(); Index += 2)
+        {
+            const float Progress = Centerline.Num() > 1
+                ? static_cast<float>(Index) / static_cast<float>(Centerline.Num() - 1)
+                : 0.0f;
+            CenterlineWorldPoints.Add(
+                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, Progress));
+        }
+        if (CenterlineWorldPoints.IsEmpty() ||
+            !CenterlineWorldPoints.Last().Equals(
+                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f),
+                1.0f))
+        {
+            CenterlineWorldPoints.Add(
+                SampleLandscapeCandidateCenterlineWorld(Candidate, Centerline, 1.0f));
+        }
+    }
+
+    static const FString DenseTerrainActorPrefix =
+        TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_");
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor || !Actor->GetActorLabel().StartsWith(DenseTerrainActorPrefix))
+        {
+            continue;
+        }
+        UProceduralMeshComponent* MeshComponent =
+            Actor->FindComponentByClass<UProceduralMeshComponent>();
+        if (!MeshComponent)
+        {
+            continue;
+        }
+        MeshComponent->SetMaterial(0, TerrainReviewMaterial);
+        ++LocalStats.VisualTileCount;
+        if (!bApplyVisualMorphology)
+        {
+            continue;
+        }
+
+        FProcMeshSection* Section = MeshComponent->GetProcMeshSection(0);
+        if (!Section || Section->ProcVertexBuffer.IsEmpty() ||
+            Section->ProcIndexBuffer.IsEmpty() || Section->bEnableCollision)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Batoka V13 refused to condition invalid or collision-enabled visual tile %s.\n"),
+                *Actor->GetActorLabel());
+            return false;
+        }
+
+        TArray<FVector> Vertices;
+        TArray<int32> Triangles;
+        Vertices.Reserve(Section->ProcVertexBuffer.Num());
+        Triangles.Reserve(Section->ProcIndexBuffer.Num());
+        for (const FProcMeshVertex& Vertex : Section->ProcVertexBuffer)
+        {
+            Vertices.Add(FVector(Vertex.Position));
+        }
+        for (const uint32 Index : Section->ProcIndexBuffer)
+        {
+            Triangles.Add(static_cast<int32>(Index));
+        }
+        const TArray<FVector> SourceNormals = ComputePreviewMeshNormals(Vertices, Triangles);
+        const FTransform ActorTransform = Actor->GetActorTransform();
+        for (int32 VertexIndex = 0; VertexIndex < Vertices.Num(); ++VertexIndex)
+        {
+            ++LocalStats.TotalVertexCount;
+            const FVector WorldPosition = ActorTransform.TransformPosition(Vertices[VertexIndex]);
+            float MinimumCenterlineDistanceSquared = TNumericLimits<float>::Max();
+            for (const FVector2D& CenterlinePoint : CenterlineWorldPoints)
+            {
+                MinimumCenterlineDistanceSquared = FMath::Min(
+                    MinimumCenterlineDistanceSquared,
+                    FVector2D::DistSquared(
+                        FVector2D(WorldPosition.X, WorldPosition.Y),
+                        CenterlinePoint));
+            }
+            const float CenterlineDistanceCm = FMath::Sqrt(MinimumCenterlineDistanceSquared);
+            const float RiverProtectionFade = SmoothPreviewStep(
+                22000.0f,
+                65000.0f,
+                CenterlineDistanceCm);
+            if (RiverProtectionFade <= KINDA_SMALL_NUMBER)
+            {
+                ++LocalStats.ProtectedRiverCorridorVertexCount;
+                continue;
+            }
+
+            const float Steepness = 1.0f - FMath::Clamp(
+                SourceNormals[VertexIndex].Z,
+                0.0f,
+                1.0f);
+            const float ScarpMask = SmoothPreviewStep(0.12f, 0.62f, Steepness);
+            const float TalusMask =
+                SmoothPreviewStep(0.08f, 0.30f, Steepness) *
+                (1.0f - SmoothPreviewStep(0.55f, 0.78f, Steepness));
+            if (ScarpMask <= KINDA_SMALL_NUMBER && TalusMask <= KINDA_SMALL_NUMBER)
+            {
+                ++LocalStats.RejectedLowSlopeVertexCount;
+                continue;
+            }
+
+            const FVector2D BroadCoordinates(
+                WorldPosition.X * 0.000018f,
+                WorldPosition.Y * 0.000018f);
+            const float BroadVariation = FMath::PerlinNoise2D(BroadCoordinates);
+            const float LayerHeightCm = 1100.0f + BroadVariation * 260.0f;
+            const float LayerPhaseCm = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000043f + 19.0f,
+                    WorldPosition.Y * 0.000043f - 7.0f)) *
+                360.0f;
+            const float LayerCoordinate =
+                (WorldPosition.Z + LayerPhaseCm) / LayerHeightCm;
+            const float LayerFloor = FMath::FloorToFloat(LayerCoordinate);
+            const float LayerFraction = LayerCoordinate - LayerFloor;
+            const float ConditionedLayerFraction = SmoothPreviewStep(
+                0.28f,
+                0.72f,
+                LayerFraction);
+            const float TerracedWorldZ =
+                (LayerFloor + ConditionedLayerFraction) * LayerHeightCm - LayerPhaseCm;
+            const float TerraceOffsetCm =
+                (TerracedWorldZ - WorldPosition.Z) * 0.82f;
+
+            const float JointNoise = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.000031f - 5.0f,
+                    WorldPosition.Y * 0.000031f + 13.0f));
+            const float PrimaryJointCoordinate =
+                (WorldPosition.X * 0.78f + WorldPosition.Y * 0.62f) / 9200.0f +
+                JointNoise * 0.62f;
+            const float PrimaryJointFraction =
+                PrimaryJointCoordinate - FMath::FloorToFloat(PrimaryJointCoordinate);
+            const float PrimaryJointDistance = FMath::Min(
+                PrimaryJointFraction,
+                1.0f - PrimaryJointFraction);
+            const float PrimaryJointMask =
+                1.0f - SmoothPreviewStep(0.015f, 0.085f, PrimaryJointDistance);
+            const float SecondaryJointCoordinate =
+                (WorldPosition.X * -0.44f + WorldPosition.Y * 0.90f) / 14800.0f -
+                JointNoise * 0.38f;
+            const float SecondaryJointFraction =
+                SecondaryJointCoordinate - FMath::FloorToFloat(SecondaryJointCoordinate);
+            const float SecondaryJointDistance = FMath::Min(
+                SecondaryJointFraction,
+                1.0f - SecondaryJointFraction);
+            const float SecondaryJointMask =
+                1.0f - SmoothPreviewStep(0.01f, 0.055f, SecondaryJointDistance);
+            const float JointRecessCm =
+                -(PrimaryJointMask * 120.0f + SecondaryJointMask * 65.0f);
+
+            const float TalusBroad = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.00012f + 31.0f,
+                    WorldPosition.Y * 0.00012f - 23.0f));
+            const float TalusFine = FMath::PerlinNoise2D(
+                FVector2D(
+                    WorldPosition.X * 0.00038f - 17.0f,
+                    WorldPosition.Y * 0.00038f + 29.0f));
+            const float TalusOffsetCm =
+                (TalusBroad * 92.0f + TalusFine * 46.0f) * TalusMask;
+            const float OffsetCm = FMath::Clamp(
+                RiverProtectionFade *
+                    (ScarpMask * (TerraceOffsetCm + JointRecessCm) + TalusOffsetCm),
+                -450.0f,
+                450.0f);
+            if (FMath::Abs(OffsetCm) <= 0.5f)
+            {
+                continue;
+            }
+
+            const FVector LocalOffset = ActorTransform.InverseTransformVectorNoScale(
+                FVector(0.0f, 0.0f, OffsetCm));
+            Vertices[VertexIndex] += LocalOffset;
+            ++LocalStats.ModifiedVertexCount;
+            LocalStats.AbsoluteOffsetSumCm += FMath::Abs(OffsetCm);
+            LocalStats.MinimumOffsetCm = FMath::Min(LocalStats.MinimumOffsetCm, OffsetCm);
+            LocalStats.MaximumOffsetCm = FMath::Max(LocalStats.MaximumOffsetCm, OffsetCm);
+        }
+
+        const TArray<FVector> ConditionedNormals = ComputePreviewMeshNormals(
+            Vertices,
+            Triangles);
+        MeshComponent->UpdateMeshSection(
+            0,
+            Vertices,
+            ConditionedNormals,
+            TArray<FVector2D>(),
+            TArray<FColor>(),
+            TArray<FProcMeshTangent>());
+    }
+
+    if (OutStats)
+    {
+        *OutStats = LocalStats;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Applied the transient Batoka %s treatment to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
+        bApplyVisualMorphology ? TEXT("V13 morphology plus V12 world-aligned material")
+                               : TEXT("V12 world-aligned material"),
+        LocalStats.VisualTileCount);
+    return LocalStats.VisualTileCount == 4;
+}
+
+bool CaptureZambeziBatokaTerrainComparisonInternal(
+    bool bWorldAligned,
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* ZambeziCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates =
+        GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            ZambeziCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!ZambeziCandidate)
+    {
+        OutSummary += TEXT("The Zambezi physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    UMaterialInterface* TerrainReviewMaterial =
+        LoadOrCreatePhysicalSourceTerrainRenderMaterial(
+            *ZambeziCandidate,
+            true,
+            bWorldAligned);
+    if (!TerrainReviewMaterial)
+    {
+        OutSummary += FString::Printf(
+            TEXT("Could not create the Batoka %s terrain-integrated review material.\n"),
+            bWorldAligned ? TEXT("V12 world-aligned") : TEXT("V11 top-down"));
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString BaselineGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        bWorldAligned
+            ? TEXT("zambezi_batoka_v12_pre_world_aligned_guide_seat_downstream.png")
+            : TEXT("zambezi_batoka_v11_pre_terrain_integrated_guide_seat_downstream.png"));
+    FString BaselineRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        bWorldAligned
+            ? TEXT("zambezi_batoka_v12_pre_world_aligned_river_eye_downstream.png")
+            : TEXT("zambezi_batoka_v11_pre_terrain_integrated_river_eye_downstream.png"));
+    FString ComparisonGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        bWorldAligned
+            ? TEXT("zambezi_batoka_v12_world_aligned_guide_seat_downstream.png")
+            : TEXT("zambezi_batoka_v11_terrain_integrated_guide_seat_downstream.png"));
+    FString ComparisonRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        bWorldAligned
+            ? TEXT("zambezi_batoka_v12_world_aligned_river_eye_downstream.png")
+            : TEXT("zambezi_batoka_v11_terrain_integrated_river_eye_downstream.png"));
+
+    const bool bBaselineGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        bWorldAligned
+            ? TEXT("pre_batoka_v12_world_aligned_guide_seat_downstream")
+            : TEXT("pre_batoka_v11_terrain_integrated_guide_seat_downstream"),
+        TEXT("Zambezi untouched baseline guide-seat terrain-integrated Batoka comparison"),
+        true,
+        OutSummary);
+    const bool bBaselineRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        bWorldAligned
+            ? TEXT("pre_batoka_v12_world_aligned_river_eye_downstream")
+            : TEXT("pre_batoka_v11_terrain_integrated_river_eye_downstream"),
+        TEXT("Zambezi untouched baseline river-eye terrain-integrated Batoka comparison"),
+        true,
+        OutSummary);
+
+    auto MakeWorldSetup = [TerrainReviewMaterial, bWorldAligned](int32& OutOverriddenTileCount)
+    {
+        return [TerrainReviewMaterial, bWorldAligned, &OutOverriddenTileCount](
+                   UWorld* World,
+                   ACameraActor*,
+                   FString& Summary)
+        {
+            if (!World || !TerrainReviewMaterial)
+            {
+                return false;
+            }
+
+            OutOverriddenTileCount = 0;
+            static const FString DenseTerrainActorPrefix =
+                TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_");
+            for (TActorIterator<AActor> It(World); It; ++It)
+            {
+                AActor* Actor = *It;
+                if (!Actor || !Actor->GetActorLabel().StartsWith(DenseTerrainActorPrefix))
+                {
+                    continue;
+                }
+                UProceduralMeshComponent* MeshComponent =
+                    Actor->FindComponentByClass<UProceduralMeshComponent>();
+                if (!MeshComponent)
+                {
+                    continue;
+                }
+                MeshComponent->SetMaterial(0, TerrainReviewMaterial);
+                ++OutOverriddenTileCount;
+            }
+            Summary += FString::Printf(
+                TEXT("Applied the transient Batoka %s material to %d dense visual-terrain tiles; collision and source Landscape were not changed.\n"),
+                bWorldAligned ? TEXT("V12 world-aligned") : TEXT("V11 top-down"),
+                OutOverriddenTileCount);
+            return OutOverriddenTileCount == 4;
+        };
+    };
+
+    int32 GuideOverriddenTileCount = 0;
+    int32 RiverEyeOverriddenTileCount = 0;
+    const bool bComparisonGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        bWorldAligned
+            ? TEXT("batoka_v12_world_aligned_guide_seat_downstream")
+            : TEXT("batoka_v11_terrain_integrated_guide_seat_downstream"),
+        bWorldAligned
+            ? TEXT("Zambezi guide-seat transient world-aligned Batoka V12 comparison")
+            : TEXT("Zambezi guide-seat transient terrain-integrated Batoka V11 comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(GuideOverriddenTileCount));
+    const bool bComparisonRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        bWorldAligned
+            ? TEXT("batoka_v12_world_aligned_river_eye_downstream")
+            : TEXT("batoka_v11_terrain_integrated_river_eye_downstream"),
+        bWorldAligned
+            ? TEXT("Zambezi river-eye transient world-aligned Batoka V12 comparison")
+            : TEXT("Zambezi river-eye transient terrain-integrated Batoka V11 comparison"),
+        true,
+        OutSummary,
+        MakeWorldSetup(RiverEyeOverriddenTileCount));
+    const bool bAllCaptured =
+        bBaselineGuideCaptured && bBaselineRiverEyeCaptured &&
+        bComparisonGuideCaptured && bComparisonRiverEyeCaptured;
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        bWorldAligned
+            ? TEXT("raftsim.unreal.zambezi_batoka_world_aligned_terrain_comparison.v1")
+            : TEXT("raftsim.unreal.zambezi_batoka_terrain_integrated_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("zambezi_batoka_gorge"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? (bWorldAligned
+                   ? TEXT("paired_transient_world_aligned_v12_comparison_captured_pending_human_review")
+                   : TEXT("paired_transient_terrain_integrated_v11_comparison_captured_pending_human_review"))
+            : (bWorldAligned
+                   ? TEXT("one_or_more_world_aligned_v12_comparison_captures_failed")
+                   : TEXT("one_or_more_terrain_integrated_v11_comparison_captures_failed")));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("landscape_height_or_collision_modified"), false);
+    Report->SetBoolField(TEXT("hydrodynamic_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("external_pixels_copied"), true);
+    Report->SetBoolField(TEXT("external_geometry_copied"), false);
+    Report->SetStringField(TEXT("source_map"), ZambeziCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(TEXT("material_asset"), TerrainReviewMaterial->GetPathName());
+    Report->SetStringField(
+        TEXT("target_actor_prefix"),
+        TEXT("RaftSim_PhysicalCorridorDenseSourceTerrainTile_"));
+    Report->SetNumberField(TEXT("expected_visual_tile_count"), 4);
+    Report->SetNumberField(TEXT("guide_overridden_visual_tile_count"), GuideOverriddenTileCount);
+    Report->SetNumberField(TEXT("river_eye_overridden_visual_tile_count"), RiverEyeOverriddenTileCount);
+    Report->SetStringField(
+        TEXT("authority_boundary"),
+        TEXT("transient render-material override on the continuous dense visual-terrain mesh only; saved map, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"));
+
+    TSharedRef<FJsonObject> MaterialParameters = MakeShared<FJsonObject>();
+    MaterialParameters->SetNumberField(TEXT("macro_tile_cm"), 5000.0);
+    MaterialParameters->SetNumberField(TEXT("detail_tile_cm"), 240.0);
+    MaterialParameters->SetNumberField(TEXT("macro_albedo_weight"), 0.56);
+    MaterialParameters->SetNumberField(TEXT("detail_albedo_weight"), 0.16);
+    MaterialParameters->SetNumberField(TEXT("detail_color_scale"), 1.18);
+    MaterialParameters->SetNumberField(TEXT("detail_normal_weight"), 0.42);
+    MaterialParameters->SetNumberField(TEXT("detail_roughness_weight"), 0.28);
+    MaterialParameters->SetNumberField(TEXT("macro_ao_weight"), 0.32);
+    MaterialParameters->SetNumberField(TEXT("rock_slope_start"), 0.10);
+    MaterialParameters->SetNumberField(TEXT("rock_slope_gain"), 3.3);
+    MaterialParameters->SetStringField(
+        TEXT("projection"),
+        bWorldAligned ? TEXT("world_aligned_triplanar") : TEXT("top_down_corridor_uv"));
+    MaterialParameters->SetBoolField(
+        TEXT("world_space_normal_output"),
+        bWorldAligned);
+    MaterialParameters->SetStringField(
+        TEXT("macro_asset_id"),
+        TEXT("polyhaven_aerial_rocks_02_4k"));
+    MaterialParameters->SetStringField(
+        TEXT("detail_asset_id"),
+        TEXT("ambientcg_rock037_2k"));
+    Report->SetObjectField(TEXT("material_parameters"), MaterialParameters);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("baseline_guide_seat"), BaselineGuidePath);
+    Captures->SetStringField(TEXT("baseline_river_eye"), BaselineRiverEyePath);
+    Captures->SetStringField(TEXT("comparison_guide_seat"), ComparisonGuidePath);
+    Captures->SetStringField(TEXT("comparison_river_eye"), ComparisonRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("continuous_surface_seam_and_repetition_review"),
+             TEXT("Batoka_geology_and_reach_specific_lithology_review"),
+             TEXT("higher_resolution_terrain_and_gorge_silhouette_review"),
+             TEXT("guide_and_hazard_readability_review"),
+             TEXT("geospatial_and_source_terrain_review"),
+             TEXT("rights_and_art_review"),
+             TEXT("woodland_water_mist_and_lighting_review"),
+             TEXT("desktop_console_handheld_and_VR_performance"),
+             TEXT("separate_surveyed_collision_and_hydrodynamic_review")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        bWorldAligned
+            ? TEXT("zambezi_batoka_v12_world_aligned_comparison_report.json")
+            : TEXT("zambezi_batoka_v11_terrain_integrated_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Batoka %s transient terrain-integrated comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        bWorldAligned ? TEXT("V12 world-aligned") : TEXT("V11 top-down"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureZambeziBatokaTerrainIntegratedComparison(
+    FString& OutSummary)
+{
+    return CaptureZambeziBatokaTerrainComparisonInternal(false, OutSummary);
+}
+
+bool FRaftSimEditorModule::CaptureZambeziBatokaWorldAlignedTerrainComparison(
+    FString& OutSummary)
+{
+    return CaptureZambeziBatokaTerrainComparisonInternal(true, OutSummary);
+}
+
+bool FRaftSimEditorModule::CaptureZambeziBatokaVisualMorphologyComparison(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* ZambeziCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates =
+        GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge"))
+        {
+            ZambeziCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!ZambeziCandidate)
+    {
+        OutSummary += TEXT("The Zambezi physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    UMaterialInterface* TerrainReviewMaterial =
+        LoadOrCreatePhysicalSourceTerrainRenderMaterial(
+            *ZambeziCandidate,
+            true,
+            true);
+    if (!TerrainReviewMaterial)
+    {
+        OutSummary += TEXT("Could not load the retained Batoka V12 world-aligned material.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString BaselineGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_v13_pre_morphology_guide_seat_downstream.png"));
+    FString BaselineRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_v13_pre_morphology_river_eye_downstream.png"));
+    FString ComparisonGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_v13_visual_morphology_guide_seat_downstream.png"));
+    FString ComparisonRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_v13_visual_morphology_river_eye_downstream.png"));
+
+    FZambeziBatokaVisualMorphologyStats BaselineGuideStats;
+    FZambeziBatokaVisualMorphologyStats BaselineRiverEyeStats;
+    FZambeziBatokaVisualMorphologyStats ComparisonGuideStats;
+    FZambeziBatokaVisualMorphologyStats ComparisonRiverEyeStats;
+    auto MakeWorldSetup = [ZambeziCandidate, TerrainReviewMaterial](
+                              bool bApplyMorphology,
+                              FZambeziBatokaVisualMorphologyStats& Stats)
+    {
+        return [ZambeziCandidate, TerrainReviewMaterial, bApplyMorphology, &Stats](
+                   UWorld* World,
+                   ACameraActor*,
+                   FString& Summary)
+        {
+            return ApplyZambeziBatokaVisualTerrainTreatment(
+                World,
+                TerrainReviewMaterial,
+                *ZambeziCandidate,
+                bApplyMorphology,
+                &Stats,
+                Summary);
+        };
+    };
+
+    const bool bBaselineGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("batoka_v13_pre_morphology_guide_seat_downstream"),
+        TEXT("Zambezi guide-seat retained V12 material before V13 morphology"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, BaselineGuideStats));
+    const bool bBaselineRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        BaselineRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("batoka_v13_pre_morphology_river_eye_downstream"),
+        TEXT("Zambezi river-eye retained V12 material before V13 morphology"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, BaselineRiverEyeStats));
+    const bool bComparisonGuideCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("batoka_v13_visual_morphology_guide_seat_downstream"),
+        TEXT("Zambezi guide-seat bounded render-only Batoka V13 morphology"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, ComparisonGuideStats));
+    const bool bComparisonRiverEyeCaptured = CapturePreviewImageForSpec(
+        ZambeziCandidate->PreviewSpec,
+        CaptureRoot,
+        ComparisonRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("batoka_v13_visual_morphology_river_eye_downstream"),
+        TEXT("Zambezi river-eye bounded render-only Batoka V13 morphology"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, ComparisonRiverEyeStats));
+    const bool bAllCaptured =
+        bBaselineGuideCaptured && bBaselineRiverEyeCaptured &&
+        bComparisonGuideCaptured && bComparisonRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FZambeziBatokaVisualMorphologyStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetNumberField(TEXT("visual_tile_count"), Stats.VisualTileCount);
+        Object->SetNumberField(TEXT("total_vertex_count"), Stats.TotalVertexCount);
+        Object->SetNumberField(TEXT("modified_vertex_count"), Stats.ModifiedVertexCount);
+        Object->SetNumberField(
+            TEXT("protected_river_corridor_vertex_count"),
+            Stats.ProtectedRiverCorridorVertexCount);
+        Object->SetNumberField(
+            TEXT("rejected_low_slope_vertex_count"),
+            Stats.RejectedLowSlopeVertexCount);
+        Object->SetNumberField(
+            TEXT("minimum_offset_cm"),
+            Stats.ModifiedVertexCount > 0 ? Stats.MinimumOffsetCm : 0.0);
+        Object->SetNumberField(
+            TEXT("maximum_offset_cm"),
+            Stats.ModifiedVertexCount > 0 ? Stats.MaximumOffsetCm : 0.0);
+        Object->SetNumberField(
+            TEXT("mean_absolute_offset_cm"),
+            Stats.ModifiedVertexCount > 0
+                ? Stats.AbsoluteOffsetSumCm / Stats.ModifiedVertexCount
+                : 0.0);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.zambezi_batoka_visual_morphology_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("zambezi_batoka_gorge"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("paired_transient_v13_visual_morphology_comparison_captured_pending_human_review")
+            : TEXT("one_or_more_v13_visual_morphology_comparison_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("survey_or_source_terrain_replacement_performed"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("landscape_height_or_collision_modified"), false);
+    Report->SetBoolField(TEXT("hydrodynamic_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(TEXT("external_pixels_copied"), true);
+    Report->SetBoolField(TEXT("external_geometry_copied"), false);
+    Report->SetStringField(TEXT("source_map"), ZambeziCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(TEXT("material_asset"), TerrainReviewMaterial->GetPathName());
+    Report->SetStringField(
+        TEXT("authority_boundary"),
+        TEXT("transient authored visual hypothesis on the continuous dense render mesh only; saved map, 30 m source DSM, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"));
+    Report->SetStringField(
+        TEXT("evidence_limit"),
+        TEXT("regional Batoka morphology constraints guide bounded visual breakup but do not establish surveyed wall, ledge, joint, gully, talus, bank, or bed geometry for Boiling Pot to Mukuni Beach"));
+
+    TSharedRef<FJsonObject> MorphologyParameters = MakeShared<FJsonObject>();
+    MorphologyParameters->SetStringField(
+        TEXT("projection_basis"),
+        TEXT("V12 world-aligned material"));
+    MorphologyParameters->SetNumberField(TEXT("source_dsm_resolution_m"), 30.0);
+    MorphologyParameters->SetNumberField(TEXT("visual_mesh_target_spacing_m"), 12.5);
+    MorphologyParameters->SetNumberField(TEXT("maximum_absolute_offset_m"), 4.5);
+    MorphologyParameters->SetNumberField(TEXT("river_protection_full_width_m"), 220.0);
+    MorphologyParameters->SetNumberField(TEXT("river_protection_fade_end_m"), 650.0);
+    MorphologyParameters->SetNumberField(TEXT("minimum_lava_flow_height_m"), 8.4);
+    MorphologyParameters->SetNumberField(TEXT("maximum_lava_flow_height_m"), 13.6);
+    MorphologyParameters->SetNumberField(TEXT("primary_joint_spacing_m"), 92.0);
+    MorphologyParameters->SetNumberField(TEXT("secondary_joint_spacing_m"), 148.0);
+    MorphologyParameters->SetStringField(
+        TEXT("treatments"),
+        TEXT("bounded elevation-conditioned flow breaks, two irregular joint families, and moderate-slope talus-scale breakup"));
+    Report->SetObjectField(TEXT("morphology_parameters"), MorphologyParameters);
+
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(TEXT("baseline_guide_seat"), MakeStatsObject(BaselineGuideStats));
+    Stats->SetObjectField(TEXT("baseline_river_eye"), MakeStatsObject(BaselineRiverEyeStats));
+    Stats->SetObjectField(TEXT("comparison_guide_seat"), MakeStatsObject(ComparisonGuideStats));
+    Stats->SetObjectField(TEXT("comparison_river_eye"), MakeStatsObject(ComparisonRiverEyeStats));
+    Report->SetObjectField(TEXT("treatment_statistics"), Stats);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("baseline_guide_seat"), BaselineGuidePath);
+    Captures->SetStringField(TEXT("baseline_river_eye"), BaselineRiverEyePath);
+    Captures->SetStringField(TEXT("comparison_guide_seat"), ComparisonGuidePath);
+    Captures->SetStringField(TEXT("comparison_river_eye"), ComparisonRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("higher_resolution_survey_or_photogrammetry_acquisition"),
+             TEXT("Batoka_geology_and_reach_specific_lithology_review"),
+             TEXT("gorge_silhouette_and_procedural_artifact_review"),
+             TEXT("guide_and_hazard_readability_review"),
+             TEXT("geospatial_and_source_terrain_review"),
+             TEXT("rights_and_art_review"),
+             TEXT("woodland_water_mist_and_lighting_review"),
+             TEXT("desktop_console_handheld_and_VR_performance"),
+             TEXT("separate_surveyed_collision_and_hydrodynamic_review")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("zambezi_batoka_v13_visual_morphology_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Batoka V13 transient visual-morphology comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
 bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyCorridorComparison(
     FString& OutSummary)
 {
@@ -30689,6 +36910,745 @@ bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyCorridorComparison(
         bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
         *ReportPath);
     return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuDenseCanopyComparison(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates =
+        GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString SparseGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v24_sparse_alpha2_guide_seat_downstream.png"));
+    FString SparseRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v24_sparse_alpha2_river_eye_downstream.png"));
+    FString DenseGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v24_dense_source_masked_alpha2_guide_seat_downstream.png"));
+    FString DenseRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v24_dense_source_masked_alpha2_river_eye_downstream.png"));
+
+    FFutaleufuCanopyCorridorComparisonStats SparseGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats SparseRiverEyeStats;
+    FFutaleufuCanopyCorridorComparisonStats DenseGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats DenseRiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              bool bDenseLocalReview,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, bDenseLocalReview, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow,
+                Stats,
+                Summary,
+                bDenseLocalReview);
+        };
+    };
+
+    const bool bSparseGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        SparseGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v24_sparse_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat retained sparse alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, SparseGuideStats));
+    const bool bSparseRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        SparseRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v24_sparse_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye retained sparse alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, SparseRiverEyeStats));
+    const bool bDenseGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        DenseGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v24_dense_source_masked_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat dense camera-local source-masked alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, DenseGuideStats));
+    const bool bDenseRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        DenseRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v24_dense_source_masked_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye dense camera-local source-masked alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, DenseRiverEyeStats));
+    const bool bAllCaptured =
+        bSparseGuideCaptured && bSparseRiverEyeCaptured &&
+        bDenseGuideCaptured && bDenseRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetBoolField(TEXT("dense_local_review"), Stats.bDenseLocalReview);
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("target_tree_count"), Stats.TargetTreeCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(
+            TEXT("hidden_fallback_pve_actor_count"),
+            Stats.HiddenFallbackActorCount);
+        Object->SetNumberField(
+            TEXT("rejected_vegetation_mask_count"),
+            Stats.RejectedVegetationMaskCount);
+        Object->SetNumberField(
+            TEXT("rejected_water_mask_count"),
+            Stats.RejectedWaterMaskCount);
+        Object->SetNumberField(TEXT("rejected_slope_count"), Stats.RejectedSlopeCount);
+        Object->SetNumberField(TEXT("rejected_spacing_count"), Stats.RejectedSpacingCount);
+        Object->SetNumberField(TEXT("centerline_progress_min"), Stats.ProgressMinimum);
+        Object->SetNumberField(TEXT("centerline_progress_max"), Stats.ProgressMaximum);
+        Object->SetNumberField(TEXT("minimum_spacing_m"), Stats.MinimumSpacingCm * 0.01f);
+        Object->SetNumberField(TEXT("river_setback_m"), Stats.RiverSetbackCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("maximum_lateral_offset_m"),
+            Stats.MaximumLateralOffsetCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("mean_accepted_vegetation_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedVegetationMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("mean_accepted_water_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedWaterMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_dense_canopy_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("paired_v24_sparse_dense_source_masked_canopy_captured_pending_human_review")
+            : TEXT("one_or_more_v24_sparse_dense_canopy_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("landscape_or_collision_modified"), false);
+    Report->SetBoolField(TEXT("hydrodynamic_or_gameplay_authority_modified"), false);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        FutaleufuCandidate->PreviewSpec.SourceManifest);
+    Report->SetStringField(
+        TEXT("vegetation_mask"),
+        FutaleufuCandidate->PreviewSpec.VegetationMaskImage);
+    Report->SetStringField(
+        TEXT("water_mask"),
+        FutaleufuCandidate->PreviewSpec.WaterMaskImage);
+    Report->SetStringField(
+        TEXT("fixed_between_variants"),
+        TEXT("project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, deterministic Halton candidates, terrain, water, rocks, cameras, lighting, physics, and saved map"));
+    Report->SetStringField(
+        TEXT("changed_in_dense_variant"),
+        TEXT("camera-local centerline window, 9000-tree target, 6.5 m minimum spacing, 24 m river setback, 750 m maximum lateral coverage, reduced deterministic micro-gap thinning, and 0.78-1.12 scale range"));
+    Report->SetStringField(
+        TEXT("authority_boundary"),
+        TEXT("transient review-only non-colliding HISM placement; source Landscape, visual terrain, physical river ribbon, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, gameplay, and saved-map authority remain unchanged"));
+
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(TEXT("sparse_guide_seat"), MakeStatsObject(SparseGuideStats));
+    Stats->SetObjectField(TEXT("sparse_river_eye"), MakeStatsObject(SparseRiverEyeStats));
+    Stats->SetObjectField(TEXT("dense_guide_seat"), MakeStatsObject(DenseGuideStats));
+    Stats->SetObjectField(TEXT("dense_river_eye"), MakeStatsObject(DenseRiverEyeStats));
+    Report->SetObjectField(TEXT("placement_statistics"), Stats);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("sparse_guide_seat"), SparseGuidePath);
+    Captures->SetStringField(TEXT("sparse_river_eye"), SparseRiverEyePath);
+    Captures->SetStringField(TEXT("dense_guide_seat"), DenseGuidePath);
+    Captures->SetStringField(TEXT("dense_river_eye"), DenseRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("source_mask_and_aerial_alignment_review"),
+             TEXT("second_ecology_reviewed_native_canopy_species"),
+             TEXT("riparian_shrub_understory_fern_bamboo_epiphyte_and_deadwood_strata"),
+             TEXT("terrain_water_boulder_and_atmosphere_review"),
+             TEXT("moving_camera_temporal_stability_and_wind"),
+             TEXT("masked_overdraw_streaming_culling_and_multiplatform_performance"),
+             TEXT("guide_ecology_geospatial_rights_and_art_approval")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v24_dense_canopy_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu V24 sparse/dense canopy comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuAreaSampledCanopyComparison(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates =
+        GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString CenterlineGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v25_centerline_dense_alpha2_guide_seat_downstream.png"));
+    FString CenterlineRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v25_centerline_dense_alpha2_river_eye_downstream.png"));
+    FString AreaGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v25_area_sampled_alpha2_guide_seat_downstream.png"));
+    FString AreaRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v25_area_sampled_alpha2_river_eye_downstream.png"));
+
+    FFutaleufuCanopyCorridorComparisonStats CenterlineGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats CenterlineRiverEyeStats;
+    FFutaleufuCanopyCorridorComparisonStats AreaGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats AreaRiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              bool bAreaSampledReview,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, bAreaSampledReview, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow,
+                Stats,
+                Summary,
+                true,
+                bAreaSampledReview);
+        };
+    };
+
+    const bool bCenterlineGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        CenterlineGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v25_centerline_dense_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat V24 centerline-dense alpha2 no-shadow baseline"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, CenterlineGuideStats));
+    const bool bCenterlineRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        CenterlineRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v25_centerline_dense_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye V24 centerline-dense alpha2 no-shadow baseline"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, CenterlineRiverEyeStats));
+    const bool bAreaGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        AreaGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v25_area_sampled_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat 2D area-sampled source-masked alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, AreaGuideStats));
+    const bool bAreaRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        AreaRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v25_area_sampled_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye 2D area-sampled source-masked alpha2 no-shadow canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, AreaRiverEyeStats));
+    const bool bAllCaptured =
+        bCenterlineGuideCaptured && bCenterlineRiverEyeCaptured &&
+        bAreaGuideCaptured && bAreaRiverEyeCaptured;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetBoolField(TEXT("dense_local_review"), Stats.bDenseLocalReview);
+        Object->SetBoolField(TEXT("area_sampled_review"), Stats.bAreaSampledReview);
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("target_tree_count"), Stats.TargetTreeCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(
+            TEXT("hidden_fallback_pve_actor_count"),
+            Stats.HiddenFallbackActorCount);
+        Object->SetNumberField(
+            TEXT("rejected_natural_gap_count"),
+            Stats.RejectedNaturalGapCount);
+        Object->SetNumberField(
+            TEXT("rejected_vegetation_mask_count"),
+            Stats.RejectedVegetationMaskCount);
+        Object->SetNumberField(
+            TEXT("rejected_water_mask_count"),
+            Stats.RejectedWaterMaskCount);
+        Object->SetNumberField(
+            TEXT("rejected_river_setback_count"),
+            Stats.RejectedRiverSetbackCount);
+        Object->SetNumberField(
+            TEXT("rejected_stand_density_count"),
+            Stats.RejectedStandDensityCount);
+        Object->SetNumberField(TEXT("rejected_slope_count"), Stats.RejectedSlopeCount);
+        Object->SetNumberField(TEXT("rejected_spacing_count"), Stats.RejectedSpacingCount);
+        Object->SetNumberField(TEXT("centerline_progress_min"), Stats.ProgressMinimum);
+        Object->SetNumberField(TEXT("centerline_progress_max"), Stats.ProgressMaximum);
+        Object->SetNumberField(TEXT("minimum_spacing_m"), Stats.MinimumSpacingCm * 0.01f);
+        Object->SetNumberField(TEXT("river_setback_m"), Stats.RiverSetbackCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("maximum_lateral_offset_m"),
+            Stats.MaximumLateralOffsetCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("sampling_half_extent_m"),
+            Stats.SamplingHalfExtentCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("minimum_accepted_river_distance_m"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.MinimumAcceptedRiverDistanceCm * 0.01f
+                : 0.0f);
+        Object->SetNumberField(
+            TEXT("maximum_accepted_river_distance_m"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.MaximumAcceptedRiverDistanceCm * 0.01f
+                : 0.0f);
+        Object->SetNumberField(
+            TEXT("mean_accepted_vegetation_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedVegetationMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        Object->SetNumberField(
+            TEXT("mean_accepted_water_mask"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.AcceptedWaterMaskSum / Stats.AcceptedTreeCount
+                : 0.0);
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_area_sampled_canopy_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured
+            ? TEXT("paired_v25_centerline_area_sampled_canopy_captured_pending_human_review")
+            : TEXT("one_or_more_v25_area_sampled_canopy_captures_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("landscape_or_collision_modified"), false);
+    Report->SetBoolField(TEXT("hydrodynamic_or_gameplay_authority_modified"), false);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        FutaleufuCandidate->PreviewSpec.SourceManifest);
+    Report->SetStringField(
+        TEXT("vegetation_mask"),
+        FutaleufuCandidate->PreviewSpec.VegetationMaskImage);
+    Report->SetStringField(
+        TEXT("water_mask"),
+        FutaleufuCandidate->PreviewSpec.WaterMaskImage);
+    Report->SetStringField(
+        TEXT("fixed_between_variants"),
+        TEXT("9000-tree target, 6.5 m spacing, 24 m river setback, project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, terrain, water, rocks, cameras, lighting, physics, and saved map"));
+    Report->SetStringField(
+        TEXT("changed_in_area_sampled_variant"),
+        TEXT("deterministic direct 2D Halton sampling in a 2.2 km camera-local square, true nearest-centerline setback enforcement, probabilistic source-mask feathering, and broad plus mid-scale deterministic stand-density fields replace centerline progress/lateral placement and stripe-like progress gaps"));
+    Report->SetStringField(
+        TEXT("authority_boundary"),
+        TEXT("transient review-only non-colliding HISM placement; source Landscape, visual terrain, physical river ribbon, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, gameplay, and saved-map authority remain unchanged"));
+
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(
+        TEXT("centerline_guide_seat"),
+        MakeStatsObject(CenterlineGuideStats));
+    Stats->SetObjectField(
+        TEXT("centerline_river_eye"),
+        MakeStatsObject(CenterlineRiverEyeStats));
+    Stats->SetObjectField(TEXT("area_sampled_guide_seat"), MakeStatsObject(AreaGuideStats));
+    Stats->SetObjectField(TEXT("area_sampled_river_eye"), MakeStatsObject(AreaRiverEyeStats));
+    Report->SetObjectField(TEXT("placement_statistics"), Stats);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("centerline_guide_seat"), CenterlineGuidePath);
+    Captures->SetStringField(TEXT("centerline_river_eye"), CenterlineRiverEyePath);
+    Captures->SetStringField(TEXT("area_sampled_guide_seat"), AreaGuidePath);
+    Captures->SetStringField(TEXT("area_sampled_river_eye"), AreaRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("source_mask_and_aerial_alignment_review"),
+             TEXT("second_ecology_reviewed_native_canopy_species"),
+             TEXT("riparian_shrub_understory_fern_bamboo_epiphyte_and_deadwood_strata"),
+             TEXT("terrain_water_boulder_and_atmosphere_review"),
+             TEXT("moving_camera_temporal_stability_and_wind"),
+             TEXT("masked_overdraw_streaming_culling_and_multiplatform_performance"),
+             TEXT("guide_ecology_geospatial_rights_and_art_approval")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v25_area_sampled_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu V25 centerline/area-sampled canopy comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bReportSaved;
+}
+
+bool FRaftSimEditorModule::CaptureFutaleufuWorldStableCanopyComparison(
+    FString& OutSummary)
+{
+    const FRaftSimLandscapeImportCandidateSpec* FutaleufuCandidate = nullptr;
+    const TArray<FRaftSimLandscapeImportCandidateSpec> Candidates =
+        GetLandscapeImportCandidateSpecs();
+    for (const FRaftSimLandscapeImportCandidateSpec& Candidate : Candidates)
+    {
+        if (Candidate.PreviewSpec.RiverId == TEXT("futaleufu_terminator"))
+        {
+            FutaleufuCandidate = &Candidate;
+            break;
+        }
+    }
+    if (!FutaleufuCandidate)
+    {
+        OutSummary += TEXT("The Futaleufu physical-corridor candidate is not registered.\n");
+        return false;
+    }
+
+    const FString CaptureRelativeRoot =
+        TEXT("docs/environment-captures/photoreal_river_previews/landscape_candidates");
+    const FString CaptureRoot = FPaths::Combine(GetRepoRoot(), CaptureRelativeRoot);
+    IFileManager::Get().MakeDirectory(*CaptureRoot, true);
+    FString CameraLocalGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v26_camera_local_area_alpha2_guide_seat_downstream.png"));
+    FString CameraLocalRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v26_camera_local_area_alpha2_river_eye_downstream.png"));
+    FString WorldStableGuidePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v26_world_stable_occupancy_alpha2_guide_seat_downstream.png"));
+    FString WorldStableRiverEyePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_v26_world_stable_occupancy_alpha2_river_eye_downstream.png"));
+
+    FFutaleufuCanopyCorridorComparisonStats CameraLocalGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats CameraLocalRiverEyeStats;
+    FFutaleufuCanopyCorridorComparisonStats WorldStableGuideStats;
+    FFutaleufuCanopyCorridorComparisonStats WorldStableRiverEyeStats;
+    auto MakeWorldSetup = [FutaleufuCandidate](
+                              bool bWorldStableReview,
+                              FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        return [FutaleufuCandidate, bWorldStableReview, &Stats](
+                   UWorld* World,
+                   ACameraActor* Camera,
+                   FString& Summary)
+        {
+            return AddFutaleufuCanopyCorridorComparisonInstances(
+                World,
+                Camera,
+                *FutaleufuCandidate,
+                EFutaleufuCanopyCorridorRenderMode::NativeAlphaScaleTwoNoShadow,
+                Stats,
+                Summary,
+                !bWorldStableReview,
+                !bWorldStableReview,
+                bWorldStableReview);
+        };
+    };
+
+    const bool bCameraLocalGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        CameraLocalGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v26_camera_local_area_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat V25 camera-local area-sampled baseline"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, CameraLocalGuideStats));
+    const bool bCameraLocalRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        CameraLocalRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v26_camera_local_area_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye V25 camera-local area-sampled baseline"),
+        true,
+        OutSummary,
+        MakeWorldSetup(false, CameraLocalRiverEyeStats));
+    const bool bWorldStableGuideCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        WorldStableGuidePath,
+        TEXT("RaftSim_GuideSeat_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v26_world_stable_occupancy_alpha2_guide_seat_downstream"),
+        TEXT("Futaleufu guide-seat world-stable spatial-occupancy canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, WorldStableGuideStats));
+    const bool bWorldStableRiverEyeCaptured = CapturePreviewImageForSpec(
+        FutaleufuCandidate->PreviewSpec,
+        CaptureRoot,
+        WorldStableRiverEyePath,
+        TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"),
+        TEXT("futaleufu_v26_world_stable_occupancy_alpha2_river_eye_downstream"),
+        TEXT("Futaleufu river-eye world-stable spatial-occupancy canopy"),
+        true,
+        OutSummary,
+        MakeWorldSetup(true, WorldStableRiverEyeStats));
+    const bool bAllCaptured =
+        bCameraLocalGuideCaptured && bCameraLocalRiverEyeCaptured &&
+        bWorldStableGuideCaptured && bWorldStableRiverEyeCaptured;
+    const bool bWorldStableFingerprintsMatch =
+        WorldStableGuideStats.AcceptedTreeCount > 0 &&
+        WorldStableGuideStats.PlacementFingerprint ==
+            WorldStableRiverEyeStats.PlacementFingerprint;
+
+    auto MakeStatsObject = [](const FFutaleufuCanopyCorridorComparisonStats& Stats)
+    {
+        TSharedRef<FJsonObject> Object = MakeShared<FJsonObject>();
+        Object->SetBoolField(TEXT("dense_local_review"), Stats.bDenseLocalReview);
+        Object->SetBoolField(TEXT("area_sampled_review"), Stats.bAreaSampledReview);
+        Object->SetBoolField(TEXT("world_stable_review"), Stats.bWorldStableReview);
+        Object->SetNumberField(TEXT("candidate_count"), Stats.CandidateCount);
+        Object->SetNumberField(TEXT("target_tree_count"), Stats.TargetTreeCount);
+        Object->SetNumberField(TEXT("accepted_tree_count"), Stats.AcceptedTreeCount);
+        Object->SetNumberField(TEXT("near_full_tree_count"), Stats.NearTreeCount);
+        Object->SetNumberField(TEXT("mid_tree_count"), Stats.MidTreeCount);
+        Object->SetNumberField(TEXT("runtime_far_tree_count"), Stats.FarTreeCount);
+        Object->SetNumberField(
+            TEXT("hidden_fallback_pve_actor_count"),
+            Stats.HiddenFallbackActorCount);
+        Object->SetNumberField(
+            TEXT("rejected_vegetation_mask_count"),
+            Stats.RejectedVegetationMaskCount);
+        Object->SetNumberField(
+            TEXT("rejected_river_setback_count"),
+            Stats.RejectedRiverSetbackCount);
+        Object->SetNumberField(
+            TEXT("rejected_stand_density_count"),
+            Stats.RejectedStandDensityCount);
+        Object->SetNumberField(TEXT("rejected_slope_count"), Stats.RejectedSlopeCount);
+        Object->SetNumberField(TEXT("rejected_spacing_count"), Stats.RejectedSpacingCount);
+        Object->SetNumberField(TEXT("minimum_spacing_m"), Stats.MinimumSpacingCm * 0.01f);
+        Object->SetNumberField(TEXT("river_setback_m"), Stats.RiverSetbackCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("sampling_half_extent_m"),
+            Stats.SamplingHalfExtentCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("sampling_along_half_extent_m"),
+            Stats.SamplingAlongHalfExtentCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("sampling_cross_half_extent_m"),
+            Stats.SamplingCrossHalfExtentCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("occupancy_field_resolution"),
+            Stats.OccupancyFieldResolution);
+        Object->SetNumberField(
+            TEXT("occupancy_feather_distance_m"),
+            Stats.OccupancyFeatherDistanceCm * 0.01f);
+        Object->SetNumberField(
+            TEXT("minimum_accepted_river_distance_m"),
+            Stats.AcceptedTreeCount > 0
+                ? Stats.MinimumAcceptedRiverDistanceCm * 0.01f
+                : 0.0f);
+        Object->SetStringField(
+            TEXT("placement_fingerprint_fnv1a64"),
+            FString::Printf(
+                TEXT("%016llx"),
+                static_cast<unsigned long long>(Stats.PlacementFingerprint)));
+        return Object;
+    };
+
+    TSharedRef<FJsonObject> Report = MakeShared<FJsonObject>();
+    Report->SetStringField(
+        TEXT("schema"),
+        TEXT("raftsim.unreal.futaleufu_world_stable_canopy_comparison.v1"));
+    Report->SetStringField(TEXT("river_id"), TEXT("futaleufu_terminator"));
+    Report->SetStringField(
+        TEXT("status"),
+        bAllCaptured && bWorldStableFingerprintsMatch
+            ? TEXT("paired_v26_camera_local_world_stable_canopy_captured_identical_world_placement_pending_human_review")
+            : TEXT("v26_capture_or_world_stability_gate_failed"));
+    Report->SetBoolField(TEXT("production_promoted"), false);
+    Report->SetBoolField(TEXT("corridor_substitution_performed"), false);
+    Report->SetBoolField(TEXT("source_map_modified"), false);
+    Report->SetBoolField(TEXT("landscape_or_collision_modified"), false);
+    Report->SetBoolField(TEXT("hydrodynamic_or_gameplay_authority_modified"), false);
+    Report->SetBoolField(
+        TEXT("world_stable_placement_fingerprints_match"),
+        bWorldStableFingerprintsMatch);
+    Report->SetStringField(TEXT("source_map"), FutaleufuCandidate->PreviewSpec.MapPackagePath);
+    Report->SetStringField(
+        TEXT("source_manifest"),
+        FutaleufuCandidate->PreviewSpec.SourceManifest);
+    Report->SetStringField(
+        TEXT("fixed_between_variants"),
+        TEXT("6.5 m spacing, 24 m river setback, project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, terrain, water, rocks, cameras, lighting, physics, and saved map"));
+    Report->SetStringField(
+        TEXT("changed_in_world_stable_variant"),
+        TEXT("a corridor-anchored 6.0 km by 2.2 km curvilinear centerline domain and 24000-tree target replace each camera's 2.2 km square and 9000-tree target; a 512-cell chamfer signed-distance occupancy field with 180 m feather replaces scalar source-mask luma feathering"));
+    Report->SetStringField(
+        TEXT("authority_boundary"),
+        TEXT("transient review-only non-colliding HISM placement; source Landscape, visual terrain, physical river ribbon, collision, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, gameplay, and saved-map authority remain unchanged"));
+
+    TSharedRef<FJsonObject> Stats = MakeShared<FJsonObject>();
+    Stats->SetObjectField(
+        TEXT("camera_local_guide_seat"),
+        MakeStatsObject(CameraLocalGuideStats));
+    Stats->SetObjectField(
+        TEXT("camera_local_river_eye"),
+        MakeStatsObject(CameraLocalRiverEyeStats));
+    Stats->SetObjectField(
+        TEXT("world_stable_guide_seat"),
+        MakeStatsObject(WorldStableGuideStats));
+    Stats->SetObjectField(
+        TEXT("world_stable_river_eye"),
+        MakeStatsObject(WorldStableRiverEyeStats));
+    Report->SetObjectField(TEXT("placement_statistics"), Stats);
+
+    TSharedRef<FJsonObject> Captures = MakeShared<FJsonObject>();
+    Captures->SetStringField(TEXT("camera_local_guide_seat"), CameraLocalGuidePath);
+    Captures->SetStringField(TEXT("camera_local_river_eye"), CameraLocalRiverEyePath);
+    Captures->SetStringField(TEXT("world_stable_guide_seat"), WorldStableGuidePath);
+    Captures->SetStringField(TEXT("world_stable_river_eye"), WorldStableRiverEyePath);
+    Captures->SetBoolField(TEXT("all_captured"), bAllCaptured);
+    Report->SetObjectField(TEXT("captures"), Captures);
+
+    TArray<TSharedPtr<FJsonValue>> OpenGates;
+    for (const TCHAR* Gate : {
+             TEXT("paired_human_visual_review"),
+             TEXT("camera_motion_temporal_stability"),
+             TEXT("mixed_native_canopy_species_and_vertical_strata"),
+             TEXT("terrain_water_boulder_and_atmosphere_review"),
+             TEXT("masked_overdraw_streaming_culling_and_multiplatform_performance"),
+             TEXT("guide_ecology_geospatial_rights_and_art_approval")})
+    {
+        OpenGates.Add(MakeShared<FJsonValueString>(Gate));
+    }
+    Report->SetArrayField(TEXT("open_promotion_gates"), OpenGates);
+
+    FString SerializedReport;
+    const TSharedRef<TJsonWriter<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>> Writer =
+        TJsonWriterFactory<TCHAR, TPrettyJsonPrintPolicy<TCHAR>>::Create(&SerializedReport);
+    const bool bSerialized = FJsonSerializer::Serialize(Report, Writer);
+    SerializedReport += TEXT("\n");
+    const FString ReportRelativePath = FPaths::Combine(
+        CaptureRelativeRoot,
+        TEXT("futaleufu_native_canopy_coigue_v26_world_stable_comparison_report.json"));
+    const FString ReportPath = FPaths::Combine(GetRepoRoot(), ReportRelativePath);
+    const bool bReportSaved =
+        bSerialized && FFileHelper::SaveStringToFile(SerializedReport, *ReportPath);
+    OutSummary += FString::Printf(
+        TEXT("%s Futaleufu V26 world-stable canopy comparison report -> %s\n"),
+        bReportSaved ? TEXT("Saved") : TEXT("Failed to save"),
+        *ReportPath);
+    return bAllCaptured && bWorldStableFingerprintsMatch && bReportSaved;
 }
 
 bool FRaftSimEditorModule::CaptureFutaleufuNativeCanopyRenderDiagnostics(

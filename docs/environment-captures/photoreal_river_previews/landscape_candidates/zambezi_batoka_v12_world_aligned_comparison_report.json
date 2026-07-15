@@ -1,0 +1,56 @@
+{
+	"schema": "raftsim.unreal.zambezi_batoka_world_aligned_terrain_comparison.v1",
+	"river_id": "zambezi_batoka_gorge",
+	"status": "paired_transient_world_aligned_v12_comparison_captured_pending_human_review",
+	"production_promoted": false,
+	"corridor_substitution_performed": false,
+	"source_map_modified": false,
+	"landscape_height_or_collision_modified": false,
+	"hydrodynamic_or_gameplay_authority_modified": false,
+	"external_pixels_copied": true,
+	"external_geometry_copied": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+	"material_asset": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+	"target_actor_prefix": "RaftSim_PhysicalCorridorDenseSourceTerrainTile_",
+	"expected_visual_tile_count": 4,
+	"guide_overridden_visual_tile_count": 4,
+	"river_eye_overridden_visual_tile_count": 4,
+	"authority_boundary": "transient render-material override on the continuous dense visual-terrain mesh only; saved map, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged",
+	"material_parameters":
+	{
+		"macro_tile_cm": 5000,
+		"detail_tile_cm": 240,
+		"macro_albedo_weight": 0.56000000000000005,
+		"detail_albedo_weight": 0.16,
+		"detail_color_scale": 1.1799999999999999,
+		"detail_normal_weight": 0.41999999999999998,
+		"detail_roughness_weight": 0.28000000000000003,
+		"macro_ao_weight": 0.32000000000000001,
+		"rock_slope_start": 0.10000000000000001,
+		"rock_slope_gain": 3.2999999999999998,
+		"projection": "world_aligned_triplanar",
+		"world_space_normal_output": true,
+		"macro_asset_id": "polyhaven_aerial_rocks_02_4k",
+		"detail_asset_id": "ambientcg_rock037_2k"
+	},
+	"captures":
+	{
+		"baseline_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_pre_world_aligned_guide_seat_downstream.png",
+		"baseline_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_pre_world_aligned_river_eye_downstream.png",
+		"comparison_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_guide_seat_downstream.png",
+		"comparison_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"open_promotion_gates": [
+		"paired_human_visual_review",
+		"continuous_surface_seam_and_repetition_review",
+		"Batoka_geology_and_reach_specific_lithology_review",
+		"higher_resolution_terrain_and_gorge_silhouette_review",
+		"guide_and_hazard_readability_review",
+		"geospatial_and_source_terrain_review",
+		"rights_and_art_review",
+		"woodland_water_mist_and_lighting_review",
+		"desktop_console_handheld_and_VR_performance",
+		"separate_surveyed_collision_and_hydrodynamic_review"
+	]
+}

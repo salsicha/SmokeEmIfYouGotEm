@@ -113,11 +113,11 @@
     {
       "role": "high_resolution_terrain_acquisition_lead",
       "path": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json",
-      "sha256": "319a1fd9c57b8201e4279ed85532809e9ebdc3c91dc8f57f3bb1d05fd7195816",
+      "sha256": "d790411901e674665edf54c0d66e0f824e51af5ab8a90253fd6bae66339bb8b4",
       "provider": "Zambezi River Authority / BGHES feasibility document set",
       "license": "discovery metadata only; survey data access and rights pending",
       "authority": "lead_only_no_geometry_or_media_imported",
-      "status": "high_resolution_surveys_confirmed_to_exist_data_access_rights_and_reach_coverage_pending"
+      "status": "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent"
     }
   ],
   "environment_contract": {

@@ -1,0 +1,221 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_twig_review.v1",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v18_2_open_grown_conical_compact_connected_twig_hierarchy",
+  "status": "connected_geometry_mechanism_retained_source_art_and_corridor_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "project-owned V17 PVE growth graph and seed",
+      "3626 live-foliage transforms",
+      "V18 branch-scale atlas, material defaults, cameras, and HLOD baker",
+      "24.68 m open-grown tree envelope and connected PVE woody collection"
+    ],
+    "v18_changed": "replace disconnected curved cards with a two-material live twig containing connected authored wood and foliage",
+    "v18_2_changed": "shorten eight lateral woody connectors while preserving the main twig axis and foliage-card layout",
+    "reports": {
+      "v18_disconnected": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v18_pve_open_grown_conical_twig_hierarchy_report.json",
+      "v18_1_connected": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v18_1_pve_open_grown_conical_connected_twig_hierarchy_report.json",
+      "v18_2_compact_connected": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v18_2_pve_open_grown_conical_compact_connected_twig_hierarchy_report.json"
+    }
+  },
+  "structural_evidence": {
+    "v18_disconnected": {
+      "palette_mode": "twig_hierarchy",
+      "tree_vertex_count": 136041,
+      "tree_triangle_count": 245571,
+      "foliage_instance_count": 3626,
+      "impostor_source_material_slot_count": 2,
+      "atlas_coverage_fraction_range": [
+        0.095176697,
+        0.105758667
+      ]
+    },
+    "v18_1_connected": {
+      "palette_mode": "connected_twig_hierarchy",
+      "tree_vertex_count": 136041,
+      "tree_triangle_count": 245571,
+      "foliage_instance_count": 3626,
+      "impostor_source_material_slot_count": 2,
+      "atlas_coverage_fraction_range": [
+        0.146133423,
+        0.164154053
+      ]
+    },
+    "v18_2_compact_connected": {
+      "palette_mode": "compact_connected_twig_hierarchy",
+      "tree_vertex_count": 136041,
+      "tree_triangle_count": 245571,
+      "foliage_instance_count": 3626,
+      "impostor_source_material_slot_count": 2,
+      "atlas_coverage_fraction_range": [
+        0.151309967,
+        0.169956207
+      ]
+    }
+  },
+  "transitions": {
+    "v18_to_v18_1": {
+      "before": "v18_disconnected",
+      "after": "v18_1_connected",
+      "capture_comparisons": {
+        "exact_60m_source": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTwigHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "80ca948e229356dd1336db93a4c4586ee5f833e063ec143d7016d7a10490814e"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "150287b6344b3148440ee1df8a4a0c84add9652fd01f4245dfa5c70a4739f34f"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.0703125,
+          "mean_absolute_channel_delta": 4.9750368923611115,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 39269,
+            "after_pixels": 60239,
+            "intersection_over_union": 0.5686608339244896
+          }
+        },
+        "branch_spray_closeup": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTwigHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "da43c5b7191708ca4e77e2e21d2b4087bd1eaec5817241743e1bc18802c1109c"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "4b6ac209000f644c2a2dbe1ec3127ddb20149e8c32a22066a83001355f5c95fc"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.10152018229166666,
+          "mean_absolute_channel_delta": 10.894185836226852,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 24663,
+            "after_pixels": 80417,
+            "intersection_over_union": 0.22998408090645192
+          }
+        },
+        "exact_60m_hlod": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTwigHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "c91022cadb91d07e0112ba4c22b9cefdbfc9b3b75fabd973408240531fe22467"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "853f76ddf23ea81a8be08e937674996adaa557fe6d2aa2eccefe6a0db47b0b84"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.06460286458333334,
+          "mean_absolute_channel_delta": 4.929240089699074,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 44546,
+            "after_pixels": 64138,
+            "intersection_over_union": 0.6194903889137238
+          }
+        }
+      }
+    },
+    "v18_1_to_v18_2": {
+      "before": "v18_1_connected",
+      "after": "v18_2_compact_connected",
+      "capture_comparisons": {
+        "exact_60m_source": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "150287b6344b3148440ee1df8a4a0c84add9652fd01f4245dfa5c70a4739f34f"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "d3084e334a9c98ec4c15dd10037dff22cf688a185e1bcab84a38ccd8d8ff45a2"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.06833767361111111,
+          "mean_absolute_channel_delta": 3.2215946903935184,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 60239,
+            "after_pixels": 63456,
+            "intersection_over_union": 0.7432388629733501
+          }
+        },
+        "branch_spray_closeup": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "4b6ac209000f644c2a2dbe1ec3127ddb20149e8c32a22066a83001355f5c95fc"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "ac66420d33f645d8d436e1bbe7cb80578d1f2d6facfcbb33766224d47f20031b"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.12115668402777778,
+          "mean_absolute_channel_delta": 10.912836733217592,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 80417,
+            "after_pixels": 69548,
+            "intersection_over_union": 0.385204411520201
+          }
+        },
+        "exact_60m_hlod": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressConnectedTwigHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "853f76ddf23ea81a8be08e937674996adaa557fe6d2aa2eccefe6a0db47b0b84"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "fd2403c7ca18d1f459283a410012466b10cadfd99df38a135f8042a8e2028655"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.06152560763888889,
+          "mean_absolute_channel_delta": 3.060860821759259,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 64138,
+            "after_pixels": 68865,
+            "intersection_over_union": 0.7966337516378716
+          }
+        }
+      }
+    }
+  },
+  "rights_reviewed_species_references": {
+    "status": "reference_only_no_external_photo_pixels_vendored_or_derived",
+    "whole_tree_morphology": {
+      "creator": "Krzysztof Ziarnek, Kenraiz",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0",
+      "files": [
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz01.jpg",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz02.jpg",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz03.jpg",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz04.jpg",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz05.jpg",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_kz06.jpg"
+      ]
+    },
+    "scale_leaf_morphology": {
+      "creator": "Gagea",
+      "license": "CC BY-SA 3.0",
+      "license_url": "https://creativecommons.org/licenses/by-sa/3.0",
+      "files": [
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_-_branch_-_01.JPG",
+        "https://commons.wikimedia.org/wiki/File:Austrocedrus_chilensis_-_leaves_-_01.JPG"
+      ]
+    },
+    "screening_decision": "Retain as species and crown-morphology references. Natural forest backgrounds prevent a trustworthy automatic alpha extraction, and the share-alike leaf images require a separately reviewed derivative-license boundary before any pixel-derived texture is committed."
+  },
+  "human_review": {
+    "accepted": [
+      "V18.1 proves that converted PVE live twigs preserve separate bark and foliage material slots and connected woody attachment.",
+      "V18.2 removes the oversized lateral spikes that dominate the V18.1 closeup while retaining a denser 60 m crown than disconnected V18.",
+      "The exact 60 m HLOD continues to preserve the source silhouette; the two connected candidates remain close at 0.146-0.170 atlas coverage while disconnected V18 remains lower at 0.095-0.106."
+    ],
+    "rejected": [
+      "Disconnected V18 leaves visible gaps between branch-scale spray cards.",
+      "V18.1 overextends woody laterals through masked sprays and reads as a cluster of sharpened sticks.",
+      "V18.2 still exposes repeated flat spray crops in closeup and retains coarse horizontal shelf rhythms at 60 m.",
+      "The current source atlas does not provide geometric scale leaves or enough independent branch-spray art for a photoreal near tier.",
+      "The 20/28/36 m authority, moving-camera temporal, wind, packaged desktop, and target-VR gates remain open."
+    ],
+    "decision": "Retain V18.2 as the connected live-twig geometry basis, but do not regenerate the other seven forms or place cypress in the corridor. The next pass must replace the repeated photo-card near art with a rights-reviewed native/Cupressaceae branch source or authored scale-leaf geometry, then repeat this exact isolated gate before LOD and platform work."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_pve_visual_review.v16",
+  "river_id": "futaleufu_terminator",
+  "candidate": "ue_5_8_pve_cordillera_cypress_v16",
+  "reviewed_utc": "2026-07-14T16:32:21Z",
+  "status": "production_authoring_workflow_accepted_visual_and_corridor_promotion_rejected",
+  "decisions": {
+    "real_vegetation_authoring_workflow_established": "pass",
+    "all_eight_required_forms_generated": "pass",
+    "distinct_adult_and_intermediate_scale_envelopes": "pass",
+    "distinct_morphology_controls_visible": "pass",
+    "nanite_woody_raster_micro_foliage_split": "pass",
+    "project_owned_live_and_dead_foliage_palette": "pass",
+    "bounded_non_emissive_foliage_photometry": "pass",
+    "isolated_leaf_shadow_artifact_removed": "pass",
+    "healthy_monopodial_leader_control": "pass_structural_setting_fail_visual_apex",
+    "non_tiered_continuous_native_crown": "fail",
+    "isolated_photoreal_material_response": "pass_bounded_pending_exact_camera_closeup",
+    "native_austrocedrus_identity": "fail_pending_ecology_review",
+    "v13_exact_67_camera_contract": "not_run",
+    "v10_far_authority_comparison": "not_run",
+    "temporal_wind_and_moving_camera": "not_run",
+    "futaleufu_corridor_ecology": "not_run",
+    "packaged_desktop_and_target_vr_performance": "not_run",
+    "production_promotion": "fail",
+    "corridor_substitution": "fail"
+  },
+  "structural_summary": {
+    "form_count": 8,
+    "adult_form_count": 5,
+    "intermediate_form_count": 3,
+    "vertex_count_range": [42689, 142634],
+    "triangle_count_range": [80078, 267683],
+    "foliage_instance_count_range": [630, 6628],
+    "adult_height_m_range": [27.49624484, 31.08888489],
+    "intermediate_height_m_range": [10.40412364, 17.52848928]
+  },
+  "forms": [
+    {"id": "open_grown_conical", "life_stage": "adult", "vertices": 116313, "triangles": 217241, "foliage_instances": 5820, "bounds_cm": [1086.772766, 1229.377319, 3108.243607]},
+    {"id": "closed_grove_columnar", "life_stage": "adult", "vertices": 93192, "triangles": 174848, "foliage_instances": 4599, "bounds_cm": [753.609161, 953.116486, 3068.888489]},
+    {"id": "rocky_slope_asymmetric", "life_stage": "adult", "vertices": 89213, "triangles": 166166, "foliage_instances": 4301, "bounds_cm": [872.446716, 938.968140, 2858.739692]},
+    {"id": "storm_damaged", "life_stage": "adult", "vertices": 70872, "triangles": 133452, "foliage_instances": 3522, "bounds_cm": [965.842957, 709.254364, 2933.480460]},
+    {"id": "coigue_transition_edge", "life_stage": "adult", "vertices": 142634, "triangles": 267683, "foliage_instances": 6628, "bounds_cm": [925.628632, 927.038116, 2749.624484]},
+    {"id": "grove_intermediate", "life_stage": "intermediate", "vertices": 78268, "triangles": 146670, "foliage_instances": 2106, "bounds_cm": [484.884415, 444.150055, 1682.572526]},
+    {"id": "suppressed_intermediate", "life_stage": "intermediate", "vertices": 42689, "triangles": 80078, "foliage_instances": 630, "bounds_cm": [234.218109, 217.469643, 1040.412364]},
+    {"id": "released_intermediate", "life_stage": "intermediate", "vertices": 119813, "triangles": 225658, "foliage_instances": 3323, "bounds_cm": [597.431396, 620.627136, 1752.848928]}
+  ],
+  "retained": [
+    "transient PVE graph adaptation with no installed sample assets copied into the repository",
+    "eight explicit morphology profiles instead of seed-and-scale-only labels",
+    "project-owned V10 broad-spray atlas and project-generated live/dead twig palette",
+    "connected Nanite woody output with shape preservation disabled",
+    "traditional raster masked micro-foliage",
+    "per-form structural reports, local foliage templates, review maps, and deterministic captures",
+    "automatic failure when reflected grower, graft, foliage, export, or graph-bypass controls drift",
+    "bounded 2.10 base-color scale, 0.08 AO influence, stronger physical transmission, and zero diagnostic emissive",
+    "live-foliage shadows disabled in isolated review while connected woody shadows remain",
+    "explicit gravity, angle-correction, bifurcation, graft jitter, phyllotaxy, and upper-crown taper controls"
+  ],
+  "visual_failures": [
+    "the installed spruce scaffold still produces sparse dotted apexes even after explicit bifurcation disable and crown taper",
+    "healthy forms retain stacked crown islands, open bands, or coarse branch shelves",
+    "the storm form reads as damaged but remains too skeletal to substitute for a normal canopy member",
+    "three diagnostic views per form do not satisfy the exact 67-camera V13 gate",
+    "the installed spruce scaffold remains a reconstruction aid rather than native species approval",
+    "no mixed coigue-cypress ecology, river corridor, motion, wind, or target-hardware evidence exists"
+  ],
+  "rights_boundary": "Installed Unreal sample graph and presets are local reconstruction inputs only. No Epic graph, preset, twig mesh, material, texture, or locally generated derivative is committed. Project-owned cypress source textures and the V16 material are retained in source control.",
+  "next_step": "Keep the corrected V16 material, shadow, renderer, density, gravity, phyllotaxy, bifurcation, and export-taper controls. Replace the installed spruce growth scaffold with a project-authored Austrocedrus-oriented PVE graph or a rights-cleared Cupressaceae morphology source that produces a continuous non-tiered crown and convincing apex. Only then run the exact V13 67-camera and V10 far-authority gates before bounded ecology placement, moving-camera wind review, packaged desktop, and target-VR profiling."
+}
