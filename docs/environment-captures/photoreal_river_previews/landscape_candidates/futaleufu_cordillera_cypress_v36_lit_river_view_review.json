@@ -4,7 +4,7 @@
   "candidate": "v35_8x8_handoff_in_v36_lit_physical_corridor_capture",
   "status": "lit_river_view_captured_art_rejected_visible_periodic_pattern_hlod_photometry_and_background_instability",
   "source_structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v32_pve_open_grown_conical_frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
-  "source_structural_report_sha256": "c7e746717d6ed8c8202aa71c431f55958305f7da72f79b6c0ababdad4d6416be",
+  "source_structural_report_sha256": "c93899b278e2d60d75673e1d455f4ad58d29ae2b235220c6222404860cddda0c",
   "capture_contract": {
     "structural_contract_valid": true,
     "expected_capture_count": 147,
@@ -20,12 +20,12 @@
       "source_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_source_only.png",
-          "sha256": "fec66c5ae25d837d01712373f9c3a8fb354fad0ec5ac08ea6e665e1611e92f9d",
-          "dark_chromatic_foreground_pixels": 500287,
+          "sha256": "97a4f8b018c1de22291fffceea01fd742744003b890756197b45c2b0d76cdf1f",
+          "dark_chromatic_foreground_pixels": 500323,
           "foreground_mean_rgb": [
-            18.985258461643017,
-            30.629746525494365,
-            29.3352875449492
+            18.985311488778247,
+            30.63222358356502,
+            29.340701906568356
           ],
           "foreground_median_rgb": [
             5.0,
@@ -35,12 +35,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_hlod_only.png",
-          "sha256": "f460a34f3192fa9b979c5c207eb289b887c34811a1f190c0ce6d70cd11df9e39",
-          "dark_chromatic_foreground_pixels": 763160,
+          "sha256": "fa99b5d553213d14d0d6724e77b3611c2b00173f39f3f362c60bff7c17c0ad26",
+          "dark_chromatic_foreground_pixels": 763208,
           "foreground_mean_rgb": [
-            88.26503223439384,
-            100.32812516379265,
-            80.91215865611406
+            88.25473003427636,
+            100.32717424345657,
+            80.91326610832172
           ],
           "foreground_median_rgb": [
             102.0,
@@ -48,19 +48,19 @@
             69.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9093218315972222,
-        "mean_absolute_channel_delta": 46.86848813657407,
-        "dark_chromatic_foreground_intersection_over_union": 0.5265050327846867
+        "changed_pixel_fraction_max_channel_gt_12": 0.9093185763888889,
+        "mean_absolute_channel_delta": 46.86815646701389,
+        "dark_chromatic_foreground_intersection_over_union": 0.5266268114278534
       },
       "combined_to_source": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_combined.png",
-          "sha256": "a3658b389f6874c22f9f0c8896df91da7ee26fe9f7202dbde071a4eb8c65673c",
-          "dark_chromatic_foreground_pixels": 839228,
+          "sha256": "3effa2892b946422f62d245721780fc14d182fc0e901f4dcdcd774930dc584e2",
+          "dark_chromatic_foreground_pixels": 839277,
           "foreground_mean_rgb": [
-            71.2387920803405,
-            84.07041113976179,
-            69.62280452987746
+            71.23945729479064,
+            84.07058575416698,
+            69.62524768342276
           ],
           "foreground_median_rgb": [
             64.0,
@@ -70,12 +70,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_source_only.png",
-          "sha256": "fec66c5ae25d837d01712373f9c3a8fb354fad0ec5ac08ea6e665e1611e92f9d",
-          "dark_chromatic_foreground_pixels": 500287,
+          "sha256": "97a4f8b018c1de22291fffceea01fd742744003b890756197b45c2b0d76cdf1f",
+          "dark_chromatic_foreground_pixels": 500323,
           "foreground_mean_rgb": [
-            18.985258461643017,
-            30.629746525494365,
-            29.3352875449492
+            18.985311488778247,
+            30.63222358356502,
+            29.340701906568356
           ],
           "foreground_median_rgb": [
             5.0,
@@ -83,19 +83,19 @@
             4.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.7264084201388888,
-        "mean_absolute_channel_delta": 29.390289713541666,
-        "dark_chromatic_foreground_intersection_over_union": 0.5918938511634539
+        "changed_pixel_fraction_max_channel_gt_12": 0.7263661024305555,
+        "mean_absolute_channel_delta": 29.39304181134259,
+        "dark_chromatic_foreground_intersection_over_union": 0.5918624410300286
       },
       "combined_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_combined.png",
-          "sha256": "a3658b389f6874c22f9f0c8896df91da7ee26fe9f7202dbde071a4eb8c65673c",
-          "dark_chromatic_foreground_pixels": 839228,
+          "sha256": "3effa2892b946422f62d245721780fc14d182fc0e901f4dcdcd774930dc584e2",
+          "dark_chromatic_foreground_pixels": 839277,
           "foreground_mean_rgb": [
-            71.2387920803405,
-            84.07041113976179,
-            69.62280452987746
+            71.23945729479064,
+            84.07058575416698,
+            69.62524768342276
           ],
           "foreground_median_rgb": [
             64.0,
@@ -105,12 +105,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f000_23m00_hlod_only.png",
-          "sha256": "f460a34f3192fa9b979c5c207eb289b887c34811a1f190c0ce6d70cd11df9e39",
-          "dark_chromatic_foreground_pixels": 763160,
+          "sha256": "fa99b5d553213d14d0d6724e77b3611c2b00173f39f3f362c60bff7c17c0ad26",
+          "dark_chromatic_foreground_pixels": 763208,
           "foreground_mean_rgb": [
-            88.26503223439384,
-            100.32812516379265,
-            80.91215865611406
+            88.25473003427636,
+            100.32717424345657,
+            80.91326610832172
           ],
           "foreground_median_rgb": [
             102.0,
@@ -118,21 +118,21 @@
             69.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.23005750868055555,
-        "mean_absolute_channel_delta": 18.040370732060186,
-        "dark_chromatic_foreground_intersection_over_union": 0.9067580705234461
+        "changed_pixel_fraction_max_channel_gt_12": 0.2301052517361111,
+        "mean_absolute_channel_delta": 18.04008427372685,
+        "dark_chromatic_foreground_intersection_over_union": 0.9067260166722589
       }
     },
     "15": {
       "source_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_source_only.png",
-          "sha256": "08ac0fd3400d14b6dac9dfb08c242e976f1c6a5af1e933787d3173b263782bf0",
-          "dark_chromatic_foreground_pixels": 505393,
+          "sha256": "6f89a3e852fdc854401448a4eb063be2822e2ac4ac5349555cdc9c5ef0a98541",
+          "dark_chromatic_foreground_pixels": 505379,
           "foreground_mean_rgb": [
-            19.66472032655775,
-            30.78333099192114,
-            30.143563523831947
+            19.672212339650045,
+            30.791880944795885,
+            30.156092754150844
           ],
           "foreground_median_rgb": [
             5.0,
@@ -142,12 +142,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_hlod_only.png",
-          "sha256": "67a55ee1014ab13b631d5c1044ce66123c095514c202b39b4a682767a0790f34",
-          "dark_chromatic_foreground_pixels": 764176,
+          "sha256": "7566460701a240f937b58a98088d2766d5dfed646955b724ffd66a55e8d5e7ed",
+          "dark_chromatic_foreground_pixels": 764151,
           "foreground_mean_rgb": [
-            87.68527538158749,
-            100.04934072779045,
-            81.73952204727706
+            87.67823113494585,
+            100.04421770042832,
+            81.73630473558237
           ],
           "foreground_median_rgb": [
             101.0,
@@ -155,19 +155,19 @@
             69.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9096245659722222,
-        "mean_absolute_channel_delta": 46.45081199363426,
-        "dark_chromatic_foreground_intersection_over_union": 0.5298426619141093
+        "changed_pixel_fraction_max_channel_gt_12": 0.909677734375,
+        "mean_absolute_channel_delta": 46.44774052372685,
+        "dark_chromatic_foreground_intersection_over_union": 0.5296942852598551
       },
       "combined_to_source": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_combined.png",
-          "sha256": "8d41f23dff52fbace3d527716bc6b355998cea3278d4e8829076038de6692973",
-          "dark_chromatic_foreground_pixels": 811002,
+          "sha256": "f99f5d712370e03a82cba9a49eda7376b67b65be44675958b4f024adf80c13ef",
+          "dark_chromatic_foreground_pixels": 811115,
           "foreground_mean_rgb": [
-            79.19703034024577,
-            90.86055151528603,
-            75.77847896799268
+            79.2024595772486,
+            90.86687214513356,
+            75.78604636827083
           ],
           "foreground_median_rgb": [
             71.0,
@@ -177,12 +177,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_source_only.png",
-          "sha256": "08ac0fd3400d14b6dac9dfb08c242e976f1c6a5af1e933787d3173b263782bf0",
-          "dark_chromatic_foreground_pixels": 505393,
+          "sha256": "6f89a3e852fdc854401448a4eb063be2822e2ac4ac5349555cdc9c5ef0a98541",
+          "dark_chromatic_foreground_pixels": 505379,
           "foreground_mean_rgb": [
-            19.66472032655775,
-            30.78333099192114,
-            30.143563523831947
+            19.672212339650045,
+            30.791880944795885,
+            30.156092754150844
           ],
           "foreground_median_rgb": [
             5.0,
@@ -190,19 +190,19 @@
             4.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.8741775173611112,
-        "mean_absolute_channel_delta": 36.7925658275463,
-        "dark_chromatic_foreground_intersection_over_union": 0.5691712231690846
+        "changed_pixel_fraction_max_channel_gt_12": 0.8742035590277778,
+        "mean_absolute_channel_delta": 36.792662398726854,
+        "dark_chromatic_foreground_intersection_over_union": 0.5691713926772463
       },
       "combined_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_combined.png",
-          "sha256": "8d41f23dff52fbace3d527716bc6b355998cea3278d4e8829076038de6692973",
-          "dark_chromatic_foreground_pixels": 811002,
+          "sha256": "f99f5d712370e03a82cba9a49eda7376b67b65be44675958b4f024adf80c13ef",
+          "dark_chromatic_foreground_pixels": 811115,
           "foreground_mean_rgb": [
-            79.19703034024577,
-            90.86055151528603,
-            75.77847896799268
+            79.2024595772486,
+            90.86687214513356,
+            75.78604636827083
           ],
           "foreground_median_rgb": [
             71.0,
@@ -212,12 +212,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f015_24m50_hlod_only.png",
-          "sha256": "67a55ee1014ab13b631d5c1044ce66123c095514c202b39b4a682767a0790f34",
-          "dark_chromatic_foreground_pixels": 764176,
+          "sha256": "7566460701a240f937b58a98088d2766d5dfed646955b724ffd66a55e8d5e7ed",
+          "dark_chromatic_foreground_pixels": 764151,
           "foreground_mean_rgb": [
-            87.68527538158749,
-            100.04934072779045,
-            81.73952204727706
+            87.67823113494585,
+            100.04421770042832,
+            81.73630473558237
           ],
           "foreground_median_rgb": [
             101.0,
@@ -225,21 +225,21 @@
             69.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.18168619791666665,
-        "mean_absolute_channel_delta": 10.256422526041666,
-        "dark_chromatic_foreground_intersection_over_union": 0.9204194941394201
+        "changed_pixel_fraction_max_channel_gt_12": 0.18171440972222222,
+        "mean_absolute_channel_delta": 10.25529224537037,
+        "dark_chromatic_foreground_intersection_over_union": 0.9203207552229999
       }
     },
     "30": {
       "source_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_source_only.png",
-          "sha256": "995261fc5a162e89526e69c10a57ea4d7a7dc1ffa64f39a724e92c4f58b6f27e",
-          "dark_chromatic_foreground_pixels": 505688,
+          "sha256": "865d5dce63decd60c759e47bbbf9c638ce870dee5c804ffd15b6903b8e81c824",
+          "dark_chromatic_foreground_pixels": 505629,
           "foreground_mean_rgb": [
-            19.211490088750377,
-            29.972382180316718,
-            29.985678916644254
+            19.199118325887163,
+            29.957975116142467,
+            29.966321156421014
           ],
           "foreground_median_rgb": [
             4.0,
@@ -249,12 +249,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_hlod_only.png",
-          "sha256": "82690d19fd45421c862525517af094576b63d0736f510f3ea516f0188813c797",
-          "dark_chromatic_foreground_pixels": 763048,
+          "sha256": "5534237cd3ab97a469279d9080b1067b668fc4a5005ced21a893720b9cd01d9b",
+          "dark_chromatic_foreground_pixels": 762976,
           "foreground_mean_rgb": [
-            87.33122293748231,
-            100.00140882356025,
-            82.6533166982942
+            87.32359340267584,
+            99.99477309902278,
+            82.65174789246319
           ],
           "foreground_median_rgb": [
             101.0,
@@ -262,19 +262,19 @@
             70.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9081618923611111,
-        "mean_absolute_channel_delta": 46.605810185185184,
-        "dark_chromatic_foreground_intersection_over_union": 0.5281998901490697
+        "changed_pixel_fraction_max_channel_gt_12": 0.9081564670138889,
+        "mean_absolute_channel_delta": 46.60919777199074,
+        "dark_chromatic_foreground_intersection_over_union": 0.5279390368457566
       },
       "combined_to_source": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_combined.png",
-          "sha256": "24acb1f7294fe91e0b6b0c630ef7d7bde879aaac1d00faeaeb20ff029f21466f",
-          "dark_chromatic_foreground_pixels": 762271,
+          "sha256": "c025bfb39376bd1470f38655509dfe5e7cf8c7363ae65be631458e620c58b226",
+          "dark_chromatic_foreground_pixels": 762169,
           "foreground_mean_rgb": [
-            86.74991308865219,
-            99.23476034113853,
-            82.65630071195153
+            86.74146678754974,
+            99.22714253662902,
+            82.65397438100999
           ],
           "foreground_median_rgb": [
             100.0,
@@ -284,12 +284,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_source_only.png",
-          "sha256": "995261fc5a162e89526e69c10a57ea4d7a7dc1ffa64f39a724e92c4f58b6f27e",
-          "dark_chromatic_foreground_pixels": 505688,
+          "sha256": "865d5dce63decd60c759e47bbbf9c638ce870dee5c804ffd15b6903b8e81c824",
+          "dark_chromatic_foreground_pixels": 505629,
           "foreground_mean_rgb": [
-            19.211490088750377,
-            29.972382180316718,
-            29.985678916644254
+            19.199118325887163,
+            29.957975116142467,
+            29.966321156421014
           ],
           "foreground_median_rgb": [
             4.0,
@@ -297,19 +297,19 @@
             4.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9079079861111111,
-        "mean_absolute_channel_delta": 46.00398292824074,
-        "dark_chromatic_foreground_intersection_over_union": 0.5263043221810005
+        "changed_pixel_fraction_max_channel_gt_12": 0.90791015625,
+        "mean_absolute_channel_delta": 46.00696795428241,
+        "dark_chromatic_foreground_intersection_over_union": 0.5261105185991252
       },
       "combined_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_combined.png",
-          "sha256": "24acb1f7294fe91e0b6b0c630ef7d7bde879aaac1d00faeaeb20ff029f21466f",
-          "dark_chromatic_foreground_pixels": 762271,
+          "sha256": "c025bfb39376bd1470f38655509dfe5e7cf8c7363ae65be631458e620c58b226",
+          "dark_chromatic_foreground_pixels": 762169,
           "foreground_mean_rgb": [
-            86.74991308865219,
-            99.23476034113853,
-            82.65630071195153
+            86.74146678754974,
+            99.22714253662902,
+            82.65397438100999
           ],
           "foreground_median_rgb": [
             100.0,
@@ -319,12 +319,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f030_26m00_hlod_only.png",
-          "sha256": "82690d19fd45421c862525517af094576b63d0736f510f3ea516f0188813c797",
-          "dark_chromatic_foreground_pixels": 763048,
+          "sha256": "5534237cd3ab97a469279d9080b1067b668fc4a5005ced21a893720b9cd01d9b",
+          "dark_chromatic_foreground_pixels": 762976,
           "foreground_mean_rgb": [
-            87.33122293748231,
-            100.00140882356025,
-            82.6533166982942
+            87.32359340267584,
+            99.99477309902278,
+            82.65174789246319
           ],
           "foreground_median_rgb": [
             101.0,
@@ -332,21 +332,21 @@
             70.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.03774197048611111,
-        "mean_absolute_channel_delta": 0.8416001157407408,
-        "dark_chromatic_foreground_intersection_over_union": 0.9835484437277711
+        "changed_pixel_fraction_max_channel_gt_12": 0.037763671875,
+        "mean_absolute_channel_delta": 0.8429654947916667,
+        "dark_chromatic_foreground_intersection_over_union": 0.9834279219292953
       }
     },
     "40": {
       "source_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_source_only.png",
-          "sha256": "43874d139b9fdbbea9c2999701aeacfa6cd98ddc16549f30d6cea011c8741dd4",
-          "dark_chromatic_foreground_pixels": 504807,
+          "sha256": "8ab09f09258a1a89a2609083ecf45fc3b2d360758c3d6f2f26247d217b92b5b1",
+          "dark_chromatic_foreground_pixels": 504865,
           "foreground_mean_rgb": [
-            18.83033317683788,
-            29.43309423205304,
-            29.816175290754686
+            18.833183128162975,
+            29.439776970081112,
+            29.825369158091767
           ],
           "foreground_median_rgb": [
             4.0,
@@ -356,12 +356,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_hlod_only.png",
-          "sha256": "657a39125a635df9ccb0d6dd01418e5195d64f6c81f8cdef10bddfb027c786fe",
-          "dark_chromatic_foreground_pixels": 759920,
+          "sha256": "100b1007de228ae80b6609d2706c05cac9397279dbc2f3610df891a2d620e43f",
+          "dark_chromatic_foreground_pixels": 759731,
           "foreground_mean_rgb": [
-            87.00525055268976,
-            99.76230261080114,
-            82.7698270870618
+            86.9999039133588,
+            99.7618973031244,
+            82.7694697202036
           ],
           "foreground_median_rgb": [
             100.0,
@@ -369,19 +369,19 @@
             70.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9075065104166666,
-        "mean_absolute_channel_delta": 46.493797019675924,
-        "dark_chromatic_foreground_intersection_over_union": 0.5231582065968793
+        "changed_pixel_fraction_max_channel_gt_12": 0.9075499131944444,
+        "mean_absolute_channel_delta": 46.497141203703706,
+        "dark_chromatic_foreground_intersection_over_union": 0.5229875990408737
       },
       "combined_to_source": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_combined.png",
-          "sha256": "9055f25278df4cc07e67d4fc5709a811b354d386aa17e13c984532abbc0e5989",
-          "dark_chromatic_foreground_pixels": 761352,
+          "sha256": "1b892ae980500507197014e5616eadc78461de347c1badcb2d86eff2be7742b6",
+          "dark_chromatic_foreground_pixels": 761145,
           "foreground_mean_rgb": [
-            86.93934868497095,
-            99.6093869852578,
-            82.74825836144123
+            86.93089490175984,
+            99.60521319853642,
+            82.75008047086955
           ],
           "foreground_median_rgb": [
             100.0,
@@ -391,12 +391,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_source_only.png",
-          "sha256": "43874d139b9fdbbea9c2999701aeacfa6cd98ddc16549f30d6cea011c8741dd4",
-          "dark_chromatic_foreground_pixels": 504807,
+          "sha256": "8ab09f09258a1a89a2609083ecf45fc3b2d360758c3d6f2f26247d217b92b5b1",
+          "dark_chromatic_foreground_pixels": 504865,
           "foreground_mean_rgb": [
-            18.83033317683788,
-            29.43309423205304,
-            29.816175290754686
+            18.833183128162975,
+            29.439776970081112,
+            29.825369158091767
           ],
           "foreground_median_rgb": [
             4.0,
@@ -404,19 +404,19 @@
             4.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9074251302083334,
-        "mean_absolute_channel_delta": 46.30276548032408,
-        "dark_chromatic_foreground_intersection_over_union": 0.5236845430422932
+        "changed_pixel_fraction_max_channel_gt_12": 0.9074717881944444,
+        "mean_absolute_channel_delta": 46.30583622685185,
+        "dark_chromatic_foreground_intersection_over_union": 0.5235107378980531
       },
       "combined_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_combined.png",
-          "sha256": "9055f25278df4cc07e67d4fc5709a811b354d386aa17e13c984532abbc0e5989",
-          "dark_chromatic_foreground_pixels": 761352,
+          "sha256": "1b892ae980500507197014e5616eadc78461de347c1badcb2d86eff2be7742b6",
+          "dark_chromatic_foreground_pixels": 761145,
           "foreground_mean_rgb": [
-            86.93934868497095,
-            99.6093869852578,
-            82.74825836144123
+            86.93089490175984,
+            99.60521319853642,
+            82.75008047086955
           ],
           "foreground_median_rgb": [
             100.0,
@@ -426,12 +426,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f040_27m00_hlod_only.png",
-          "sha256": "657a39125a635df9ccb0d6dd01418e5195d64f6c81f8cdef10bddfb027c786fe",
-          "dark_chromatic_foreground_pixels": 759920,
+          "sha256": "100b1007de228ae80b6609d2706c05cac9397279dbc2f3610df891a2d620e43f",
+          "dark_chromatic_foreground_pixels": 759731,
           "foreground_mean_rgb": [
-            87.00525055268976,
-            99.76230261080114,
-            82.7698270870618
+            86.9999039133588,
+            99.7618973031244,
+            82.7694697202036
           ],
           "foreground_median_rgb": [
             100.0,
@@ -440,20 +440,20 @@
           ]
         },
         "changed_pixel_fraction_max_channel_gt_12": 0.008842230902777777,
-        "mean_absolute_channel_delta": 0.25186125578703705,
-        "dark_chromatic_foreground_intersection_over_union": 0.9958646675728012
+        "mean_absolute_channel_delta": 0.2527488425925926,
+        "dark_chromatic_foreground_intersection_over_union": 0.995813829584808
       }
     },
     "48": {
       "source_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_source_only.png",
-          "sha256": "7d6800dcfe736c0d29ba9c4573830f7bf10a06561bb402df738e6530e5e982e4",
-          "dark_chromatic_foreground_pixels": 503646,
+          "sha256": "1c7c53e39bdcb4df54091ea013915cec6f0045045d806b2f2a6e0e9c4a991e6f",
+          "dark_chromatic_foreground_pixels": 503632,
           "foreground_mean_rgb": [
-            18.598785655003713,
-            29.270606735683398,
-            29.630764465517448
+            18.59360406010738,
+            29.26849763319249,
+            29.633188518600882
           ],
           "foreground_median_rgb": [
             4.0,
@@ -463,12 +463,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_hlod_only.png",
-          "sha256": "7c18c3c5e0a1e00549c1761d9d2fa7a00a377812e2dfb0a765e50c24d596a768",
-          "dark_chromatic_foreground_pixels": 761731,
+          "sha256": "2c9d9cb9b4d830de3eae44cd2b9f4a28b15fd097ffe62a75d8182c39a1c33316",
+          "dark_chromatic_foreground_pixels": 761481,
           "foreground_mean_rgb": [
-            87.0700102792193,
-            99.86578464050957,
-            82.82164307347344
+            87.06101793741406,
+            99.86183896906161,
+            82.82242235853553
           ],
           "foreground_median_rgb": [
             100.0,
@@ -476,19 +476,19 @@
             70.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9068684895833333,
-        "mean_absolute_channel_delta": 46.56088324652778,
-        "dark_chromatic_foreground_intersection_over_union": 0.5239153316810101
+        "changed_pixel_fraction_max_channel_gt_12": 0.9068891059027778,
+        "mean_absolute_channel_delta": 46.56349645543982,
+        "dark_chromatic_foreground_intersection_over_union": 0.5236964826832006
       },
       "combined_to_source": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_combined.png",
-          "sha256": "6fa75769a9eba30a1a1b0f2c71500d8f28ecbab8ddcc56d63eb49d263e13ac04",
-          "dark_chromatic_foreground_pixels": 762852,
+          "sha256": "85ba0e46c030aea8099835bb67282aaa5d6ca1cebb996620723f36b2cfa1307b",
+          "dark_chromatic_foreground_pixels": 762614,
           "foreground_mean_rgb": [
-            87.04740631210248,
-            99.78063110537823,
-            82.79747185561551
+            87.04193995914054,
+            99.7761396984582,
+            82.79713459233636
           ],
           "foreground_median_rgb": [
             100.0,
@@ -498,12 +498,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_source_only.png",
-          "sha256": "7d6800dcfe736c0d29ba9c4573830f7bf10a06561bb402df738e6530e5e982e4",
-          "dark_chromatic_foreground_pixels": 503646,
+          "sha256": "1c7c53e39bdcb4df54091ea013915cec6f0045045d806b2f2a6e0e9c4a991e6f",
+          "dark_chromatic_foreground_pixels": 503632,
           "foreground_mean_rgb": [
-            18.598785655003713,
-            29.270606735683398,
-            29.630764465517448
+            18.59360406010738,
+            29.26849763319249,
+            29.633188518600882
           ],
           "foreground_median_rgb": [
             4.0,
@@ -511,19 +511,19 @@
             4.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.9068196614583334,
-        "mean_absolute_channel_delta": 46.45066840277778,
-        "dark_chromatic_foreground_intersection_over_union": 0.5242905989695226
+        "changed_pixel_fraction_max_channel_gt_12": 0.9068467881944444,
+        "mean_absolute_channel_delta": 46.45319118923611,
+        "dark_chromatic_foreground_intersection_over_union": 0.5240625105315609
       },
       "combined_to_hlod": {
         "before": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_combined.png",
-          "sha256": "6fa75769a9eba30a1a1b0f2c71500d8f28ecbab8ddcc56d63eb49d263e13ac04",
-          "dark_chromatic_foreground_pixels": 762852,
+          "sha256": "85ba0e46c030aea8099835bb67282aaa5d6ca1cebb996620723f36b2cfa1307b",
+          "dark_chromatic_foreground_pixels": 762614,
           "foreground_mean_rgb": [
-            87.04740631210248,
-            99.78063110537823,
-            82.79747185561551
+            87.04193995914054,
+            99.7761396984582,
+            82.79713459233636
           ],
           "foreground_median_rgb": [
             100.0,
@@ -533,12 +533,12 @@
         },
         "after": {
           "path": "/Users/alexmoran/repos/SmokeEmIfYouGotEm/unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_motion_8x8_lit_river_view_f048_settle08_27m00_hlod_only.png",
-          "sha256": "7c18c3c5e0a1e00549c1761d9d2fa7a00a377812e2dfb0a765e50c24d596a768",
-          "dark_chromatic_foreground_pixels": 761731,
+          "sha256": "2c9d9cb9b4d830de3eae44cd2b9f4a28b15fd097ffe62a75d8182c39a1c33316",
+          "dark_chromatic_foreground_pixels": 761481,
           "foreground_mean_rgb": [
-            87.0700102792193,
-            99.86578464050957,
-            82.82164307347344
+            87.06101793741406,
+            99.86183896906161,
+            82.82242235853553
           ],
           "foreground_median_rgb": [
             100.0,
@@ -546,9 +546,9 @@
             70.0
           ]
         },
-        "changed_pixel_fraction_max_channel_gt_12": 0.004864366319444444,
-        "mean_absolute_channel_delta": 0.14279875578703705,
-        "dark_chromatic_foreground_intersection_over_union": 0.9977710570247739
+        "changed_pixel_fraction_max_channel_gt_12": 0.004854600694444444,
+        "mean_absolute_channel_delta": 0.1431807002314815,
+        "dark_chromatic_foreground_intersection_over_union": 0.9977782001454985
       }
     }
   },
@@ -562,95 +562,95 @@
       540
     ],
     "classification": "pixels whose source/HLOD maximum-channel delta exceeds 24 are assigned to the closer authority image, then grouped by 8x8 screen phase",
-    "valid_pixel_fraction": 0.6982818930041153,
-    "observed_source_owned_fraction": 0.44365948167901814,
+    "valid_pixel_fraction": 0.6978317901234568,
+    "observed_source_owned_fraction": 0.44415572927608665,
     "phase_source_owned_fractions": [
       [
-        0.4956316410861865,
-        0.41130742049469965,
-        0.4163323105971206,
-        0.4710900473933649,
-        0.46987666034155595,
-        0.5148584905660377,
-        0.5178320037541061,
-        0.4599811676082863
+        0.4942285041224971,
+        0.4110169491525424,
+        0.41550460883951784,
+        0.47149643705463185,
+        0.46956728483119353,
+        0.5164186156390267,
+        0.520828430218875,
+        0.4614840989399293
       ],
       [
-        0.5170132325141777,
-        0.6071008699741359,
-        0.6118699952896844,
-        0.5035294117647059,
-        0.4591283863368669,
-        0.05785898336847037,
-        0.05602437880918894,
-        0.454331450094162
+        0.5156876621844775,
+        0.6089517078916372,
+        0.6135721017907634,
+        0.5034029570523352,
+        0.45939565627950896,
+        0.05779129620963968,
+        0.05445197476045805,
+        0.4554478846608367
       ],
       [
-        0.5307692307692308,
-        0.633201027317301,
-        0.6305361305361306,
-        0.5208138447146866,
-        0.45588235294117646,
-        0.05301261092947221,
-        0.06011183597390494,
-        0.4394293732460243
+        0.5307835820895522,
+        0.632191940368041,
+        0.6315298507462687,
+        0.5246478873239436,
+        0.45824561403508773,
+        0.05389640690620625,
+        0.060379124736718935,
+        0.4401309635173059
       ],
       [
-        0.5582907570831398,
-        0.6018648018648018,
-        0.5953770721456922,
-        0.5379278445883441,
-        0.46935446282917737,
-        0.41548477098349224,
-        0.41188811188811186,
-        0.46200325354403904
+        0.5599813650128116,
+        0.6012098650535133,
+        0.5957943925233645,
+        0.5388180764774044,
+        0.4695022201448937,
+        0.415041782729805,
+        0.41177839851024206,
+        0.46064814814814814
       ],
       [
-        0.556953013763645,
-        0.5512241502258142,
-        0.5215015443098123,
-        0.5033065658951347,
-        0.5170777988614801,
-        0.5060127328460269,
-        0.5021337126600285,
-        0.5438346400570206
+        0.559208958780081,
+        0.5504739336492891,
+        0.524648725887116,
+        0.5027116246168356,
+        0.5187470336971998,
+        0.510673624288425,
+        0.500236518448439,
+        0.5425658050746976
       ],
       [
-        0.4870083432657926,
-        0.04904761904761905,
-        0.04364326375711575,
-        0.4395343311950582,
-        0.49338686820973077,
-        0.5959212710457671,
-        0.5990510083036773,
-        0.5444839857651246
+        0.486538003335716,
+        0.0486873508353222,
+        0.042340627973358705,
+        0.4383139947904333,
+        0.4951548097376507,
+        0.598286530223703,
+        0.6011890606420928,
+        0.5454114299264881
       ],
       [
-        0.4042654028436019,
-        0.04094263270649845,
-        0.040482954545454544,
-        0.3412210127780407,
-        0.5148632580261593,
-        0.6104294478527608,
-        0.6211725611203418,
-        0.5410456588597113
+        0.40488614800759015,
+        0.04109263657957245,
+        0.04050213169114164,
+        0.34228028503562946,
+        0.5138724211524781,
+        0.6112030252895296,
+        0.621017593913457,
+        0.5411234889784309
       ],
       [
-        0.41127497621313036,
-        0.22383099928791836,
-        0.21712247324613557,
-        0.38077106139933364,
-        0.5190294957183634,
-        0.5676762896355892,
-        0.5806603773584905,
-        0.5196589294173377
+        0.4137848795611734,
+        0.2239409804854831,
+        0.21777460090540862,
+        0.3801711840228245,
+        0.5185009487666035,
+        0.5685809207403891,
+        0.5833530385433908,
+        0.5196496212121212
       ]
     ],
     "phase_source_fraction_range": [
-      0.040482954545454544,
-      0.633201027317301
+      0.04050213169114164,
+      0.632191940368041
     ],
-    "phase_contrast": 0.5927180727718464,
+    "phase_contrast": 0.5916898086768994,
     "maximum_acceptable_phase_contrast": 0.2,
     "visible_periodic_pattern_gate_passed": false
   },
@@ -664,7 +664,7 @@
           280,
           450
         ],
-        "source_to_hlod_mean_absolute_channel_delta": 18.978470238095237
+        "source_to_hlod_mean_absolute_channel_delta": 18.979886904761905
       },
       "foreground_water": {
         "roi_xyxy": [
@@ -673,10 +673,10 @@
           1280,
           700
         ],
-        "source_to_hlod_mean_absolute_channel_delta": 79.79205240885416
+        "source_to_hlod_mean_absolute_channel_delta": 79.79201822916667
       }
     },
-    "maximum_mean_absolute_channel_delta": 79.79205240885416,
+    "maximum_mean_absolute_channel_delta": 79.79201822916667,
     "maximum_acceptable_mean_absolute_channel_delta": 4.0,
     "authority_background_stability_gate_passed": false
   },
@@ -710,7 +710,7 @@
   },
   "contact_sheet": {
     "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v36_lit_river_view_contact_sheet.png",
-    "sha256": "6abcc0f521031f4b0ba70fca8152c1127c2d5fa98c86a5f461bce8f3671e89c5",
+    "sha256": "2ca11c219f929fae798d6dd7ffd6daf47c10499742cdcc32e78b5e7d96933964",
     "selected_frames": [
       0,
       15,
