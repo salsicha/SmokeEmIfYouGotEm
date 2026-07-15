@@ -29708,8 +29708,11 @@ bool CreateFutaleufuCypressPvePalette(
     FString& OutSummary)
 {
     const bool bCurvedShells = PaletteMode == TEXT("curved_shells");
+    const bool bDeTieredCompoundBranchletAtlas =
+        PaletteMode == TEXT("detiered_compound_branchlet_atlas");
     const bool bCompoundBranchletAtlas =
-        PaletteMode == TEXT("compound_branchlet_atlas");
+        PaletteMode == TEXT("compound_branchlet_atlas") ||
+        bDeTieredCompoundBranchletAtlas;
     const bool bTerminalClusterBotanicalShoot =
         PaletteMode == TEXT("terminal_cluster_botanical_shoot");
     const bool bHierarchicalBotanicalShootCluster =
@@ -29744,7 +29747,9 @@ bool CreateFutaleufuCypressPvePalette(
     }
     const FString LiveMaterialName = bBotanicalFlattenedSprayHierarchy
         ? (bCompoundBranchletAtlas
-            ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V21_CompoundBranchletAtlasLiveTwigs")
+            ? (bDeTieredCompoundBranchletAtlas
+                ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V22_DeTieredCompoundBranchletAtlasLiveTwigs")
+                : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V21_CompoundBranchletAtlasLiveTwigs"))
             : (bTerminalClusterBotanicalShoot
             ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V20_4_TerminalClusterBotanicalShootLiveTwigs")
             : (bHierarchicalBotanicalShootCluster
@@ -29792,8 +29797,11 @@ bool CreateFutaleufuCypressPvePalette(
 
     const FString PaletteRoot = bBotanicalFlattenedSprayHierarchy
         ? (bCompoundBranchletAtlas
-            ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                   "PVEFutaleufuCordilleraCypressCompoundBranchletAtlas/Palette/")
+            ? (bDeTieredCompoundBranchletAtlas
+                ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                       "PVEFutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/Palette/")
+                : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                       "PVEFutaleufuCordilleraCypressCompoundBranchletAtlas/Palette/"))
             : (bTerminalClusterBotanicalShoot
             ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                    "PVEFutaleufuCordilleraCypressTerminalClusterBotanicalShoot/Palette/")
@@ -30350,7 +30358,9 @@ bool CreateFutaleufuCypressPvePalette(
         const FString PaletteAssetToken = bConnectedTwigHierarchy
             ? (bBotanicalFlattenedSprayHierarchy
                    ? (bCompoundBranchletAtlas
-                        ? TEXT("V21_CompoundBranchletAtlas_Pve")
+                        ? (bDeTieredCompoundBranchletAtlas
+                            ? TEXT("V22_DeTieredCompoundBranchletAtlas_Pve")
+                            : TEXT("V21_CompoundBranchletAtlas_Pve"))
                         : (bTerminalClusterBotanicalShoot
                         ? TEXT("V20_4_TerminalClusterBotanicalShoot_Pve")
                         : (bHierarchicalBotanicalShootCluster
@@ -30523,13 +30533,15 @@ UPCGNode* AddProjectPveNode(
 bool ConfigureFutaleufuCypressPveGrower(
     UPCGSettings* Settings,
     const FFutaleufuCypressPveFormSpec& Spec,
-    bool bBranchletGrower)
+    bool bBranchletGrower,
+    bool bDeTieredCrown)
 {
     if (!Settings)
     {
         return false;
     }
 
+    const bool bDeTieredMain = bDeTieredCrown && !bBranchletGrower;
     bool bConfigured = SetPveGrowerSeed(
         Settings, Spec.Seed + (bBranchletGrower ? 7919 : 0));
     bConfigured &= SetPveStructText(
@@ -30690,7 +30702,9 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("AxillaryPriorityGradient"),
         bBranchletGrower
             ? TArray<FVector2f>{{0.0f, 0.15f}, {0.22f, 0.86f}, {0.82f, 0.72f}, {1.0f, 0.34f}}
-            : TArray<FVector2f>{{0.0f, 0.0f}, {0.12f, 0.0f}, {0.18f, 0.64f}, {0.72f, 0.84f}, {1.0f, 0.56f}});
+            : (bDeTieredMain
+                ? TArray<FVector2f>{{0.0f, 0.0f}, {0.08f, 0.18f}, {0.18f, 0.68f}, {0.52f, 0.88f}, {0.78f, 0.74f}, {1.0f, 0.22f}}
+                : TArray<FVector2f>{{0.0f, 0.0f}, {0.12f, 0.0f}, {0.18f, 0.64f}, {0.72f, 0.84f}, {1.0f, 0.56f}}));
     bConfigured &= SetPveNestedRamp(
         Settings,
         TEXT("GrowerParams"),
@@ -30733,7 +30747,7 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("GrowerParams"),
         TEXT("Phyllotaxy"),
         TEXT("AdditionalAngle"),
-        bBranchletGrower ? 4.0f : 7.5f);
+        bBranchletGrower ? 4.0f : (bDeTieredMain ? 137.507764f : 7.5f));
     bConfigured &= SetPveNestedFloat(
         Settings,
         TEXT("GrowerParams"),
@@ -30751,7 +30765,7 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("GrowerParams"),
         TEXT("Phyllotaxy"),
         TEXT("Stagger"),
-        bBranchletGrower ? 0.04f : 0.035f);
+        bBranchletGrower ? 0.04f : (bDeTieredMain ? 0.14f : 0.035f));
     bConfigured &= SetPveNestedFloat(
         Settings,
         TEXT("GrowerParams"),
@@ -30769,13 +30783,13 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("GrowerParams"),
         TEXT("BranchPhyllotaxy"),
         TEXT("Flatten"),
-        bBranchletGrower ? 0.92f : 0.78f);
+        bBranchletGrower ? 0.92f : (bDeTieredMain ? 0.60f : 0.78f));
     bConfigured &= SetPveNestedFloat(
         Settings,
         TEXT("GrowerParams"),
         TEXT("BranchPhyllotaxy"),
         TEXT("Stagger"),
-        bBranchletGrower ? 0.04f : 0.08f);
+        bBranchletGrower ? 0.04f : (bDeTieredMain ? 0.16f : 0.08f));
     bConfigured &= SetPveNestedBool(
         Settings,
         TEXT("GrowerParams"),
@@ -30856,13 +30870,13 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("GrowerParams"),
         TEXT("Directional"),
         TEXT("ApicalRandomAngle"),
-        bBranchletGrower ? 1.5f : Spec.ApicalRandomAngle);
+        bBranchletGrower ? 1.5f : (bDeTieredMain ? 1.5f : Spec.ApicalRandomAngle));
     bConfigured &= SetPveNestedFloat(
         Settings,
         TEXT("GrowerParams"),
         TEXT("Directional"),
         TEXT("AxillaryRandomAngle"),
-        bBranchletGrower ? 5.0f : Spec.AxillaryRandomAngle);
+        bBranchletGrower ? 5.0f : (bDeTieredMain ? 12.0f : Spec.AxillaryRandomAngle));
     bConfigured &= SetPveNestedFloat(
         Settings,
         TEXT("GrowerParams"),
@@ -30874,7 +30888,7 @@ bool ConfigureFutaleufuCypressPveGrower(
         TEXT("GrowerParams"),
         TEXT("BranchDirectional"),
         TEXT("AxillaryRandomAngle"),
-        bBranchletGrower ? 7.0f : Spec.AxillaryRandomAngle);
+        bBranchletGrower ? 7.0f : (bDeTieredMain ? 15.0f : Spec.AxillaryRandomAngle));
     bConfigured &= SetPveNestedInt(
         Settings,
         TEXT("GrowerParams"),
@@ -31837,12 +31851,13 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT("branchlet_mass_botanical_flattened_spray_hierarchy") &&
         PaletteMode != TEXT("hierarchical_botanical_shoot_cluster") &&
         PaletteMode != TEXT("terminal_cluster_botanical_shoot") &&
-        PaletteMode != TEXT("compound_branchlet_atlas"))
+        PaletteMode != TEXT("compound_branchlet_atlas") &&
+        PaletteMode != TEXT("detiered_compound_branchlet_atlas"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, or compound_branchlet_atlas."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, or detiered_compound_branchlet_atlas."),
             *PaletteMode);
         return;
     }
@@ -31856,6 +31871,8 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
             *Variant);
         return;
     }
+    const bool bDeTieredCrown =
+        PaletteMode == TEXT("detiered_compound_branchlet_atlas");
 
     UWorld* PaletteWorld = UEditorLoadingAndSavingUtils::NewBlankMap(false);
     TArray<FString> LiveTwigPaths;
@@ -31967,9 +31984,9 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         LiveDistributorNode;
     bool bConfigured = bNodesCreated;
     bConfigured &= ConfigureFutaleufuCypressPveGrower(
-        BranchGrowerSettings, *Spec, true);
+        BranchGrowerSettings, *Spec, true, bDeTieredCrown);
     bConfigured &= ConfigureFutaleufuCypressPveGrower(
-        MainGrowerSettings, *Spec, false);
+        MainGrowerSettings, *Spec, false, bDeTieredCrown);
     bConfigured &= SetPveFoliagePaletteMeshes(
         DeadPaletteSettings, TArray<FString>{DeadTwigPath});
     bConfigured &= SetPveFoliagePaletteMeshes(LivePaletteSettings, LiveTwigPaths);
@@ -32021,7 +32038,7 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         TEXT("ParametricSettings"),
         TEXT("SpacingSettings"),
         TEXT("RelativeEnd"),
-        1.0f);
+        bDeTieredCrown ? 0.98f : 1.0f);
     bConfigured &= SetPveNestedBool(
         GraftDistributorSettings,
         TEXT("ParametricSettings"),
@@ -32069,25 +32086,25 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         TEXT("ParametricSettings"),
         TEXT("PhyllotaxySettings"),
         TEXT("PhyllotaxyAdditionalAngle"),
-        17.5f);
+        bDeTieredCrown ? 137.507764f : 17.5f);
     bConfigured &= SetPveNestedFloat(
         GraftDistributorSettings,
         TEXT("ParametricSettings"),
         TEXT("AngleSettings"),
         TEXT("AxilAngle"),
-        72.0f);
+        bDeTieredCrown ? 66.0f : 72.0f);
     bConfigured &= SetPveNestedFloat(
         GraftDistributorSettings,
         TEXT("ParametricSettings"),
         TEXT("AngleSettings"),
         TEXT("RandomizeAxilAngleMinimum"),
-        -8.0f);
+        bDeTieredCrown ? -18.0f : -8.0f);
     bConfigured &= SetPveNestedFloat(
         GraftDistributorSettings,
         TEXT("ParametricSettings"),
         TEXT("AngleSettings"),
         TEXT("RandomizeAxilAngleMaximum"),
-        8.0f);
+        bDeTieredCrown ? 18.0f : 8.0f);
 
     bConfigured &= SetPvePropertyText(
         DeadDistributorSettings, TEXT("Mode"), TEXT("ParametricSettings"));
@@ -32493,9 +32510,13 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const bool bCurvedCypressShellPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("curved_shells");
+    const bool bDeTieredCompoundBranchletAtlasCypressPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT("detiered_compound_branchlet_atlas");
     const bool bCompoundBranchletAtlasCypressPalette =
         bProceduralCypressPveCandidate &&
-        ProceduralCypressPaletteMode == TEXT("compound_branchlet_atlas");
+        (ProceduralCypressPaletteMode == TEXT("compound_branchlet_atlas") ||
+         bDeTieredCompoundBranchletAtlasCypressPalette);
     const bool bTerminalClusterBotanicalShootCypressPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("terminal_cluster_botanical_shoot");
@@ -32545,7 +32566,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const FString LocalReviewNamespace = bProceduralCypressPveCandidate
         ? (bBotanicalFlattenedSprayCypressHierarchyPalette
                ? (bCompoundBranchletAtlasCypressPalette
-                    ? TEXT("PVEFutaleufuCordilleraCypressCompoundBranchletAtlas")
+                    ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                        ? TEXT("PVEFutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas")
+                        : TEXT("PVEFutaleufuCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
                     ? TEXT("PVEFutaleufuCordilleraCypressTerminalClusterBotanicalShoot")
                     : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -32572,7 +32595,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const FString LocalSavedNamespace = bProceduralCypressPveCandidate
         ? (bBotanicalFlattenedSprayCypressHierarchyPalette
                ? (bCompoundBranchletAtlasCypressPalette
-                    ? TEXT("FutaleufuCordilleraCypressCompoundBranchletAtlas")
+                    ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                        ? TEXT("FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas")
+                        : TEXT("FutaleufuCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
                     ? TEXT("FutaleufuCordilleraCypressTerminalClusterBotanicalShoot")
                     : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -32602,7 +32627,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const FString CandidateAssetPrefix = bProceduralCypressPveCandidate
         ? (bBotanicalFlattenedSprayCypressHierarchyPalette
                ? (bCompoundBranchletAtlasCypressPalette
-                    ? TEXT("FutaleufuPveCordilleraCypressCompoundBranchletAtlas")
+                    ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                        ? TEXT("FutaleufuPveCordilleraCypressDeTieredCompoundBranchletAtlas")
+                        : TEXT("FutaleufuPveCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
                     ? TEXT("FutaleufuPveCordilleraCypressTerminalClusterBotanicalShoot")
                     : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -33820,7 +33847,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         }
     }
     const TCHAR* LocalMultiViewAtlasHumanAcceptance =
-        bCompoundBranchletAtlasCypressPalette
+        bDeTieredCompoundBranchletAtlasCypressPalette
+        ? TEXT("V22 de-tiered golden-angle crown and V21 compound branchlet source completed under the fixed open-grown source-cost and camera contract; crown topology and visual promotion remain pending committed comparison")
+        : (bCompoundBranchletAtlasCypressPalette
         ? TEXT("V21 six-spray compound branchlet atlas and reduced-card source completed under the fixed V20.2 topology and camera contract; visual and cost promotion remain pending committed exact-camera comparison")
         : (bTerminalClusterBotanicalShootCypressPalette
         ? TEXT("V20.4 low-wood terminal-cluster source and clean first-run HLOD capture completed under the fixed V20.2 parent-spray and camera contract; visual promotion remains pending committed source-art comparison before handoff, temporal, and platform review")
@@ -33834,7 +33863,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? TEXT("V20 botanical flattened-spray source and HLOD capture completed under the measured dimorphic-scale contract; visual promotion remains rejected pending the committed V20 closeup, silhouette, repetition, handoff, temporal, and platform review")
         : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("authored scale-leaf source and HLOD capture completed without whole-spray crop boundaries; visual promotion remains rejected pending the committed V19 review because botanical scale-leaf read, silhouette, handoff, temporal, and platform gates remain open")
-        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open")))))));
+        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open"))))))));
     const FString LocalMultiViewAtlasJson = FString::Printf(
         TEXT("{\n")
         TEXT("    \"status\": \"%s\",\n")
@@ -33908,7 +33937,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const FString CypressPaletteReportSuffix =
         bBotanicalFlattenedSprayCypressHierarchyPalette
         ? (bCompoundBranchletAtlasCypressPalette
-            ? TEXT("_compound_branchlet_atlas")
+            ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                ? TEXT("_detiered_compound_branchlet_atlas")
+                : TEXT("_compound_branchlet_atlas"))
             : (bTerminalClusterBotanicalShootCypressPalette
             ? TEXT("_terminal_cluster_botanical_shoot")
             : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -33932,7 +33963,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const FString CypressCandidateVersion =
         bBotanicalFlattenedSprayCypressHierarchyPalette
         ? (bCompoundBranchletAtlasCypressPalette
-            ? TEXT("v21")
+            ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                ? TEXT("v22")
+                : TEXT("v21"))
             : (bTerminalClusterBotanicalShootCypressPalette
             ? TEXT("v20_4")
             : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -34072,8 +34105,12 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("    \"live_foliage_shadows_enabled_in_isolated_review\": false,\n")
               TEXT("    \"live_foliage_material_defaults\": {\"base_color_scale\": 2.10, \"ao_influence\": 0.08, \"opacity_clip\": 0.42, \"diagnostic_emissive\": 0.0},\n")
               TEXT("    \"live_foliage_distribution\": {\"ethylene_threshold\": 0.72, \"instance_spacing\": 0.055, \"spacing_ramp_effect\": 0.45},\n")
-              TEXT("    \"graft_angle_jitter_degrees\": [-8.0, 8.0],\n")
-              TEXT("    \"graft_phyllotaxy_additional_angle_degrees\": 17.5,\n")
+              TEXT("    \"crown_topology_mode\": \"%s\",\n")
+              TEXT("    \"main_phyllotaxy_additional_angle_degrees\": %.6f,\n")
+              TEXT("    \"main_phyllotaxy_stagger\": %.6f,\n")
+              TEXT("    \"graft_angle_jitter_degrees\": [%.6f, %.6f],\n")
+              TEXT("    \"graft_phyllotaxy_additional_angle_degrees\": %.6f,\n")
+              TEXT("    \"graft_axil_angle_degrees\": %.6f,\n")
               TEXT("    \"upper_crown_spray_taper\": {\"start_normalized_height\": 0.86, \"scale_range\": [0.92, 0.68]},\n")
               TEXT("    \"seed\": %d,\n")
               TEXT("    \"epic_sample_content_copied_into_repository\": false,\n")
@@ -34140,7 +34177,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("}\n"),
               bBotanicalFlattenedSprayCypressHierarchyPalette
                   ? (bCompoundBranchletAtlasCypressPalette
-                    ? TEXT("ue_5_8_pve_cordillera_cypress_v21_compound_branchlet_atlas")
+                    ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                        ? TEXT("ue_5_8_pve_cordillera_cypress_v22_detiered_compound_branchlet_atlas")
+                        : TEXT("ue_5_8_pve_cordillera_cypress_v21_compound_branchlet_atlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
                     ? TEXT("ue_5_8_pve_cordillera_cypress_v20_4_terminal_cluster_botanical_shoot")
                     : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -34167,7 +34206,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               *EscapeRaftSimJsonString(ProceduralCypressPaletteMode),
               bBotanicalFlattenedSprayCypressHierarchyPalette
                   ? (bCompoundBranchletAtlasCypressPalette
-                    ? TEXT("[\"V21 compound branchlet atlas live twig A\", \"V21 compound branchlet atlas live twig B\", \"V21 compound branchlet atlas live twig C\", \"V16 dead twig\"]")
+                    ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                        ? TEXT("[\"V22 de-tiered compound branchlet atlas live twig A\", \"V22 de-tiered compound branchlet atlas live twig B\", \"V22 de-tiered compound branchlet atlas live twig C\", \"V16 dead twig\"]")
+                        : TEXT("[\"V21 compound branchlet atlas live twig A\", \"V21 compound branchlet atlas live twig B\", \"V21 compound branchlet atlas live twig C\", \"V16 dead twig\"]"))
                     : (bTerminalClusterBotanicalShootCypressPalette
                     ? TEXT("[\"V20.4 terminal-cluster botanical shoot live twig A\", \"V20.4 terminal-cluster botanical shoot live twig B\", \"V20.4 terminal-cluster botanical shoot live twig C\", \"V16 dead twig\"]")
                     : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -34236,12 +34277,25 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               FMath::Clamp(CypressSpec->GraftDensity, 18, 36),
               CypressSpec->GraftRelativeStart,
               CypressSpec->bAllowSenescence ? TEXT("true") : TEXT("false"),
-              CypressSpec->ApicalRandomAngle,
-              CypressSpec->AxillaryRandomAngle,
+              bDeTieredCompoundBranchletAtlasCypressPalette
+                  ? 1.5f
+                  : CypressSpec->ApicalRandomAngle,
+              bDeTieredCompoundBranchletAtlasCypressPalette
+                  ? 12.0f
+                  : CypressSpec->AxillaryRandomAngle,
               CypressSpec->GravityStrength * (CypressSpec->bAllowSenescence ? 0.55f : 0.05f),
               CypressSpec->bAllowSenescence
                   ? FMath::Max(CypressSpec->GravityAngleCorrection, 0.52f)
                   : FMath::Max(CypressSpec->GravityAngleCorrection, 0.92f),
+              bDeTieredCompoundBranchletAtlasCypressPalette
+                  ? TEXT("golden_angle_detiered")
+                  : TEXT("retained_ranked_spiral"),
+              bDeTieredCompoundBranchletAtlasCypressPalette ? 137.507764f : 7.5f,
+              bDeTieredCompoundBranchletAtlasCypressPalette ? 0.14f : 0.035f,
+              bDeTieredCompoundBranchletAtlasCypressPalette ? -18.0f : -8.0f,
+              bDeTieredCompoundBranchletAtlasCypressPalette ? 18.0f : 8.0f,
+              bDeTieredCompoundBranchletAtlasCypressPalette ? 137.507764f : 17.5f,
+              bDeTieredCompoundBranchletAtlasCypressPalette ? 66.0f : 72.0f,
               CypressSpec->Seed,
               TransformCount,
               VertexCount,
@@ -34270,7 +34324,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               LocalImpostorSourceBoundsSize.Z,
               bLocalImpostorSourceNaniteEnabled ? TEXT("true") : TEXT("false"),
               bCompoundBranchletAtlasCypressPalette
-                  ? TEXT("traditional raster preserves V21 compound branchlet measured-spray alpha; woody source remains separately Nanite-enabled")
+                  ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                      ? TEXT("traditional raster preserves V22 de-tiered V21 compound branchlet alpha; woody source remains separately Nanite-enabled")
+                      : TEXT("traditional raster preserves V21 compound branchlet measured-spray alpha; woody source remains separately Nanite-enabled"))
                   : (bTerminalClusterBotanicalShootCypressPalette
                   ? TEXT("traditional raster preserves V20.4 low-wood terminal-cluster measured-spray alpha; woody source remains separately Nanite-enabled")
                   : (bHierarchicalBotanicalShootClusterCypressPalette
@@ -34288,7 +34344,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? TEXT("not_applicable_traditional_raster_micro_foliage")
                   : TEXT("none"),
               bCompoundBranchletAtlasCypressPalette
-                  ? TEXT("Nanite is deliberately disabled for the merged V21 compound branchlet atlas so measured alpha remains available to the exact source and source-lit HLOD cost review")
+                  ? (bDeTieredCompoundBranchletAtlasCypressPalette
+                      ? TEXT("Nanite is deliberately disabled for the merged V22 de-tiered V21 compound source so measured alpha remains available to the exact source and source-lit HLOD topology review")
+                      : TEXT("Nanite is deliberately disabled for the merged V21 compound branchlet atlas so measured alpha remains available to the exact source and source-lit HLOD cost review"))
                   : (bTerminalClusterBotanicalShootCypressPalette
                   ? TEXT("Nanite is deliberately disabled for the merged V20.4 terminal-cluster measured sprays so millimetre-scale alpha detail remains available to the exact source and source-lit HLOD review")
                   : (bHierarchicalBotanicalShootClusterCypressPalette
