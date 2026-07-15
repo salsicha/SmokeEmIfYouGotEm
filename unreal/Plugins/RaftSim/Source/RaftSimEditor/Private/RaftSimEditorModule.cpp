@@ -20495,6 +20495,57 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
         (bSourceOnly || bHlodOnly || bCombined);
 }
 
+bool SetFutaleufuHlodAtlasFrameOverride(
+    UWorld* World,
+    float FrameOverride,
+    FString& OutSummary)
+{
+    AActor* HlodActor = nullptr;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            HlodActor = *It;
+            break;
+        }
+    }
+    if (!HlodActor)
+    {
+        OutSummary += TEXT("V38 frame search could not resolve the HLOD actor.\n");
+        return false;
+    }
+
+    TInlineComponentArray<UMeshComponent*> MeshComponents;
+    HlodActor->GetComponents(MeshComponents);
+    bool bUpdated = false;
+    for (UMeshComponent* Component : MeshComponents)
+    {
+        if (!Component)
+        {
+            continue;
+        }
+        for (int32 MaterialIndex = 0;
+             MaterialIndex < Component->GetNumMaterials();
+             ++MaterialIndex)
+        {
+            UMaterialInstanceDynamic* DynamicMaterial =
+                Cast<UMaterialInstanceDynamic>(Component->GetMaterial(MaterialIndex));
+            if (!DynamicMaterial)
+            {
+                DynamicMaterial = Component->CreateDynamicMaterialInstance(MaterialIndex);
+            }
+            if (DynamicMaterial)
+            {
+                DynamicMaterial->SetScalarParameterValue(
+                    TEXT("AtlasFrameOverride"),
+                    FrameOverride);
+                bUpdated = true;
+            }
+        }
+    }
+    return bUpdated;
+}
+
 bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FString& RelativeCaptureBase,
@@ -20511,7 +20562,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
         FVector&,
         FVector&,
         FString&)>& SceneSetup = {},
-    float TransitionMode = 0.0f)
+    float TransitionMode = 0.0f,
+    bool bHlodFrameSearch = false)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -32262,6 +32314,12 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
         AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -1400, -240);
     AtlasAzimuthOffsetTurns->ParameterName = TEXT("AtlasAzimuthOffsetTurns");
     AtlasAzimuthOffsetTurns->DefaultValue = AtlasAzimuthOffsetDegrees / 360.0f;
+    UMaterialExpressionScalarParameter* AtlasFrameOverride =
+        AddExpression(NewObject<UMaterialExpressionScalarParameter>(Material), -1400, -60);
+    AtlasFrameOverride->ParameterName = TEXT("AtlasFrameOverride");
+    AtlasFrameOverride->DefaultValue = -1.0f;
+    AtlasFrameOverride->SliderMin = -1.0f;
+    AtlasFrameOverride->SliderMax = 15.0f;
 
     UMaterialExpressionCustom* AtlasUv =
         AddExpression(NewObject<UMaterialExpressionCustom>(Material), -1060, -420);
@@ -32274,7 +32332,8 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
         TEXT("float AzimuthFrame = floor(NormalizedAzimuth * 8.0 + 0.5);\n")
         TEXT("AzimuthFrame -= floor(AzimuthFrame / 8.0) * 8.0;\n")
         TEXT("float ElevationFrame = ViewToCamera.z > 0.2164396149 ? 1.0 : 0.0;\n")
-        TEXT("float Frame = ElevationFrame * 8.0 + AzimuthFrame;\n")
+        TEXT("float AutomaticFrame = ElevationFrame * 8.0 + AzimuthFrame;\n")
+        TEXT("float Frame = FrameOverride >= -0.5 ? clamp(floor(FrameOverride + 0.5), 0.0, 15.0) : AutomaticFrame;\n")
         TEXT("float2 Cell = float2(Frame - floor(Frame / 4.0) * 4.0, floor(Frame / 4.0));\n")
         TEXT("float2 PlaneUv = float2(UV.x, 1.0 - UV.y);\n")
         TEXT("return (clamp(PlaneUv, 0.001, 0.999) + Cell) * 0.25;");
@@ -32290,6 +32349,9 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     FCustomInput& AtlasAzimuthOffsetInput = AtlasUv->Inputs.AddDefaulted_GetRef();
     AtlasAzimuthOffsetInput.InputName = TEXT("AzimuthOffsetTurns");
     AtlasAzimuthOffsetInput.Input.Expression = AtlasAzimuthOffsetTurns;
+    FCustomInput& AtlasFrameOverrideInput = AtlasUv->Inputs.AddDefaulted_GetRef();
+    AtlasFrameOverrideInput.InputName = TEXT("FrameOverride");
+    AtlasFrameOverrideInput.Input.Expression = AtlasFrameOverride;
 
     UMaterialExpressionTextureSampleParameter2D* DepthSample = nullptr;
     UMaterialExpressionScalarParameter* DepthScale = nullptr;
