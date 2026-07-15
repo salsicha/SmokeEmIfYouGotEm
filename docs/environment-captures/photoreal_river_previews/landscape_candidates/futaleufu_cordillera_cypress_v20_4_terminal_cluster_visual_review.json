@@ -1,0 +1,190 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_terminal_cluster_review.v20_4",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v20_4_open_grown_conical_terminal_cluster_botanical_shoot",
+  "status": "terminal_cluster_cost_gate_failed_visual_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "V20.2 parent topology, measured sprays, 3/2 layering, seed, and 3626 transforms",
+      "post-usage shader-resource gate and corrected HLOD path",
+      "open-grown form envelope and exact cameras"
+    ],
+    "v20_4_changed": [
+      "add two 9-10 cm terminal spray cards per lateral at 0.69 and 0.82 parent length",
+      "connect each terminal card with a 0.28-length tapered woody support"
+    ],
+    "reports": {
+      "v20_2_branchlet_mass": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_2_pve_open_grown_conical_branchlet_mass_botanical_flattened_spray_hierarchy_report.json",
+      "v20_4_terminal_cluster": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_4_pve_open_grown_conical_terminal_cluster_botanical_shoot_report.json"
+    }
+  },
+  "structural_evidence": {
+    "v20_2_branchlet_mass": {
+      "palette_mode": "branchlet_mass_botanical_flattened_spray_hierarchy",
+      "authored_branchlet_geometry": {
+        "paired_laterals_per_twig": 6,
+        "woody_support_length_fraction": 0.68,
+        "attachment_rhythm": "six staggered connected pairs at 0.10-0.825 normalized main-axis positions with three-state vertical variation"
+      },
+      "foliage_instance_count": 3626,
+      "impostor_source_triangle_count": 1786619,
+      "atlas_coverage_fraction_range": [
+        0.096195221,
+        0.103752136
+      ]
+    },
+    "v20_4_terminal_cluster": {
+      "palette_mode": "terminal_cluster_botanical_shoot",
+      "authored_branchlet_geometry": {
+        "paired_laterals_per_twig": 6,
+        "woody_support_length_fraction": 0.68,
+        "attachment_rhythm": "six staggered connected pairs at 0.10-0.825 normalized main-axis positions with three-state vertical variation",
+        "tertiary_subshoots_per_lateral": 2
+      },
+      "foliage_instance_count": 3626,
+      "impostor_source_triangle_count": 3353051,
+      "atlas_coverage_fraction_range": [
+        0.096858978,
+        0.106296539
+      ]
+    }
+  },
+  "capture_comparisons": {
+    "exact_60m_source": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBranchletMassBotanicalFlattenedSprayHierarchy/open_grown_conical_river_distance_60m.png",
+        "sha256": "c0205d5284b9a7926237832c268dec5ada9ff3d0ebef6df61124330536000be7",
+        "dark_chromatic_foreground_pixels": 39281,
+        "foreground_mean_rgb": [
+          46.22476515363662,
+          59.09839362541687,
+          58.78712354573458
+        ],
+        "foreground_median_rgb": [
+          46.0,
+          53.0,
+          40.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTerminalClusterBotanicalShoot/open_grown_conical_river_distance_60m.png",
+        "sha256": "9d8edfa27165ee48eee818fb53d9435ebf8746372c351dbc8f4d4362b459f4fb",
+        "dark_chromatic_foreground_pixels": 40010,
+        "foreground_mean_rgb": [
+          45.283229192701825,
+          58.030742314421396,
+          57.78235441139715
+        ],
+        "foreground_median_rgb": [
+          43.0,
+          51.0,
+          38.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.013275824652777778,
+      "mean_absolute_channel_delta": 0.5829116030092593,
+      "dark_chromatic_foreground_intersection_over_union": 0.9357209120648405
+    },
+    "branch_spray_closeup": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBranchletMassBotanicalFlattenedSprayHierarchy/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "d61ba4747d27a01b5143869c2ae869dd0850e470cdd3a38cc38d31dedde6861d",
+        "dark_chromatic_foreground_pixels": 40708,
+        "foreground_mean_rgb": [
+          48.27591628181193,
+          51.894394222265895,
+          36.81600668173332
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          52.0,
+          35.0
+        ],
+        "wood": {
+          "wood_pixels": 13425,
+          "wood_fraction_of_detected_plant": 0.3297877567062985
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTerminalClusterBotanicalShoot/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "0bb0834831147541ae8d75838742b517b2340e4649cc416ccb9126de99b8a292",
+        "dark_chromatic_foreground_pixels": 43372,
+        "foreground_mean_rgb": [
+          47.86781794706262,
+          51.783201143594944,
+          36.885824956192934
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          52.0,
+          35.0
+        ],
+        "wood": {
+          "wood_pixels": 13880,
+          "wood_fraction_of_detected_plant": 0.32002213409572994
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.010635850694444445,
+      "mean_absolute_channel_delta": 0.6809212239583333,
+      "dark_chromatic_foreground_intersection_over_union": 0.9285288315977798
+    },
+    "exact_60m_hlod": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBranchletMassBotanicalFlattenedSprayHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "3e546a6b3e4b29926cceb438f3a0faee812dda6828419b8689024419ddb1242e",
+        "dark_chromatic_foreground_pixels": 44498,
+        "foreground_mean_rgb": [
+          36.80736212863499,
+          52.226796709964496,
+          51.04213672524608
+        ],
+        "foreground_median_rgb": [
+          30.0,
+          42.0,
+          28.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressTerminalClusterBotanicalShoot/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "d0214d2984597e2d18b494952570c2b9488e3cb92be65993e2292424e32c2d9a",
+        "dark_chromatic_foreground_pixels": 45410,
+        "foreground_mean_rgb": [
+          36.25917198854878,
+          51.322065624311826,
+          50.183571900462454
+        ],
+        "foreground_median_rgb": [
+          28.0,
+          41.0,
+          28.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.013626302083333333,
+      "mean_absolute_channel_delta": 0.5813642939814815,
+      "dark_chromatic_foreground_intersection_over_union": 0.9402650092796409
+    }
+  },
+  "derived_findings": {
+    "triangle_cost_increase_fraction": 0.8767577194690082,
+    "closeup_foreground_change_fraction": 0.06544168222462421,
+    "closeup_wood_fraction_change": -0.00976562261056857,
+    "exact_60m_source_foreground_change_fraction": 0.018558590667243635,
+    "v20_4_hlod_to_source_foreground_ratio": 1.1349662584353912
+  },
+  "human_review": {
+    "accepted": [
+      "The clean first-run material and corrected HLOD path remain stable.",
+      "V20.4 preserves V20.2 parent spray mass and limits new woody supports to short terminal connections."
+    ],
+    "rejected": [
+      "The terminal clusters do not produce enough exact 60 m source-density gain to justify the merged triangle increase.",
+      "The closeup remains a woody procedural fan and the open-grown crown retains large tier gaps.",
+      "Only one form is evaluated; no handoff, temporal, ecology, desktop, VR, or native-art promotion gate is closed."
+    ],
+    "decision": "Retain V20.2 as the source baseline and reject V20.4 geometry and every promotion path. Stop adding per-twig cards until a lower-cost source strategy or reviewed native asset can improve the 60 m silhouette."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false,
+  "v20_4_geometry_retained": false
+}
