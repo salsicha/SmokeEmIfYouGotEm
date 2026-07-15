@@ -1,0 +1,116 @@
+{
+  "schema": "raftsim.chilko_source_attachment.v0",
+  "status": "first_official_source_attachment_complete_production_corridor_blocked",
+  "generated_on": "2026-07-14",
+  "river_id": "chilko_river_lava_canyon",
+  "reach": {
+    "put_in": "Chilko River Lodge",
+    "take_out": "Chilko-Taseko Junction",
+    "exact_endpoint_geometry_approved": false,
+    "corridor_search_bbox_wgs84": [
+      -124.2,
+      51.6,
+      -123.6,
+      52.1
+    ]
+  },
+  "source_records": [
+    {
+      "source_id": "bc_freshwater_atlas_chilko_named_stream",
+      "authority": "official_provincial_hydrography",
+      "license": "Open Government Licence - British Columbia",
+      "url": "https://openmaps.gov.bc.ca/geo/pub/WHSE_BASEMAPPING.FWA_STREAM_NETWORKS_SP/ows",
+      "artifact": "physics/data/real_world/chilko_river_bc/source/hydrography/fwa_chilko_river_segments.geojson",
+      "sha256": "b26acbf6da5b5ef6138f99644512df8453cb4aa7d1221aec3a9389014fc5a0bf"
+    },
+    {
+      "source_id": "eccc_hydrometric_historical_data",
+      "authority": "official_federal_hydrometric_archive",
+      "license": "Open Government Licence - Canada",
+      "url": "https://api.weather.gc.ca/collections/hydrometric-monthly-mean/",
+      "artifacts": [
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA001_station.json",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA002_station.json",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA001_monthly_mean.json",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA002_monthly_mean.json"
+      ],
+      "sha256": {
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA001_station.json": "cc686b7f0537d1246b6f984351a755a1f9adf8b59f9c67b2460a374a71ff8dca",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA002_station.json": "da68653b15ec59cf164612e1f53e8ff0c565243ae0904e1bca35101ab25a17a4",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA001_monthly_mean.json": "867cd8e1529925468b7f07b511a60dea87f23984e8a6fd84c89f8a3ceb85f573",
+        "physics/data/real_world/chilko_river_bc/source/hydrology/eccc_08MA002_monthly_mean.json": "1f041ff662fb6902fbf2b5de68dab93c2982d22bfdbb7b7e4fd2af692f332351"
+      }
+    },
+    {
+      "source_id": "nrcan_canelevation",
+      "authority": "official_federal_elevation_catalog",
+      "license": "Open Government Licence - Canada",
+      "url": "https://datacube.services.geo.ca/stac/api/",
+      "artifacts": [
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_lidar_stac_search.json",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_riverine_floodplain_extent.geojson",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_bcts_chinook_kamloops_extent.geojson",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_stac_search.json"
+      ],
+      "sha256": {
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_lidar_stac_search.json": "196bdcab95b93f1883f4de30366650a5bc555406c333cf8f0265d36d4a77b371",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_riverine_floodplain_extent.geojson": "97f5e4c95e21939487ab984bd1c3bd4a2a24c87975553f7f24cb5a7ca0f6fb0e",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_hrdem_bcts_chinook_kamloops_extent.geojson": "cc674e6e94d593d5060312988b8031d9ed1bb22170be8a0ca3f9c66776fd694a",
+        "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_stac_search.json": "87bb8f56eac9fd47592cd5889d6e55a37af9ec0fe013c66d3261098b4d73c891"
+      }
+    },
+    {
+      "source_id": "copernicus_sentinel2_l2a_earth_search",
+      "authority": "copernicus_data_via_public_stac_mirror",
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "url": "https://earth-search.aws.element84.com/v1/",
+      "artifacts": [
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_summer_2025_stac_search.json",
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_selected_preview.jpg",
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250904_preview.jpg"
+      ],
+      "sha256": {
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_summer_2025_stac_search.json": "48aaee3590bcaf46e4841c765aeec3d3a534991eb31bc886889606d5a1c0eb1f",
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_selected_preview.jpg": "a0435f5523e4d5b54480f41c7d13aa4ebbc2ff4f5d39bdbac63c8e103b06b36d",
+        "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250904_preview.jpg": "54a1b87d591bed8a419f9a24332ac179024924916f58f5c4757aa371abb5f358"
+      }
+    }
+  ],
+  "generated_artifacts": [
+    {
+      "path": "physics/data/real_world/chilko_river_bc/hydrography/lodge_to_taseko_junction_candidate_segments.geojson",
+      "sha256": "3b7a9dc4a20aac476cc3962a0f8ab6e8040d288ccfaef2a07d7e691abbeaefec"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_bc/hydrography/route_source_review.json",
+      "sha256": "06f9d80c04751bd084edb92b9904f79702e1f405bc29d175ebb42ea4e27baae3"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json",
+      "sha256": "8f67b619db34b072f517a3ae6d774fec4a98eb50a7ac2f063d67d162572cb788"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_bc/terrain/terrain_source_review.json",
+      "sha256": "16b8934abf707ef7db6a939678f43aab3c31418360dcb75b0ad3e61b6c636a20"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_bc/imagery/imagery_source_review.json",
+      "sha256": "36f03da212955d736451b9cd10704ad22b49094d9a3336d843c1f014f0faa979"
+    },
+    {
+      "path": "physics/data/real_world/chilko_river_bc/review/land_and_publication_source_review.json",
+      "sha256": "bcb379e4bc90d46519d9ce213bf12478a826aceb2130e826a13fff7f987f73a8"
+    }
+  ],
+  "promotion_gates": {
+    "source_attachment_complete": true,
+    "production_corridor_complete": false,
+    "exact_route_and_endpoints": false,
+    "rapid_scale_terrain": false,
+    "numeric_flow_bands": false,
+    "named_rapid_stationing": false,
+    "guide_review": false,
+    "land_and_publication_review": false,
+    "lifelike_unreal_capture": false
+  }
+}

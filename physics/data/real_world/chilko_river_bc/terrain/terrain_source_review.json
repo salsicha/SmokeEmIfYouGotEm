@@ -1,0 +1,228 @@
+{
+  "schema": "raftsim.chilko.terrain_source_review.v0",
+  "status": "mrdem30_fallback_attached_higher_resolution_terrain_open",
+  "corridor_search_bbox_wgs84": [
+    -124.2,
+    51.6,
+    -123.6,
+    52.1
+  ],
+  "hrdem_lidar": {
+    "stac_search_item_count": 2,
+    "actual_extent_intersection_count": 0,
+    "decision": "no_confirmed_hrdem_lidar_coverage_use_mrdem30_fallback_and_continue_source_search",
+    "warning": "STAC item bounding boxes are project envelopes and are not proof of local lidar coverage.",
+    "extent_records": [
+      {
+        "project_name": "BC-Riverine_Floodplain_UTM10_2019",
+        "polygon_count": 9,
+        "corridor_bbox_intersection_count": 0,
+        "polygon_bounds_wgs84": [
+          [
+            -124.790638,
+            53.182447,
+            -120.000018,
+            54.278348
+          ],
+          [
+            -120.625667,
+            53.529372,
+            -120.61763,
+            53.533908
+          ],
+          [
+            -121.473833,
+            53.891457,
+            -121.457927,
+            53.897454
+          ],
+          [
+            -122.657536,
+            52.085036,
+            -121.947733,
+            53.239599
+          ],
+          [
+            -120.820024,
+            49.165977,
+            -120.000023,
+            49.728222
+          ],
+          [
+            -124.39106,
+            54.336942,
+            -124.133533,
+            54.501617
+          ],
+          [
+            -122.011152,
+            50.637697,
+            -121.851151,
+            50.741809
+          ],
+          [
+            -124.743901,
+            53.825062,
+            -124.741636,
+            53.826338
+          ],
+          [
+            -126.000016,
+            54.171615,
+            -125.700018,
+            54.423783
+          ]
+        ]
+      },
+      {
+        "project_name": "BC-BCTS_Chinook_Kamloops_BCAlbers_2017",
+        "polygon_count": 21,
+        "corridor_bbox_intersection_count": 0,
+        "polygon_bounds_wgs84": [
+          [
+            -121.030668,
+            51.06712,
+            -120.836638,
+            51.223049
+          ],
+          [
+            -121.278794,
+            51.257143,
+            -120.994142,
+            51.432401
+          ],
+          [
+            -121.821769,
+            51.133034,
+            -121.445212,
+            51.299162
+          ],
+          [
+            -122.241025,
+            50.89052,
+            -122.150192,
+            50.944519
+          ],
+          [
+            -122.836087,
+            50.565457,
+            -122.390967,
+            50.897774
+          ],
+          [
+            -127.956491,
+            53.559916,
+            -127.84681,
+            53.684033
+          ],
+          [
+            -128.83692,
+            53.539769,
+            -128.135241,
+            53.971541
+          ],
+          [
+            -128.058442,
+            53.667542,
+            -127.98014,
+            53.777938
+          ],
+          [
+            -128.213631,
+            53.393027,
+            -128.046045,
+            53.492734
+          ],
+          [
+            -128.362951,
+            53.394325,
+            -128.132145,
+            53.477701
+          ],
+          [
+            -128.354548,
+            53.491933,
+            -128.331093,
+            53.504658
+          ],
+          [
+            -128.775663,
+            53.819817,
+            -128.724209,
+            53.871769
+          ],
+          [
+            -129.082631,
+            53.679393,
+            -128.858665,
+            53.776467
+          ],
+          [
+            -128.888137,
+            53.721346,
+            -128.832341,
+            53.761536
+          ],
+          [
+            -129.106362,
+            53.633953,
+            -128.827473,
+            53.71687
+          ],
+          [
+            -129.071597,
+            53.558547,
+            -128.857657,
+            53.653624
+          ],
+          [
+            -132.211886,
+            53.645489,
+            -131.925485,
+            54.052597
+          ],
+          [
+            -131.849366,
+            52.806396,
+            -131.645132,
+            52.860516
+          ],
+          [
+            -131.792197,
+            52.8003,
+            -131.79207,
+            52.80032
+          ],
+          [
+            -132.076985,
+            52.68382,
+            -131.657327,
+            52.834613
+          ],
+          [
+            -132.149674,
+            52.767627,
+            -132.060942,
+            52.823685
+          ]
+        ]
+      }
+    ]
+  },
+  "mrdem30": {
+    "stac_item_id": "mrdem",
+    "collection": "mrdem-30",
+    "resolution_m": 30,
+    "dtm_cog": "https://canelevation-dem.s3.ca-central-1.amazonaws.com/mrdem-30/mrdem-30-dtm.tif",
+    "source_cog": "https://canelevation-dem.s3.ca-central-1.amazonaws.com/mrdem-30/mrdem-30-source.tif",
+    "authority": "official_nrcan_fallback_not_rapid_scale_geometry",
+    "clip_attached": false
+  },
+  "production_promotion_allowed": false,
+  "required_next_review": [
+    "extract_and_verify_mrdem30_corridor_clip_and_per_pixel_source",
+    "search_bc_data_catalogue_and_local_holdings_for_lidar_or_photogrammetry",
+    "record_horizontal_and_vertical_datum_and_transform",
+    "obtain_rapid_scale_terrain_or_reviewed_field_reconstruction"
+  ]
+}

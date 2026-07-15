@@ -1,0 +1,303 @@
+{
+  "schema": "raftsim.chilko.seasonal_flow_context.v0",
+  "status": "official_monthly_history_attached_gameplay_bands_blocked",
+  "units": "m3/s",
+  "stations": [
+    {
+      "station_number": "08MA002",
+      "station_name": "CHILKO RIVER AT OUTLET OF CHILKO LAKE",
+      "coordinates_wgs84": [
+        -124.1433563232422,
+        51.62485885620117
+      ],
+      "status": "Active",
+      "real_time": true,
+      "reference_hydrometric_basin_network": true,
+      "drainage_area_gross_km2": 2138.0,
+      "vertical_datum": "ASSUMED DATUM",
+      "role": "primary_upstream_seasonality_and_timing_candidate",
+      "limitation": "lake_outlet_is_upstream_of_put_in_and_does_not_include_reach_tributaries",
+      "monthly_history": {
+        "record_count": 1068,
+        "first_month": "1928-11",
+        "last_month": "2025-12",
+        "discharge_record_count": 1033,
+        "calendar_month_climatology": [
+          {
+            "month": 1,
+            "sample_count": 74,
+            "minimum_m3_s": 5.25,
+            "p10_m3_s": 9.127,
+            "median_m3_s": 13.2,
+            "mean_m3_s": 13.76,
+            "p90_m3_s": 19.31,
+            "maximum_m3_s": 32.2
+          },
+          {
+            "month": 2,
+            "sample_count": 74,
+            "minimum_m3_s": 5.36,
+            "p10_m3_s": 6.986,
+            "median_m3_s": 9.76,
+            "mean_m3_s": 10.74,
+            "p90_m3_s": 15.54,
+            "maximum_m3_s": 23.9
+          },
+          {
+            "month": 3,
+            "sample_count": 74,
+            "minimum_m3_s": 4.81,
+            "p10_m3_s": 5.813,
+            "median_m3_s": 8.455,
+            "mean_m3_s": 9.114,
+            "p90_m3_s": 12.95,
+            "maximum_m3_s": 20.0
+          },
+          {
+            "month": 4,
+            "sample_count": 87,
+            "minimum_m3_s": 4.41,
+            "p10_m3_s": 5.574,
+            "median_m3_s": 8.74,
+            "mean_m3_s": 9.301,
+            "p90_m3_s": 14.34,
+            "maximum_m3_s": 21.0
+          },
+          {
+            "month": 5,
+            "sample_count": 91,
+            "minimum_m3_s": 7.99,
+            "p10_m3_s": 13.2,
+            "median_m3_s": 20.8,
+            "mean_m3_s": 22.566,
+            "p90_m3_s": 33.9,
+            "maximum_m3_s": 57.1
+          },
+          {
+            "month": 6,
+            "sample_count": 94,
+            "minimum_m3_s": 42.4,
+            "p10_m3_s": 52.46,
+            "median_m3_s": 74.85,
+            "mean_m3_s": 77.262,
+            "p90_m3_s": 103.4,
+            "maximum_m3_s": 157.0
+          },
+          {
+            "month": 7,
+            "sample_count": 95,
+            "minimum_m3_s": 72.0,
+            "p10_m3_s": 87.64,
+            "median_m3_s": 114.0,
+            "mean_m3_s": 114.014,
+            "p90_m3_s": 142.6,
+            "maximum_m3_s": 175.0
+          },
+          {
+            "month": 8,
+            "sample_count": 95,
+            "minimum_m3_s": 68.9,
+            "p10_m3_s": 88.12,
+            "median_m3_s": 105.0,
+            "mean_m3_s": 105.808,
+            "p90_m3_s": 123.0,
+            "maximum_m3_s": 166.0
+          },
+          {
+            "month": 9,
+            "sample_count": 97,
+            "minimum_m3_s": 47.1,
+            "p10_m3_s": 54.64,
+            "median_m3_s": 67.0,
+            "mean_m3_s": 69.062,
+            "p90_m3_s": 83.34,
+            "maximum_m3_s": 98.6
+          },
+          {
+            "month": 10,
+            "sample_count": 92,
+            "minimum_m3_s": 25.8,
+            "p10_m3_s": 30.9,
+            "median_m3_s": 40.35,
+            "mean_m3_s": 41.855,
+            "p90_m3_s": 55.76,
+            "maximum_m3_s": 79.9
+          },
+          {
+            "month": 11,
+            "sample_count": 84,
+            "minimum_m3_s": 13.3,
+            "p10_m3_s": 20.29,
+            "median_m3_s": 26.2,
+            "mean_m3_s": 28.501,
+            "p90_m3_s": 38.47,
+            "maximum_m3_s": 46.9
+          },
+          {
+            "month": 12,
+            "sample_count": 76,
+            "minimum_m3_s": 6.03,
+            "p10_m3_s": 13.6,
+            "median_m3_s": 18.45,
+            "mean_m3_s": 19.528,
+            "p90_m3_s": 26.4,
+            "maximum_m3_s": 47.0
+          }
+        ]
+      }
+    },
+    {
+      "station_number": "08MA001",
+      "station_name": "CHILKO RIVER NEAR REDSTONE",
+      "coordinates_wgs84": [
+        -123.53949737548828,
+        52.06975173950195
+      ],
+      "status": "Active",
+      "real_time": true,
+      "reference_hydrometric_basin_network": false,
+      "drainage_area_gross_km2": 6691.0,
+      "vertical_datum": "ASSUMED DATUM",
+      "role": "downstream_context_and_routing_check_only",
+      "limitation": "station_is_downstream_of_taseko_confluence_and_cannot_define_pre_confluence_route_discharge",
+      "monthly_history": {
+        "record_count": 1107,
+        "first_month": "1927-05",
+        "last_month": "2024-12",
+        "discharge_record_count": 1076,
+        "calendar_month_climatology": [
+          {
+            "month": 1,
+            "sample_count": 79,
+            "minimum_m3_s": 12.3,
+            "p10_m3_s": 15.76,
+            "median_m3_s": 21.7,
+            "mean_m3_s": 22.968,
+            "p90_m3_s": 31.46,
+            "maximum_m3_s": 51.4
+          },
+          {
+            "month": 2,
+            "sample_count": 78,
+            "minimum_m3_s": 10.4,
+            "p10_m3_s": 13.31,
+            "median_m3_s": 17.9,
+            "mean_m3_s": 19.647,
+            "p90_m3_s": 28.14,
+            "maximum_m3_s": 45.3
+          },
+          {
+            "month": 3,
+            "sample_count": 79,
+            "minimum_m3_s": 9.6,
+            "p10_m3_s": 12.4,
+            "median_m3_s": 16.7,
+            "mean_m3_s": 17.511,
+            "p90_m3_s": 22.26,
+            "maximum_m3_s": 34.1
+          },
+          {
+            "month": 4,
+            "sample_count": 85,
+            "minimum_m3_s": 10.5,
+            "p10_m3_s": 13.76,
+            "median_m3_s": 18.0,
+            "mean_m3_s": 21.06,
+            "p90_m3_s": 29.92,
+            "maximum_m3_s": 57.1
+          },
+          {
+            "month": 5,
+            "sample_count": 92,
+            "minimum_m3_s": 21.5,
+            "p10_m3_s": 39.37,
+            "median_m3_s": 64.4,
+            "mean_m3_s": 70.722,
+            "p90_m3_s": 107.8,
+            "maximum_m3_s": 168.0
+          },
+          {
+            "month": 6,
+            "sample_count": 97,
+            "minimum_m3_s": 101.0,
+            "p10_m3_s": 127.6,
+            "median_m3_s": 180.0,
+            "mean_m3_s": 186.639,
+            "p90_m3_s": 239.2,
+            "maximum_m3_s": 389.0
+          },
+          {
+            "month": 7,
+            "sample_count": 98,
+            "minimum_m3_s": 146.0,
+            "p10_m3_s": 181.7,
+            "median_m3_s": 231.5,
+            "mean_m3_s": 234.99,
+            "p90_m3_s": 285.5,
+            "maximum_m3_s": 370.0
+          },
+          {
+            "month": 8,
+            "sample_count": 98,
+            "minimum_m3_s": 139.0,
+            "p10_m3_s": 175.0,
+            "median_m3_s": 204.5,
+            "mean_m3_s": 210.112,
+            "p90_m3_s": 245.6,
+            "maximum_m3_s": 313.0
+          },
+          {
+            "month": 9,
+            "sample_count": 98,
+            "minimum_m3_s": 84.5,
+            "p10_m3_s": 97.4,
+            "median_m3_s": 125.5,
+            "mean_m3_s": 129.432,
+            "p90_m3_s": 162.3,
+            "maximum_m3_s": 190.0
+          },
+          {
+            "month": 10,
+            "sample_count": 96,
+            "minimum_m3_s": 38.7,
+            "p10_m3_s": 51.25,
+            "median_m3_s": 69.15,
+            "mean_m3_s": 72.395,
+            "p90_m3_s": 97.45,
+            "maximum_m3_s": 155.0
+          },
+          {
+            "month": 11,
+            "sample_count": 93,
+            "minimum_m3_s": 20.4,
+            "p10_m3_s": 31.2,
+            "median_m3_s": 43.4,
+            "mean_m3_s": 45.302,
+            "p90_m3_s": 65.12,
+            "maximum_m3_s": 80.6
+          },
+          {
+            "month": 12,
+            "sample_count": 83,
+            "minimum_m3_s": 13.8,
+            "p10_m3_s": 19.82,
+            "median_m3_s": 29.8,
+            "mean_m3_s": 30.482,
+            "p90_m3_s": 41.94,
+            "maximum_m3_s": 70.6
+          }
+        ]
+      }
+    }
+  ],
+  "gameplay_flow_bands": {
+    "status": "blocked_pending_daily_window_routing_and_local_guide_review",
+    "numeric_thresholds": [],
+    "required_before_authoring": [
+      "attach_daily_and_event_windows_for_reviewed_run_dates",
+      "estimate_lag_and_tributary_change_from_08MA002_to_put_in",
+      "separate_pre_confluence_chilko_flow_from_08MA001_taseko_influence",
+      "review_low_reference_high_and_washout_behavior_with_local_guides"
+    ]
+  }
+}

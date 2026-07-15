@@ -92,19 +92,6 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 - Aerial imagery: SNIT/IDECORI orthophoto/model service leads first when layer terms permit, plus Copernicus Sentinel and Landsat for vegetation, river color, and cloud-aware seasonal review.
 - Review media: first-party field captures or explicit outfitter/guide permissions; Wikimedia/Flickr/YouTube/Instagram/Mapillary-style links remain reference-only until creator permission, local guide review, and publication-sensitivity review pass.
 
-### Chilko
-
-Treat Chilko River Lodge to the Chilko-Taseko Junction as a source-first Canadian production corridor:
-
-- Maps and terrain: prefer BC Data Catalogue and GeoBC elevation or lidar products, with Natural Resources Canada CanElevation as fallback. Do not promote terrain before resolution, acquisition date, CRS, vertical datum, license, and river-conditioning review are recorded.
-- Hydrography: prefer the British Columbia Freshwater Atlas or another official provincial watercourse layer, checked against current aerial imagery and guide GPS. OSM is discovery-only.
-- Flow levels: begin with Environment and Climate Change Canada stations `08MA002` at the Chilko Lake outlet and `08MA001` near Redstone. Review station period, regulation, lag, tributaries, units, and reach applicability before defining numeric low/reference/high bands.
-- Aerial imagery: prefer rights-compatible GeoBC or provincial orthophoto coverage where available; use Copernicus Sentinel-2 and Landsat for seasonal context and cloud/snow/smoke screening.
-- Land and publication review: consult Tŝilhqot’in National Government title-land, place-name, fisheries, access, stewardship, and publication guidance before exposing detailed access, hazard, cultural, or sensitive-location geometry.
-- Rapid and media review: Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon are provisional guide/media leads only. Attach exact stationing and local review before generating production windows. Keep third-party footage and social media link-only until item-level rights are cleared.
-
-No Chilko corridor, flow band, rapid marker, or lifelike capture is currently approved. The first implementation task is an authoritative source attachment, not procedural scene generation.
-
 Initial source slice:
 
 - `physics/data/real_world/pacuare_river_costa_rica/production_source_pull_manifest.json` records the first Pacuare source pull.
@@ -254,9 +241,31 @@ Initial source slice:
 - The Pacuare Unreal preview now samples those production-import placeholder derivatives for the aerial drape, terrain relief, heightfield preview, water mask, and vegetation mask, with refreshed guide-seat and river-eye captures recorded in `docs/environment-captures/photoreal_river_previews/environment_capture_manifest.json`. The frames are still stylized/proxy, but Pacuare now follows the same review-gated derivative wiring pattern as South Fork and Colorado.
 - OpenTopography SRTMGL1 was probed and returned an API-key requirement, so that path remains available only after key and terms review.
 
+### Chilko
+
+Treat Chilko River Lodge to the Chilko-Taseko Junction as a source-first Canadian production corridor:
+
+- Maps and terrain: prefer BC Data Catalogue and GeoBC elevation or lidar products, with Natural Resources Canada CanElevation as fallback. Do not promote terrain before resolution, acquisition date, CRS, vertical datum, license, and river-conditioning review are recorded.
+- Hydrography: prefer the British Columbia Freshwater Atlas or another official provincial watercourse layer, checked against current aerial imagery and guide GPS. OSM is discovery-only.
+- Flow levels: begin with Environment and Climate Change Canada stations `08MA002` at the Chilko Lake outlet and `08MA001` near Redstone. Review station period, regulation, lag, tributaries, units, and reach applicability before defining numeric low/reference/high bands.
+- Aerial imagery: prefer rights-compatible GeoBC or provincial orthophoto coverage where available; use Copernicus Sentinel-2 and Landsat for seasonal context and cloud/snow/smoke screening.
+- Land and publication review: consult Tŝilhqot’in National Government title-land, place-name, fisheries, access, stewardship, and publication guidance before exposing detailed access, hazard, cultural, or sensitive-location geometry.
+- Rapid and media review: Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon are provisional guide/media leads only. Attach exact stationing and local review before generating production windows. Keep third-party footage and social media link-only until item-level rights are cleared.
+
+No Chilko corridor, flow band, rapid marker, or lifelike capture is currently approved.
+
+Initial source slice:
+
+- `physics/data/real_world/chilko_river_bc/source_manifest.json` hash-locks the first official attachment and keeps every production promotion gate closed.
+- The British Columbia Freshwater Atlas response contains 545 named Chilko River features. The review-seed interval selects 160 official source segments totaling 56.160 km, but exact launch/ramp geometry and a single stitched downstream centerline remain blocked.
+- Environment and Climate Change Canada monthly means are attached for `08MA002` and `08MA001`. The former is upstream timing context; the latter is downstream of the Taseko confluence. `hydrology/seasonal_flow_context.json` deliberately emits no gameplay thresholds.
+- NRCan STAC metadata records MRDEM-30 as fallback and rejects two false-positive lidar project envelopes after their actual extent polygons show zero corridor intersections.
+- The August 25, 2025 Sentinel-2 L2A scene is the current cloud-screened imagery candidate. Its attached tile preview is source review evidence only; corridor COG extraction, cloud/shadow masking, orthophoto comparison, and production derivatives remain open.
+- Tŝilhqot’in fisheries, title-area, place-name, access, and publication sources are link-only. Consultation, permission, sensitive-location review, and exact access approval remain open.
+
 ## Unreal Construction Plan
 
-1. Create source-controlled preview recipes for all three rivers from the manifest.
+1. Create source-controlled preview recipes for the active five rivers, preserving existing three-river and international candidates as review evidence until each replacement source package passes.
 2. Generate one Unreal preview level per river with procedural terrain bands, river surface, bank/canyon walls, boulders, foliage proxies, lighting, camera, and source/capture metadata.
 3. Capture downstream guide-seat screenshots for each preview level.
 4. Replace proxy terrain and visual masks with real DEM, hydrography, imagery, and flow-derived masks as source pulls are reviewed.

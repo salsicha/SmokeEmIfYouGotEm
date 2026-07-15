@@ -1,0 +1,41 @@
+{
+  "schema": "raftsim.chilko.imagery_source_review.v0",
+  "status": "cloud_screened_sentinel_preview_attached_production_corridor_clip_open",
+  "search_bbox_wgs84": [
+    -124.2,
+    51.6,
+    -123.6,
+    52.1
+  ],
+  "search_item_count": 77,
+  "full_bbox_coverage_item_count": 29,
+  "selected_scene": {
+    "item_id": "S2C_10UDC_20250825_0_L2A",
+    "datetime_utc": "2025-08-25T19:30:32.137000Z",
+    "platform": "sentinel-2c",
+    "tile": "MGRS-10UDC",
+    "cloud_cover_percent": 0.000644,
+    "visual_cog": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/10/U/DC/2025/8/S2C_10UDC_20250825_0_L2A/TCI.tif",
+    "attached_preview": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250825_selected_preview.jpg",
+    "attached_preview_sha256": "a0435f5523e4d5b54480f41c7d13aa4ebbc2ff4f5d39bdbac63c8e103b06b36d"
+  },
+  "rejected_cloud_screening_example": {
+    "item_id": "S2C_10UDC_20250904_0_L2A",
+    "attached_preview": "physics/data/real_world/chilko_river_bc/source/imagery/sentinel2_20250904_preview.jpg",
+    "reason": "broad_tile_preview_has_visible_haze_and_cloud_despite_acceptable_scene_level_metadata"
+  },
+  "rights": {
+    "data": "Copernicus Sentinel data",
+    "use_basis": "free_full_and_open_sentinel_data_subject_to_legal_notice",
+    "terms_url": "https://dataspace.copernicus.eu/terms-and-conditions",
+    "attribution": "Contains modified Copernicus Sentinel data (2025)",
+    "third_party_portal_content_promoted": false
+  },
+  "production_promotion_allowed": false,
+  "required_next_review": [
+    "extract_cloud_and_shadow_checked_corridor_tci_and_spectral_masks",
+    "compare_against_rights_compatible_provincial_orthophoto",
+    "review_water_color_snow_smoke_burn_and_vegetation_season",
+    "record_processing_graph_and_output_hashes"
+  ]
+}
