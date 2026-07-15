@@ -63,6 +63,7 @@ class RiverCorridorDefinition:
     sentinel_scenes: tuple[SentinelScene, ...]
     sentinel_visual_file: str
     terrain_acquisition_lead_file: str | None
+    centerline_review_manifest_file: str | None
     endpoint_evidence: tuple[dict[str, Any], ...]
     flow_context: dict[str, Any]
     environment_contract: dict[str, Any]
@@ -143,6 +144,9 @@ ZAMBEZI = RiverCorridorDefinition(
     sentinel_visual_file="imagery/source/sentinel2_20260610_route_visual.png",
     terrain_acquisition_lead_file=(
         "terrain/source/batoka_high_resolution_terrain_acquisition_leads.json"
+    ),
+    centerline_review_manifest_file=(
+        "hydrography/review/sentinel2_20260610_centerline_candidate_manifest.json"
     ),
     endpoint_evidence=(
         {
@@ -268,6 +272,7 @@ FUTALEUFU = RiverCorridorDefinition(
     ),
     sentinel_visual_file="imagery/source/sentinel2_20260104_route_visual.png",
     terrain_acquisition_lead_file=None,
+    centerline_review_manifest_file=None,
     endpoint_evidence=(
         {
             "endpoint": "put_in",
@@ -1163,6 +1168,28 @@ def build_production_corridor(repo_root: Path, river_id: str) -> dict[str, Any]:
                 "status": terrain_acquisition_lead["status"],
             }
         )
+    centerline_review_manifest_path: Path | None = None
+    centerline_review_candidate_path: Path | None = None
+    if definition.centerline_review_manifest_file:
+        centerline_review_manifest_path = river_root / definition.centerline_review_manifest_file
+        centerline_review_manifest = json.loads(
+            centerline_review_manifest_path.read_text(encoding="utf-8")
+        )
+        centerline_review_candidate_path = repo_root / (
+            centerline_review_manifest["outputs"]["candidate_geojson"]["path"]
+        )
+        source_records.append(
+            {
+                "role": "surface_water_centerline_review_candidate",
+                "path": str(centerline_review_manifest_path.relative_to(repo_root)),
+                "sha256": _sha256(centerline_review_manifest_path),
+                "provider": "Copernicus Sentinel-2",
+                "license": "Copernicus Sentinel Data Legal Notice",
+                "authority": "10m_surface_water_observation_not_surveyed_centerline_or_bathymetry",
+                "status": centerline_review_manifest["status"],
+                "production_promoted": centerline_review_manifest["production_promoted"],
+            }
+        )
     route_length = _stationed(points)[-1]["station_m"]
     manifest = {
         "schema": ROUTE_SCHEMA,
@@ -1196,6 +1223,16 @@ def build_production_corridor(repo_root: Path, river_id: str) -> dict[str, Any]:
             "high_resolution_terrain_acquisition_lead": (
                 str(terrain_acquisition_lead_path.relative_to(repo_root))
                 if terrain_acquisition_lead_path
+                else None
+            ),
+            "centerline_review_candidate": (
+                str(centerline_review_candidate_path.relative_to(repo_root))
+                if centerline_review_candidate_path
+                else None
+            ),
+            "centerline_review_manifest": (
+                str(centerline_review_manifest_path.relative_to(repo_root))
+                if centerline_review_manifest_path
                 else None
             ),
         },

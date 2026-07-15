@@ -1,0 +1,109 @@
+{
+  "schema": "raftsim.zambezi_sentinel_centerline_candidate.v1",
+  "generated_at": "2026-07-15T01:56:15.346586+00:00",
+  "river_id": "zambezi_batoka_gorge",
+  "status": "surface_water_observation_review_candidate_not_production_geometry",
+  "production_promoted": false,
+  "source": {
+    "stac_response": "physics/data/real_world/zambezi_batoka_gorge/imagery/source/earth_search_stac_response.json",
+    "stac_response_sha256": "189d5317bf6b360b4498ca66c74a9ae13636d1be3d4eb30ecb8d6904268a6a0c",
+    "visual_reference": "physics/data/real_world/zambezi_batoka_gorge/imagery/source/sentinel2_20260610_route_visual.png",
+    "visual_reference_sha256": "44250d8b88a2da926894a2a73e7a3ea329633139947fae68dc914ae07aa3fb8a",
+    "scenes": [
+      {
+        "item_id": "S2C_35KLA_20260610_0_L2A",
+        "datetime_utc": "2026-06-10T08:35:11.763000Z",
+        "cloud_cover_percent": 3e-06,
+        "green_href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/LA/2026/6/S2C_35KLA_20260610_0_L2A/B03.tif",
+        "nir_href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/LA/2026/6/S2C_35KLA_20260610_0_L2A/B08.tif"
+      },
+      {
+        "item_id": "S2C_35KMA_20260610_0_L2A",
+        "datetime_utc": "2026-06-10T08:35:08.983000Z",
+        "cloud_cover_percent": 0,
+        "green_href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/MA/2026/6/S2C_35KMA_20260610_0_L2A/B03.tif",
+        "nir_href": "https://sentinel-cogs.s3.us-west-2.amazonaws.com/sentinel-s2-l2a-cogs/35/K/MA/2026/6/S2C_35KMA_20260610_0_L2A/B08.tif"
+      }
+    ],
+    "license": "Copernicus Sentinel Data Legal Notice"
+  },
+  "processing": {
+    "target_crs": "EPSG:32735",
+    "target_resolution_m": 10.0,
+    "bounds_wgs84": [
+      25.826935535974975,
+      -18.02077352349982,
+      26.01842667723117,
+      -17.90811477650018
+    ],
+    "raster_width": 2036,
+    "raster_height": 1259,
+    "ndwi_formula": "(Sentinel-2 B03 green - B08 NIR) / (B03 + B08)",
+    "water_ndwi_threshold": -0.05,
+    "route_sample_spacing_m": 20.0,
+    "maximum_lateral_search_m": 200.0,
+    "endpoint_taper_m": 200.0,
+    "simplification_tolerance_m": 8.0
+  },
+  "measurements": {
+    "source_route_length_m": 29980.8172,
+    "candidate_dense_length_m": 30308.8321,
+    "candidate_simplified_length_m": 30170.9483,
+    "source_route_point_count": 209,
+    "candidate_dense_point_count": 1501,
+    "candidate_simplified_point_count": 198,
+    "median_absolute_lateral_shift_m": 9.375,
+    "p95_absolute_lateral_shift_m": 32.5,
+    "maximum_absolute_lateral_shift_m": 196.25,
+    "large_shift_review_threshold_m": 100.0,
+    "large_shift_sample_count": 17,
+    "large_shift_station_ranges": [
+      {
+        "start_station_m": 1520.0,
+        "end_station_m": 1840.0,
+        "peak_station_m": 1760.0,
+        "peak_absolute_lateral_shift_m": 196.25
+      }
+    ],
+    "source_route_water_support_fraction": 0.893404,
+    "candidate_water_support_fraction": 0.960693,
+    "candidate_ndwi_improves_fraction": 0.456362,
+    "source_route_median_ndwi": 0.242424,
+    "candidate_median_ndwi": 0.264214
+  },
+  "authority": {
+    "surveyed_centerline": false,
+    "bathymetry": false,
+    "bank_geometry": false,
+    "rapid_or_hazard_geometry": false,
+    "may_replace_production_corridor": false,
+    "changes_cpp_solver_or_geoclaw_state": false,
+    "allowed_use": "visual alignment review, source comparison, and survey acquisition QA"
+  },
+  "outputs": {
+    "candidate_geojson": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/hydrography/review/sentinel2_20260610_centerline_candidate.geojson",
+      "sha256": "be4c8e2031b672147f9a7c957d88e3188409e928d6c4773e1a7522ede5d0e987"
+    },
+    "ndwi_preview": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/review/sentinel2_20260610_ndwi_corridor.png",
+      "sha256": "6809e1e68630e52f23a7d02db7954ff733349c3d58a11a9e094b67ad3a6bece7",
+      "encoding": "uint8 where 0..255 maps NDWI -1..1; invalid pixels are 0"
+    },
+    "comparison_overlay": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/review/sentinel2_20260610_centerline_comparison.png",
+      "sha256": "38379f4087ea49aa913294c5ead3ec3ea2a22cd5be8b7b5054d7412585a987ab",
+      "legend": {
+        "osm_route": "yellow",
+        "sentinel_candidate": "cyan"
+      }
+    }
+  },
+  "promotion_gates": [
+    "manual cloud, shadow, whitewater, island, tributary, and bank review",
+    "guide confirms put-in, take-out, route order, named-rapid stations, and navigable channel",
+    "geospatial reviewer compares against high-resolution survey terrain, orthophoto, banks, and breaklines",
+    "rights reviewer confirms derivative and attribution handling",
+    "candidate is regenerated against accepted terrain before any Unreal or solver binding"
+  ]
+}
