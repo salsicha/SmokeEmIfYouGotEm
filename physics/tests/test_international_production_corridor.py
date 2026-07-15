@@ -187,6 +187,22 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert corridor["artifacts"]["high_resolution_terrain_acquisition_lead"].endswith(
         "batoka_high_resolution_terrain_acquisition_leads.json"
     )
+    centerline_review_records = [
+        record
+        for record in corridor["source_records"]
+        if record["role"] == "surface_water_centerline_review_candidate"
+    ]
+    assert len(centerline_review_records) == 1
+    assert centerline_review_records[0]["production_promoted"] is False
+    assert "not_surveyed_centerline_or_bathymetry" in (
+        centerline_review_records[0]["authority"]
+    )
+    assert corridor["artifacts"]["centerline_review_candidate"].endswith(
+        "sentinel2_20260610_centerline_candidate.geojson"
+    )
+    assert corridor["route"]["geometry_authority"] == (
+        "low_precision_osm_international_boundary_trace_cross_reference_not_surveyed_centerline"
+    )
     zambezi_source_plan = next(
         river for river in source_plan["rivers"] if river["river_id"] == "zambezi_batoka_gorge"
     )

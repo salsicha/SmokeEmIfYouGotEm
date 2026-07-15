@@ -1,6 +1,6 @@
 {
   "schema": "raftsim.international_production_corridor.v1",
-  "generated_at": "2026-07-15T01:44:01.932049+00:00",
+  "generated_at": "2026-07-15T01:56:44.833751+00:00",
   "river_id": "zambezi_batoka_gorge",
   "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
   "status": "source_scale_technical_corridor_not_yet_lifelike",
@@ -118,6 +118,16 @@
       "license": "discovery metadata only; survey data access and rights pending",
       "authority": "lead_only_no_geometry_or_media_imported",
       "status": "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent"
+    },
+    {
+      "role": "surface_water_centerline_review_candidate",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/hydrography/review/sentinel2_20260610_centerline_candidate_manifest.json",
+      "sha256": "8a169950ba108094edd71fdfc7a4873cb1ada67d67d1cf90d35329133cb5182e",
+      "provider": "Copernicus Sentinel-2",
+      "license": "Copernicus Sentinel Data Legal Notice",
+      "authority": "10m_surface_water_observation_not_surveyed_centerline_or_bathymetry",
+      "status": "surface_water_observation_review_candidate_not_production_geometry",
+      "production_promoted": false
     }
   ],
   "environment_contract": {
@@ -201,7 +211,9 @@
       "detail_packed": "unreal/Content/RaftSim/Rendering/ProductionDetailTextures/zambezi_batoka_gorge_terrain_bank_detail_v1_ao_roughness_height.png"
     },
     "seasonal_flow_context": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrology/seasonal_flow_context.json",
-    "high_resolution_terrain_acquisition_lead": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json"
+    "high_resolution_terrain_acquisition_lead": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json",
+    "centerline_review_candidate": "physics/data/real_world/zambezi_batoka_gorge/hydrography/review/sentinel2_20260610_centerline_candidate.geojson",
+    "centerline_review_manifest": "physics/data/real_world/zambezi_batoka_gorge/hydrography/review/sentinel2_20260610_centerline_candidate_manifest.json"
   },
   "promotion_gates": [
     "local guide confirms exact put-in, take-out, line direction, rapid stations, access, and rescue routes",
