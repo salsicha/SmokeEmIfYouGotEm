@@ -5379,7 +5379,7 @@ bool CreateFutaleufuCordilleraCypressTextureAssets(
     return bAllSaved;
 }
 
-UMaterialExpressionCustom* AddComplementaryScreenDitherOpacity(
+UMaterialExpression* AddComplementaryScreenDitherOpacity(
     UMaterial* Material,
     UMaterialExpression* BaseOpacity,
     int32 BaseOpacityOutputIndex,
@@ -5461,7 +5461,65 @@ UMaterialExpressionCustom* AddComplementaryScreenDitherOpacity(
     PatternSizeInput.InputName = TEXT("PatternSize");
     PatternSizeInput.Input.Expression = PatternSize;
     Material->GetExpressionCollection().AddExpression(DitherMask);
-    return DitherMask;
+
+    UMaterialFunctionInterface* TemporalDitherFunction =
+        LoadObject<UMaterialFunctionInterface>(
+            nullptr,
+            TEXT("/Engine/Functions/Engine_MaterialFunctions02/Utility/"
+                 "DitherTemporalAA.DitherTemporalAA"));
+    UMaterialExpressionMaterialFunctionCall* TemporalDither =
+        NewObject<UMaterialExpressionMaterialFunctionCall>(Material);
+    if (!TemporalDitherFunction ||
+        !TemporalDither->SetMaterialFunction(TemporalDitherFunction) ||
+        TemporalDither->FunctionInputs.IsEmpty())
+    {
+        return DitherMask;
+    }
+    TemporalDither->MaterialExpressionEditorX = EditorX;
+    TemporalDither->MaterialExpressionEditorY = EditorY + 180;
+    TemporalDither->FunctionInputs[0].Input.Expression = SourceCoverage;
+    Material->GetExpressionCollection().AddExpression(TemporalDither);
+
+    UMaterialExpression* TemporalKeep = TemporalDither;
+    if (!bKeepSourceSide)
+    {
+        UMaterialExpressionOneMinus* InverseTemporalDither =
+            NewObject<UMaterialExpressionOneMinus>(Material);
+        InverseTemporalDither->MaterialExpressionEditorX = EditorX + 220;
+        InverseTemporalDither->MaterialExpressionEditorY = EditorY + 180;
+        InverseTemporalDither->Input.Expression = TemporalDither;
+        Material->GetExpressionCollection().AddExpression(InverseTemporalDither);
+        TemporalKeep = InverseTemporalDither;
+    }
+
+    UMaterialExpressionMultiply* TemporalOpacity =
+        NewObject<UMaterialExpressionMultiply>(Material);
+    TemporalOpacity->MaterialExpressionEditorX = EditorX + 440;
+    TemporalOpacity->MaterialExpressionEditorY = EditorY + 160;
+    TemporalOpacity->A.Expression = BaseOpacity;
+    TemporalOpacity->A.OutputIndex = BaseOpacityOutputIndex;
+    TemporalOpacity->B.Expression = TemporalKeep;
+    Material->GetExpressionCollection().AddExpression(TemporalOpacity);
+
+    UMaterialExpressionScalarParameter* TransitionMode =
+        NewObject<UMaterialExpressionScalarParameter>(Material);
+    TransitionMode->MaterialExpressionEditorX = EditorX + 180;
+    TransitionMode->MaterialExpressionEditorY = EditorY + 300;
+    TransitionMode->ParameterName = TEXT("ComplementaryTransitionMode");
+    TransitionMode->DefaultValue = 0.0f;
+    TransitionMode->SliderMin = 0.0f;
+    TransitionMode->SliderMax = 1.0f;
+    Material->GetExpressionCollection().AddExpression(TransitionMode);
+
+    UMaterialExpressionLinearInterpolate* SelectedOpacity =
+        NewObject<UMaterialExpressionLinearInterpolate>(Material);
+    SelectedOpacity->MaterialExpressionEditorX = EditorX + 700;
+    SelectedOpacity->MaterialExpressionEditorY = EditorY + 40;
+    SelectedOpacity->A.Expression = DitherMask;
+    SelectedOpacity->B.Expression = TemporalOpacity;
+    SelectedOpacity->Alpha.Expression = TransitionMode;
+    Material->GetExpressionCollection().AddExpression(SelectedOpacity);
+    return SelectedOpacity;
 }
 
 UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
@@ -5770,7 +5828,7 @@ UMaterial* CreateOrUpdateFutaleufuNativeCanopyMaterial(
             UMaterialExpressionConstant* FullOpacity =
                 AddExpression(NewObject<UMaterialExpressionConstant>(Material), 120, -460);
             FullOpacity->R = 1.0f;
-            UMaterialExpressionCustom* TransitionOpacity =
+            UMaterialExpression* TransitionOpacity =
                 AddComplementaryScreenDitherOpacity(
                     Material,
                     FullOpacity,
@@ -20331,7 +20389,8 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
     const FString& AuthorityMode,
     float SourceCoverage,
     FString& SetupSummary,
-    float PatternSize = 4.0f)
+    float PatternSize = 4.0f,
+    float TransitionMode = 0.0f)
 {
     AActor* SourceTrunkActor = nullptr;
     AActor* SourceFoliageActor = nullptr;
@@ -20374,7 +20433,7 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
     const bool bShowSource = bSourceOnly || bCombined;
     const bool bShowHlod = bHlodOnly || bCombined;
     SourceCoverage = bSourceOnly ? 1.0f : (bHlodOnly ? 0.0f : SourceCoverage);
-    auto SetCoverage = [SourceCoverage, PatternSize](AActor* Actor)
+    auto SetCoverage = [SourceCoverage, PatternSize, TransitionMode](AActor* Actor)
     {
         TInlineComponentArray<UMeshComponent*> MeshComponents;
         Actor->GetComponents(MeshComponents);
@@ -20404,6 +20463,9 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
                     DynamicMaterial->SetScalarParameterValue(
                         TEXT("ComplementaryPatternSize"),
                         PatternSize);
+                    DynamicMaterial->SetScalarParameterValue(
+                        TEXT("ComplementaryTransitionMode"),
+                        TransitionMode);
                     bUpdated = true;
                 }
             }
@@ -20420,10 +20482,11 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
         CaptureCamera->GetActorLocation(),
         LoadedAtlasActor->GetActorLocation());
     SetupSummary += FString::Printf(
-        TEXT("Complementary transition %s at %.3f m radial distance sets source coverage %.4f with a %.0fx%.0f pattern and visibility source=%s HLOD=%s.\n"),
+        TEXT("Complementary transition %s at %.3f m radial distance sets source coverage %.4f with %s ownership (legacy pattern %.0fx%.0f) and visibility source=%s HLOD=%s.\n"),
         *AuthorityMode,
         HorizontalDistanceCm / 100.0f,
         SourceCoverage,
+        TransitionMode >= 0.5f ? TEXT("temporal-AA") : TEXT("ordered"),
         PatternSize,
         PatternSize,
         bShowSource ? TEXT("true") : TEXT("false"),
@@ -20447,7 +20510,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
         FVector&,
         FVector&,
         FVector&,
-        FString&)>& SceneSetup = {})
+        FString&)>& SceneSetup = {},
+    float TransitionMode = 0.0f)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -20617,6 +20681,7 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
                              MotionRight,
                              AuthorityMode,
                              PatternSize,
+                             TransitionMode,
                              &OutSummary](float RadiusCm, float SourceCoverage)
     {
         const float AxialDistanceCm = FMath::Sqrt(
@@ -20634,7 +20699,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             AuthorityMode,
             SourceCoverage,
             OutSummary,
-            static_cast<float>(PatternSize));
+            static_cast<float>(PatternSize),
+            TransitionMode);
     };
     auto AdvanceAndCapture = [World, CaptureComponent]()
     {
@@ -20666,11 +20732,13 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     };
 
     bool bAllFramesSaved = true;
-    const FString SequenceToken = bLitRiverView
+    const FString SequenceToken = TransitionMode >= 0.5f
+        ? TEXT("motion_temporal_lit_river_view")
+        : (bLitRiverView
         ? TEXT("motion_8x8_lit_river_view")
         : (PatternSize >= 8
                ? TEXT("motion_8x8")
-               : TEXT("motion"));
+               : TEXT("motion")));
     if (!SetFrameState(StartRadiusCm, 1.0f))
     {
         RestoreAntiAliasingMethod();
@@ -20736,12 +20804,13 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     SceneCapture->Destroy();
     RenderTarget->ReleaseResource();
     OutSummary += FString::Printf(
-        TEXT("Persistent same-world %s%s motion sequence saved %d frames with a %dx%d complementary pattern, 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
+        TEXT("Persistent same-world %s%s motion sequence saved %d frames with %s complementary ownership, 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
         *AuthorityMode,
         bLitRiverView ? TEXT(" lit river-view") : TEXT(""),
         TransitionFrameCount + SettleFrameCount,
-        PatternSize,
-        PatternSize);
+        TransitionMode >= 0.5f
+            ? TEXT("engine temporal-AA")
+            : *FString::Printf(TEXT("a %dx%d ordered pattern"), PatternSize, PatternSize));
     return bAllFramesSaved &&
         OutRelativeCapturePaths.Num() - InitialCapturePathCount ==
             TransitionFrameCount + SettleFrameCount;
@@ -31867,6 +31936,7 @@ struct FRaftSimPveMultiViewAtlasBakeResult
     bool bAtlasFilesSaved = false;
     bool bTextureAssetsSaved = false;
     bool bMaterialSaved = false;
+    bool bRelightableMaterialSaved = false;
     bool bProxyActorCreated = false;
     int32 ViewCount = 0;
     int32 TileResolution = 0;
@@ -31887,19 +31957,24 @@ struct FRaftSimPveMultiViewAtlasBakeResult
     FString OpacitySource;
     FString ManifestRelativePath;
     FString BaseColorRelativePath;
+    FString AlbedoRelativePath;
     FString NormalRelativePath;
     FString OpacityRelativePath;
     FString DepthRelativePath;
     FString BaseColorDigest;
+    FString AlbedoDigest;
     FString NormalDigest;
     FString OpacityDigest;
     FString DepthDigest;
     FString BaseColorAssetPath;
+    FString AlbedoAssetPath;
     FString NormalAssetPath;
     FString OpacityAssetPath;
     FString DepthAssetPath;
     FString MaterialAssetPath;
+    FString RelightableMaterialAssetPath;
     UMaterial* Material = nullptr;
+    UMaterial* RelightableMaterial = nullptr;
     AStaticMeshActor* ProxyActor = nullptr;
 
     bool IsReady() const
@@ -31911,6 +31986,14 @@ struct FRaftSimPveMultiViewAtlasBakeResult
             MaximumCoverage <= 0.85f &&
             (!bDepthParallaxEnabled ||
              (ProxyVertexCount == 1089 && ProxyTriangleCount == 2048));
+    }
+
+    bool IsRelightableReady() const
+    {
+        return IsReady() && bRelightableMaterialSaved &&
+            !AlbedoRelativePath.IsEmpty() && !AlbedoDigest.IsEmpty() &&
+            !AlbedoAssetPath.IsEmpty() && !RelightableMaterialAssetPath.IsEmpty() &&
+            RelightableMaterial != nullptr;
     }
 };
 
@@ -32116,6 +32199,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     bool bUseDepthParallax,
     float DepthParallaxScaleCm,
     bool bEnableComplementaryTransition,
+    bool bUseLitShading,
     FString& OutSummary)
 {
     if (!BaseColorTexture || !NormalTexture || !OpacityTexture || !DepthTexture)
@@ -32151,10 +32235,10 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
 
     Material->Modify();
     Material->GetExpressionCollection().Empty();
-    Material->SetShadingModel(MSM_Unlit);
+    Material->SetShadingModel(bUseLitShading ? MSM_DefaultLit : MSM_Unlit);
     Material->BlendMode = BLEND_Masked;
     Material->TwoSided = true;
-    Material->bTangentSpaceNormal = true;
+    Material->bTangentSpaceNormal = !bUseLitShading;
     Material->DitheredLODTransition = true;
     Material->OpacityMaskClipValue = 0.38f;
 
@@ -32281,6 +32365,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     OpacitySample->SamplerType = SAMPLERTYPE_LinearGrayscale;
     OpacitySample->Coordinates.Expression = AtlasUv;
     UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
+    UMaterialExpression* ConditionedColor = BaseColorSample;
     if (bUseColorCorrectShading)
     {
         UMaterialExpressionVectorParameter* AtlasColorGain =
@@ -32291,13 +32376,51 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
             AddExpression(NewObject<UMaterialExpressionMultiply>(Material), -60, -480);
         ConditionedAtlasColor->A.Expression = BaseColorSample;
         ConditionedAtlasColor->B.Expression = AtlasColorGain;
-        ConnectPreviewMaterialColorInput(
-            EditorOnlyData->EmissiveColor,
-            ConditionedAtlasColor);
+        ConditionedColor = ConditionedAtlasColor;
+    }
+    if (bUseLitShading)
+    {
+        ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, ConditionedColor);
+        UMaterialExpressionTextureSampleParameter2D* WorldNormalSample =
+            AddExpression(
+                NewObject<UMaterialExpressionTextureSampleParameter2D>(Material),
+                -620,
+                -80);
+        WorldNormalSample->ParameterName = TEXT("AtlasWorldNormal");
+        WorldNormalSample->Texture = NormalTexture;
+        WorldNormalSample->SamplerType = SAMPLERTYPE_LinearColor;
+        WorldNormalSample->Coordinates.Expression = AtlasUv;
+        UMaterialExpressionCustom* DecodedWorldNormal =
+            AddExpression(NewObject<UMaterialExpressionCustom>(Material), -300, -40);
+        DecodedWorldNormal->Description = TEXT(
+            "Decode the captured world-space source normal for relighting");
+        DecodedWorldNormal->OutputType = CMOT_Float3;
+        DecodedWorldNormal->Code =
+            TEXT("return normalize(WorldNormal.rgb * 2.0 - 1.0);");
+        FCustomInput& WorldNormalInput =
+            DecodedWorldNormal->Inputs.AddDefaulted_GetRef();
+        WorldNormalInput.InputName = TEXT("WorldNormal");
+        WorldNormalInput.Input.Expression = WorldNormalSample;
+        ConnectPreviewMaterialVectorInput(EditorOnlyData->Normal, DecodedWorldNormal);
+
+        UMaterialExpressionConstant* Roughness =
+            AddExpression(NewObject<UMaterialExpressionConstant>(Material), 180, 180);
+        Roughness->R = 0.68f;
+        UMaterialExpressionConstant* Specular =
+            AddExpression(NewObject<UMaterialExpressionConstant>(Material), 180, 260);
+        Specular->R = 0.18f;
+        UMaterialExpressionConstant* AmbientOcclusion =
+            AddExpression(NewObject<UMaterialExpressionConstant>(Material), 180, 340);
+        AmbientOcclusion->R = 1.0f;
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
+        ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
+        ConnectPreviewMaterialScalarInput(
+            EditorOnlyData->AmbientOcclusion,
+            AmbientOcclusion);
     }
     else
     {
-        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, BaseColorSample);
+        ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, ConditionedColor);
     }
     UMaterialExpression* FinalOpacity = OpacitySample;
     if (bEnableComplementaryTransition)
@@ -32563,10 +32686,12 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     CaptureComponent->PostProcessBlendWeight = 1.0f;
 
     TArray<FColor> BaseColorAtlas;
+    TArray<FColor> AlbedoAtlas;
     TArray<FColor> NormalAtlas;
     TArray<FColor> OpacityAtlas;
     TArray<FColor> DepthAtlas;
     BaseColorAtlas.Init(FColor(0, 0, 0, 0), AtlasResolution * AtlasResolution);
+    AlbedoAtlas.Init(FColor(0, 0, 0, 0), AtlasResolution * AtlasResolution);
     NormalAtlas.Init(FColor(128, 128, 255, 0), AtlasResolution * AtlasResolution);
     OpacityAtlas.Init(FColor::Black, AtlasResolution * AtlasResolution);
     DepthAtlas.Init(FColor(0, 0, 0, 0), AtlasResolution * AtlasResolution);
@@ -32698,6 +32823,10 @@ bool BakeFutaleufuCypressMultiViewAtlas(
                     FColor BaseColor = FinalColorPixels[TileIndex];
                     BaseColor.A = Alpha;
                     BaseColorAtlas[AtlasIndex] = BaseColor;
+                    FColor AlbedoColor =
+                        BaseColorPixels[TileIndex].GetClamped().ToFColor(true);
+                    AlbedoColor.A = Alpha;
+                    AlbedoAtlas[AtlasIndex] = AlbedoColor;
                     FColor NormalColor = NormalPixels[TileIndex].GetClamped().ToFColor(false);
                     NormalColor.A = Alpha;
                     NormalAtlas[AtlasIndex] = NormalColor;
@@ -32713,6 +32842,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
             }
             DilatePveAtlasTileRgb(
                 BaseColorAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
+            DilatePveAtlasTileRgb(
+                AlbedoAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
             DilatePveAtlasTileRgb(
                 NormalAtlas, AtlasResolution, TileOriginX, TileOriginY, TileResolution, 12);
             DilatePveAtlasTileRgb(
@@ -32743,11 +32874,14 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         *LocalSavedNamespace,
         *VariantLower);
     OutResult.BaseColorRelativePath = RelativeOutputRoot + TEXT("_base_color_opacity.png");
+    OutResult.AlbedoRelativePath = RelativeOutputRoot + TEXT("_albedo_opacity.png");
     OutResult.NormalRelativePath = RelativeOutputRoot + TEXT("_world_normal.png");
     OutResult.OpacityRelativePath = RelativeOutputRoot + TEXT("_opacity.png");
     OutResult.DepthRelativePath = RelativeOutputRoot + TEXT("_depth.png");
     const FString BaseColorAbsolutePath = FPaths::Combine(
         OutputDirectory, VariantLower + TEXT("_multiview_atlas_base_color_opacity.png"));
+    const FString AlbedoAbsolutePath = FPaths::Combine(
+        OutputDirectory, VariantLower + TEXT("_multiview_atlas_albedo_opacity.png"));
     const FString NormalAbsolutePath = FPaths::Combine(
         OutputDirectory, VariantLower + TEXT("_multiview_atlas_world_normal.png"));
     const FString OpacityAbsolutePath = FPaths::Combine(
@@ -32756,6 +32890,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         OutputDirectory, VariantLower + TEXT("_multiview_atlas_depth.png"));
     OutResult.bAtlasFilesSaved =
         SavePveAtlasPng(BaseColorAbsolutePath, AtlasResolution, AtlasResolution, BaseColorAtlas) &&
+        SavePveAtlasPng(AlbedoAbsolutePath, AtlasResolution, AtlasResolution, AlbedoAtlas) &&
         SavePveAtlasPng(NormalAbsolutePath, AtlasResolution, AtlasResolution, NormalAtlas) &&
         SavePveAtlasPng(OpacityAbsolutePath, AtlasResolution, AtlasResolution, OpacityAtlas) &&
         SavePveAtlasPng(DepthAbsolutePath, AtlasResolution, AtlasResolution, DepthAtlas);
@@ -32765,6 +32900,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         return false;
     }
     OutResult.BaseColorDigest = LexToString(FMD5Hash::HashFile(*BaseColorAbsolutePath));
+    OutResult.AlbedoDigest = LexToString(FMD5Hash::HashFile(*AlbedoAbsolutePath));
     OutResult.NormalDigest = LexToString(FMD5Hash::HashFile(*NormalAbsolutePath));
     OutResult.OpacityDigest = LexToString(FMD5Hash::HashFile(*OpacityAbsolutePath));
     OutResult.DepthDigest = LexToString(FMD5Hash::HashFile(*DepthAbsolutePath));
@@ -32774,6 +32910,9 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         *LocalReviewNamespace);
     OutResult.BaseColorAssetPath = FString::Printf(
         TEXT("%s/T_%s_%s_MultiViewBaseColorOpacity"),
+        *AtlasPackageRoot, *AssetToken, *VariantLower);
+    OutResult.AlbedoAssetPath = FString::Printf(
+        TEXT("%s/T_%s_%s_MultiViewAlbedoOpacity"),
         *AtlasPackageRoot, *AssetToken, *VariantLower);
     OutResult.NormalAssetPath = FString::Printf(
         TEXT("%s/T_%s_%s_MultiViewWorldNormal"),
@@ -32787,6 +32926,14 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     UTexture2D* BaseColorTexture = CreateOrUpdateLocalPveAtlasTexture(
         OutResult.BaseColorAssetPath,
         BaseColorAtlas,
+        AtlasResolution,
+        TC_Default,
+        true,
+        true,
+        OutSummary);
+    UTexture2D* AlbedoTexture = CreateOrUpdateLocalPveAtlasTexture(
+        OutResult.AlbedoAssetPath,
+        AlbedoAtlas,
         AtlasResolution,
         TC_Default,
         true,
@@ -32817,13 +32964,14 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         false,
         OutSummary);
     OutResult.bTextureAssetsSaved =
-        BaseColorTexture && NormalTexture && OpacityTexture && DepthTexture;
+        BaseColorTexture && AlbedoTexture && NormalTexture && OpacityTexture &&
+        DepthTexture;
     if (!OutResult.bTextureAssetsSaved)
     {
         return false;
     }
     TArray<UTexture*> AtlasTextures = {
-        BaseColorTexture, NormalTexture, OpacityTexture, DepthTexture};
+        BaseColorTexture, AlbedoTexture, NormalTexture, OpacityTexture, DepthTexture};
     FTextureCompilingManager::Get().FinishCompilation(AtlasTextures);
     for (UTexture* Texture : AtlasTextures)
     {
@@ -32846,8 +32994,30 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         bUseDepthParallax,
         DepthParallaxScaleCm,
         bEnableComplementaryTransition,
+        false,
         OutSummary);
     OutResult.bMaterialSaved = OutResult.Material != nullptr;
+    OutResult.RelightableMaterialAssetPath = FString::Printf(
+        TEXT("%s/M_%s_%s_MultiViewHlodV3Lit"),
+        *AtlasPackageRoot,
+        *AssetToken,
+        *VariantLower);
+    OutResult.RelightableMaterial = CreateOrUpdateLocalPveAtlasMaterial(
+        OutResult.RelightableMaterialAssetPath,
+        AlbedoTexture,
+        NormalTexture,
+        OpacityTexture,
+        DepthTexture,
+        true,
+        FLinearColor(1.55f, 1.55f, 1.55f, 1.0f),
+        AzimuthOffsetDegrees,
+        bUseDepthParallax,
+        DepthParallaxScaleCm,
+        bEnableComplementaryTransition,
+        true,
+        OutSummary);
+    OutResult.bRelightableMaterialSaved =
+        OutResult.RelightableMaterial != nullptr;
     UStaticMesh* ProxyMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Plane.Plane"));
     if (bUseDepthParallax && OutResult.Material)
     {
@@ -32949,16 +33119,18 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("  \"atlas_contract\": {\"grid\": [4, 4], \"tile_resolution\": %d, \"atlas_resolution\": %d, \"padding_pixels\": 12, \"orthographic_width_cm\": %.6f},\n")
         TEXT("  \"projection_contract\": {\"type\": \"%s\", \"capture_radius_cm\": %.6f, \"perspective_horizontal_fov_degrees\": %.6f, \"proxy_plane_width_cm\": %.6f},\n")
         TEXT("  \"representation_shape_contract\": {\"type\": \"%s\", \"depth_parallax_enabled\": %s, \"depth_parallax_scale_cm\": %.6f, \"proxy_vertex_count\": %d, \"proxy_triangle_count\": %d},\n")
-        TEXT("  \"capture_contract\": {\"base_color\": \"%s\", \"normal\": \"SCS_Normal world space\", \"opacity\": \"%s\", \"depth\": \"SCS_SceneDepth normalized per view, near white\", \"primitive_filter\": \"all non-source mesh actors hidden while retaining the review light rig\"},\n")
+        TEXT("  \"capture_contract\": {\"source_lit_color\": \"%s\", \"relightable_albedo\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"normal\": \"SCS_Normal world space\", \"opacity\": \"%s\", \"depth\": \"SCS_SceneDepth normalized per view, near white\", \"primitive_filter\": \"all non-source mesh actors hidden while retaining the review light rig\"},\n")
         TEXT("  \"coverage_fraction_range\": [%.9f, %.9f],\n")
         TEXT("  \"outputs\": {\n")
         TEXT("    \"base_color_opacity\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
+        TEXT("    \"albedo_opacity\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
         TEXT("    \"world_normal\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
         TEXT("    \"opacity\": {\"path\": \"%s\", \"md5\": \"%s\"},\n")
         TEXT("    \"depth\": {\"path\": \"%s\", \"md5\": \"%s\"}\n")
         TEXT("  },\n")
-        TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material\": \"%s\"},\n")
+        TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"albedo_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"legacy_unlit_material\": \"%s\", \"relightable_lit_material\": \"%s\"},\n")
         TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s, \"complementary_screen_dither_enabled\": %s, \"complementary_source_coverage_parameter\": \"ComplementarySourceCoverage\"},\n")
+        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"shading\": \"masked DefaultLit albedo plus captured world normal\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true},\n")
         TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
@@ -32992,6 +33164,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         OutResult.MaximumCoverage,
         *EscapeRaftSimJsonString(OutResult.BaseColorRelativePath),
         *OutResult.BaseColorDigest,
+        *EscapeRaftSimJsonString(OutResult.AlbedoRelativePath),
+        *OutResult.AlbedoDigest,
         *EscapeRaftSimJsonString(OutResult.NormalRelativePath),
         *OutResult.NormalDigest,
         *EscapeRaftSimJsonString(OutResult.OpacityRelativePath),
@@ -32999,10 +33173,12 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         *EscapeRaftSimJsonString(OutResult.DepthRelativePath),
         *OutResult.DepthDigest,
         *EscapeRaftSimJsonString(OutResult.BaseColorAssetPath),
+        *EscapeRaftSimJsonString(OutResult.AlbedoAssetPath),
         *EscapeRaftSimJsonString(OutResult.NormalAssetPath),
         *EscapeRaftSimJsonString(OutResult.OpacityAssetPath),
         *EscapeRaftSimJsonString(OutResult.DepthAssetPath),
         *EscapeRaftSimJsonString(OutResult.MaterialAssetPath),
+        *EscapeRaftSimJsonString(OutResult.RelightableMaterialAssetPath),
         bUseDepthParallax
             ? TEXT("camera-facing 32x32 tessellated XY grid with depth-atlas vertex displacement")
             : TEXT("camera-facing XY plane through world-position offset"),
@@ -33016,7 +33192,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         bUseDepthParallax ? TEXT("\"world_normal\"") : TEXT("\"world_normal\", \"depth\""),
         TEXT("false"),
         bUseDepthParallax ? TEXT("false") : TEXT("true"),
-        bEnableComplementaryTransition ? TEXT("true") : TEXT("false"));
+        bEnableComplementaryTransition ? TEXT("true") : TEXT("false"),
+        OutResult.IsRelightableReady() ? TEXT("true") : TEXT("false"));
     const bool bManifestSaved = FFileHelper::SaveStringToFile(Manifest, *ManifestAbsolutePath);
     if (!bManifestSaved)
     {
@@ -33028,7 +33205,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         AtlasResolution,
         OutResult.MinimumCoverage,
         OutResult.MaximumCoverage);
-    return bManifestSaved && OutResult.IsReady();
+    return bManifestSaved && OutResult.IsRelightableReady();
 }
 } // namespace
 
@@ -34794,6 +34971,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalLitRiverViewMotionTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalTemporalLitRiverViewMotionTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     UStaticMesh* LocalMultiViewHlodMesh = nullptr;
     FTransform LocalMultiViewHlodTransform = FTransform::Identity;
@@ -34851,6 +35030,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalFinePersistentMotionTransitionCapturesJson;
     TArray<FString> LocalLitRiverViewMotionTransitionCapturePaths;
     FString LocalLitRiverViewMotionTransitionCapturesJson;
+    TArray<FString> LocalTemporalLitRiverViewMotionTransitionCapturePaths;
+    FString LocalTemporalLitRiverViewMotionTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -35829,10 +36010,12 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
                              "L_FutaleufuTerminator_PhysicalCorridorCandidate");
                     LitRiverReviewSpec.bDeterministicValidationCapture = false;
+                    UMaterialInterface* ActiveLitRiverHlodMaterial =
+                        LocalMultiViewAtlas.Material;
                     const auto SetupLitRiverView = [
                         TrunkMesh,
                         LocalHlodMesh = LocalMultiViewHlodMesh,
-                        HlodMaterial = LocalMultiViewAtlas.Material,
+                        &ActiveLitRiverHlodMaterial,
                         LocalHlodTransform = LocalMultiViewHlodTransform,
                         &FoliageFacade,
                         GetLocalFoliageTransform](
@@ -35844,7 +36027,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                             FVector& ViewTargetOffset,
                             FString& SetupSummary)
                     {
-                        if (!World || !TrunkMesh || !LocalHlodMesh || !HlodMaterial ||
+                        if (!World || !TrunkMesh || !LocalHlodMesh ||
+                            !ActiveLitRiverHlodMaterial ||
                             !FoliageFacade.IsValid())
                         {
                             SetupSummary += TEXT(
@@ -36112,7 +36296,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         UStaticMeshComponent* AtlasComponent =
                             AtlasActor->GetStaticMeshComponent();
                         AtlasComponent->SetStaticMesh(LocalHlodMesh);
-                        AtlasComponent->SetMaterial(0, HlodMaterial);
+                        AtlasComponent->SetMaterial(0, ActiveLitRiverHlodMaterial);
                         AtlasComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
                         AtlasComponent->SetGenerateOverlapEvents(false);
                         AtlasComponent->SetCastShadow(false);
@@ -36187,6 +36371,38 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 : TEXT(", "),
                             *EscapeRaftSimJsonString(CapturePath));
                     }
+                    ActiveLitRiverHlodMaterial =
+                        LocalMultiViewAtlas.RelightableMaterial;
+                    bool bAllTemporalLitRiverViewMotionCapturesProduced =
+                        LocalMultiViewAtlas.IsRelightableReady();
+                    for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+                    {
+                        bAllTemporalLitRiverViewMotionCapturesProduced &=
+                            CaptureFutaleufuComplementaryTransitionMotionSequence(
+                                LitRiverReviewSpec,
+                                LocalVisualCaptureBase,
+                                AuthorityToken,
+                                8,
+                                LocalTemporalLitRiverViewMotionTransitionCapturePaths,
+                                LocalVisualSummary,
+                                true,
+                                SetupLitRiverView,
+                                1.0f);
+                    }
+                    bLocalTemporalLitRiverViewMotionTransitionReviewCaptured =
+                        bAllTemporalLitRiverViewMotionCapturesProduced &&
+                        LocalTemporalLitRiverViewMotionTransitionCapturePaths.Num() == 147;
+                    for (const FString& CapturePath :
+                         LocalTemporalLitRiverViewMotionTransitionCapturePaths)
+                    {
+                        LocalTemporalLitRiverViewMotionTransitionCapturesJson +=
+                            FString::Printf(
+                                TEXT("%s\"%s\""),
+                                LocalTemporalLitRiverViewMotionTransitionCapturesJson.IsEmpty()
+                                    ? TEXT("")
+                                    : TEXT(", "),
+                                *EscapeRaftSimJsonString(CapturePath));
+                    }
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -36199,7 +36415,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalTemporalTransitionReviewCaptured &&
                     bLocalPersistentMotionTransitionReviewCaptured &&
                     bLocalFinePersistentMotionTransitionReviewCaptured &&
-                    bLocalLitRiverViewMotionTransitionReviewCaptured;
+                    bLocalLitRiverViewMotionTransitionReviewCaptured &&
+                    bLocalTemporalLitRiverViewMotionTransitionReviewCaptured;
             }
         }
     }
@@ -36234,7 +36451,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, and a V36 lit physical-corridor river-view sequence under the same 60 Hz motion and endpoint-settle contract; V33-V36 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V36 art, silhouette, patterning, and hazard-readability review remain pending")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, and a V37 temporal-AA plus relightable-albedo/world-normal sequence under the same 60 Hz motion and endpoint-settle contract; V33-V37 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V37 remains review-only pending measured art, silhouette, patterning, background-isolation, and hazard decisions")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -36253,8 +36470,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"representation_shape_contract\": {\"type\": \"%s\", \"depth_parallax_enabled\": %s, \"depth_parallax_scale_cm\": %.6f, \"proxy_vertex_count\": %d, \"proxy_triangle_count\": %d},\n")
         TEXT("    \"coverage_fraction_range\": [%.9f, %.9f],\n")
         TEXT("    \"opacity_source\": \"%s\",\n")
-        TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\"],\n")
+        TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
         TEXT("    \"material_asset\": \"%s\",\n")
+        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"emissive_connected\": false, \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"]},\n")
         TEXT("    \"runtime_representation\": \"%s\",\n")
         TEXT("    \"atlas_color_gain\": [%.6f, %.6f, %.6f],\n")
         TEXT("    \"exact_source_camera_60m_capture\": \"%s\",\n")
@@ -36267,6 +36485,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_4x4_screen_bayer\", \"pattern_rank_count\": 16, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"fine_persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"base_pattern_retained_for_control\": \"deterministic_4x4_screen_bayer\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"one transient non-colliding source/HLOD pair placed on the finite lower-slope near bank from the existing river-eye basis\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"temporal_lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement as V36 with a separate relightable HLOD material\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"transition\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_modes_retained\": true, \"source_material\": \"masked source bark and foliage with ComplementaryTransitionMode=1\", \"hlod_shading\": \"DefaultLit albedo plus captured world normal, no emissive connection\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -36295,10 +36514,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.MaximumCoverage,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.OpacitySource),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.BaseColorRelativePath),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.AlbedoRelativePath),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.NormalRelativePath),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.OpacityRelativePath),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.DepthRelativePath),
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.MaterialAssetPath),
+        LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.AlbedoRelativePath),
+        *LocalMultiViewAtlas.AlbedoDigest,
+        *EscapeRaftSimJsonString(LocalMultiViewAtlas.RelightableMaterialAssetPath),
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("camera-facing 32x32 tessellated grid with nearest-frame selection, inverse-opacity silhouette, bounded source-lit color gain, and depth-atlas vertex displacement; world normal retained but not sampled")
             : LocalMultiViewAtlas.bComplementaryTransitionEnabled
@@ -36338,6 +36562,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
         LocalLitRiverViewMotionTransitionCapturePaths.Num(),
         *LocalLitRiverViewMotionTransitionCapturesJson,
+        LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
+        LocalTemporalLitRiverViewMotionTransitionCapturePaths.Num(),
+        *LocalTemporalLitRiverViewMotionTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -36362,6 +36589,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"fine_persistent_motion_transition_captures\": [%s],\n")
         TEXT("    \"lit_river_view_motion_transition_capture_count\": %d,\n")
         TEXT("    \"lit_river_view_motion_transition_captures\": [%s],\n")
+        TEXT("    \"temporal_lit_river_view_motion_transition_capture_count\": %d,\n")
+        TEXT("    \"temporal_lit_river_view_motion_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -36391,6 +36620,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalFinePersistentMotionTransitionCapturesJson,
         LocalLitRiverViewMotionTransitionCapturePaths.Num(),
         *LocalLitRiverViewMotionTransitionCapturesJson,
+        LocalTemporalLitRiverViewMotionTransitionCapturePaths.Num(),
+        *LocalTemporalLitRiverViewMotionTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
