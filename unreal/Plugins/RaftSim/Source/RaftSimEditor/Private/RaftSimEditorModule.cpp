@@ -20296,6 +20296,102 @@ bool CapturePreviewImageForSpec(
     return bSaved;
 }
 
+bool ConfigureFutaleufuComplementaryTransitionCapture(
+    UWorld* LoadedWorld,
+    ACameraActor* CaptureCamera,
+    const FString& AuthorityMode,
+    float SourceCoverage,
+    FString& SetupSummary)
+{
+    AActor* SourceTrunkActor = nullptr;
+    AActor* SourceFoliageActor = nullptr;
+    AActor* LoadedAtlasActor = nullptr;
+    for (TActorIterator<AActor> It(LoadedWorld); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor)
+        {
+            continue;
+        }
+        const FString Label = Actor->GetActorLabel();
+        if (Label == TEXT("RaftSim_PveReview_Trunk"))
+        {
+            SourceTrunkActor = Actor;
+        }
+        else if (Label == TEXT("RaftSim_PveReview_Foliage"))
+        {
+            SourceFoliageActor = Actor;
+        }
+        else if (Label == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            LoadedAtlasActor = Actor;
+        }
+        else if (Label == TEXT("RaftSim_PveCypressVolumetricFarProxy") ||
+                 Label == TEXT("RaftSim_PveCypressNaniteWholeTree"))
+        {
+            Actor->SetActorHiddenInGame(true);
+        }
+    }
+    if (!SourceTrunkActor || !SourceFoliageActor || !LoadedAtlasActor || !CaptureCamera)
+    {
+        SetupSummary += TEXT(
+            "Complementary transition setup could not resolve source, HLOD, and camera actors.\n");
+        return false;
+    }
+    const bool bSourceOnly = AuthorityMode == TEXT("source_only");
+    const bool bHlodOnly = AuthorityMode == TEXT("hlod_only");
+    const bool bCombined = AuthorityMode == TEXT("combined");
+    const bool bShowSource = bSourceOnly || bCombined;
+    const bool bShowHlod = bHlodOnly || bCombined;
+    SourceCoverage = bSourceOnly ? 1.0f : (bHlodOnly ? 0.0f : SourceCoverage);
+    auto SetCoverage = [SourceCoverage](AActor* Actor)
+    {
+        TInlineComponentArray<UMeshComponent*> MeshComponents;
+        Actor->GetComponents(MeshComponents);
+        bool bUpdated = false;
+        for (UMeshComponent* Component : MeshComponents)
+        {
+            if (!Component)
+            {
+                continue;
+            }
+            for (int32 MaterialIndex = 0;
+                 MaterialIndex < Component->GetNumMaterials();
+                 ++MaterialIndex)
+            {
+                UMaterialInstanceDynamic* DynamicMaterial =
+                    Component->CreateDynamicMaterialInstance(MaterialIndex);
+                if (DynamicMaterial)
+                {
+                    DynamicMaterial->SetScalarParameterValue(
+                        TEXT("ComplementarySourceCoverage"),
+                        SourceCoverage);
+                    bUpdated = true;
+                }
+            }
+        }
+        return bUpdated;
+    };
+    const bool bSourceMaterialsUpdated =
+        SetCoverage(SourceTrunkActor) && SetCoverage(SourceFoliageActor);
+    const bool bHlodMaterialUpdated = SetCoverage(LoadedAtlasActor);
+    SourceTrunkActor->SetActorHiddenInGame(!bShowSource);
+    SourceFoliageActor->SetActorHiddenInGame(!bShowSource);
+    LoadedAtlasActor->SetActorHiddenInGame(!bShowHlod);
+    const float HorizontalDistanceCm = FVector::Dist2D(
+        CaptureCamera->GetActorLocation(),
+        LoadedAtlasActor->GetActorLocation());
+    SetupSummary += FString::Printf(
+        TEXT("Complementary transition %s at %.3f m radial distance sets source coverage %.4f and visibility source=%s HLOD=%s.\n"),
+        *AuthorityMode,
+        HorizontalDistanceCm / 100.0f,
+        SourceCoverage,
+        bShowSource ? TEXT("true") : TEXT("false"),
+        bShowHlod ? TEXT("true") : TEXT("false"));
+    return bSourceMaterialsUpdated && bHlodMaterialUpdated &&
+        (bSourceOnly || bHlodOnly || bCombined);
+}
+
 FBox GetZambeziCliffComparisonEffectiveBounds(UStaticMesh* Mesh)
 {
     if (!Mesh)
@@ -33712,12 +33808,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             DynamicMesh->SetMesh(MoveTemp(CombinedMesh));
 
             TArray<TObjectPtr<UMaterialInterface>> Materials;
+            const TCHAR* CypressBarkMaterialObjectPath =
+                bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                ? TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+                       "Materials/M_RaftSim_FutaleufuCordilleraCypress_V32_ComplementaryTransitionBark."
+                       "M_RaftSim_FutaleufuCordilleraCypress_V32_ComplementaryTransitionBark")
+                : TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
+                       "Materials/M_RaftSim_FutaleufuCordilleraCypress_Bark."
+                       "M_RaftSim_FutaleufuCordilleraCypress_Bark");
             UMaterialInterface* CypressBarkMaterial = bProceduralCypressPveCandidate
-                ? LoadObject<UMaterialInterface>(
-                      nullptr,
-                      TEXT("/Game/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/"
-                           "Materials/M_RaftSim_FutaleufuCordilleraCypress_Bark."
-                           "M_RaftSim_FutaleufuCordilleraCypress_Bark"))
+                ? LoadObject<UMaterialInterface>(nullptr, CypressBarkMaterialObjectPath)
                 : nullptr;
             if (Collection.HasAttribute(TEXT("MaterialPath"), FGeometryCollection::MaterialGroup))
             {
@@ -33739,7 +33839,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
             CopyOptions.NewMaterials = Materials;
             CopyOptions.bApplyNaniteSettings = true;
             CopyOptions.NewNaniteSettings = TrunkMesh->GetNaniteSettings();
-            CopyOptions.NewNaniteSettings.bEnabled = true;
+            CopyOptions.NewNaniteSettings.bEnabled =
+                !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
             CopyOptions.NewNaniteSettings.ShapePreservation = bProceduralCypressPveCandidate
                 ? ENaniteShapePreservation::None
                 : ENaniteShapePreservation::PreserveArea;
@@ -33789,8 +33890,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     const bool bShapePreservationValid = bProceduralCypressPveCandidate
                         ? !bLocalTrunkPreserveArea
                         : bLocalTrunkPreserveArea;
+                    const bool bTrunkRendererValid =
+                        bLocalTrunkNaniteEnabled ||
+                        bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
                     bLocalTrunkValidated =
-                        bLocalTrunkNaniteEnabled &&
+                        bTrunkRendererValid &&
                         bShapePreservationValid &&
                         LocalTrunkVertexCount > 0 &&
                         LocalTrunkTriangleCount > 0 &&
@@ -34327,6 +34431,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalComplementaryTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalTemporalTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
@@ -34371,6 +34477,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalHandoffCapturesJson;
     TArray<FString> LocalComplementaryTransitionCapturePaths;
     FString LocalComplementaryTransitionCapturesJson;
+    TArray<FString> LocalTemporalTransitionTokens;
+    TArray<float> LocalTemporalTransitionRadiiCm;
+    TArray<float> LocalTemporalTransitionSourceCoverage;
+    TArray<FString> LocalTemporalTransitionCapturePaths;
+    FString LocalTemporalTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -34405,6 +34516,36 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 LocalComplementaryTransitionCapturesJson += FString::Printf(
                     TEXT("%s\"%s\""),
                     LocalComplementaryTransitionCapturesJson.IsEmpty()
+                        ? TEXT("")
+                        : TEXT(", "),
+                    *EscapeRaftSimJsonString(CapturePath));
+            }
+        }
+        constexpr int32 TemporalSampleCount = 17;
+        for (int32 SampleIndex = 0; SampleIndex < TemporalSampleCount; ++SampleIndex)
+        {
+            const int32 RadiusCm = 2300 + SampleIndex * 25;
+            const int32 RadiusMeters = RadiusCm / 100;
+            const int32 RadiusCentimeters = RadiusCm % 100;
+            const FString DistanceToken = FString::Printf(
+                TEXT("%02dm%02d"),
+                RadiusMeters,
+                RadiusCentimeters);
+            LocalTemporalTransitionTokens.Add(DistanceToken);
+            LocalTemporalTransitionRadiiCm.Add(static_cast<float>(RadiusCm));
+            LocalTemporalTransitionSourceCoverage.Add(
+                1.0f - static_cast<float>(SampleIndex) / 16.0f);
+            for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+            {
+                const FString CapturePath = FString::Printf(
+                    TEXT("%s_temporal_%s_%s.png"),
+                    *LocalVisualCaptureBase,
+                    *DistanceToken,
+                    AuthorityToken);
+                LocalTemporalTransitionCapturePaths.Add(CapturePath);
+                LocalTemporalTransitionCapturesJson += FString::Printf(
+                    TEXT("%s\"%s\""),
+                    LocalTemporalTransitionCapturesJson.IsEmpty()
                         ? TEXT("")
                         : TEXT(", "),
                     *EscapeRaftSimJsonString(CapturePath));
@@ -34666,6 +34807,25 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         const FString CameraLabel = FString::Printf(
                             TEXT("RaftSim_PveTransition_%s"),
                             ComplementaryTransitionDistanceTokens[TransitionIndex]);
+                        bHandoffCamerasComplete &= AddReviewCamera(
+                            *CameraLabel,
+                            FVector(
+                                Target.X - AxialDistanceCm,
+                                Target.Y - 800.0f,
+                                CameraHeight),
+                            50.0f);
+                    }
+                    for (int32 SampleIndex = 0;
+                         SampleIndex < LocalTemporalTransitionTokens.Num();
+                         ++SampleIndex)
+                    {
+                        const float RadialDistanceCm =
+                            LocalTemporalTransitionRadiiCm[SampleIndex];
+                        const float AxialDistanceCm = FMath::Sqrt(
+                            FMath::Square(RadialDistanceCm) - FMath::Square(800.0f));
+                        const FString CameraLabel = FString::Printf(
+                            TEXT("RaftSim_PveTemporal_%s"),
+                            *LocalTemporalTransitionTokens[SampleIndex]);
                         bHandoffCamerasComplete &= AddReviewCamera(
                             *CameraLabel,
                             FVector(
@@ -35184,6 +35344,56 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     }
                     bLocalComplementaryTransitionReviewCaptured =
                         bAllTransitionCapturesProduced;
+                    bool bAllTemporalTransitionCapturesProduced = true;
+                    for (int32 SampleIndex = 0;
+                         SampleIndex < LocalTemporalTransitionTokens.Num();
+                         ++SampleIndex)
+                    {
+                        for (int32 AuthorityIndex = 0; AuthorityIndex < 3; ++AuthorityIndex)
+                        {
+                            const FString AuthorityMode =
+                                HandoffAuthorityTokens[AuthorityIndex];
+                            const float SourceCoverage =
+                                LocalTemporalTransitionSourceCoverage[SampleIndex];
+                            const FString CameraLabel = FString::Printf(
+                                TEXT("RaftSim_PveTemporal_%s"),
+                                *LocalTemporalTransitionTokens[SampleIndex]);
+                            const FString CaptureId = FString::Printf(
+                                TEXT("temporal_%s_%s"),
+                                *LocalTemporalTransitionTokens[SampleIndex],
+                                *AuthorityMode);
+                            const FString Description = FString::Printf(
+                                TEXT("V33 temporal-path sample %s mode %s at %.4f source coverage"),
+                                *LocalTemporalTransitionTokens[SampleIndex],
+                                *AuthorityMode,
+                                SourceCoverage);
+                            bAllTemporalTransitionCapturesProduced &=
+                                CapturePreviewImageForSpec(
+                                    ReviewSpec,
+                                    LocalCaptureRoot,
+                                    LocalTemporalTransitionCapturePaths[
+                                        SampleIndex * 3 + AuthorityIndex],
+                                    CameraLabel,
+                                    CaptureId,
+                                    Description,
+                                    false,
+                                    LocalVisualSummary,
+                                    [AuthorityMode, SourceCoverage](
+                                        UWorld* LoadedWorld,
+                                        ACameraActor* CaptureCamera,
+                                        FString& SetupSummary)
+                                    {
+                                        return ConfigureFutaleufuComplementaryTransitionCapture(
+                                            LoadedWorld,
+                                            CaptureCamera,
+                                            AuthorityMode,
+                                            SourceCoverage,
+                                            SetupSummary);
+                                    });
+                        }
+                    }
+                    bLocalTemporalTransitionReviewCaptured =
+                        bAllTemporalTransitionCapturesProduced;
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -35192,7 +35402,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bCaptureA && bCaptureB && bCaptureDistance && bCaptureSpray &&
                     bCaptureFarProxy && bCaptureNaniteWholeTree &&
                     bCaptureMultiViewAtlas && bLocalHandoffReviewCaptured &&
-                    bLocalComplementaryTransitionReviewCaptured;
+                    bLocalComplementaryTransitionReviewCaptured &&
+                    bLocalTemporalTransitionReviewCaptured;
             }
         }
     }
@@ -35227,7 +35438,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures at exact radial 24/25/26 m cameras; matched transition comparison and any art decision remain pending")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures at exact radial 24/25/26 m cameras plus a V33 ordered 17-sample 23-27 m path precursor; V33 preserves woody geometry but uses traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; matched temporal-path comparison and any art decision remain pending")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -35256,6 +35467,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"deterministic_capture_contract\": {\"enabled\": %s, \"validation_only_not_art_review\": true, \"lighting\": false, \"post_processing\": false, \"atmosphere\": false, \"fog\": false, \"anti_aliasing\": false, \"temporal_aa\": false, \"motion_blur\": false, \"eye_adaptation\": false, \"ambient_occlusion\": false, \"global_illumination\": false, \"lumen_gi\": false, \"lumen_reflections\": false, \"screen_space_reflections\": false, \"reflection_environment\": false},\n")
         TEXT("    \"handoff_contract\": {\"enabled\": %s, \"distance_metric\": \"camera_to_hlod_actor_horizontal_distance\", \"source_selection_distance_cm\": 2500.0, \"source_authority_below_threshold\": true, \"single_representation_by_actor_visibility\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"complementary_transition_contract\": {\"enabled\": %s, \"pattern\": \"deterministic_4x4_screen_bayer\", \"parameter\": \"ComplementarySourceCoverage\", \"radial_band_cm\": [2300.0, 2700.0], \"sample_radii_cm\": [2400.0, 2500.0, 2600.0], \"source_coverage\": [0.75, 0.50, 0.25], \"source_and_hlod_visibility_overlap_inside_band\": true, \"pixel_ownership_complementary\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"temporal_transition_path_contract\": {\"enabled\": %s, \"sampling\": \"ordered_camera_path_precursor_without_same-world_temporal_history\", \"radial_band_cm\": [2300.0, 2700.0], \"radial_step_cm\": 25.0, \"sample_count\": 17, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.0625, \"authority_modes_per_sample\": [\"source_only\", \"hlod_only\", \"combined\"], \"source_woody_geometry\": \"unchanged_v24_v30_geometry\", \"source_woody_renderer\": \"traditional_raster_for_dynamic_screen_mask_compatibility\", \"nanite_source_woody_diagnostic\": \"rejected_wood_leaked_into_hlod_owned_pixels\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -35315,6 +35527,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
         LocalComplementaryTransitionCapturePaths.Num(),
         *LocalComplementaryTransitionCapturesJson,
+        LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
+        LocalTemporalTransitionCapturePaths.Num(),
+        *LocalTemporalTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -35331,6 +35546,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"handoff_captures\": [%s],\n")
         TEXT("    \"complementary_transition_capture_count\": %d,\n")
         TEXT("    \"complementary_transition_captures\": [%s],\n")
+        TEXT("    \"temporal_transition_capture_count\": %d,\n")
+        TEXT("    \"temporal_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -35352,6 +35569,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalHandoffCapturesJson,
         LocalComplementaryTransitionCapturePaths.Num(),
         *LocalComplementaryTransitionCapturesJson,
+        LocalTemporalTransitionCapturePaths.Num(),
+        *LocalTemporalTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
@@ -35605,6 +35824,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("    \"trunk_asset\": \"%s\",\n")
               TEXT("    \"foliage_template\": \"%s\",\n")
               TEXT("    \"nanite_woody_enabled\": %s,\n")
+              TEXT("    \"woody_renderer_contract\": \"%s\",\n")
               TEXT("    \"nanite_shape_preservation\": \"none\",\n")
               TEXT("    \"bounds_size_cm\": [%.6f, %.6f, %.6f]\n")
               TEXT("  },\n")
@@ -35833,11 +36053,16 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               FoliageInstanceCount,
               *FoliageMeshesJson,
               bLocalTrunkExported && bLocalTrunkValidated && bLocalTemplateSaved
-                  ? TEXT("nanite_woody_asset_and_project_palette_template_generated_locally")
+                  ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                      ? TEXT("traditional_raster_transition_woody_asset_and_project_palette_template_generated_locally")
+                      : TEXT("nanite_woody_asset_and_project_palette_template_generated_locally"))
                   : TEXT("local_export_failed"),
               *EscapeRaftSimJsonString(LocalTrunkAssetPath),
               *EscapeRaftSimJsonString(LocalTemplateReportPath),
               bLocalTrunkNaniteEnabled ? TEXT("true") : TEXT("false"),
+              bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                  ? TEXT("traditional_raster_for_dynamic_screen_mask_compatibility")
+                  : TEXT("nanite"),
               LocalTrunkBoundsSize.X,
               LocalTrunkBoundsSize.Y,
               LocalTrunkBoundsSize.Z,
@@ -35856,7 +36081,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? (bDeTieredCompoundBranchletAtlasCypressPalette
                       ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                           ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
-                              ? TEXT("traditional raster preserves V24 irregular-scale V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled")
+                              ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
+                                  ? TEXT("traditional raster preserves V24 irregular-scale V23 asynchronous V21 compound branchlet alpha; transition source wood also uses traditional raster for dynamic screen-mask compatibility")
+                                  : TEXT("traditional raster preserves V24 irregular-scale V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled"))
                               : TEXT("traditional raster preserves V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled"))
                           : TEXT("traditional raster preserves V22 de-tiered V21 compound branchlet alpha; woody source remains separately Nanite-enabled"))
                       : TEXT("traditional raster preserves V21 compound branchlet measured-spray alpha; woody source remains separately Nanite-enabled"))

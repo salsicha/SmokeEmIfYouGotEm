@@ -62,6 +62,8 @@ Chilko should read as a real transition through the Chilcotin landscape, not a g
 
 Futaleufu remains a Patagonian turquoise big-water corridor with granite and mixed temperate-rainforest structure, but current coigue and cordilleran-cypress candidates remain review assets rather than ecology or photoreal approval.
 
+The cordilleran-cypress V33 transition-path precursor now samples the V32 complementary source/HLOD handoff at 17 exact radial positions from 23.00 m through 27.00 m. It corrected an incomplete woody-material binding and proved that the current dynamic screen mask requires the unchanged source trunk geometry to use traditional raster: the Nanite source path leaked trunk and branches into HLOD-owned pixels. Two deterministic runs keep source, HLOD, and combined variation below 0.004557 percent, match the authored Bayer composite within 0.001411 percent, and bound transition overhead above ordinary camera-motion controls to 1.156684 percentage points. This retains a diagnostic path and renderer boundary, not a photoreal or production LOD. Same-world continuous motion with persistent view state, TAA history, motion vectors, target frame pacing, lit art, and desktop/VR profiling remains required.
+
 ## Flexible Raft Review
 
 Both rivers must exercise the flexible outer-tube contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json`. A seated or high-siding passenger must depress the local tube and alter freeboard; current overtopping that tube must add recorded water load and roll moment; rock contact must support bounded indentation, wrap or pinch, recovery, and pressure-dependent response. Simulator evidence must distinguish a missed high-side flip or pin from a correctly timed save.
