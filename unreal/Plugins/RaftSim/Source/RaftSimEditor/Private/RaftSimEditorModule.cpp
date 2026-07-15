@@ -29965,8 +29965,11 @@ bool CreateFutaleufuCypressPvePalette(
     FString& OutSummary)
 {
     const bool bCurvedShells = PaletteMode == TEXT("curved_shells");
+    const bool bIrregularCrownMassCompoundBranchletAtlas =
+        PaletteMode == TEXT("irregular_crown_mass_compound_branchlet_atlas");
     const bool bAsyncSecondaryCompoundBranchletAtlas =
-        PaletteMode == TEXT("async_secondary_compound_branchlet_atlas");
+        PaletteMode == TEXT("async_secondary_compound_branchlet_atlas") ||
+        bIrregularCrownMassCompoundBranchletAtlas;
     const bool bDeTieredCompoundBranchletAtlas =
         PaletteMode == TEXT("detiered_compound_branchlet_atlas") ||
         bAsyncSecondaryCompoundBranchletAtlas;
@@ -30009,7 +30012,9 @@ bool CreateFutaleufuCypressPvePalette(
         ? (bCompoundBranchletAtlas
             ? (bDeTieredCompoundBranchletAtlas
                 ? (bAsyncSecondaryCompoundBranchletAtlas
-                    ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V23_AsyncSecondaryCompoundBranchletAtlasLiveTwigs")
+                    ? (bIrregularCrownMassCompoundBranchletAtlas
+                        ? TEXT("M_RaftSim_FutaleufuCordilleraCypress_V24_IrregularCrownMassCompoundBranchletAtlasLiveTwigs")
+                        : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V23_AsyncSecondaryCompoundBranchletAtlasLiveTwigs"))
                     : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V22_DeTieredCompoundBranchletAtlasLiveTwigs"))
                 : TEXT("M_RaftSim_FutaleufuCordilleraCypress_V21_CompoundBranchletAtlasLiveTwigs"))
             : (bTerminalClusterBotanicalShoot
@@ -30061,8 +30066,11 @@ bool CreateFutaleufuCypressPvePalette(
         ? (bCompoundBranchletAtlas
             ? (bDeTieredCompoundBranchletAtlas
                 ? (bAsyncSecondaryCompoundBranchletAtlas
-                    ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                           "PVEFutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/Palette/")
+                    ? (bIrregularCrownMassCompoundBranchletAtlas
+                        ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                               "PVEFutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/Palette/")
+                        : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                               "PVEFutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/Palette/"))
                     : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                            "PVEFutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/Palette/"))
                 : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
@@ -30625,7 +30633,9 @@ bool CreateFutaleufuCypressPvePalette(
                    ? (bCompoundBranchletAtlas
                         ? (bDeTieredCompoundBranchletAtlas
                             ? (bAsyncSecondaryCompoundBranchletAtlas
-                                ? TEXT("V23_AsyncSecondaryCompoundBranchletAtlas_Pve")
+                                ? (bIrregularCrownMassCompoundBranchletAtlas
+                                    ? TEXT("V24_IrregularCrownMassCompoundBranchletAtlas_Pve")
+                                    : TEXT("V23_AsyncSecondaryCompoundBranchletAtlas_Pve"))
                                 : TEXT("V22_DeTieredCompoundBranchletAtlas_Pve"))
                             : TEXT("V21_CompoundBranchletAtlas_Pve"))
                         : (bTerminalClusterBotanicalShoot
@@ -32139,12 +32149,13 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT("terminal_cluster_botanical_shoot") &&
         PaletteMode != TEXT("compound_branchlet_atlas") &&
         PaletteMode != TEXT("detiered_compound_branchlet_atlas") &&
-        PaletteMode != TEXT("async_secondary_compound_branchlet_atlas"))
+        PaletteMode != TEXT("async_secondary_compound_branchlet_atlas") &&
+        PaletteMode != TEXT("irregular_crown_mass_compound_branchlet_atlas"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, or async_secondary_compound_branchlet_atlas."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, or irregular_crown_mass_compound_branchlet_atlas."),
             *PaletteMode);
         return;
     }
@@ -32158,8 +32169,11 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
             *Variant);
         return;
     }
+    const bool bIrregularCrownMass =
+        PaletteMode == TEXT("irregular_crown_mass_compound_branchlet_atlas");
     const bool bAsyncSecondaryCrown =
-        PaletteMode == TEXT("async_secondary_compound_branchlet_atlas");
+        PaletteMode == TEXT("async_secondary_compound_branchlet_atlas") ||
+        bIrregularCrownMass;
     const bool bDeTieredCrown =
         PaletteMode == TEXT("detiered_compound_branchlet_atlas") ||
         bAsyncSecondaryCrown;
@@ -32417,6 +32431,45 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         TEXT("AngleSettings"),
         TEXT("RandomizeAxilAngleMaximum"),
         bDeTieredCrown ? 18.0f : 8.0f);
+    if (bIrregularCrownMass)
+    {
+        bConfigured &= SetPveNestedText(
+            GraftDistributorSettings,
+            TEXT("ParametricSettings"),
+            TEXT("ScaleSettings"),
+            TEXT("ScaleRampBasis"),
+            TEXT("Plant"));
+        bConfigured &= SetPveNestedFloat(
+            GraftDistributorSettings,
+            TEXT("ParametricSettings"),
+            TEXT("ScaleSettings"),
+            TEXT("BaseScale"),
+            1.0f);
+        bConfigured &= SetPveNestedFloat(
+            GraftDistributorSettings,
+            TEXT("ParametricSettings"),
+            TEXT("ScaleSettings"),
+            TEXT("RandomizeScaleMinimum"),
+            0.88f);
+        bConfigured &= SetPveNestedFloat(
+            GraftDistributorSettings,
+            TEXT("ParametricSettings"),
+            TEXT("ScaleSettings"),
+            TEXT("RandomizeScaleMaximum"),
+            1.12f);
+        bConfigured &= SetPveNestedRamp(
+            GraftDistributorSettings,
+            TEXT("ParametricSettings"),
+            TEXT("ScaleSettings"),
+            TEXT("ScaleRamp"),
+            TArray<FVector2f>{
+                {0.0f, 0.92f},
+                {0.18f, 0.96f},
+                {0.40f, 0.98f},
+                {0.62f, 0.94f},
+                {0.82f, 0.82f},
+                {1.0f, 0.48f}});
+    }
 
     bConfigured &= SetPvePropertyText(
         DeadDistributorSettings, TEXT("Mode"), TEXT("ParametricSettings"));
@@ -32502,7 +32555,7 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         TEXT("HormoneBasedSettings"),
         TEXT("DistributionSettings"),
         TEXT("InstanceSpacing"),
-        0.055f);
+        bIrregularCrownMass ? 0.096f : 0.055f);
     bConfigured &= SetPveNestedFloat(
         LiveDistributorSettings,
         TEXT("HormoneBasedSettings"),
@@ -32829,10 +32882,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const bool bCurvedCypressShellPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("curved_shells");
-    const bool bAsyncSecondaryCompoundBranchletAtlasCypressPalette =
+    const bool bIrregularCrownMassCompoundBranchletAtlasCypressPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode ==
-            TEXT("async_secondary_compound_branchlet_atlas");
+            TEXT("irregular_crown_mass_compound_branchlet_atlas");
+    const bool bAsyncSecondaryCompoundBranchletAtlasCypressPalette =
+        bProceduralCypressPveCandidate &&
+        (ProceduralCypressPaletteMode ==
+             TEXT("async_secondary_compound_branchlet_atlas") ||
+         bIrregularCrownMassCompoundBranchletAtlasCypressPalette);
     const bool bDeTieredCompoundBranchletAtlasCypressPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode == TEXT("detiered_compound_branchlet_atlas") ||
@@ -32892,7 +32950,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                            ? TEXT("PVEFutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas")
+                            ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                                ? TEXT("PVEFutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas")
+                                : TEXT("PVEFutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("PVEFutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas"))
                         : TEXT("PVEFutaleufuCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
@@ -32923,7 +32983,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                            ? TEXT("FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas")
+                            ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                                ? TEXT("FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas")
+                                : TEXT("FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas"))
                         : TEXT("FutaleufuCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
@@ -32957,7 +33019,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                            ? TEXT("FutaleufuPveCordilleraCypressAsyncSecondaryCompoundBranchletAtlas")
+                            ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                                ? TEXT("FutaleufuPveCordilleraCypressIrregularCrownMassCompoundBranchletAtlas")
+                                : TEXT("FutaleufuPveCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("FutaleufuPveCordilleraCypressDeTieredCompoundBranchletAtlas"))
                         : TEXT("FutaleufuPveCordilleraCypressCompoundBranchletAtlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
@@ -34177,7 +34241,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         }
     }
     const TCHAR* LocalMultiViewAtlasHumanAcceptance =
-        bAsyncSecondaryCompoundBranchletAtlasCypressPalette
+        bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+        ? TEXT("V24 irregular plant-height graft-scale mass ramp completed over the V23 asynchronous secondary-shoot and V22 de-tiered golden-angle crown under fixed attachment-count, source-cost, and camera contracts; visual promotion remains pending committed comparison")
+        : (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
         ? TEXT("V23 asynchronous secondary-shoot graft variants and the V22 de-tiered golden-angle main crown completed under the fixed open-grown attachment-count, source-cost, and camera contract; crown topology and visual promotion remain pending committed comparison")
         : (bDeTieredCompoundBranchletAtlasCypressPalette
         ? TEXT("V22 de-tiered golden-angle crown and V21 compound branchlet source completed under the fixed open-grown source-cost and camera contract; crown topology and visual promotion remain pending committed comparison")
@@ -34195,7 +34261,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? TEXT("V20 botanical flattened-spray source and HLOD capture completed under the measured dimorphic-scale contract; visual promotion remains rejected pending the committed V20 closeup, silhouette, repetition, handoff, temporal, and platform review")
         : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("authored scale-leaf source and HLOD capture completed without whole-spray crop boundaries; visual promotion remains rejected pending the committed V19 review because botanical scale-leaf read, silhouette, handoff, temporal, and platform gates remain open")
-        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open")))))))));
+        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open"))))))))));
     const FString LocalMultiViewAtlasJson = FString::Printf(
         TEXT("{\n")
         TEXT("    \"status\": \"%s\",\n")
@@ -34271,7 +34337,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bCompoundBranchletAtlasCypressPalette
             ? (bDeTieredCompoundBranchletAtlasCypressPalette
                 ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                    ? TEXT("_async_secondary_compound_branchlet_atlas")
+                    ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                        ? TEXT("_irregular_crown_mass_compound_branchlet_atlas")
+                        : TEXT("_async_secondary_compound_branchlet_atlas"))
                     : TEXT("_detiered_compound_branchlet_atlas"))
                 : TEXT("_compound_branchlet_atlas"))
             : (bTerminalClusterBotanicalShootCypressPalette
@@ -34299,7 +34367,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bCompoundBranchletAtlasCypressPalette
             ? (bDeTieredCompoundBranchletAtlasCypressPalette
                 ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                    ? TEXT("v23")
+                    ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                        ? TEXT("v24")
+                        : TEXT("v23"))
                     : TEXT("v22"))
                 : TEXT("v21"))
             : (bTerminalClusterBotanicalShootCypressPalette
@@ -34436,6 +34506,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("    \"branchlet_template_phyllotaxy_additional_angles_degrees\": %s,\n")
               TEXT("    \"branchlet_template_phyllotaxy_staggers\": %s,\n")
               TEXT("    \"graft_template_selection\": \"%s\",\n")
+              TEXT("    \"graft_scale_ramp_basis\": \"%s\",\n")
+              TEXT("    \"graft_scale_ramp\": %s,\n")
+              TEXT("    \"graft_random_scale_range\": %s,\n")
               TEXT("    \"maximum_generation\": 2,\n")
               TEXT("    \"main_target_length_m\": 22.5,\n")
               TEXT("    \"branchlet_target_length_m\": 1.45,\n")
@@ -34445,7 +34518,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               TEXT("    \"manual_edit_or_export_nodes_present\": false,\n")
               TEXT("    \"live_foliage_shadows_enabled_in_isolated_review\": false,\n")
               TEXT("    \"live_foliage_material_defaults\": {\"base_color_scale\": 2.10, \"ao_influence\": 0.08, \"opacity_clip\": 0.42, \"diagnostic_emissive\": 0.0},\n")
-              TEXT("    \"live_foliage_distribution\": {\"ethylene_threshold\": 0.72, \"instance_spacing\": 0.055, \"spacing_ramp_effect\": 0.45},\n")
+              TEXT("    \"live_foliage_distribution\": {\"ethylene_threshold\": 0.72, \"instance_spacing\": %.6f, \"spacing_ramp_effect\": 0.45},\n")
               TEXT("    \"crown_topology_mode\": \"%s\",\n")
               TEXT("    \"main_phyllotaxy_additional_angle_degrees\": %.6f,\n")
               TEXT("    \"main_phyllotaxy_stagger\": %.6f,\n")
@@ -34520,7 +34593,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                            ? TEXT("ue_5_8_pve_cordillera_cypress_v23_async_secondary_compound_branchlet_atlas")
+                            ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                                ? TEXT("ue_5_8_pve_cordillera_cypress_v24_irregular_crown_mass_compound_branchlet_atlas")
+                                : TEXT("ue_5_8_pve_cordillera_cypress_v23_async_secondary_compound_branchlet_atlas"))
                             : TEXT("ue_5_8_pve_cordillera_cypress_v22_detiered_compound_branchlet_atlas"))
                         : TEXT("ue_5_8_pve_cordillera_cypress_v21_compound_branchlet_atlas"))
                     : (bTerminalClusterBotanicalShootCypressPalette
@@ -34551,7 +34626,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                   ? (bCompoundBranchletAtlasCypressPalette
                     ? (bDeTieredCompoundBranchletAtlasCypressPalette
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                            ? TEXT("[\"V23 asynchronous secondary-shoot compound branchlet atlas live twig A\", \"V23 asynchronous secondary-shoot compound branchlet atlas live twig B\", \"V23 asynchronous secondary-shoot compound branchlet atlas live twig C\", \"V16 dead twig\"]")
+                            ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                                ? TEXT("[\"V24 irregular crown-mass compound branchlet atlas live twig A\", \"V24 irregular crown-mass compound branchlet atlas live twig B\", \"V24 irregular crown-mass compound branchlet atlas live twig C\", \"V16 dead twig\"]")
+                                : TEXT("[\"V23 asynchronous secondary-shoot compound branchlet atlas live twig A\", \"V23 asynchronous secondary-shoot compound branchlet atlas live twig B\", \"V23 asynchronous secondary-shoot compound branchlet atlas live twig C\", \"V16 dead twig\"]"))
                             : TEXT("[\"V22 de-tiered compound branchlet atlas live twig A\", \"V22 de-tiered compound branchlet atlas live twig B\", \"V22 de-tiered compound branchlet atlas live twig C\", \"V16 dead twig\"]"))
                         : TEXT("[\"V21 compound branchlet atlas live twig A\", \"V21 compound branchlet atlas live twig B\", \"V21 compound branchlet atlas live twig C\", \"V16 dead twig\"]"))
                     : (bTerminalClusterBotanicalShootCypressPalette
@@ -34645,9 +34722,23 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                   ? TEXT("uniform deterministic selection from connected palette entries; no active distribution condition")
                   : TEXT("single connected palette entry"),
+              bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                  ? TEXT("plant")
+                  : TEXT("engine_default_plant"),
+              bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                  ? TEXT("[[0.0, 0.92], [0.18, 0.96], [0.40, 0.98], [0.62, 0.94], [0.82, 0.82], [1.0, 0.48]]")
+                  : TEXT("[[0.0, 1.0], [1.0, 0.1]]"),
+              bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                  ? TEXT("[0.88, 1.12]")
+                  : TEXT("[1.0, 1.0]"),
+              bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                  ? 0.096f
+                  : 0.055f,
               bDeTieredCompoundBranchletAtlasCypressPalette
                   ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                      ? TEXT("golden_angle_detiered_async_secondary")
+                      ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                          ? TEXT("golden_angle_detiered_async_secondary_irregular_crown_mass")
+                          : TEXT("golden_angle_detiered_async_secondary"))
                       : TEXT("golden_angle_detiered"))
                   : TEXT("retained_ranked_spiral"),
               bDeTieredCompoundBranchletAtlasCypressPalette ? 137.507764f : 7.5f,
@@ -34686,7 +34777,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               bCompoundBranchletAtlasCypressPalette
                   ? (bDeTieredCompoundBranchletAtlasCypressPalette
                       ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                          ? TEXT("traditional raster preserves V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled")
+                          ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                              ? TEXT("traditional raster preserves V24 irregular-scale V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled")
+                              : TEXT("traditional raster preserves V23 asynchronous V21 compound branchlet alpha; woody source remains separately Nanite-enabled"))
                           : TEXT("traditional raster preserves V22 de-tiered V21 compound branchlet alpha; woody source remains separately Nanite-enabled"))
                       : TEXT("traditional raster preserves V21 compound branchlet measured-spray alpha; woody source remains separately Nanite-enabled"))
                   : (bTerminalClusterBotanicalShootCypressPalette
@@ -34708,7 +34801,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
               bCompoundBranchletAtlasCypressPalette
                   ? (bDeTieredCompoundBranchletAtlasCypressPalette
                       ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
-                          ? TEXT("Nanite is deliberately disabled for the merged V23 asynchronous V21 compound source so measured alpha remains available to the exact source, source-cost, and source-lit HLOD topology review")
+                          ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
+                              ? TEXT("Nanite is deliberately disabled for the merged V24 irregular-scale V23 asynchronous V21 compound source so measured alpha remains available to the exact source, source-cost, and source-lit HLOD crown-mass review")
+                              : TEXT("Nanite is deliberately disabled for the merged V23 asynchronous V21 compound source so measured alpha remains available to the exact source, source-cost, and source-lit HLOD topology review"))
                           : TEXT("Nanite is deliberately disabled for the merged V22 de-tiered V21 compound source so measured alpha remains available to the exact source and source-lit HLOD topology review"))
                       : TEXT("Nanite is deliberately disabled for the merged V21 compound branchlet atlas so measured alpha remains available to the exact source and source-lit HLOD cost review"))
                   : (bTerminalClusterBotanicalShootCypressPalette
