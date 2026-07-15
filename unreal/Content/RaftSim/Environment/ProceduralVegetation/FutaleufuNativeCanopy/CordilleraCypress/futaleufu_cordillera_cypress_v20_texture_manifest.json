@@ -1,0 +1,327 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v20",
+  "generated_on": "2026-07-14",
+  "status": "v20_botanical_flattened_spray_atlas_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "derivation": "deterministic project-owned flattened spray raster authoring from published dimensional facts",
+    "external_photo_pixels_vendored": false,
+    "external_reference_pixels_derived": false,
+    "external_geometry_copied": false,
+    "morphology_sources": [
+      {
+        "authority": "Sistema de Informacion de Biodiversidad, Administracion de Parques Nacionales, Argentina",
+        "url": "https://sib.gob.ar/especies/austrocedrus-chilensis",
+        "accessed_on": "2026-07-14",
+        "facts_used": [
+          "branchlets flattened in one plane",
+          "leaves opposite, scale-like, imbricate, and dimorphic",
+          "lateral leaves keeled with two whitish stomatal bands, 2-5 mm long",
+          "facial leaves triangular, 0.5-2 mm long"
+        ],
+        "pixels_or_geometry_copied": false
+      },
+      {
+        "authority": "The Gymnosperm Database",
+        "url": "https://www.conifers.org/cu/Austrocedrus.php",
+        "accessed_on": "2026-07-14",
+        "facts_used": [
+          "shoots dense and flat",
+          "lateral leaves longer than facial leaves and incurved at the apex",
+          "facial leaves blunt with whitish bands on the lower surface"
+        ],
+        "pixels_or_geometry_copied": false
+      }
+    ]
+  },
+  "botanical_contract": {
+    "branchlet_arrangement": "flattened in one plane",
+    "leaf_arrangement": "opposite decussate, scale-like, and imbricate",
+    "lateral_leaf_length_mm": [
+      2.0,
+      5.0
+    ],
+    "lateral_leaf_form": "keeled, incurved tip, paired pale stomatal bands",
+    "facial_leaf_length_mm": [
+      0.5,
+      2.0
+    ],
+    "facial_leaf_form": "small triangular or blunt appressed scale",
+    "tile_physical_spray_length_cm": [
+      18.0,
+      23.0
+    ]
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v20_assets.py",
+    "generator_sha256": "cf5d17e205ba002686147ddf1bbed0d420da8d55e0052e6cee998bd29aceb93c",
+    "atlas_grid": [
+      4,
+      4
+    ],
+    "tile_size": 512,
+    "whole_external_spray_image_tiles": false,
+    "independent_project_owned_spray_variants": 16,
+    "tile_records": [
+      {
+        "tile": 0,
+        "seed": 18427,
+        "physical_spray_length_cm": 19.427006,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3180,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.09601211547851562,
+        "opaque_alpha_fraction": 0.011333465576171875
+      },
+      {
+        "tile": 1,
+        "seed": 26346,
+        "physical_spray_length_cm": 22.569776,
+        "primary_branch_count": 14,
+        "secondary_branch_count": 49,
+        "branch_count": 63,
+        "scale_leaf_count": 3696,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.08845138549804688,
+        "opaque_alpha_fraction": 0.008579254150390625
+      },
+      {
+        "tile": 2,
+        "seed": 34265,
+        "physical_spray_length_cm": 20.523619,
+        "primary_branch_count": 16,
+        "secondary_branch_count": 56,
+        "branch_count": 72,
+        "scale_leaf_count": 4004,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.10811614990234375,
+        "opaque_alpha_fraction": 0.00505828857421875
+      },
+      {
+        "tile": 3,
+        "seed": 42184,
+        "physical_spray_length_cm": 22.486819,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3252,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.07976531982421875,
+        "opaque_alpha_fraction": 0.00318145751953125
+      },
+      {
+        "tile": 4,
+        "seed": 50103,
+        "physical_spray_length_cm": 19.177588,
+        "primary_branch_count": 14,
+        "secondary_branch_count": 49,
+        "branch_count": 63,
+        "scale_leaf_count": 3576,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.11043930053710938,
+        "opaque_alpha_fraction": 0.01309967041015625
+      },
+      {
+        "tile": 5,
+        "seed": 58022,
+        "physical_spray_length_cm": 20.390671,
+        "primary_branch_count": 16,
+        "secondary_branch_count": 56,
+        "branch_count": 72,
+        "scale_leaf_count": 4248,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.10992431640625,
+        "opaque_alpha_fraction": 0.011974334716796875
+      },
+      {
+        "tile": 6,
+        "seed": 65941,
+        "physical_spray_length_cm": 20.233356,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3224,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.091064453125,
+        "opaque_alpha_fraction": 0.0042572021484375
+      },
+      {
+        "tile": 7,
+        "seed": 73860,
+        "physical_spray_length_cm": 22.191694,
+        "primary_branch_count": 14,
+        "secondary_branch_count": 49,
+        "branch_count": 63,
+        "scale_leaf_count": 3560,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.08913421630859375,
+        "opaque_alpha_fraction": 0.003467559814453125
+      },
+      {
+        "tile": 8,
+        "seed": 81779,
+        "physical_spray_length_cm": 20.040834,
+        "primary_branch_count": 16,
+        "secondary_branch_count": 56,
+        "branch_count": 72,
+        "scale_leaf_count": 4004,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.11017990112304688,
+        "opaque_alpha_fraction": 0.0123748779296875
+      },
+      {
+        "tile": 9,
+        "seed": 89698,
+        "physical_spray_length_cm": 18.317834,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3276,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.10735702514648438,
+        "opaque_alpha_fraction": 0.0133514404296875
+      },
+      {
+        "tile": 10,
+        "seed": 97617,
+        "physical_spray_length_cm": 22.990242,
+        "primary_branch_count": 14,
+        "secondary_branch_count": 49,
+        "branch_count": 63,
+        "scale_leaf_count": 3952,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.09008407592773438,
+        "opaque_alpha_fraction": 0.0036163330078125
+      },
+      {
+        "tile": 11,
+        "seed": 105536,
+        "physical_spray_length_cm": 20.75188,
+        "primary_branch_count": 16,
+        "secondary_branch_count": 56,
+        "branch_count": 72,
+        "scale_leaf_count": 4052,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.10783004760742188,
+        "opaque_alpha_fraction": 0.0048675537109375
+      },
+      {
+        "tile": 12,
+        "seed": 113455,
+        "physical_spray_length_cm": 18.306504,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3116,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.10730361938476562,
+        "opaque_alpha_fraction": 0.013652801513671875
+      },
+      {
+        "tile": 13,
+        "seed": 121374,
+        "physical_spray_length_cm": 20.784741,
+        "primary_branch_count": 14,
+        "secondary_branch_count": 49,
+        "branch_count": 63,
+        "scale_leaf_count": 3876,
+        "underside_stomatal_band_variant": false,
+        "nonzero_alpha_fraction": 0.10420989990234375,
+        "opaque_alpha_fraction": 0.011249542236328125
+      },
+      {
+        "tile": 14,
+        "seed": 129293,
+        "physical_spray_length_cm": 18.634792,
+        "primary_branch_count": 16,
+        "secondary_branch_count": 56,
+        "branch_count": 72,
+        "scale_leaf_count": 4184,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.12795639038085938,
+        "opaque_alpha_fraction": 0.006916046142578125
+      },
+      {
+        "tile": 15,
+        "seed": 137212,
+        "physical_spray_length_cm": 18.948496,
+        "primary_branch_count": 12,
+        "secondary_branch_count": 42,
+        "branch_count": 54,
+        "scale_leaf_count": 3072,
+        "underside_stomatal_band_variant": true,
+        "nonzero_alpha_fraction": 0.09715652465820312,
+        "opaque_alpha_fraction": 0.0048675537109375
+      }
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "739ca6f855384aa6ab0ac8a4214cf87b102ea084137772fba85661e1a2686c7f",
+      "nontransparent_rgb_sha256": "e4b5a2819a552a1c9d39d1f6c9796dccb731e850850f74e2b50555ef749fb956",
+      "padded_transparent_pixel_count": 1204154,
+      "transparent_nonzero_rgb_pixel_count": 1136498
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 425980,
+    "nonzero_fraction": 0.1015615463256836,
+    "opaque_pixel_count": 34563,
+    "opaque_fraction": 0.008240461349487305,
+    "transparent_corners": true
+  },
+  "maps": {
+    "botanical_spray_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_botanical_spray_v20_albedo_opacity.png",
+      "sha256": "16484ff9fb56f48956e58d9e2d067eaf11469393e9860e06bba5f9640fed73fc",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v20_isolated_review_candidate_not_production_promoted"
+    },
+    "botanical_spray_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_botanical_spray_v20_normal.png",
+      "sha256": "4ed6e2aa9ec19a23222825414354ec8cff1e7aff7c0f95805ac825907cad8874",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v20_isolated_review_candidate_not_production_promoted"
+    },
+    "botanical_spray_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_botanical_spray_v20_ao_roughness_subsurface.png",
+      "sha256": "01ca084c095b4777745428e09ca812053a2d6b1c948f6bc839c6b80cac7fdd0d",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v20_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "unreal_contract": {
+    "texture_key_prefix": "BotanicalSpray",
+    "intended_geometry": "connected flattened branch hierarchy carrying curved independent botanical spray tiles",
+    "near_representation_eligible": false,
+    "required_before_eligibility": [
+      "isolated exact-camera 60 m, closeup, and multi-view HLOD review",
+      "millimetre-scale dimorphic leaves remain legible without broad leaf cards",
+      "curved spray boundaries and sixteen source variants avoid repeated planar motifs",
+      "source and HLOD silhouettes do not regress against V18.2",
+      "masked overdraw and packaged desktop/target-VR cost pass"
+    ]
+  }
+}
