@@ -53,8 +53,8 @@ def test_committed_candidate_is_bounded_hashed_and_review_only() -> None:
     measurements = manifest["measurements"]
     assert 28_000.0 <= measurements["candidate_simplified_length_m"] <= 32_000.0
     assert measurements["maximum_absolute_lateral_shift_m"] <= 200.0
-    assert measurements["large_shift_sample_count"] > 0
-    assert measurements["large_shift_station_ranges"]
+    assert measurements["topology_rejected_lateral_candidate_count"] > 0
+    assert measurements["unguarded_large_shift_station_ranges"]
     assert measurements["candidate_water_support_fraction"] >= (
         measurements["source_route_water_support_fraction"]
     )
@@ -85,3 +85,8 @@ def test_committed_candidate_geojson_preserves_review_authority() -> None:
     assert review_flags
     assert all(feature["geometry"]["type"] == "Point" for feature in review_flags)
     assert all(feature["properties"]["production_authority"] is False for feature in review_flags)
+    assert any(
+        feature["properties"]["review_flag"]
+        == "raw_cross_channel_snap_rejected_by_route_topology_guard"
+        for feature in review_flags
+    )

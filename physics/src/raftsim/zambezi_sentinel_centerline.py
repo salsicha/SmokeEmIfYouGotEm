@@ -207,7 +207,7 @@ def _sample_observations(
     route_xy: np.ndarray,
     normals: np.ndarray,
     offsets_m: np.ndarray,
-) -> tuple[np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     candidates = route_xy[:, None, :] + normals[:, None, :] * offsets_m[None, :, None]
     inverse = ~transform
     columns_f, rows_f = inverse * (candidates[..., 0], candidates[..., 1])
@@ -224,7 +224,39 @@ def _sample_observations(
     observations[inside] = ndwi[rows[inside], columns[inside]]
     sampled_valid[inside] = valid[rows[inside], columns[inside]]
     observations[~sampled_valid] = -1.0
-    return observations, sampled_valid
+    return observations, sampled_valid, candidates
+
+
+def _topology_valid_candidates(
+    candidate_xy: np.ndarray,
+    route_xy: np.ndarray,
+    stations_m: np.ndarray,
+    offsets_m: np.ndarray,
+    *,
+    nonlocal_station_delta_m: float = 400.0,
+    closer_margin_m: float = 10.0,
+    batch_size: int = 48,
+) -> np.ndarray:
+    """Reject lateral candidates that land closer to a nonlocal route branch."""
+
+    valid = np.ones(candidate_xy.shape[:2], dtype=bool)
+    route_f32 = route_xy.astype(np.float32)
+    for start in range(0, len(route_xy), batch_size):
+        end = min(start + batch_size, len(route_xy))
+        batch = candidate_xy[start:end].reshape(-1, 2).astype(np.float32)
+        delta = batch[:, None, :] - route_f32[None, :, :]
+        nearest_indices = np.argmin(np.sum(delta * delta, axis=2), axis=1)
+        nearest_points = route_f32[nearest_indices]
+        nearest_distance = np.linalg.norm(batch - nearest_points, axis=1)
+        station_indices = np.repeat(np.arange(start, end), len(offsets_m))
+        station_delta = np.abs(stations_m[nearest_indices] - stations_m[station_indices])
+        own_distance = np.tile(np.abs(offsets_m), end - start)
+        rejected = (
+            (station_delta > nonlocal_station_delta_m)
+            & (nearest_distance + closer_margin_m < own_distance)
+        )
+        valid[start:end] = (~rejected).reshape(end - start, len(offsets_m))
+    return valid
 
 
 def _mean_lateral_window(values: np.ndarray, radius: int = 2) -> np.ndarray:
@@ -240,6 +272,7 @@ def _draw_overlay(
     output: Path,
     bounds_wgs84: tuple[float, float, float, float],
     route_lon_lat: np.ndarray,
+    raw_candidate_lon_lat: np.ndarray,
     candidate_lon_lat: np.ndarray,
 ) -> None:
     image = Image.open(source_visual).convert("RGB")
@@ -256,6 +289,7 @@ def _draw_overlay(
 
     draw = ImageDraw.Draw(image)
     draw.line(pixels(route_lon_lat), fill=(255, 196, 48), width=4, joint="curve")
+    draw.line(pixels(raw_candidate_lon_lat), fill=(255, 56, 166), width=3, joint="curve")
     draw.line(pixels(candidate_lon_lat), fill=(35, 236, 255), width=3, joint="curve")
     output.parent.mkdir(parents=True, exist_ok=True)
     image.save(output)
@@ -266,6 +300,7 @@ def _large_shift_review_features(
     selected_offsets_m: np.ndarray,
     candidate_ndwi: np.ndarray,
     candidate_lon_lat: np.ndarray,
+    review_flag: str,
     threshold_m: float = 100.0,
 ) -> tuple[list[dict[str, Any]], list[dict[str, float]]]:
     flagged = np.abs(selected_offsets_m) >= threshold_m
@@ -281,7 +316,7 @@ def _large_shift_review_features(
             local_peak = start + int(np.argmax(np.abs(selected_offsets_m[start : end + 1])))
             properties = {
                 "river_id": RIVER_ID,
-                "review_flag": "large_lateral_shift_requires_manual_water_and_bank_review",
+                "review_flag": review_flag,
                 "start_station_m": round(float(stations_m[start]), 3),
                 "end_station_m": round(float(stations_m[end]), 3),
                 "peak_station_m": round(float(stations_m[local_peak]), 3),
@@ -357,7 +392,7 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
         TARGET_RESOLUTION_M,
         dtype=np.float64,
     )
-    observations, sampled_valid = _sample_observations(
+    observations, sampled_valid, lateral_candidates = _sample_observations(
         ndwi, valid, raster_transform, dense_route, normals, offsets
     )
     water_likelihood = np.clip(
@@ -369,14 +404,34 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
     normalized_offset = offsets[None, :] / MAXIMUM_LATERAL_SEARCH_M
     scores = 3.0 * water_likelihood + 1.5 * lateral_support - 0.18 * normalized_offset**2
     scores[~sampled_valid] = -50.0
-    raw_offsets = select_centerline_offsets(scores, offsets)
-    selected_offsets = _smooth_offsets(raw_offsets, stations_m)
+    unguarded_offsets = _smooth_offsets(
+        select_centerline_offsets(scores, offsets), stations_m
+    )
+    topology_valid = _topology_valid_candidates(
+        lateral_candidates,
+        dense_route,
+        stations_m,
+        offsets,
+    )
+    guarded_scores = scores.copy()
+    guarded_scores[~topology_valid] = -50.0
+    selected_offsets = _smooth_offsets(
+        select_centerline_offsets(guarded_scores, offsets), stations_m
+    )
+    unguarded_candidate_xy = dense_route + normals * unguarded_offsets[:, None]
     candidate_xy = dense_route + normals * selected_offsets[:, None]
 
     candidate_x = candidate_xy[:, 0].tolist()
     candidate_y = candidate_xy[:, 1].tolist()
     candidate_lon, candidate_lat = transform(TARGET_CRS, "EPSG:4326", candidate_x, candidate_y)
     candidate_lon_lat_dense = np.column_stack((candidate_lon, candidate_lat))
+    unguarded_lon, unguarded_lat = transform(
+        TARGET_CRS,
+        "EPSG:4326",
+        unguarded_candidate_xy[:, 0].tolist(),
+        unguarded_candidate_xy[:, 1].tolist(),
+    )
+    unguarded_lon_lat_dense = np.column_stack((unguarded_lon, unguarded_lat))
     simplified_xy = _rdp(candidate_xy, tolerance_m=8.0)
     simplified_lon, simplified_lat = transform(
         TARGET_CRS,
@@ -394,12 +449,26 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
     row_indices = np.arange(len(stations_m))
     route_ndwi = observations[:, route_index]
     candidate_ndwi = observations[row_indices, selected_indices]
+    unguarded_indices = np.rint(
+        (unguarded_offsets + MAXIMUM_LATERAL_SEARCH_M) / TARGET_RESOLUTION_M
+    ).astype(np.int32)
+    unguarded_indices = np.clip(unguarded_indices, 0, len(offsets) - 1)
+    unguarded_ndwi = observations[row_indices, unguarded_indices]
     review_features, large_shift_ranges = _large_shift_review_features(
         stations_m,
         selected_offsets,
         candidate_ndwi,
         candidate_lon_lat_dense,
+        "guarded_large_lateral_shift_requires_manual_water_and_bank_review",
     )
+    unguarded_review_features, unguarded_large_shift_ranges = _large_shift_review_features(
+        stations_m,
+        unguarded_offsets,
+        unguarded_ndwi,
+        unguarded_lon_lat_dense,
+        "raw_cross_channel_snap_rejected_by_route_topology_guard",
+    )
+    review_features = [*unguarded_review_features, *review_features]
 
     imagery_review_root = river_root / "imagery/review"
     hydrography_review_root = river_root / "hydrography/review"
@@ -410,7 +479,14 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
     ndwi_encoded[~valid] = 0
     Image.fromarray(ndwi_encoded, mode="L").save(ndwi_path)
     overlay_path = imagery_review_root / "sentinel2_20260610_centerline_comparison.png"
-    _draw_overlay(visual_path, overlay_path, bounds, route_lon_lat, candidate_lon_lat_dense)
+    _draw_overlay(
+        visual_path,
+        overlay_path,
+        bounds,
+        route_lon_lat,
+        unguarded_lon_lat_dense,
+        candidate_lon_lat_dense,
+    )
 
     candidate_path = hydrography_review_root / "sentinel2_20260610_centerline_candidate.geojson"
     candidate_payload = {
@@ -454,6 +530,11 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
         "large_shift_review_threshold_m": 100.0,
         "large_shift_sample_count": int(np.count_nonzero(absolute_offsets >= 100.0)),
         "large_shift_station_ranges": large_shift_ranges,
+        "topology_rejected_lateral_candidate_count": int(np.count_nonzero(~topology_valid)),
+        "unguarded_maximum_absolute_lateral_shift_m": round(
+            float(np.abs(unguarded_offsets).max()), 4
+        ),
+        "unguarded_large_shift_station_ranges": unguarded_large_shift_ranges,
         "source_route_water_support_fraction": round(
             float(np.mean(route_ndwi[valid_route] >= WATER_NDWI_THRESHOLD)), 6
         ),
@@ -492,6 +573,11 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
             "maximum_lateral_search_m": MAXIMUM_LATERAL_SEARCH_M,
             "endpoint_taper_m": 200.0,
             "simplification_tolerance_m": 8.0,
+            "route_topology_guard": {
+                "nonlocal_station_delta_m": 400.0,
+                "closer_margin_m": 10.0,
+                "policy": "reject a lateral sample when it is materially closer to a route branch more than 400 m away in station space",
+            },
         },
         "measurements": measurements,
         "authority": {
@@ -516,7 +602,11 @@ def build_zambezi_sentinel_centerline_candidate(repo_root: Path) -> dict[str, An
             "comparison_overlay": {
                 "path": str(overlay_path.relative_to(repo_root)),
                 "sha256": _sha256(overlay_path),
-                "legend": {"osm_route": "yellow", "sentinel_candidate": "cyan"},
+                "legend": {
+                    "osm_route": "yellow",
+                    "unguarded_rejected_candidate": "magenta",
+                    "topology_guarded_candidate": "cyan",
+                },
             },
         },
         "promotion_gates": [
