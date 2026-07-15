@@ -20438,7 +20438,16 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     const FString& AuthorityMode,
     int32 PatternSize,
     TArray<FString>& OutRelativeCapturePaths,
-    FString& OutSummary)
+    FString& OutSummary,
+    bool bLitRiverView = false,
+    const TFunction<bool(
+        UWorld*,
+        ACameraActor*&,
+        AActor*&,
+        FVector&,
+        FVector&,
+        FVector&,
+        FString&)>& SceneSetup = {})
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -20477,21 +20486,46 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     World->SendAllEndOfFrameUpdates();
     FlushRenderingCommands();
 
-    ACameraActor* ReferenceCamera =
-        FindPreviewCaptureCamera(World, TEXT("RaftSim_PveTemporal_23m00"));
+    ACameraActor* ReferenceCamera = nullptr;
     AActor* HlodActor = nullptr;
-    for (TActorIterator<AActor> It(World); It; ++It)
+    FVector MotionForward = FVector::ForwardVector;
+    FVector MotionRight = FVector::RightVector;
+    FVector ViewTargetOffset = FVector::ZeroVector;
+    bool bSceneReady = false;
+    if (SceneSetup)
     {
-        if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
-        {
-            HlodActor = *It;
-            break;
-        }
+        bSceneReady = SceneSetup(
+            World,
+            ReferenceCamera,
+            HlodActor,
+            MotionForward,
+            MotionRight,
+            ViewTargetOffset,
+            OutSummary);
     }
-    if (!ReferenceCamera || !ReferenceCamera->GetCameraComponent() || !HlodActor)
+    else
+    {
+        ReferenceCamera =
+            FindPreviewCaptureCamera(World, TEXT("RaftSim_PveTemporal_23m00"));
+        for (TActorIterator<AActor> It(World); It; ++It)
+        {
+            if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+            {
+                HlodActor = *It;
+                break;
+            }
+        }
+        bSceneReady = ReferenceCamera && HlodActor;
+    }
+    MotionForward.Z = 0.0f;
+    MotionRight.Z = 0.0f;
+    MotionForward.Normalize();
+    MotionRight.Normalize();
+    if (!bSceneReady || !ReferenceCamera || !ReferenceCamera->GetCameraComponent() ||
+        !HlodActor || MotionForward.IsNearlyZero() || MotionRight.IsNearlyZero())
     {
         OutSummary += FString::Printf(
-            TEXT("V34 motion sequence could not resolve the reference camera and HLOD actor for %s.\n"),
+            TEXT("Persistent transition sequence could not resolve its camera, HLOD actor, and motion basis for %s.\n"),
             *AuthorityMode);
         return false;
     }
@@ -20532,24 +20566,24 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     CaptureComponent->bCaptureEveryFrame = false;
     CaptureComponent->bCaptureOnMovement = false;
     CaptureComponent->bAlwaysPersistRenderingState = true;
-    CaptureComponent->bExcludeFromSceneTextureExtents = true;
+    CaptureComponent->bExcludeFromSceneTextureExtents = !bLitRiverView;
     CaptureComponent->ShowFlags.SetSelection(false);
     CaptureComponent->ShowFlags.SetModeWidgets(false);
     CaptureComponent->ShowFlags.SetCompositeEditorPrimitives(false);
-    CaptureComponent->ShowFlags.SetLighting(false);
+    CaptureComponent->ShowFlags.SetLighting(bLitRiverView);
     CaptureComponent->ShowFlags.SetPostProcessing(true);
-    CaptureComponent->ShowFlags.SetAtmosphere(false);
-    CaptureComponent->ShowFlags.SetFog(false);
+    CaptureComponent->ShowFlags.SetAtmosphere(bLitRiverView);
+    CaptureComponent->ShowFlags.SetFog(bLitRiverView);
     CaptureComponent->ShowFlags.SetAntiAliasing(true);
     CaptureComponent->ShowFlags.SetTemporalAA(true);
     CaptureComponent->ShowFlags.SetMotionBlur(false);
     CaptureComponent->ShowFlags.SetEyeAdaptation(false);
-    CaptureComponent->ShowFlags.SetAmbientOcclusion(false);
-    CaptureComponent->ShowFlags.SetGlobalIllumination(false);
-    CaptureComponent->ShowFlags.SetLumenGlobalIllumination(false);
-    CaptureComponent->ShowFlags.SetLumenReflections(false);
-    CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
-    CaptureComponent->ShowFlags.SetReflectionEnvironment(false);
+    CaptureComponent->ShowFlags.SetAmbientOcclusion(bLitRiverView);
+    CaptureComponent->ShowFlags.SetGlobalIllumination(bLitRiverView);
+    CaptureComponent->ShowFlags.SetLumenGlobalIllumination(bLitRiverView);
+    CaptureComponent->ShowFlags.SetLumenReflections(bLitRiverView);
+    CaptureComponent->ShowFlags.SetScreenSpaceReflections(bLitRiverView);
+    CaptureComponent->ShowFlags.SetReflectionEnvironment(bLitRiverView);
     IConsoleVariable* AntiAliasingMethodVariable =
         IConsoleManager::Get().FindConsoleVariable(TEXT("r.AntiAliasingMethod"));
     const int32 PreviousAntiAliasingMethod =
@@ -20577,18 +20611,21 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
                              ReferenceCamera,
                              SceneCapture,
                              Target,
+                             ViewTargetOffset,
                              CameraHeight,
+                             MotionForward,
+                             MotionRight,
                              AuthorityMode,
                              PatternSize,
                              &OutSummary](float RadiusCm, float SourceCoverage)
     {
         const float AxialDistanceCm = FMath::Sqrt(
             FMath::Max(0.0f, FMath::Square(RadiusCm) - FMath::Square(LateralOffsetCm)));
-        const FVector CameraLocation(
-            Target.X - AxialDistanceCm,
-            Target.Y - LateralOffsetCm,
-            CameraHeight);
-        const FRotator CameraRotation = (Target - CameraLocation).Rotation();
+        FVector CameraLocation =
+            Target - MotionForward * AxialDistanceCm - MotionRight * LateralOffsetCm;
+        CameraLocation.Z = CameraHeight;
+        const FRotator CameraRotation =
+            (Target + ViewTargetOffset - CameraLocation).Rotation();
         ReferenceCamera->SetActorLocationAndRotation(CameraLocation, CameraRotation);
         SceneCapture->SetActorLocationAndRotation(CameraLocation, CameraRotation);
         return ConfigureFutaleufuComplementaryTransitionCapture(
@@ -20629,9 +20666,11 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     };
 
     bool bAllFramesSaved = true;
-    const FString SequenceToken = PatternSize >= 8
-        ? TEXT("motion_8x8")
-        : TEXT("motion");
+    const FString SequenceToken = bLitRiverView
+        ? TEXT("motion_8x8_lit_river_view")
+        : (PatternSize >= 8
+               ? TEXT("motion_8x8")
+               : TEXT("motion"));
     if (!SetFrameState(StartRadiusCm, 1.0f))
     {
         RestoreAntiAliasingMethod();
@@ -20697,8 +20736,9 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     SceneCapture->Destroy();
     RenderTarget->ReleaseResource();
     OutSummary += FString::Printf(
-        TEXT("Persistent same-world %s motion sequence saved %d frames with a %dx%d complementary pattern, 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
+        TEXT("Persistent same-world %s%s motion sequence saved %d frames with a %dx%d complementary pattern, 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
         *AuthorityMode,
+        bLitRiverView ? TEXT(" lit river-view") : TEXT(""),
         TransitionFrameCount + SettleFrameCount,
         PatternSize,
         PatternSize);
@@ -34752,7 +34792,11 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalFinePersistentMotionTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalLitRiverViewMotionTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
+    UStaticMesh* LocalMultiViewHlodMesh = nullptr;
+    FTransform LocalMultiViewHlodTransform = FTransform::Identity;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
     const FString LocalVisualMapPackagePath = FString::Printf(
@@ -34805,6 +34849,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalPersistentMotionTransitionCapturesJson;
     TArray<FString> LocalFinePersistentMotionTransitionCapturePaths;
     FString LocalFinePersistentMotionTransitionCapturesJson;
+    TArray<FString> LocalLitRiverViewMotionTransitionCapturePaths;
+    FString LocalLitRiverViewMotionTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -35201,6 +35247,14 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         : 512,
                     LocalMultiViewAtlas,
                     LocalVisualSummary);
+            if (LocalMultiViewAtlas.ProxyActor &&
+                LocalMultiViewAtlas.ProxyActor->GetStaticMeshComponent())
+            {
+                LocalMultiViewHlodMesh =
+                    LocalMultiViewAtlas.ProxyActor->GetStaticMeshComponent()->GetStaticMesh();
+                LocalMultiViewHlodTransform =
+                    LocalMultiViewAtlas.ProxyActor->GetActorTransform();
+            }
 
             const bool bSceneComplete =
                 TrunkActor && TrunkActor->GetStaticMeshComponent() &&
@@ -35767,6 +35821,372 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 : TEXT(", "),
                             *EscapeRaftSimJsonString(CapturePath));
                     }
+
+                    FRaftSimEnvironmentPreviewSpec LitRiverReviewSpec = ReviewSpec;
+                    LitRiverReviewSpec.DisplayName =
+                        TEXT("Futaleufu V35 cypress handoff in the physical corridor");
+                    LitRiverReviewSpec.MapPackagePath =
+                        TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
+                             "L_FutaleufuTerminator_PhysicalCorridorCandidate");
+                    LitRiverReviewSpec.bDeterministicValidationCapture = false;
+                    const auto SetupLitRiverView = [
+                        TrunkMesh,
+                        LocalHlodMesh = LocalMultiViewHlodMesh,
+                        HlodMaterial = LocalMultiViewAtlas.Material,
+                        LocalHlodTransform = LocalMultiViewHlodTransform,
+                        &FoliageFacade,
+                        GetLocalFoliageTransform](
+                            UWorld* World,
+                            ACameraActor*& ReferenceCamera,
+                            AActor*& HlodActor,
+                            FVector& MotionForward,
+                            FVector& MotionRight,
+                            FVector& ViewTargetOffset,
+                            FString& SetupSummary)
+                    {
+                        if (!World || !TrunkMesh || !LocalHlodMesh || !HlodMaterial ||
+                            !FoliageFacade.IsValid())
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup is missing the corridor world, source, or HLOD assets.\n");
+                            return false;
+                        }
+
+                        ACameraActor* RiverEyeCamera = FindPreviewCaptureCamera(
+                            World,
+                            TEXT("RaftSim_RiverEye_DownstreamCaptureCamera"));
+                        TActorIterator<ALandscape> LandscapeIt(World);
+                        ALandscape* Landscape = LandscapeIt ? *LandscapeIt : nullptr;
+                        if (!RiverEyeCamera || !RiverEyeCamera->GetCameraComponent() || !Landscape)
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup could not resolve the river-eye camera and Landscape.\n");
+                            return false;
+                        }
+
+                        FVector RiverForward = RiverEyeCamera->GetActorForwardVector();
+                        RiverForward.Z = 0.0f;
+                        RiverForward.Normalize();
+                        const FVector RiverRight(-RiverForward.Y, RiverForward.X, 0.0f);
+                        if (RiverForward.IsNearlyZero())
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup found a degenerate river-eye camera basis.\n");
+                            return false;
+                        }
+
+                        constexpr float TreeForwardOffsetCm = 3000.0f;
+                        constexpr float StartRadiusCm = 2300.0f;
+                        constexpr float LateralOffsetCm = 800.0f;
+                        constexpr float RiverEyeClearanceAboveWaterCm = 130.0f;
+                        const float StartAxialDistanceCm = FMath::Sqrt(
+                            FMath::Square(StartRadiusCm) - FMath::Square(LateralOffsetCm));
+                        const FVector RiverEyeLocation = RiverEyeCamera->GetActorLocation();
+                        const float WaterSurfaceZ =
+                            RiverEyeLocation.Z - RiverEyeClearanceAboveWaterCm;
+                        UProceduralMeshComponent* RiverRibbonComponent = nullptr;
+                        for (TActorIterator<AActor> It(World); It; ++It)
+                        {
+                            if (*It && It->GetActorLabel() ==
+                                    TEXT("RaftSim_PhysicalCorridorRiverRibbon_futaleufu_terminator"))
+                            {
+                                RiverRibbonComponent =
+                                    It->FindComponentByClass<UProceduralMeshComponent>();
+                                break;
+                            }
+                        }
+                        const FProcMeshSection* RiverRibbonSection =
+                            RiverRibbonComponent
+                            ? RiverRibbonComponent->GetProcMeshSection(0)
+                            : nullptr;
+                        if (!RiverRibbonSection)
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup could not resolve the physical river-ribbon section.\n");
+                            return false;
+                        }
+
+                        const FVector DesiredCrossSection =
+                            RiverEyeLocation + RiverForward * TreeForwardOffsetCm;
+                        FVector RiverEdgeWorld[2] = {
+                            FVector::ZeroVector,
+                            FVector::ZeroVector};
+                        float RiverEdgeDistanceSquared[2] = {
+                            TNumericLimits<float>::Max(),
+                            TNumericLimits<float>::Max()};
+                        for (const FProcMeshVertex& Vertex :
+                             RiverRibbonSection->ProcVertexBuffer)
+                        {
+                            const int32 EdgeIndex = Vertex.UV0.Y <= 0.01f
+                                ? 0
+                                : (Vertex.UV0.Y >= 0.99f ? 1 : -1);
+                            if (EdgeIndex < 0)
+                            {
+                                continue;
+                            }
+                            const FVector WorldPosition =
+                                RiverRibbonComponent->GetComponentTransform().TransformPosition(
+                                    Vertex.Position);
+                            const float DistanceSquared = FVector::DistSquared2D(
+                                WorldPosition,
+                                DesiredCrossSection);
+                            if (DistanceSquared < RiverEdgeDistanceSquared[EdgeIndex])
+                            {
+                                RiverEdgeDistanceSquared[EdgeIndex] = DistanceSquared;
+                                RiverEdgeWorld[EdgeIndex] = WorldPosition;
+                            }
+                        }
+                        if (!FMath::IsFinite(RiverEdgeDistanceSquared[0]) ||
+                            !FMath::IsFinite(RiverEdgeDistanceSquared[1]))
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup could not resolve both physical ribbon edges.\n");
+                            return false;
+                        }
+
+                        float BestScore = TNumericLimits<float>::Max();
+                        float BestBankSign = 1.0f;
+                        float BestBankOffsetCm = 0.0f;
+                        FVector BestTreeXY = FVector::ZeroVector;
+                        float BestTreeGroundZ = TNumericLimits<float>::Lowest();
+                        float BestCameraGroundZ = TNumericLimits<float>::Lowest();
+                        for (int32 EdgeIndex = 0; EdgeIndex < 2; ++EdgeIndex)
+                        {
+                            FVector Outward = RiverEdgeWorld[EdgeIndex] - DesiredCrossSection;
+                            Outward.Z = 0.0f;
+                            Outward.Normalize();
+                            if (Outward.IsNearlyZero())
+                            {
+                                continue;
+                            }
+                            constexpr float TreeOutsideRibbonCm = 150.0f;
+                            const FVector CandidateTreeXY =
+                                RiverEdgeWorld[EdgeIndex] + Outward * TreeOutsideRibbonCm;
+                            const FVector CandidateCameraXY =
+                                CandidateTreeXY - Outward * StartAxialDistanceCm -
+                                RiverForward * LateralOffsetCm;
+                            const float TreeGroundZ = Landscape->GetHeightAtLocation(
+                                FVector(CandidateTreeXY.X, CandidateTreeXY.Y, 0.0f),
+                                EHeightfieldSource::Editor).Get(
+                                    TNumericLimits<float>::Lowest());
+                            const float CameraGroundZ = Landscape->GetHeightAtLocation(
+                                FVector(CandidateCameraXY.X, CandidateCameraXY.Y, 0.0f),
+                                EHeightfieldSource::Editor).Get(
+                                    TNumericLimits<float>::Lowest());
+                            if (!FMath::IsFinite(TreeGroundZ) ||
+                                !FMath::IsFinite(CameraGroundZ))
+                            {
+                                continue;
+                            }
+                            const float BankElevationPenalty = FMath::Abs(
+                                TreeGroundZ - RiverEdgeWorld[EdgeIndex].Z);
+                            const float CameraRibbonPenalty = FMath::Max(
+                                0.0f,
+                                CameraGroundZ - WaterSurfaceZ) * 4.0f;
+                            const float Score =
+                                BankElevationPenalty + CameraRibbonPenalty;
+                            if (Score < BestScore)
+                            {
+                                BestScore = Score;
+                                BestBankSign = FVector::DotProduct(Outward, RiverRight) < 0.0f
+                                    ? -1.0f
+                                    : 1.0f;
+                                BestBankOffsetCm = FVector::Dist2D(
+                                    CandidateTreeXY,
+                                    DesiredCrossSection);
+                                BestTreeXY = CandidateTreeXY;
+                                BestTreeGroundZ = TreeGroundZ;
+                                BestCameraGroundZ = CameraGroundZ;
+                            }
+                        }
+                        if (!FMath::IsFinite(BestTreeGroundZ) ||
+                            !FMath::IsFinite(BestCameraGroundZ))
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup could not find a finite near-bank placement.\n");
+                            return false;
+                        }
+
+                        const FBox TrunkBounds = TrunkMesh->GetBoundingBox();
+                        const FVector TreeRootLocation(
+                            BestTreeXY.X,
+                            BestTreeXY.Y,
+                            BestTreeGroundZ - TrunkBounds.Min.Z + 2.0f);
+                        const FTransform TreeRootTransform(
+                            FRotator::ZeroRotator,
+                            TreeRootLocation);
+                        FActorSpawnParameters SpawnParameters;
+                        SpawnParameters.ObjectFlags = RF_Transient;
+                        AStaticMeshActor* SourceTrunkActor = World->SpawnActor<AStaticMeshActor>(
+                            AStaticMeshActor::StaticClass(),
+                            TreeRootTransform,
+                            SpawnParameters);
+                        AActor* SourceFoliageActor = World->SpawnActor<AActor>(
+                            AActor::StaticClass(),
+                            TreeRootTransform,
+                            SpawnParameters);
+                        AStaticMeshActor* AtlasActor = World->SpawnActor<AStaticMeshActor>(
+                            AStaticMeshActor::StaticClass(),
+                            LocalHlodTransform * TreeRootTransform,
+                            SpawnParameters);
+                        if (!SourceTrunkActor || !SourceTrunkActor->GetStaticMeshComponent() ||
+                            !SourceFoliageActor || !AtlasActor ||
+                            !AtlasActor->GetStaticMeshComponent())
+                        {
+                            SetupSummary += TEXT(
+                                "V36 lit river-view setup could not spawn the transient transition actors.\n");
+                            return false;
+                        }
+
+                        SourceTrunkActor->SetActorLabel(TEXT("RaftSim_PveReview_Trunk"));
+                        SourceTrunkActor->Tags.Add(TEXT("RaftSim_VisualReviewOnly"));
+                        UStaticMeshComponent* TrunkComponent =
+                            SourceTrunkActor->GetStaticMeshComponent();
+                        TrunkComponent->SetStaticMesh(TrunkMesh);
+                        TrunkComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                        TrunkComponent->SetGenerateOverlapEvents(false);
+                        TrunkComponent->SetCastShadow(true);
+
+                        SourceFoliageActor->SetActorLabel(TEXT("RaftSim_PveReview_Foliage"));
+                        SourceFoliageActor->Tags.Add(TEXT("RaftSim_VisualReviewOnly"));
+                        USceneComponent* Root = NewObject<USceneComponent>(
+                            SourceFoliageActor,
+                            TEXT("V36LitRiverViewRoot"));
+                        SourceFoliageActor->AddInstanceComponent(Root);
+                        SourceFoliageActor->SetRootComponent(Root);
+                        Root->SetMobility(EComponentMobility::Static);
+                        Root->RegisterComponent();
+                        SourceFoliageActor->SetActorTransform(TreeRootTransform);
+                        TArray<UHierarchicalInstancedStaticMeshComponent*> FoliageComponents;
+                        FoliageComponents.SetNum(FoliageFacade.NumFoliageInfo());
+                        for (int32 MeshIndex = 0;
+                             MeshIndex < FoliageFacade.NumFoliageInfo();
+                             ++MeshIndex)
+                        {
+                            UStaticMesh* FoliageMesh = LoadObject<UStaticMesh>(
+                                nullptr,
+                                *FoliageFacade.GetFoliageInfo(MeshIndex).Mesh.ToString());
+                            if (!FoliageMesh)
+                            {
+                                continue;
+                            }
+                            UHierarchicalInstancedStaticMeshComponent* Component =
+                                NewObject<UHierarchicalInstancedStaticMeshComponent>(
+                                    SourceFoliageActor,
+                                    *FString::Printf(TEXT("V36PveFoliage_%02d"), MeshIndex));
+                            SourceFoliageActor->AddInstanceComponent(Component);
+                            Component->SetupAttachment(Root);
+                            Component->SetStaticMesh(FoliageMesh);
+                            Component->SetMobility(EComponentMobility::Static);
+                            Component->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                            Component->SetGenerateOverlapEvents(false);
+                            Component->SetCastShadow(false);
+                            Component->bCastStaticShadow = false;
+                            Component->bCastDynamicShadow = false;
+                            Component->SetCastContactShadow(false);
+                            Component->SetAffectDistanceFieldLighting(false);
+                            Component->SetAffectDynamicIndirectLighting(false);
+                            Component->RegisterComponent();
+                            FoliageComponents[MeshIndex] = Component;
+                        }
+                        int32 AddedFoliageInstanceCount = 0;
+                        for (int32 EntryIndex = 0;
+                             EntryIndex < FoliageFacade.NumFoliageEntries();
+                             ++EntryIndex)
+                        {
+                            const PV::Facades::FFoliageEntryData Entry =
+                                FoliageFacade.GetFoliageEntry(EntryIndex);
+                            if (!FoliageComponents.IsValidIndex(Entry.NameId) ||
+                                !FoliageComponents[Entry.NameId])
+                            {
+                                continue;
+                            }
+                            FoliageComponents[Entry.NameId]->AddInstance(
+                                GetLocalFoliageTransform(EntryIndex));
+                            ++AddedFoliageInstanceCount;
+                        }
+
+                        AtlasActor->SetActorLabel(
+                            TEXT("RaftSim_PveCypressMultiViewAtlasHlod"));
+                        AtlasActor->Tags.Add(TEXT("RaftSim_VisualReviewOnly"));
+                        UStaticMeshComponent* AtlasComponent =
+                            AtlasActor->GetStaticMeshComponent();
+                        AtlasComponent->SetStaticMesh(LocalHlodMesh);
+                        AtlasComponent->SetMaterial(0, HlodMaterial);
+                        AtlasComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                        AtlasComponent->SetGenerateOverlapEvents(false);
+                        AtlasComponent->SetCastShadow(false);
+                        AtlasComponent->SetAffectDistanceFieldLighting(false);
+                        AtlasComponent->SetAffectDynamicIndirectLighting(false);
+                        AtlasComponent->BoundsScale = 2.5f;
+
+                        const FVector HlodTarget = AtlasActor->GetActorLocation();
+                        FVector BankOutward = BestTreeXY - DesiredCrossSection;
+                        BankOutward.Z = 0.0f;
+                        BankOutward.Normalize();
+                        const FVector CameraStartXY =
+                            HlodTarget - BankOutward * StartAxialDistanceCm -
+                            RiverForward * LateralOffsetCm;
+                        const FVector CameraStart(
+                            CameraStartXY.X,
+                            CameraStartXY.Y,
+                            RiverEyeLocation.Z);
+                        const FVector ViewTarget =
+                            TreeRootLocation + FVector(0.0f, 0.0f, 500.0f);
+                        RiverEyeCamera->SetActorLocationAndRotation(
+                            CameraStart,
+                            (ViewTarget - CameraStart).Rotation());
+                        RiverEyeCamera->GetCameraComponent()->FieldOfView = 68.0f;
+
+                        ReferenceCamera = RiverEyeCamera;
+                        HlodActor = AtlasActor;
+                        MotionForward = BankOutward;
+                        MotionRight = RiverForward;
+                        ViewTargetOffset = ViewTarget - HlodTarget;
+                        World->SendAllEndOfFrameUpdates();
+                        FlushRenderingCommands();
+                        SetupSummary += FString::Printf(
+                            TEXT("V36 placed one transient source/HLOD pair on the %.0f bank side "
+                                 "at %.3f m offset, bank ground %.3f m, water-side ground %.3f m, "
+                                 "and water surface %.3f m with %d/%d foliage instances; the source "
+                                 "Landscape, water, collision, solver, and saved corridor remain unchanged.\n"),
+                            BestBankSign,
+                            BestBankOffsetCm / 100.0f,
+                            BestTreeGroundZ / 100.0f,
+                            BestCameraGroundZ / 100.0f,
+                            WaterSurfaceZ / 100.0f,
+                            AddedFoliageInstanceCount,
+                            FoliageFacade.NumFoliageEntries());
+                        return AddedFoliageInstanceCount ==
+                            FoliageFacade.NumFoliageEntries();
+                    };
+                    bool bAllLitRiverViewMotionCapturesProduced = true;
+                    for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+                    {
+                        bAllLitRiverViewMotionCapturesProduced &=
+                            CaptureFutaleufuComplementaryTransitionMotionSequence(
+                                LitRiverReviewSpec,
+                                LocalVisualCaptureBase,
+                                AuthorityToken,
+                                8,
+                                LocalLitRiverViewMotionTransitionCapturePaths,
+                                LocalVisualSummary,
+                                true,
+                                SetupLitRiverView);
+                    }
+                    bLocalLitRiverViewMotionTransitionReviewCaptured =
+                        bAllLitRiverViewMotionCapturesProduced &&
+                        LocalLitRiverViewMotionTransitionCapturePaths.Num() == 147;
+                    for (const FString& CapturePath :
+                         LocalLitRiverViewMotionTransitionCapturePaths)
+                    {
+                        LocalLitRiverViewMotionTransitionCapturesJson += FString::Printf(
+                            TEXT("%s\"%s\""),
+                            LocalLitRiverViewMotionTransitionCapturesJson.IsEmpty()
+                                ? TEXT("")
+                                : TEXT(", "),
+                            *EscapeRaftSimJsonString(CapturePath));
+                    }
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -35778,7 +36198,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalComplementaryTransitionReviewCaptured &&
                     bLocalTemporalTransitionReviewCaptured &&
                     bLocalPersistentMotionTransitionReviewCaptured &&
-                    bLocalFinePersistentMotionTransitionReviewCaptured;
+                    bLocalFinePersistentMotionTransitionReviewCaptured &&
+                    bLocalLitRiverViewMotionTransitionReviewCaptured;
             }
         }
     }
@@ -35813,7 +36234,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, and a V35 isolated 8x8 sequence under the same 60 Hz motion and endpoint-settle contract; V33-V35 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; committed V35 comparison and any art decision remain pending")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, and a V36 lit physical-corridor river-view sequence under the same 60 Hz motion and endpoint-settle contract; V33-V36 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V36 art, silhouette, patterning, and hazard-readability review remain pending")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -35845,6 +36266,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"temporal_transition_path_contract\": {\"enabled\": %s, \"sampling\": \"ordered_camera_path_precursor_without_same-world_temporal_history\", \"radial_band_cm\": [2300.0, 2700.0], \"radial_step_cm\": 25.0, \"sample_count\": 17, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.0625, \"authority_modes_per_sample\": [\"source_only\", \"hlod_only\", \"combined\"], \"source_woody_geometry\": \"unchanged_v24_v30_geometry\", \"source_woody_renderer\": \"traditional_raster_for_dynamic_screen_mask_compatibility\", \"nanite_source_woody_diagnostic\": \"rejected_wood_leaked_into_hlod_owned_pixels\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_4x4_screen_bayer\", \"pattern_rank_count\": 16, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"fine_persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"base_pattern_retained_for_control\": \"deterministic_4x4_screen_bayer\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"one transient non-colliding source/HLOD pair placed on the finite lower-slope near bank from the existing river-eye basis\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -35913,6 +36335,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
         LocalFinePersistentMotionTransitionCapturePaths.Num(),
         *LocalFinePersistentMotionTransitionCapturesJson,
+        LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
+        LocalLitRiverViewMotionTransitionCapturePaths.Num(),
+        *LocalLitRiverViewMotionTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -35935,6 +36360,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"persistent_motion_transition_captures\": [%s],\n")
         TEXT("    \"fine_persistent_motion_transition_capture_count\": %d,\n")
         TEXT("    \"fine_persistent_motion_transition_captures\": [%s],\n")
+        TEXT("    \"lit_river_view_motion_transition_capture_count\": %d,\n")
+        TEXT("    \"lit_river_view_motion_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -35962,6 +36389,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalPersistentMotionTransitionCapturesJson,
         LocalFinePersistentMotionTransitionCapturePaths.Num(),
         *LocalFinePersistentMotionTransitionCapturesJson,
+        LocalLitRiverViewMotionTransitionCapturePaths.Num(),
+        *LocalLitRiverViewMotionTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
