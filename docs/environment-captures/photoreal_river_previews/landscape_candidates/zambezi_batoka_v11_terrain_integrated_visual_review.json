@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_visual_review.v3",
+  "generated_on": "2026-07-13",
+  "status": "v11_continuous_terrain_material_rejected_world_projection_and_geometry_required",
+  "decision": "retain_continuous_visual_terrain_path_reject_top_down_uv_and_coarse_dsm_result",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_map_modified": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_terrain_integrated_comparison_report.json",
+  "source_report_sha256": "7024e40922f8666488a3875f29d62fcbdbc156b0067e24f8730a369b042dad1d",
+  "accepted_findings": [
+    "The V11 command replaces standalone sheets with one continuous material response across all four dense visual-terrain tiles.",
+    "Both exact gameplay cameras confirm that the transient override changes only the render mesh while preserving the saved map, Landscape height and collision, water, and gameplay authority.",
+    "The 50 m macro and 2.4 m detail sources remain rights-reviewed, parameter-exposed, and visually bounded to the steep-slope mask."
+  ],
+  "rejection_reasons": [
+    "Top-down corridor UVs stretch the macro and detail maps into long vertical streaks on steep banks.",
+    "Repeated directional streaks read as texture projection rather than irregular jointed basalt.",
+    "The 30 m DSM and 12.5 m visual mesh remain rounded and cannot express stacked scarps, ledges, flow breaks, gullies, or blocky talus.",
+    "Smooth orange terrain, sparse broken foliage, flat water, and empty atmosphere remain far below a lifelike Batoka Gorge result."
+  ],
+  "reviewed_evidence": {
+    "guide_seat": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_pre_terrain_integrated_guide_seat_downstream.png",
+      "baseline_sha256": "fb7d4f055468d20dcdc3bc981917c6cfb6756a7d6be7a9ac48421da8b1eb502c",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_terrain_integrated_guide_seat_downstream.png",
+      "comparison_sha256": "23a02fedd9a6db42f70f3207812187f58ff26622aed6cd53b4f44e7af4771176",
+      "changed_pixel_fraction": 0.1668023003472222,
+      "mean_absolute_channel_delta": 1.691242042824074,
+      "maximum_channel_delta": 165
+    },
+    "river_eye": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_pre_terrain_integrated_river_eye_downstream.png",
+      "baseline_sha256": "48cbef47c76ff5cf7e64302f5240ca2a46b02f5a254f25850fe0368f18b41cca",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_terrain_integrated_river_eye_downstream.png",
+      "comparison_sha256": "4b5350d38763855353f14bab29287e85be6ad0029e4a6a13237acc1117234a8f",
+      "changed_pixel_fraction": 0.2694585503472222,
+      "mean_absolute_channel_delta": 3.12580005787037,
+      "maximum_channel_delta": 118
+    }
+  },
+  "next_iteration_requirements": [
+    "Replace top-down steep-slope sampling with tri-planar or world-aligned macro, detail, normal, roughness, and AO projection.",
+    "Acquire or derive reviewed higher-resolution Batoka terrain and condition it into continuous scarps, ledges, gullies, and talus before silhouette approval.",
+    "Keep the dense visual mesh render-only and retain the Landscape, collision, water solver, raft contact, and gameplay authority boundary.",
+    "Rebuild woodland, water, mist, lighting, and hazard-readable surfaces only after the terrain morphology passes exact-camera review."
+  ],
+  "authority": "transient render-material override on the continuous dense visual-terrain mesh only; saved map, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"
+}

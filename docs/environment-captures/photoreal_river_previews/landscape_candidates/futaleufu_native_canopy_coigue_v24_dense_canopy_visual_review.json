@@ -1,0 +1,87 @@
+{
+  "schema": "raftsim.unreal.futaleufu_dense_canopy_review.v24",
+  "reviewed_on": "2026-07-13",
+  "river_id": "futaleufu_terminator",
+  "status": "density_response_validated_centerline_row_artifacts_and_scene_quality_failed_candidate_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "alpha2_no_shadow_candidate_retained": true,
+  "dense_camera_local_profile_retained": false,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v24_dense_canopy_comparison_report.json",
+  "decision": "retain_v24_camera_local_coverage_measurements_reject_density_only_corridor_promotion",
+  "diagnostic_conclusions": {
+    "dense_profile_reached_target_count_in_both_views": true,
+    "dense_profile_materially_changes_visible_canopy_coverage": true,
+    "dense_profile_produces_continuous_lifelike_forest": false,
+    "centerline_parallel_row_and_trunk_fence_artifacts_present": true,
+    "whole_image_green_classification_materially_improved": false,
+    "whole_image_dark_coverage_regressed": true,
+    "terrain_water_and_atmosphere_remain_dominant_blockers": true,
+    "dense_profile_is_production_promoted": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "landscape_or_collision_modified": false,
+    "hydrodynamic_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "fixed_between_variants": "project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, terrain, water, rocks, cameras, lighting, physics, and saved map",
+    "changed_in_dense_variant": "camera-local centerline window, 9000-tree target, 6.5 m minimum spacing, 24 m river setback, 750 m maximum lateral coverage, reduced micro-gap thinning, and 0.78-1.12 scale range"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "sparse": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v24_sparse_alpha2_guide_seat_downstream.png",
+      "sparse_sha256": "90939fce1c69cf400f99d71d24aa9eede349bbd84a1e0fc1c50d3a757e1a83be",
+      "dense": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v24_dense_source_masked_alpha2_guide_seat_downstream.png",
+      "dense_sha256": "07aa3796ad5dafe52fd69981760b0913df7bcc83fe51632c7054a3b6c1f39736",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.04774088541666666,
+      "mean_absolute_rgb_delta": [2.3463151041666666, 2.4214095052083335, 2.7260069444444444],
+      "sparse_green_dominant_fraction": 0.0070301649305555556,
+      "dense_green_dominant_fraction": 0.007186414930555556,
+      "sparse_dark_fraction": 0.026588541666666667,
+      "dense_dark_fraction": 0.055580512152777775,
+      "sparse_tree_count": 1200,
+      "dense_tree_count": 9000,
+      "dense_near_mid_runtime_far_counts": [213, 1900, 6887]
+    },
+    "river_eye": {
+      "sparse": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v24_sparse_alpha2_river_eye_downstream.png",
+      "sparse_sha256": "68cf03dabbb129852498a37446db09e9539aef8e35c64c6b05b8c5bd13de5476",
+      "dense": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v24_dense_source_masked_alpha2_river_eye_downstream.png",
+      "dense_sha256": "3b4e710b47a9ce54635c1d029eec0ab3ec79a7c42887863d1c26ca48dc5f90e7",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.06496636284722222,
+      "mean_absolute_rgb_delta": [3.3102528211805557, 2.643132595486111, 2.0881608072916666],
+      "sparse_green_dominant_fraction": 0.002184244791666667,
+      "dense_green_dominant_fraction": 0.0018207465277777777,
+      "sparse_dark_fraction": 0.03901584201388889,
+      "dense_dark_fraction": 0.075869140625,
+      "sparse_tree_count": 1200,
+      "dense_tree_count": 9000,
+      "dense_near_mid_runtime_far_counts": [257, 1857, 6886]
+    }
+  },
+  "accepted_findings": [
+    "Both camera-local variants reach the full 9000-tree target while preserving source vegetation and water masks, slope and elevation rejection, deterministic placement, and collision-free transient ownership.",
+    "The denser profile changes 4.77 percent of guide-seat pixels and 6.50 percent of river-eye pixels, proving that insufficient route-wide density was one visible cause of the empty slopes.",
+    "The retained alpha2 no-shadow material keeps individual crown color readable without reintroducing V15 ground carpets or V23 crown self-darkening.",
+    "The exact placement counts and coverage window provide a reproducible upper-bound workload for later area-sampled mixed-ecology and performance tests."
+  ],
+  "rejection_reasons": [
+    "Centerline-progress plus lateral-offset sampling resolves into conspicuous contour-following rows, hard forest edges, and exposed parallel trunk fences instead of irregular temperate-rainforest stands.",
+    "Increasing the tree target from 1200 to 9000 raises guide-seat dark coverage from 2.66 to 5.56 percent and river-eye dark coverage from 3.90 to 7.59 percent without a meaningful whole-image green-classification gain.",
+    "A single repeated coigue family cannot supply crown-age diversity, riparian shrubs, bamboo, ferns, epiphytes, snags, deadwood, or a credible treeline and aspect transition.",
+    "Smooth 30 m terrain, tan provisional ground response, flat tiled water, sparse boulders, clear blue atmosphere, and absent spray or valley cloud still dominate both frames.",
+    "No moving-camera, wind, masked-overdraw, streaming, packaged desktop, console, handheld, or on-device VR evidence exists for 9000 trees per local review window."
+  ],
+  "next_iteration_requirements": [
+    "Replace centerline-parallel candidate generation with deterministic two-dimensional area sampling over the source vegetation mask, using blue-noise spacing, broad density noise, feathered mask boundaries, irregular stand gaps, and explicit river-distance and treeline gradients.",
+    "Add ecology-reviewed age and vertical strata before another density comparison: dominant coigue adults and intermediates, a second accepted native canopy family, riparian shrubs, bamboo or fern understory, epiphyte cues, snags, and deadwood.",
+    "Retain alpha2 with leaf shadows disabled until a simplified sparse shadow proxy passes both the V15 off-crown artifact metric and V23 crown-photometry metric.",
+    "Pair the next ecology pass with world-aligned terrain detail, source-consistent forest-floor color, improved turquoise water response, boulder and gravel-bar structure, humid mountain atmosphere, and spray so canopy is reviewed in a representative scene.",
+    "Profile moving-camera temporal stability, wind, HISM culling, masked overdraw, memory, streaming, and packaged desktop, console, handheld, and VR cost before production promotion."
+  ]
+}

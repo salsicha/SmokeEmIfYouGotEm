@@ -1,9 +1,9 @@
 {
-  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v1",
-  "reviewed_on": "2026-07-12",
+  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v2",
+  "reviewed_on": "2026-07-13",
   "river_id": "zambezi_batoka_gorge",
   "reach": "Boiling Pot to Mukuni Beach",
-  "status": "high_resolution_surveys_confirmed_to_exist_data_access_rights_and_reach_coverage_pending",
+  "status": "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent",
   "production_promoted": false,
   "policy": {
     "link_only_until_access_and_rights_clear": true,
@@ -65,6 +65,25 @@
     }
   ],
   "acquisition_request": {
+    "request_template": "docs/batoka-high-resolution-terrain-acquisition-request.md",
+    "contact_routes": [
+      {
+        "provider": "Zambezi River Authority",
+        "email": "info@zambezira.org",
+        "source": "https://www.zambezira.org/contact-us",
+        "role": "official project owner and first survey-custodian contact"
+      },
+      {
+        "provider": "Studio Ing. G. Pietrangeli S.r.l.",
+        "email": "info@pietrangeli.it",
+        "source": "https://www.pietrangeli.com/contact-us/",
+        "role": "published Batoka engineering and drone-photogrammetry survey-team contact"
+      }
+    ],
+    "outreach_status": {
+      "sent": false,
+      "reason": "sender identity, organization, reply address, and authority to accept quoted data/license cost require project-owner confirmation"
+    },
     "priority_contacts": [
       "Zambezi River Authority BGHES project office",
       "Studio Pietrangeli feasibility survey team",

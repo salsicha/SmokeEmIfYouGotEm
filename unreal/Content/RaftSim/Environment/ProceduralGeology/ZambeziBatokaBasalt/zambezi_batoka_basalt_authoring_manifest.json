@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.environment.procedural_geology_authoring.v1",
   "asset_family_id": "zambezi_batoka_basalt",
-  "status": "v10_surface_retained_corridor_c2_rejected_terrain_integration_required",
+  "status": "v13_bounded_visual_morphology_rejected_insufficient_source_resolution",
   "production_promoted": false,
   "corridor_substitution_performed": false,
   "river_id": "zambezi_batoka_gorge",
@@ -67,6 +67,7 @@
       "isolated Unreal morphology and material review",
       "fixed-camera turntable, closeup, and 60 m captures",
       "non-colliding transient corridor comparison after isolated acceptance",
+      "transient render-material override on the continuous dense visual-terrain mesh",
       "Nanite and desktop performance measurement"
     ],
     "forbidden_now": [
@@ -223,6 +224,27 @@
       "decision": "2.8-4.4x slope-aligned modules reach gorge scale but expose vertical sheet seams, overlaps, oversized talus shadows, and no integration with the low-resolution source terrain",
       "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_c2_corridor_comparison_report.json",
       "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_basalt_v10_c2_corridor_visual_review.json"
+    },
+    {
+      "version": 3,
+      "status": "rejected",
+      "decision": "V11 removes standalone sheets and applies the retained two-scale response continuously, but top-down UVs stretch into vertical streaks while the 30 m DSM remains rounded and cannot express Batoka scarps, ledges, joints, gullies, or talus",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_terrain_integrated_comparison_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v11_terrain_integrated_visual_review.json"
+    },
+    {
+      "version": 4,
+      "status": "projection_basis_retained_scene_rejected",
+      "decision": "V12 world-aligns macro, detail, normal, roughness, and AO at recorded scale and removes the worst top-down stretching, but material retuning stops because the 30 m DSM silhouette, generic brown source, sparse foliage, flat water, and empty atmosphere remain non-lifelike",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_comparison_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_visual_review.json"
+    },
+    {
+      "version": 5,
+      "status": "rejected",
+      "decision": "V13 applies bounded visual-only flow breaks, joints, and talus outside a 220-650 m river-protection fade, but 69,987 modified vertices and a 29.35 cm mean absolute offset do not materially improve the rounded 30 m DSM silhouette; larger unsupported displacement is prohibited",
+      "report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_comparison_report.json",
+      "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_visual_review.json"
     }
   ],
   "promotion_sequence": [
@@ -234,5 +256,5 @@
     "desktop, console, handheld, and VR performance review",
     "separate surveyed collision and hydrodynamic-authority review before any gameplay obstacle use"
   ],
-  "next_step": "Stop placing standalone cliff sheets. Author the accepted V10 two-scale response into a continuous terrain-integrated visual material and cliff morphology layer, while retaining source Landscape, collision, centerline, water, GeoClaw, forcing, raft-contact, and gameplay authority. Condition or replace the 30 m DSM corridor with reviewed higher-resolution terrain before final gorge silhouette approval, then rebuild gorge woodland, water, mist, lighting, and hazard-readable river surfaces before any photoreal claim."
+  "next_step": "Retain V12 world-aligned projection and reject further small-offset or enlarged unsupported procedural displacement. Acquire rights-cleared higher-resolution Batoka terrain, prioritizing the confirmed 0.3 m LiDAR DTM and drone-photogrammetry leads, or a commercially licensed stereo product with full Boiling Pot-to-Mukuni coverage, CRS, vertical datum, accuracy, and derivative-use metadata. Keep source Landscape, collision, centerline, water, GeoClaw, forcing, raft-contact, and gameplay authority unchanged, then resume continuous morphology, material, gorge woodland, water, mist, lighting, and hazard-readable river-surface review against the reviewed terrain candidate before any photoreal claim."
 }

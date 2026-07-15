@@ -36,7 +36,13 @@ private:
     void HandleCaptureZambeziCliffComparisonCommand(const TArray<FString>& Args);
     void HandleCreateZambeziBatokaBasaltFamilyCommand(const TArray<FString>& Args);
     void HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureZambeziBatokaTerrainIntegratedComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureZambeziBatokaWorldAlignedTerrainComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureZambeziBatokaVisualMorphologyComparisonCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureFutaleufuDenseCanopyComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureFutaleufuAreaSampledCanopyComparisonCommand(const TArray<FString>& Args);
+    void HandleCaptureFutaleufuWorldStableCanopyComparisonCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyRenderDiagnosticsCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyOpacityDiagnosticsCommand(const TArray<FString>& Args);
     void HandleCaptureFutaleufuNativeCanopyLightingDiagnosticsCommand(const TArray<FString>& Args);
@@ -48,8 +54,12 @@ private:
     void HandleCaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsCommand(const TArray<FString>& Args);
     void HandleInspectProceduralVegetationSampleCommand(const TArray<FString>& Args);
     void HandleEvaluateProceduralBeechCandidateCommand(const TArray<FString>& Args);
+    void HandleEvaluateFutaleufuCordilleraCypressPveCandidateCommand(
+        const TArray<FString>& Args);
     void HandleCreateFutaleufuNativeCanopyPrototypeCommand(const TArray<FString>& Args);
     void HandleCreateFutaleufuCordilleraCypressFamilyCommand(const TArray<FString>& Args);
+    void HandleCreateFutaleufuCordilleraCypressOpaqueNearReviewCommand(const TArray<FString>& Args);
+    void HandleCreateFutaleufuCordilleraCypressVolumetricNearReviewCommand(const TArray<FString>& Args);
     void HandleCreateFutaleufuCordilleraCypressDonorReviewCommand(const TArray<FString>& Args);
     void HandleProceduralBeechPostProcess(const FPCGDataCollection& OutputData);
     bool TickProceduralBeechCandidate(float DeltaSeconds);
@@ -72,7 +82,13 @@ private:
     bool CaptureZambeziCliffComparison(FString& OutSummary);
     bool CreateZambeziBatokaBasaltFamily(FString& OutSummary);
     bool CaptureZambeziBatokaBasaltCorridorComparison(FString& OutSummary);
+    bool CaptureZambeziBatokaTerrainIntegratedComparison(FString& OutSummary);
+    bool CaptureZambeziBatokaWorldAlignedTerrainComparison(FString& OutSummary);
+    bool CaptureZambeziBatokaVisualMorphologyComparison(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyCorridorComparison(FString& OutSummary);
+    bool CaptureFutaleufuDenseCanopyComparison(FString& OutSummary);
+    bool CaptureFutaleufuAreaSampledCanopyComparison(FString& OutSummary);
+    bool CaptureFutaleufuWorldStableCanopyComparison(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyRenderDiagnostics(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyOpacityDiagnostics(FString& OutSummary);
     bool CaptureFutaleufuNativeCanopyLightingDiagnostics(FString& OutSummary);
@@ -84,7 +100,13 @@ private:
     bool CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics(FString& OutSummary);
     bool CreateFutaleufuNativeCanopyPrototype(FString& OutSummary);
     bool CreateFutaleufuCordilleraCypressFamily(FString& OutSummary);
+    bool CreateFutaleufuCordilleraCypressOpaqueNearReview(FString& OutSummary);
+    bool CreateFutaleufuCordilleraCypressVolumetricNearReview(FString& OutSummary);
     bool CreateFutaleufuCordilleraCypressDonorReview(FString& OutSummary);
+    bool CreateFutaleufuCordilleraCypressReview(
+        bool bOpaqueNearGeometry,
+        bool bVolumetricNearGeometry,
+        FString& OutSummary);
 
     TArray<FRaftSimEditorToolDescriptor> ToolDescriptors;
     TMap<FName, TWeakPtr<SDockTab>> OpenedToolTabs;
@@ -99,7 +121,13 @@ private:
     TUniquePtr<FAutoConsoleCommand> CaptureZambeziCliffComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateZambeziBatokaBasaltFamilyConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaTerrainIntegratedComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaWorldAlignedTerrainComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaVisualMorphologyComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuDenseCanopyComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuAreaSampledCanopyComparisonConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuWorldStableCanopyComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyLightingDiagnosticsConsoleCommand;
@@ -111,8 +139,11 @@ private:
     TUniquePtr<FAutoConsoleCommand> CaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> InspectProceduralVegetationSampleConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> EvaluateProceduralBeechCandidateConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> EvaluateFutaleufuCordilleraCypressPveCandidateConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateFutaleufuNativeCanopyPrototypeConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressFamilyConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressOpaqueNearReviewConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressVolumetricNearReviewConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateFutaleufuCordilleraCypressDonorReviewConsoleCommand;
     FDelegateHandle PhotorealEnvironmentAutomationPostEngineInitHandle;
     FTSTicker::FDelegateHandle PhotorealEnvironmentAutomationTickerHandle;
@@ -122,13 +153,23 @@ private:
     UObject* ProceduralBeechGrowthAsset = nullptr;
     TSharedPtr<FManagedArrayCollection> ProceduralBeechOutputCollection;
     FString ProceduralBeechVariant;
+    FString ProceduralCypressPaletteMode;
     double ProceduralBeechStartSeconds = 0.0;
+    bool bProceduralCypressPveCandidate = false;
     bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
     bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
     bool bCreateLandscapeImportCandidateMapsOnStartup = false;
     bool bCreateZambeziBatokaBasaltFamilyOnStartup = false;
     bool bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup = false;
+    bool bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup = false;
+    bool bCaptureZambeziBatokaWorldAlignedTerrainComparisonOnStartup = false;
+    bool bCaptureZambeziBatokaVisualMorphologyComparisonOnStartup = false;
+    bool bCaptureFutaleufuDenseCanopyComparisonOnStartup = false;
+    bool bCaptureFutaleufuAreaSampledCanopyComparisonOnStartup = false;
+    bool bCaptureFutaleufuWorldStableCanopyComparisonOnStartup = false;
     bool bCreateFutaleufuCordilleraCypressFamilyOnStartup = false;
+    bool bCreateFutaleufuCordilleraCypressOpaqueNearReviewOnStartup = false;
+    bool bCreateFutaleufuCordilleraCypressVolumetricNearReviewOnStartup = false;
     bool bCreateFutaleufuCordilleraCypressDonorReviewOnStartup = false;
     bool bExitAfterPhotorealEnvironmentAutomation = false;
     int32 PhotorealEnvironmentAutomationStartupAttempts = 0;

@@ -1,7 +1,7 @@
 {
   "schema": "raftsim.unreal.futaleufu_cordillera_cypress_authoring.v1",
   "river_id": "futaleufu_terminator",
-  "status": "v13_cc0_fir_direct_donor_rejected_v14_opaque_geometry_pending",
+  "status": "v17_project_graph_open_form_generated_visual_promotion_rejected",
   "production_promoted": false,
   "corridor_substitution_allowed": false,
   "species": {
@@ -171,6 +171,149 @@
     "shadow_policy": "disabled for initial corridor ecology captures; any later shadow-pass density or proxy must pass V23 off-crown and crown-photometry gates",
     "collision_policy": "visual HISM review instances remain transient and non-colliding; gameplay collision authority is unchanged"
   },
+  "v16_procedural_vegetation_workflow": {
+    "engine_version": "5.8",
+    "required_plugins": [
+      "PCG",
+      "ProceduralVegetationEditor",
+      "DynamicWind"
+    ],
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate <form_id>",
+    "source_graph": "/ProceduralVegetationEditor/SampleAssets/StarterContent/ConiferTree_01/PVE_Sample_Conifer_Tree_01",
+    "source_graph_use": "transient local reconstruction scaffold only; the installed graph, preset, twig meshes, materials, textures, and generated derivatives are not copied into the open-source repository",
+    "project_owned_inputs": [
+      "V10 cypress broad-spray atlas and material maps",
+      "three layered live-twig card meshes generated locally from the V10 atlas",
+      "one connected dead-twig mesh generated locally from project geometry",
+      "cypress bark and V16 masked TwoSidedFoliage materials"
+    ],
+    "graph_adaptation": [
+      "replace both Epic foliage palettes with project-owned live and dead twig meshes",
+      "bypass the sample-specific Manual Edit node before meshing",
+      "record per-form branch scale, axillary growth, graft density and range, senescence, random direction, gravity, bifurcation, foliage density, and seed",
+      "redirect export into a git-ignored local review namespace",
+      "use Nanite with shape preservation disabled for connected woody geometry and traditional raster rendering for masked micro-foliage"
+    ],
+    "forms_generated": [
+      "open_grown_conical",
+      "closed_grove_columnar",
+      "rocky_slope_asymmetric",
+      "storm_damaged",
+      "coigue_transition_edge",
+      "grove_intermediate",
+      "suppressed_intermediate",
+      "released_intermediate"
+    ],
+    "structural_envelope": {
+      "vertex_count_range": [42689, 142634],
+      "triangle_count_range": [80078, 267683],
+      "foliage_instance_count_range": [630, 6628],
+      "adult_height_m_range": [27.49624484, 31.08888489],
+      "intermediate_height_m_range": [10.40412364, 17.52848928]
+    },
+    "bounded_visual_correction": {
+      "status": "photometry_and_shadow_artifact_corrected_native_topology_still_rejected",
+      "retained_controls": [
+        "2.10 live-spray base-color scale with 0.08 AO influence and zero diagnostic emissive",
+        "stronger physically lit transmission with a 0.42 opacity-mask clip",
+        "live-foliage shadows disabled only in isolated review while connected woody shadows remain",
+        "per-form gravity strength and angle correction",
+        "trunk and branch bifurcation disabled",
+        "higher retained-foliage threshold, bounded graft density, deterministic axil jitter, and phyllotaxy offset",
+        "deterministic upper-crown spray taper applied identically to the local foliage template and review map"
+      ],
+      "material_response_passed": true,
+      "native_crown_topology_passed": false,
+      "observed_failures": [
+        "the spruce scaffold produces sparse dotted apexes",
+        "healthy forms retain stacked crown islands, open bands, or coarse shelves",
+        "the storm form remains too skeletal for normal-canopy substitution"
+      ]
+    },
+    "reports": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v16_pve_<form_id>_report.json",
+    "visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v16_pve_visual_review.json",
+    "workflow_accepted": true,
+    "visual_promotion_accepted": false,
+    "open_visual_failures": [
+      "the installed spruce scaffold produces sparse dotted apexes and crown islands after the bounded photometry/topology correction",
+      "healthy forms retain open bands or coarse branch shelves",
+      "the installed spruce scaffold is not final Austrocedrus species identity",
+      "only three diagnostic views per form exist; the V13 exact 67-camera contract has not run",
+      "corridor ecology, temporal wind, packaged desktop, and target-VR gates have not run"
+    ]
+  },
+  "v17_project_graph_workflow": {
+    "engine_version": "5.8",
+    "status": "project_owned_growth_topology_verified_open_form_visual_promotion_rejected",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate <form_id>",
+    "source_graph": "RaftSim-created transient UProceduralVegetationGraph",
+    "source_graph_use": "project-owned grower, grafting, gravity, bone-reduction, and foliage-distribution topology; no installed sample topology, preset, manual-edit node, or export node is duplicated",
+    "bounded_installed_rendering_setting_donors": [
+      "UE 5.8 conifer PVMeshBuilderSettings",
+      "UE 5.8 conifer PVPlantProfileLoaderSettings"
+    ],
+    "project_owned_inputs": [
+      "V10 cypress broad-spray atlas and material maps",
+      "three layered live-twig card meshes generated locally from the V10 atlas",
+      "one connected dead-twig mesh available only to damaged-form paths",
+      "cypress bark and V16 masked TwoSidedFoliage materials"
+    ],
+    "growth_contract": {
+      "main_growth_cycles": 44,
+      "branchlet_growth_cycles": 6,
+      "maximum_generation": 2,
+      "main_target_length_m": 22.5,
+      "branchlet_target_length_m": 1.45,
+      "primary_axil_elevation_degrees_is_form_specific": true,
+      "bifurcation_enabled": false,
+      "healthy_forms_bypass_dead_twig_path": true,
+      "nanite_woody_shape_preservation": "none",
+      "masked_micro_foliage_renderer": "traditional_raster"
+    },
+    "forms_generated": [
+      "open_grown_conical"
+    ],
+    "forms_remaining": [
+      "closed_grove_columnar",
+      "rocky_slope_asymmetric",
+      "storm_damaged",
+      "coigue_transition_edge",
+      "grove_intermediate",
+      "suppressed_intermediate",
+      "released_intermediate"
+    ],
+    "open_grown_conical_structural_result": {
+      "vertex_count": 136041,
+      "triangle_count": 245571,
+      "foliage_mesh_count": 3,
+      "foliage_instance_count": 3626,
+      "height_m": 24.681574,
+      "crown_width_m": [12.358619, 11.973823]
+    },
+    "capture_contract": [
+      "turntable_azimuth_035",
+      "turntable_azimuth_145",
+      "river_distance_60m",
+      "branch_spray_closeup"
+    ],
+    "accepted_outcomes": [
+      "installed spruce graph topology removed from the forward authoring path",
+      "open-grown height and crown-width envelope are plausible for the 25 meter species authority",
+      "crown continuity and pyramidal mass are materially improved over the V16 scaffold",
+      "project-owned branch-spray source material and alpha response pass isolated closeup review"
+    ],
+    "open_visual_failures": [
+      "whole-spray card edges remain visible at the 60 meter river-view distance",
+      "the seven remaining forms have not been regenerated from the V17 graph",
+      "the V13 exact 67-camera and V10 near/mid/far authority gates have not run",
+      "temporal wind, corridor ecology, packaged desktop, and target-VR gates have not run",
+      "the basal flare remains a secondary isolated-review cleanup item"
+    ],
+    "reports": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v17_pve_<form_id>_report.json",
+    "workflow_accepted": true,
+    "visual_promotion_accepted": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -196,5 +339,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Build V14 as project-owned opaque connected primary, secondary, and tertiary branchlets carrying bounded scale-leaf clusters. Do not copy or relabel the rejected fir geometry and do not return to masked whole-spray cards. Retain V10 far authority and silhouette floors, V12 branch-scale and resource ceilings, and V13 exact-camera, exterior-closeup, provenance, and culling-bounds evidence before any corridor review."
+  "next_step": "Keep the V17 project-owned growth graph and solve the visible whole-spray card edges through a validated near/mid/far geometry, card, or impostor authority path. Regenerate the seven remaining forms only after the open-grown representation passes its 60 meter visual gate, then run the V13 exact 67-camera, V10 authority, temporal wind, corridor ecology, packaged desktop, and target-VR gates. Keep installed sample content and local generated derivatives out of the open-source repository."
 }

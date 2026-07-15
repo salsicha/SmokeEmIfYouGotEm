@@ -1,0 +1,98 @@
+{
+	"schema": "raftsim.unreal.zambezi_batoka_visual_morphology_comparison.v1",
+	"river_id": "zambezi_batoka_gorge",
+	"status": "paired_transient_v13_visual_morphology_comparison_captured_pending_human_review",
+	"production_promoted": false,
+	"survey_or_source_terrain_replacement_performed": false,
+	"corridor_substitution_performed": false,
+	"source_map_modified": false,
+	"landscape_height_or_collision_modified": false,
+	"hydrodynamic_or_gameplay_authority_modified": false,
+	"external_pixels_copied": true,
+	"external_geometry_copied": false,
+	"source_map": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+	"material_asset": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview.M_RaftSim_Zambezi_BatokaV12_WorldAlignedTerrainReview",
+	"authority_boundary": "transient authored visual hypothesis on the continuous dense render mesh only; saved map, 30 m source DSM, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged",
+	"evidence_limit": "regional Batoka morphology constraints guide bounded visual breakup but do not establish surveyed wall, ledge, joint, gully, talus, bank, or bed geometry for Boiling Pot to Mukuni Beach",
+	"morphology_parameters":
+	{
+		"projection_basis": "V12 world-aligned material",
+		"source_dsm_resolution_m": 30,
+		"visual_mesh_target_spacing_m": 12.5,
+		"maximum_absolute_offset_m": 4.5,
+		"river_protection_full_width_m": 220,
+		"river_protection_fade_end_m": 650,
+		"minimum_lava_flow_height_m": 8.4000000000000004,
+		"maximum_lava_flow_height_m": 13.6,
+		"primary_joint_spacing_m": 92,
+		"secondary_joint_spacing_m": 148,
+		"treatments": "bounded elevation-conditioned flow breaks, two irregular joint families, and moderate-slope talus-scale breakup"
+	},
+	"treatment_statistics":
+	{
+		"baseline_guide_seat":
+		{
+			"visual_tile_count": 4,
+			"total_vertex_count": 0,
+			"modified_vertex_count": 0,
+			"protected_river_corridor_vertex_count": 0,
+			"rejected_low_slope_vertex_count": 0,
+			"minimum_offset_cm": 0,
+			"maximum_offset_cm": 0,
+			"mean_absolute_offset_cm": 0
+		},
+		"baseline_river_eye":
+		{
+			"visual_tile_count": 4,
+			"total_vertex_count": 0,
+			"modified_vertex_count": 0,
+			"protected_river_corridor_vertex_count": 0,
+			"rejected_low_slope_vertex_count": 0,
+			"minimum_offset_cm": 0,
+			"maximum_offset_cm": 0,
+			"mean_absolute_offset_cm": 0
+		},
+		"comparison_guide_seat":
+		{
+			"visual_tile_count": 4,
+			"total_vertex_count": 1631500,
+			"modified_vertex_count": 69987,
+			"protected_river_corridor_vertex_count": 76403,
+			"rejected_low_slope_vertex_count": 1471404,
+			"minimum_offset_cm": -394.00534057617188,
+			"maximum_offset_cm": 292.89312744140625,
+			"mean_absolute_offset_cm": 29.345341793381486
+		},
+		"comparison_river_eye":
+		{
+			"visual_tile_count": 4,
+			"total_vertex_count": 1631500,
+			"modified_vertex_count": 69987,
+			"protected_river_corridor_vertex_count": 76403,
+			"rejected_low_slope_vertex_count": 1471404,
+			"minimum_offset_cm": -394.00534057617188,
+			"maximum_offset_cm": 292.89312744140625,
+			"mean_absolute_offset_cm": 29.345341793381486
+		}
+	},
+	"captures":
+	{
+		"baseline_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_pre_morphology_guide_seat_downstream.png",
+		"baseline_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_pre_morphology_river_eye_downstream.png",
+		"comparison_guide_seat": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_guide_seat_downstream.png",
+		"comparison_river_eye": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v13_visual_morphology_river_eye_downstream.png",
+		"all_captured": true
+	},
+	"open_promotion_gates": [
+		"paired_human_visual_review",
+		"higher_resolution_survey_or_photogrammetry_acquisition",
+		"Batoka_geology_and_reach_specific_lithology_review",
+		"gorge_silhouette_and_procedural_artifact_review",
+		"guide_and_hazard_readability_review",
+		"geospatial_and_source_terrain_review",
+		"rights_and_art_review",
+		"woodland_water_mist_and_lighting_review",
+		"desktop_console_handheld_and_VR_performance",
+		"separate_surveyed_collision_and_hydrodynamic_review"
+	]
+}

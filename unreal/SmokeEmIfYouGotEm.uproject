@@ -41,6 +41,10 @@
       "Enabled": true
     },
     {
+      "Name": "ImpostorBaker",
+      "Enabled": true
+    },
+    {
       "Name": "Water",
       "Enabled": true
     },

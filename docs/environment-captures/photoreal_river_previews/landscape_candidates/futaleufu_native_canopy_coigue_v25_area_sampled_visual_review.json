@@ -1,0 +1,87 @@
+{
+  "schema": "raftsim.unreal.futaleufu_area_sampled_canopy_review.v25",
+  "reviewed_on": "2026-07-13",
+  "river_id": "futaleufu_terminator",
+  "status": "two_dimensional_topology_validated_source_mask_band_and_scene_quality_failed_candidate_rejected",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "placement_pipeline_retained": true,
+  "area_sampled_topology_retained": true,
+  "alpha2_no_shadow_candidate_retained": true,
+  "diagnostic_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_native_canopy_coigue_v25_area_sampled_comparison_report.json",
+  "decision": "retain_v25_two_dimensional_sampling_and_nearest_river_distance_reject_current_single_stratum_visual_candidate",
+  "diagnostic_conclusions": {
+    "area_sampled_profile_reached_target_count_in_both_views": true,
+    "true_nearest_centerline_setback_enforced": true,
+    "centerline_parallel_row_artifact_reduced": true,
+    "irregular_stand_edges_improved": true,
+    "source_mask_band_artifact_resolved": false,
+    "continuous_lifelike_mixed_forest_produced": false,
+    "terrain_water_and_atmosphere_remain_dominant_blockers": true,
+    "area_sampled_profile_is_production_promoted": false
+  },
+  "authority_boundary": {
+    "source_map_modified": false,
+    "landscape_or_collision_modified": false,
+    "hydrodynamic_or_gameplay_authority_modified": false,
+    "custom_cpp_solver_modified": false,
+    "geoclaw_reference_modified": false,
+    "feature_forcing_modified": false,
+    "fixed_between_variants": "9000-tree target, 6.5 m spacing, 24 m river setback, project-owned eight-form coigue meshes, V12 runtime-far representation, V22 RGB-padded leaf atlas, alpha2 no-shadow material, source masks, terrain, water, rocks, cameras, lighting, physics, and saved map",
+    "changed_in_area_sampled_variant": "direct deterministic two-dimensional candidates in a 2.2 km camera-local square, true nearest-centerline distance, probabilistic source-mask feathering, and broad plus mid-scale stand-density fields"
+  },
+  "capture_evidence": {
+    "guide_seat": {
+      "centerline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v25_centerline_dense_alpha2_guide_seat_downstream.png",
+      "centerline_sha256": "d031f1236b24a86d9420ebf8c18d2310efce46af92103b2303cf8733a72e6e50",
+      "area_sampled": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v25_area_sampled_alpha2_guide_seat_downstream.png",
+      "area_sampled_sha256": "9b46367f1320c6d38eb0fcf99e3ab7ce044e67ca56f3192561a6114cb367d2fb",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.10581488715277777,
+      "mean_absolute_rgb_delta": [2.7663096788194443, 2.3471875, 1.9309602864583333],
+      "centerline_dark_fraction": 0.03916449652777778,
+      "area_sampled_dark_fraction": 0.06056966145833333,
+      "centerline_tree_count": 9000,
+      "area_sampled_tree_count": 9000,
+      "area_sampled_near_mid_runtime_far_counts": [111, 1021, 7868],
+      "area_sampled_candidate_count": 65304,
+      "minimum_accepted_river_distance_m": 120.22942352294922
+    },
+    "river_eye": {
+      "centerline": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v25_centerline_dense_alpha2_river_eye_downstream.png",
+      "centerline_sha256": "f1e97d8b2a6a0758ce1645b5c1cbabd68c45dee0f954dc8564164b0d213ed65f",
+      "area_sampled": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_v25_area_sampled_alpha2_river_eye_downstream.png",
+      "area_sampled_sha256": "7ab126ff962770b424f7814ec8da93ea43b7c0456ad04d01bc82ab8d27f5f92b",
+      "dimensions_px": [1280, 720],
+      "changed_pixel_fraction": 0.08275282118055556,
+      "mean_absolute_rgb_delta": [1.4781434461805556, 1.4204253472222221, 0.8966395399305556],
+      "centerline_dark_fraction": 0.06579535590277778,
+      "area_sampled_dark_fraction": 0.055681423611111114,
+      "centerline_tree_count": 9000,
+      "area_sampled_tree_count": 9000,
+      "area_sampled_near_mid_runtime_far_counts": [90, 723, 8187],
+      "area_sampled_candidate_count": 37960,
+      "minimum_accepted_river_distance_m": 98.03069305419922
+    }
+  },
+  "accepted_findings": [
+    "Both area-sampled views reach 9000 trees with deterministic placement, source vegetation and water masks, slope and elevation rejection, transient collision-free ownership, and no saved-map or physics changes.",
+    "Direct two-dimensional candidates and nearest-centerline distance remove the V24 dependence on centerline progress plus lateral offsets; the strongest contour-following rows and parallel trunk fences are visibly reduced.",
+    "Broad and mid-scale stand fields produce more irregular local boundaries and materially change 10.58 percent of guide-seat pixels and 8.28 percent of river-eye pixels.",
+    "The measured 98.03 m and 120.23 m minimum accepted river distances exceed the authored 24 m exclusion because the source vegetation mask and terrain rules provide additional clearance in these views."
+  ],
+  "rejection_reasons": [
+    "The mostly binary source vegetation mask still resolves into broad hard forest bands; scalar luma feathering does not create a spatially meaningful transition where the mask lacks a graded edge.",
+    "The direct square sampler moves more instances into the runtime-far band and leaves only 813 and 1132 near-plus-mid trees in the two views, so density allocation is not yet a representative moving-camera workload.",
+    "A single repeated coigue family cannot provide age, crown, species, riparian, understory, epiphyte, snag, or deadwood diversity and still exposes uniform trunk spacing at stand edges.",
+    "Smooth 30 m terrain, tan provisional ground, flat tiled water, sparse boulder and gravel structure, clear atmosphere, and absent mist or spray remain more visually dominant than the topology improvement.",
+    "No moving-camera, wind, masked-overdraw, streaming, packaged desktop, console, handheld, or on-device VR evidence exists for this 9000-tree local profile."
+  ],
+  "next_iteration_requirements": [
+    "Derive a deterministic spatial vegetation occupancy or signed-distance field from the source mask, then use it for true edge feathering, irregular treeline transitions, stand holes, and river-distance gradients.",
+    "Allocate density by camera-independent world cells or streamed reach tiles so guide-seat and river-eye views share one stable forest and the near, mid, and runtime-far workload reflects a moving boat.",
+    "Add ecology-reviewed age and vertical strata: coigue adults and intermediates, a second accepted native canopy family, riparian shrubs, bamboo or fern understory, epiphyte cues, snags, and deadwood.",
+    "Pair the next ecology pass with world-aligned terrain detail, source-consistent forest-floor color, improved turquoise water response, boulder and gravel-bar structure, humid mountain atmosphere, valley cloud, and spray.",
+    "Profile moving-camera temporal stability, wind, HISM culling, masked overdraw, memory, streaming, and packaged desktop, console, handheld, and VR cost before production promotion."
+  ]
+}

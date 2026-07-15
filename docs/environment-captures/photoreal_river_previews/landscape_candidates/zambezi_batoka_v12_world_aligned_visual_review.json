@@ -1,0 +1,49 @@
+{
+  "schema": "raftsim.unreal.zambezi_batoka_basalt_corridor_visual_review.v4",
+  "generated_on": "2026-07-13",
+  "status": "v12_world_alignment_retained_as_projection_basis_terrain_and_scene_rejected",
+  "decision": "retain_world_aligned_material_graph_stop_surface_retuning_until_terrain_morphology_improves",
+  "production_promoted": false,
+  "corridor_substitution_performed": false,
+  "source_map_modified": false,
+  "source_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_comparison_report.json",
+  "source_report_sha256": "266702cb46a99269ad995ba5dcd50c02193a3ec1c87328ed7ad461d792887e11",
+  "accepted_findings": [
+    "World-aligned projection keeps the 50 m macro and 2.4 m detail footprints consistent across differently oriented banks and removes the worst V11 top-down stretching.",
+    "Color, normal, roughness, and AO channels use Unreal world-aligned functions, with the review material explicitly configured for world-space normal output.",
+    "The response remains continuous across all four transient visual-terrain tiles with no standalone sheets, map save, collision change, or gameplay-authority change."
+  ],
+  "rejection_reasons": [
+    "The 30 m DSM and 12.5 m visual sampling still produce rounded canyon masses rather than stacked scarps, ledges, flow breaks, joints, gullies, and blocky talus.",
+    "The generic source remains brown and directional in places and is not exact Batoka lithology or named-outcrop evidence.",
+    "Sparse broken foliage, flat dark water, empty atmosphere, and simple lighting keep both gameplay views far below lifelike quality.",
+    "Additional surface-weight tuning cannot repair the missing terrain silhouette and would risk hiding the actual source-resolution blocker."
+  ],
+  "reviewed_evidence": {
+    "guide_seat": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_pre_world_aligned_guide_seat_downstream.png",
+      "baseline_sha256": "fb7d4f055468d20dcdc3bc981917c6cfb6756a7d6be7a9ac48421da8b1eb502c",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_guide_seat_downstream.png",
+      "comparison_sha256": "e076d214436cb03b7a66b735c05064c2cc16a573b1dcacb32e936ac9e7a83980",
+      "changed_pixel_fraction": 0.16649631076388888,
+      "mean_absolute_channel_delta": 1.0907244646990741,
+      "maximum_channel_delta": 165
+    },
+    "river_eye": {
+      "baseline_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_pre_world_aligned_river_eye_downstream.png",
+      "baseline_sha256": "48cbef47c76ff5cf7e64302f5240ca2a46b02f5a254f25850fe0368f18b41cca",
+      "comparison_capture": "docs/environment-captures/photoreal_river_previews/landscape_candidates/zambezi_batoka_v12_world_aligned_river_eye_downstream.png",
+      "comparison_sha256": "d828d1c7c4f1eb811f9502107291a5ebdb06523a19d5317ebd690c2c431de046",
+      "changed_pixel_fraction": 0.26947591145833333,
+      "mean_absolute_channel_delta": 2.989591290509259,
+      "maximum_channel_delta": 118
+    }
+  },
+  "next_iteration_requirements": [
+    "Retain V12 world-aligned projection as a technical material basis without promoting its appearance.",
+    "Acquire, derive, or condition reviewed higher-resolution Batoka terrain before further surface tuning or final gorge-silhouette review.",
+    "Author continuous visual scarps, ledges, joints, gullies, and talus while preserving source Landscape collision and all hydrodynamic authority.",
+    "Resume material, woodland, water, mist, lighting, and hazard-readability review against the improved morphology in the exact cameras."
+  ],
+  "authority": "transient render-material override on the continuous dense visual-terrain mesh only; saved map, source Landscape, height query, collision, centerline, bed, banks, custom C++ water, GeoClaw, feature forcing, raft contact, hazards, and gameplay authority remain unchanged"
+}

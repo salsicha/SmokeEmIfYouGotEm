@@ -106,6 +106,30 @@ C2_CORRIDOR_REVIEW_RELATIVE_PATH = Path(
     "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
     "zambezi_batoka_basalt_v10_c2_corridor_visual_review.json"
 )
+C3_TERRAIN_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v11_terrain_integrated_comparison_report.json"
+)
+C3_TERRAIN_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v11_terrain_integrated_visual_review.json"
+)
+C4_WORLD_ALIGNED_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v12_world_aligned_comparison_report.json"
+)
+C4_WORLD_ALIGNED_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v12_world_aligned_visual_review.json"
+)
+C5_VISUAL_MORPHOLOGY_REPORT_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v13_visual_morphology_comparison_report.json"
+)
+C5_VISUAL_MORPHOLOGY_REVIEW_RELATIVE_PATH = Path(
+    "docs/environment-captures/photoreal_river_previews/landscape_candidates/"
+    "zambezi_batoka_v13_visual_morphology_visual_review.json"
+)
 GENERATED_ON = "2026-07-13"
 
 
@@ -701,6 +725,94 @@ def build_zambezi_batoka_basalt_c2_corridor_visual_review(repo_root: Path) -> di
     )
 
 
+def build_zambezi_batoka_v11_terrain_integrated_visual_review(
+    repo_root: Path,
+) -> dict:
+    return _build_corridor_visual_review(
+        repo_root,
+        version=3,
+        report_relative_path=C3_TERRAIN_REPORT_RELATIVE_PATH,
+        status="v11_continuous_terrain_material_rejected_world_projection_and_geometry_required",
+        decision="retain_continuous_visual_terrain_path_reject_top_down_uv_and_coarse_dsm_result",
+        accepted_findings=[
+            "The V11 command replaces standalone sheets with one continuous material response across all four dense visual-terrain tiles.",
+            "Both exact gameplay cameras confirm that the transient override changes only the render mesh while preserving the saved map, Landscape height and collision, water, and gameplay authority.",
+            "The 50 m macro and 2.4 m detail sources remain rights-reviewed, parameter-exposed, and visually bounded to the steep-slope mask.",
+        ],
+        rejection_reasons=[
+            "Top-down corridor UVs stretch the macro and detail maps into long vertical streaks on steep banks.",
+            "Repeated directional streaks read as texture projection rather than irregular jointed basalt.",
+            "The 30 m DSM and 12.5 m visual mesh remain rounded and cannot express stacked scarps, ledges, flow breaks, gullies, or blocky talus.",
+            "Smooth orange terrain, sparse broken foliage, flat water, and empty atmosphere remain far below a lifelike Batoka Gorge result.",
+        ],
+        next_iteration_requirements=[
+            "Replace top-down steep-slope sampling with tri-planar or world-aligned macro, detail, normal, roughness, and AO projection.",
+            "Acquire or derive reviewed higher-resolution Batoka terrain and condition it into continuous scarps, ledges, gullies, and talus before silhouette approval.",
+            "Keep the dense visual mesh render-only and retain the Landscape, collision, water solver, raft contact, and gameplay authority boundary.",
+            "Rebuild woodland, water, mist, lighting, and hazard-readable surfaces only after the terrain morphology passes exact-camera review.",
+        ],
+    )
+
+
+def build_zambezi_batoka_v12_world_aligned_visual_review(
+    repo_root: Path,
+) -> dict:
+    return _build_corridor_visual_review(
+        repo_root,
+        version=4,
+        report_relative_path=C4_WORLD_ALIGNED_REPORT_RELATIVE_PATH,
+        status="v12_world_alignment_retained_as_projection_basis_terrain_and_scene_rejected",
+        decision="retain_world_aligned_material_graph_stop_surface_retuning_until_terrain_morphology_improves",
+        accepted_findings=[
+            "World-aligned projection keeps the 50 m macro and 2.4 m detail footprints consistent across differently oriented banks and removes the worst V11 top-down stretching.",
+            "Color, normal, roughness, and AO channels use Unreal world-aligned functions, with the review material explicitly configured for world-space normal output.",
+            "The response remains continuous across all four transient visual-terrain tiles with no standalone sheets, map save, collision change, or gameplay-authority change.",
+        ],
+        rejection_reasons=[
+            "The 30 m DSM and 12.5 m visual sampling still produce rounded canyon masses rather than stacked scarps, ledges, flow breaks, joints, gullies, and blocky talus.",
+            "The generic source remains brown and directional in places and is not exact Batoka lithology or named-outcrop evidence.",
+            "Sparse broken foliage, flat dark water, empty atmosphere, and simple lighting keep both gameplay views far below lifelike quality.",
+            "Additional surface-weight tuning cannot repair the missing terrain silhouette and would risk hiding the actual source-resolution blocker.",
+        ],
+        next_iteration_requirements=[
+            "Retain V12 world-aligned projection as a technical material basis without promoting its appearance.",
+            "Acquire, derive, or condition reviewed higher-resolution Batoka terrain before further surface tuning or final gorge-silhouette review.",
+            "Author continuous visual scarps, ledges, joints, gullies, and talus while preserving source Landscape collision and all hydrodynamic authority.",
+            "Resume material, woodland, water, mist, lighting, and hazard-readability review against the improved morphology in the exact cameras.",
+        ],
+    )
+
+
+def build_zambezi_batoka_v13_visual_morphology_review(
+    repo_root: Path,
+) -> dict:
+    return _build_corridor_visual_review(
+        repo_root,
+        version=5,
+        report_relative_path=C5_VISUAL_MORPHOLOGY_REPORT_RELATIVE_PATH,
+        status="v13_bounded_visual_morphology_rejected_insufficient_source_resolution",
+        decision="retain_v12_projection_reject_small_procedural_offsets_require_higher_resolution_terrain",
+        accepted_findings=[
+            "The transient command preserves the V12 material and applies deterministic authored morphology only to the four collision-free dense render tiles.",
+            "A 220 m fully protected river corridor fading to 650 m keeps the visual experiment away from the authored channel, banks, solver, and raft-contact authority.",
+            "The report accounts for all 1,631,500 vertices per comparison, including 76,403 river-protected and 1,471,404 low-slope-rejected vertices.",
+            "The bounded pass modifies 69,987 vertices with a 29.35 cm mean absolute offset and measured -3.94 m to +2.93 m extrema under a 4.5 m cap.",
+        ],
+        rejection_reasons=[
+            "The paired exact-camera images show no meaningful gorge-silhouette improvement: 5.22 and 7.84 percent of pixels change, but mean absolute channel deltas are only 0.19 and 0.25 levels.",
+            "Only 4.29 percent of visual vertices move, while the 30 m DSM continues to define rounded canyon masses without stacked scarps, ledges, gullies, or talus fields.",
+            "Increasing procedural offsets enough to replace the missing silhouette would invent unsupported wall and bank geometry rather than recover source detail.",
+            "Foliage, water, atmosphere, lighting, and exact Batoka lithology remain separate unresolved scene blockers.",
+        ],
+        next_iteration_requirements=[
+            "Do not increase procedural displacement as a substitute for missing survey or photogrammetry.",
+            "Acquire rights-cleared 0.3 m LiDAR, drone photogrammetry, commercial stereo terrain, or another reviewed higher-resolution terrain product with full reach coverage and datum metadata.",
+            "Retain V12 world-aligned projection and the source/collision/hydrodynamic authority boundary while the terrain acquisition gate remains open.",
+            "Resume continuous morphology and scene dressing only after a higher-resolution terrain candidate passes geospatial and rights review.",
+        ],
+    )
+
+
 def _write_followup_visual_review(
     repo_root: Path,
     relative_path: Path,
@@ -797,4 +909,34 @@ def write_zambezi_batoka_basalt_c2_corridor_visual_review(repo_root: Path) -> Pa
         repo_root,
         C2_CORRIDOR_REVIEW_RELATIVE_PATH,
         build_zambezi_batoka_basalt_c2_corridor_visual_review(repo_root),
+    )
+
+
+def write_zambezi_batoka_v11_terrain_integrated_visual_review(
+    repo_root: Path,
+) -> Path:
+    return _write_followup_visual_review(
+        repo_root,
+        C3_TERRAIN_REVIEW_RELATIVE_PATH,
+        build_zambezi_batoka_v11_terrain_integrated_visual_review(repo_root),
+    )
+
+
+def write_zambezi_batoka_v12_world_aligned_visual_review(
+    repo_root: Path,
+) -> Path:
+    return _write_followup_visual_review(
+        repo_root,
+        C4_WORLD_ALIGNED_REVIEW_RELATIVE_PATH,
+        build_zambezi_batoka_v12_world_aligned_visual_review(repo_root),
+    )
+
+
+def write_zambezi_batoka_v13_visual_morphology_review(
+    repo_root: Path,
+) -> Path:
+    return _write_followup_visual_review(
+        repo_root,
+        C5_VISUAL_MORPHOLOGY_REVIEW_RELATIVE_PATH,
+        build_zambezi_batoka_v13_visual_morphology_review(repo_root),
     )
