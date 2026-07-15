@@ -1,0 +1,187 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_dense_botanical_review.v20_1",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v20_1_open_grown_conical_dense_botanical_flattened_spray",
+  "status": "residency_density_and_color_correction_retained_visual_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "project-owned V17 PVE growth graph and seed",
+      "3626 live-foliage transforms",
+      "V20 deterministic 18-23 cm measured spray tiles and material defaults",
+      "24.68 m open-grown tree envelope",
+      "exact closeup, 60 m source, and 60 m multi-view HLOD cameras"
+    ],
+    "v20_1_changed": [
+      "classify BotanicalSpray textures as native leaf textures so full-resolution mips remain resident and 0.42 alpha coverage survives repeated runs",
+      "layer three measured sprays on each main branchlet and two on each lateral branchlet",
+      "replace rejected raw-albedo world-normal relighting with inverse-opacity source-lit color and bounded RGB gain [1.10, 1.38, 0.90]"
+    ],
+    "reports": {
+      "v20_botanical_flattened_spray": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_pve_open_grown_conical_botanical_flattened_spray_hierarchy_report.json",
+      "v20_1_dense_botanical_flattened_spray": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_1_pve_open_grown_conical_dense_botanical_flattened_spray_hierarchy_report.json"
+    }
+  },
+  "structural_evidence": {
+    "v20_botanical_flattened_spray": {
+      "palette_mode": "botanical_flattened_spray_hierarchy",
+      "botanical_spray_layering": {
+        "main_layers": 1,
+        "lateral_layers": 1,
+        "measured_source_tiles_changed": false
+      },
+      "hlod_shading": "masked unlit baked FinalColorLDR",
+      "foliage_instance_count": 3626,
+      "impostor_source_triangle_count": 945387,
+      "impostor_source_nanite_enabled": false,
+      "atlas_coverage_fraction_range": [
+        0.150623322,
+        0.162281036
+      ]
+    },
+    "v20_1_dense_botanical_flattened_spray": {
+      "palette_mode": "dense_botanical_flattened_spray_hierarchy",
+      "botanical_spray_layering": {
+        "main_layers": 3,
+        "lateral_layers": 2,
+        "measured_source_tiles_changed": false
+      },
+      "hlod_shading": "masked unlit source-lit color bake with inverse-opacity silhouette and bounded color gain; raw-albedo world-normal relighting rejected",
+      "foliage_instance_count": 3626,
+      "impostor_source_triangle_count": 1322491,
+      "impostor_source_nanite_enabled": false,
+      "atlas_coverage_fraction_range": [
+        0.161083221,
+        0.172920227
+      ]
+    }
+  },
+  "capture_comparisons": {
+    "exact_60m_source": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy/open_grown_conical_river_distance_60m.png",
+        "sha256": "862f8ebdbd953bfe574af71a853bf1ca8c131c1e9f0cf89e1d3debfdbae3dac2",
+        "dark_chromatic_foreground_pixels": 32617,
+        "foreground_mean_rgb": [
+          49.21031977189809,
+          61.659042830425854,
+          64.46230493301039
+        ],
+        "foreground_median_rgb": [
+          54.0,
+          58.0,
+          45.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseBotanicalFlattenedSprayHierarchy/open_grown_conical_river_distance_60m.png",
+        "sha256": "3dd0d6dfcd450e60cbd25cc98595c20653585318301017bf88d2fde4791d199f",
+        "dark_chromatic_foreground_pixels": 37675,
+        "foreground_mean_rgb": [
+          45.49215660252157,
+          58.00878566688786,
+          59.18970139349701
+        ],
+        "foreground_median_rgb": [
+          43.0,
+          50.0,
+          38.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.03306749131944445,
+      "mean_absolute_channel_delta": 1.5407183159722222,
+      "dark_chromatic_foreground_intersection_over_union": 0.8071781160016455
+    },
+    "branch_spray_closeup": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "c72badb65699798fad51ebcebd9e4026f3bc3aac207889c8301c59ba34800c87",
+        "dark_chromatic_foreground_pixels": 22153,
+        "foreground_mean_rgb": [
+          62.232203313320994,
+          54.73479889856904,
+          41.444183632013726
+        ],
+        "foreground_median_rgb": [
+          72.0,
+          58.0,
+          42.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseBotanicalFlattenedSprayHierarchy/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "db552f383eac5caac2e0249d85dcda587a11b456be039dc7a948deeb4423a232",
+        "dark_chromatic_foreground_pixels": 36585,
+        "foreground_mean_rgb": [
+          49.6376930435971,
+          52.12084187508542,
+          36.96143228098948
+        ],
+        "foreground_median_rgb": [
+          43.0,
+          53.0,
+          38.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.031725260416666665,
+      "mean_absolute_channel_delta": 2.7596361400462963,
+      "dark_chromatic_foreground_intersection_over_union": 0.594971081000353
+    },
+    "exact_60m_hlod": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressBotanicalFlattenedSprayHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "c7cefedb24d488733851f43a6113c506dd19318a76d6488dda94c5656a7442b1",
+        "dark_chromatic_foreground_pixels": 66589,
+        "foreground_mean_rgb": [
+          26.31620838276592,
+          34.19522743996756,
+          39.66695700491072
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          22.0,
+          22.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseBotanicalFlattenedSprayHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "62a0c649d3b101c19b4af91b9cddb5bb0df2221096363e830a50133b327eb975",
+        "dark_chromatic_foreground_pixels": 72090,
+        "foreground_mean_rgb": [
+          28.183298654459705,
+          37.71055624913303,
+          39.87615480649188
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          22.0,
+          22.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.031651475694444445,
+      "mean_absolute_channel_delta": 1.365347583912037,
+      "dark_chromatic_foreground_intersection_over_union": 0.8942372047916297
+    }
+  },
+  "derived_findings": {
+    "closeup_foreground_increase_fraction": 0.6514693269534599,
+    "exact_60m_source_foreground_increase_fraction": 0.15507250820124474,
+    "v20_1_hlod_to_source_foreground_ratio": 1.9134704711347048
+  },
+  "human_review": {
+    "accepted": [
+      "The corrected BotanicalSpray import contract keeps the full-resolution measured scales visible across fresh and repeated editor runs instead of depending on a newly imported resident mip.",
+      "Three main and two lateral spray layers make the closeup materially denser without changing the measured tiles or reintroducing broad leaves and whole-spray photographs.",
+      "The bounded source-lit HLOD correction removes the failed raw-relit blue-black response and preserves the complete trunk and crown silhouette."
+    ],
+    "rejected": [
+      "V20.1 remains visibly procedural and branch-heavy in closeup; exposed stems and repeated planar fan rhythms still dominate the fine scale foliage.",
+      "The 60 m source improves but remains skeletal compared with V18.2's distance silhouette.",
+      "The HLOD dark-foreground footprint remains about twice the exact-source footprint and is still materially darker, so it cannot define a 20/28/36 m handoff.",
+      "Only the open-grown form has been evaluated; temporal wind, ecology, packaged desktop, target-VR, and native-species art review remain open."
+    ],
+    "decision": "Retain the BotanicalSpray residency/alpha fix, measured-spray layering, and source-lit HLOD color-correction mechanism. Reject V20.1 for visual, corridor, all-form, and production promotion. The next source pass must increase true flattened branchlet mass and reduce repeated exposed wood before separately calibrating HLOD coverage and luminance at 20/28/36 m."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false
+}
