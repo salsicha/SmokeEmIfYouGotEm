@@ -1,0 +1,1288 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v21",
+  "generated_on": "2026-07-14",
+  "status": "v21_compound_branchlet_atlas_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "derivation": "deterministic project-owned composition of six independently generated V20 measured botanical sprays per branchlet tile",
+    "source_texture_manifest": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/futaleufu_cordillera_cypress_v20_texture_manifest.json",
+    "external_photo_pixels_vendored": false,
+    "external_reference_pixels_derived": false,
+    "external_geometry_copied": false,
+    "morphology_sources": [
+      {
+        "authority": "Sistema de Informacion de Biodiversidad, Administracion de Parques Nacionales, Argentina",
+        "url": "https://sib.gob.ar/especies/austrocedrus-chilensis",
+        "accessed_on": "2026-07-14",
+        "facts_used": [
+          "branchlets flattened in one plane",
+          "leaves opposite, scale-like, imbricate, and dimorphic",
+          "lateral leaves keeled with two whitish stomatal bands, 2-5 mm long",
+          "facial leaves triangular, 0.5-2 mm long"
+        ],
+        "pixels_or_geometry_copied": false
+      },
+      {
+        "authority": "The Gymnosperm Database",
+        "url": "https://www.conifers.org/cu/Austrocedrus.php",
+        "accessed_on": "2026-07-14",
+        "facts_used": [
+          "shoots dense and flat",
+          "lateral leaves longer than facial leaves and incurved at the apex",
+          "facial leaves blunt with whitish bands on the lower surface"
+        ],
+        "pixels_or_geometry_copied": false
+      }
+    ]
+  },
+  "representation_contract": {
+    "component_sprays_per_tile": 6,
+    "compound_branchlet_length_cm": [
+      36.0,
+      44.0
+    ],
+    "compound_branchlet_width_cm": [
+      27.0,
+      35.0
+    ],
+    "intended_cards_per_authored_twig": 14,
+    "v20_2_cards_per_authored_twig": 27,
+    "intended_card_count_reduction_fraction": 0.48148148148148145,
+    "v20_source_mask_clip_0_42_fraction": 0.06133437156677246,
+    "compound_mask_clip_0_42_fraction": 0.11057043075561523,
+    "compound_per_card_mask_coverage_gain": 1.8027482459038697,
+    "purpose": "consolidate measured foliage mass at branchlet scale before Unreal geometry, avoiding additional per-twig terminal cards"
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v21_assets.py",
+    "generator_sha256": "70cac3e785336181e5c338ce9d2b4961d8c64d22b0e30a5bc8a337b431dcf725",
+    "atlas_grid": [
+      4,
+      4
+    ],
+    "tile_size": 512,
+    "independent_project_owned_branchlet_variants": 16,
+    "tile_records": [
+      {
+        "tile": 0,
+        "seed": 21917,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -3.097726
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -36.492069
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 32.708296
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -24.822036
+          },
+          {
+            "source_tile": 12,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 23.666944
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.48402,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -12.406748
+          }
+        ],
+        "physical_branchlet_length_cm": 37.088326,
+        "physical_branchlet_width_cm": 31.374166,
+        "nonzero_alpha_fraction": 0.18931198120117188,
+        "mask_clip_0_42_fraction": 0.11032867431640625,
+        "opaque_alpha_fraction": 0.0178985595703125,
+        "occupied_pixel_bounds": [
+          98,
+          0,
+          441,
+          489
+        ]
+      },
+      {
+        "tile": 1,
+        "seed": 28068,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 2.145713
+          },
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -34.652518
+          },
+          {
+            "source_tile": 4,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 30.311108
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -28.188934
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 26.551264
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.481942,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 8.566135
+          }
+        ],
+        "physical_branchlet_length_cm": 36.249487,
+        "physical_branchlet_width_cm": 27.146099,
+        "nonzero_alpha_fraction": 0.19408035278320312,
+        "mask_clip_0_42_fraction": 0.11468505859375,
+        "opaque_alpha_fraction": 0.018749237060546875,
+        "occupied_pixel_bounds": [
+          97,
+          0,
+          403,
+          489
+        ]
+      },
+      {
+        "tile": 2,
+        "seed": 34219,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 3.591257
+          },
+          {
+            "source_tile": 3,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -32.318813
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 32.125229
+          },
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -27.774947
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 21.760941
+          },
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.514916,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -8.919204
+          }
+        ],
+        "physical_branchlet_length_cm": 38.038995,
+        "physical_branchlet_width_cm": 32.955334,
+        "nonzero_alpha_fraction": 0.18262481689453125,
+        "mask_clip_0_42_fraction": 0.10507583618164062,
+        "opaque_alpha_fraction": 0.0125885009765625,
+        "occupied_pixel_bounds": [
+          121,
+          0,
+          420,
+          490
+        ]
+      },
+      {
+        "tile": 3,
+        "seed": 40370,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 0,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 2.351978
+          },
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -38.467421
+          },
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 37.553092
+          },
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -23.403967
+          },
+          {
+            "source_tile": 12,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 26.179854
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.491373,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 12.228823
+          }
+        ],
+        "physical_branchlet_length_cm": 42.52989,
+        "physical_branchlet_width_cm": 27.632481,
+        "nonzero_alpha_fraction": 0.18704605102539062,
+        "mask_clip_0_42_fraction": 0.10720062255859375,
+        "opaque_alpha_fraction": 0.015224456787109375,
+        "occupied_pixel_bounds": [
+          82,
+          0,
+          435,
+          489
+        ]
+      },
+      {
+        "tile": 4,
+        "seed": 46521,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 0.790239
+          },
+          {
+            "source_tile": 11,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -33.743272
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 33.029408
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -28.578425
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 25.979342
+          },
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.506459,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -11.200846
+          }
+        ],
+        "physical_branchlet_length_cm": 42.031864,
+        "physical_branchlet_width_cm": 32.752562,
+        "nonzero_alpha_fraction": 0.18391799926757812,
+        "mask_clip_0_42_fraction": 0.10618972778320312,
+        "opaque_alpha_fraction": 0.0068511962890625,
+        "occupied_pixel_bounds": [
+          110,
+          0,
+          429,
+          489
+        ]
+      },
+      {
+        "tile": 5,
+        "seed": 52672,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -0.672806
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -38.804165
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 31.230848
+          },
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -27.929599
+          },
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 24.883129
+          },
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.513946,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 7.860198
+          }
+        ],
+        "physical_branchlet_length_cm": 39.934078,
+        "physical_branchlet_width_cm": 33.587979,
+        "nonzero_alpha_fraction": 0.197540283203125,
+        "mask_clip_0_42_fraction": 0.11455917358398438,
+        "opaque_alpha_fraction": 0.00977325439453125,
+        "occupied_pixel_bounds": [
+          124,
+          0,
+          442,
+          488
+        ]
+      },
+      {
+        "tile": 6,
+        "seed": 58823,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 1.687855
+          },
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -36.178742
+          },
+          {
+            "source_tile": 12,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 31.586236
+          },
+          {
+            "source_tile": 3,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -26.369958
+          },
+          {
+            "source_tile": 12,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 25.336589
+          },
+          {
+            "source_tile": 3,
+            "root_fraction": [
+              0.481673,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 6.559742
+          }
+        ],
+        "physical_branchlet_length_cm": 38.126199,
+        "physical_branchlet_width_cm": 31.119551,
+        "nonzero_alpha_fraction": 0.18627548217773438,
+        "mask_clip_0_42_fraction": 0.11297225952148438,
+        "opaque_alpha_fraction": 0.01293182373046875,
+        "occupied_pixel_bounds": [
+          131,
+          0,
+          427,
+          489
+        ]
+      },
+      {
+        "tile": 7,
+        "seed": 64974,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 4,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 3.923625
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -35.430463
+          },
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 33.698755
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -24.12593
+          },
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 21.520169
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.4836,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 4.778464
+          }
+        ],
+        "physical_branchlet_length_cm": 37.798948,
+        "physical_branchlet_width_cm": 31.383197,
+        "nonzero_alpha_fraction": 0.187347412109375,
+        "mask_clip_0_42_fraction": 0.1092681884765625,
+        "opaque_alpha_fraction": 0.017986297607421875,
+        "occupied_pixel_bounds": [
+          119,
+          0,
+          405,
+          488
+        ]
+      },
+      {
+        "tile": 8,
+        "seed": 71125,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -2.977942
+          },
+          {
+            "source_tile": 0,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -33.19757
+          },
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 34.729679
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -26.655235
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 21.122472
+          },
+          {
+            "source_tile": 12,
+            "root_fraction": [
+              0.48949,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 0.05848
+          }
+        ],
+        "physical_branchlet_length_cm": 43.177161,
+        "physical_branchlet_width_cm": 29.415935,
+        "nonzero_alpha_fraction": 0.19745254516601562,
+        "mask_clip_0_42_fraction": 0.1148681640625,
+        "opaque_alpha_fraction": 0.0167694091796875,
+        "occupied_pixel_bounds": [
+          86,
+          0,
+          440,
+          488
+        ]
+      },
+      {
+        "tile": 9,
+        "seed": 77276,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 3.539026
+          },
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -32.715598
+          },
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 32.5592
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -28.252028
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 23.879698
+          },
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.47793,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 12.881725
+          }
+        ],
+        "physical_branchlet_length_cm": 38.178387,
+        "physical_branchlet_width_cm": 31.013777,
+        "nonzero_alpha_fraction": 0.19321441650390625,
+        "mask_clip_0_42_fraction": 0.1156005859375,
+        "opaque_alpha_fraction": 0.011993408203125,
+        "occupied_pixel_bounds": [
+          97,
+          0,
+          395,
+          489
+        ]
+      },
+      {
+        "tile": 10,
+        "seed": 83427,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 3,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -2.719503
+          },
+          {
+            "source_tile": 9,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -34.516229
+          },
+          {
+            "source_tile": 0,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 31.485959
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -28.277342
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 26.874816
+          },
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.489412,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -12.121653
+          }
+        ],
+        "physical_branchlet_length_cm": 39.964237,
+        "physical_branchlet_width_cm": 34.909076,
+        "nonzero_alpha_fraction": 0.17046737670898438,
+        "mask_clip_0_42_fraction": 0.10027694702148438,
+        "opaque_alpha_fraction": 0.01412200927734375,
+        "occupied_pixel_bounds": [
+          119,
+          1,
+          423,
+          489
+        ]
+      },
+      {
+        "tile": 11,
+        "seed": 89578,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 0.797495
+          },
+          {
+            "source_tile": 0,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -32.159354
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 31.959765
+          },
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -25.409983
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 23.044186
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.466304,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 14.150359
+          }
+        ],
+        "physical_branchlet_length_cm": 38.511028,
+        "physical_branchlet_width_cm": 33.758275,
+        "nonzero_alpha_fraction": 0.18225479125976562,
+        "mask_clip_0_42_fraction": 0.105743408203125,
+        "opaque_alpha_fraction": 0.015850067138671875,
+        "occupied_pixel_bounds": [
+          104,
+          3,
+          437,
+          490
+        ]
+      },
+      {
+        "tile": 12,
+        "seed": 95729,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 2.979521
+          },
+          {
+            "source_tile": 5,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -31.897606
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 32.243598
+          },
+          {
+            "source_tile": 2,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -23.254063
+          },
+          {
+            "source_tile": 10,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 21.175252
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.508421,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": 13.950515
+          }
+        ],
+        "physical_branchlet_length_cm": 39.183138,
+        "physical_branchlet_width_cm": 28.978156,
+        "nonzero_alpha_fraction": 0.18952178955078125,
+        "mask_clip_0_42_fraction": 0.11568832397460938,
+        "opaque_alpha_fraction": 0.011379241943359375,
+        "occupied_pixel_bounds": [
+          105,
+          0,
+          407,
+          489
+        ]
+      },
+      {
+        "tile": 13,
+        "seed": 101880,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -2.61187
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -32.544336
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 32.319874
+          },
+          {
+            "source_tile": 8,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -24.482482
+          },
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 26.00924
+          },
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.49163,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -8.0918
+          }
+        ],
+        "physical_branchlet_length_cm": 38.496963,
+        "physical_branchlet_width_cm": 28.111232,
+        "nonzero_alpha_fraction": 0.1932525634765625,
+        "mask_clip_0_42_fraction": 0.11194229125976562,
+        "opaque_alpha_fraction": 0.01473236083984375,
+        "occupied_pixel_bounds": [
+          100,
+          0,
+          427,
+          489
+        ]
+      },
+      {
+        "tile": 14,
+        "seed": 108031,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 7,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": 2.89199
+          },
+          {
+            "source_tile": 14,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -35.702791
+          },
+          {
+            "source_tile": 6,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 31.672532
+          },
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -22.060892
+          },
+          {
+            "source_tile": 4,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 22.580966
+          },
+          {
+            "source_tile": 9,
+            "root_fraction": [
+              0.507085,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -0.699045
+          }
+        ],
+        "physical_branchlet_length_cm": 39.58637,
+        "physical_branchlet_width_cm": 30.660867,
+        "nonzero_alpha_fraction": 0.19530487060546875,
+        "mask_clip_0_42_fraction": 0.11271286010742188,
+        "opaque_alpha_fraction": 0.011951446533203125,
+        "occupied_pixel_bounds": [
+          96,
+          0,
+          439,
+          490
+        ]
+      },
+      {
+        "tile": 15,
+        "seed": 114182,
+        "component_spray_count": 6,
+        "placements": [
+          {
+            "source_tile": 13,
+            "root_fraction": [
+              0.5,
+              0.95
+            ],
+            "work_scale": 1.58,
+            "rotation_degrees": -1.55928
+          },
+          {
+            "source_tile": 4,
+            "root_fraction": [
+              0.47,
+              0.73
+            ],
+            "work_scale": 1.22,
+            "rotation_degrees": -33.643576
+          },
+          {
+            "source_tile": 11,
+            "root_fraction": [
+              0.54,
+              0.66
+            ],
+            "work_scale": 1.18,
+            "rotation_degrees": 34.524248
+          },
+          {
+            "source_tile": 1,
+            "root_fraction": [
+              0.45,
+              0.56
+            ],
+            "work_scale": 1.02,
+            "rotation_degrees": -27.122841
+          },
+          {
+            "source_tile": 9,
+            "root_fraction": [
+              0.55,
+              0.49
+            ],
+            "work_scale": 0.98,
+            "rotation_degrees": 28.314204
+          },
+          {
+            "source_tile": 15,
+            "root_fraction": [
+              0.505594,
+              0.38
+            ],
+            "work_scale": 0.88,
+            "rotation_degrees": -7.465449
+          }
+        ],
+        "physical_branchlet_length_cm": 38.769135,
+        "physical_branchlet_width_cm": 28.632334,
+        "nonzero_alpha_fraction": 0.19124603271484375,
+        "mask_clip_0_42_fraction": 0.1120147705078125,
+        "opaque_alpha_fraction": 0.01727294921875,
+        "occupied_pixel_bounds": [
+          113,
+          0,
+          405,
+          489
+        ]
+      }
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "486c8dc0ac83eac531e2422c4e0c57ae01d2de701b6a2c67c18680b85bf7ad2a",
+      "nontransparent_rgb_sha256": "c3ca3ca9860ee50e0b5aa2ac06dc05bb8eeda41ff0b20388ae018a23fa63a9ca",
+      "padded_transparent_pixel_count": 1236589,
+      "transparent_nonzero_rgb_pixel_count": 1171660
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 791900,
+    "nonzero_fraction": 0.18880367279052734,
+    "mask_clip_0_42_pixel_count": 463766,
+    "mask_clip_0_42_fraction": 0.11057043075561523,
+    "opaque_pixel_count": 59264,
+    "opaque_fraction": 0.014129638671875,
+    "transparent_corners": true
+  },
+  "maps": {
+    "compound_branchlet_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_compound_branchlet_v21_albedo_opacity.png",
+      "sha256": "9513480ed5f248c4bf08f6377b7ee55a6901be1ad2ef8b854af894e17d6a763b",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v21_isolated_review_candidate_not_production_promoted"
+    },
+    "compound_branchlet_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_compound_branchlet_v21_normal.png",
+      "sha256": "f86c922d81c958ff0ce4f3a988684e2294bd950405cf847ecfd3d40f11cf1356",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v21_isolated_review_candidate_not_production_promoted"
+    },
+    "compound_branchlet_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_compound_branchlet_v21_ao_roughness_subsurface.png",
+      "sha256": "d4fda881377477538748979b147d18bf66433cd71e764ed60b4f9150dac7da45",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v21_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "unreal_contract": {
+    "texture_key_prefix": "CompoundBranchlet",
+    "palette_mode": "compound_branchlet_atlas",
+    "required_before_eligibility": [
+      "fresh-material first-run shader gate",
+      "closeup and exact 60 m comparison against V20.2",
+      "merged raster triangle count no greater than V20.2",
+      "multi-view HLOD source ratio remains bounded",
+      "masked overdraw and packaged desktop/target-VR cost pass"
+    ]
+  }
+}
