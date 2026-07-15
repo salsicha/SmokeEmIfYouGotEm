@@ -686,6 +686,64 @@
     "regenerate_other_forms_allowed": false,
     "corridor_substitution_allowed": false
   },
+  "v30_frozen_wpo_registered_perspective_test": {
+    "engine_version": "5.8",
+    "status": "authored_distance_perspective_retained_no_pop_gate_still_open",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V29 source geometry, generated foliage transforms, zero-wind material, and deterministic unlit validation renderer",
+      "V29 512-pixel tiles, 2048-pixel atlas, 16-degree azimuth registration, elevation rows, and output channels",
+      "V25 atlas gain [2.60, 1.63, 1.60] and hard 2500 centimeter authority"
+    ],
+    "only_changed_contract": {
+      "capture_projection_before": "orthographic",
+      "capture_projection_after": "perspective",
+      "authored_28m_radial_capture_distance_cm": 2912.043945,
+      "proxy_plane_width_cm": 2751.172607,
+      "derived_perspective_horizontal_fov_degrees": 50.570065
+    },
+    "repeatability_result": {
+      "foliage_template_exact": true,
+      "source_changed_pixel_fractions_at_20_28_36m": [0.011602647569444444, 0.008483072916666667, 0.006182725694444445],
+      "hlod_changed_pixel_fractions_at_20_28_36m": [0.01497829861111111, 0.010845269097222223, 0.008237847222222223],
+      "atlas_channel_changed_pixel_fraction_range": [0.0015039443969726562, 0.015571117401123047],
+      "repeatability_gate_passed": true
+    },
+    "isolation_result": {
+      "source_geometry_unchanged": true,
+      "validation_contracts_match": true,
+      "source_control_changed_pixel_fractions_at_20_28_36m": [0.010167100694444445, 0.007969835069444445, 0.00591796875],
+      "projection_isolation_valid": true
+    },
+    "bounded_improvement": {
+      "v29_source_hlod_changed_pixel_fractions_at_20_28_36m": [0.4153645833333333, 0.2940939670138889, 0.21542100694444444],
+      "v30_source_hlod_changed_pixel_fractions_at_20_28_36m": [0.4103656684027778, 0.28400499131944446, 0.209765625],
+      "v30_minus_v29_foreground_iou_at_20_28_36m": [0.0020516820127933766, 0.006970835104339934, 0.005902192690758312],
+      "perspective_improves_active_hlod_handoffs": true,
+      "source_authority_distance_bounded": true,
+      "v30_no_pop_gate_passed": false,
+      "hard_authority_gate_passed": true
+    },
+    "execution_boundary": {
+      "first_execution_completed_before_shutdown_linger": true,
+      "exact_rerun_completed_cleanly": true
+    },
+    "accepted_outcomes": [
+      "the authored-distance perspective bake improves both no-pop metrics at all three exact handoff cameras",
+      "the registered perspective mechanism remains available for the next depth-aware representation diagnostic"
+    ],
+    "rejected_outcomes": [
+      "V30 remains far outside the no-pop gate and is not a complete handoff solution",
+      "the validation-only captures are not photoreal art evidence"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v30_pve_open_grown_conical_frozen_wpo_azimuth_registered_perspective_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
+    "projection_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v30_perspective_projection_review.json",
+    "v29_azimuth_registration_retained": true,
+    "perspective_capture_retained": true,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -711,5 +769,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker, V27 supplies the frozen-WPO 512 validation control, V28 proves that 1024 pixels per view does not improve the handoff, and V29 retains the 16-degree authored-handoff azimuth registration mechanism without passing no-pop. Keep the registered 512 diagnostic and next isolate perspective projection or depth-aware representation shape, then evaluate a bounded complementary dither transition before returning to the lit exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker, V27 supplies the frozen-WPO 512 validation control, V28 proves that 1024 pixels per view does not improve the handoff, V29 retains the 16-degree authored-handoff azimuth registration mechanism, and V30 retains authored-distance perspective capture without passing no-pop. Keep the registered perspective 512 diagnostic and next isolate depth-aware representation shape, then evaluate a bounded complementary dither transition before returning to the lit exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }

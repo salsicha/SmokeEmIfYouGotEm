@@ -1,0 +1,1141 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_projection_review.v30",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v30_registered_authored_distance_perspective_test",
+  "status": "authored_distance_perspective_retained_no_pop_gate_still_open",
+  "comparison_contract": {
+    "fixed": [
+      "V24 source geometry and generated foliage transforms",
+      "V25 atlas gain and hard 2500 centimeter authority",
+      "V27 frozen-WPO 512-pixel deterministic validation profile",
+      "V29 16-degree azimuth registration, view count, elevation rows, and output channels"
+    ],
+    "only_intended_change": "orthographic capture to perspective capture at the authored 28 m radial camera distance",
+    "art_review_allowed": false
+  },
+  "source_geometry_unchanged": true,
+  "validation_contracts_match": true,
+  "projection_isolation_valid": true,
+  "projection_contracts": {
+    "v29": {
+      "type": "orthographic",
+      "proxy_plane_width_cm": 2751.172607
+    },
+    "v30": {
+      "type": "perspective",
+      "capture_radius_cm": 2912.043945,
+      "perspective_horizontal_fov_degrees": 50.570065,
+      "proxy_plane_width_cm": 2751.172607
+    }
+  },
+  "repeatability_evidence": {
+    "run_a_snapshot_not_committed": true,
+    "regeneration_instruction": "Run the V30 command twice, preserve the first namespace, and pass it as --run-a-root.",
+    "foliage_template_sha256": {
+      "run_a": "f3c472754a52c776e9e70e576a3cf1157b1aa7d181b65568c7f30f9753020b25",
+      "run_b": "f3c472754a52c776e9e70e576a3cf1157b1aa7d181b65568c7f30f9753020b25"
+    },
+    "foliage_template_exact": true,
+    "handoffs": {
+      "20m": {
+        "source_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_20m_source_only.png",
+            "sha256": "ff99bb9512c5803af8c0dfdff2423825a9972928bd63499b8d06f0b108176c83",
+            "dark_chromatic_foreground_pixels": 664659,
+            "foreground_mean_rgb": [
+              27.32642753652625,
+              39.25090760826228,
+              21.605727147304105
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_20m_source_only.png",
+            "sha256": "003a523cfc3207ec2fb9a8b14f562c68861f133abe7a51a19fef89b804a00a18",
+            "dark_chromatic_foreground_pixels": 665062,
+            "foreground_mean_rgb": [
+              27.33331178145797,
+              39.31681858232766,
+              21.62685133115409
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.011602647569444444,
+          "mean_absolute_channel_delta": 0.4930472366898148,
+          "dark_chromatic_foreground_intersection_over_union": 0.9875713358982867
+        },
+        "hlod_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_20m_hlod_only.png",
+            "sha256": "f2fb8055239eb898177b5590a581bdd2cafcdac5b65eae3678ba81b53b354866",
+            "dark_chromatic_foreground_pixels": 519821,
+            "foreground_mean_rgb": [
+              21.7880385748171,
+              24.87791759086301,
+              12.736178415262177
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_20m_hlod_only.png",
+            "sha256": "8438671e47c32bc737e7fd8e53cc39bffe5099f5ac2e632fd24e7383cab44f33",
+            "dark_chromatic_foreground_pixels": 519723,
+            "foreground_mean_rgb": [
+              21.746270609536232,
+              24.836718790586524,
+              12.714097702045128
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.01497829861111111,
+          "mean_absolute_channel_delta": 0.6169411892361111,
+          "dark_chromatic_foreground_intersection_over_union": 0.9825156954435537
+        },
+        "combined_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_20m_combined.png",
+            "sha256": "986e1e01ae2928d1b574e7cd882a8464797d1d922bbd82c9b2f37e72c6acd8d6",
+            "dark_chromatic_foreground_pixels": 664655,
+            "foreground_mean_rgb": [
+              27.325961589095094,
+              39.25034341124343,
+              21.605305007861222
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_20m_combined.png",
+            "sha256": "b92ab6534c18383a7d1690fb628af20549abf3c5d776010e01a61e00e27c971d",
+            "dark_chromatic_foreground_pixels": 665067,
+            "foreground_mean_rgb": [
+              27.334040029049707,
+              39.31708534628842,
+              21.627324765775477
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.011597222222222222,
+          "mean_absolute_channel_delta": 0.493041087962963,
+          "dark_chromatic_foreground_intersection_over_union": 0.987552034677329
+        }
+      },
+      "28m": {
+        "source_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_28m_source_only.png",
+            "sha256": "23c82f5bd766dc4bf46938851453bcbb11da9ea0a1eb67b7616b966d496f0963",
+            "dark_chromatic_foreground_pixels": 666997,
+            "foreground_mean_rgb": [
+              19.588223035485917,
+              28.05896878096903,
+              15.276476505891331
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_28m_source_only.png",
+            "sha256": "91b2d1a757a4f8c7b4f807b5b04889aff6a1be5f2bc9327f2e66a178ba5f7509",
+            "dark_chromatic_foreground_pixels": 667206,
+            "foreground_mean_rgb": [
+              19.59990018075377,
+              28.09780337706795,
+              15.2906718464762
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.008483072916666667,
+          "mean_absolute_channel_delta": 0.399525462962963,
+          "dark_chromatic_foreground_intersection_over_union": 0.9905485707976946
+        },
+        "hlod_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_28m_hlod_only.png",
+            "sha256": "04a9497738bf08b3b59067cd378a7c076149d1c4e4c5dd2744954846910c467d",
+            "dark_chromatic_foreground_pixels": 558138,
+            "foreground_mean_rgb": [
+              14.207049152718504,
+              16.23438826956774,
+              8.311978399607266
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_28m_hlod_only.png",
+            "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+            "dark_chromatic_foreground_pixels": 557772,
+            "foreground_mean_rgb": [
+              14.167907316968224,
+              16.193666946350838,
+              8.29108130203739
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.010845269097222223,
+          "mean_absolute_channel_delta": 0.4588274016203704,
+          "dark_chromatic_foreground_intersection_over_union": 0.9883327483077318
+        },
+        "combined_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_28m_combined.png",
+            "sha256": "04a9497738bf08b3b59067cd378a7c076149d1c4e4c5dd2744954846910c467d",
+            "dark_chromatic_foreground_pixels": 558138,
+            "foreground_mean_rgb": [
+              14.207049152718504,
+              16.23438826956774,
+              8.311978399607266
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_28m_combined.png",
+            "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+            "dark_chromatic_foreground_pixels": 557772,
+            "foreground_mean_rgb": [
+              14.167907316968224,
+              16.193666946350838,
+              8.29108130203739
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.010845269097222223,
+          "mean_absolute_channel_delta": 0.4588274016203704,
+          "dark_chromatic_foreground_intersection_over_union": 0.9883327483077318
+        }
+      },
+      "36m": {
+        "source_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_36m_source_only.png",
+            "sha256": "ba03e9ab88891195d2d660dc1450f1f2622424a0e269ac5ec72e3af51df2e804",
+            "dark_chromatic_foreground_pixels": 655493,
+            "foreground_mean_rgb": [
+              14.39001484378933,
+              20.53101558674158,
+              11.051819012560012
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_36m_source_only.png",
+            "sha256": "d06a3b30e1584a1e49a9920aca1bd0677787bad13ad31465fa2c7ac3b014f66d",
+            "dark_chromatic_foreground_pixels": 655832,
+            "foreground_mean_rgb": [
+              14.429742678002903,
+              20.580096732089924,
+              11.080853023335244
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.006182725694444445,
+          "mean_absolute_channel_delta": 0.3081955295138889,
+          "dark_chromatic_foreground_intersection_over_union": 0.9929829734137219
+        },
+        "hlod_only_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_36m_hlod_only.png",
+            "sha256": "239155245ef33e558e1c25a3c2d470d0b49206cc6814e2596fd40f3009faa87c",
+            "dark_chromatic_foreground_pixels": 578411,
+            "foreground_mean_rgb": [
+              9.990097007145438,
+              11.413959969640965,
+              5.845597680542037
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_36m_hlod_only.png",
+            "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+            "dark_chromatic_foreground_pixels": 578169,
+            "foreground_mean_rgb": [
+              9.961618488711778,
+              11.37887538072778,
+              5.830127523267419
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.008237847222222223,
+          "mean_absolute_channel_delta": 0.34356372974537036,
+          "dark_chromatic_foreground_intersection_over_union": 0.9918814701531223
+        },
+        "combined_run_a_to_run_b": {
+          "before": {
+            "path": "run_a_snapshot/open_grown_conical_handoff_36m_combined.png",
+            "sha256": "239155245ef33e558e1c25a3c2d470d0b49206cc6814e2596fd40f3009faa87c",
+            "dark_chromatic_foreground_pixels": 578411,
+            "foreground_mean_rgb": [
+              9.990097007145438,
+              11.413959969640965,
+              5.845597680542037
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "after": {
+            "path": "run_b_regenerated/open_grown_conical_handoff_36m_combined.png",
+            "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+            "dark_chromatic_foreground_pixels": 578169,
+            "foreground_mean_rgb": [
+              9.961618488711778,
+              11.37887538072778,
+              5.830127523267419
+            ],
+            "foreground_median_rgb": [
+              0.0,
+              0.0,
+              0.0
+            ]
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.008237847222222223,
+          "mean_absolute_channel_delta": 0.34356372974537036,
+          "dark_chromatic_foreground_intersection_over_union": 0.9918814701531223
+        }
+      }
+    },
+    "atlas_channels": {
+      "base_color_opacity": {
+        "before": {
+          "path": "run_a_snapshot/open_grown_conical_multiview_atlas_base_color_opacity.png",
+          "sha256": "9dc4db0a4e697f7f81653eae0c6640f39555b9b1b9bbb4914b2f20f244b42998",
+          "dark_chromatic_foreground_pixels": 3930411,
+          "foreground_mean_rgb": [
+            25.936876830438344,
+            35.34913269884498,
+            18.856583446362226
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "run_b_regenerated/open_grown_conical_multiview_atlas_base_color_opacity.png",
+          "sha256": "bd5722d867fe55792c32e20df08efe1e776c94f44bed3f9e6ae6fafa74b973e7",
+          "dark_chromatic_foreground_pixels": 3932101,
+          "foreground_mean_rgb": [
+            25.968985791565373,
+            35.370442671742154,
+            18.8751524948113
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.006661653518676758,
+        "mean_absolute_channel_delta": 0.20590337117513022,
+        "dark_chromatic_foreground_intersection_over_union": 0.9933090832389392
+      },
+      "world_normal": {
+        "before": {
+          "path": "run_a_snapshot/open_grown_conical_multiview_atlas_world_normal.png",
+          "sha256": "c3fbe5973f98a393f8ece2301bc86cff106f86ea77e16c9226b32ad8d257e47b",
+          "dark_chromatic_foreground_pixels": 4122509,
+          "foreground_mean_rgb": [
+            22.316837391986287,
+            22.68339911447131,
+            25.54194472346816
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "run_b_regenerated/open_grown_conical_multiview_atlas_world_normal.png",
+          "sha256": "b086aa36d154dde3f5159d8bc14c059a48cda310f0647a16c312cf683830a3c4",
+          "dark_chromatic_foreground_pixels": 4122330,
+          "foreground_mean_rgb": [
+            22.3712126394539,
+            22.644740231859167,
+            25.53882197689171
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.015571117401123047,
+        "mean_absolute_channel_delta": 0.586246649424235,
+        "dark_chromatic_foreground_intersection_over_union": 0.9992921712785462
+      },
+      "opacity": {
+        "before": {
+          "path": "run_a_snapshot/open_grown_conical_multiview_atlas_opacity.png",
+          "sha256": "c5b546c42733635a24edd858affce108e388f9d2896f6000b266e76f4a579844",
+          "dark_chromatic_foreground_pixels": 3531156,
+          "foreground_mean_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "run_b_regenerated/open_grown_conical_multiview_atlas_opacity.png",
+          "sha256": "d81af24575a89599e489cca7615b41927a93f14551da9fd0d230b72285a797e8",
+          "dark_chromatic_foreground_pixels": 3530834,
+          "foreground_mean_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0015039443969726562,
+        "mean_absolute_channel_delta": 0.38350582122802734,
+        "dark_chromatic_foreground_intersection_over_union": 0.9982151290169147
+      },
+      "depth": {
+        "before": {
+          "path": "run_a_snapshot/open_grown_conical_multiview_atlas_depth.png",
+          "sha256": "e79b97a14debde7266c5c941ab10f24236faefd0f1b513c8b7f2f5c31e0d7fe3",
+          "dark_chromatic_foreground_pixels": 2706722,
+          "foreground_mean_rgb": [
+            0.38869599463853327,
+            0.38869599463853327,
+            0.38869599463853327
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "run_b_regenerated/open_grown_conical_multiview_atlas_depth.png",
+          "sha256": "b3d23c0d9ff25ebc6303978d1037e2548aa5ddc70be80590d516a36286a2d862",
+          "dark_chromatic_foreground_pixels": 2706518,
+          "foreground_mean_rgb": [
+            0.3886828020356783,
+            0.3886828020356783,
+            0.3886828020356783
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.00203704833984375,
+        "mean_absolute_channel_delta": 0.17266011238098145,
+        "dark_chromatic_foreground_intersection_over_union": 0.9993078631400927
+      }
+    },
+    "derived_findings": {
+      "source_changed_pixel_fractions_at_20_28_36m": [
+        0.011602647569444444,
+        0.008483072916666667,
+        0.006182725694444445
+      ],
+      "hlod_changed_pixel_fractions_at_20_28_36m": [
+        0.01497829861111111,
+        0.010845269097222223,
+        0.008237847222222223
+      ],
+      "combined_changed_pixel_fractions_at_20_28_36m": [
+        0.011597222222222222,
+        0.010845269097222223,
+        0.008237847222222223
+      ],
+      "atlas_channel_changed_pixel_fraction_range": [
+        0.0015039443969726562,
+        0.015571117401123047
+      ]
+    },
+    "thresholds": {
+      "maximum_source_changed_pixel_fraction": 0.012,
+      "maximum_hlod_changed_pixel_fraction": 0.015,
+      "maximum_atlas_channel_changed_pixel_fraction": 0.02
+    },
+    "repeatability_gate_passed": true
+  },
+  "distance_comparisons": {
+    "20m": {
+      "expected_authority": "source_only",
+      "v29_to_v30_source_control": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "5bdbd5715c423e0ac68bfa343648246130df258956ce9e0e561597388b89082a",
+          "dark_chromatic_foreground_pixels": 664998,
+          "foreground_mean_rgb": [
+            27.343940884032733,
+            39.32328367904866,
+            21.632161299733234
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "003a523cfc3207ec2fb9a8b14f562c68861f133abe7a51a19fef89b804a00a18",
+          "dark_chromatic_foreground_pixels": 665062,
+          "foreground_mean_rgb": [
+            27.33331178145797,
+            39.31681858232766,
+            21.62685133115409
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.010167100694444445,
+        "mean_absolute_channel_delta": 0.43577184606481484,
+        "dark_chromatic_foreground_intersection_over_union": 0.9891156910220154
+      },
+      "v29_to_v30_hlod_projection_change": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "46cf18d532a23fed875eefedd8aee728f1f6b8e12e1d24259efc26adb403f517",
+          "dark_chromatic_foreground_pixels": 517126,
+          "foreground_mean_rgb": [
+            20.832572719221233,
+            23.844005136079023,
+            12.223050088373046
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "8438671e47c32bc737e7fd8e53cc39bffe5099f5ac2e632fd24e7383cab44f33",
+          "dark_chromatic_foreground_pixels": 519723,
+          "foreground_mean_rgb": [
+            21.746270609536232,
+            24.836718790586524,
+            12.714097702045128
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.28577799479166666,
+        "mean_absolute_channel_delta": 20.55186595775463,
+        "dark_chromatic_foreground_intersection_over_union": 0.7370098975400223
+      },
+      "v29_source_to_hlod": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "5bdbd5715c423e0ac68bfa343648246130df258956ce9e0e561597388b89082a",
+          "dark_chromatic_foreground_pixels": 664998,
+          "foreground_mean_rgb": [
+            27.343940884032733,
+            39.32328367904866,
+            21.632161299733234
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v29_orthographic/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "46cf18d532a23fed875eefedd8aee728f1f6b8e12e1d24259efc26adb403f517",
+          "dark_chromatic_foreground_pixels": 517126,
+          "foreground_mean_rgb": [
+            20.832572719221233,
+            23.844005136079023,
+            12.223050088373046
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.4153645833333333,
+        "mean_absolute_channel_delta": 28.26469654224537,
+        "dark_chromatic_foreground_intersection_over_union": 0.6970568770250929
+      },
+      "v30_source_to_hlod": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "003a523cfc3207ec2fb9a8b14f562c68861f133abe7a51a19fef89b804a00a18",
+          "dark_chromatic_foreground_pixels": 665062,
+          "foreground_mean_rgb": [
+            27.33331178145797,
+            39.31681858232766,
+            21.62685133115409
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "8438671e47c32bc737e7fd8e53cc39bffe5099f5ac2e632fd24e7383cab44f33",
+          "dark_chromatic_foreground_pixels": 519723,
+          "foreground_mean_rgb": [
+            21.746270609536232,
+            24.836718790586524,
+            12.714097702045128
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.4103656684027778,
+        "mean_absolute_channel_delta": 26.91105107060185,
+        "dark_chromatic_foreground_intersection_over_union": 0.6991085590378863
+      },
+      "v30_combined_to_expected": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "003a523cfc3207ec2fb9a8b14f562c68861f133abe7a51a19fef89b804a00a18",
+          "dark_chromatic_foreground_pixels": 665062,
+          "foreground_mean_rgb": [
+            27.33331178145797,
+            39.31681858232766,
+            21.62685133115409
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_20m_combined.png",
+          "sha256": "b92ab6534c18383a7d1690fb628af20549abf3c5d776010e01a61e00e27c971d",
+          "dark_chromatic_foreground_pixels": 665067,
+          "foreground_mean_rgb": [
+            27.334040029049707,
+            39.31708534628842,
+            21.627324765775477
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 4.340277777777778e-06,
+        "mean_absolute_channel_delta": 0.0035344328703703705,
+        "dark_chromatic_foreground_intersection_over_union": 0.9999654174861219
+      },
+      "v30_authority_equivalent": true
+    },
+    "28m": {
+      "expected_authority": "hlod_only",
+      "v29_to_v30_source_control": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "f0d16347bd50932903a0dc2ba59b15a4edb27e17305a952f368c053b8b367584",
+          "dark_chromatic_foreground_pixels": 666901,
+          "foreground_mean_rgb": [
+            19.604202122953783,
+            28.087954583963736,
+            15.289594707460328
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "91b2d1a757a4f8c7b4f807b5b04889aff6a1be5f2bc9327f2e66a178ba5f7509",
+          "dark_chromatic_foreground_pixels": 667206,
+          "foreground_mean_rgb": [
+            19.59990018075377,
+            28.09780337706795,
+            15.2906718464762
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.007969835069444445,
+        "mean_absolute_channel_delta": 0.3645359519675926,
+        "dark_chromatic_foreground_intersection_over_union": 0.9910499483622167
+      },
+      "v29_to_v30_hlod_projection_change": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "fc6fd0120ba49a3214f5d676521b0d4689e36e169b321fd3224eb63b14da830d",
+          "dark_chromatic_foreground_pixels": 555476,
+          "foreground_mean_rgb": [
+            13.621481396135927,
+            15.584601314908294,
+            7.99104371746034
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+          "dark_chromatic_foreground_pixels": 557772,
+          "foreground_mean_rgb": [
+            14.167907316968224,
+            16.193666946350838,
+            8.29108130203739
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.21069661458333333,
+        "mean_absolute_channel_delta": 15.329492549189816,
+        "dark_chromatic_foreground_intersection_over_union": 0.8129657616342696
+      },
+      "v29_source_to_hlod": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "f0d16347bd50932903a0dc2ba59b15a4edb27e17305a952f368c053b8b367584",
+          "dark_chromatic_foreground_pixels": 666901,
+          "foreground_mean_rgb": [
+            19.604202122953783,
+            28.087954583963736,
+            15.289594707460328
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v29_orthographic/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "fc6fd0120ba49a3214f5d676521b0d4689e36e169b321fd3224eb63b14da830d",
+          "dark_chromatic_foreground_pixels": 555476,
+          "foreground_mean_rgb": [
+            13.621481396135927,
+            15.584601314908294,
+            7.99104371746034
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.2940939670138889,
+        "mean_absolute_channel_delta": 19.350697337962963,
+        "dark_chromatic_foreground_intersection_over_union": 0.7796984763665747
+      },
+      "v30_source_to_hlod": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "91b2d1a757a4f8c7b4f807b5b04889aff6a1be5f2bc9327f2e66a178ba5f7509",
+          "dark_chromatic_foreground_pixels": 667206,
+          "foreground_mean_rgb": [
+            19.59990018075377,
+            28.09780337706795,
+            15.2906718464762
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+          "dark_chromatic_foreground_pixels": 557772,
+          "foreground_mean_rgb": [
+            14.167907316968224,
+            16.193666946350838,
+            8.29108130203739
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.28400499131944446,
+        "mean_absolute_channel_delta": 16.968075086805555,
+        "dark_chromatic_foreground_intersection_over_union": 0.7866693114709147
+      },
+      "v30_combined_to_expected": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+          "dark_chromatic_foreground_pixels": 557772,
+          "foreground_mean_rgb": [
+            14.167907316968224,
+            16.193666946350838,
+            8.29108130203739
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_28m_combined.png",
+          "sha256": "1b1d9bb22e7b7cad3666f595fbdea6ac073f038573c8d8a80d8ede483a81f836",
+          "dark_chromatic_foreground_pixels": 557772,
+          "foreground_mean_rgb": [
+            14.167907316968224,
+            16.193666946350838,
+            8.29108130203739
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "v30_authority_equivalent": true
+    },
+    "36m": {
+      "expected_authority": "hlod_only",
+      "v29_to_v30_source_control": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "994c162eb86a32b976f46c902f2d86ccf0afea356e0edc582463f159720df4ad",
+          "dark_chromatic_foreground_pixels": 655605,
+          "foreground_mean_rgb": [
+            14.42093638700132,
+            20.555053728998406,
+            11.070850588387826
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "d06a3b30e1584a1e49a9920aca1bd0677787bad13ad31465fa2c7ac3b014f66d",
+          "dark_chromatic_foreground_pixels": 655832,
+          "foreground_mean_rgb": [
+            14.429742678002903,
+            20.580096732089924,
+            11.080853023335244
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.00591796875,
+        "mean_absolute_channel_delta": 0.2813411458333333,
+        "dark_chromatic_foreground_intersection_over_union": 0.9931077560920749
+      },
+      "v29_to_v30_hlod_projection_change": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "dd9d06a08cfe916aa27e2132eb1b98531cf2e7831dd04aec52e429d0c5153435",
+          "dark_chromatic_foreground_pixels": 575360,
+          "foreground_mean_rgb": [
+            9.667286568409343,
+            11.058208773637375,
+            5.6682477057842044
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+          "dark_chromatic_foreground_pixels": 578169,
+          "foreground_mean_rgb": [
+            9.961618488711778,
+            11.37887538072778,
+            5.830127523267419
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.15791015625,
+        "mean_absolute_channel_delta": 11.885046296296297,
+        "dark_chromatic_foreground_intersection_over_union": 0.8616085765790191
+      },
+      "v29_source_to_hlod": {
+        "before": {
+          "path": "v29_orthographic/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "994c162eb86a32b976f46c902f2d86ccf0afea356e0edc582463f159720df4ad",
+          "dark_chromatic_foreground_pixels": 655605,
+          "foreground_mean_rgb": [
+            14.42093638700132,
+            20.555053728998406,
+            11.070850588387826
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v29_orthographic/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "dd9d06a08cfe916aa27e2132eb1b98531cf2e7831dd04aec52e429d0c5153435",
+          "dark_chromatic_foreground_pixels": 575360,
+          "foreground_mean_rgb": [
+            9.667286568409343,
+            11.058208773637375,
+            5.6682477057842044
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.21542100694444444,
+        "mean_absolute_channel_delta": 14.340163845486112,
+        "dark_chromatic_foreground_intersection_over_union": 0.8360882898685615
+      },
+      "v30_source_to_hlod": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "d06a3b30e1584a1e49a9920aca1bd0677787bad13ad31465fa2c7ac3b014f66d",
+          "dark_chromatic_foreground_pixels": 655832,
+          "foreground_mean_rgb": [
+            14.429742678002903,
+            20.580096732089924,
+            11.080853023335244
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+          "dark_chromatic_foreground_pixels": 578169,
+          "foreground_mean_rgb": [
+            9.961618488711778,
+            11.37887538072778,
+            5.830127523267419
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.209765625,
+        "mean_absolute_channel_delta": 13.10251048900463,
+        "dark_chromatic_foreground_intersection_over_union": 0.8419904825593199
+      },
+      "v30_combined_to_expected": {
+        "before": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+          "dark_chromatic_foreground_pixels": 578169,
+          "foreground_mean_rgb": [
+            9.961618488711778,
+            11.37887538072778,
+            5.830127523267419
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "after": {
+          "path": "v30_perspective/open_grown_conical_handoff_36m_combined.png",
+          "sha256": "5882c61999b10b18cf6f349f20e479a711282887788098cbc7a9f6dea611da1d",
+          "dark_chromatic_foreground_pixels": 578169,
+          "foreground_mean_rgb": [
+            9.961618488711778,
+            11.37887538072778,
+            5.830127523267419
+          ],
+          "foreground_median_rgb": [
+            0.0,
+            0.0,
+            0.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "v30_authority_equivalent": true
+    }
+  },
+  "derived_findings": {
+    "source_control_changed_pixel_fractions_at_20_28_36m": [
+      0.010167100694444445,
+      0.007969835069444445,
+      0.00591796875
+    ],
+    "hlod_projection_changed_pixel_fractions_at_20_28_36m": [
+      0.28577799479166666,
+      0.21069661458333333,
+      0.15791015625
+    ],
+    "v29_source_hlod_changed_pixel_fractions_at_20_28_36m": [
+      0.4153645833333333,
+      0.2940939670138889,
+      0.21542100694444444
+    ],
+    "v30_source_hlod_changed_pixel_fractions_at_20_28_36m": [
+      0.4103656684027778,
+      0.28400499131944446,
+      0.209765625
+    ],
+    "v29_source_hlod_foreground_iou_at_20_28_36m": [
+      0.6970568770250929,
+      0.7796984763665747,
+      0.8360882898685615
+    ],
+    "v30_source_hlod_foreground_iou_at_20_28_36m": [
+      0.6991085590378863,
+      0.7866693114709147,
+      0.8419904825593199
+    ],
+    "v30_minus_v29_changed_pixel_fraction_at_20_28_36m": [
+      -0.0049989149305555425,
+      -0.010088975694444446,
+      -0.0056553819444444264
+    ],
+    "v30_minus_v29_foreground_iou_at_20_28_36m": [
+      0.0020516820127933766,
+      0.006970835104339934,
+      0.005902192690758312
+    ]
+  },
+  "hard_authority_gate_passed": true,
+  "perspective_improves_active_hlod_handoffs": true,
+  "source_authority_distance_bounded": true,
+  "v30_no_pop_gate_passed": false,
+  "editor_exit_boundary": {
+    "evaluation_completed": true,
+    "request_exit_logged": true,
+    "first_execution_post_completion_shutdown_required_interrupt": true,
+    "exact_rerun_completed_cleanly": true
+  },
+  "decision": {
+    "retain": [
+      "V27 deterministic 512 validation profile",
+      "V29 16-degree azimuth registration",
+      "V30 authored-distance perspective capture"
+    ],
+    "reject": [
+      "V30 as a completed no-pop or photoreal-art solution",
+      "projection correction as the only remaining representation fix"
+    ],
+    "next_step": "Keep the registered perspective bake and isolate depth-aware representation shape before complementary dither."
+  },
+  "v29_azimuth_registration_retained": true,
+  "v30_perspective_capture_retained": true,
+  "art_review_passed": false,
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false
+}
