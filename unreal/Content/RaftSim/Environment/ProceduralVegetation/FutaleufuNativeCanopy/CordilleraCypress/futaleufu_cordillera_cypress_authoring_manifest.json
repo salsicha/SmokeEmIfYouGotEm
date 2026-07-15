@@ -429,6 +429,64 @@
     "regenerate_other_forms_allowed": false,
     "corridor_substitution_allowed": false
   },
+  "v25_hlod_photometry_and_hard_authority": {
+    "engine_version": "5.8",
+    "status": "photometry_and_hard_authority_retained_handoff_popping_rejected",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V24 open-grown irregular crown-mass source geometry, material, growth seed, and exact cameras",
+      "2944 foliage instances and 1213857 merged traditional-raster source triangles",
+      "eight-azimuth by two-elevation 2048-pixel source-lit multi-view atlas bake"
+    ],
+    "changed_contract": {
+      "atlas_linear_color_gain_before": [1.1, 1.38, 0.9],
+      "atlas_linear_color_gain_after": [2.6, 1.63, 1.6],
+      "handoff_distance_metric": "camera_to_hlod_actor_horizontal_distance",
+      "source_selection_distance_cm": 2500.0,
+      "authority_modes": ["source_only", "hlod_only", "combined"],
+      "capture_distances_m": [20.0, 28.0, 36.0],
+      "single_representation_by_actor_visibility": true
+    },
+    "exact_60m_photometry": {
+      "intersection_pixels": 47573,
+      "hlod_minus_source_mean_rgb": [-0.7972589494040737, -0.1447669896790196, -3.972295209467555],
+      "hlod_to_source_foreground_ratio": 1.0899618805590852,
+      "photometry_gate_passed": true
+    },
+    "hard_authority_result": {
+      "20m_expected_authority": "source_only",
+      "20m_combined_changed_pixel_fraction": 0.000068359375,
+      "20m_combined_mean_absolute_channel_delta": 0.0033304398148148147,
+      "20m_combined_foreground_iou": 0.9999814691962449,
+      "28m_combined_byte_identical_to_hlod": true,
+      "36m_combined_byte_identical_to_hlod": true,
+      "hard_authority_gate_passed": true
+    },
+    "rejected_no_pop_result": {
+      "source_hlod_changed_pixel_fractions_at_20_28_36m": [0.42024956597222224, 0.2947970920138889, 0.21658854166666666],
+      "source_hlod_foreground_iou_at_20_28_36m": [0.49931697130197444, 0.5381710008636408, 0.5368615863468595],
+      "no_pop_gate_passed": false,
+      "human_reason": "the HLOD is visibly blurrier and fuller than the source at handoff distance, so correct one-representation authority still produces a visible hard switch"
+    },
+    "accepted_outcomes": [
+      "bounded source/HLOD color calibration under the fixed V24 source",
+      "explicit 20/28/36 meter source-only, HLOD-only, and combined evidence",
+      "single-representation actor authority without source/HLOD density overlap"
+    ],
+    "open_visual_failures": [
+      "HLOD spatial registration and branch-scale detail do not yet meet the no-pop gate",
+      "the closeup source still exposes flattened compound branchlet planes and a regular central scaffold",
+      "moving-camera temporal behavior, seven forms, mixed ecology, packaged desktop, and target-VR gates remain open"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v25_pve_open_grown_conical_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
+    "visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v25_hlod_handoff_visual_review.json",
+    "photometry_baseline_retained": true,
+    "hard_authority_baseline_retained": true,
+    "handoff_promotion_accepted": false,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -454,5 +512,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, and V24 cost-compensated irregular crown-mass envelope. Calibrate HLOD luminance and color and prove explicit 20/28/36 meter near/mid/far authority without overlap or popping, then address the remaining closeup source-plane and central-scaffold identity. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. Improve HLOD spatial registration and branch-scale detail or test a bounded complementary dither transition until the exact 20/28/36 meter no-pop gate passes, then address the remaining closeup source-plane and central-scaffold identity. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }
