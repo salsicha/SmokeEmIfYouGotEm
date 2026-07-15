@@ -1,0 +1,348 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_detiered_crown_review.v22",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v22_open_grown_conical_detiered_compound_branchlet_atlas",
+  "status": "detiered_crown_topology_baseline_retained_visual_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "V21 compound branchlet textures, fourteen-card authored twig, and material response",
+      "post-usage shader-resource gate and corrected source-lit HLOD path",
+      "open-grown form envelope and exact review cameras"
+    ],
+    "v22_changed": [
+      "replace coarse main-axis priority steps with a gradual six-key growth ramp",
+      "use the 137.507764-degree golden angle and larger stagger on main and graft phyllotaxy",
+      "reduce branch flattening and increase bounded main, branch, and graft angle jitter",
+      "reduce graft axil angle from 72 to 66 degrees and stop graft distribution at normalized 0.98 height"
+    ],
+    "crown_band_measurement": "Within the central 50% by horizontal and 3-95% by vertical capture ROI, measure the upper 82% of the detected plant. Smooth per-row dark/chromatic foreground occupancy over 11 pixels, normalize to its 90th percentile, and classify rows below 0.25 occupancy as open. Average two exact turntable views.",
+    "reports": {
+      "v21_compound_branchlet_atlas": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v21_pve_open_grown_conical_compound_branchlet_atlas_report.json",
+      "v22_detiered_compound_branchlet_atlas": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v22_pve_open_grown_conical_detiered_compound_branchlet_atlas_report.json"
+    }
+  },
+  "structural_evidence": {
+    "v21_compound_branchlet_atlas": {
+      "crown_topology_mode": "legacy_tiered",
+      "foliage_instance_count": 3626,
+      "impostor_source_triangle_count": 1409515,
+      "atlas_coverage_fraction_range": [
+        0.128456116,
+        0.143325806
+      ]
+    },
+    "v22_detiered_compound_branchlet_atlas": {
+      "crown_topology_mode": "golden_angle_detiered",
+      "foliage_instance_count": 3303,
+      "impostor_source_triangle_count": 1287173,
+      "atlas_coverage_fraction_range": [
+        0.117725372,
+        0.129779816
+      ]
+    }
+  },
+  "capture_comparisons": {
+    "exact_60m_source": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompoundBranchletAtlas/open_grown_conical_river_distance_60m.png",
+        "sha256": "0538ab7a22fd9ad15fd9b8917ce33d521daeed802afaba75e27c93db28fbea3d",
+        "dark_chromatic_foreground_pixels": 59109,
+        "foreground_mean_rgb": [
+          40.163409971408754,
+          59.341386252516536,
+          46.86492750680945
+        ],
+        "foreground_median_rgb": [
+          36.0,
+          53.0,
+          30.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/open_grown_conical_river_distance_60m.png",
+        "sha256": "a31739007c4256e62e2f2e9bc4342ea6ff616910b3bc37fed76c803eb3ecc0be",
+        "dark_chromatic_foreground_pixels": 51434,
+        "foreground_mean_rgb": [
+          43.02999961115216,
+          63.57878057316172,
+          51.27155189174476
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          59.0,
+          34.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.08794053819444445,
+      "mean_absolute_channel_delta": 8.390709635416666,
+      "dark_chromatic_foreground_intersection_over_union": 0.44093800510975545
+    },
+    "branch_spray_closeup": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompoundBranchletAtlas/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "9f3f8b261244f795bf82672bcff89ed8421e0e60280cbcfce31d64f5e21d10a1",
+        "dark_chromatic_foreground_pixels": 51935,
+        "foreground_mean_rgb": [
+          39.89411764705882,
+          46.717184942716855,
+          31.35022624434389
+        ],
+        "foreground_median_rgb": [
+          28.0,
+          42.0,
+          30.0
+        ],
+        "wood": {
+          "wood_pixels": 13379,
+          "wood_fraction_of_detected_plant": 0.25761047463175124
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "15d81d19758984fb03f885b32e1a80be536422663c38d3ea57ad8a313d4a8301",
+        "dark_chromatic_foreground_pixels": 51513,
+        "foreground_mean_rgb": [
+          40.202958476501074,
+          46.896317434434025,
+          31.60378933473104
+        ],
+        "foreground_median_rgb": [
+          30.0,
+          43.0,
+          30.0
+        ],
+        "wood": {
+          "wood_pixels": 13397,
+          "wood_fraction_of_detected_plant": 0.26007027352318834
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.05476128472222222,
+      "mean_absolute_channel_delta": 3.0451218894675924,
+      "dark_chromatic_foreground_intersection_over_union": 0.6779614280384746
+    },
+    "exact_60m_hlod": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompoundBranchletAtlas/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "78b68beb836308033000a7097f66b4ba28537788e84b0f1d3dfe34fbf44eda25",
+        "dark_chromatic_foreground_pixels": 62453,
+        "foreground_mean_rgb": [
+          29.08723359966695,
+          54.815621347253135,
+          40.774582486029495
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          46.0,
+          22.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "6b4d8eb9fe33834f7b63ea280bdfd34354162bfabd059a2bea1512b2ba9e6c28",
+        "dark_chromatic_foreground_pixels": 54934,
+        "foreground_mean_rgb": [
+          31.03329449885317,
+          59.121473040375726,
+          44.54492663923981
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          53.0,
+          25.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.08179904513888889,
+      "mean_absolute_channel_delta": 8.346545138888889,
+      "dark_chromatic_foreground_intersection_over_union": 0.4677044261065266
+    },
+    "turntable_azimuth_035": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_035.png",
+        "sha256": "a759d456e3b9f7f37d1cdb0820b3e40233bb0c4e36082f4874468463f8869230",
+        "dark_chromatic_foreground_pixels": 67797,
+        "foreground_mean_rgb": [
+          36.99837750932932,
+          54.231971916161484,
+          36.27734265527973
+        ],
+        "foreground_median_rgb": [
+          32.0,
+          48.0,
+          28.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            474,
+            42,
+            801,
+            683
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.11596958174904944,
+          "large_open_band_count_minimum_8_pixels": 2,
+          "largest_open_band_pixels": 51,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.4280403458766591
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_035.png",
+        "sha256": "e2ea6de73cd52d3a5dabe05296f3fc4d2fcdd618c1289e19c811b5e472879fe0",
+        "dark_chromatic_foreground_pixels": 61170,
+        "foreground_mean_rgb": [
+          39.258312898479645,
+          57.58773908778813,
+          38.51304561059343
+        ],
+        "foreground_median_rgb": [
+          34.0,
+          52.0,
+          28.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            488,
+            46,
+            798,
+            681
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.09596928982725528,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 46,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.3719232577061579
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.11421549479166666,
+      "mean_absolute_channel_delta": 10.945157335069444,
+      "dark_chromatic_foreground_intersection_over_union": 0.3945242806630551
+    },
+    "turntable_azimuth_145": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_145.png",
+        "sha256": "7840603c25e953f780014e01f22f5f06510c30a420000be1c791be0a4405830a",
+        "dark_chromatic_foreground_pixels": 70652,
+        "foreground_mean_rgb": [
+          41.061257996942764,
+          57.15894808356451,
+          40.40914623789843
+        ],
+        "foreground_median_rgb": [
+          37.0,
+          49.0,
+          28.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            474,
+            58,
+            797,
+            673
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.08514851485148515,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 43,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.3714468205189056
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_145.png",
+        "sha256": "64d55198922d25dddc32fe9ed696b3802834b3027d4e607e395391ca9538a2c3",
+        "dark_chromatic_foreground_pixels": 62176,
+        "foreground_mean_rgb": [
+          42.88111168296449,
+          60.265568708183224,
+          42.86226196603191
+        ],
+        "foreground_median_rgb": [
+          38.0,
+          54.0,
+          32.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            487,
+            39,
+            788,
+            673
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.05576923076923077,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 29,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.38760508846351854
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.11252278645833333,
+      "mean_absolute_channel_delta": 10.115218460648148,
+      "dark_chromatic_foreground_intersection_over_union": 0.43298846730605334
+    }
+  },
+  "derived_findings": {
+    "triangle_cost_change_fraction": -0.08679723167188713,
+    "foliage_instance_count_change_fraction": -0.08907887479316046,
+    "closeup_foreground_change_fraction": -0.008125541542312487,
+    "closeup_wood_fraction_change": 0.002459798891437104,
+    "exact_60m_source_foreground_change_fraction": -0.12984486288044117,
+    "v22_hlod_to_source_foreground_ratio": 1.0680483726717735,
+    "mean_turntable_open_band_fraction_before": 0.1005590483002673,
+    "mean_turntable_open_band_fraction_after": 0.07586926029824302,
+    "mean_turntable_open_band_fraction_change": -0.024689788002024274,
+    "largest_turntable_open_band_pixels_before": 51,
+    "largest_turntable_open_band_pixels_after": 46
+  },
+  "topology_gate_passed": true,
+  "human_review": {
+    "accepted": [
+      "V22 produces a less regular crown at both exact turntable angles; the measured mean low-occupancy row fraction falls while the largest open run does not grow.",
+      "The de-tiered scheduling lowers source triangles and keeps exact closeup foliage mass and HLOD/source agreement bounded.",
+      "Golden-angle graft distribution and bounded jitter provide a reusable crown-topology control independent of the V21 compound branchlet source art."
+    ],
+    "rejected": [
+      "The isolated crown remains too sparse and still exposes broad horizontal shelf rhythms, especially through its upper and middle thirds.",
+      "The exact 60 m footprint and foliage instance count both fall, so the next pass must restore irregular fine-scale crown mass without returning to synchronized tiers.",
+      "Only one form is evaluated; no handoff, temporal, ecology, corridor, desktop, VR, or native-art promotion gate is closed."
+    ],
+    "decision": "Retain V22 as the open-grown crown-topology baseline if the automated gate passes, but keep visual, corridor, all-form, and production promotion closed. Next densify the crown with asynchronous secondary shoot clusters while preserving the de-tiered scheduling and exact-camera measurement."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false,
+  "v22_crown_topology_baseline_retained": true
+}
