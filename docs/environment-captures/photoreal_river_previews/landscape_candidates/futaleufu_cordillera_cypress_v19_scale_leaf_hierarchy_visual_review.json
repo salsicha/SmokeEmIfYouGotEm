@@ -1,0 +1,209 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_scale_leaf_review.v19",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v19_1_open_grown_conical_dense_authored_scale_leaf_hierarchy",
+  "status": "authored_scale_leaf_mechanism_retained_visual_and_corridor_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "project-owned V17 PVE growth graph and seed",
+      "3626 live-foliage transforms",
+      "24.68 m open-grown tree envelope and connected PVE woody collection",
+      "exact closeup, 60 m source, and 60 m multi-view HLOD cameras"
+    ],
+    "v19_changed": "replace V18.2 repeated broad spray crops with sixteen deterministic project-owned scale-leaf tiles and explicit connected leaf-card shoots",
+    "v19_1_changed": "increase branch-hugging imbricate leaf density and shorten the authored shoot hierarchy while retaining the same atlas and renderer split",
+    "reports": {
+      "v18_2_compact_connected": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v18_2_pve_open_grown_conical_compact_connected_twig_hierarchy_report.json",
+      "v19_authored_scale_leaf": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v19_pve_open_grown_conical_authored_scale_leaf_hierarchy_report.json",
+      "v19_1_dense_authored_scale_leaf": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v19_1_pve_open_grown_conical_dense_authored_scale_leaf_hierarchy_report.json"
+    }
+  },
+  "source_art_contract": {
+    "ownership": "deterministic project-owned generated pixels and geometry",
+    "external_photo_pixels_vendored": false,
+    "external_reference_pixels_derived": false,
+    "whole_spray_image_tiles": false,
+    "botanical_measurement_claimed": false,
+    "renderer_split": "Nanite connected wood plus traditional-raster masked micro-foliage"
+  },
+  "structural_evidence": {
+    "v18_2_compact_connected": {
+      "palette_mode": "compact_connected_twig_hierarchy",
+      "foliage_instance_count": 3626,
+      "impostor_source_vertex_count": 93853,
+      "impostor_source_triangle_count": 47345,
+      "impostor_source_nanite_enabled": true,
+      "atlas_coverage_fraction_range": [
+        0.151309967,
+        0.169956207
+      ],
+      "exact_60m_source_capture_produced": true,
+      "exact_60m_hlod_capture_produced": true
+    },
+    "v19_authored_scale_leaf": {
+      "palette_mode": "authored_scale_leaf_hierarchy",
+      "foliage_instance_count": 3626,
+      "impostor_source_vertex_count": 2003652,
+      "impostor_source_triangle_count": 1267109,
+      "impostor_source_nanite_enabled": false,
+      "atlas_coverage_fraction_range": [
+        0.08744812,
+        0.09336853
+      ],
+      "exact_60m_source_capture_produced": true,
+      "exact_60m_hlod_capture_produced": true
+    },
+    "v19_1_dense_authored_scale_leaf": {
+      "palette_mode": "dense_authored_scale_leaf_hierarchy",
+      "foliage_instance_count": 3626,
+      "impostor_source_vertex_count": 3672044,
+      "impostor_source_triangle_count": 2123061,
+      "impostor_source_nanite_enabled": false,
+      "atlas_coverage_fraction_range": [
+        0.131248474,
+        0.145881653
+      ],
+      "exact_60m_source_capture_produced": true,
+      "exact_60m_hlod_capture_produced": true
+    }
+  },
+  "transitions": {
+    "v18_2_to_v19": {
+      "before": "v18_2_compact_connected",
+      "after": "v19_authored_scale_leaf",
+      "capture_comparisons": {
+        "exact_60m_source": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "d3084e334a9c98ec4c15dd10037dff22cf688a185e1bcab84a38ccd8d8ff45a2"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "264784261a4804e2b9af6ca5cc2f7edac6c6ee110ce0c4ada4518eca534614f8"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.07468098958333333,
+          "mean_absolute_channel_delta": 5.369917896412037,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 63456,
+            "after_pixels": 37069,
+            "intersection_over_union": 0.5277819994528709
+          }
+        },
+        "branch_spray_closeup": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "ac66420d33f645d8d436e1bbe7cb80578d1f2d6facfcbb33766224d47f20031b"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "95cd62be3aa9448e04628fa0224d4565aaf7a3b3cbcf6e9f5a1c420750466e91"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.09636935763888889,
+          "mean_absolute_channel_delta": 11.590239438657408,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 69548,
+            "after_pixels": 13058,
+            "intersection_over_union": 0.09094030639197041
+          }
+        },
+        "exact_60m_hlod": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressCompactConnectedTwigHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "fd2403c7ca18d1f459283a410012466b10cadfd99df38a135f8042a8e2028655"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "18f73d08f8970d2753cbaa39e61a034e79ef780a46385057b2c65482447a5e12"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.07030598958333334,
+          "mean_absolute_channel_delta": 6.021082899305555,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 68865,
+            "after_pixels": 37706,
+            "intersection_over_union": 0.5102315562735595
+          }
+        }
+      }
+    },
+    "v19_to_v19_1": {
+      "before": "v19_authored_scale_leaf",
+      "after": "v19_1_dense_authored_scale_leaf",
+      "capture_comparisons": {
+        "exact_60m_source": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "264784261a4804e2b9af6ca5cc2f7edac6c6ee110ce0c4ada4518eca534614f8"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy/open_grown_conical_river_distance_60m.png",
+            "sha256": "1bf12d3290ea5bd0c0f9637f8b27471b0d4b6bc1370c2faaa83b5a4cb06cba0d"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.056583116319444446,
+          "mean_absolute_channel_delta": 3.4592563657407407,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 37069,
+            "after_pixels": 49097,
+            "intersection_over_union": 0.6605831679161287
+          }
+        },
+        "branch_spray_closeup": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "95cd62be3aa9448e04628fa0224d4565aaf7a3b3cbcf6e9f5a1c420750466e91"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy/open_grown_conical_branch_spray_closeup.png",
+            "sha256": "a52b847919e82e1c0ad8c061e8bd784bbfed5ac06aeb7ed12c62109da35f5ea7"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.05567274305555556,
+          "mean_absolute_channel_delta": 6.642127459490741,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 13058,
+            "after_pixels": 35114,
+            "intersection_over_union": 0.11403529058069888
+          }
+        },
+        "exact_60m_hlod": {
+          "before": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAuthoredScaleLeafHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "18f73d08f8970d2753cbaa39e61a034e79ef780a46385057b2c65482447a5e12"
+          },
+          "after": {
+            "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressDenseAuthoredScaleLeafHierarchy/open_grown_conical_multiview_atlas_hlod_60m.png",
+            "sha256": "6447d79dc2e4efff4622ae5c59d5ba45f6f901af8c05080881308a66322d01fb"
+          },
+          "changed_pixel_fraction_max_channel_gt_12": 0.057076822916666665,
+          "mean_absolute_channel_delta": 4.852012080439815,
+          "dark_chromatic_foreground_mask": {
+            "contract": "min_channel_lt_75 and (channel_range_gt_12 or mean_rgb_lt_55)",
+            "before_pixels": 37706,
+            "after_pixels": 61755,
+            "intersection_over_union": 0.5939262820512821
+          }
+        }
+      }
+    }
+  },
+  "human_review": {
+    "accepted": [
+      "V19 removes external and repeated whole-spray photo crops from the near source.",
+      "The connected-wood plus traditional-raster micro-foliage split preserves explicit leaf geometry; the first merged Nanite pass was correctly rejected after collapsing it.",
+      "V19.1 raises multi-view atlas coverage from V19's 0.087-0.093 range to 0.131-0.146 without reintroducing whole-spray image tiles."
+    ],
+    "rejected": [
+      "V19 is too sparse at close and river distance, with isolated lanceolate cards instead of attached imbricate cypress scales.",
+      "V19.1 is denser but its closeup still reads as discrete broad leaves on a regular comb-like shoot rather than Austrocedrus scale foliage.",
+      "The V19.1 60 m source remains noisy and detached, while the unlit HLOD crushes the crown into an overly dark mass.",
+      "Neither authored candidate matches V18.2's fuller distance silhouette or clears native-species, 20/28/36 m handoff, temporal, wind, desktop, or target-VR gates."
+    ],
+    "decision": "Retain the project-owned atlas generator, explicit connected shoot geometry, and Nanite-wood/traditional-raster renderer split as reusable mechanisms. Reject V19 and V19.1 as near art, do not regenerate the other seven forms, and do not place cypress in the corridor. The next art pass needs a rights-reviewed native or Cupressaceae branch source with enough independent sprays, or a botanical authored shoot model whose overlapping scales read correctly in closeup before repeating the exact gate."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false
+}
