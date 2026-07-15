@@ -11,7 +11,7 @@ FLEXIBLE_TUBE_PATH = (
 )
 
 
-def test_active_river_portfolio_replaces_zambezi_with_chilko() -> None:
+def test_active_river_portfolio_prioritizes_zambezi_and_futaleufu() -> None:
     plan = json.loads(PORTFOLIO_PATH.read_text(encoding="utf-8"))
     active = plan["active_rivers"]
     active_ids = [river["river_id"] for river in active]
@@ -30,9 +30,25 @@ def test_active_river_portfolio_replaces_zambezi_with_chilko() -> None:
     assert chilko["take_out"] == "Chilko-Taseko Junction"
     assert plan["portfolio_rules"]["active_river_count"] == len(active)
 
-    backlog = {river["river_id"]: river for river in plan["backlog_rivers"]}
-    assert backlog["zambezi_batoka_gorge"]["artifact_policy"] == (
-        "retain_existing_source_corridor_visual_and_validation_evidence"
+    priority = plan["photoreal_priority_goal"]
+    assert priority["priority_river_ids"] == [
+        "zambezi_batoka_gorge",
+        "futaleufu_river_chile",
+    ]
+    assert priority["no_photoreal_claim_before_all_gates_pass"] is True
+
+    additional = {
+        river["river_id"]: river
+        for river in plan["additional_active_environment_targets"]
+    }
+    zambezi = additional["zambezi_batoka_gorge"]
+    assert zambezi["environment_status"] == (
+        "active_photoreal_production_source_blocked"
+    )
+    assert zambezi["runnable_status"].startswith("blocked_pending_")
+    assert plan["backlog_rivers"] == []
+    assert plan["portfolio_rules"]["active_environment_target_count"] == (
+        len(active) + len(additional)
     )
 
 

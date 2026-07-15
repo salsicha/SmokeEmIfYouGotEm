@@ -10,7 +10,9 @@ Construct complete, photorealistic Unreal river environments for the five planne
 - Futaleufu River, Rio Azul Swinging Bridge to The Pasarela
 - Chilko River, Chilko River Lodge to the Chilko-Taseko Junction
 
-The portfolio decision is machine-readable in `physics/data/real_world/river_portfolio_plan.json`. The original three-river source and capture artifacts remain valid legacy checkpoints for South Fork, Colorado, and Pacuare. Futaleufu keeps the international production contract; Chilko starts with the source and validation contract in `docs/chilko-futaleufu-photoreal-goal.md`. Zambezi's existing corridor, terrain, source, and capture artifacts remain retained backlog evidence under `docs/zambezi-futaleufu-photoreal-goal.md`, but it is not part of the active five-river production claim.
+The immediate photoreal priority is the Zambezi River through Batoka Gorge from Boiling Pot to Mukuni Beach and the Futaleufu River from Rio Azul Swinging Bridge to The Pasarela. Zambezi is an additional active environment target beyond the five planned runnable rivers; it is no longer backlog work, but its runnable and lifelike promotion remains blocked by authoritative centerline, high-resolution terrain, route, guide, and review evidence.
+
+The portfolio decision is machine-readable in `physics/data/real_world/river_portfolio_plan.json`. The original three-river source and capture artifacts remain valid legacy checkpoints for South Fork, Colorado, and Pacuare. Futaleufu keeps the international production contract; Chilko keeps the source and validation contract in `docs/chilko-futaleufu-photoreal-goal.md`; and the Zambezi/Futaleufu priority and completion gates live in `docs/zambezi-futaleufu-photoreal-goal.md`.
 
 Each river environment must be driven by traceable river maps, seasonal or release-driven flow levels, aerial/satellite imagery, reviewed terrain and hydrography, and rights-reviewed visual reference. Procedural generation is expected for terrain dressing, foliage, rock scatter, debris, foam cues, wetness masks, lighting variants, and placeholder art until imported or first-party assets are approved.
 

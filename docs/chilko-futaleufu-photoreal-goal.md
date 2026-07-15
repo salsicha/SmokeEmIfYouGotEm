@@ -10,7 +10,7 @@ The active five-river production portfolio is:
 4. Futaleufu River, Rio Azul Swinging Bridge to The Pasarela.
 5. Chilko River, Chilko River Lodge to the Chilko-Taseko Junction.
 
-Zambezi Batoka Gorge is retained as a backlog river. Its source manifests, corridor experiments, terrain reviews, and Unreal captures remain useful evidence, but missing authoritative full-reach terrain and centerline data block active photoreal production. Nothing in this decision promotes, deletes, or rewrites that evidence.
+Zambezi Batoka Gorge is now an additional active photoreal environment target and, with Futaleufu, forms the immediate environment priority. It remains outside the five-river runnable claim until authoritative full-reach terrain, centerline, route, guide, and review evidence pass. This priority change does not remove Chilko from the runnable portfolio or promote, delete, or rewrite any existing evidence.
 
 ## Objective
 
