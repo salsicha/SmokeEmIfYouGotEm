@@ -1,0 +1,337 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_hlod_handoff_review.v25",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v25_hlod_calibrated_irregular_crown_mass",
+  "status": "photometry_and_hard_authority_retained_handoff_popping_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "V24 open-grown irregular crown-mass source geometry and material",
+      "V24 PVE growth seed, 2,944 foliage transforms, and 1,213,857 merged source triangles",
+      "eight-azimuth by two-elevation 2048-pixel multi-view atlas bake",
+      "exact 60 m and exact 20/28/36 m cameras"
+    ],
+    "v25_changed": [
+      "atlas linear color gain from [1.10, 1.38, 0.90] to [2.60, 1.63, 1.60]",
+      "hard camera-to-HLOD-actor horizontal-distance authority at 2,500 cm",
+      "source-only, HLOD-only, and combined captures at 20, 28, and 36 m"
+    ],
+    "reports": {
+      "v24": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v24_pve_open_grown_conical_irregular_crown_mass_compound_branchlet_atlas_report.json",
+      "v25": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v25_pve_open_grown_conical_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json"
+    }
+  },
+  "source_geometry_unchanged": true,
+  "exact_60m": {
+    "source_hlod_comparison": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_river_distance_60m.png",
+        "sha256": "a353a61f27a26ededd7b62e482181bde4e14a69ad9e2878509913f8ff3143f78",
+        "dark_chromatic_foreground_pixels": 59025,
+        "foreground_mean_rgb": [
+          43.318238034731046,
+          64.12845404489623,
+          49.415230834392204
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          61.0,
+          34.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "3e98d711a90da3c5efbc35854a1edaf652d9e1926cd91faa3bee95913635b922",
+        "dark_chromatic_foreground_pixels": 64335,
+        "foreground_mean_rgb": [
+          42.44645993627108,
+          63.97780368384239,
+          44.265485350120464
+        ],
+        "foreground_median_rgb": [
+          38.0,
+          59.0,
+          28.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.08162217881944445,
+      "mean_absolute_channel_delta": 5.658892144097222,
+      "dark_chromatic_foreground_intersection_over_union": 0.6277197936321532
+    },
+    "intersection_photometry": {
+      "intersection_pixels": 47573,
+      "source_mean_rgb": [
+        42.32800117713829,
+        63.51390494608286,
+        51.327286486031994
+      ],
+      "hlod_mean_rgb": [
+        41.530742227734216,
+        63.36913795640384,
+        47.35499127656444
+      ],
+      "hlod_minus_source_mean_rgb": [
+        -0.7972589494040737,
+        -0.1447669896790196,
+        -3.972295209467555
+      ],
+      "mean_absolute_rgb_delta": [
+        17.107182645618312,
+        22.160742437937486,
+        9.409160658356631
+      ]
+    },
+    "hlod_to_source_foreground_ratio": 1.0899618805590852
+  },
+  "handoffs": {
+    "20m": {
+      "expected_authority": "source_only",
+      "source_hlod_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "c0d11eb135aea78437b78dc85ae4f2816a392404c62beba751aed2fd81e0002b",
+          "dark_chromatic_foreground_pixels": 269819,
+          "foreground_mean_rgb": [
+            31.42933225606796,
+            48.86592493486374,
+            23.341113857808384
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "0b7f3cc0ac18afea52581044c74615b92cc3c2c5db0162dec7867f60e0b50208",
+          "dark_chromatic_foreground_pixels": 284444,
+          "foreground_mean_rgb": [
+            30.341504830476296,
+            49.35874548241482,
+            15.957844074756366
+          ],
+          "foreground_median_rgb": [
+            22.0,
+            42.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.42024956597222224,
+        "mean_absolute_channel_delta": 36.51367657696759,
+        "dark_chromatic_foreground_intersection_over_union": 0.49931697130197444
+      },
+      "combined_expected_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "c0d11eb135aea78437b78dc85ae4f2816a392404c62beba751aed2fd81e0002b",
+          "dark_chromatic_foreground_pixels": 269819,
+          "foreground_mean_rgb": [
+            31.42933225606796,
+            48.86592493486374,
+            23.341113857808384
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_combined.png",
+          "sha256": "ad4021a8af58a97fa72511a3fc009968f684fcdabd40c76ac56f96acb6373e10",
+          "dark_chromatic_foreground_pixels": 269818,
+          "foreground_mean_rgb": [
+            31.429508038752047,
+            48.86572800925068,
+            23.34039982506727
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 6.8359375e-05,
+        "mean_absolute_channel_delta": 0.0033304398148148147,
+        "dark_chromatic_foreground_intersection_over_union": 0.9999814691962449
+      },
+      "combined_exact_hash_match": false,
+      "combined_selected_authority_equivalent": true
+    },
+    "28m": {
+      "expected_authority": "hlod_only",
+      "source_hlod_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "893c0dc98551884f9760932efa8d4f34ed99ca98e46a68cb07485e73c40cf6a7",
+          "dark_chromatic_foreground_pixels": 194592,
+          "foreground_mean_rgb": [
+            32.66021727511922,
+            50.506649810886366,
+            25.722701858247
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "4cbcc13cf18cdec207d92f8ea4f2b327a675a023872397ac176da0b00da2afed",
+          "dark_chromatic_foreground_pixels": 206140,
+          "foreground_mean_rgb": [
+            31.562937809255846,
+            50.191913262831086,
+            18.996589696322886
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            42.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.2947970920138889,
+        "mean_absolute_channel_delta": 23.67852105034722,
+        "dark_chromatic_foreground_intersection_over_union": 0.5381710008636408
+      },
+      "combined_expected_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "4cbcc13cf18cdec207d92f8ea4f2b327a675a023872397ac176da0b00da2afed",
+          "dark_chromatic_foreground_pixels": 206140,
+          "foreground_mean_rgb": [
+            31.562937809255846,
+            50.191913262831086,
+            18.996589696322886
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            42.0,
+            13.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_combined.png",
+          "sha256": "4cbcc13cf18cdec207d92f8ea4f2b327a675a023872397ac176da0b00da2afed",
+          "dark_chromatic_foreground_pixels": 206140,
+          "foreground_mean_rgb": [
+            31.562937809255846,
+            50.191913262831086,
+            18.996589696322886
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            42.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "combined_exact_hash_match": true,
+      "combined_selected_authority_equivalent": true
+    },
+    "36m": {
+      "expected_authority": "hlod_only",
+      "source_hlod_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "623706dc8fb32b1fe9bb72f2f9f272a2f8b30c6d9f6733385dbabd0d0ff71bdd",
+          "dark_chromatic_foreground_pixels": 140818,
+          "foreground_mean_rgb": [
+            35.0977005780511,
+            53.665859478191706,
+            29.918192276555555
+          ],
+          "foreground_median_rgb": [
+            32.0,
+            49.0,
+            24.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "e633d86f9e534b8b1156f17aeab08670ccf81cb20c0b8b2066cf2b49beb4528e",
+          "dark_chromatic_foreground_pixels": 151490,
+          "foreground_mean_rgb": [
+            34.13810812594891,
+            53.292032477391245,
+            24.11507690276586
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.21658854166666666,
+        "mean_absolute_channel_delta": 17.161924913194444,
+        "dark_chromatic_foreground_intersection_over_union": 0.5368615863468595
+      },
+      "combined_expected_comparison": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "e633d86f9e534b8b1156f17aeab08670ccf81cb20c0b8b2066cf2b49beb4528e",
+          "dark_chromatic_foreground_pixels": 151490,
+          "foreground_mean_rgb": [
+            34.13810812594891,
+            53.292032477391245,
+            24.11507690276586
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_combined.png",
+          "sha256": "e633d86f9e534b8b1156f17aeab08670ccf81cb20c0b8b2066cf2b49beb4528e",
+          "dark_chromatic_foreground_pixels": 151490,
+          "foreground_mean_rgb": [
+            34.13810812594891,
+            53.292032477391245,
+            24.11507690276586
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "combined_exact_hash_match": true,
+      "combined_selected_authority_equivalent": true
+    }
+  },
+  "derived_findings": {
+    "worst_handoff_source_hlod_changed_pixel_fraction": 0.42024956597222224,
+    "minimum_handoff_source_hlod_foreground_iou": 0.49931697130197444
+  },
+  "photometry_gate_passed": true,
+  "hard_authority_gate_passed": true,
+  "no_pop_gate_passed": false,
+  "human_review": {
+    "accepted": [
+      "The calibrated 60 m HLOD matches the source intersection mean within four RGB levels per channel while keeping foreground mass bounded.",
+      "Combined authority selects only the source at 20 m and only the HLOD at 28 and 36 m; the HLOD selections are byte-identical and the temporally lit source selection is pixel-equivalent.",
+      "V25 leaves the retained V24 source geometry and source-cost counts unchanged."
+    ],
+    "rejected": [
+      "The HLOD is visibly blurrier and fuller than the source at handoff distance, so a hard switch would pop despite correct actor authority.",
+      "Source/HLOD changed-pixel fraction reaches more than 20 percent and minimum foreground IoU remains near 0.5 instead of the 0.8 no-pop floor.",
+      "Closeup source planes, the regular central scaffold, temporal motion, packaged desktop, target-VR, all-form, corridor, and production gates remain open."
+    ],
+    "decision": "Retain the V25 color gain and hard single-representation authority mechanism, but reject handoff and visual promotion. The next pass must improve HLOD spatial registration and branch-scale detail or use a bounded complementary dither transition before moving-camera review."
+  },
+  "v25_photometry_baseline_retained": true,
+  "v25_hard_authority_baseline_retained": true,
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false
+}
