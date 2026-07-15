@@ -1,0 +1,78 @@
+{
+  "schema": "raftsim.unreal.chilko_source_scale_landscape_review.v1",
+  "reviewed_on": "2026-07-15",
+  "river_id": "chilko_river_lava_canyon",
+  "status": "technical_source_scale_candidate_passed_visual_photoreal_review_failed",
+  "source_corridor_manifest": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json",
+  "unreal_candidate_manifest": "docs/environment-captures/photoreal_river_previews/landscape_candidates/landscape_candidate_manifest_chilko_river_lava_canyon.json",
+  "source_summary": {
+    "official_fwa_segments_stitched": 160,
+    "route_length_m": 55845.69567955752,
+    "maximum_join_gap_m": 0.0,
+    "put_in_seed_offset_m": 218.43972731922648,
+    "take_out_seed_offset_m": 84.92937221995732,
+    "terrain_product": "NRCan CanElevation MRDEM-30 DTM",
+    "terrain_horizontal_crs": "EPSG:3979",
+    "terrain_vertical_datum": "CGVD2013 orthometric heights (EPSG:6647)",
+    "terrain_resolution_m": 30.0,
+    "imagery_scene": "S2C_10UDC_20250825_0_L2A",
+    "imagery_resolution_m": 10.0,
+    "scene_classification_resolution_m": 20.0,
+    "obscured_fraction_of_valid_clip": 0.0
+  },
+  "unreal_summary": {
+    "heightfield_size": 1009,
+    "landscape_spacing_m": {
+      "x": 33.63468047686441,
+      "y": 38.481249995391146
+    },
+    "landscape_component_count": 64,
+    "landscape_material_bound_component_count": 64,
+    "terrain_overlay_target_spacing_m": 30.0,
+    "terrain_overlay_vertex_count": 1468690,
+    "terrain_overlay_triangle_count": 2924766,
+    "river_center_sample_spacing_m": 5.0,
+    "river_center_sample_count": 11577,
+    "river_cross_steps": 16,
+    "nanite_requested": true,
+    "nanite_component_count": 1,
+    "nanite_material_slot_count": 64,
+    "nanite_material_bound_slot_count": 64,
+    "nanite_material_audit_error_count": 0,
+    "nanite_representation_status": "enabled_and_built_up_to_date"
+  },
+  "artifacts": {
+    "map": {
+      "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ChilkoRiver_PhysicalCorridorCandidate.umap",
+      "size_bytes": 1151155839,
+      "sha256": "d03f39e0fe75313930e5cffe2787f7a64c57969463f11412ee310fc009993ee0"
+    },
+    "guide_seat_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_guide_seat_downstream.png",
+      "sha256": "101ef5464718046142e74a066544eb6f16569b23aad714691795d89933e0113e"
+    },
+    "river_eye_capture": {
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/chilko_river_lava_canyon_river_eye_downstream.png",
+      "sha256": "75373b9ecc764e13c9f408937e00a0140de365c88444b9ff4fd9ce1f6ac64306"
+    }
+  },
+  "visual_review": {
+    "technical_geometry_evidence_accepted": true,
+    "photoreal_or_lifelike_approved": false,
+    "production_playable_approved": false,
+    "observed_blockers": [
+      "30 m source terrain is too smooth for rapid-scale banks, rocks, and canyon morphology",
+      "source albedo is not yet reading convincingly in near-field terrain shading",
+      "generic Procedural Vegetation Editor trees are sparse and not Chilko ecology approval",
+      "opaque review water lacks validated Chilko solver fields, crest-scale whitewater, transparency, spray, and flow-specific feature response",
+      "exact access geometry, named rapid stations, numeric flow bands, guide review, land/publication review, and performance approval remain open"
+    ]
+  },
+  "authority": {
+    "changes_custom_cpp_solver_state": false,
+    "changes_collision_or_raft_forces": false,
+    "surveyed_bathymetry": false,
+    "may_hide_conservation_or_parity_failures": false
+  },
+  "production_promoted": false
+}

@@ -27,14 +27,14 @@
     "first_party_material_texture_assets": {
       "root": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/Textures",
       "exists": true,
-      "file_count": 9,
-      "total_bytes": 16155419
+      "file_count": 12,
+      "total_bytes": 21457004
     },
     "source_conditioned_material_texture_assets": {
       "root": "unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/Textures",
       "exists": true,
-      "file_count": 18,
-      "total_bytes": 121625956
+      "file_count": 22,
+      "total_bytes": 137274868
     },
     "material_instance_review_assets": {
       "root": "unreal/Content/RaftSim/Materials/MaterialInstances",

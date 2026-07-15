@@ -25,6 +25,9 @@ plot = [
 research = [
   "clawpack>=5.10",
 ]
+geospatial = [
+  "rasterio>=1.4,<2",
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

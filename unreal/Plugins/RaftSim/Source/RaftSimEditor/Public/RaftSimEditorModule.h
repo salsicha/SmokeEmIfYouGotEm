@@ -78,7 +78,9 @@ private:
     bool SaveWidgetScreenshot(const TSharedRef<SWidget>& Widget, const FString& BaseFileName, FString& OutPath) const;
     bool CreatePhotorealEnvironmentPreviewMaps(FString& OutSummary);
     bool CapturePhotorealEnvironmentPreviews(FString& OutSummary);
-    bool CreateLandscapeImportCandidateMaps(FString& OutSummary);
+    bool CreateLandscapeImportCandidateMaps(
+        FString& OutSummary,
+        const FString& RiverIdFilter = FString());
     bool CaptureZambeziCliffComparison(FString& OutSummary);
     bool CreateZambeziBatokaBasaltFamily(FString& OutSummary);
     bool CaptureZambeziBatokaBasaltCorridorComparison(FString& OutSummary);
