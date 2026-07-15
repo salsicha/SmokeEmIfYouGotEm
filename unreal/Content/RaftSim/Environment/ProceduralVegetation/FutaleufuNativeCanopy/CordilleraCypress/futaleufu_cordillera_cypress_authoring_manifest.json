@@ -545,6 +545,50 @@
     "regenerate_other_forms_allowed": false,
     "corridor_substitution_allowed": false
   },
+  "v27_frozen_wpo_validation_baseline": {
+    "engine_version": "5.8",
+    "status": "frozen_wpo_tolerance_bounded_deterministic_validation_baseline_retained",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V24 source geometry with 2944 foliage instances and 1213857 merged source triangles",
+      "V25 atlas gain [2.60, 1.63, 1.60] and hard 2500 centimeter one-representation authority",
+      "512 pixels per view and 2048 pixel sixteen-view atlas"
+    ],
+    "changed_contract": {
+      "separate_material_and_generated_review_namespace": true,
+      "production_material_defaults_modified": false,
+      "WindIntensity": 0.0,
+      "WindWeight": 0.0,
+      "WindSpeed": 0.0,
+      "validation_only_unlit_capture": true,
+      "lighting_post_process_atmosphere_fog_aa_temporal_gi_ao_and_reflections_disabled": true
+    },
+    "repeatability_result": {
+      "foliage_template_sha256_run_a": "3da4033595b9ff75ac467fd7c343fbd25555863a6a84b20b0b4385541351dfde",
+      "foliage_template_sha256_run_b": "3da4033595b9ff75ac467fd7c343fbd25555863a6a84b20b0b4385541351dfde",
+      "foliage_template_exact": true,
+      "source_changed_pixel_fractions_at_20_28_36m": [0.010448133680555555, 0.007648654513888889, 0.005856119791666667],
+      "hlod_changed_pixel_fractions_at_20_28_36m": [0.011459418402777777, 0.009482421875, 0.007531467013888889],
+      "atlas_channel_changed_pixel_fraction_range": [0.0014934539794921875, 0.017592430114746094],
+      "hard_authority_gate_passed": true,
+      "deterministic_validation_gate_passed": true
+    },
+    "accepted_outcomes": [
+      "frozen WPO removes the V26 live-pose confounder without changing production wind defaults",
+      "byte-identical generated foliage transforms and measured Metal raster tolerances provide a valid 512 resolution control",
+      "hard source/HLOD authority remains correct under the validation profile"
+    ],
+    "scope_limits": [
+      "the unlit validation captures are not photoreal art evidence",
+      "lit handoff no-pop, moving-camera temporal behavior, packaged desktop, target VR, all-form, corridor, and production gates remain open"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v27_pve_open_grown_conical_frozen_wpo_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
+    "repeatability_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v27_frozen_wpo_repeatability_review.json",
+    "validation_baseline_retained": true,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -570,5 +614,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker and proves that active SimpleGrassWind invalidates separate-run resolution comparisons. Freeze source wind/WPO for both source controls and all atlas views, rerun matched 512 and 1024 profiles, and only then decide whether HLOD spatial registration, branch-scale detail, or a bounded complementary dither transition can pass the exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker, and V27 supplies the frozen-WPO 512 validation control with byte-identical source transforms and bounded Metal raster tolerances. Generate a frozen-WPO 1024 profile under the identical validation contract and compare it with V27 before deciding whether HLOD spatial registration, branch-scale detail, or a bounded complementary dither transition can pass the lit exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }
