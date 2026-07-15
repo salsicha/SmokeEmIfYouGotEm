@@ -1,0 +1,510 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_high_detail_hlod_review.v26",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v26_1024px_per_view_high_detail_hlod",
+  "status": "high_detail_hlod_not_retained_resolution_isolation_invalid",
+  "comparison_contract": {
+    "intended_fixed": [
+      "V24 source geometry and material",
+      "V25 atlas color gain and hard 2,500 cm authority",
+      "sixteen-view camera, lighting, and output-channel contract"
+    ],
+    "intended_change": "tile resolution 512 to 1024 and atlas resolution 2048 to 4096",
+    "discovered_confounder": "The live source material retains SimpleGrassWind defaults WindIntensity=0.16, WindWeight=0.28, and WindSpeed=0.42, so separate runs and sequential atlas views do not share a frozen pose.",
+    "reports": {
+      "v25_512": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v25_pve_open_grown_conical_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
+      "v26_1024": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v26_pve_open_grown_conical_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json"
+    }
+  },
+  "source_geometry_unchanged": true,
+  "atlas_resource_evidence": {
+    "v25_tile_resolution": 512,
+    "v25_atlas_resolution": 2048,
+    "v26_tile_resolution": 1024,
+    "v26_atlas_resolution": 4096,
+    "texel_area_ratio": 4.0,
+    "uncompressed_four_rgba8_source_bytes": {
+      "v25_512": 67108864,
+      "v26_1024": 268435456
+    },
+    "stored_png_bytes": {
+      "v25_512": 10185617,
+      "v26_1024": 35176074
+    },
+    "packaged_gpu_memory_not_measured": true
+  },
+  "distance_comparisons": {
+    "20m": {
+      "expected_authority": "source_only",
+      "v25_to_v26_source": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "c0d11eb135aea78437b78dc85ae4f2816a392404c62beba751aed2fd81e0002b",
+          "dark_chromatic_foreground_pixels": 269819,
+          "foreground_mean_rgb": [
+            31.42933225606796,
+            48.86592493486374,
+            23.341113857808384
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "120691e7f8f7d9491d1cba2e47ee161f18372680dd79b1671e3d3fb402e188c9",
+          "dark_chromatic_foreground_pixels": 269862,
+          "foreground_mean_rgb": [
+            31.33484521718508,
+            49.01685676382744,
+            23.322698268003645
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.028701171875,
+        "mean_absolute_channel_delta": 1.0338957609953703,
+        "dark_chromatic_foreground_intersection_over_union": 0.9884857573424023
+      },
+      "v25_to_v26_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "0b7f3cc0ac18afea52581044c74615b92cc3c2c5db0162dec7867f60e0b50208",
+          "dark_chromatic_foreground_pixels": 284444,
+          "foreground_mean_rgb": [
+            30.341504830476296,
+            49.35874548241482,
+            15.957844074756366
+          ],
+          "foreground_median_rgb": [
+            22.0,
+            42.0,
+            13.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "c8a2ad5367eb3fbc63d457f27885dc7d4d10f6d91be9d4908d945a6dc7a1d8d5",
+          "dark_chromatic_foreground_pixels": 288595,
+          "foreground_mean_rgb": [
+            30.33267728131118,
+            52.03415513089277,
+            17.8695230340096
+          ],
+          "foreground_median_rgb": [
+            22.0,
+            44.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.2740798611111111,
+        "mean_absolute_channel_delta": 11.602150607638889,
+        "dark_chromatic_foreground_intersection_over_union": 0.8461605373797902
+      },
+      "v26_source_to_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "120691e7f8f7d9491d1cba2e47ee161f18372680dd79b1671e3d3fb402e188c9",
+          "dark_chromatic_foreground_pixels": 269862,
+          "foreground_mean_rgb": [
+            31.33484521718508,
+            49.01685676382744,
+            23.322698268003645
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_hlod_only.png",
+          "sha256": "c8a2ad5367eb3fbc63d457f27885dc7d4d10f6d91be9d4908d945a6dc7a1d8d5",
+          "dark_chromatic_foreground_pixels": 288595,
+          "foreground_mean_rgb": [
+            30.33267728131118,
+            52.03415513089277,
+            17.8695230340096
+          ],
+          "foreground_median_rgb": [
+            22.0,
+            44.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.42486219618055554,
+        "mean_absolute_channel_delta": 36.239971788194445,
+        "dark_chromatic_foreground_intersection_over_union": 0.5039371987181214
+      },
+      "v26_combined_to_expected": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_source_only.png",
+          "sha256": "120691e7f8f7d9491d1cba2e47ee161f18372680dd79b1671e3d3fb402e188c9",
+          "dark_chromatic_foreground_pixels": 269862,
+          "foreground_mean_rgb": [
+            31.33484521718508,
+            49.01685676382744,
+            23.322698268003645
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_20m_combined.png",
+          "sha256": "f9a4571073557685e37a9603d416fb64d98c2008ffc904f3243e887aca172bda",
+          "dark_chromatic_foreground_pixels": 269863,
+          "foreground_mean_rgb": [
+            31.334640169271076,
+            49.017649696327396,
+            23.32290829050296
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            44.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 6.944444444444444e-05,
+        "mean_absolute_channel_delta": 0.0033000578703703703,
+        "dark_chromatic_foreground_intersection_over_union": 0.9999740612007441
+      },
+      "v26_combined_selected_authority_equivalent": true
+    },
+    "28m": {
+      "expected_authority": "hlod_only",
+      "v25_to_v26_source": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "893c0dc98551884f9760932efa8d4f34ed99ca98e46a68cb07485e73c40cf6a7",
+          "dark_chromatic_foreground_pixels": 194592,
+          "foreground_mean_rgb": [
+            32.66021727511922,
+            50.506649810886366,
+            25.722701858247
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "3956f1ba0171bb91fac2e7aeb5bde70c804a60aff8954b1d4762c20d1ce19ff3",
+          "dark_chromatic_foreground_pixels": 194380,
+          "foreground_mean_rgb": [
+            32.68131495009775,
+            50.676623109373395,
+            25.770048358884658
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.023065321180555556,
+        "mean_absolute_channel_delta": 0.8106080005787037,
+        "dark_chromatic_foreground_intersection_over_union": 0.9874206124148643
+      },
+      "v25_to_v26_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "4cbcc13cf18cdec207d92f8ea4f2b327a675a023872397ac176da0b00da2afed",
+          "dark_chromatic_foreground_pixels": 206140,
+          "foreground_mean_rgb": [
+            31.562937809255846,
+            50.191913262831086,
+            18.996589696322886
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            42.0,
+            13.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "981f3c216d6eeba7568e14215f950504eb18761aff6af96fd0306a5c66fada0c",
+          "dark_chromatic_foreground_pixels": 206815,
+          "foreground_mean_rgb": [
+            31.66923095520151,
+            53.025046539177524,
+            20.30645262674371
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.19866644965277777,
+        "mean_absolute_channel_delta": 7.9654322193287035,
+        "dark_chromatic_foreground_intersection_over_union": 0.8528963072643245
+      },
+      "v26_source_to_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_source_only.png",
+          "sha256": "3956f1ba0171bb91fac2e7aeb5bde70c804a60aff8954b1d4762c20d1ce19ff3",
+          "dark_chromatic_foreground_pixels": 194380,
+          "foreground_mean_rgb": [
+            32.68131495009775,
+            50.676623109373395,
+            25.770048358884658
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "981f3c216d6eeba7568e14215f950504eb18761aff6af96fd0306a5c66fada0c",
+          "dark_chromatic_foreground_pixels": 206815,
+          "foreground_mean_rgb": [
+            31.66923095520151,
+            53.025046539177524,
+            20.30645262674371
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.29949001736111114,
+        "mean_absolute_channel_delta": 23.71291775173611,
+        "dark_chromatic_foreground_intersection_over_union": 0.5375108263265603
+      },
+      "v26_combined_to_expected": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_hlod_only.png",
+          "sha256": "981f3c216d6eeba7568e14215f950504eb18761aff6af96fd0306a5c66fada0c",
+          "dark_chromatic_foreground_pixels": 206815,
+          "foreground_mean_rgb": [
+            31.66923095520151,
+            53.025046539177524,
+            20.30645262674371
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            13.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_28m_combined.png",
+          "sha256": "981f3c216d6eeba7568e14215f950504eb18761aff6af96fd0306a5c66fada0c",
+          "dark_chromatic_foreground_pixels": 206815,
+          "foreground_mean_rgb": [
+            31.66923095520151,
+            53.025046539177524,
+            20.30645262674371
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            13.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "v26_combined_selected_authority_equivalent": true
+    },
+    "36m": {
+      "expected_authority": "hlod_only",
+      "v25_to_v26_source": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "623706dc8fb32b1fe9bb72f2f9f272a2f8b30c6d9f6733385dbabd0d0ff71bdd",
+          "dark_chromatic_foreground_pixels": 140818,
+          "foreground_mean_rgb": [
+            35.0977005780511,
+            53.665859478191706,
+            29.918192276555555
+          ],
+          "foreground_median_rgb": [
+            32.0,
+            49.0,
+            24.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "39c49832a39b3f4d8ffa5bcb551cb182154e7ea0d15a431e78b3c0e0069e67b0",
+          "dark_chromatic_foreground_pixels": 140556,
+          "foreground_mean_rgb": [
+            35.18933378866786,
+            53.86100913514898,
+            30.01992800022767
+          ],
+          "foreground_median_rgb": [
+            32.0,
+            49.0,
+            25.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.01630099826388889,
+        "mean_absolute_channel_delta": 0.5879108796296296,
+        "dark_chromatic_foreground_intersection_over_union": 0.9860666036111072
+      },
+      "v25_to_v26_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "e633d86f9e534b8b1156f17aeab08670ccf81cb20c0b8b2066cf2b49beb4528e",
+          "dark_chromatic_foreground_pixels": 151490,
+          "foreground_mean_rgb": [
+            34.13810812594891,
+            53.292032477391245,
+            24.11507690276586
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            46.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "8525a964e19e8bcd9d256b50bf31b10b171b5a0aea8cb3fe13febc2f0243d471",
+          "dark_chromatic_foreground_pixels": 151073,
+          "foreground_mean_rgb": [
+            33.90566150139337,
+            55.61773447273835,
+            24.94092260033229
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            48.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.1487424045138889,
+        "mean_absolute_channel_delta": 5.910428964120371,
+        "dark_chromatic_foreground_intersection_over_union": 0.8432104782211391
+      },
+      "v26_source_to_hlod": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_source_only.png",
+          "sha256": "39c49832a39b3f4d8ffa5bcb551cb182154e7ea0d15a431e78b3c0e0069e67b0",
+          "dark_chromatic_foreground_pixels": 140556,
+          "foreground_mean_rgb": [
+            35.18933378866786,
+            53.86100913514898,
+            30.01992800022767
+          ],
+          "foreground_median_rgb": [
+            32.0,
+            49.0,
+            25.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "8525a964e19e8bcd9d256b50bf31b10b171b5a0aea8cb3fe13febc2f0243d471",
+          "dark_chromatic_foreground_pixels": 151073,
+          "foreground_mean_rgb": [
+            33.90566150139337,
+            55.61773447273835,
+            24.94092260033229
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            48.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.22126410590277779,
+        "mean_absolute_channel_delta": 17.121773726851853,
+        "dark_chromatic_foreground_intersection_over_union": 0.5379410725492161
+      },
+      "v26_combined_to_expected": {
+        "before": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_hlod_only.png",
+          "sha256": "8525a964e19e8bcd9d256b50bf31b10b171b5a0aea8cb3fe13febc2f0243d471",
+          "dark_chromatic_foreground_pixels": 151073,
+          "foreground_mean_rgb": [
+            33.90566150139337,
+            55.61773447273835,
+            24.94092260033229
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            48.0,
+            22.0
+          ]
+        },
+        "after": {
+          "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_handoff_36m_combined.png",
+          "sha256": "8525a964e19e8bcd9d256b50bf31b10b171b5a0aea8cb3fe13febc2f0243d471",
+          "dark_chromatic_foreground_pixels": 151073,
+          "foreground_mean_rgb": [
+            33.90566150139337,
+            55.61773447273835,
+            24.94092260033229
+          ],
+          "foreground_median_rgb": [
+            28.0,
+            48.0,
+            22.0
+          ]
+        },
+        "changed_pixel_fraction_max_channel_gt_12": 0.0,
+        "mean_absolute_channel_delta": 0.0,
+        "dark_chromatic_foreground_intersection_over_union": 1.0
+      },
+      "v26_combined_selected_authority_equivalent": true
+    }
+  },
+  "derived_findings": {
+    "source_temporal_changed_pixel_fraction_range": [
+      0.01630099826388889,
+      0.028701171875
+    ],
+    "hlod_changed_pixel_fraction_range": [
+      0.1487424045138889,
+      0.2740798611111111
+    ],
+    "v26_source_hlod_changed_pixel_fractions_at_20_28_36m": [
+      0.42486219618055554,
+      0.29949001736111114,
+      0.22126410590277779
+    ],
+    "v26_source_hlod_foreground_iou_at_20_28_36m": [
+      0.5039371987181214,
+      0.5375108263265603,
+      0.5379410725492161
+    ]
+  },
+  "resolution_isolation_valid": false,
+  "hard_authority_gate_passed": true,
+  "no_pop_gate_passed": false,
+  "human_review": {
+    "accepted": [
+      "The baker and generated texture/material path support an explicit 1024-pixel-per-view, 4096-pixel atlas profile.",
+      "V26 preserves V25 hard one-representation authority at all three exact handoff cameras.",
+      "The run exposes temporal pose contamination as a required deterministic-bake gate."
+    ],
+    "rejected": [
+      "V25 and V26 source-only frames change by more than one percent despite identical source geometry, proving the intended resolution isolation is invalid while live wind remains active.",
+      "V25 and V26 HLOD frames contain visibly different branch poses, with 15-27 percent changed pixels across handoff distances.",
+      "V26 does not pass the no-pop thresholds and quadruples atlas texel area, so the high-detail profile is not retained for runtime use."
+    ],
+    "decision": "Reject V26 promotion and any conclusion that resolution alone improves the handoff. Freeze source wind/WPO for deterministic atlas and source controls, then rerun matched 512 and 1024 profiles before choosing registration, detail, or complementary dither work."
+  },
+  "v26_high_detail_hlod_retained": false,
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false
+}

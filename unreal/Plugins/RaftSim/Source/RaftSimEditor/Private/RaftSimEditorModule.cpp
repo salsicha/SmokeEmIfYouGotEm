@@ -29965,9 +29965,13 @@ bool CreateFutaleufuCypressPvePalette(
     FString& OutSummary)
 {
     const bool bCurvedShells = PaletteMode == TEXT("curved_shells");
+    const bool bHighDetailHlodCalibratedIrregularCrownMass =
+        PaletteMode == TEXT(
+            "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bHlodCalibratedIrregularCrownMassCompoundBranchletAtlas =
         PaletteMode ==
-        TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+        bHighDetailHlodCalibratedIrregularCrownMass;
     const bool bIrregularCrownMassCompoundBranchletAtlas =
         PaletteMode == TEXT("irregular_crown_mass_compound_branchlet_atlas") ||
         bHlodCalibratedIrregularCrownMassCompoundBranchletAtlas;
@@ -30072,8 +30076,11 @@ bool CreateFutaleufuCypressPvePalette(
                 ? (bAsyncSecondaryCompoundBranchletAtlas
                     ? (bIrregularCrownMassCompoundBranchletAtlas
                         ? (bHlodCalibratedIrregularCrownMassCompoundBranchletAtlas
-                            ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
-                                   "PVEFutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+                            ? (bHighDetailHlodCalibratedIrregularCrownMass
+                                ? TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                                       "PVEFutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/")
+                                : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
+                                       "PVEFutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/Palette/"))
                             : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
                                    "PVEFutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/Palette/"))
                         : TEXT("/Game/RaftSim/Environment/GeneratedLocalReview/"
@@ -30642,7 +30649,9 @@ bool CreateFutaleufuCypressPvePalette(
                             ? (bAsyncSecondaryCompoundBranchletAtlas
                                 ? (bIrregularCrownMassCompoundBranchletAtlas
                                     ? (bHlodCalibratedIrregularCrownMassCompoundBranchletAtlas
-                                        ? TEXT("V25_HlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+                                        ? (bHighDetailHlodCalibratedIrregularCrownMass
+                                            ? TEXT("V26_HighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve")
+                                            : TEXT("V25_HlodCalibratedIrregularCrownMassCompoundBranchletAtlas_Pve"))
                                         : TEXT("V24_IrregularCrownMassCompoundBranchletAtlas_Pve"))
                                     : TEXT("V23_AsyncSecondaryCompoundBranchletAtlas_Pve"))
                                 : TEXT("V22_DeTieredCompoundBranchletAtlas_Pve"))
@@ -31249,8 +31258,9 @@ struct FRaftSimPveMultiViewAtlasBakeResult
     bool IsReady() const
     {
         return bAtlasFilesSaved && bTextureAssetsSaved && bMaterialSaved &&
-            bProxyActorCreated && ViewCount == 16 && TileResolution == 512 &&
-            AtlasResolution == 2048 && MinimumCoverage >= 0.002f &&
+            bProxyActorCreated && ViewCount == 16 &&
+            (TileResolution == 512 || TileResolution == 1024) &&
+            AtlasResolution == TileResolution * 4 && MinimumCoverage >= 0.002f &&
             MaximumCoverage <= 0.85f;
     }
 };
@@ -31660,6 +31670,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     const FString& LocalReviewNamespace,
     bool bUseColorCorrectHlod,
     const FLinearColor& AtlasColorGain,
+    int32 RequestedTileResolution,
     FRaftSimPveMultiViewAtlasBakeResult& OutResult,
     FString& OutSummary)
 {
@@ -31669,9 +31680,14 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         OutSummary += TEXT("Multi-view atlas bake requires the live trunk and foliage actors.\n");
         return false;
     }
-    constexpr int32 TileResolution = 512;
+    if (RequestedTileResolution != 512 && RequestedTileResolution != 1024)
+    {
+        OutSummary += TEXT("Multi-view atlas tile resolution must be 512 or 1024.\n");
+        return false;
+    }
+    const int32 TileResolution = RequestedTileResolution;
     constexpr int32 AtlasGrid = 4;
-    constexpr int32 AtlasResolution = TileResolution * AtlasGrid;
+    const int32 AtlasResolution = TileResolution * AtlasGrid;
     constexpr int32 AzimuthViewCount = 8;
     constexpr int32 ElevationViewCount = 2;
     constexpr int32 ViewCount = AzimuthViewCount * ElevationViewCount;
@@ -31785,7 +31801,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
     bool bUsedInverseOpacity = true;
     bool bAllPassesCaptured = true;
 
-    auto CapturePass = [CaptureComponent, RenderTarget](
+    auto CapturePass = [CaptureComponent, RenderTarget, TileResolution](
                            ESceneCaptureSource Source,
                            TArray<FLinearColor>& OutPixels)
     {
@@ -31798,7 +31814,11 @@ bool BakeFutaleufuCypressMultiViewAtlas(
             FReadSurfaceDataFlags(RCM_MinMax, CubeFace_MAX)) &&
             OutPixels.Num() == TileResolution * TileResolution;
     };
-    auto CaptureColorPass = [CaptureComponent, ColorRenderTarget, RenderTarget](
+    auto CaptureColorPass = [
+                                CaptureComponent,
+                                ColorRenderTarget,
+                                RenderTarget,
+                                TileResolution](
                                 TArray<FColor>& OutPixels)
     {
         CaptureComponent->TextureTarget = ColorRenderTarget;
@@ -32085,7 +32105,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("  \"variant\": \"%s\",\n")
         TEXT("  \"status\": \"%s\",\n")
         TEXT("  \"view_contract\": {\"type\": \"bounded_upper_hemisphere\", \"azimuth_degrees\": [0, 45, 90, 135, 180, 225, 270, 315], \"elevation_degrees\": [0, 25], \"view_count\": 16},\n")
-        TEXT("  \"atlas_contract\": {\"grid\": [4, 4], \"tile_resolution\": 512, \"atlas_resolution\": 2048, \"padding_pixels\": 12, \"orthographic_width_cm\": %.6f},\n")
+        TEXT("  \"atlas_contract\": {\"grid\": [4, 4], \"tile_resolution\": %d, \"atlas_resolution\": %d, \"padding_pixels\": 12, \"orthographic_width_cm\": %.6f},\n")
         TEXT("  \"capture_contract\": {\"base_color\": \"%s\", \"normal\": \"SCS_Normal world space\", \"opacity\": \"%s\", \"depth\": \"SCS_SceneDepth normalized per view, near white\", \"primitive_filter\": \"all non-source mesh actors hidden while retaining the review light rig\"},\n")
         TEXT("  \"coverage_fraction_range\": [%.9f, %.9f],\n")
         TEXT("  \"outputs\": {\n")
@@ -32100,6 +32120,8 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
         OutResult.IsReady() ? TEXT("generated_and_proxy_ready_for_exact_camera_review") : TEXT("generation_failed"),
+        TileResolution,
+        AtlasResolution,
         OrthoWidth,
         bUseColorCorrectHlod
             ? TEXT("SCS_FinalColorLDR source-lit RGB with inverse-opacity silhouette")
@@ -32133,7 +32155,9 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         OutSummary += TEXT("Multi-view atlas manifest failed to save.\n");
     }
     OutSummary += FString::Printf(
-        TEXT("Multi-view atlas generated 16 views at 512 px into 2048 px outputs; coverage %.6f to %.6f.\n"),
+        TEXT("Multi-view atlas generated 16 views at %d px into %d px outputs; coverage %.6f to %.6f.\n"),
+        TileResolution,
+        AtlasResolution,
         OutResult.MinimumCoverage,
         OutResult.MaximumCoverage);
     return bManifestSaved && OutResult.IsReady();
@@ -32169,12 +32193,14 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
         PaletteMode != TEXT("async_secondary_compound_branchlet_atlas") &&
         PaletteMode != TEXT("irregular_crown_mass_compound_branchlet_atlas") &&
         PaletteMode !=
-            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
+            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") &&
+        PaletteMode != TEXT(
+            "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
     {
         UE_LOG(
             LogRaftSimEditor,
             Error,
-            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, or hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
+            TEXT("Unsupported cypress palette mode %s; use flat_cards, curved_shells, twig_hierarchy, connected_twig_hierarchy, compact_connected_twig_hierarchy, authored_scale_leaf_hierarchy, dense_authored_scale_leaf_hierarchy, botanical_flattened_spray_hierarchy, dense_botanical_flattened_spray_hierarchy, branchlet_mass_botanical_flattened_spray_hierarchy, hierarchical_botanical_shoot_cluster, terminal_cluster_botanical_shoot, compound_branchlet_atlas, detiered_compound_branchlet_atlas, async_secondary_compound_branchlet_atlas, irregular_crown_mass_compound_branchlet_atlas, hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas, or high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas."),
             *PaletteMode);
         return;
     }
@@ -32191,7 +32217,9 @@ void FRaftSimEditorModule::HandleEvaluateFutaleufuCordilleraCypressPveCandidateC
     const bool bIrregularCrownMass =
         PaletteMode == TEXT("irregular_crown_mass_compound_branchlet_atlas") ||
         PaletteMode ==
-            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+        PaletteMode == TEXT(
+            "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bAsyncSecondaryCrown =
         PaletteMode == TEXT("async_secondary_compound_branchlet_atlas") ||
         bIrregularCrownMass;
@@ -32903,10 +32931,15 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     const bool bCurvedCypressShellPalette =
         bProceduralCypressPveCandidate &&
         ProceduralCypressPaletteMode == TEXT("curved_shells");
+    const bool bHighDetailHlodCalibratedIrregularCrownMassCypressPalette =
+        bProceduralCypressPveCandidate &&
+        ProceduralCypressPaletteMode == TEXT(
+            "high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
     const bool bHlodCalibratedIrregularCrownMassCypressPalette =
         bProceduralCypressPveCandidate &&
-        ProceduralCypressPaletteMode ==
-            TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas");
+        (ProceduralCypressPaletteMode ==
+             TEXT("hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas") ||
+         bHighDetailHlodCalibratedIrregularCrownMassCypressPalette);
     const bool bIrregularCrownMassCompoundBranchletAtlasCypressPalette =
         bProceduralCypressPveCandidate &&
         (ProceduralCypressPaletteMode ==
@@ -32978,7 +33011,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                             ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                                 ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                                    ? TEXT("PVEFutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                    ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                        ? TEXT("PVEFutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                        : TEXT("PVEFutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
                                     : TEXT("PVEFutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas"))
                                 : TEXT("PVEFutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("PVEFutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas"))
@@ -33013,7 +33048,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                             ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                                 ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                                    ? TEXT("FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                    ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                        ? TEXT("FutaleufuCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                        : TEXT("FutaleufuCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
                                     : TEXT("FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas"))
                                 : TEXT("FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("FutaleufuCordilleraCypressDeTieredCompoundBranchletAtlas"))
@@ -33051,7 +33088,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                             ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                                 ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                                    ? TEXT("FutaleufuPveCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                    ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                        ? TEXT("FutaleufuPveCordilleraCypressHighDetailHlodCalibratedIrregularCrownMassCompoundBranchletAtlas")
+                                        : TEXT("FutaleufuPveCordilleraCypressHlodCalibratedIrregularCrownMassCompoundBranchletAtlas"))
                                     : TEXT("FutaleufuPveCordilleraCypressIrregularCrownMassCompoundBranchletAtlas"))
                                 : TEXT("FutaleufuPveCordilleraCypressAsyncSecondaryCompoundBranchletAtlas"))
                             : TEXT("FutaleufuPveCordilleraCypressDeTieredCompoundBranchletAtlas"))
@@ -34096,6 +34135,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bHlodCalibratedIrregularCrownMassCypressPalette
                         ? FLinearColor(2.60f, 1.63f, 1.60f, 1.0f)
                         : FLinearColor(1.10f, 1.38f, 0.90f, 1.0f),
+                    bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                        ? 1024
+                        : 512,
                     LocalMultiViewAtlas,
                     LocalVisualSummary);
 
@@ -34432,7 +34474,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         }
     }
     const TCHAR* LocalMultiViewAtlasHumanAcceptance =
-        bHlodCalibratedIrregularCrownMassCypressPalette
+        bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+        ? TEXT("V26 1024-pixel-per-view mid-distance atlas completed over the V25 color gain, hard authority, and hash-retained V24 source; no-pop and runtime-cost promotion remain pending committed comparison")
+        : (bHlodCalibratedIrregularCrownMassCypressPalette
         ? TEXT("V25 calibrated HLOD color gain completed over the hash-retained V24 source geometry and exact 60 m camera; photometry and 20/28/36 m authority remain pending committed comparison")
         : (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
         ? TEXT("V24 irregular plant-height graft-scale mass ramp completed over the V23 asynchronous secondary-shoot and V22 de-tiered golden-angle crown under fixed attachment-count, source-cost, and camera contracts; visual promotion remains pending committed comparison")
@@ -34454,7 +34498,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? TEXT("V20 botanical flattened-spray source and HLOD capture completed under the measured dimorphic-scale contract; visual promotion remains rejected pending the committed V20 closeup, silhouette, repetition, handoff, temporal, and platform review")
         : (bAuthoredScaleLeafCypressHierarchyPalette
         ? TEXT("authored scale-leaf source and HLOD capture completed without whole-spray crop boundaries; visual promotion remains rejected pending the committed V19 review because botanical scale-leaf read, silhouette, handoff, temporal, and platform gates remain open")
-        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open")))))))))));
+        : TEXT("representation path accepted at the exact 60 m camera: upright frame selection, branch-scale detail, alpha silhouette, and color survive the bake; production visual promotion remains rejected because source whole-spray card edges transfer into the atlas and handoff, temporal, and platform gates remain open"))))))))))));
     const FString LocalMultiViewAtlasJson = FString::Printf(
         TEXT("{\n")
         TEXT("    \"status\": \"%s\",\n")
@@ -34544,7 +34588,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                     ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                         ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                            ? TEXT("_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                            ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                ? TEXT("_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                                : TEXT("_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
                             : TEXT("_irregular_crown_mass_compound_branchlet_atlas"))
                         : TEXT("_async_secondary_compound_branchlet_atlas"))
                     : TEXT("_detiered_compound_branchlet_atlas"))
@@ -34576,7 +34622,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                 ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                     ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                         ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                            ? TEXT("v25")
+                            ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                ? TEXT("v26")
+                                : TEXT("v25"))
                             : TEXT("v24"))
                         : TEXT("v23"))
                     : TEXT("v22"))
@@ -34804,7 +34852,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         ? (bAsyncSecondaryCompoundBranchletAtlasCypressPalette
                             ? (bIrregularCrownMassCompoundBranchletAtlasCypressPalette
                                 ? (bHlodCalibratedIrregularCrownMassCypressPalette
-                                    ? TEXT("ue_5_8_pve_cordillera_cypress_v25_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                                    ? (bHighDetailHlodCalibratedIrregularCrownMassCypressPalette
+                                        ? TEXT("ue_5_8_pve_cordillera_cypress_v26_high_detail_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas")
+                                        : TEXT("ue_5_8_pve_cordillera_cypress_v25_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas"))
                                     : TEXT("ue_5_8_pve_cordillera_cypress_v24_irregular_crown_mass_compound_branchlet_atlas"))
                                 : TEXT("ue_5_8_pve_cordillera_cypress_v23_async_secondary_compound_branchlet_atlas"))
                             : TEXT("ue_5_8_pve_cordillera_cypress_v22_detiered_compound_branchlet_atlas"))
