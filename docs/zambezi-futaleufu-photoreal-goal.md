@@ -1,15 +1,15 @@
 # Zambezi And Futaleufu Photoreal Goal
 
-> Portfolio note, July 14, 2026: Futaleufu remains an active runnable river. Zambezi Batoka Gorge is now backlog because authoritative full-reach centerline and high-resolution terrain are unavailable. Preserve this document and all Zambezi artifacts as technical and visual evidence; do not treat them as an active photoreal production commitment. Chilko replaces Zambezi in the active five-river portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+> Active priority decision, July 14, 2026: Zambezi Batoka Gorge and Futaleufu are the immediate photoreal environment goal. Zambezi returns from backlog as an additional active environment target, while runnable and lifelike promotion remains blocked until authoritative full-reach centerline, high-resolution terrain, route, guide, and review evidence are attached. Chilko remains in the five-river runnable portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
 
 ## Objective
 
-Make the fourth and fifth runnable river environments photorealistic in Unreal:
+Make these two priority river environments photorealistic in Unreal:
 
 - Zambezi River, Batoka Gorge, from Boiling Pot to Mukuni Beach: a photoreal big-water basalt gorge run below Victoria Falls.
 - Futaleufu River, Chile, from Rio Azul Swinging Bridge to The Pasarela: a photoreal Patagonian turquoise big-water run with boulder gardens and forested Andean valley walls.
 
-Futaleufu is required by the active five-river goal. Zambezi is retained as a future candidate whose completion definition remains lifelike in-engine guide-seat and river-eye captures, not merely source-data packages, generated maps, or technically valid screenshots.
+Futaleufu is required by the active five-river runnable goal. Zambezi is an additional active environment target whose runnable promotion remains source-blocked. For both rivers, completion means lifelike in-engine guide-seat and river-eye captures at reviewed seasonal flows, backed by source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, and accepted art, guide, geospatial, rights, hazard-readability, desktop, and VR review. Source-data packages, generated maps, or technically valid screenshots alone do not complete the goal.
 
 ## Current Evidence And Blockers
 

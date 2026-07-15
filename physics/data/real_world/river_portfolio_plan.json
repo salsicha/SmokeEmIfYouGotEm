@@ -1,6 +1,6 @@
 {
-  "schema": "raftsim.real_world.river_portfolio_plan.v0",
-  "status": "active_portfolio_decision_chilko_source_attachment_pending",
+  "schema": "raftsim.real_world.river_portfolio_plan.v1",
+  "status": "active_zambezi_futaleufu_photoreal_priority",
   "decision_date": "2026-07-14",
   "active_rivers": [
     {
@@ -50,18 +50,30 @@
       "source_status": "first_official_source_attachment_complete_production_corridor_blocked"
     }
   ],
-  "backlog_rivers": [
+  "photoreal_priority_goal": {
+    "objective": "Make the Zambezi River through Batoka Gorge and the Futaleufu River from Rio Azul Swinging Bridge to The Pasarela photorealistic in Unreal Engine.",
+    "priority_river_ids": [
+      "zambezi_batoka_gorge",
+      "futaleufu_river_chile"
+    ],
+    "completion_definition": "Lifelike guide-seat and river-eye captures at reviewed seasonal flows with source-traceable terrain, hydrography, materials, foliage, water, atmosphere, named hazards, rights, guide, geospatial, hazard-readability, desktop, and VR approval.",
+    "no_photoreal_claim_before_all_gates_pass": true
+  },
+  "additional_active_environment_targets": [
     {
       "river_id": "zambezi_batoka_gorge",
       "display_name": "Zambezi River through Batoka Gorge",
       "put_in": "Boiling Pot",
       "take_out": "Mukuni Beach",
-      "reason": "authoritative_full_reach_centerline_and_high_resolution_terrain_unavailable",
-      "artifact_policy": "retain_existing_source_corridor_visual_and_validation_evidence"
+      "environment_status": "active_photoreal_production_source_blocked",
+      "runnable_status": "blocked_pending_authoritative_centerline_high_resolution_terrain_and_review",
+      "artifact_policy": "advance_existing_source_corridor_visual_and_validation_evidence_without_overclaiming"
     }
   ],
+  "backlog_rivers": [],
   "portfolio_rules": {
     "active_river_count": 5,
+    "active_environment_target_count": 6,
     "do_not_delete_backlog_evidence": true,
     "no_lifelike_claim_without_human_review": true,
     "no_numeric_flow_band_without_gauge_window_and_guide_review": true,
