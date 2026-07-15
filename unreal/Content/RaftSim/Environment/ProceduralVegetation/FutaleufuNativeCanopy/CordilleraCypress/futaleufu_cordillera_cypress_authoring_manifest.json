@@ -636,6 +636,56 @@
     "regenerate_other_forms_allowed": false,
     "corridor_substitution_allowed": false
   },
+  "v29_frozen_wpo_azimuth_registration_test": {
+    "engine_version": "5.8",
+    "status": "azimuth_registration_retained_no_pop_gate_still_open",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V27 source geometry, generated foliage transforms, zero-wind material, and deterministic unlit validation renderer",
+      "V27 512-pixel tiles, 2048-pixel atlas, orthographic projection, elevation rows, and output channels",
+      "V25 atlas gain [2.60, 1.63, 1.60] and hard 2500 centimeter authority"
+    ],
+    "only_changed_contract": {
+      "atlas_capture_azimuth_offset_degrees_before": 0.0,
+      "atlas_capture_azimuth_offset_degrees_after": 16.0,
+      "runtime_frame_selection_offset_degrees_before": 0.0,
+      "runtime_frame_selection_offset_degrees_after": 16.0
+    },
+    "authored_handoff_geometry": {
+      "camera_azimuth_degrees_at_20_28_36m": [201.80140948635182, 195.94539590092288, 192.52880770915152],
+      "v27_nearest_frame_errors_degrees_at_20_28_36m": [21.801409486351815, 15.945395900922875, 12.528807709151522],
+      "v29_nearest_frame_errors_degrees_at_20_28_36m": [5.801409486351815, 0.0546040990771246, 3.471192290848478]
+    },
+    "isolation_result": {
+      "source_geometry_unchanged": true,
+      "validation_contracts_match": true,
+      "source_control_changed_pixel_fractions_at_20_28_36m": [0.01123806423611111, 0.008279079861111111, 0.006525607638888889],
+      "azimuth_isolation_valid": true
+    },
+    "bounded_improvement": {
+      "v27_source_hlod_changed_pixel_fractions_at_20_28_36m": [0.42516710069444447, 0.30182834201388886, 0.22183051215277777],
+      "v29_source_hlod_changed_pixel_fractions_at_20_28_36m": [0.4153645833333333, 0.2940939670138889, 0.21542100694444444],
+      "v29_minus_v27_foreground_iou_at_20_28_36m": [0.008806422421063775, 0.004938593747619069, 0.0016224940982046965],
+      "azimuth_registration_improves_no_pop": true,
+      "v29_no_pop_gate_passed": false,
+      "hard_authority_gate_passed": true
+    },
+    "accepted_outcomes": [
+      "the 16-degree registered grid reduces authored-camera frame error and improves both no-pop metrics at all three exact handoff cameras",
+      "the registered frame-selection mechanism remains available for the next representation-shape diagnostic"
+    ],
+    "rejected_outcomes": [
+      "V29 remains far outside the no-pop gate and is not a complete handoff solution",
+      "the validation-only captures are not photoreal art evidence"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v29_pve_open_grown_conical_frozen_wpo_azimuth_registered_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
+    "azimuth_registration_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v29_azimuth_registration_review.json",
+    "v27_validation_baseline_retained": true,
+    "azimuth_registration_retained": true,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -661,5 +711,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker, V27 supplies the frozen-WPO 512 validation control, and V28 proves that 1024 pixels per view does not improve the handoff under a valid matched contract. Keep 512 for bounded diagnostics and next correct HLOD spatial registration or representation shape, then evaluate a bounded complementary dither transition before returning to the lit exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, V24 cost-compensated irregular crown-mass envelope, and V25 HLOD color-gain plus hard single-representation authority. V26 retains only the flexible-resolution baker, V27 supplies the frozen-WPO 512 validation control, V28 proves that 1024 pixels per view does not improve the handoff, and V29 retains the 16-degree authored-handoff azimuth registration mechanism without passing no-pop. Keep the registered 512 diagnostic and next isolate perspective projection or depth-aware representation shape, then evaluate a bounded complementary dither transition before returning to the lit exact 20/28/36 meter no-pop gate. Address the remaining closeup source-plane and central-scaffold identity afterward. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }
