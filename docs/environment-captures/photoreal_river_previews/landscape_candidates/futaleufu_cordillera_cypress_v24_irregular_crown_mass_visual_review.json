@@ -1,0 +1,350 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cypress_irregular_crown_mass_review.v24",
+  "river_id": "futaleufu_terminator",
+  "candidate": "v24_open_grown_conical_irregular_crown_mass_compound_branchlet_atlas",
+  "status": "irregular_crown_mass_baseline_retained_visual_promotion_rejected",
+  "comparison_contract": {
+    "fixed": [
+      "V21 compound branchlet textures, fourteen-card authored twig, and material response",
+      "V22 de-tiered main grower and golden-angle graft schedule",
+      "V23 three-template asynchronous branch growth and attachment density",
+      "post-usage shader-resource gate and corrected source-lit HLOD path",
+      "open-grown form envelope and exact review cameras"
+    ],
+    "v24_changed": [
+      "replace Unreal's default linear 1.0-to-0.1 graft scale taper with a six-key bounded plant-height mass envelope",
+      "apply deterministic 0.88-to-1.12 per-attachment graft scale variation",
+      "increase hormone foliage spacing from 0.055 to 0.096 to compensate measured foliage-bearing path growth",
+      "retain the V23 graft count, three templates, source cards, cameras, and HLOD path"
+    ],
+    "crown_band_measurement": "Within the central 50% by horizontal and 3-95% by vertical capture ROI, measure the upper 82% of the detected plant. Smooth per-row dark/chromatic foreground occupancy over 11 pixels, normalize to its 90th percentile, and classify rows below 0.25 occupancy as open. Average two exact turntable views.",
+    "reports": {
+      "v23_async_secondary_compound_branchlet_atlas": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v23_pve_open_grown_conical_async_secondary_compound_branchlet_atlas_report.json",
+      "v24_irregular_crown_mass_compound_branchlet_atlas": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v24_pve_open_grown_conical_irregular_crown_mass_compound_branchlet_atlas_report.json"
+    }
+  },
+  "structural_evidence": {
+    "v23_async_secondary_compound_branchlet_atlas": {
+      "crown_topology_mode": "golden_angle_detiered_async_secondary",
+      "foliage_instance_count": 2993,
+      "impostor_source_triangle_count": 1165057,
+      "atlas_coverage_fraction_range": [
+        0.115131378,
+        0.126678467
+      ]
+    },
+    "v24_irregular_crown_mass_compound_branchlet_atlas": {
+      "crown_topology_mode": "golden_angle_detiered_async_secondary_irregular_crown_mass",
+      "foliage_instance_count": 2944,
+      "impostor_source_triangle_count": 1213857,
+      "atlas_coverage_fraction_range": [
+        0.141555786,
+        0.156162262
+      ]
+    }
+  },
+  "capture_comparisons": {
+    "exact_60m_source": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/open_grown_conical_river_distance_60m.png",
+        "sha256": "81580a07e4e19501abae93b3488e14235a81e0226c1fc4afc238e4766658ced7",
+        "dark_chromatic_foreground_pixels": 50267,
+        "foreground_mean_rgb": [
+          43.188732170211075,
+          63.255495653211845,
+          51.87311755227088
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          59.0,
+          34.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_river_distance_60m.png",
+        "sha256": "8b4ca93c77cf23316a2e08bf2fb81386dfc7fa8863d4cfe1fc8b3bda17c8d668",
+        "dark_chromatic_foreground_pixels": 58915,
+        "foreground_mean_rgb": [
+          43.534193329372826,
+          64.49050326741916,
+          49.55320376814054
+        ],
+        "foreground_median_rgb": [
+          42.0,
+          63.0,
+          34.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.07292317708333333,
+      "mean_absolute_channel_delta": 5.045861183449074,
+      "dark_chromatic_foreground_intersection_over_union": 0.6311645626353926
+    },
+    "branch_spray_closeup": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "979d2256ed86c947b1525f17d733912663d659965746fa83d189d5155f1cae82",
+        "dark_chromatic_foreground_pixels": 51573,
+        "foreground_mean_rgb": [
+          40.211951990382566,
+          46.910767261939384,
+          31.62922459426444
+        ],
+        "foreground_median_rgb": [
+          30.0,
+          43.0,
+          30.0
+        ],
+        "wood": {
+          "wood_pixels": 13393,
+          "wood_fraction_of_detected_plant": 0.25969014794563045
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_branch_spray_closeup.png",
+        "sha256": "7d5586a39de7da29156fb19ec99cac478f79bfc8657ba690b98dffe843a1b446",
+        "dark_chromatic_foreground_pixels": 51572,
+        "foreground_mean_rgb": [
+          40.07781354223222,
+          46.78672535484371,
+          31.4846622198092
+        ],
+        "foreground_median_rgb": [
+          30.0,
+          43.0,
+          30.0
+        ],
+        "wood": {
+          "wood_pixels": 13395,
+          "wood_fraction_of_detected_plant": 0.25973396416660205
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.03030490451388889,
+      "mean_absolute_channel_delta": 1.2080154079861112,
+      "dark_chromatic_foreground_intersection_over_union": 0.8539921630657512
+    },
+    "exact_60m_hlod": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "646abae13632bc731a39e80cf84d11a843dbf387b814ec5f6c3e9e91b0d8f73a",
+        "dark_chromatic_foreground_pixels": 53745,
+        "foreground_mean_rgb": [
+          31.722281142431854,
+          58.681998325425624,
+          45.22616057307656
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          49.0,
+          28.0
+        ]
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_multiview_atlas_hlod_60m.png",
+        "sha256": "806bdc461e364d14878f668a4f2d83a7e5077ee5a9275d9172e3b0a4d8003551",
+        "dark_chromatic_foreground_pixels": 64660,
+        "foreground_mean_rgb": [
+          30.614444788122487,
+          60.573693164243736,
+          42.03713269409217
+        ],
+        "foreground_median_rgb": [
+          22.0,
+          56.0,
+          22.0
+        ]
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.06862847222222222,
+      "mean_absolute_channel_delta": 5.121064814814815,
+      "dark_chromatic_foreground_intersection_over_union": 0.6443083503450957
+    },
+    "turntable_azimuth_035": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_035.png",
+        "sha256": "4cbd9a3877e302e9c70b398e62ecccc0b6a3ec57ee5ff5c45733ab07f2d118a2",
+        "dark_chromatic_foreground_pixels": 59374,
+        "foreground_mean_rgb": [
+          39.03868696735945,
+          56.749031562636844,
+          38.69880755886415
+        ],
+        "foreground_median_rgb": [
+          34.0,
+          49.0,
+          28.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            481,
+            46,
+            799,
+            681
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.08829174664107485,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 45,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.38457428265917015
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_035.png",
+        "sha256": "78ca743a0400ccf30ef8e7c61cff66dd2a67fc746b1fdd30897ce1cd68bdc35b",
+        "dark_chromatic_foreground_pixels": 72496,
+        "foreground_mean_rgb": [
+          40.27687044802472,
+          58.90287740013242,
+          38.31952107702494
+        ],
+        "foreground_median_rgb": [
+          38.0,
+          54.0,
+          31.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            470,
+            47,
+            805,
+            682
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.07869481765834933,
+          "large_open_band_count_minimum_8_pixels": 2,
+          "largest_open_band_pixels": 24,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.3500462880962987
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.09648546006944445,
+      "mean_absolute_channel_delta": 6.67876880787037,
+      "dark_chromatic_foreground_intersection_over_union": 0.5911723538780829
+    },
+    "turntable_azimuth_145": {
+      "before": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressAsyncSecondaryCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_145.png",
+        "sha256": "a28a6e6905ac825c83e8149659c6e80c36f37f8aa5b48715d60bb72f1c8c93d6",
+        "dark_chromatic_foreground_pixels": 60647,
+        "foreground_mean_rgb": [
+          43.026134845911585,
+          60.27450657081142,
+          43.19892162843999
+        ],
+        "foreground_median_rgb": [
+          38.0,
+          53.0,
+          32.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            479,
+            40,
+            794,
+            664
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.052734375,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 27,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.3884101139046189
+        }
+      },
+      "after": {
+        "path": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_turntable_azimuth_145.png",
+        "sha256": "2887ae7748b0ec036aa5e429c6c1b614864d281622ba9870b6600f251a5ea73e",
+        "dark_chromatic_foreground_pixels": 71979,
+        "foreground_mean_rgb": [
+          42.950971811222715,
+          60.84348212673141,
+          41.783478514566745
+        ],
+        "foreground_median_rgb": [
+          38.0,
+          56.0,
+          32.0
+        ],
+        "crown_bands": {
+          "analysis_roi_normalized": [
+            0.25,
+            0.03,
+            0.75,
+            0.95
+          ],
+          "detected_plant_bounds_pixels": [
+            472,
+            51,
+            801,
+            672
+          ],
+          "crown_height_fraction_of_detected_plant": 0.82,
+          "row_smoothing_window_pixels": 11,
+          "occupancy_normalization_percentile": 90,
+          "open_row_normalized_occupancy_threshold": 0.25,
+          "open_band_fraction": 0.03333333333333333,
+          "large_open_band_count_minimum_8_pixels": 1,
+          "largest_open_band_pixels": 17,
+          "smoothed_row_occupancy_coefficient_of_variation": 0.3314120179010456
+        }
+      },
+      "changed_pixel_fraction_max_channel_gt_12": 0.09177625868055556,
+      "mean_absolute_channel_delta": 6.175347583912037,
+      "dark_chromatic_foreground_intersection_over_union": 0.6281519310564954
+    }
+  },
+  "derived_findings": {
+    "triangle_cost_change_fraction": 0.04188636264148449,
+    "foliage_instance_count_change_fraction": -0.01637153357834953,
+    "closeup_foreground_change_fraction": -1.9389990886686803e-05,
+    "closeup_wood_fraction_change": 4.38162209716042e-05,
+    "exact_60m_source_foreground_change_fraction": 0.17204129946087887,
+    "v24_hlod_to_source_foreground_ratio": 1.0975133667147585,
+    "mean_turntable_open_band_fraction_before": 0.07051306082053743,
+    "mean_turntable_open_band_fraction_after": 0.05601407549584134,
+    "mean_turntable_open_band_fraction_change": -0.014498985324696095,
+    "largest_turntable_open_band_pixels_before": 45,
+    "largest_turntable_open_band_pixels_after": 24
+  },
+  "topology_gate_passed": true,
+  "human_review": {
+    "accepted": [
+      "The bounded crown-mass envelope fills the largest V23 primary-shelf gap in both exact turntable views without making every attachment the same size.",
+      "Mean low-occupancy crown rows fall by 1.45 percentage points and the largest open run falls from 45 to 24 pixels.",
+      "Exact 60 meter source mass rises 17.2 percent while foliage instances remain within two percent and merged-source triangles remain within five percent of V23."
+    ],
+    "rejected": [
+      "The isolated tree still exposes a regular central scaffold and flattened compound branchlet planes at close range, so it is not finished photoreal cordilleran-cypress art.",
+      "The source-lit HLOD remains darker and more saturated than the exact source despite bounded foreground agreement.",
+      "Only one form is evaluated; exact handoffs, temporal stability, mixed ecology, corridor placement, packaged desktop, target-VR, and native-art gates remain open."
+    ],
+    "decision": "Retain V24 as the open-grown irregular crown-mass topology baseline because the bounded cost, two-view crown-band, exact 60 meter source, HLOD agreement, and human topology gates pass. Keep visual, corridor, all-form, and production promotion closed; next calibrate source/HLOD photometry and exact handoffs before temporal, platform, or family regeneration work."
+  },
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "regenerate_other_forms_allowed": false,
+  "v24_irregular_crown_mass_baseline_retained": true
+}

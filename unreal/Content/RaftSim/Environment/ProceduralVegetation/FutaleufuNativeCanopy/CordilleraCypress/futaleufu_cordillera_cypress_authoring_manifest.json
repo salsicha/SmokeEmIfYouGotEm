@@ -370,6 +370,65 @@
     "regenerate_other_forms_allowed": false,
     "corridor_substitution_allowed": false
   },
+  "v24_irregular_crown_mass": {
+    "engine_version": "5.8",
+    "status": "open_grown_irregular_crown_mass_baseline_retained_visual_promotion_rejected",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical irregular_crown_mass_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V21 project-owned compound branchlet textures and fourteen-card authored twig",
+      "V22 de-tiered main grower and 137.507764-degree main and graft phyllotaxy",
+      "V23 three-template asynchronous branch-growth palette, graft count, material response, review cameras, and source-lit multi-view HLOD path"
+    ],
+    "changed_contract": {
+      "graft_scale_ramp_by_normalized_plant_height": [
+        [0.0, 0.92],
+        [0.18, 0.96],
+        [0.4, 0.98],
+        [0.62, 0.94],
+        [0.82, 0.82],
+        [1.0, 0.48]
+      ],
+      "deterministic_attachment_scale_range": [0.88, 1.12],
+      "live_foliage_instance_spacing_before": 0.055,
+      "live_foliage_instance_spacing_after": 0.096,
+      "spacing_reason": "compensate the measured foliage-bearing path growth introduced by the bounded crown-mass envelope while retaining V23 attachment count and source-card topology"
+    },
+    "rejected_initial_unbalanced_run": {
+      "foliage_instance_count": 5241,
+      "impostor_source_triangle_count_lod0_rounded_millions": 1.97,
+      "decision": "rejected because unbounded foliage-bearing path growth exceeded the retained source-cost guardrail"
+    },
+    "open_grown_conical_result": {
+      "foliage_instance_count": 2944,
+      "foliage_instance_count_change_from_v23_fraction": -0.01637153357834953,
+      "impostor_source_triangle_count_lod0": 1213857,
+      "triangle_count_change_from_v23_fraction": 0.04188636264148449,
+      "atlas_coverage_fraction_range": [0.141555786, 0.156162262],
+      "closeup_foreground_change_from_v23_fraction": -0.000019389990886686803,
+      "exact_60m_source_foreground_change_from_v23_fraction": 0.17204129946087887,
+      "hlod_to_source_foreground_ratio": 1.0975133667147585,
+      "mean_turntable_open_band_fraction_before": 0.07051306082053743,
+      "mean_turntable_open_band_fraction_after": 0.05601407549584134,
+      "largest_turntable_open_band_pixels_before": 45,
+      "largest_turntable_open_band_pixels_after": 24
+    },
+    "accepted_outcomes": [
+      "the smooth plant-height mass envelope fills the largest V23 primary-shelf gap without uniformly inflating every graft attachment",
+      "two-view mean low-occupancy crown rows fall by 1.45 percentage points and the largest open run falls from 45 to 24 pixels",
+      "exact 60 meter source mass rises 17.2 percent while foliage instances remain within two percent and merged-source triangles remain within five percent of V23"
+    ],
+    "open_visual_failures": [
+      "the isolated tree still exposes a regular central scaffold and flattened compound branchlet planes at close range",
+      "the source-lit HLOD remains darker and more saturated than the exact source",
+      "seven forms, exact 20/28/36 meter handoffs, temporal behavior, mixed ecology, packaged desktop, and target-VR gates remain open"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v24_pve_open_grown_conical_irregular_crown_mass_compound_branchlet_atlas_report.json",
+    "visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v24_irregular_crown_mass_visual_review.json",
+    "topology_baseline_retained": true,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -395,5 +454,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, and V23 asynchronous three-template graft palette. Replace the remaining broad primary-shelf rhythm with irregular crown-level mass under the retained source-cost and exact-camera guardrails, then calibrate HLOD luminance and color and prove explicit 20/28/36 meter near/mid/far authority without overlap or popping. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, V23 asynchronous three-template graft palette, and V24 cost-compensated irregular crown-mass envelope. Calibrate HLOD luminance and color and prove explicit 20/28/36 meter near/mid/far authority without overlap or popping, then address the remaining closeup source-plane and central-scaffold identity. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }
