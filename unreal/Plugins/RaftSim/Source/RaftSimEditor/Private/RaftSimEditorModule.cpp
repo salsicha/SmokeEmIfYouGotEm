@@ -20360,7 +20360,12 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
                  ++MaterialIndex)
             {
                 UMaterialInstanceDynamic* DynamicMaterial =
-                    Component->CreateDynamicMaterialInstance(MaterialIndex);
+                    Cast<UMaterialInstanceDynamic>(Component->GetMaterial(MaterialIndex));
+                if (!DynamicMaterial)
+                {
+                    DynamicMaterial =
+                        Component->CreateDynamicMaterialInstance(MaterialIndex);
+                }
                 if (DynamicMaterial)
                 {
                     DynamicMaterial->SetScalarParameterValue(
@@ -20390,6 +20395,271 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
         bShowHlod ? TEXT("true") : TEXT("false"));
     return bSourceMaterialsUpdated && bHlodMaterialUpdated &&
         (bSourceOnly || bHlodOnly || bCombined);
+}
+
+bool CaptureFutaleufuComplementaryTransitionMotionSequence(
+    const FRaftSimEnvironmentPreviewSpec& Spec,
+    const FString& RelativeCaptureBase,
+    const FString& AuthorityMode,
+    TArray<FString>& OutRelativeCapturePaths,
+    FString& OutSummary)
+{
+    const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
+    constexpr int32 CaptureWidth = 1280;
+    constexpr int32 CaptureHeight = 720;
+    constexpr int32 WarmupFrameCount = 8;
+    constexpr int32 TransitionFrameCount = 41;
+    constexpr int32 CoverageTransitionFrameCount = 31;
+    constexpr int32 SettleFrameCount = 8;
+    constexpr float FixedDeltaSeconds = 1.0f / 60.0f;
+    constexpr float StartRadiusCm = 2300.0f;
+    constexpr float CameraStepCm = 10.0f;
+    constexpr float LateralOffsetCm = 800.0f;
+
+    const FString MapFilename = FPackageName::LongPackageNameToFilename(
+        Spec.MapPackagePath,
+        FPackageName::GetMapPackageExtension());
+    UWorld* World = FPaths::FileExists(MapFilename)
+        ? UEditorLoadingAndSavingUtils::LoadMap(MapFilename)
+        : nullptr;
+    if (!World)
+    {
+        OutSummary += FString::Printf(
+            TEXT("V34 motion sequence could not load %s for %s.\n"),
+            *Spec.MapPackagePath,
+            *AuthorityMode);
+        return false;
+    }
+
+    FlushAsyncLoading();
+    World->FlushLevelStreaming(EFlushLevelStreamingType::Full);
+    FAssetCompilingManager::Get().FinishAllCompilation();
+    if (GShaderCompilingManager)
+    {
+        GShaderCompilingManager->FinishAllCompilation();
+    }
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+
+    ACameraActor* ReferenceCamera =
+        FindPreviewCaptureCamera(World, TEXT("RaftSim_PveTemporal_23m00"));
+    AActor* HlodActor = nullptr;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        if (*It && It->GetActorLabel() == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            HlodActor = *It;
+            break;
+        }
+    }
+    if (!ReferenceCamera || !ReferenceCamera->GetCameraComponent() || !HlodActor)
+    {
+        OutSummary += FString::Printf(
+            TEXT("V34 motion sequence could not resolve the reference camera and HLOD actor for %s.\n"),
+            *AuthorityMode);
+        return false;
+    }
+
+    UTextureRenderTarget2D* RenderTarget =
+        NewObject<UTextureRenderTarget2D>(GetTransientPackage(), NAME_None, RF_Transient);
+    if (!RenderTarget)
+    {
+        OutSummary += TEXT("V34 motion sequence could not allocate a render target.\n");
+        return false;
+    }
+    RenderTarget->RenderTargetFormat = RTF_RGBA8_SRGB;
+    RenderTarget->ClearColor = FLinearColor::Black;
+    RenderTarget->InitAutoFormat(CaptureWidth, CaptureHeight);
+    RenderTarget->UpdateResourceImmediate(true);
+
+    ASceneCapture2D* SceneCapture = World->SpawnActor<ASceneCapture2D>(
+        ASceneCapture2D::StaticClass(),
+        ReferenceCamera->GetActorLocation(),
+        ReferenceCamera->GetActorRotation());
+    USceneCaptureComponent2D* CaptureComponent =
+        SceneCapture ? SceneCapture->GetCaptureComponent2D() : nullptr;
+    if (!SceneCapture || !CaptureComponent)
+    {
+        RenderTarget->ReleaseResource();
+        OutSummary += TEXT("V34 motion sequence could not create a persistent scene capture.\n");
+        return false;
+    }
+
+    FMinimalViewInfo CameraView;
+    ReferenceCamera->GetCameraComponent()->GetCameraView(0.0f, CameraView);
+    CaptureComponent->SetCameraView(CameraView);
+    CaptureComponent->PostProcessSettings =
+        ReferenceCamera->GetCameraComponent()->PostProcessSettings;
+    CaptureComponent->PostProcessBlendWeight = 1.0f;
+    CaptureComponent->TextureTarget = RenderTarget;
+    CaptureComponent->CaptureSource = SCS_FinalColorLDR;
+    CaptureComponent->bCaptureEveryFrame = false;
+    CaptureComponent->bCaptureOnMovement = false;
+    CaptureComponent->bAlwaysPersistRenderingState = true;
+    CaptureComponent->bExcludeFromSceneTextureExtents = true;
+    CaptureComponent->ShowFlags.SetSelection(false);
+    CaptureComponent->ShowFlags.SetModeWidgets(false);
+    CaptureComponent->ShowFlags.SetCompositeEditorPrimitives(false);
+    CaptureComponent->ShowFlags.SetLighting(false);
+    CaptureComponent->ShowFlags.SetPostProcessing(true);
+    CaptureComponent->ShowFlags.SetAtmosphere(false);
+    CaptureComponent->ShowFlags.SetFog(false);
+    CaptureComponent->ShowFlags.SetAntiAliasing(true);
+    CaptureComponent->ShowFlags.SetTemporalAA(true);
+    CaptureComponent->ShowFlags.SetMotionBlur(false);
+    CaptureComponent->ShowFlags.SetEyeAdaptation(false);
+    CaptureComponent->ShowFlags.SetAmbientOcclusion(false);
+    CaptureComponent->ShowFlags.SetGlobalIllumination(false);
+    CaptureComponent->ShowFlags.SetLumenGlobalIllumination(false);
+    CaptureComponent->ShowFlags.SetLumenReflections(false);
+    CaptureComponent->ShowFlags.SetScreenSpaceReflections(false);
+    CaptureComponent->ShowFlags.SetReflectionEnvironment(false);
+    IConsoleVariable* AntiAliasingMethodVariable =
+        IConsoleManager::Get().FindConsoleVariable(TEXT("r.AntiAliasingMethod"));
+    const int32 PreviousAntiAliasingMethod =
+        AntiAliasingMethodVariable ? AntiAliasingMethodVariable->GetInt() : -1;
+    if (AntiAliasingMethodVariable)
+    {
+        AntiAliasingMethodVariable->Set(2, ECVF_SetByCode);
+    }
+    auto RestoreAntiAliasingMethod = [
+                                         AntiAliasingMethodVariable,
+                                         PreviousAntiAliasingMethod]()
+    {
+        if (AntiAliasingMethodVariable && PreviousAntiAliasingMethod >= 0)
+        {
+            AntiAliasingMethodVariable->Set(
+                PreviousAntiAliasingMethod,
+                ECVF_SetByCode);
+        }
+    };
+
+    const FVector Target = HlodActor->GetActorLocation();
+    const float CameraHeight = ReferenceCamera->GetActorLocation().Z;
+    auto SetFrameState = [
+                             World,
+                             ReferenceCamera,
+                             SceneCapture,
+                             Target,
+                             CameraHeight,
+                             AuthorityMode,
+                             &OutSummary](float RadiusCm, float SourceCoverage)
+    {
+        const float AxialDistanceCm = FMath::Sqrt(
+            FMath::Max(0.0f, FMath::Square(RadiusCm) - FMath::Square(LateralOffsetCm)));
+        const FVector CameraLocation(
+            Target.X - AxialDistanceCm,
+            Target.Y - LateralOffsetCm,
+            CameraHeight);
+        const FRotator CameraRotation = (Target - CameraLocation).Rotation();
+        ReferenceCamera->SetActorLocationAndRotation(CameraLocation, CameraRotation);
+        SceneCapture->SetActorLocationAndRotation(CameraLocation, CameraRotation);
+        return ConfigureFutaleufuComplementaryTransitionCapture(
+            World,
+            ReferenceCamera,
+            AuthorityMode,
+            SourceCoverage,
+            OutSummary);
+    };
+    auto AdvanceAndCapture = [World, CaptureComponent]()
+    {
+        World->Tick(LEVELTICK_All, FixedDeltaSeconds);
+        World->SendAllEndOfFrameUpdates();
+        CaptureComponent->CaptureScene();
+        FlushRenderingCommands();
+    };
+    auto SaveCurrentFrame = [RenderTarget](const FString& RelativeCapturePath)
+    {
+        FTextureRenderTargetResource* Resource =
+            RenderTarget->GameThread_GetRenderTargetResource();
+        TArray<FColor> Pixels;
+        if (!Resource || !Resource->ReadPixels(Pixels) ||
+            Pixels.Num() != CaptureWidth * CaptureHeight)
+        {
+            return false;
+        }
+        TArray64<uint8> CompressedPng;
+        FImageUtils::PNGCompressImageArray(
+            CaptureWidth,
+            CaptureHeight,
+            MakeArrayView(Pixels),
+            CompressedPng);
+        const FString AbsoluteCapturePath = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(GetRepoRoot(), RelativeCapturePath));
+        IFileManager::Get().MakeDirectory(*FPaths::GetPath(AbsoluteCapturePath), true);
+        return FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
+    };
+
+    bool bAllFramesSaved = true;
+    if (!SetFrameState(StartRadiusCm, 1.0f))
+    {
+        RestoreAntiAliasingMethod();
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        return false;
+    }
+    for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+    {
+        AdvanceAndCapture();
+    }
+    for (int32 FrameIndex = 0; FrameIndex < TransitionFrameCount; ++FrameIndex)
+    {
+        const float RadiusCm = StartRadiusCm + CameraStepCm * FrameIndex;
+        const float SourceCoverage = FrameIndex < CoverageTransitionFrameCount
+            ? 1.0f - static_cast<float>(FrameIndex) /
+                static_cast<float>(CoverageTransitionFrameCount - 1)
+            : 0.0f;
+        bAllFramesSaved &= SetFrameState(RadiusCm, SourceCoverage);
+        AdvanceAndCapture();
+        const int32 RadiusIntegerCm = FMath::RoundToInt(RadiusCm);
+        const FString DistanceToken = FString::Printf(
+            TEXT("%02dm%02d"),
+            RadiusIntegerCm / 100,
+            RadiusIntegerCm % 100);
+        const FString RelativeCapturePath = FString::Printf(
+            TEXT("%s_motion_f%03d_%s_%s.png"),
+            *RelativeCaptureBase,
+            FrameIndex,
+            *DistanceToken,
+            *AuthorityMode);
+        const bool bSaved = SaveCurrentFrame(RelativeCapturePath);
+        bAllFramesSaved &= bSaved;
+        if (bSaved)
+        {
+            OutRelativeCapturePaths.Add(RelativeCapturePath);
+        }
+    }
+    constexpr float EndRadiusCm =
+        StartRadiusCm + CameraStepCm * (TransitionFrameCount - 1);
+    for (int32 SettleIndex = 0; SettleIndex < SettleFrameCount; ++SettleIndex)
+    {
+        bAllFramesSaved &= SetFrameState(EndRadiusCm, 0.0f);
+        AdvanceAndCapture();
+        const int32 FrameIndex = TransitionFrameCount + SettleIndex;
+        const FString RelativeCapturePath = FString::Printf(
+            TEXT("%s_motion_f%03d_settle%02d_27m00_%s.png"),
+            *RelativeCaptureBase,
+            FrameIndex,
+            SettleIndex + 1,
+            *AuthorityMode);
+        const bool bSaved = SaveCurrentFrame(RelativeCapturePath);
+        bAllFramesSaved &= bSaved;
+        if (bSaved)
+        {
+            OutRelativeCapturePaths.Add(RelativeCapturePath);
+        }
+    }
+
+    RestoreAntiAliasingMethod();
+    SceneCapture->Destroy();
+    RenderTarget->ReleaseResource();
+    OutSummary += FString::Printf(
+        TEXT("V34 persistent same-world %s motion sequence saved %d frames with 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
+        *AuthorityMode,
+        TransitionFrameCount + SettleFrameCount);
+    return bAllFramesSaved &&
+        OutRelativeCapturePaths.Num() - InitialCapturePathCount ==
+            TransitionFrameCount + SettleFrameCount;
 }
 
 FBox GetZambeziCliffComparisonEffectiveBounds(UStaticMesh* Mesh)
@@ -34433,6 +34703,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalTemporalTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalPersistentMotionTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
@@ -34482,6 +34754,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     TArray<float> LocalTemporalTransitionSourceCoverage;
     TArray<FString> LocalTemporalTransitionCapturePaths;
     FString LocalTemporalTransitionCapturesJson;
+    TArray<FString> LocalPersistentMotionTransitionCapturePaths;
+    FString LocalPersistentMotionTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -35394,6 +35668,30 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     }
                     bLocalTemporalTransitionReviewCaptured =
                         bAllTemporalTransitionCapturesProduced;
+                    bool bAllPersistentMotionTransitionCapturesProduced = true;
+                    for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+                    {
+                        bAllPersistentMotionTransitionCapturesProduced &=
+                            CaptureFutaleufuComplementaryTransitionMotionSequence(
+                                ReviewSpec,
+                                LocalVisualCaptureBase,
+                                AuthorityToken,
+                                LocalPersistentMotionTransitionCapturePaths,
+                                LocalVisualSummary);
+                    }
+                    bLocalPersistentMotionTransitionReviewCaptured =
+                        bAllPersistentMotionTransitionCapturesProduced &&
+                        LocalPersistentMotionTransitionCapturePaths.Num() == 147;
+                    for (const FString& CapturePath :
+                         LocalPersistentMotionTransitionCapturePaths)
+                    {
+                        LocalPersistentMotionTransitionCapturesJson += FString::Printf(
+                            TEXT("%s\"%s\""),
+                            LocalPersistentMotionTransitionCapturesJson.IsEmpty()
+                                ? TEXT("")
+                                : TEXT(", "),
+                            *EscapeRaftSimJsonString(CapturePath));
+                    }
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -35403,7 +35701,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bCaptureFarProxy && bCaptureNaniteWholeTree &&
                     bCaptureMultiViewAtlas && bLocalHandoffReviewCaptured &&
                     bLocalComplementaryTransitionReviewCaptured &&
-                    bLocalTemporalTransitionReviewCaptured;
+                    bLocalTemporalTransitionReviewCaptured &&
+                    bLocalPersistentMotionTransitionReviewCaptured;
             }
         }
     }
@@ -35438,7 +35737,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures at exact radial 24/25/26 m cameras plus a V33 ordered 17-sample 23-27 m path precursor; V33 preserves woody geometry but uses traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; matched temporal-path comparison and any art decision remain pending")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, and a V34 persistent same-world 60 Hz motion sequence with source/HLOD controls and endpoint settling; V33/V34 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; matched temporal comparison and any art decision remain pending")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -35468,6 +35767,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"handoff_contract\": {\"enabled\": %s, \"distance_metric\": \"camera_to_hlod_actor_horizontal_distance\", \"source_selection_distance_cm\": 2500.0, \"source_authority_below_threshold\": true, \"single_representation_by_actor_visibility\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"complementary_transition_contract\": {\"enabled\": %s, \"pattern\": \"deterministic_4x4_screen_bayer\", \"parameter\": \"ComplementarySourceCoverage\", \"radial_band_cm\": [2300.0, 2700.0], \"sample_radii_cm\": [2400.0, 2500.0, 2600.0], \"source_coverage\": [0.75, 0.50, 0.25], \"source_and_hlod_visibility_overlap_inside_band\": true, \"pixel_ownership_complementary\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"temporal_transition_path_contract\": {\"enabled\": %s, \"sampling\": \"ordered_camera_path_precursor_without_same-world_temporal_history\", \"radial_band_cm\": [2300.0, 2700.0], \"radial_step_cm\": 25.0, \"sample_count\": 17, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.0625, \"authority_modes_per_sample\": [\"source_only\", \"hlod_only\", \"combined\"], \"source_woody_geometry\": \"unchanged_v24_v30_geometry\", \"source_woody_renderer\": \"traditional_raster_for_dynamic_screen_mask_compatibility\", \"nanite_source_woody_diagnostic\": \"rejected_wood_leaked_into_hlod_owned_pixels\", \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -35530,6 +35830,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
         LocalTemporalTransitionCapturePaths.Num(),
         *LocalTemporalTransitionCapturesJson,
+        LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
+        LocalPersistentMotionTransitionCapturePaths.Num(),
+        *LocalPersistentMotionTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -35548,6 +35851,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"complementary_transition_captures\": [%s],\n")
         TEXT("    \"temporal_transition_capture_count\": %d,\n")
         TEXT("    \"temporal_transition_captures\": [%s],\n")
+        TEXT("    \"persistent_motion_transition_capture_count\": %d,\n")
+        TEXT("    \"persistent_motion_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -35571,6 +35876,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalComplementaryTransitionCapturesJson,
         LocalTemporalTransitionCapturePaths.Num(),
         *LocalTemporalTransitionCapturesJson,
+        LocalPersistentMotionTransitionCapturePaths.Num(),
+        *LocalPersistentMotionTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
