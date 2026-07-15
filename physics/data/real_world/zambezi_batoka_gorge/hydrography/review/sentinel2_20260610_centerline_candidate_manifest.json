@@ -1,6 +1,6 @@
 {
   "schema": "raftsim.zambezi_sentinel_centerline_candidate.v1",
-  "generated_at": "2026-07-15T01:56:15.346586+00:00",
+  "generated_at": "2026-07-15T02:06:12.229876+00:00",
   "river_id": "zambezi_batoka_gorge",
   "status": "surface_water_observation_review_candidate_not_production_geometry",
   "production_promoted": false,
@@ -43,21 +43,36 @@
     "route_sample_spacing_m": 20.0,
     "maximum_lateral_search_m": 200.0,
     "endpoint_taper_m": 200.0,
-    "simplification_tolerance_m": 8.0
+    "simplification_tolerance_m": 8.0,
+    "route_topology_guard": {
+      "nonlocal_station_delta_m": 400.0,
+      "closer_margin_m": 10.0,
+      "policy": "reject a lateral sample when it is materially closer to a route branch more than 400 m away in station space"
+    }
   },
   "measurements": {
     "source_route_length_m": 29980.8172,
-    "candidate_dense_length_m": 30308.8321,
-    "candidate_simplified_length_m": 30170.9483,
+    "candidate_dense_length_m": 30262.1442,
+    "candidate_simplified_length_m": 30154.1531,
     "source_route_point_count": 209,
     "candidate_dense_point_count": 1501,
-    "candidate_simplified_point_count": 198,
+    "candidate_simplified_point_count": 199,
     "median_absolute_lateral_shift_m": 9.375,
-    "p95_absolute_lateral_shift_m": 32.5,
-    "maximum_absolute_lateral_shift_m": 196.25,
+    "p95_absolute_lateral_shift_m": 31.875,
+    "maximum_absolute_lateral_shift_m": 130.625,
     "large_shift_review_threshold_m": 100.0,
-    "large_shift_sample_count": 17,
+    "large_shift_sample_count": 5,
     "large_shift_station_ranges": [
+      {
+        "start_station_m": 1520.0,
+        "end_station_m": 1600.0,
+        "peak_station_m": 1560.0,
+        "peak_absolute_lateral_shift_m": 130.625
+      }
+    ],
+    "topology_rejected_lateral_candidate_count": 1377,
+    "unguarded_maximum_absolute_lateral_shift_m": 196.25,
+    "unguarded_large_shift_station_ranges": [
       {
         "start_station_m": 1520.0,
         "end_station_m": 1840.0,
@@ -66,10 +81,10 @@
       }
     ],
     "source_route_water_support_fraction": 0.893404,
-    "candidate_water_support_fraction": 0.960693,
-    "candidate_ndwi_improves_fraction": 0.456362,
+    "candidate_water_support_fraction": 0.956696,
+    "candidate_ndwi_improves_fraction": 0.45503,
     "source_route_median_ndwi": 0.242424,
-    "candidate_median_ndwi": 0.264214
+    "candidate_median_ndwi": 0.263804
   },
   "authority": {
     "surveyed_centerline": false,
@@ -83,7 +98,7 @@
   "outputs": {
     "candidate_geojson": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/hydrography/review/sentinel2_20260610_centerline_candidate.geojson",
-      "sha256": "be4c8e2031b672147f9a7c957d88e3188409e928d6c4773e1a7522ede5d0e987"
+      "sha256": "eb432d88cec4565443069fe46e927716eba2f223e154673d71d9c30c89135f54"
     },
     "ndwi_preview": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/review/sentinel2_20260610_ndwi_corridor.png",
@@ -92,10 +107,11 @@
     },
     "comparison_overlay": {
       "path": "physics/data/real_world/zambezi_batoka_gorge/imagery/review/sentinel2_20260610_centerline_comparison.png",
-      "sha256": "38379f4087ea49aa913294c5ead3ec3ea2a22cd5be8b7b5054d7412585a987ab",
+      "sha256": "d403947d75b854b52bcbe877f15bb4c158a311e9de260fb7671d17b925a34bce",
       "legend": {
         "osm_route": "yellow",
-        "sentinel_candidate": "cyan"
+        "unguarded_rejected_candidate": "magenta",
+        "topology_guarded_candidate": "cyan"
       }
     }
   },

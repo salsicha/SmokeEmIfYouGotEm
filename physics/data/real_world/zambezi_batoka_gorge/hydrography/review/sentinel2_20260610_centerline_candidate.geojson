@@ -58,32 +58,36 @@
             -17.93016992594994
           ],
           [
-            25.8497843342034,
-            -17.929619491491923
+            25.849114802498715,
+            -17.9298636161751
           ],
           [
-            25.850719577668098,
-            -17.929664746132453
+            25.84940140102893,
+            -17.930144150713154
           ],
           [
-            25.850905535693208,
-            -17.929760390639572
+            25.84981172848271,
+            -17.931115677578557
           ],
           [
-            25.85159718699885,
-            -17.93100027317145
+            25.851043066019788,
+            -17.93143683753252
           ],
           [
-            25.851986491045245,
-            -17.931396728137685
+            25.851800373483353,
+            -17.931492091245275
           ],
           [
-            25.8540613385991,
-            -17.931292417275667
+            25.853872431963925,
+            -17.93129153902371
           ],
           [
-            25.856670587238508,
-            -17.931533449266105
+            25.855006643885993,
+            -17.93133632898655
+          ],
+          [
+            25.856110304968606,
+            -17.93152964669523
           ],
           [
             25.858362172935905,
@@ -816,7 +820,7 @@
       "type": "Feature",
       "properties": {
         "river_id": "zambezi_batoka_gorge",
-        "review_flag": "large_lateral_shift_requires_manual_water_and_bank_review",
+        "review_flag": "raw_cross_channel_snap_rejected_by_route_topology_guard",
         "start_station_m": 1520.0,
         "end_station_m": 1840.0,
         "peak_station_m": 1760.0,
@@ -829,6 +833,26 @@
         "coordinates": [
           25.85053136488688,
           -17.929642495743607
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "river_id": "zambezi_batoka_gorge",
+        "review_flag": "guarded_large_lateral_shift_requires_manual_water_and_bank_review",
+        "start_station_m": 1520.0,
+        "end_station_m": 1600.0,
+        "peak_station_m": 1560.0,
+        "peak_signed_lateral_shift_m": 130.625,
+        "peak_candidate_ndwi": 0.196262,
+        "production_authority": false
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          25.849114802498715,
+          -17.9298636161751
         ]
       }
     }
