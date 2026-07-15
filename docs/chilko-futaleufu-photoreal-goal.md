@@ -18,6 +18,14 @@ Complete photoreal, physically readable Unreal environments for Futaleufu and Ch
 
 Futaleufu keeps its existing Rio Azul Swinging Bridge-to-The Pasarela production corridor and native canopy work. Chilko begins as a source-acquisition target; it is not yet a generated or validated corridor.
 
+## Current Chilko Evidence
+
+The first source attachment is now committed under `physics/data/real_world/chilko_river_bc/`. It preserves 545 official British Columbia Freshwater Atlas features named Chilko River and selects 160 source segments, totaling 56.160 km, between the current put-in and take-out review seeds. The nearest official stream vertices are 218.44 m from the OpenStreetMap lodge seed and 84.929 m from the official Taseko-mouth seed. Those distances are useful alignment diagnostics, not launch/ramp approval; the selected features are still unstitched areal-stream skeletons rather than a production centerline.
+
+Environment and Climate Change Canada metadata plus monthly mean discharge are attached for `08MA002` from November 1928 through December 2025 and `08MA001` from May 1927 through December 2024. `08MA002` is the upstream seasonality/timing candidate, but it is above the put-in and omits route tributaries. `08MA001` is downstream of the Taseko confluence, so it is routing context only and cannot define pre-confluence gameplay discharge. Numeric low/reference/high bands remain blocked pending daily-window routing and local guide review.
+
+The NRCan CanElevation search records MRDEM-30 as the current official terrain fallback. Two high-resolution lidar project envelopes appeared to intersect the search box, but their actual extent polygons have zero intersections with the corridor; they are explicitly rejected as coverage authority. A cloud-screened August 25, 2025 Sentinel-2 L2A scene and review preview are attached with Copernicus terms and attribution, while an apparently acceptable September 4 scene is retained as a visible haze/cloud screening failure. No terrain clip, orthophoto, production imagery derivative, or lifelike asset is promoted yet.
+
 ## Chilko Source Contract
 
 The authored reach starts at the Chilko River Lodge put-in and ends at the Chilko-Taseko Junction recreation-site take-out. Put-in ownership, access, and exact launch geometry require direct review. The take-out has an official British Columbia recreation-site record, but its exact ramp geometry and current access conditions still require field or operator confirmation.

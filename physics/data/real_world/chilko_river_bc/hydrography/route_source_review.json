@@ -1,0 +1,66 @@
+{
+  "schema": "raftsim.chilko.route_source_review.v0",
+  "status": "official_fwa_source_attached_exact_endpoints_and_stitched_centerline_blocked",
+  "source_feature_count": 545,
+  "candidate_feature_count": 160,
+  "candidate_feature_length_sum_m": 56160.337,
+  "put_in": {
+    "name": "Chilko River Lodge",
+    "seed_wgs84": [
+      -124.10681,
+      51.69627
+    ],
+    "seed_authority": "openstreetmap_discovery_seed_not_launch_geometry_authority",
+    "exact_geometry_approved": false,
+    "nearest_fwa_match": {
+      "source_feature_id": "WHSE_BASEMAPPING.FWA_STREAM_NETWORKS_SP.700688116",
+      "linear_feature_id": 700688116,
+      "nearest_source_coordinate_wgs84": [
+        -124.10476102,
+        51.69477128
+      ],
+      "seed_to_source_distance_m": 218.44,
+      "feature_downstream_route_measure_m": 76628.1405141547,
+      "feature_length_m": 184.010647381664,
+      "feature_source": "areal stream sk",
+      "edge_type": 1250,
+      "stream_order": 6
+    }
+  },
+  "take_out": {
+    "name": "Chilko-Taseko Junction",
+    "seed_wgs84": [
+      -123.677222,
+      52.006944
+    ],
+    "seed_authority": "bc_geographical_names_taseko_river_mouth_discovery_seed",
+    "exact_ramp_geometry_approved": false,
+    "nearest_fwa_match": {
+      "source_feature_id": "WHSE_BASEMAPPING.FWA_STREAM_NETWORKS_SP.700679847",
+      "linear_feature_id": 700679847,
+      "nearest_source_coordinate_wgs84": [
+        -123.67756745,
+        52.00767759
+      ],
+      "seed_to_source_distance_m": 84.929,
+      "feature_downstream_route_measure_m": 20703.6089426511,
+      "feature_length_m": 179.804266767509,
+      "feature_source": "areal stream sk",
+      "edge_type": 1250,
+      "stream_order": 7
+    }
+  },
+  "route_authority": {
+    "source_geometry": "official_bc_freshwater_atlas_named_stream_network",
+    "candidate_is_stitched_centerline": false,
+    "candidate_is_bathymetry": false,
+    "production_promotion_allowed": false,
+    "required_next_review": [
+      "confirm_put_in_permission_and_exact_launch_geometry_with_operator_and_land_authority",
+      "confirm_take_out_ramp_and_confluence_geometry",
+      "resolve_areal_stream_skeleton_choice_and_stitch_one_downstream_centerline",
+      "compare_against_current_orthophoto_and_guide_gps",
+      "attach_crs_accuracy_scale_and_update_metadata"
+    ]
+  }
+}

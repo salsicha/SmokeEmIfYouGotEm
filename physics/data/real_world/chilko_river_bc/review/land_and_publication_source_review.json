@@ -1,0 +1,42 @@
+{
+  "schema": "raftsim.chilko.land_publication_source_review.v0",
+  "status": "official_and_nation_source_links_recorded_consultation_and_publication_review_open",
+  "sources": [
+    {
+      "source_id": "tsilhqotin_fisheries",
+      "url": "https://tsilhqotin.ca/our-territory/fisheries/",
+      "role": "watershed_stewardship_salmon_and_nation_context",
+      "use": "link_only_review_context"
+    },
+    {
+      "source_id": "tsilhqotin_declared_title_area",
+      "url": "https://tsilhqotin.ca/governance/declared-title-area/",
+      "role": "title_land_access_and_visiting_context",
+      "use": "link_only_review_context"
+    },
+    {
+      "source_id": "tsilhqotin_place_names",
+      "url": "https://tsilhqotin.ca/our-nation/heritage/place-names/",
+      "role": "place_name_and_cultural_publication_context",
+      "use": "link_only_review_context"
+    },
+    {
+      "source_id": "bc_chilko_taseko_recreation_site",
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/forestry/bc-timber-sales/environmental-stewardship-sustainability/forest-stewardship-plans/cariboo-chilcotin/bcts_cariboo-chilcotin_fsp_828_final.pdf",
+      "role": "official_recreation_site_and_access_source_lead",
+      "use": "link_only_until_exact_site_geometry_and_current_access_review"
+    }
+  ],
+  "policy": {
+    "consultation_or_permission_complete": false,
+    "detailed_access_or_sensitive_location_publication_allowed": false,
+    "nation_media_or_text_downloaded": false,
+    "nation_knowledge_used_as_geometry_authority": false,
+    "required_before_public_release": [
+      "review_title_land_access_and_publication_with_appropriate_tsilhqotin_contact",
+      "confirm_operator_permission_and_put_in_access",
+      "confirm_current_take_out_access_and_ramp_condition",
+      "screen_cultural_ecological_salmon_and_rescue_sensitive_locations"
+    ]
+  }
+}
