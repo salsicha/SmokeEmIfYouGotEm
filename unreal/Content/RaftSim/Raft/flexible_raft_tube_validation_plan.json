@@ -1,0 +1,103 @@
+{
+  "schema": "raftsim.raft.flexible_tube_validation_plan.v0",
+  "status": "planned_not_authoritative",
+  "authority": {
+    "water_state": "custom_cxx_shallow_water_solver",
+    "current_raft_contact_runtime": "CustomReducedRigidBody",
+    "candidate_runtime": "Jolt",
+    "visual_ragdolls_and_non_authoritative_props": "UnrealChaos",
+    "high_fidelity_reference": "ProjectChrono",
+    "scoring_authority_allowed": false,
+    "promotion_rule": "Pass all fixture, telemetry, determinism, water-coupling, platform, and human-review gates before enabling scoring-critical flexible-tube outcomes."
+  },
+  "state": {
+    "required_channels": [
+      "tube_segment_position",
+      "tube_segment_velocity",
+      "tube_segment_compression",
+      "tube_pressure",
+      "tube_volume",
+      "local_freeboard",
+      "floor_and_lacing_tension",
+      "entrained_water_mass",
+      "overwash_flux_and_side",
+      "rock_contact_patch",
+      "water_and_contact_roll_moment"
+    ],
+    "required_mechanics": [
+      "pressure_volume_compliance",
+      "perimeter_segment_compression_and_shape_recovery",
+      "seat_and_high_side_load_depress_local_tube",
+      "two_way_current_loading_on_depressed_or_upstream_tube",
+      "overwash_accumulation_drainage_and_weight_transfer",
+      "rock_indentation_wrap_pinch_friction_and_release",
+      "floor_lacing_frame_and_outer_tube_coupling",
+      "pressure_temperature_damage_and_repair_parameter_hooks"
+    ]
+  },
+  "fixtures": [
+    {
+      "fixture_id": "static_seat_load_sag",
+      "required_outcomes": ["local_tube_depression", "freeboard_change", "shape_recovery"]
+    },
+    {
+      "fixture_id": "traveling_crew_weight_shift",
+      "required_outcomes": ["center_of_mass_transfer", "segment_load_propagation", "deterministic_roll_response"]
+    },
+    {
+      "fixture_id": "rock_pinch_and_wrap",
+      "required_outcomes": ["bounded_indentation", "pin_or_wrap", "pressure_dependent_release"]
+    },
+    {
+      "fixture_id": "upstream_tube_overwash_flip",
+      "required_outcomes": ["overtopping", "entrained_water_load", "missed_high_side_flip"]
+    },
+    {
+      "fixture_id": "timed_high_side_save",
+      "required_outcomes": ["local_tube_depression", "counter_roll_moment", "pin_or_flip_avoidance"]
+    },
+    {
+      "fixture_id": "post_contact_shape_recovery",
+      "required_outcomes": ["bounded_energy_loss", "no_explosive_rebound", "restored_navigable_shape"]
+    },
+    {
+      "fixture_id": "pressure_and_flow_sweep",
+      "required_outcomes": ["low_pressure_wrap_risk", "nominal_pressure_baseline", "high_pressure_contact_response", "flow_dependent_overwash"]
+    }
+  ],
+  "validation": {
+    "reference_comparisons": [
+      "ProjectChrono_or_reviewed_offline_compliant_model",
+      "UnrealChaos_rigid_baseline",
+      "measured_or_guide_reviewed_raft_behavior"
+    ],
+    "required_gates": [
+      "static_equilibrium",
+      "energy_and_momentum_accounting",
+      "water_load_conservation",
+      "contact_stability",
+      "fixed_step_replay_determinism",
+      "pin_release_and_flip_outcome_envelopes",
+      "desktop_console_handheld_and_vr_budget",
+      "guide_and_safety_review"
+    ],
+    "feature_forcing_policy": "Feature forcing must stay disabled or low, bounded, manifest-recorded, GeoClaw-compared where applicable, and unable to hide water or contact conservation failures."
+  },
+  "scalability": {
+    "must_remain_identical": [
+      "authoritative_tube_state",
+      "contact_geometry",
+      "local_freeboard",
+      "overwash_water_mass",
+      "crew_weight_transfer",
+      "pin_release_flip_and_rescue_outcomes"
+    ],
+    "may_scale": [
+      "render_mesh_subdivision",
+      "wrinkle_normals",
+      "spray_and_foam_particles",
+      "non_authoritative_visual_ragdoll_detail",
+      "telemetry_render_density"
+    ]
+  }
+}
