@@ -1,6 +1,6 @@
 {
   "schema": "raftsim.international_production_corridor.v1",
-  "generated_at": "2026-07-13T01:18:25.979367+00:00",
+  "generated_at": "2026-07-15T01:44:01.932049+00:00",
   "river_id": "zambezi_batoka_gorge",
   "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
   "status": "source_scale_technical_corridor_not_yet_lifelike",
@@ -113,11 +113,11 @@
     {
       "role": "high_resolution_terrain_acquisition_lead",
       "path": "physics/data/real_world/zambezi_batoka_gorge/terrain/source/batoka_high_resolution_terrain_acquisition_leads.json",
-      "sha256": "d790411901e674665edf54c0d66e0f824e51af5ab8a90253fd6bae66339bb8b4",
+      "sha256": "e58cce8cf3a2f7e1e59dd5c31e0dbeb84ebf145fc181f9eede0a80e0266c805e",
       "provider": "Zambezi River Authority / BGHES feasibility document set",
       "license": "discovery metadata only; survey data access and rights pending",
       "authority": "lead_only_no_geometry_or_media_imported",
-      "status": "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent"
+      "status": "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent"
     }
   ],
   "environment_contract": {

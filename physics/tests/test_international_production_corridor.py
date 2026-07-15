@@ -127,7 +127,7 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert FUTALEUFU.terrain_acquisition_lead_file is None
     assert lead["production_promoted"] is False
     assert lead["status"] == (
-        "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent"
+        "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent"
     )
     assert lead["policy"]["report_figures_are_not_geometry_authority"] is True
     assert lead["policy"]["no_lidar_dtm_dsm_ortho_or_breakline_data_downloaded"] is True
@@ -135,7 +135,13 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert "bghes_lidar_topographic_survey_report_230_gen_r_sp_001" in sources
     assert "bghes_dam_safety_plan_346_gen_r_sp_001" in sources
     assert "pietrangeli_batoka_drone_photogrammetry_case_study" in sources
+    assert "world_bank_p133380_batoka_engineering_and_lidar_records" in sources
+    assert "zamcom_zamwis_public_catalog_audit" in sources
     assert all(source["data_attached"] is False for source in sources.values())
+    zamwis_audit = sources["zamcom_zamwis_public_catalog_audit"]["catalog_result"]
+    assert zamwis_audit["public_thematic_layer_count"] == 65
+    assert zamwis_audit["batoka_high_resolution_terrain_found"] is False
+    assert zamwis_audit["survey_geometry_downloaded"] is False
     assert "classified ground point cloud or bare-earth DTM" in " ".join(
         lead["acquisition_request"]["request_products"]
     )
@@ -151,6 +157,12 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     assert contacts["Studio Ing. G. Pietrangeli S.r.l."]["email"] == (
         "info@pietrangeli.it"
     )
+    assert contacts["Zambezi Watercourse Commission"]["email"] == (
+        "zamcom@zambezicommission.org"
+    )
+    assert contacts["World Bank Access to Information"]["request_portal"].startswith(
+        "https://"
+    )
     assert lead["acquisition_request"]["outreach_status"]["sent"] is False
     request_text = ZAMBEZI_TERRAIN_ACQUISITION_REQUEST_PATH.read_text(encoding="utf-8")
     for bound in (
@@ -161,6 +173,8 @@ def test_zambezi_high_resolution_terrain_lead_is_rights_gated_and_generator_boun
     ):
         assert bound in request_text
     assert "commercial desktop, console, handheld, and VR game use" in request_text
+    assert "World Bank Records Request Addendum" in request_text
+    assert "information disclosure is not a game-use license" in request_text
     assert "The request has not been sent." in request_text
     acquisition_records = [
         record
