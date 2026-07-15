@@ -1,9 +1,9 @@
 {
-  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v2",
-  "reviewed_on": "2026-07-13",
+  "schema": "raftsim.zambezi_batoka_high_resolution_terrain_acquisition_leads.v3",
+  "reviewed_on": "2026-07-14",
   "river_id": "zambezi_batoka_gorge",
   "reach": "Boiling Pot to Mukuni Beach",
-  "status": "high_resolution_surveys_confirmed_contact_routes_recorded_request_ready_not_sent",
+  "status": "high_resolution_surveys_confirmed_custodian_portal_audit_complete_request_ready_not_sent",
   "production_promoted": false,
   "policy": {
     "link_only_until_access_and_rights_clear": true,
@@ -62,6 +62,42 @@
       ],
       "data_attached": false,
       "rights_status": "public_paper_only_underlying_survey_data_and_derivative_rights_unknown"
+    },
+    {
+      "source_id": "world_bank_p133380_batoka_engineering_and_lidar_records",
+      "provider": "World Bank / Zambezi River Basin Development Project P133380",
+      "url": "https://projects.worldbank.org/en/projects-operations/project-detail/P133380",
+      "supporting_document_url": "https://documents.worldbank.org/curated/en/506061543802152924/pdf/Disclosable-Version-of-the-ISR-AFCC2-RI-Zambezi-River-Basin-Development-Project-P133380-Sequence-No-09.pdf",
+      "source_class": "official_project_record_and_survey_custodian_lead",
+      "observed_evidence": [
+        "Project P133380 funded engineering studies for the proposed Batoka Gorge HES.",
+        "The September 2018 implementation report records initial dam-break mapping and additional LiDAR advancing.",
+        "The public project and document records do not expose a LiDAR point cloud, DTM, orthophoto, breakline package, coverage polygon, or redistribution license."
+      ],
+      "data_attached": false,
+      "rights_status": "project_metadata_public_underlying_survey_access_and_redistribution_unknown"
+    },
+    {
+      "source_id": "zamcom_zamwis_public_catalog_audit",
+      "provider": "Zambezi Watercourse Commission / ZAMWIS",
+      "url": "https://zambezicommission.org/zamwis",
+      "catalog_url": "http://zamwis.zambezicommission.org/INFO/api/Map/GetAllLayers",
+      "source_class": "official_basin_data_catalog_and_custodian_lead",
+      "observed_evidence": [
+        "The public catalog returned 65 thematic layers plus station and background groups without login.",
+        "The only listed elevation product is a 1 km Globe layer; Major rivers and Tributaries are generalized basin context.",
+        "No Batoka LiDAR, high-resolution DTM or DSM, orthophoto, breakline, surveyed centerline, or project-specific terrain layer is listed.",
+        "The portal configuration disallows time-series download because ZAMCOM does not own those records; spatial-product license and redistribution terms are not stated."
+      ],
+      "catalog_result": {
+        "reviewed_on": "2026-07-14",
+        "public_thematic_layer_count": 65,
+        "highest_resolution_listed_elevation": "Globe 1 km",
+        "batoka_high_resolution_terrain_found": false,
+        "survey_geometry_downloaded": false
+      },
+      "data_attached": false,
+      "rights_status": "catalog_metadata_public_spatial_product_access_and_redistribution_not_granted"
     }
   ],
   "acquisition_request": {
@@ -78,6 +114,18 @@
         "email": "info@pietrangeli.it",
         "source": "https://www.pietrangeli.com/contact-us/",
         "role": "published Batoka engineering and drone-photogrammetry survey-team contact"
+      },
+      {
+        "provider": "Zambezi Watercourse Commission",
+        "email": "zamcom@zambezicommission.org",
+        "source": "https://zambezicommission.org/zamwis",
+        "role": "official basin data-system custodian and referral route for unlisted survey holdings"
+      },
+      {
+        "provider": "World Bank Access to Information",
+        "source": "https://www.worldbank.org/ext/en/access-to-information",
+        "request_portal": "https://wbgcmsa2i.microsoftcrmportals.com/",
+        "role": "formal records request route for project P133380 survey reports, deliverables, coverage, and disposition"
       }
     ],
     "outreach_status": {
@@ -87,6 +135,8 @@
     "priority_contacts": [
       "Zambezi River Authority BGHES project office",
       "Studio Pietrangeli feasibility survey team",
+      "Zambezi Watercourse Commission ZAMWIS data custodian",
+      "World Bank project P133380 records through Access to Information",
       "ERM BGHES document custodian"
     ],
     "request_products": [

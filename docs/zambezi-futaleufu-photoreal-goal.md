@@ -15,6 +15,8 @@ Futaleufu is required by the active five-river runnable goal. Zambezi is an addi
 
 Both rivers now have reproducible technical corridor packages with named-route geometry, source-recorded Copernicus DEM GLO-30 terrain, route-window Sentinel-2 imagery, seasonal-flow context, derived Unreal texture inputs, and physical-scale Unreal Landscape candidate maps. The international centerline contract now follows source image rows southward from the northwest heightfield corner, matching the established South Fork and Colorado import convention.
 
+The July 14 custodian audit found no downloadable Batoka survey payload in the official ZAMCOM/ZAMWIS public catalog: it exposes 65 thematic layers, but its listed elevation product is a generalized 1 km layer and no Batoka LiDAR, high-resolution terrain, breakline, or surveyed-centerline layer appears. World Bank project `P133380` records independently confirm Batoka engineering work and additional LiDAR activity without publishing the payload or its license. ZAMCOM/ZAMWIS and the World Bank Access to Information route are now part of the acquisition chain, while the request remains unsent pending project-owner sender and cost authority. This closes a public-portal search path; it does not close the terrain or centerline gate.
+
 Fresh offscreen Unreal captures prove that the Futaleufu river ribbon, cameras, and DEM valley are registered after that transform correction. They also prove that neither environment is lifelike yet. Current blockers include:
 
 - Zambezi's current OSM route is a low-precision international-boundary trace rather than a surveyed centerline; its 30 m DSM cannot resolve the narrow gorge floor and the current bounded visual conditioning reaches a review-gated 218.8192 m maximum cut.

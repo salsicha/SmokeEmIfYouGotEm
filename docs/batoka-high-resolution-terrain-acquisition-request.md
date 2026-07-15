@@ -11,8 +11,17 @@ Request access to existing high-resolution terrain and imagery for an open-sourc
   - Batoka HES document index: https://zambezira.org/hydro-electric-schemes/batoka-hes-project
 - Studio Ing. G. Pietrangeli: `info@pietrangeli.it`
   - Official contact page: https://www.pietrangeli.com/contact-us/
+- Zambezi Watercourse Commission / ZAMWIS: `zamcom@zambezicommission.org`
+  - Official programme page: https://zambezicommission.org/zamwis
+  - The public ZAMWIS catalog exposes generalized basin layers and a 1 km elevation product, but no Batoka LiDAR or high-resolution terrain payload.
+- World Bank project `P133380` records:
+  - Project page: https://projects.worldbank.org/en/projects-operations/project-detail/P133380
+  - Access to Information route: https://www.worldbank.org/ext/en/access-to-information
+  - The September 2018 implementation report records additional LiDAR work but does not publish the survey payload or its disposition.
 
 The request has not been sent. A project owner should confirm the sender identity, organization, reply address, and willingness to accept any quoted license or data cost before outreach.
+
+Send the technical request first to ZRA and Studio Pietrangeli. Ask ZAMCOM to check unlisted ZAMWIS holdings or identify the current survey custodian. Submit a separate World Bank Access to Information request for project `P133380` records if the direct custodians cannot provide Vol.3, its coverage index, or the underlying survey disposition. Do not upload private project material or accept license terms through any portal without project-owner review.
 
 ## Email Draft
 
@@ -53,6 +62,18 @@ We need explicit terms for:
 The open-source repository can keep raw licensed survey data outside version control if redistribution is restricted. We can publish only code, manifests, provenance, and permitted non-reversible game derivatives.
 
 Thank you for any guidance or referral to the appropriate survey custodian.
+
+## World Bank Records Request Addendum
+
+For project `P133380`, request records sufficient to identify and lawfully acquire the survey rather than assuming that public financing makes the data redistributable:
+
+- final or draft `230 GEN R SP 001` LiDAR Topographic Survey Report and appendices;
+- survey deliverable register, coverage polygon or sheet index, acceptance record, and current custodian;
+- contract clauses or data-management records governing ownership, disclosure, reuse, and redistribution;
+- confirmation whether the Batoka engineering LiDAR and the additional dam-break-analysis LiDAR are the same survey, overlapping surveys, or separate products;
+- referral to ZRA, ZAMCOM, Studio Pietrangeli, or another custodian if the World Bank does not hold the payload.
+
+An information disclosure is not a game-use license. Any released report, index, or data must still pass the technical and rights checklist below.
 
 ## Technical Acceptance Checklist
 
