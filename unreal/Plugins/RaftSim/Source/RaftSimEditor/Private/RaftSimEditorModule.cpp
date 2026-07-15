@@ -20563,7 +20563,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
         FVector&,
         FString&)>& SceneSetup = {},
     float TransitionMode = 0.0f,
-    bool bHlodFrameSearch = false)
+    bool bHlodFrameSearch = false,
+    int32* OutAutomaticHlodFrame = nullptr)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -20722,19 +20723,14 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
 
     const FVector Target = HlodActor->GetActorLocation();
     const float CameraHeight = ReferenceCamera->GetActorLocation().Z;
-    auto SetFrameState = [
-                             World,
-                             ReferenceCamera,
-                             SceneCapture,
-                             Target,
-                             ViewTargetOffset,
-                             CameraHeight,
-                             MotionForward,
-                             MotionRight,
-                             AuthorityMode,
-                             PatternSize,
-                             TransitionMode,
-                             &OutSummary](float RadiusCm, float SourceCoverage)
+    auto SetCameraState = [
+                              ReferenceCamera,
+                              SceneCapture,
+                              Target,
+                              ViewTargetOffset,
+                              CameraHeight,
+                              MotionForward,
+                              MotionRight](float RadiusCm)
     {
         const float AxialDistanceCm = FMath::Sqrt(
             FMath::Max(0.0f, FMath::Square(RadiusCm) - FMath::Square(LateralOffsetCm)));
@@ -20745,6 +20741,17 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             (Target + ViewTargetOffset - CameraLocation).Rotation();
         ReferenceCamera->SetActorLocationAndRotation(CameraLocation, CameraRotation);
         SceneCapture->SetActorLocationAndRotation(CameraLocation, CameraRotation);
+    };
+    auto SetFrameState = [
+                             World,
+                             ReferenceCamera,
+                             AuthorityMode,
+                             PatternSize,
+                             TransitionMode,
+                             &SetCameraState,
+                             &OutSummary](float RadiusCm, float SourceCoverage)
+    {
+        SetCameraState(RadiusCm);
         return ConfigureFutaleufuComplementaryTransitionCapture(
             World,
             ReferenceCamera,
@@ -20782,6 +20789,100 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
         IFileManager::Get().MakeDirectory(*FPaths::GetPath(AbsoluteCapturePath), true);
         return FFileHelper::SaveArrayToFile(CompressedPng, *AbsoluteCapturePath);
     };
+
+    if (bHlodFrameSearch)
+    {
+        constexpr float SearchRadiusCm = 2450.0f;
+        constexpr float AtlasAzimuthOffsetTurns = 16.0f / 360.0f;
+        bool bAllSearchFramesSaved = true;
+        SetCameraState(SearchRadiusCm);
+        const FVector ViewToCamera =
+            (ReferenceCamera->GetActorLocation() - Target).GetSafeNormal();
+        float NormalizedAzimuth = FMath::Fmod(
+            FMath::Atan2(ViewToCamera.Y, ViewToCamera.X) / (2.0f * PI) -
+                AtlasAzimuthOffsetTurns + 1.0f,
+            1.0f);
+        if (NormalizedAzimuth < 0.0f)
+        {
+            NormalizedAzimuth += 1.0f;
+        }
+        const int32 AutomaticAzimuthFrame =
+            FMath::RoundToInt(NormalizedAzimuth * 8.0f) % 8;
+        if (OutAutomaticHlodFrame)
+        {
+            *OutAutomaticHlodFrame = AutomaticAzimuthFrame;
+        }
+
+        bAllSearchFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+            World,
+            ReferenceCamera,
+            TEXT("source_only"),
+            1.0f,
+            OutSummary,
+            static_cast<float>(PatternSize),
+            TransitionMode);
+        bAllSearchFramesSaved &=
+            SetFutaleufuHlodAtlasFrameOverride(World, -1.0f, OutSummary);
+        for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+        {
+            AdvanceAndCapture();
+        }
+        const FString SourcePath = FString::Printf(
+            TEXT("%s_hlod_frame_search_source_reference.png"),
+            *RelativeCaptureBase);
+        const bool bSourceSaved = SaveCurrentFrame(SourcePath);
+        bAllSearchFramesSaved &= bSourceSaved;
+        if (bSourceSaved)
+        {
+            OutRelativeCapturePaths.Add(SourcePath);
+        }
+
+        bAllSearchFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+            World,
+            ReferenceCamera,
+            TEXT("hlod_only"),
+            0.0f,
+            OutSummary,
+            static_cast<float>(PatternSize),
+            TransitionMode);
+        for (int32 SearchIndex = -1; SearchIndex < 8; ++SearchIndex)
+        {
+            bAllSearchFramesSaved &= SetFutaleufuHlodAtlasFrameOverride(
+                World,
+                static_cast<float>(SearchIndex),
+                OutSummary);
+            for (int32 WarmupIndex = 0;
+                 WarmupIndex < WarmupFrameCount;
+                 ++WarmupIndex)
+            {
+                AdvanceAndCapture();
+            }
+            const FString SearchPath = SearchIndex < 0
+                ? FString::Printf(
+                      TEXT("%s_hlod_frame_search_automatic.png"),
+                      *RelativeCaptureBase)
+                : FString::Printf(
+                      TEXT("%s_hlod_frame_search_override_frame%02d.png"),
+                      *RelativeCaptureBase,
+                      SearchIndex);
+            const bool bSearchSaved = SaveCurrentFrame(SearchPath);
+            bAllSearchFramesSaved &= bSearchSaved;
+            if (bSearchSaved)
+            {
+                OutRelativeCapturePaths.Add(SearchPath);
+            }
+        }
+
+        RestoreAntiAliasingMethod();
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        OutSummary += FString::Printf(
+            TEXT("V38 HLOD frame search saved source, automatic, and eight row-zero override captures at 24.5 m; the material calculation selects automatic frame %d from normalized azimuth %.6f.\n"),
+            AutomaticAzimuthFrame,
+            NormalizedAzimuth);
+        return bAllSearchFramesSaved &&
+            OutRelativeCapturePaths.Num() - InitialCapturePathCount == 10;
+    }
 
     bool bAllFramesSaved = true;
     const FString SequenceToken = TransitionMode >= 0.5f
@@ -33192,7 +33293,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("  },\n")
         TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"albedo_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"legacy_unlit_material\": \"%s\", \"relightable_lit_material\": \"%s\"},\n")
         TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s, \"complementary_screen_dither_enabled\": %s, \"complementary_source_coverage_parameter\": \"ComplementarySourceCoverage\"},\n")
-        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"shading\": \"masked DefaultLit albedo plus captured world normal\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true},\n")
+        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"shading\": \"masked DefaultLit albedo plus captured world normal\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
@@ -35035,6 +35136,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalTemporalLitRiverViewMotionTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalHlodFrameSearchReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     UStaticMesh* LocalMultiViewHlodMesh = nullptr;
     FTransform LocalMultiViewHlodTransform = FTransform::Identity;
@@ -35094,6 +35197,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalLitRiverViewMotionTransitionCapturesJson;
     TArray<FString> LocalTemporalLitRiverViewMotionTransitionCapturePaths;
     FString LocalTemporalLitRiverViewMotionTransitionCapturesJson;
+    TArray<FString> LocalHlodFrameSearchCapturePaths;
+    FString LocalHlodFrameSearchCapturesJson;
+    int32 LocalHlodFrameSearchAutomaticFrame = -1;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -36465,6 +36571,33 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                     : TEXT(", "),
                                 *EscapeRaftSimJsonString(CapturePath));
                     }
+                    const bool bAllHlodFrameSearchCapturesProduced =
+                        LocalMultiViewAtlas.IsRelightableReady() &&
+                        CaptureFutaleufuComplementaryTransitionMotionSequence(
+                            LitRiverReviewSpec,
+                            LocalVisualCaptureBase,
+                            TEXT("hlod_frame_search"),
+                            8,
+                            LocalHlodFrameSearchCapturePaths,
+                            LocalVisualSummary,
+                            true,
+                            SetupLitRiverView,
+                            1.0f,
+                            true,
+                            &LocalHlodFrameSearchAutomaticFrame);
+                    bLocalHlodFrameSearchReviewCaptured =
+                        bAllHlodFrameSearchCapturesProduced &&
+                        LocalHlodFrameSearchCapturePaths.Num() == 10;
+                    for (const FString& CapturePath :
+                         LocalHlodFrameSearchCapturePaths)
+                    {
+                        LocalHlodFrameSearchCapturesJson += FString::Printf(
+                            TEXT("%s\"%s\""),
+                            LocalHlodFrameSearchCapturesJson.IsEmpty()
+                                ? TEXT("")
+                                : TEXT(", "),
+                            *EscapeRaftSimJsonString(CapturePath));
+                    }
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -36478,7 +36611,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalPersistentMotionTransitionReviewCaptured &&
                     bLocalFinePersistentMotionTransitionReviewCaptured &&
                     bLocalLitRiverViewMotionTransitionReviewCaptured &&
-                    bLocalTemporalLitRiverViewMotionTransitionReviewCaptured;
+                    bLocalTemporalLitRiverViewMotionTransitionReviewCaptured &&
+                    bLocalHlodFrameSearchReviewCaptured;
             }
         }
     }
@@ -36513,7 +36647,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, and a V37 temporal-AA plus relightable-albedo/world-normal sequence under the same 60 Hz motion and endpoint-settle contract; V33-V37 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V37 remains review-only pending measured art, silhouette, patterning, background-isolation, and hazard decisions")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, and a V38 fixed-camera automatic-versus-eight-frame atlas search; V33-V38 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V38 remains review-only pending measured frame-selection, silhouette, photometry, and representation decisions")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -36534,7 +36668,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"opacity_source\": \"%s\",\n")
         TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
         TEXT("    \"material_asset\": \"%s\",\n")
-        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"emissive_connected\": false, \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"]},\n")
+        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"emissive_connected\": false, \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"], \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("    \"runtime_representation\": \"%s\",\n")
         TEXT("    \"atlas_color_gain\": [%.6f, %.6f, %.6f],\n")
         TEXT("    \"exact_source_camera_60m_capture\": \"%s\",\n")
@@ -36548,6 +36682,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"fine_persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"base_pattern_retained_for_control\": \"deterministic_4x4_screen_bayer\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"one transient non-colliding source/HLOD pair placed on the finite lower-slope near bank from the existing river-eye basis\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"temporal_lit_river_view_motion_sequence_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement as V36 with a separate relightable HLOD material\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_and_one_persistent_scene_capture_per_authority_mode\", \"transition\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_modes_retained\": true, \"source_material\": \"masked source bark and foliage with ComplementaryTransitionMode=1\", \"hlod_shading\": \"DefaultLit albedo plus captured world normal, no emissive connection\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"lighting\": true, \"atmosphere\": true, \"fog\": true, \"ambient_occlusion\": true, \"global_illumination\": true, \"lumen_gi\": true, \"lumen_reflections\": true, \"screen_space_reflections\": true, \"reflection_environment\": true, \"motion_blur\": false, \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"hlod_frame_search_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement and relightable HLOD as V37\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"lighting\": true, \"temporal_aa\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_override_value\": -1.0, \"calculated_automatic_row_zero_frame\": %d, \"tested_row_zero_frames\": [0, 1, 2, 3, 4, 5, 6, 7], \"source_reference_count\": 1, \"automatic_selection_count\": 1, \"override_capture_count\": 8, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -36627,6 +36762,10 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
         LocalTemporalLitRiverViewMotionTransitionCapturePaths.Num(),
         *LocalTemporalLitRiverViewMotionTransitionCapturesJson,
+        LocalMultiViewAtlas.IsRelightableReady() ? TEXT("true") : TEXT("false"),
+        LocalHlodFrameSearchAutomaticFrame,
+        LocalHlodFrameSearchCapturePaths.Num(),
+        *LocalHlodFrameSearchCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -36653,6 +36792,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"lit_river_view_motion_transition_captures\": [%s],\n")
         TEXT("    \"temporal_lit_river_view_motion_transition_capture_count\": %d,\n")
         TEXT("    \"temporal_lit_river_view_motion_transition_captures\": [%s],\n")
+        TEXT("    \"hlod_frame_search_capture_count\": %d,\n")
+        TEXT("    \"hlod_frame_search_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -36684,6 +36825,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalLitRiverViewMotionTransitionCapturesJson,
         LocalTemporalLitRiverViewMotionTransitionCapturePaths.Num(),
         *LocalTemporalLitRiverViewMotionTransitionCapturesJson,
+        LocalHlodFrameSearchCapturePaths.Num(),
+        *LocalHlodFrameSearchCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
