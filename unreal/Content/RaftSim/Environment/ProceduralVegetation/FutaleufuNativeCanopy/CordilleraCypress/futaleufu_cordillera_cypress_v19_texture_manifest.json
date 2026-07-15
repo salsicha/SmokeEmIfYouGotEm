@@ -1,0 +1,220 @@
+{
+  "schema": "raftsim.unreal.futaleufu_cordillera_cypress_textures.v19",
+  "generated_on": "2026-07-14",
+  "status": "v19_project_owned_scale_leaf_atlas_ready_for_isolated_review",
+  "production_promoted": false,
+  "corridor_substitution_allowed": false,
+  "species": "Austrocedrus chilensis",
+  "source_provenance": {
+    "derivation": "deterministic project-owned scale-leaf tile authoring",
+    "external_photo_pixels_vendored": false,
+    "external_reference_pixels_derived": false,
+    "botanical_measurement_claimed": false,
+    "reference_boundary": "rights-reviewed species photographs remain link-only morphology evidence"
+  },
+  "derivation": {
+    "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v19_assets.py",
+    "generator_sha256": "cc321ff09ab11a4efe6828f6a1258938cc270f6d3b5a9bb2bf354c4972000470",
+    "atlas_grid": [
+      4,
+      4
+    ],
+    "tile_size": 512,
+    "whole_spray_image_tiles": false,
+    "tile_records": [
+      {
+        "tile": 0,
+        "seed": 1,
+        "width_scale": 0.214,
+        "curve_phase": 0.71,
+        "nonzero_alpha_fraction": 0.2544441223144531,
+        "opaque_alpha_fraction": 0.23708724975585938
+      },
+      {
+        "tile": 1,
+        "seed": 2,
+        "width_scale": 0.238,
+        "curve_phase": 1.42,
+        "nonzero_alpha_fraction": 0.2830848693847656,
+        "opaque_alpha_fraction": 0.2638206481933594
+      },
+      {
+        "tile": 2,
+        "seed": 3,
+        "width_scale": 0.202,
+        "curve_phase": 2.13,
+        "nonzero_alpha_fraction": 0.23835372924804688,
+        "opaque_alpha_fraction": 0.2220916748046875
+      },
+      {
+        "tile": 3,
+        "seed": 4,
+        "width_scale": 0.226,
+        "curve_phase": 2.84,
+        "nonzero_alpha_fraction": 0.2669219970703125,
+        "opaque_alpha_fraction": 0.24877548217773438
+      },
+      {
+        "tile": 4,
+        "seed": 5,
+        "width_scale": 0.19,
+        "curve_phase": 3.55,
+        "nonzero_alpha_fraction": 0.22377777099609375,
+        "opaque_alpha_fraction": 0.20849990844726562
+      },
+      {
+        "tile": 5,
+        "seed": 6,
+        "width_scale": 0.214,
+        "curve_phase": 4.26,
+        "nonzero_alpha_fraction": 0.2511558532714844,
+        "opaque_alpha_fraction": 0.23381805419921875
+      },
+      {
+        "tile": 6,
+        "seed": 7,
+        "width_scale": 0.238,
+        "curve_phase": 4.97,
+        "nonzero_alpha_fraction": 0.28235626220703125,
+        "opaque_alpha_fraction": 0.2631797790527344
+      },
+      {
+        "tile": 7,
+        "seed": 8,
+        "width_scale": 0.202,
+        "curve_phase": 5.68,
+        "nonzero_alpha_fraction": 0.242034912109375,
+        "opaque_alpha_fraction": 0.22557449340820312
+      },
+      {
+        "tile": 8,
+        "seed": 9,
+        "width_scale": 0.226,
+        "curve_phase": 6.39,
+        "nonzero_alpha_fraction": 0.26615142822265625,
+        "opaque_alpha_fraction": 0.24799728393554688
+      },
+      {
+        "tile": 9,
+        "seed": 10,
+        "width_scale": 0.19,
+        "curve_phase": 7.1,
+        "nonzero_alpha_fraction": 0.2203826904296875,
+        "opaque_alpha_fraction": 0.20514297485351562
+      },
+      {
+        "tile": 10,
+        "seed": 11,
+        "width_scale": 0.214,
+        "curve_phase": 7.81,
+        "nonzero_alpha_fraction": 0.25292205810546875,
+        "opaque_alpha_fraction": 0.23557281494140625
+      },
+      {
+        "tile": 11,
+        "seed": 12,
+        "width_scale": 0.238,
+        "curve_phase": 8.52,
+        "nonzero_alpha_fraction": 0.28688812255859375,
+        "opaque_alpha_fraction": 0.2672691345214844
+      },
+      {
+        "tile": 12,
+        "seed": 13,
+        "width_scale": 0.202,
+        "curve_phase": 9.23,
+        "nonzero_alpha_fraction": 0.239349365234375,
+        "opaque_alpha_fraction": 0.222991943359375
+      },
+      {
+        "tile": 13,
+        "seed": 14,
+        "width_scale": 0.226,
+        "curve_phase": 9.94,
+        "nonzero_alpha_fraction": 0.2623481750488281,
+        "opaque_alpha_fraction": 0.244293212890625
+      },
+      {
+        "tile": 14,
+        "seed": 15,
+        "width_scale": 0.19,
+        "curve_phase": 10.65,
+        "nonzero_alpha_fraction": 0.22345733642578125,
+        "opaque_alpha_fraction": 0.20814132690429688
+      },
+      {
+        "tile": 15,
+        "seed": 16,
+        "width_scale": 0.214,
+        "curve_phase": 11.36,
+        "nonzero_alpha_fraction": 0.2558784484863281,
+        "opaque_alpha_fraction": 0.238525390625
+      }
+    ],
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "4a27e37faea5c353d3f22e1b26c8d4916496265d6aec4c58e98dc2c882f7ecc6",
+      "nontransparent_rgb_sha256": "be51f75385d5ac82130ad500f9a41bb4468427ab395f2abbbac5cb9b45289b40",
+      "padded_transparent_pixel_count": 540960,
+      "transparent_nonzero_rgb_pixel_count": 540960
+    }
+  },
+  "alpha": {
+    "nonzero_pixel_count": 1061554,
+    "nonzero_fraction": 0.2530941963195801,
+    "opaque_pixel_count": 989012,
+    "opaque_fraction": 0.23579883575439453,
+    "transparent_corners": true
+  },
+  "maps": {
+    "scale_leaf_albedo_opacity": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_scale_leaf_v19_albedo_opacity.png",
+      "sha256": "77bc839acf9dab72908ff7827f30424b664c2c90ae208aae6338de205268a32f",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "v19_isolated_review_candidate_not_production_promoted"
+    },
+    "scale_leaf_normal": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_scale_leaf_v19_normal.png",
+      "sha256": "12a4f5272f146ef18ba6716b4e3feec29869623a5321e6afc98f27eec6663d68",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "v19_isolated_review_candidate_not_production_promoted"
+    },
+    "scale_leaf_ao_roughness_subsurface": {
+      "path": "unreal/Content/RaftSim/Environment/ProceduralVegetation/FutaleufuNativeCanopy/CordilleraCypress/Textures/cordillera_cypress_scale_leaf_v19_ao_roughness_subsurface.png",
+      "sha256": "5131fad7f88d280ebc0b21fcb6af09540d49107199547cabbfeeb3878b0b1f9e",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "v19_isolated_review_candidate_not_production_promoted"
+    }
+  },
+  "unreal_contract": {
+    "texture_key_prefix": "Scale",
+    "intended_geometry": "connected branch-scale hierarchy carrying explicit overlapping scale-leaf cards",
+    "near_representation_eligible": false,
+    "required_before_eligibility": [
+      "isolated exact-camera 60 m, closeup, and multi-view HLOD review",
+      "no whole-spray crop boundaries or repeated broad spray motifs",
+      "leaf-scale cards read as an attached imbricate shoot rather than detached planes",
+      "source and HLOD silhouettes do not regress against V18.2",
+      "masked overdraw and packaged desktop/target-VR cost pass"
+    ]
+  }
+}

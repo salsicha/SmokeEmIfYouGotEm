@@ -35,7 +35,7 @@
   },
   "derivation": {
     "generator": "physics/src/raftsim/futaleufu_cordillera_cypress_v18_assets.py",
-    "generator_sha256": "a3fc2e3c4b499b653c77958a3e515be3eea2eb420b64c4a9b8a6956528e2d3de",
+    "generator_sha256": "5a8dc272ce91c656f84f9a1a794b2e08b032f4ad62bc770d67b8ef8762e08c38",
     "atlas_grid": [
       4,
       4
