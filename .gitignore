@@ -34,3 +34,5 @@ unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeec
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypress*/
 
 graphify-out/
+
+.DS_Store

@@ -5402,27 +5402,53 @@ UMaterialExpressionCustom* AddComplementaryScreenDitherOpacity(
     SourceCoverage->SliderMax = 1.0f;
     Material->GetExpressionCollection().AddExpression(SourceCoverage);
 
+    UMaterialExpressionScalarParameter* PatternSize =
+        NewObject<UMaterialExpressionScalarParameter>(Material);
+    PatternSize->MaterialExpressionEditorX = EditorX - 260;
+    PatternSize->MaterialExpressionEditorY = EditorY + 200;
+    PatternSize->ParameterName = TEXT("ComplementaryPatternSize");
+    PatternSize->DefaultValue = 4.0f;
+    PatternSize->SliderMin = 4.0f;
+    PatternSize->SliderMax = 8.0f;
+    Material->GetExpressionCollection().AddExpression(PatternSize);
+
     UMaterialExpressionCustom* DitherMask = NewObject<UMaterialExpressionCustom>(Material);
     DitherMask->MaterialExpressionEditorX = EditorX;
     DitherMask->MaterialExpressionEditorY = EditorY;
     DitherMask->Description = bKeepSourceSide
-        ? TEXT("Keep the source side of a deterministic complementary 4x4 screen dither")
-        : TEXT("Keep the HLOD side of a deterministic complementary 4x4 screen dither");
+        ? TEXT("Keep the source side of a deterministic complementary 4x4 or 8x8 screen dither")
+        : TEXT("Keep the HLOD side of a deterministic complementary 4x4 or 8x8 screen dither");
     DitherMask->OutputType = CMOT_Float1;
     DitherMask->Code = bKeepSourceSide
-        ? TEXT("float2 Cell = fmod(floor(Parameters.SvPosition.xy), 4.0);\n")
-          TEXT("float Rank = Cell.y < 0.5 ? (Cell.x < 0.5 ? 0.0 : (Cell.x < 1.5 ? 8.0 : (Cell.x < 2.5 ? 2.0 : 10.0))) :\n")
-          TEXT("             Cell.y < 1.5 ? (Cell.x < 0.5 ? 12.0 : (Cell.x < 1.5 ? 4.0 : (Cell.x < 2.5 ? 14.0 : 6.0))) :\n")
-          TEXT("             Cell.y < 2.5 ? (Cell.x < 0.5 ? 3.0 : (Cell.x < 1.5 ? 11.0 : (Cell.x < 2.5 ? 1.0 : 9.0))) :\n")
-          TEXT("                              (Cell.x < 0.5 ? 15.0 : (Cell.x < 1.5 ? 7.0 : (Cell.x < 2.5 ? 13.0 : 5.0)));\n")
-          TEXT("float Keep = Rank < saturate(SourceCoverage) * 16.0 ? 1.0 : 0.0;\n")
+        ? TEXT("float2 Pixel = floor(Parameters.SvPosition.xy);\n")
+          TEXT("float2 Cell4 = fmod(Pixel, 4.0);\n")
+          TEXT("float Rank4 = Cell4.y < 0.5 ? (Cell4.x < 0.5 ? 0.0 : (Cell4.x < 1.5 ? 8.0 : (Cell4.x < 2.5 ? 2.0 : 10.0))) :\n")
+          TEXT("              Cell4.y < 1.5 ? (Cell4.x < 0.5 ? 12.0 : (Cell4.x < 1.5 ? 4.0 : (Cell4.x < 2.5 ? 14.0 : 6.0))) :\n")
+          TEXT("              Cell4.y < 2.5 ? (Cell4.x < 0.5 ? 3.0 : (Cell4.x < 1.5 ? 11.0 : (Cell4.x < 2.5 ? 1.0 : 9.0))) :\n")
+          TEXT("                                (Cell4.x < 0.5 ? 15.0 : (Cell4.x < 1.5 ? 7.0 : (Cell4.x < 2.5 ? 13.0 : 5.0)));\n")
+          TEXT("float2 Cell8 = fmod(Pixel, 8.0);\n")
+          TEXT("float X0 = fmod(Cell8.x, 2.0); float Y0 = fmod(Cell8.y, 2.0);\n")
+          TEXT("float X1 = fmod(floor(Cell8.x / 2.0), 2.0); float Y1 = fmod(floor(Cell8.y / 2.0), 2.0);\n")
+          TEXT("float X2 = floor(Cell8.x / 4.0); float Y2 = floor(Cell8.y / 4.0);\n")
+          TEXT("float Rank8 = 16.0 * (2.0 * fmod(X2 + Y2, 2.0) + Y2) + 4.0 * (2.0 * fmod(X1 + Y1, 2.0) + Y1) + (2.0 * fmod(X0 + Y0, 2.0) + Y0);\n")
+          TEXT("float Use8 = step(7.5, PatternSize);\n")
+          TEXT("float Rank = lerp(Rank4, Rank8, Use8); float LevelCount = lerp(16.0, 64.0, Use8);\n")
+          TEXT("float Keep = Rank < saturate(SourceCoverage) * LevelCount ? 1.0 : 0.0;\n")
           TEXT("return BaseOpacity * Keep;")
-        : TEXT("float2 Cell = fmod(floor(Parameters.SvPosition.xy), 4.0);\n")
-          TEXT("float Rank = Cell.y < 0.5 ? (Cell.x < 0.5 ? 0.0 : (Cell.x < 1.5 ? 8.0 : (Cell.x < 2.5 ? 2.0 : 10.0))) :\n")
-          TEXT("             Cell.y < 1.5 ? (Cell.x < 0.5 ? 12.0 : (Cell.x < 1.5 ? 4.0 : (Cell.x < 2.5 ? 14.0 : 6.0))) :\n")
-          TEXT("             Cell.y < 2.5 ? (Cell.x < 0.5 ? 3.0 : (Cell.x < 1.5 ? 11.0 : (Cell.x < 2.5 ? 1.0 : 9.0))) :\n")
-          TEXT("                              (Cell.x < 0.5 ? 15.0 : (Cell.x < 1.5 ? 7.0 : (Cell.x < 2.5 ? 13.0 : 5.0)));\n")
-          TEXT("float Keep = Rank >= saturate(SourceCoverage) * 16.0 ? 1.0 : 0.0;\n")
+        : TEXT("float2 Pixel = floor(Parameters.SvPosition.xy);\n")
+          TEXT("float2 Cell4 = fmod(Pixel, 4.0);\n")
+          TEXT("float Rank4 = Cell4.y < 0.5 ? (Cell4.x < 0.5 ? 0.0 : (Cell4.x < 1.5 ? 8.0 : (Cell4.x < 2.5 ? 2.0 : 10.0))) :\n")
+          TEXT("              Cell4.y < 1.5 ? (Cell4.x < 0.5 ? 12.0 : (Cell4.x < 1.5 ? 4.0 : (Cell4.x < 2.5 ? 14.0 : 6.0))) :\n")
+          TEXT("              Cell4.y < 2.5 ? (Cell4.x < 0.5 ? 3.0 : (Cell4.x < 1.5 ? 11.0 : (Cell4.x < 2.5 ? 1.0 : 9.0))) :\n")
+          TEXT("                                (Cell4.x < 0.5 ? 15.0 : (Cell4.x < 1.5 ? 7.0 : (Cell4.x < 2.5 ? 13.0 : 5.0)));\n")
+          TEXT("float2 Cell8 = fmod(Pixel, 8.0);\n")
+          TEXT("float X0 = fmod(Cell8.x, 2.0); float Y0 = fmod(Cell8.y, 2.0);\n")
+          TEXT("float X1 = fmod(floor(Cell8.x / 2.0), 2.0); float Y1 = fmod(floor(Cell8.y / 2.0), 2.0);\n")
+          TEXT("float X2 = floor(Cell8.x / 4.0); float Y2 = floor(Cell8.y / 4.0);\n")
+          TEXT("float Rank8 = 16.0 * (2.0 * fmod(X2 + Y2, 2.0) + Y2) + 4.0 * (2.0 * fmod(X1 + Y1, 2.0) + Y1) + (2.0 * fmod(X0 + Y0, 2.0) + Y0);\n")
+          TEXT("float Use8 = step(7.5, PatternSize);\n")
+          TEXT("float Rank = lerp(Rank4, Rank8, Use8); float LevelCount = lerp(16.0, 64.0, Use8);\n")
+          TEXT("float Keep = Rank >= saturate(SourceCoverage) * LevelCount ? 1.0 : 0.0;\n")
           TEXT("return BaseOpacity * Keep;");
     FCustomInput& BaseOpacityInput = DitherMask->Inputs.AddDefaulted_GetRef();
     BaseOpacityInput.InputName = TEXT("BaseOpacity");
@@ -5431,6 +5457,9 @@ UMaterialExpressionCustom* AddComplementaryScreenDitherOpacity(
     FCustomInput& CoverageInput = DitherMask->Inputs.AddDefaulted_GetRef();
     CoverageInput.InputName = TEXT("SourceCoverage");
     CoverageInput.Input.Expression = SourceCoverage;
+    FCustomInput& PatternSizeInput = DitherMask->Inputs.AddDefaulted_GetRef();
+    PatternSizeInput.InputName = TEXT("PatternSize");
+    PatternSizeInput.Input.Expression = PatternSize;
     Material->GetExpressionCollection().AddExpression(DitherMask);
     return DitherMask;
 }
@@ -20301,7 +20330,8 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
     ACameraActor* CaptureCamera,
     const FString& AuthorityMode,
     float SourceCoverage,
-    FString& SetupSummary)
+    FString& SetupSummary,
+    float PatternSize = 4.0f)
 {
     AActor* SourceTrunkActor = nullptr;
     AActor* SourceFoliageActor = nullptr;
@@ -20344,7 +20374,7 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
     const bool bShowSource = bSourceOnly || bCombined;
     const bool bShowHlod = bHlodOnly || bCombined;
     SourceCoverage = bSourceOnly ? 1.0f : (bHlodOnly ? 0.0f : SourceCoverage);
-    auto SetCoverage = [SourceCoverage](AActor* Actor)
+    auto SetCoverage = [SourceCoverage, PatternSize](AActor* Actor)
     {
         TInlineComponentArray<UMeshComponent*> MeshComponents;
         Actor->GetComponents(MeshComponents);
@@ -20371,6 +20401,9 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
                     DynamicMaterial->SetScalarParameterValue(
                         TEXT("ComplementarySourceCoverage"),
                         SourceCoverage);
+                    DynamicMaterial->SetScalarParameterValue(
+                        TEXT("ComplementaryPatternSize"),
+                        PatternSize);
                     bUpdated = true;
                 }
             }
@@ -20387,10 +20420,12 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
         CaptureCamera->GetActorLocation(),
         LoadedAtlasActor->GetActorLocation());
     SetupSummary += FString::Printf(
-        TEXT("Complementary transition %s at %.3f m radial distance sets source coverage %.4f and visibility source=%s HLOD=%s.\n"),
+        TEXT("Complementary transition %s at %.3f m radial distance sets source coverage %.4f with a %.0fx%.0f pattern and visibility source=%s HLOD=%s.\n"),
         *AuthorityMode,
         HorizontalDistanceCm / 100.0f,
         SourceCoverage,
+        PatternSize,
+        PatternSize,
         bShowSource ? TEXT("true") : TEXT("false"),
         bShowHlod ? TEXT("true") : TEXT("false"));
     return bSourceMaterialsUpdated && bHlodMaterialUpdated &&
@@ -20401,6 +20436,7 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FString& RelativeCaptureBase,
     const FString& AuthorityMode,
+    int32 PatternSize,
     TArray<FString>& OutRelativeCapturePaths,
     FString& OutSummary)
 {
@@ -20543,6 +20579,7 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
                              Target,
                              CameraHeight,
                              AuthorityMode,
+                             PatternSize,
                              &OutSummary](float RadiusCm, float SourceCoverage)
     {
         const float AxialDistanceCm = FMath::Sqrt(
@@ -20559,7 +20596,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             ReferenceCamera,
             AuthorityMode,
             SourceCoverage,
-            OutSummary);
+            OutSummary,
+            static_cast<float>(PatternSize));
     };
     auto AdvanceAndCapture = [World, CaptureComponent]()
     {
@@ -20591,6 +20629,9 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     };
 
     bool bAllFramesSaved = true;
+    const FString SequenceToken = PatternSize >= 8
+        ? TEXT("motion_8x8")
+        : TEXT("motion");
     if (!SetFrameState(StartRadiusCm, 1.0f))
     {
         RestoreAntiAliasingMethod();
@@ -20617,8 +20658,9 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             RadiusIntegerCm / 100,
             RadiusIntegerCm % 100);
         const FString RelativeCapturePath = FString::Printf(
-            TEXT("%s_motion_f%03d_%s_%s.png"),
+            TEXT("%s_%s_f%03d_%s_%s.png"),
             *RelativeCaptureBase,
+            *SequenceToken,
             FrameIndex,
             *DistanceToken,
             *AuthorityMode);
@@ -20637,8 +20679,9 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
         AdvanceAndCapture();
         const int32 FrameIndex = TransitionFrameCount + SettleIndex;
         const FString RelativeCapturePath = FString::Printf(
-            TEXT("%s_motion_f%03d_settle%02d_27m00_%s.png"),
+            TEXT("%s_%s_f%03d_settle%02d_27m00_%s.png"),
             *RelativeCaptureBase,
+            *SequenceToken,
             FrameIndex,
             SettleIndex + 1,
             *AuthorityMode);
@@ -20654,9 +20697,11 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     SceneCapture->Destroy();
     RenderTarget->ReleaseResource();
     OutSummary += FString::Printf(
-        TEXT("V34 persistent same-world %s motion sequence saved %d frames with 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
+        TEXT("Persistent same-world %s motion sequence saved %d frames with a %dx%d complementary pattern, 8 warm-up frames, 41 transition frames, 8 endpoint-settle frames, and a fixed 60 Hz simulation delta.\n"),
         *AuthorityMode,
-        TransitionFrameCount + SettleFrameCount);
+        TransitionFrameCount + SettleFrameCount,
+        PatternSize,
+        PatternSize);
     return bAllFramesSaved &&
         OutRelativeCapturePaths.Num() - InitialCapturePathCount ==
             TransitionFrameCount + SettleFrameCount;
@@ -34705,6 +34750,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalPersistentMotionTransitionReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalFinePersistentMotionTransitionReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     int32 LocalVisualFoliageMeshCount = 0;
     int32 LocalVisualFoliageInstanceCount = 0;
@@ -34756,6 +34803,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalTemporalTransitionCapturesJson;
     TArray<FString> LocalPersistentMotionTransitionCapturePaths;
     FString LocalPersistentMotionTransitionCapturesJson;
+    TArray<FString> LocalFinePersistentMotionTransitionCapturePaths;
+    FString LocalFinePersistentMotionTransitionCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -35676,6 +35725,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 ReviewSpec,
                                 LocalVisualCaptureBase,
                                 AuthorityToken,
+                                4,
                                 LocalPersistentMotionTransitionCapturePaths,
                                 LocalVisualSummary);
                     }
@@ -35692,6 +35742,31 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 : TEXT(", "),
                             *EscapeRaftSimJsonString(CapturePath));
                     }
+                    bool bAllFinePersistentMotionTransitionCapturesProduced = true;
+                    for (const TCHAR* AuthorityToken : HandoffAuthorityTokens)
+                    {
+                        bAllFinePersistentMotionTransitionCapturesProduced &=
+                            CaptureFutaleufuComplementaryTransitionMotionSequence(
+                                ReviewSpec,
+                                LocalVisualCaptureBase,
+                                AuthorityToken,
+                                8,
+                                LocalFinePersistentMotionTransitionCapturePaths,
+                                LocalVisualSummary);
+                    }
+                    bLocalFinePersistentMotionTransitionReviewCaptured =
+                        bAllFinePersistentMotionTransitionCapturesProduced &&
+                        LocalFinePersistentMotionTransitionCapturePaths.Num() == 147;
+                    for (const FString& CapturePath :
+                         LocalFinePersistentMotionTransitionCapturePaths)
+                    {
+                        LocalFinePersistentMotionTransitionCapturesJson += FString::Printf(
+                            TEXT("%s\"%s\""),
+                            LocalFinePersistentMotionTransitionCapturesJson.IsEmpty()
+                                ? TEXT("")
+                                : TEXT(", "),
+                            *EscapeRaftSimJsonString(CapturePath));
+                    }
                 }
                 bLocalFarProxyReviewCaptured = bCaptureFarProxy;
                 bLocalNaniteWholeTreeReviewCaptured = bCaptureNaniteWholeTree;
@@ -35702,7 +35777,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bCaptureMultiViewAtlas && bLocalHandoffReviewCaptured &&
                     bLocalComplementaryTransitionReviewCaptured &&
                     bLocalTemporalTransitionReviewCaptured &&
-                    bLocalPersistentMotionTransitionReviewCaptured;
+                    bLocalPersistentMotionTransitionReviewCaptured &&
+                    bLocalFinePersistentMotionTransitionReviewCaptured;
             }
         }
     }
@@ -35737,7 +35813,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, and a V34 persistent same-world 60 Hz motion sequence with source/HLOD controls and endpoint settling; V33/V34 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; matched temporal comparison and any art decision remain pending")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, and a V35 isolated 8x8 sequence under the same 60 Hz motion and endpoint-settle contract; V33-V35 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; committed V35 comparison and any art decision remain pending")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -35767,7 +35843,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"handoff_contract\": {\"enabled\": %s, \"distance_metric\": \"camera_to_hlod_actor_horizontal_distance\", \"source_selection_distance_cm\": 2500.0, \"source_authority_below_threshold\": true, \"single_representation_by_actor_visibility\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"complementary_transition_contract\": {\"enabled\": %s, \"pattern\": \"deterministic_4x4_screen_bayer\", \"parameter\": \"ComplementarySourceCoverage\", \"radial_band_cm\": [2300.0, 2700.0], \"sample_radii_cm\": [2400.0, 2500.0, 2600.0], \"source_coverage\": [0.75, 0.50, 0.25], \"source_and_hlod_visibility_overlap_inside_band\": true, \"pixel_ownership_complementary\": true, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"temporal_transition_path_contract\": {\"enabled\": %s, \"sampling\": \"ordered_camera_path_precursor_without_same-world_temporal_history\", \"radial_band_cm\": [2300.0, 2700.0], \"radial_step_cm\": 25.0, \"sample_count\": 17, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.0625, \"authority_modes_per_sample\": [\"source_only\", \"hlod_only\", \"combined\"], \"source_woody_geometry\": \"unchanged_v24_v30_geometry\", \"source_woody_renderer\": \"traditional_raster_for_dynamic_screen_mask_compatibility\", \"nanite_source_woody_diagnostic\": \"rejected_wood_leaked_into_hlod_owned_pixels\", \"capture_count\": %d, \"captures\": [%s]},\n")
-        TEXT("    \"persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_4x4_screen_bayer\", \"pattern_rank_count\": 16, \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"fine_persistent_motion_sequence_contract\": {\"enabled\": %s, \"sampling\": \"one_loaded_world_and_one_persistent_scene_capture_per_authority_mode\", \"pattern\": \"deterministic_8x8_screen_bayer\", \"pattern_rank_count\": 64, \"base_pattern_retained_for_control\": \"deterministic_4x4_screen_bayer\", \"authority_modes\": [\"source_only\", \"hlod_only\", \"combined\"], \"radial_band_cm\": [2300.0, 2700.0], \"camera_step_cm\": 10.0, \"fixed_delta_seconds\": 0.016666667, \"target_simulation_fps\": 60.0, \"nominal_camera_speed_cm_per_second\": 600.0, \"warmup_frame_count\": 8, \"transition_frame_count\": 41, \"source_coverage_transition_frame_count\": 31, \"source_coverage_transition_end_radius_cm\": 2600.0, \"moving_hlod_only_tail_frame_count\": 10, \"endpoint_settle_frame_count\": 8, \"saved_frame_count_per_mode\": 49, \"source_coverage_start\": 1.0, \"source_coverage_end\": 0.0, \"source_coverage_step\": -0.033333333, \"persistent_view_state\": true, \"temporal_history\": true, \"anti_aliasing_method\": \"temporal_aa\", \"camera_motion_vectors\": \"camera_transform_advanced_before_each_capture_with_persistent_view_state\", \"target_pacing_scope\": \"fixed_simulation_delta_not_wall_clock_performance_measurement\", \"lighting\": false, \"motion_blur\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -35833,6 +35910,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
         LocalPersistentMotionTransitionCapturePaths.Num(),
         *LocalPersistentMotionTransitionCapturesJson,
+        LocalMultiViewAtlas.bComplementaryTransitionEnabled ? TEXT("true") : TEXT("false"),
+        LocalFinePersistentMotionTransitionCapturePaths.Num(),
+        *LocalFinePersistentMotionTransitionCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -35853,6 +35933,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"temporal_transition_captures\": [%s],\n")
         TEXT("    \"persistent_motion_transition_capture_count\": %d,\n")
         TEXT("    \"persistent_motion_transition_captures\": [%s],\n")
+        TEXT("    \"fine_persistent_motion_transition_capture_count\": %d,\n")
+        TEXT("    \"fine_persistent_motion_transition_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -35878,6 +35960,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalTemporalTransitionCapturesJson,
         LocalPersistentMotionTransitionCapturePaths.Num(),
         *LocalPersistentMotionTransitionCapturesJson,
+        LocalFinePersistentMotionTransitionCapturePaths.Num(),
+        *LocalFinePersistentMotionTransitionCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
