@@ -169,6 +169,14 @@ For each raft sample point:
 
 The same raft-force sampler should run against GeoClaw output and C++ runtime fields whenever possible.
 
+### Flexible Raft State
+
+The initial rigid-body sampler is a baseline, not the final inflatable model. The production contract in `unreal/Content/RaftSim/Raft/flexible_raft_tube_validation_plan.json` adds a pressure/volume-compliant outer ring, perimeter compression and recovery, floor/lacing/frame coupling, local freeboard, and entrained overwash water.
+
+A passenger seated on a tube or executing a high-side must produce local deformation as well as a center-of-mass shift. Deformed upstream tubes receive two-way water load; overtopping contributes explicit water mass and roll moment. Rock contacts must report indentation, contact patch, friction, wrap/pinch depth, release margin, and shape recovery. The model must keep these authoritative channels identical across platform scalability profiles while permitting lower render-mesh subdivision, wrinkle detail, spray, and telemetry drawing.
+
+Current authority remains `CustomReducedRigidBody` until the existing Chaos/Jolt evaluation and the new compliant fixtures produce measured evidence. Jolt remains the candidate portable raft/contact island, Chaos owns visual ragdolls and non-authoritative effects, and Project Chrono or another reviewed offline compliant model supplies high-fidelity comparison evidence. No flexible outcome is scoring-authoritative merely because it looks plausible in Unreal.
+
 ## Comparison And Tuning
 
 Compare GeoClaw and C++ on:
@@ -244,6 +252,7 @@ Unreal production begins only after:
 - Add 6-DoF raft state and sample patches.
 - Couple raft forces to GeoClaw outputs and C++ fields.
 - Compare force envelopes, trajectories, and outcome classifications.
+- Add the compliant-tube fixture suite and compare pressure, deformation, freeboard, overwash, rock-wrap, high-side, and recovery telemetry before promoting flexible gameplay authority.
 
 ### Phase 6: Profiling And Runtime Readiness
 

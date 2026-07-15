@@ -1,0 +1,76 @@
+{
+  "schema": "raftsim.real_world.river_portfolio_plan.v0",
+  "status": "active_portfolio_decision_chilko_source_attachment_pending",
+  "decision_date": "2026-07-14",
+  "active_rivers": [
+    {
+      "order": 1,
+      "river_id": "american_south_fork",
+      "display_name": "South Fork American River",
+      "put_in": "Chili Bar",
+      "take_out": "Folsom Reservoir",
+      "crew_mode": "guided_paddle_raft",
+      "voice_commands": true
+    },
+    {
+      "order": 2,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "display_name": "Colorado River through Grand Canyon",
+      "put_in": "Lees Ferry",
+      "take_out": "Pearce Ferry",
+      "crew_mode": "oar_rig_rowing",
+      "voice_commands": false
+    },
+    {
+      "order": 3,
+      "river_id": "pacuare_river_costa_rica",
+      "display_name": "Pacuare River",
+      "put_in": "Tres Equis",
+      "take_out": "Siquirres",
+      "crew_mode": "guided_paddle_raft",
+      "voice_commands": true
+    },
+    {
+      "order": 4,
+      "river_id": "futaleufu_river_chile",
+      "display_name": "Futaleufu River",
+      "put_in": "Rio Azul Swinging Bridge",
+      "take_out": "The Pasarela",
+      "crew_mode": "guided_paddle_raft",
+      "voice_commands": true
+    },
+    {
+      "order": 5,
+      "river_id": "chilko_river_lava_canyon",
+      "display_name": "Chilko River",
+      "put_in": "Chilko River Lodge",
+      "take_out": "Chilko-Taseko Junction",
+      "crew_mode": "guided_paddle_raft",
+      "voice_commands": true,
+      "source_status": "official_source_attachment_pending"
+    }
+  ],
+  "backlog_rivers": [
+    {
+      "river_id": "zambezi_batoka_gorge",
+      "display_name": "Zambezi River through Batoka Gorge",
+      "put_in": "Boiling Pot",
+      "take_out": "Mukuni Beach",
+      "reason": "authoritative_full_reach_centerline_and_high_resolution_terrain_unavailable",
+      "artifact_policy": "retain_existing_source_corridor_visual_and_validation_evidence"
+    }
+  ],
+  "portfolio_rules": {
+    "active_river_count": 5,
+    "do_not_delete_backlog_evidence": true,
+    "no_lifelike_claim_without_human_review": true,
+    "no_numeric_flow_band_without_gauge_window_and_guide_review": true,
+    "physics_and_hazard_authority_must_not_scale_by_platform": true
+  },
+  "documents": {
+    "production_plan": "docs/photoreal-river-environment-production-plan.md",
+    "chilko_futaleufu_goal": "docs/chilko-futaleufu-photoreal-goal.md",
+    "zambezi_archive": "docs/zambezi-futaleufu-photoreal-goal.md",
+    "named_rapid_plan": "docs/named-rapid-realism-validation-plan.md"
+  }
+}

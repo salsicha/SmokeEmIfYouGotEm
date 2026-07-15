@@ -1,5 +1,7 @@
 # Zambezi And Futaleufu Photoreal Goal
 
+> Portfolio note, July 14, 2026: Futaleufu remains an active runnable river. Zambezi Batoka Gorge is now backlog because authoritative full-reach centerline and high-resolution terrain are unavailable. Preserve this document and all Zambezi artifacts as technical and visual evidence; do not treat them as an active photoreal production commitment. Chilko replaces Zambezi in the active five-river portfolio through `docs/chilko-futaleufu-photoreal-goal.md`.
+
 ## Objective
 
 Make the fourth and fifth runnable river environments photorealistic in Unreal:
@@ -7,7 +9,7 @@ Make the fourth and fifth runnable river environments photorealistic in Unreal:
 - Zambezi River, Batoka Gorge, from Boiling Pot to Mukuni Beach: a photoreal big-water basalt gorge run below Victoria Falls.
 - Futaleufu River, Chile, from Rio Azul Swinging Bridge to The Pasarela: a photoreal Patagonian turquoise big-water run with boulder gardens and forested Andean valley walls.
 
-These reaches are required parts of the active five-river Codex goal. Completion means lifelike in-engine guide-seat and river-eye captures, not merely source-data packages, generated maps, or technically valid screenshots.
+Futaleufu is required by the active five-river goal. Zambezi is retained as a future candidate whose completion definition remains lifelike in-engine guide-seat and river-eye captures, not merely source-data packages, generated maps, or technically valid screenshots.
 
 ## Current Evidence And Blockers
 

@@ -7,10 +7,10 @@ Construct complete, photorealistic Unreal river environments for the five planne
 - South Fork American River, Chili Bar to Folsom Reservoir
 - Colorado River through the Grand Canyon, Lees Ferry to Pearce Ferry
 - Pacuare River, Tres Equis to Siquirres
-- Zambezi River through Batoka Gorge, Boiling Pot to Mukuni Beach
 - Futaleufu River, Rio Azul Swinging Bridge to The Pasarela
+- Chilko River, Chilko River Lodge to the Chilko-Taseko Junction
 
-The original three-river source and capture artifacts remain valid legacy checkpoints for South Fork, Colorado, and Pacuare. Zambezi and Futaleufu use the international production contracts and evidence linked from `docs/zambezi-futaleufu-photoreal-goal.md`; they must satisfy the same source, rights, visual, gameplay-readability, and multiplatform performance gates before any lifelike claim.
+The portfolio decision is machine-readable in `physics/data/real_world/river_portfolio_plan.json`. The original three-river source and capture artifacts remain valid legacy checkpoints for South Fork, Colorado, and Pacuare. Futaleufu keeps the international production contract; Chilko starts with the source and validation contract in `docs/chilko-futaleufu-photoreal-goal.md`. Zambezi's existing corridor, terrain, source, and capture artifacts remain retained backlog evidence under `docs/zambezi-futaleufu-photoreal-goal.md`, but it is not part of the active five-river production claim.
 
 Each river environment must be driven by traceable river maps, seasonal or release-driven flow levels, aerial/satellite imagery, reviewed terrain and hydrography, and rights-reviewed visual reference. Procedural generation is expected for terrain dressing, foliage, rock scatter, debris, foam cues, wetness masks, lighting variants, and placeholder art until imported or first-party assets are approved.
 
@@ -91,6 +91,19 @@ Treat this as a rain-fed tropical gorge environment until authoritative hydrolog
 - Protected-area review: SINAC/MINAE and SNIT protected-area, forest-cover, corridor, wetland, and SENARA recharge/vulnerability layers before publishing detailed route packages.
 - Aerial imagery: SNIT/IDECORI orthophoto/model service leads first when layer terms permit, plus Copernicus Sentinel and Landsat for vegetation, river color, and cloud-aware seasonal review.
 - Review media: first-party field captures or explicit outfitter/guide permissions; Wikimedia/Flickr/YouTube/Instagram/Mapillary-style links remain reference-only until creator permission, local guide review, and publication-sensitivity review pass.
+
+### Chilko
+
+Treat Chilko River Lodge to the Chilko-Taseko Junction as a source-first Canadian production corridor:
+
+- Maps and terrain: prefer BC Data Catalogue and GeoBC elevation or lidar products, with Natural Resources Canada CanElevation as fallback. Do not promote terrain before resolution, acquisition date, CRS, vertical datum, license, and river-conditioning review are recorded.
+- Hydrography: prefer the British Columbia Freshwater Atlas or another official provincial watercourse layer, checked against current aerial imagery and guide GPS. OSM is discovery-only.
+- Flow levels: begin with Environment and Climate Change Canada stations `08MA002` at the Chilko Lake outlet and `08MA001` near Redstone. Review station period, regulation, lag, tributaries, units, and reach applicability before defining numeric low/reference/high bands.
+- Aerial imagery: prefer rights-compatible GeoBC or provincial orthophoto coverage where available; use Copernicus Sentinel-2 and Landsat for seasonal context and cloud/snow/smoke screening.
+- Land and publication review: consult Tŝilhqot’in National Government title-land, place-name, fisheries, access, stewardship, and publication guidance before exposing detailed access, hazard, cultural, or sensitive-location geometry.
+- Rapid and media review: Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon are provisional guide/media leads only. Attach exact stationing and local review before generating production windows. Keep third-party footage and social media link-only until item-level rights are cleared.
+
+No Chilko corridor, flow band, rapid marker, or lifelike capture is currently approved. The first implementation task is an authoritative source attachment, not procedural scene generation.
 
 Initial source slice:
 
