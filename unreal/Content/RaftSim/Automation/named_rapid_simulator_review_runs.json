@@ -6,8 +6,26 @@
     "platform": "The same authored rapid and outcome envelope survives all target scalability profiles without changing gameplay physics.",
     "visual": "Water, foam, spray, wet banks, rocks, foliage, and lighting agree with rights-reviewed references at the recorded flow."
   },
+  "portfolio": {
+    "additional_active_environment_count": 1,
+    "additional_active_environment_river_ids": [
+      "zambezi_batoka_gorge"
+    ],
+    "runnable_river_count": 5,
+    "runnable_river_ids": [
+      "south_fork_american_chili_bar",
+      "colorado_river_grand_canyon_rowing",
+      "pacuare_river_costa_rica",
+      "futaleufu_river_chile",
+      "chilko_river_lava_canyon"
+    ],
+    "source": "physics/data/real_world/river_portfolio_plan.json",
+    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "total_river_count": 6,
+    "zambezi_evidence_retained": true
+  },
   "production_promoted": false,
-  "run_count": 423,
+  "run_count": 453,
   "runs": [
     {
       "control_mode": "guided_paddle_crew",
@@ -33,6 +51,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -87,6 +106,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -141,6 +161,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -195,6 +216,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -249,6 +271,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -303,6 +326,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -357,6 +381,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -411,6 +436,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -465,6 +491,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -519,6 +546,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -573,6 +601,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -627,6 +656,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -681,6 +711,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -735,6 +766,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -789,6 +821,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -843,6 +876,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -897,6 +931,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -951,6 +986,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1005,6 +1041,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1059,6 +1096,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1113,6 +1151,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1167,6 +1206,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1221,6 +1261,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1275,6 +1316,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1329,6 +1371,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1383,6 +1426,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1437,6 +1481,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1491,6 +1536,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1545,6 +1591,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1599,6 +1646,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1653,6 +1701,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1707,6 +1756,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1761,6 +1811,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1815,6 +1866,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1869,6 +1921,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1923,6 +1976,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -1977,6 +2031,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2031,6 +2086,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2085,6 +2141,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2139,6 +2196,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2193,6 +2251,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2247,6 +2306,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2301,6 +2361,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2355,6 +2416,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2409,6 +2471,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2463,6 +2526,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2517,6 +2581,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2571,6 +2636,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2625,6 +2691,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2679,6 +2746,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2733,6 +2801,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2787,6 +2856,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2841,6 +2911,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2895,6 +2966,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -2949,6 +3021,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3003,6 +3076,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3057,6 +3131,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3111,6 +3186,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3165,6 +3241,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3219,6 +3296,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3273,6 +3351,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3327,6 +3406,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3381,6 +3461,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3435,6 +3516,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3489,6 +3571,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3543,6 +3626,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3597,6 +3681,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3651,6 +3736,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3705,6 +3791,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3759,6 +3846,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3813,6 +3901,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3867,6 +3956,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3921,6 +4011,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -3975,6 +4066,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4029,6 +4121,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4083,6 +4176,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4137,6 +4231,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4191,6 +4286,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4245,6 +4341,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4299,6 +4396,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4353,6 +4451,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4407,6 +4506,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4461,6 +4561,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4515,6 +4616,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4569,6 +4671,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4623,6 +4726,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4677,6 +4781,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4731,6 +4836,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4785,6 +4891,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4839,6 +4946,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4893,6 +5001,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -4947,6 +5056,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5001,6 +5111,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5055,6 +5166,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5109,6 +5221,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5163,6 +5276,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5217,6 +5331,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5271,6 +5386,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5325,6 +5441,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5379,6 +5496,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5433,6 +5551,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5487,6 +5606,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5541,6 +5661,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5595,6 +5716,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5649,6 +5771,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5703,6 +5826,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5757,6 +5881,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5811,6 +5936,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5865,6 +5991,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5919,6 +6046,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -5973,6 +6101,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6027,6 +6156,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6081,6 +6211,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6135,6 +6266,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6189,6 +6321,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6243,6 +6376,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6297,6 +6431,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6351,6 +6486,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6405,6 +6541,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6459,6 +6596,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6513,6 +6651,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6567,6 +6706,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6621,6 +6761,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6675,6 +6816,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6729,6 +6871,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6783,6 +6926,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6837,6 +6981,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6891,6 +7036,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6945,6 +7091,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -6999,6 +7146,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7053,6 +7201,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7107,6 +7256,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7161,6 +7311,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7215,6 +7366,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7269,6 +7421,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7323,6 +7476,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7377,6 +7531,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7431,6 +7586,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7485,6 +7641,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7539,6 +7696,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7593,6 +7751,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7647,6 +7806,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7701,6 +7861,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7755,6 +7916,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7809,6 +7971,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7863,6 +8026,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7917,6 +8081,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -7971,6 +8136,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8025,6 +8191,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8079,6 +8246,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8133,6 +8301,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8187,6 +8356,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8241,6 +8411,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8295,6 +8466,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8349,6 +8521,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8403,6 +8576,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8457,6 +8631,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8511,6 +8686,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8565,6 +8741,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8619,6 +8796,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8673,6 +8851,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8727,6 +8906,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8781,6 +8961,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8835,6 +9016,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8889,6 +9071,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8943,6 +9126,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -8997,6 +9181,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9051,6 +9236,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9105,6 +9291,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9159,6 +9346,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9213,6 +9401,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9267,6 +9456,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9321,6 +9511,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9375,6 +9566,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9429,6 +9621,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9483,6 +9676,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9537,6 +9731,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9591,6 +9786,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9645,6 +9841,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9699,6 +9896,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9753,6 +9951,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9807,6 +10006,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9861,6 +10061,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9915,6 +10116,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -9969,6 +10171,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10023,6 +10226,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10077,6 +10281,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10131,6 +10336,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10185,6 +10391,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10239,6 +10446,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10293,6 +10501,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10347,6 +10556,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10401,6 +10611,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10455,6 +10666,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10509,6 +10721,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10563,6 +10776,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10617,6 +10831,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10671,6 +10886,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10725,6 +10941,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10779,6 +10996,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10833,6 +11051,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10887,6 +11106,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10941,6 +11161,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -10995,6 +11216,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11049,6 +11271,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11103,6 +11326,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11157,6 +11381,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11211,6 +11436,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11265,6 +11491,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11319,6 +11546,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11373,6 +11601,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11427,6 +11656,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11481,6 +11711,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11535,6 +11766,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11589,6 +11821,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11643,6 +11876,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11697,6 +11931,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11751,6 +11986,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11805,6 +12041,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11859,6 +12096,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11913,6 +12151,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -11967,6 +12206,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12021,6 +12261,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12075,6 +12316,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12129,6 +12371,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12183,6 +12426,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12237,6 +12481,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12291,6 +12536,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12345,6 +12591,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12399,6 +12646,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12453,6 +12701,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12507,6 +12756,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12561,6 +12811,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12615,6 +12866,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12669,6 +12921,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12723,6 +12976,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12777,6 +13031,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12831,6 +13086,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12885,6 +13141,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12939,6 +13196,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -12993,6 +13251,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13047,6 +13306,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13101,6 +13361,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13155,6 +13416,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13209,6 +13471,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13263,6 +13526,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13317,6 +13581,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13371,6 +13636,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13425,6 +13691,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13479,6 +13746,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13533,6 +13801,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13587,6 +13856,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13641,6 +13911,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13695,6 +13966,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13749,6 +14021,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13803,6 +14076,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13857,6 +14131,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13911,6 +14186,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -13965,6 +14241,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14019,6 +14296,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14073,6 +14351,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14127,6 +14406,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14181,6 +14461,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14235,6 +14516,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14289,6 +14571,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14343,6 +14626,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14397,6 +14681,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14451,6 +14736,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14505,6 +14791,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14559,6 +14846,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14613,6 +14901,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14667,6 +14956,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14721,6 +15011,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14775,6 +15066,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14829,6 +15121,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14883,6 +15176,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14937,6 +15231,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -14991,6 +15286,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15045,6 +15341,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15099,6 +15396,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15153,6 +15451,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15207,6 +15506,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15261,6 +15561,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15315,6 +15616,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15369,6 +15671,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15423,6 +15726,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15477,6 +15781,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15531,6 +15836,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15585,6 +15891,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15639,6 +15946,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15693,6 +16001,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15747,6 +16056,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15801,6 +16111,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15855,6 +16166,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15909,6 +16221,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -15963,6 +16276,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16017,6 +16331,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16071,6 +16386,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16125,6 +16441,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16179,6 +16496,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16233,6 +16551,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16287,6 +16606,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16341,6 +16661,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16395,6 +16716,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16449,6 +16771,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16503,6 +16826,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16557,6 +16881,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16611,6 +16936,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16665,6 +16991,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16719,6 +17046,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16773,6 +17101,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16827,6 +17156,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16881,6 +17211,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16935,6 +17266,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -16989,6 +17321,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17043,6 +17376,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17097,6 +17431,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17151,6 +17486,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17205,6 +17541,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17259,6 +17596,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17313,6 +17651,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17367,6 +17706,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17421,6 +17761,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17475,6 +17816,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17529,6 +17871,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17583,6 +17926,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17637,6 +17981,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17691,6 +18036,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17745,6 +18091,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17799,6 +18146,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17853,6 +18201,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17907,6 +18256,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -17961,6 +18311,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18015,6 +18366,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18069,6 +18421,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18123,6 +18476,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18177,6 +18531,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18231,6 +18586,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18285,6 +18641,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18339,6 +18696,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18393,6 +18751,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18447,6 +18806,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18501,6 +18861,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18555,6 +18916,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18609,6 +18971,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18663,6 +19026,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18717,6 +19081,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18771,6 +19136,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18825,6 +19191,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18879,6 +19246,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18933,6 +19301,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -18987,6 +19356,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19041,6 +19411,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19095,6 +19466,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19149,6 +19521,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19203,6 +19576,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19257,6 +19631,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19311,6 +19686,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19365,6 +19741,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19419,6 +19796,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19473,6 +19851,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19527,6 +19906,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19581,6 +19961,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19635,6 +20016,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19689,6 +20071,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19743,6 +20126,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19797,6 +20181,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19851,6 +20236,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19905,6 +20291,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -19959,6 +20346,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20013,6 +20401,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20067,6 +20456,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20121,6 +20511,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20175,6 +20566,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20229,6 +20621,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20283,6 +20676,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20337,6 +20731,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20391,6 +20786,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20445,6 +20841,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20499,6 +20896,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20553,6 +20951,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20607,6 +21006,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20661,6 +21061,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20715,6 +21116,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20769,6 +21171,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20823,6 +21226,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20877,6 +21281,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20931,6 +21336,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -20985,6 +21391,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21039,6 +21446,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "additional_active_environment",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21093,6 +21501,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21147,6 +21556,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21201,6 +21611,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21255,6 +21666,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21309,6 +21721,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21363,6 +21776,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21417,6 +21831,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21471,6 +21886,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21525,6 +21941,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21579,6 +21996,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21633,6 +22051,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21687,6 +22106,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21741,6 +22161,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21795,6 +22216,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21849,6 +22271,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21903,6 +22326,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -21957,6 +22381,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22011,6 +22436,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22065,6 +22491,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22119,6 +22546,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22173,6 +22601,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22227,6 +22656,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22281,6 +22711,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22335,6 +22766,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22389,6 +22821,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22443,6 +22876,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22497,6 +22931,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22551,6 +22986,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22605,6 +23041,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22659,6 +23096,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22713,6 +23151,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22767,6 +23206,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22821,6 +23261,7 @@
         "console_performance",
         "handheld_low"
       ],
+      "portfolio_role": "runnable_river",
       "required_metrics": [
         "entry_angle_error_deg",
         "trajectory_cross_track_error_m",
@@ -22848,6 +23289,1656 @@
       ],
       "river_id": "futaleufu_river_chile",
       "run_id": "futaleufu_river_chile__himalayas__high_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__low_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__low_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__reference_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__reference_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__high_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Bidwell Rapids",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__bidwell_rapids__high_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__low_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__low_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__reference_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__reference_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__high_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Lava Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__lava_canyon",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__lava_canyon__high_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__low_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__low_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__reference_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__reference_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__high_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "White Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__white_mile",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__white_mile__high_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__low_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__low_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__reference_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__reference_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__high_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Green Mile",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__green_mile",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__green_mile__high_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__low_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "low_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__low_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__reference_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "reference_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__reference_review__bounded_feature_contact",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "clean_line",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "clean_reference",
+      "line_intent": "Run the sourced or guide-reviewed clean line and measure timing, angle, acceleration, crew loading, and recovery.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__high_review__clean_reference",
+      "swimmer_and_rescue_enabled": true,
+      "voice_paddle_commands_enabled": true
+    },
+    {
+      "control_mode": "guided_paddle_crew",
+      "crew_weight_distribution_enabled": true,
+      "definition_status": "ready_for_window_binding",
+      "display_name": "Miracle Canyon",
+      "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
+      "expected_outcome": "feature_dependent",
+      "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+      "flow_band": "high_review",
+      "initial_conditions": {
+        "crew_loading": "balanced_then_scripted_error_for_consequence_runs",
+        "entry_heading": "guide_line_required",
+        "entry_station_offset_m": -120.0,
+        "entry_velocity": "sample_from_validated_cpp_window"
+      },
+      "line_id": "bounded_feature_contact",
+      "line_intent": "Deliberately contact the primary hydraulic or obstacle inside a bounded review run to test surf, flush, pin, release, flip, and swimmer consequences.",
+      "platform_profiles": [
+        "desktop_high",
+        "desktop_scalable",
+        "console_quality",
+        "console_performance",
+        "handheld_low"
+      ],
+      "portfolio_role": "runnable_river",
+      "required_metrics": [
+        "entry_angle_error_deg",
+        "trajectory_cross_track_error_m",
+        "peak_roll_deg",
+        "peak_pitch_deg",
+        "crew_center_of_mass_shift_m",
+        "surf_or_retention_duration_s",
+        "pin_duration_s",
+        "release_success",
+        "flip_occurred",
+        "swimmer_count",
+        "rescue_time_s",
+        "mass_conservation_error"
+      ],
+      "required_overlays": [
+        "depth",
+        "velocity",
+        "froude",
+        "wet_dry_mask",
+        "feature_tags",
+        "raft_trajectory",
+        "contact_probes",
+        "crew_center_of_mass",
+        "conservation_deltas"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "run_id": "chilko_river_lava_canyon__miracle_canyon__high_review__bounded_feature_contact",
       "swimmer_and_rescue_enabled": true,
       "voice_paddle_commands_enabled": true
     }

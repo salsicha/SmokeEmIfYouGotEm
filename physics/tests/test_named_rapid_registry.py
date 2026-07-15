@@ -36,7 +36,7 @@ def _load(relative_path: str) -> dict:
     return json.loads((REPO_ROOT / relative_path).read_text(encoding="utf-8"))
 
 
-def test_named_rapid_catalog_covers_all_five_runs_with_rights_gated_sources():
+def test_named_rapid_catalog_covers_runnable_portfolio_and_additional_environment():
     catalog = _load(SOURCE_CATALOG_RELATIVE_PATH)
     validate_source_catalog(catalog)
 
@@ -46,6 +46,7 @@ def test_named_rapid_catalog_covers_all_five_runs_with_rights_gated_sources():
         "pacuare_river_costa_rica": 15,
         "zambezi_batoka_gorge": 25,
         "futaleufu_river_chile": 5,
+        "chilko_river_lava_canyon": 5,
     }
     assert {river["river_id"]: len(river["rapids"]) for river in catalog["rivers"]} == expected_counts
     assert all(source["url"].startswith("https://") for source in catalog["sources"])
@@ -54,6 +55,29 @@ def test_named_rapid_catalog_covers_all_five_runs_with_rights_gated_sources():
         for source in catalog["sources"]
     )
     assert catalog["status"] == "review_baseline_not_guide_approved"
+    assert catalog["portfolio"] == {
+        "source": "physics/data/real_world/river_portfolio_plan.json",
+        "status": "five_runnable_rivers_plus_one_additional_active_environment",
+        "runnable_river_ids": [
+            "south_fork_american_chili_bar",
+            "colorado_river_grand_canyon_rowing",
+            "pacuare_river_costa_rica",
+            "futaleufu_river_chile",
+            "chilko_river_lava_canyon",
+        ],
+        "additional_active_environment_river_ids": ["zambezi_batoka_gorge"],
+        "runnable_river_count": 5,
+        "additional_active_environment_count": 1,
+        "total_river_count": 6,
+        "zambezi_evidence_retained": True,
+    }
+    rivers = {river["river_id"]: river for river in catalog["rivers"]}
+    assert rivers["zambezi_batoka_gorge"]["portfolio_role"] == "additional_active_environment"
+    assert all(
+        river["portfolio_role"] == "runnable_river"
+        for river_id, river in rivers.items()
+        if river_id != "zambezi_batoka_gorge"
+    )
 
 
 def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
@@ -62,7 +86,9 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     committed = _load(EDITOR_MARKERS_RELATIVE_PATH)
     assert generated == committed
     assert committed["production_promoted"] is False
-    assert sum(river["marker_count"] for river in committed["rivers"]) == 80
+    assert sum(river["marker_count"] for river in committed["rivers"]) == 85
+    assert committed["portfolio"]["runnable_river_count"] == 5
+    assert committed["portfolio"]["additional_active_environment_count"] == 1
 
     rivers = {river["river_id"]: river for river in committed["rivers"]}
     south_fork = {marker["display_name"]: marker for marker in rivers["south_fork_american_chili_bar"]["markers"]}
@@ -84,6 +110,19 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
         "Bobo Falls",
         "Lower Huacas",
     ]
+    chilko = rivers["chilko_river_lava_canyon"]["markers"]
+    assert [marker["display_name"] for marker in chilko] == [
+        "Bidwell Rapids",
+        "Lava Canyon",
+        "White Mile",
+        "Green Mile",
+        "Miracle Canyon",
+    ]
+    assert all(
+        marker["stationing"]["station_kind"] == "provisional_downstream_order_interpolation"
+        and marker["stationing"]["production_authoritative"] is False
+        for marker in chilko
+    )
 
 
 def test_editor_geometry_is_candidate_only_and_blocks_misaligned_south_fork():
@@ -91,18 +130,24 @@ def test_editor_geometry_is_candidate_only_and_blocks_misaligned_south_fork():
     generated = build_editor_geometry_geojson(markers)
     committed = _load(EDITOR_GEOMETRY_RELATIVE_PATH)
     assert generated == committed
-    assert committed["feature_count"] == 45
+    assert committed["feature_count"] == 50
     assert committed["production_promoted"] is False
     assert {feature["properties"]["river_id"] for feature in committed["features"]} == {
         "pacuare_river_costa_rica",
         "zambezi_batoka_gorge",
         "futaleufu_river_chile",
+        "chilko_river_lava_canyon",
     }
     assert all(
         feature["properties"]["production_authoritative"] is False
         and feature["properties"]["geometry_status"]
         == "candidate_centerline_projection_not_exact"
         for feature in committed["features"]
+    )
+    assert all(
+        feature["properties"]["portfolio_role"] == "runnable_river"
+        for feature in committed["features"]
+        if feature["properties"]["river_id"] == "chilko_river_lava_canyon"
     )
     south_fork = next(
         river for river in markers["rivers"]
@@ -124,6 +169,8 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     assert generated == committed
     assert committed["run_count"] == len(committed["runs"])
     assert committed["run_count"] > 400
+    assert committed["run_count"] == 453
+    assert committed["portfolio"]["total_river_count"] == 6
     assert {run["flow_band"] for run in committed["runs"]} == {
         "low_review",
         "reference_review",
@@ -139,6 +186,13 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     ]
     assert all(run["control_mode"] == "manual_oar_rig" for run in colorado)
     assert all(run["voice_paddle_commands_enabled"] is False for run in colorado)
+
+    chilko = [run for run in committed["runs"] if run["river_id"] == "chilko_river_lava_canyon"]
+    assert len(chilko) == 30
+    assert all(run["portfolio_role"] == "runnable_river" for run in chilko)
+    zambezi = [run for run in committed["runs"] if run["river_id"] == "zambezi_batoka_gorge"]
+    assert zambezi
+    assert all(run["portfolio_role"] == "additional_active_environment" for run in zambezi)
 
     commercial_suicide = [
         run for run in committed["runs"]
@@ -170,9 +224,12 @@ def test_unreal_rapid_editor_exposes_named_markers_and_review_run_queue():
         assert relative_path in module
         assert relative_path in actions
         assert relative_path in shell["source_manifests"].values()
-    assert shell["named_rapid_review"]["river_count"] == 5
-    assert shell["named_rapid_review"]["marker_count"] == 80
-    assert shell["named_rapid_review"]["candidate_geometry_count"] == 45
+    assert shell["named_rapid_review"]["river_count"] == 6
+    assert shell["named_rapid_review"]["runnable_river_count"] == 5
+    assert shell["named_rapid_review"]["additional_active_environment_count"] == 1
+    assert shell["named_rapid_review"]["marker_count"] == 85
+    assert shell["named_rapid_review"]["candidate_geometry_count"] == 50
+    assert shell["named_rapid_review"]["run_definition_count"] == 453
     assert "execution_evidence_pending" in shell["named_rapid_review"]["status"]
     assert "BuildNamedRapidReviewPanel" in module
     assert "PROVISIONAL STATION" in module
@@ -183,6 +240,9 @@ def test_unreal_rapid_editor_exposes_named_markers_and_review_run_queue():
     assert "Map geometry unavailable" in module
     assert "All guide status" in module
     assert "All execution status" in module
+    assert "All portfolio roles" in module
+    assert "Runnable rivers" in module
+    assert "Additional active environments" in module
     assert EDITOR_BROWSER_CAPTURE.is_file()
     capture = Image.open(EDITOR_BROWSER_CAPTURE).convert("RGB")
     assert capture.width >= 1600

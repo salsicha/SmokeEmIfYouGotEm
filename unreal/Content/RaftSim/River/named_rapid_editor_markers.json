@@ -7,6 +7,24 @@
     "show_provisional_station_badge": true,
     "show_source_and_rights_panel": true
   },
+  "portfolio": {
+    "additional_active_environment_count": 1,
+    "additional_active_environment_river_ids": [
+      "zambezi_batoka_gorge"
+    ],
+    "runnable_river_count": 5,
+    "runnable_river_ids": [
+      "south_fork_american_chili_bar",
+      "colorado_river_grand_canyon_rowing",
+      "pacuare_river_costa_rica",
+      "futaleufu_river_chile",
+      "chilko_river_lava_canyon"
+    ],
+    "source": "physics/data/real_world/river_portfolio_plan.json",
+    "status": "five_runnable_rivers_plus_one_additional_active_environment",
+    "total_river_count": 6,
+    "zambezi_evidence_retained": true
+  },
   "production_promoted": false,
   "rivers": [
     {
@@ -1093,6 +1111,7 @@
           }
         }
       ],
+      "portfolio_role": "runnable_river",
       "river_id": "south_fork_american_chili_bar",
       "run_length_m": 33796.224,
       "source_refs": [
@@ -1954,6 +1973,7 @@
           }
         }
       ],
+      "portfolio_role": "runnable_river",
       "river_id": "colorado_river_grand_canyon_rowing",
       "run_length_m": 451420.0,
       "source_refs": [
@@ -2935,6 +2955,7 @@
           }
         }
       ],
+      "portfolio_role": "runnable_river",
       "river_id": "pacuare_river_costa_rica",
       "run_length_m": 26250.0,
       "source_refs": [
@@ -4528,6 +4549,7 @@
           }
         }
       ],
+      "portfolio_role": "additional_active_environment",
       "river_id": "zambezi_batoka_gorge",
       "run_length_m": 27358.848,
       "source_refs": [
@@ -4881,6 +4903,7 @@
           }
         }
       ],
+      "portfolio_role": "runnable_river",
       "river_id": "futaleufu_river_chile",
       "run_length_m": 10000.0,
       "source_refs": [
@@ -4902,6 +4925,402 @@
         }
       ],
       "stationing_authority": "published_order_only_route_length_approximate"
+    },
+    {
+      "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+      "marker_count": 5,
+      "markers": [
+        {
+          "aliases": [
+            "Bidwell Rapid"
+          ],
+          "difficulty_label": "IV (guide-published, all reviewed levels)",
+          "display_name": "Bidwell Rapids",
+          "downstream_order": 1,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -124.08128908,
+              51.76144057
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+            "source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "retention",
+            "splash",
+            "surf",
+            "swimmer_recovery"
+          ],
+          "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+          "feature_tags": [
+            "blind_corner",
+            "scout",
+            "s_bend",
+            "breaking_waves",
+            "terminal_hole",
+            "midstream_boulder",
+            "flip_hazard",
+            "swimmer_hazard",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Test peak useful retention and clean-line versus contact-line outcomes; require footage and guide comparison."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum and wave scale while testing whether the hydraulic washes out rather than becoming monotonically stickier."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "chilko_bc_whitewater_bidwell",
+            "chilko_mens_journal_lava_canyon",
+            "chilko_american_whitewater_white_mile_accident"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 1,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 9307.616
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "III-V (flow-dependent reach, exact feature scope pending)",
+          "display_name": "Lava Canyon",
+          "downstream_order": 2,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -124.02574247,
+              51.82075055
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+            "source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "chilko_river_lava_canyon__lava_canyon",
+          "feature_tags": [
+            "continuous_whitewater",
+            "basalt_canyon",
+            "constriction",
+            "wave_train",
+            "boulders",
+            "wood_hazard",
+            "cold_water",
+            "limited_recovery",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "chilko_bc_whitewater_bidwell",
+            "chilko_mens_journal_lava_canyon",
+            "chilko_american_whitewater_white_mile_accident"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 2,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 18615.232
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "IV-V (flow-dependent)",
+          "display_name": "White Mile",
+          "downstream_order": 3,
+          "editor_color": "red",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -123.93848526,
+              51.87278684
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+            "source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flip",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf",
+            "swimmer_recovery"
+          ],
+          "feature_id": "chilko_river_lava_canyon__white_mile",
+          "feature_tags": [
+            "continuous_whitewater",
+            "large_waves",
+            "midstream_rock",
+            "broach_hazard",
+            "flip_hazard",
+            "swimmer_hazard",
+            "cold_water",
+            "limited_recovery",
+            "high_flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "critical",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "chilko_bc_whitewater_bidwell",
+            "chilko_mens_journal_lava_canyon",
+            "chilko_american_whitewater_white_mile_accident"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 3,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 27922.848
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "guide review required",
+          "display_name": "Green Mile",
+          "downstream_order": 4,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -123.83243131,
+              51.90410396
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+            "source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "chilko_river_lava_canyon__green_mile",
+          "feature_tags": [
+            "continuous_whitewater",
+            "wave_train",
+            "boulders",
+            "cold_water",
+            "limited_recovery",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "chilko_bc_whitewater_bidwell",
+            "chilko_mens_journal_lava_canyon",
+            "chilko_american_whitewater_white_mile_accident"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 4,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 37230.464
+          }
+        },
+        {
+          "aliases": [],
+          "difficulty_label": "guide review required",
+          "display_name": "Miracle Canyon",
+          "downstream_order": 5,
+          "editor_color": "orange",
+          "editor_map_geometry": {
+            "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
+            "coordinates": [
+              -123.77376543,
+              51.96236425
+            ],
+            "production_authoritative": false,
+            "source_path": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+            "source_status": "official_fwa_stitched_centerline_source_scale_candidate_not_exact_rapid_stationing",
+            "type": "Point"
+          },
+          "editor_map_geometry_status": "candidate_centerline_projection_not_exact",
+          "exact_geometry_status": "required_before_production",
+          "expected_outcomes": [
+            "clean_line",
+            "flush",
+            "pin",
+            "release",
+            "splash",
+            "surf"
+          ],
+          "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+          "feature_tags": [
+            "canyon_constriction",
+            "continuous_whitewater",
+            "wave_train",
+            "boulders",
+            "cold_water",
+            "limited_recovery",
+            "flow_sensitive"
+          ],
+          "flow_hypotheses": [
+            {
+              "flow_band": "low_review",
+              "hypothesis": "Expose more rocks, shelves, and narrow slots; reduce water-feature scale but retain collision and pin review."
+            },
+            {
+              "flow_band": "reference_review",
+              "hypothesis": "Use the guide-reviewed reference line and compare raft timing, angle, acceleration, and recovery."
+            },
+            {
+              "flow_band": "high_review",
+              "hypothesis": "Increase momentum, laterals, boils, and wave scale where supported; verify submerged hazards and recovery distance."
+            }
+          ],
+          "geometry_kind": "station_pin",
+          "guide_review_status": "required",
+          "rapid_number": null,
+          "review_priority": "high",
+          "solver_window_status": "not_authored",
+          "source_ids": [
+            "chilko_bc_whitewater_bidwell",
+            "chilko_mens_journal_lava_canyon",
+            "chilko_american_whitewater_white_mile_accident"
+          ],
+          "stationing": {
+            "production_authoritative": false,
+            "published_unit": "downstream_order",
+            "published_value": 5,
+            "station_kind": "provisional_downstream_order_interpolation",
+            "station_m": 46538.08
+          }
+        }
+      ],
+      "portfolio_role": "runnable_river",
+      "river_id": "chilko_river_lava_canyon",
+      "run_length_m": 55845.69567955752,
+      "source_refs": [
+        {
+          "evidence_scope": "Bidwell Rapid class, scout recognition, and low/medium/high 08MA002 flow-photo context; no copied media or exact geometry.",
+          "rights_status": "link_only_factual_index",
+          "river_id": "chilko_river_lava_canyon",
+          "source_id": "chilko_bc_whitewater_bidwell",
+          "source_kind": "community_guide_route_and_flow_reference",
+          "title": "BC Whitewater Chilko-Chilcotin-Fraser Route Notes",
+          "url": "https://www.bcwhitewater.org/reaches/807-chilcotin-river-chilko-chilcotin-fraser"
+        },
+        {
+          "evidence_scope": "Published downstream-name evidence for Bidwell, Lava Canyon, White Mile, Green Mile, and Miracle Canyon; no exact stations.",
+          "rights_status": "link_only_factual_index",
+          "river_id": "chilko_river_lava_canyon",
+          "source_id": "chilko_mens_journal_lava_canyon",
+          "source_kind": "guide_trip_feature_index",
+          "title": "Rafting Chilko River, North America's Most Notorious Rapids",
+          "url": "https://www.mensjournal.com/travel/chilko-river-north-america-longest-stretch-whitewater"
+        },
+        {
+          "evidence_scope": "White Mile high-flow flip, midstream-rock, cold-water, and long-swim consequence evidence; historical report is not an exact line or station source.",
+          "rights_status": "link_only_factual_index",
+          "river_id": "chilko_river_lava_canyon",
+          "source_id": "chilko_american_whitewater_white_mile_accident",
+          "source_kind": "safety_incident_and_high_flow_behavior_reference",
+          "title": "American Whitewater Accident Report 86686: Chilko White Mile",
+          "url": "https://www.americanwhitewater.org/accident/aug-1-1987-chilko/"
+        }
+      ],
+      "stationing_authority": "published_downstream_names_only_order_interpolation_pending_exact_gps_aerial_and_guide_review"
     }
   ],
   "schema": "raftsim.unreal.named_rapid_editor_markers.v1",
