@@ -314,6 +314,62 @@
     "visual_promotion_accepted": false,
     "corridor_substitution_allowed": false
   },
+  "v23_async_secondary_crown": {
+    "engine_version": "5.8",
+    "status": "open_grown_topology_baseline_retained_visual_promotion_rejected",
+    "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate open_grown_conical async_secondary_compound_branchlet_atlas",
+    "fixed_contract": [
+      "V21 project-owned compound branchlet textures and fourteen-card authored twig",
+      "V22 de-tiered main grower and 137.507764-degree main and graft phyllotaxy",
+      "open-grown form, graft density and range, material response, review cameras, and source-lit multi-view HLOD path"
+    ],
+    "branchlet_graft_templates": [
+      {
+        "index": 0,
+        "seed_offset": 7919,
+        "phyllotaxy_additional_angle_degrees": 4.0,
+        "phyllotaxy_stagger": 0.04
+      },
+      {
+        "index": 1,
+        "seed_offset": 112648,
+        "phyllotaxy_additional_angle_degrees": 71.0,
+        "phyllotaxy_stagger": 0.07
+      },
+      {
+        "index": 2,
+        "seed_offset": 217377,
+        "phyllotaxy_additional_angle_degrees": 223.5,
+        "phyllotaxy_stagger": 0.1
+      }
+    ],
+    "selection_contract": "one branch-growth template is selected uniformly and deterministically per existing graft attachment because no distribution condition is active",
+    "open_grown_conical_result": {
+      "foliage_instance_count": 2993,
+      "impostor_source_triangle_count_lod0": 1165057,
+      "atlas_coverage_fraction_range": [0.115131378, 0.126678467],
+      "mean_turntable_open_band_fraction": 0.07051306082053743,
+      "largest_turntable_open_band_pixels": 45,
+      "exact_60m_source_foreground_change_from_v22_fraction": -0.02268927168798851,
+      "hlod_to_source_foreground_ratio": 1.0691905226092666
+    },
+    "accepted_outcomes": [
+      "three phased branch-growth templates reduce synchronized secondary-shoot alignment without per-twig card multiplication",
+      "two-view crown-band metrics improve while closeup foliage mass is unchanged and exact 60 meter silhouette loss remains bounded",
+      "source triangle and foliage-instance cost both fall about 9.4 percent from V22"
+    ],
+    "open_visual_failures": [
+      "the primary scaffold remains a sparse ladder of broad shelves",
+      "the source-lit HLOD remains darker and more saturated than the exact source",
+      "seven forms, exact 20/28/36 meter handoffs, temporal behavior, mixed ecology, packaged desktop, and target-VR gates remain open"
+    ],
+    "structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v23_pve_open_grown_conical_async_secondary_compound_branchlet_atlas_report.json",
+    "visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v23_async_secondary_crown_visual_review.json",
+    "topology_baseline_retained": true,
+    "visual_promotion_accepted": false,
+    "regenerate_other_forms_allowed": false,
+    "corridor_substitution_allowed": false
+  },
   "promotion_gates": {
     "isolated": [
       "two adult and one intermediate turntable azimuth per form",
@@ -339,5 +395,5 @@
       "production claim based only on protected-area plausibility"
     ]
   },
-  "next_step": "Keep the V17 project-owned growth graph and solve the visible whole-spray card edges through a validated near/mid/far geometry, card, or impostor authority path. Regenerate the seven remaining forms only after the open-grown representation passes its 60 meter visual gate, then run the V13 exact 67-camera, V10 authority, temporal wind, corridor ecology, packaged desktop, and target-VR gates. Keep installed sample content and local generated derivatives out of the open-source repository."
+  "next_step": "Keep the V17 project-owned growth graph, V21 compound branchlet source, V22 golden-angle main crown, and V23 asynchronous three-template graft palette. Replace the remaining broad primary-shelf rhythm with irregular crown-level mass under the retained source-cost and exact-camera guardrails, then calibrate HLOD luminance and color and prove explicit 20/28/36 meter near/mid/far authority without overlap or popping. Regenerate the seven remaining forms only after the open-grown visual, temporal, packaged desktop, and target-VR gates pass. Keep installed sample content and local generated derivatives out of the open-source repository."
 }
