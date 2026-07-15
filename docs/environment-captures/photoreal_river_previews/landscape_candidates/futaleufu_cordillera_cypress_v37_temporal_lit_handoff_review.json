@@ -4,7 +4,7 @@
   "candidate": "v37_engine_temporal_aa_relightable_multiview_hlod",
   "status": "temporal_pattern_and_background_isolation_passed_hlod_shape_photometry_and_corridor_art_rejected",
   "source_structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v32_pve_open_grown_conical_frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
-  "source_structural_report_sha256": "c93899b278e2d60d75673e1d455f4ad58d29ae2b235220c6222404860cddda0c",
+  "source_structural_report_sha256": "cd7d4975fd2b11436d37bd2198acf8654938ce2fa784bf4eb6bc9e3b33e72a59",
   "legacy_v35_guard": {
     "review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v35_fine_transition_review.json",
     "sha256": "75b7a5d5744ce9039cb15f5f3cabd1d459c63e74d3853e75bbd3ae4d826c0d04",
@@ -25,13 +25,30 @@
     "legacy_ordered_modes_retained": true,
     "relightable_representation": {
       "ready": true,
+      "split_layer_ready": true,
       "albedo_source": "SCS_BaseColor linear converted to sRGB atlas texels",
       "albedo_output": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_multiview_atlas_albedo_opacity.png",
-      "albedo_md5": "f96dcd533b8f735abeb13c6cb032f372",
+      "albedo_md5": "8a7e2cfc44291f1ad59a58c1fdc06328",
       "material_identity_output": "unreal/Saved/RaftSimPveReview/FutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/open_grown_conical_multiview_atlas_material_identity.png",
       "material_identity_md5": "7c6d03c3132771bd24eb2f1734c51fc3",
       "material_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/MultiViewAtlas/M_OpenGrownConicalAdult_open_grown_conical_MultiViewHlodV3Lit",
+      "trunk_material_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/MultiViewAtlas/M_OpenGrownConicalAdult_open_grown_conical_MultiViewHlodV4LitTrunk",
+      "foliage_material_asset": "/Game/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypressFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCompoundBranchletAtlas/MultiViewAtlas/M_OpenGrownConicalAdult_open_grown_conical_MultiViewHlodV4LitFoliage",
       "shading_model": "DefaultLit",
+      "split_shading_models": {
+        "trunk": "DefaultLit",
+        "foliage": "TwoSidedFoliage"
+      },
+      "split_layer_opacity": {
+        "trunk": "opacity_times_one_minus_material_identity",
+        "foliage": "opacity_times_material_identity"
+      },
+      "foliage_transmission_parameter": "AtlasFoliageTransmissionTint",
+      "foliage_transmission_default": [
+        0.78,
+        1.0,
+        0.58
+      ],
       "base_color_gain": [
         1.55,
         1.55,
@@ -63,6 +80,14 @@
         0.18,
         0.18
       ],
+      "split_default_roughness": [
+        0.62,
+        0.72
+      ],
+      "split_default_specular": [
+        0.12,
+        0.18
+      ],
       "transition_modes": [
         "legacy_ordered_control",
         "engine_temporal_aa_complementary"
@@ -74,11 +99,11 @@
   },
   "v36_to_v37_delta": {
     "v36_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v36_lit_river_view_review.json",
-    "v36_review_sha256": "4100aa5a8458b8f3ea5bfac3e2ed8f968694348569133f7ed5176a2b5a6724f8",
+    "v36_review_sha256": "8d7728912489e35ae32d9d4ec4538898454316d86cdde8d2f70363f6531c409b",
     "phase_contrast": {
-      "v36": 0.5916898086768994,
-      "v37": 0.03825954370905804,
-      "reduction_fraction": 0.9353385115849608
+      "v36": 0.5916993995203025,
+      "v37": 0.0379827574518089,
+      "reduction_fraction": 0.9358073415612692
     },
     "maximum_background_mean_absolute_channel_delta": {
       "v36": 79.79201822916667,
@@ -96,95 +121,95 @@
       540
     ],
     "classification": "pixels whose source/HLOD maximum-channel delta exceeds 24 are assigned to the closer authority image, then grouped by 8x8 screen phase",
-    "valid_pixel_fraction": 0.3785570987654321,
-    "observed_source_owned_fraction": 0.6650156607760407,
+    "valid_pixel_fraction": 0.3785236625514403,
+    "observed_source_owned_fraction": 0.6650336345722634,
     "phase_source_owned_fractions": [
       [
-        0.6722870730652832,
-        0.65748031496063,
-        0.6642241379310345,
-        0.6446351931330472,
-        0.6647972389991372,
-        0.671875,
-        0.6631944444444444,
-        0.6742259049280419
+        0.6728608470181504,
+        0.6580673371228684,
+        0.6640793445450626,
+        0.6449119793902963,
+        0.6646525679758308,
+        0.6711496746203904,
+        0.6633405639913232,
+        0.6742160278745645
       ],
       [
-        0.6640488656195462,
-        0.651890482398957,
-        0.6750761200521966,
-        0.6555944055944056,
-        0.6611642050390965,
+        0.6643417611159547,
+        0.6519097222222222,
+        0.6746515679442509,
+        0.6554438128552689,
+        0.6610169491525424,
         0.6735840899265024,
-        0.6683915480810694,
-        0.6738847986141187
+        0.6673847479534684,
+        0.6737435008665511
       ],
       [
-        0.6743679163034002,
-        0.6737435008665511,
-        0.6605308219178082,
-        0.6656441717791411,
-        0.6570691877954448,
+        0.6750981247274314,
+        0.6730186227804245,
+        0.6596746575342466,
+        0.6654975887768523,
+        0.6587881392350666,
         0.6583369237397674,
-        0.6600942991855979,
-        0.6695690030474531
+        0.6599485420240138,
+        0.6681165724227925
       ],
       [
-        0.6819923371647509,
+        0.6828437633035335,
         0.6702586206896551,
-        0.6534090909090909,
-        0.6537634408602151,
-        0.6662343277129269,
-        0.6610680447889751,
-        0.6642335766423357,
-        0.6676750216076058
+        0.6547202797202797,
+        0.6533333333333333,
+        0.6668107173725151,
+        0.661498708010336,
+        0.6626609442060086,
+        0.6673866090712743
       ],
       [
         0.673866090712743,
-        0.6711438474870017,
-        0.6685664182376151,
-        0.6716222125054657,
-        0.6624175824175824,
-        0.6621797655232305,
-        0.6773204903677759,
-        0.6766104626026805
+        0.67157712305026,
+        0.6694432266549759,
+        0.6719160104986877,
+        0.662269129287599,
+        0.6618923611111112,
+        0.6783523225241017,
+        0.6777681660899654
       ],
       [
-        0.6602953953084274,
-        0.6720665499124343,
-        0.6754651665945478,
+        0.6607142857142857,
+        0.6716352476983779,
+        0.6761781236489408,
         0.6655172413793103,
-        0.6723016905071522,
+        0.6727351538794972,
         0.6828947368421052,
-        0.6606514084507042,
-        0.6573791902481497
+        0.6602112676056338,
+        0.6569438397910318
       ],
       [
-        0.6539823008849558,
-        0.6546572934973638,
-        0.6647627416520211,
-        0.6777188328912467,
-        0.675476603119584,
-        0.6553228621291448,
-        0.6453900709219859,
-        0.6465669014084507
+        0.6542718016821603,
+        0.6547933157431838,
+        0.6649076517150396,
+        0.6768211920529801,
+        0.6760502381983543,
+        0.654434250764526,
+        0.6451041205139566,
+        0.6470070422535211
       ],
       [
-        0.651080723423026,
-        0.6549631556133507,
-        0.6794701986754967,
-        0.6685441941074524,
-        0.6676789587852494,
-        0.6556951061065396,
-        0.6615452151009658,
-        0.6628216503992902
+        0.6509058771542201,
+        0.6545296922410057,
+        0.6785871964679911,
+        0.6688339835283919,
+        0.6678245766391663,
+        0.6551126516464472,
+        0.6618357487922706,
+        0.6631205673758865
       ]
     ],
     "phase_source_fraction_range": [
-      0.6446351931330472,
+      0.6449119793902963,
       0.6828947368421052
     ],
-    "phase_contrast": 0.03825954370905804,
+    "phase_contrast": 0.0379827574518089,
     "maximum_acceptable_phase_contrast": 0.2,
     "visible_periodic_pattern_gate_passed": true,
     "purpose": "8x8 grouping is retained only as a periodicity diagnostic for the temporal mask"
@@ -225,10 +250,10 @@
       540
     ],
     "silhouette_classification": "rec709_luminance_below_75_in_fixed_tree_roi",
-    "source_silhouette_pixels": 131162,
+    "source_silhouette_pixels": 131168,
     "hlod_silhouette_pixels": 137852,
-    "source_hlod_silhouette_intersection_over_union": 0.5121981382380717,
-    "hlod_to_source_silhouette_area_ratio": 1.0510056266296641,
+    "source_hlod_silhouette_intersection_over_union": 0.5122063642853529,
+    "hlod_to_source_silhouette_area_ratio": 1.050957550622103,
     "minimum_acceptable_silhouette_iou": 0.9,
     "acceptable_silhouette_area_ratio": [
       0.9,
@@ -236,15 +261,15 @@
     ],
     "source_hlod_silhouette_gate_passed": false,
     "photometry_classification": "mean_rec709_luminance_where_source_hlod_max_channel_delta_exceeds_24",
-    "photometry_sample_fraction": 0.3785570987654321,
-    "source_mean_luminance": 64.00517272949219,
-    "hlod_mean_luminance": 43.58237838745117,
-    "hlod_to_source_luminance_ratio": 0.6809196277251723,
+    "photometry_sample_fraction": 0.3785236625514403,
+    "source_mean_luminance": 64.00141143798828,
+    "hlod_mean_luminance": 43.57841110229492,
+    "hlod_to_source_luminance_ratio": 0.6808976571480545,
     "acceptable_luminance_ratio": [
       0.9,
       1.1
     ],
-    "source_hlod_roi_mean_absolute_channel_delta": 19.852991104125977,
+    "source_hlod_roi_mean_absolute_channel_delta": 19.852657318115234,
     "maximum_acceptable_roi_mean_absolute_channel_delta": 12.0,
     "source_hlod_photometry_gate_passed": false
   },
@@ -254,73 +279,73 @@
         "source_coverage": 1.0,
         "combined_to_source": {
           "changed_pixel_fraction_max_channel_gt_12": 0.019482421875,
-          "mean_absolute_channel_delta": 0.7475947627314815,
-          "dark_chromatic_foreground_intersection_over_union": 0.9984419052387509
+          "mean_absolute_channel_delta": 0.7476696325231481,
+          "dark_chromatic_foreground_intersection_over_union": 0.9984395247285858
         },
         "combined_to_hlod": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.183369140625,
-          "mean_absolute_channel_delta": 9.09902560763889,
-          "dark_chromatic_foreground_intersection_over_union": 0.9937425063959284
+          "changed_pixel_fraction_max_channel_gt_12": 0.18339952256944445,
+          "mean_absolute_channel_delta": 9.09880931712963,
+          "dark_chromatic_foreground_intersection_over_union": 0.993741318113816
         }
       },
       "15": {
         "source_coverage": 0.5,
         "combined_to_source": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.13673177083333332,
-          "mean_absolute_channel_delta": 3.487569806134259,
-          "dark_chromatic_foreground_intersection_over_union": 0.9939002755175181
+          "changed_pixel_fraction_max_channel_gt_12": 0.1367209201388889,
+          "mean_absolute_channel_delta": 3.4874370659722222,
+          "dark_chromatic_foreground_intersection_over_union": 0.9939074194462503
         },
         "combined_to_hlod": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.14222764756944445,
-          "mean_absolute_channel_delta": 5.68786205150463,
-          "dark_chromatic_foreground_intersection_over_union": 0.9953308486778083
+          "changed_pixel_fraction_max_channel_gt_12": 0.14226236979166668,
+          "mean_absolute_channel_delta": 5.68774486400463,
+          "dark_chromatic_foreground_intersection_over_union": 0.9953356075621284
         }
       },
       "30": {
         "source_coverage": 0.0,
         "combined_to_source": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.16467122395833333,
-          "mean_absolute_channel_delta": 7.10543800636574,
-          "dark_chromatic_foreground_intersection_over_union": 0.9949652393128102
+          "changed_pixel_fraction_max_channel_gt_12": 0.16465603298611112,
+          "mean_absolute_channel_delta": 7.105159866898148,
+          "dark_chromatic_foreground_intersection_over_union": 0.9949652332831134
         },
         "combined_to_hlod": {
           "changed_pixel_fraction_max_channel_gt_12": 0.04110894097222222,
-          "mean_absolute_channel_delta": 1.116689453125,
+          "mean_absolute_channel_delta": 1.1166800491898148,
           "dark_chromatic_foreground_intersection_over_union": 0.9991005932486932
         }
       },
       "40": {
         "source_coverage": 0.0,
         "combined_to_source": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.15944986979166667,
-          "mean_absolute_channel_delta": 7.085931351273148,
-          "dark_chromatic_foreground_intersection_over_union": 0.9947012314362255
+          "changed_pixel_fraction_max_channel_gt_12": 0.1594487847222222,
+          "mean_absolute_channel_delta": 7.085821759259259,
+          "dark_chromatic_foreground_intersection_over_union": 0.994697614529356
         },
         "combined_to_hlod": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.01990017361111111,
-          "mean_absolute_channel_delta": 0.5900415943287037,
+          "changed_pixel_fraction_max_channel_gt_12": 0.019904513888888888,
+          "mean_absolute_channel_delta": 0.5900632957175926,
           "dark_chromatic_foreground_intersection_over_union": 0.9996314996514349
         }
       },
       "48": {
         "source_coverage": 0.0,
         "combined_to_source": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.15791666666666668,
-          "mean_absolute_channel_delta": 7.221102430555556,
-          "dark_chromatic_foreground_intersection_over_union": 0.9946897725066709
+          "changed_pixel_fraction_max_channel_gt_12": 0.15792209201388888,
+          "mean_absolute_channel_delta": 7.221045645254629,
+          "dark_chromatic_foreground_intersection_over_union": 0.9946958013753056
         },
         "combined_to_hlod": {
-          "changed_pixel_fraction_max_channel_gt_12": 0.014838324652777778,
-          "mean_absolute_channel_delta": 0.47346245659722225,
+          "changed_pixel_fraction_max_channel_gt_12": 0.014841579861111112,
+          "mean_absolute_channel_delta": 0.47347945601851854,
           "dark_chromatic_foreground_intersection_over_union": 0.9997535023211864
         }
       }
     },
-    "maximum_combined_transition_overhead_above_larger_control": 0.0004817708333333115,
+    "maximum_combined_transition_overhead_above_larger_control": 0.0004796006944444431,
     "maximum_acceptable_transition_overhead": 0.015,
     "combined_transition_overhead_by_pair": [
-      0.0004817708333333115,
-      6.727430555555913e-05,
+      0.0004796006944444431,
+      7.921006944444642e-05,
       0.0,
       0.0,
       0.0,
@@ -362,17 +387,17 @@
     ],
     "source_endpoint_frame_0_combined_to_source": {
       "changed_pixel_fraction_max_channel_gt_12": 0.019482421875,
-      "mean_absolute_channel_delta": 0.7475947627314815,
-      "dark_chromatic_foreground_intersection_over_union": 0.9984419052387509
+      "mean_absolute_channel_delta": 0.7476696325231481,
+      "dark_chromatic_foreground_intersection_over_union": 0.9984395247285858
     },
     "motion_tail_frame_40_combined_to_hlod": {
-      "changed_pixel_fraction_max_channel_gt_12": 0.01990017361111111,
-      "mean_absolute_channel_delta": 0.5900415943287037,
+      "changed_pixel_fraction_max_channel_gt_12": 0.019904513888888888,
+      "mean_absolute_channel_delta": 0.5900632957175926,
       "dark_chromatic_foreground_intersection_over_union": 0.9996314996514349
     },
     "settle_endpoint_frame_48_combined_to_hlod": {
-      "changed_pixel_fraction_max_channel_gt_12": 0.014838324652777778,
-      "mean_absolute_channel_delta": 0.47346245659722225,
+      "changed_pixel_fraction_max_channel_gt_12": 0.014841579861111112,
+      "mean_absolute_channel_delta": 0.47347945601851854,
       "dark_chromatic_foreground_intersection_over_union": 0.9997535023211864
     },
     "thresholds": {
@@ -418,7 +443,7 @@
   },
   "contact_sheet": {
     "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v37_temporal_lit_handoff_contact_sheet.png",
-    "sha256": "314a3ab349a2832c7d8d85eae1badb26c38acc47d4cb950e9c9cb856f1eb8d33",
+    "sha256": "540a46d3cf1710417b4052a851c8010dbde225a882c988af9196eedc6a2a3727",
     "selected_frames": [
       0,
       15,
