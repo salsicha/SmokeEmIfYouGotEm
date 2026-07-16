@@ -127,6 +127,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Updated the source inventory to include private headers and regenerated it at **36 files, 50,491 lines, 34 commands, 18 flags, and six river paths**. Regenerated the Pacuare preview-centerline provenance through its generator so `GetPreviewRiverCenterY` points to `RaftSimEditorSurfaceSampling.cpp`.
 - Verification: UE 5.8 independently compiled all 23 new translation units and linked the editor target; the 123 focused editor/geospatial/Milestone 20/photoreal tests pass.
 
+### 2026-07-16 Finding 2 Step 2.2 Reference-Profile Externalization
+
+- Moved the eight retained dam-break and reduced bed-step GeoClaw playback arrays out of `solver.cpp` into the versioned `physics/data/calibration/milestone18_column_geoclaw_profiles.json` calibration artifact.
+- Added a strict schema/shape loader and explicit `calibration_only_not_solver_parity` provenance. This changes storage only: playback enablement, interpolation, bounded response, and emitted manifest fields remain unchanged.
+- Verification: the native C++ targets compile, and fresh dam-break finite-volume, dam-break reduced, and bed-step reduced runs reproduce the pre-change manifest and frame SHA-256 hashes byte for byte.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
