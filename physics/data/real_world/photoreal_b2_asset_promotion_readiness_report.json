@@ -1,0 +1,228 @@
+{
+  "generated_on": "2026-07-16",
+  "global_gate_status": {
+    "can_promote_any_b2_asset_set": false,
+    "import_capture_reviews_valid": false,
+    "source_binaries_allowed_in_repo_now": false,
+    "source_downloads_allowed_now": false,
+    "source_hashes_valid": false
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_mark_chilko_b2_complete": false,
+    "can_mark_colorado_b2_complete": false,
+    "can_mark_futaleufu_b2_complete": false,
+    "can_mark_pacuare_b2_complete": false,
+    "can_mark_south_fork_b2_complete": false,
+    "can_run_corridor_substitution": false,
+    "complete_when": [
+      "the per-river source-hash records validate",
+      "the per-river import/capture review records validate",
+      "the river-specific ecology/guide/art/rights/hazard/performance reviews pass",
+      "corridor substitution is explicitly enabled by the river manifest",
+      "the full per-river asset set is manually approved for promotion"
+    ]
+  },
+  "rivers": [
+    {
+      "blocking_reasons": [
+        "source_assets_not_downloaded_or_recorded",
+        "source_assets_not_imported",
+        "source_hash_records_have_failures",
+        "import_capture_review_records_have_failures",
+        "corridor_substitution_not_allowed",
+        "desktop_vr_performance_review_missing",
+        "human_domain_reviews_missing"
+      ],
+      "candidate_asset_count": 9,
+      "display_name": "South Fork American",
+      "gate_status": {
+        "corridor_substitution_allowed": false,
+        "desktop_vr_performance_reviewed": false,
+        "human_ecology_guide_art_rights_hazard_reviewed": false,
+        "import_capture_reviews_valid": false,
+        "selection_manifest_not_promoted": true,
+        "source_assets_downloaded": false,
+        "source_assets_imported": false,
+        "source_hash_records_valid": false
+      },
+      "import_review_failing_record_count": 7,
+      "import_review_record_count": 7,
+      "next_required_actions": [
+        "Fill and validate source hash records for every selected source candidate.",
+        "Attach Unreal import reports and hash-locked isolated captures.",
+        "Pass rights, ecology/guide, art, technical-art, hazard, and desktop/VR performance review.",
+        "Enable corridor substitution only after reviewed source evidence and river-specific approval exist."
+      ],
+      "promotion_ready": false,
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "source_hash_failing_record_count": 7,
+      "source_hash_record_count": 7
+    },
+    {
+      "blocking_reasons": [
+        "source_assets_not_downloaded_or_recorded",
+        "source_assets_not_imported",
+        "source_hash_records_have_failures",
+        "import_capture_review_records_have_failures",
+        "corridor_substitution_not_allowed",
+        "desktop_vr_performance_review_missing",
+        "human_domain_reviews_missing"
+      ],
+      "candidate_asset_count": 9,
+      "display_name": "Colorado River Grand Canyon",
+      "gate_status": {
+        "corridor_substitution_allowed": false,
+        "desktop_vr_performance_reviewed": false,
+        "human_ecology_guide_art_rights_hazard_reviewed": false,
+        "import_capture_reviews_valid": false,
+        "selection_manifest_not_promoted": true,
+        "source_assets_downloaded": false,
+        "source_assets_imported": false,
+        "source_hash_records_valid": false
+      },
+      "import_review_failing_record_count": 9,
+      "import_review_record_count": 9,
+      "next_required_actions": [
+        "Fill and validate source hash records for every selected source candidate.",
+        "Attach Unreal import reports and hash-locked isolated captures.",
+        "Pass rights, ecology/guide, art, technical-art, hazard, and desktop/VR performance review.",
+        "Enable corridor substitution only after reviewed source evidence and river-specific approval exist."
+      ],
+      "promotion_ready": false,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "source_hash_failing_record_count": 9,
+      "source_hash_record_count": 9
+    },
+    {
+      "blocking_reasons": [
+        "source_assets_not_downloaded_or_recorded",
+        "source_assets_not_imported",
+        "source_hash_records_have_failures",
+        "import_capture_review_records_have_failures",
+        "corridor_substitution_not_allowed",
+        "desktop_vr_performance_review_missing",
+        "human_domain_reviews_missing"
+      ],
+      "candidate_asset_count": 9,
+      "display_name": "Pacuare River",
+      "gate_status": {
+        "corridor_substitution_allowed": false,
+        "desktop_vr_performance_reviewed": false,
+        "human_ecology_guide_art_rights_hazard_reviewed": false,
+        "import_capture_reviews_valid": false,
+        "selection_manifest_not_promoted": true,
+        "source_assets_downloaded": false,
+        "source_assets_imported": false,
+        "source_hash_records_valid": false
+      },
+      "import_review_failing_record_count": 9,
+      "import_review_record_count": 9,
+      "next_required_actions": [
+        "Fill and validate source hash records for every selected source candidate.",
+        "Attach Unreal import reports and hash-locked isolated captures.",
+        "Pass rights, ecology/guide, art, technical-art, hazard, and desktop/VR performance review.",
+        "Enable corridor substitution only after reviewed source evidence and river-specific approval exist."
+      ],
+      "promotion_ready": false,
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "source_hash_failing_record_count": 9,
+      "source_hash_record_count": 9
+    },
+    {
+      "blocking_reasons": [
+        "source_assets_not_downloaded_or_recorded",
+        "source_assets_not_imported",
+        "source_hash_records_have_failures",
+        "import_capture_review_records_have_failures",
+        "corridor_substitution_not_allowed",
+        "desktop_vr_performance_review_missing",
+        "human_domain_reviews_missing"
+      ],
+      "candidate_asset_count": 9,
+      "display_name": "Futaleufu River",
+      "gate_status": {
+        "corridor_substitution_allowed": false,
+        "desktop_vr_performance_reviewed": false,
+        "human_ecology_guide_art_rights_hazard_reviewed": false,
+        "import_capture_reviews_valid": false,
+        "selection_manifest_not_promoted": true,
+        "source_assets_downloaded": false,
+        "source_assets_imported": false,
+        "source_hash_records_valid": false
+      },
+      "import_review_failing_record_count": 9,
+      "import_review_record_count": 9,
+      "next_required_actions": [
+        "Fill and validate source hash records for every selected source candidate.",
+        "Attach Unreal import reports and hash-locked isolated captures.",
+        "Pass rights, ecology/guide, art, technical-art, hazard, and desktop/VR performance review.",
+        "Enable corridor substitution only after reviewed source evidence and river-specific approval exist."
+      ],
+      "promotion_ready": false,
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "source_hash_failing_record_count": 9,
+      "source_hash_record_count": 9
+    },
+    {
+      "blocking_reasons": [
+        "source_assets_not_downloaded_or_recorded",
+        "source_assets_not_imported",
+        "source_hash_records_have_failures",
+        "import_capture_review_records_have_failures",
+        "corridor_substitution_not_allowed",
+        "desktop_vr_performance_review_missing",
+        "human_domain_reviews_missing"
+      ],
+      "candidate_asset_count": 10,
+      "display_name": "Chilko River",
+      "gate_status": {
+        "corridor_substitution_allowed": false,
+        "desktop_vr_performance_reviewed": false,
+        "human_ecology_guide_art_rights_hazard_reviewed": false,
+        "import_capture_reviews_valid": false,
+        "selection_manifest_not_promoted": true,
+        "source_assets_downloaded": false,
+        "source_assets_imported": false,
+        "source_hash_records_valid": false
+      },
+      "import_review_failing_record_count": 10,
+      "import_review_record_count": 10,
+      "next_required_actions": [
+        "Fill and validate source hash records for every selected source candidate.",
+        "Attach Unreal import reports and hash-locked isolated captures.",
+        "Pass rights, ecology/guide, art, technical-art, hazard, and desktop/VR performance review.",
+        "Enable corridor substitution only after reviewed source evidence and river-specific approval exist."
+      ],
+      "promotion_ready": false,
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "source_hash_failing_record_count": 10,
+      "source_hash_record_count": 10
+    }
+  ],
+  "schema": "raftsim.photoreal.b2_asset_promotion_readiness_report.v1",
+  "source_artifacts": {
+    "import_capture_review_ledger": "physics/data/real_world/photoreal_b2_import_capture_review_ledger.json",
+    "import_capture_review_validation_report": "physics/data/real_world/photoreal_b2_import_capture_review_validation_report.json",
+    "source_acquisition_preflight": "physics/data/real_world/photoreal_b2_source_acquisition_preflight.json",
+    "source_hash_report_template": "physics/data/real_world/photoreal_b2_source_hash_report_template.json",
+    "source_hash_validation_report": "physics/data/real_world/photoreal_b2_source_hash_validation_report.json",
+    "source_storage_decision": "physics/data/real_world/photoreal_b2_source_storage_decision_packet.json"
+  },
+  "status": "b2_asset_promotion_readiness_blocked_missing_source_import_capture_review_evidence",
+  "summary": {
+    "blocked_river_count": 5,
+    "import_review_failing_record_count": 44,
+    "import_review_record_count": 44,
+    "ready_river_count": 0,
+    "river_count": 5,
+    "selection_manifest_count": 5,
+    "source_hash_failing_record_count": 44,
+    "source_hash_record_count": 44
+  }
+}
