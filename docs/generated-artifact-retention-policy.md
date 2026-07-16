@@ -1,6 +1,6 @@
 # Generated Artifact Retention Policy
 
-Written July 15, 2026. This document records the non-destructive Finding 3.1 audit and the proposed retention policy. It does not authorize an LFS prune, server deletion, history rewrite, `git rm --cached`, or ignore-rule change.
+Written July 15, 2026. This document records the non-destructive Finding 3.1 audit and the resulting owner decision. On July 16, 2026, the owner chose to keep versioning generated maps and not prune Git LFS. No LFS dry run, prune, server deletion, history rewrite, `git rm --cached`, retention-configuration change, or ignore-rule change is authorized.
 
 ## Current audit
 
@@ -85,36 +85,29 @@ The base and flow-variant preview maps are regenerated through:
 
 Before any candidate is removed from tracking, its manifest must record the exact generator command, Unreal association/build, enabled project plugins, source hashes, river/flow selection, output package path, and review status. Regeneration must reproduce the required logical package and validation evidence; volatile binary hashes need not match unless a gate explicitly declares byte identity.
 
-## Proposed local LFS retention
+## Owner decision: no LFS pruning
 
-After explicit owner approval, use a conservative 30-day recent-ref and recent-commit window with a 7-day prune offset. The sequence must be:
+The owner rejected local and hosted LFS pruning. The repository keeps the existing Git LFS configuration and retains all currently reachable local and hosted objects. The previously proposed 30-day recent-ref and recent-commit window with a 7-day prune offset is not adopted.
 
-1. Record `git status --short`, `git lfs env`, local LFS size, and available disk space.
-2. Fetch or otherwise verify every object required by current refs against `origin`.
-3. Run `git lfs prune --dry-run --verify-remote` and preserve the object/byte estimate in this document.
-4. Obtain a second explicit owner approval for the exact dry-run result.
-5. Run the non-dry prune only after that approval, then record before/after sizes and verify checkout plus required tests.
+Do not run `git lfs prune`, including a dry run, as part of this remediation. Do not alter repository-specific LFS retention settings. Future reconsideration requires a new explicit owner decision and a new impact review.
 
-The GitLab mirror needs a separate hosted-retention decision. A successful GitHub verification does not prove that GitLab contains every object. No server-side LFS deletion or history rewrite is part of this proposal.
+The decision applies to both the GitHub origin and GitLab mirror. No server-side LFS deletion or history rewrite is planned.
 
-## Proposed tracking change
+## Owner decision: keep versioning maps
 
-After explicit owner approval:
+Generated preview and candidate maps remain tracked in Git LFS, including maps under `unreal/Content/RaftSim/Maps/EnvironmentPreviews/`. The proposed volatile-map untracking and narrow ignore rules are rejected. Regeneration contracts remain documented because they are useful for recovery and validation, but they do not replace versioned map packages.
 
-1. Inventory every tracked file under `unreal/Content/RaftSim/Maps/EnvironmentPreviews/` as `promoted`, `milestone_locked`, or `volatile`.
-2. Keep only promoted and deliberately milestone-locked maps tracked.
-3. Remove volatile candidates from the index while retaining local files, then add narrow ignore rules for those exact candidate/flow paths.
-4. Regenerate one physical corridor and one flow variant from a clean local absence, run their manifest/capture tests, and record the commands and hashes.
-5. Do not rewrite history. Existing LFS objects remain in historical commits and hosted storage until a separately approved retention action addresses them.
+This accepts continued repository and hosted-LFS growth as the cost of retaining exact generated map revisions. The audit measurements remain the baseline for observing that growth; observation does not authorize cleanup.
 
 ## Owner gates
 
-The following remain blocked without a new explicit approval naming the action:
+The following remain prohibited without a new explicit approval that reverses or narrows the July 16, 2026 decision:
 
+- running `git lfs prune --dry-run`;
 - running any non-dry `git lfs prune`;
 - changing repository-specific LFS retention configuration;
 - deleting hosted GitHub or GitLab LFS objects;
 - untracking or ignoring current candidate maps;
 - rewriting history to remove old LFS pointers or objects.
 
-The policy recommendation is to approve the inventory and future untracking of volatile candidates, then review a real `git lfs prune --dry-run --verify-remote` result before authorizing local deletion.
+Finding 3.1 is closed by owner decision: keep versioning maps and do not prune. No destructive action was performed.
