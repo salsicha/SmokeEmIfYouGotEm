@@ -1,0 +1,1106 @@
+{
+  "cases": [
+    {
+      "case_id": "calm_no_overtopping",
+      "intent": "Calm water below the depressed tube top should not overtop or retain water.",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "depressed_tube_top_m": 0.15709559970507053,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15661960394311394,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1574172254846264,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "starboard_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "starboard_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "starboard_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.155887242818261,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "starboard_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1430131188231959,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.157256360635918,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        }
+      ],
+      "summary": {
+        "reference_flip_margin_nm": 1800.0,
+        "reference_flip_risk": false,
+        "reference_flip_threshold_nm": 1800.0,
+        "retained_water_pitch_moment_nm": 0.0,
+        "retained_water_roll_moment_nm": 0.0,
+        "total_drainage_flux_m3_s": 0.0,
+        "total_overtopping_flux_m3_s": 0.0,
+        "total_retained_water_mass_kg": 0.0,
+        "total_retained_water_volume_m3": 0.0
+      }
+    },
+    {
+      "case_id": "starboard_incoming_overwash",
+      "intent": "Incoming starboard water overtops depressed upstream tube segments.",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "depressed_tube_top_m": 0.15709559970507053,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04290440029492948,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.043970597547996704,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15661960394311394,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04338039605688607,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1574172254846264,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04258277451537362,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.08953280509630204,
+          "retained_water_mass_kg": 2.9844268365434017,
+          "retained_water_pitch_moment_nm": 47.209528967216364,
+          "retained_water_roll_moment_nm": 27.813365903166233,
+          "retained_water_volume_m3": 0.0029844268365434015,
+          "segment_id": "starboard_3",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.043970597547996704,
+          "overtopping_flux_m3_s": 0.07373869208799047,
+          "retained_water_mass_kg": 2.4579564029330156,
+          "retained_water_pitch_moment_nm": 12.960496868115428,
+          "retained_water_roll_moment_nm": 22.90692469713424,
+          "retained_water_volume_m3": 0.002457956402933016,
+          "segment_id": "starboard_2",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.08953280509630204,
+          "retained_water_mass_kg": 2.9844268365434017,
+          "retained_water_pitch_moment_nm": -15.736509655738793,
+          "retained_water_roll_moment_nm": 27.813365903166233,
+          "retained_water_volume_m3": 0.0029844268365434015,
+          "segment_id": "starboard_1",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.155887242818261,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.044112757181739015,
+          "overtopping_flux_m3_s": 0.07397709379377632,
+          "retained_water_mass_kg": 2.4659031264592106,
+          "retained_water_pitch_moment_nm": -39.00719684378583,
+          "retained_water_roll_moment_nm": 22.980984187036615,
+          "retained_water_volume_m3": 0.0024659031264592105,
+          "segment_id": "starboard_0",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1430131188231959,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.056986881176804116,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.157256360635918,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.042743639364082014,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        }
+      ],
+      "summary": {
+        "reference_flip_margin_nm": 1698.4853593094967,
+        "reference_flip_risk": false,
+        "reference_flip_threshold_nm": 1800.0,
+        "retained_water_pitch_moment_nm": 5.426319335807172,
+        "retained_water_roll_moment_nm": 101.51464069050331,
+        "total_drainage_flux_m3_s": 0.0,
+        "total_overtopping_flux_m3_s": 0.32678139607437084,
+        "total_retained_water_mass_kg": 10.89271320247903,
+        "total_retained_water_volume_m3": 0.010892713202479028
+      }
+    },
+    {
+      "case_id": "starboard_high_side_counterplay_reference",
+      "intent": "High-side crew action changes tube depression and the reference flip margin.",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "depressed_tube_top_m": 0.15709559970507053,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04290440029492948,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15709559970507053,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04290440029492948,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1577175481026931,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04228245189730692,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1440520376377709,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0559479623622291,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15621073911931346,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04378926088068655,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.08953280509630204,
+          "retained_water_mass_kg": 2.9844268365434017,
+          "retained_water_pitch_moment_nm": 47.209528967216364,
+          "retained_water_roll_moment_nm": 27.813365903166233,
+          "retained_water_volume_m3": 0.0029844268365434015,
+          "segment_id": "starboard_3",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.043970597547996704,
+          "overtopping_flux_m3_s": 0.07373869208799047,
+          "retained_water_mass_kg": 2.4579564029330156,
+          "retained_water_pitch_moment_nm": 12.960496868115428,
+          "retained_water_roll_moment_nm": 22.90692469713424,
+          "retained_water_volume_m3": 0.002457956402933016,
+          "segment_id": "starboard_2",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.053388673283424004,
+          "overtopping_flux_m3_s": 0.08953280509630204,
+          "retained_water_mass_kg": 2.9844268365434017,
+          "retained_water_pitch_moment_nm": -15.736509655738793,
+          "retained_water_roll_moment_nm": 27.813365903166233,
+          "retained_water_volume_m3": 0.0029844268365434015,
+          "segment_id": "starboard_1",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15650919121588355,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 2.4,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.04349080878411646,
+          "overtopping_flux_m3_s": 0.0729340863309633,
+          "retained_water_mass_kg": 2.4311362110321095,
+          "retained_water_pitch_moment_nm": -38.4572320462378,
+          "retained_water_roll_moment_nm": 22.656973918713746,
+          "retained_water_volume_m3": 0.0024311362110321097,
+          "segment_id": "starboard_0",
+          "upstream_exposed": true,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1423093351100967,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.05769066488990332,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.157256360635918,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.042743639364082014,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.2,
+          "wet": true
+        }
+      ],
+      "summary": {
+        "reference_flip_margin_nm": 2201.5324817059663,
+        "reference_flip_risk": false,
+        "reference_flip_threshold_nm": 2302.7231121281466,
+        "retained_water_pitch_moment_nm": 5.9762841333552,
+        "retained_water_roll_moment_nm": 101.19063042218045,
+        "total_drainage_flux_m3_s": 0.0,
+        "total_overtopping_flux_m3_s": 0.32573838861155785,
+        "total_retained_water_mass_kg": 10.857946287051929,
+        "total_retained_water_volume_m3": 0.010857946287051928
+      }
+    },
+    {
+      "case_id": "retained_water_drains_without_new_flux",
+      "intent": "Previously retained water drains deterministically when overtopping stops.",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "depressed_tube_top_m": 0.15709559970507053,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "port_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.15661960394311394,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1574172254846264,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": 0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "bow_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.001641434760098871,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 2.9297123445401057,
+          "retained_water_pitch_moment_nm": 46.34402093615073,
+          "retained_water_roll_moment_nm": 27.303454194941516,
+          "retained_water_volume_m3": 0.0029297123445401058,
+          "segment_id": "starboard_3",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1560294024520033,
+          "drainage_flux_m3_s": 0.0013518760216131589,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 2.412893868879244,
+          "retained_water_pitch_moment_nm": 12.722887758866648,
+          "retained_water_roll_moment_nm": 22.486964411020114,
+          "retained_water_volume_m3": 0.002412893868879244,
+          "segment_id": "starboard_2",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.146611326716576,
+          "drainage_flux_m3_s": 0.001641434760098871,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 2.9297123445401057,
+          "retained_water_pitch_moment_nm": -15.448006978716913,
+          "retained_water_roll_moment_nm": 27.303454194941516,
+          "retained_water_volume_m3": 0.0029297123445401058,
+          "segment_id": "starboard_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.155887242818261,
+          "drainage_flux_m3_s": 0.001356246719552566,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 2.420694902474125,
+          "retained_water_pitch_moment_nm": -38.29206490164975,
+          "retained_water_roll_moment_nm": 22.559666143607608,
+          "retained_water_volume_m3": 0.002420694902474125,
+          "segment_id": "starboard_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.1430131188231959,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": 0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_1",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        },
+        {
+          "depressed_tube_top_m": 0.157256360635918,
+          "drainage_flux_m3_s": 0.0,
+          "feature_tags": [],
+          "incoming_speed_mps": 0.0,
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overtopping_depth_m": 0.0,
+          "overtopping_flux_m3_s": 0.0,
+          "retained_water_mass_kg": 0.0,
+          "retained_water_pitch_moment_nm": -0.0,
+          "retained_water_roll_moment_nm": -0.0,
+          "retained_water_volume_m3": 0.0,
+          "segment_id": "stern_0",
+          "upstream_exposed": false,
+          "water_surface_m": 0.05,
+          "wet": true
+        }
+      ],
+      "summary": {
+        "reference_flip_margin_nm": 1700.3464610554893,
+        "reference_flip_risk": false,
+        "reference_flip_threshold_nm": 1800.0,
+        "retained_water_pitch_moment_nm": 5.32683681465071,
+        "retained_water_roll_moment_nm": 99.65353894451076,
+        "total_drainage_flux_m3_s": 0.005990992261363467,
+        "total_overtopping_flux_m3_s": 0.0,
+        "total_retained_water_mass_kg": 10.69301346043358,
+        "total_retained_water_volume_m3": 0.010693013460433581
+      }
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "model_contract": {
+    "accepted_water_sampler_coupled": "WaterField2_5D",
+    "gameplay_scoring_authority": "disabled_until_d6_fixture_suite_and_design_review",
+    "retained_water_mass_and_drainage_recorded": true,
+    "roll_moment_reported_reference_only": true,
+    "uses_deformed_d2_tube_freeboard": true
+  },
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_inform_engine_port": true,
+    "requires_before_runtime_authority": [
+      "D4 rock wrap/pin/release contact coupling",
+      "D5 replay telemetry",
+      "D6 Chrono-or-reviewed compliant reference comparison",
+      "named-rapid consequence-line review"
+    ]
+  },
+  "schema": "raftsim.flexible_raft.d3_overwash_flip_reference.v1",
+  "scoring_authority": "disabled_reference_only",
+  "scoring_authority_enabled": false,
+  "status": "overwash_flip_reference_fixture_recorded_not_gameplay_authority"
+}
