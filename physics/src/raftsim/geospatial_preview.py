@@ -324,7 +324,7 @@ def build_pacuare_preview_centerline_scaffold(
         "river_id": "pacuare",
         "section_id": "lower_pacuare_planning_corridor",
         "generated_from": {
-            "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp:GetPreviewRiverCenterY",
+            "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp:GetPreviewRiverCenterY",
             "source_masks": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
             "production_import_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
         },

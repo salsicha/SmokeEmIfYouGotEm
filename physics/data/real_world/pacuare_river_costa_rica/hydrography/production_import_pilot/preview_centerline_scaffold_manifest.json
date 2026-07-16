@@ -2,7 +2,7 @@
   "generated_from": {
     "production_import_recipe": "physics/data/real_world/pacuare_river_costa_rica/production_import_pilot.json",
     "source_masks": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/water_mask_2048.png",
-    "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp:GetPreviewRiverCenterY"
+    "unreal_preview_curve": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp:GetPreviewRiverCenterY"
   },
   "output_checksums": {
     "centerline_geojson": {

@@ -31,7 +31,8 @@ class EditorImplementationSourceSet:
 
 def editor_implementation_paths(repo_root: Path) -> list[Path]:
     private_root = repo_root / EDITOR_PRIVATE_RELATIVE_PATH
-    return sorted(private_root.rglob("*.cpp"), key=lambda path: path.relative_to(private_root).as_posix())
+    paths = [*private_root.rglob("*.cpp"), *private_root.rglob("*.h")]
+    return sorted(paths, key=lambda path: path.relative_to(private_root).as_posix())
 
 
 def read_raftsim_editor_source(repo_root: Path) -> str:
