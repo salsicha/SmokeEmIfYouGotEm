@@ -1395,6 +1395,9 @@ This milestone turns the five runnable river targets into complete, reviewable, 
 
 ## Immediate Next Steps
 
+- [x] Measure the uncalibrated C++ solver truth baseline with fixture profiles, correction chains, boundary exceptions, and `fixture_kind` source treatments disabled: preserve all 40 GeoClaw/C++ rows and actual norms in `physics/reports/solver_truth_baseline/uncalibrated_baseline.*`; 6 simple canonical rows pass and 34 rows fail, with no rafting-feature, South Fork real-world, or stitched cascading pass.
+- [ ] Make the Milestone 16 comparison gate honest by labeling every row `solver` or `reference_playback`, reporting separate headline counts, regenerating affected locks through their generators, and removing playback rows from live-water solver approval.
+- [ ] Write the water-solver strategy decision memo with the uncalibrated evidence, compare game-feel re-scoping against a real well-balanced finite-volume SWE core, and stop for the owner decision before implementing either option.
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.

@@ -27,6 +27,15 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - With these two items resolved, Phase 0 is complete. **Proceed directly into Finding 1, Steps 1.1–1.2 — no further owner input is required until the Step 1.3 decision memo.** Do not stop again for anything except the owner gates explicitly named in this plan (Step 1.3, LFS pruning in 3.1, policy sign-off in 3.2, and the Finding 4 memo).
 - Phase 0 post-check: `cd physics && uv run pytest -q` remained at **529 passed / 5 failed / 3 skipped in 123.93 seconds**. There is no regression from the recorded baseline.
 
+### 2026-07-15 Finding 1 Step 1.1
+
+- Added an opt-in `disable_fixture_calibrations` configuration path through the Python runner and C++ CLI. Default calibrated behavior is unchanged.
+- Added fixture-kind invariance coverage and a report generator that rejects any row not explicitly manifest-recorded as uncalibrated.
+- Ran the frozen 40-row Milestone 16 GeoClaw/C++ matrix from commit `accfaeeef1b88baf9c33a024c00023cdfa9c80c4`. The uncalibrated solver passes **6 of 40** rows and fails **34 of 40**.
+- Committed evidence lives in `physics/reports/solver_truth_baseline/uncalibrated_baseline.{json,md}`; the full per-row error norms and solver binary hash are preserved there.
+- Step 1.2 must now relabel calibrated comparison rows as reference playback and remove playback rows from the solver-parity approval count.
+- Post-check: the full suite reports **531 passed / 5 failed / 3 skipped in 124.64 seconds**. The two added passes are the new truth-baseline tests; the five failures and three skips are identical to Phase 0, so there is no regression.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
