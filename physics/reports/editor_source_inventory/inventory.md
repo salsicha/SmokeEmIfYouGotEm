@@ -1,14 +1,16 @@
 # RaftSim Editor Source Inventory
 
-Implementation files: **8**.
-Implementation lines: **47663**.
+Implementation files: **10**.
+Implementation lines: **47957**.
 Registered console commands: **34**.
 
 ## Source Files
 
 | File | Lines |
 | --- | ---: |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorProceduralVegetation.cpp` | 8442 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorProceduralVegetation.cpp` | 2154 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveAtlas.cpp` | 1684 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp` | 4898 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp` | 36964 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp` | 1 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimFeatureTuningEditorShell.cpp` | 196 |

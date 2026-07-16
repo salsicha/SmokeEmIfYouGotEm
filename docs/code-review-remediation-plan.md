@@ -88,6 +88,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Regenerated the inventory at **8 implementation files, 47,663 lines, 34 commands, 18 flags, and all six river paths**. `RaftSimEditorModule.cpp` is down to 36,964 lines; the extracted 8,442-line PVE implementation still requires an internal functional split before the god-file acceptance criterion is complete.
 - Verification: the focused source-layout and photoreal asset contracts pass, and UE 5.8 independently compiled `RaftSimEditorModule.cpp` plus `RaftSimEditorProceduralVegetation.cpp` and linked the editor module.
 
+### 2026-07-15 Finding 2 Step 2.1 PVE Functional Split
+
+- Split the extracted subsystem into graph/palette authoring (`RaftSimEditorProceduralVegetation.cpp`, 2,154 lines), atlas baking (`RaftSimEditorPveAtlas.cpp`, 1,684 lines), and async evaluation (`RaftSimEditorPveEvaluation.cpp`, 4,898 lines) behind `RaftSimEditorPveAuthoringInternal.h`.
+- The evaluation file's long completion function is now a documented frozen-legacy exception: only lifecycle fixes belong there; new graph, material, atlas, capture, or report behavior must be added to focused modules. The same function-owned-module policy now applies to Python milestone coordinators in `docs/raftsim-tools-workflow.md`.
+- Verification: UE 5.8 independently compiled the authoring, atlas, and evaluation translation units and linked `libUnrealEditor-RaftSimEditor.dylib` successfully.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

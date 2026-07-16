@@ -3,7 +3,15 @@
   "implementation_files": [
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorProceduralVegetation.cpp",
-      "line_count": 8442
+      "line_count": 2154
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveAtlas.cpp",
+      "line_count": 1684
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorPveEvaluation.cpp",
+      "line_count": 4898
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
@@ -34,8 +42,8 @@
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 8,
-  "implementation_line_count": 47663,
+  "implementation_file_count": 10,
+  "implementation_line_count": 47957,
   "registered_console_command_count": 34,
   "registered_console_commands": [
     {
