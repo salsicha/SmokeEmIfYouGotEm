@@ -22,6 +22,10 @@ FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/review/"
     "full_reach_directed_station_candidates.json"
 )
+FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/review/"
+    "full_reach_directed_station_candidates.geojson"
+)
 EARTH_RADIUS_M = 6_371_008.8
 
 
@@ -232,6 +236,22 @@ def _station_candidate(
     }
 
 
+def _geojson_feature(
+    feature_id: str,
+    lon_lat: list[float],
+    properties: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "type": "Feature",
+        "id": feature_id,
+        "geometry": {
+            "type": "Point",
+            "coordinates": lon_lat,
+        },
+        "properties": properties,
+    }
+
+
 def _rapid_station_candidates(
     river: dict[str, Any],
     features: list[dict[str, Any]],
@@ -304,6 +324,13 @@ def build_south_fork_a1_directed_station_candidates(
         "south_fork_americanwhitewater_map",
         21.0,
     )
+    chili_bar = _station_candidate(
+        features,
+        chain,
+        "chili_bar_put_in_published_0_0_miles",
+        "south_fork_american_rivers_mile_guide",
+        0.0,
+    )
     coloma_current_seed_station_m = 5250.41934
     coloma_seed_lon_lat = (
         -120.7632701,
@@ -369,6 +396,15 @@ def build_south_fork_a1_directed_station_candidates(
             ],
         },
         "source_anchor_station_candidates": {
+            "chili_bar_put_in": {
+                **chili_bar,
+                "current_seed_station_m": 0.0,
+                "current_seed_minus_candidate_station_m": 0.0,
+                "current_seed_to_candidate_geodesic_distance_m": 0.0,
+                "validation_status": (
+                    "candidate_matches_current_review_seed_but_exact_access_still_unreviewed"
+                ),
+            },
             "coloma_bridge_checkpoint": {
                 **coloma,
                 "current_seed_station_m": coloma_current_seed_station_m,
@@ -415,9 +451,124 @@ def build_south_fork_a1_directed_station_candidates(
     }
 
 
+def build_south_fork_a1_directed_station_candidates_geojson(
+    repo_root: Path,
+) -> dict[str, Any]:
+    """Build a visual review GeoJSON layer from the directed candidates."""
+
+    payload = build_south_fork_a1_directed_station_candidates(repo_root)
+    anchors = payload["source_anchor_station_candidates"]
+    downstream = anchors["downstream_source_window"]
+    anchor_candidates = [
+        (
+            "anchor_chili_bar_put_in",
+            anchors["chili_bar_put_in"],
+            "anchor_candidate",
+            "Chili Bar put-in",
+        ),
+        (
+            "anchor_coloma_bridge_checkpoint",
+            anchors["coloma_bridge_checkpoint"],
+            "anchor_checkpoint_candidate",
+            "Coloma Bridge checkpoint",
+        ),
+        (
+            "anchor_salmon_falls_20_5",
+            downstream["minimum_source_mile_candidate"],
+            "downstream_window_candidate",
+            "Salmon Falls/Folsom source window 20.5 mi",
+        ),
+        (
+            "anchor_full_run_21_0",
+            downstream["maximum_source_mile_candidate"],
+            "downstream_window_candidate",
+            "Salmon Falls/Folsom source window 21.0 mi",
+        ),
+    ]
+    features: list[dict[str, Any]] = []
+    for feature_id, anchor, marker_kind, label in anchor_candidates:
+        features.append(
+            _geojson_feature(
+                feature_id,
+                anchor["lon_lat"],
+                {
+                    "river_id": payload["river_id"],
+                    "marker_kind": marker_kind,
+                    "label": label,
+                    "station_id": anchor["station_id"],
+                    "station_m": anchor["station_m"],
+                    "published_river_mile": anchor["published_river_mile"],
+                    "source_id": anchor["source_id"],
+                    "geometry_status": anchor["geometry_status"],
+                    "production_promoted": False,
+                    "can_bind_editor_geometry": False,
+                    "can_bind_solver_window": False,
+                },
+            )
+        )
+    for rapid in payload["named_rapid_station_candidates"]:
+        rapid_id = rapid["name"].lower().replace(" ", "_").replace("'", "")
+        features.append(
+            _geojson_feature(
+                f"rapid_{rapid['order']:02d}_{rapid_id}",
+                rapid["lon_lat"],
+                {
+                    "river_id": payload["river_id"],
+                    "marker_kind": "named_rapid_candidate",
+                    "label": rapid["name"],
+                    "order": rapid["order"],
+                    "station_m": rapid["station_m"],
+                    "published_river_mile": rapid["published_river_mile"],
+                    "class": rapid["class"],
+                    "review_priority": rapid["review_priority"],
+                    "feature_tags": rapid["feature_tags"],
+                    "geometry_status": rapid["geometry_status"],
+                    "production_promoted": False,
+                    "can_bind_editor_geometry": rapid["can_bind_editor_geometry"],
+                    "can_bind_solver_window": rapid["can_bind_solver_window"],
+                },
+            )
+        )
+
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.south_fork.a1_directed_station_candidates.geojson.v1",
+        "generated_on": payload["generated_on"],
+        "status": "review_only_visual_layer_not_production_geometry",
+        "production_promoted": False,
+        "source_json": FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH,
+        "river_id": payload["river_id"],
+        "feature_count": len(features),
+        "policy": {
+            "allowed_use": [
+                "visual review",
+                "anchor and guide review queue",
+                "editor overlay with binding disabled",
+            ],
+            "forbidden_use": [
+                "shipping gameplay geometry",
+                "solver-window binding",
+                "public access or rescue geometry",
+            ],
+        },
+        "features": features,
+    }
+
+
 def write_south_fork_a1_directed_station_candidates(repo_root: Path) -> Path:
     payload = build_south_fork_a1_directed_station_candidates(repo_root)
     path = repo_root / FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def write_south_fork_a1_directed_station_candidates_geojson(repo_root: Path) -> Path:
+    payload = build_south_fork_a1_directed_station_candidates_geojson(repo_root)
+    path = repo_root / FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",

@@ -593,6 +593,28 @@
   "river_id": "south_fork_american_chili_bar",
   "schema": "raftsim.south_fork.a1_directed_station_candidates.v1",
   "source_anchor_station_candidates": {
+    "chili_bar_put_in": {
+      "coordinate_interpolation": "polyline_fraction_within_source_record",
+      "current_seed_minus_candidate_station_m": 0.0,
+      "current_seed_station_m": 0.0,
+      "current_seed_to_candidate_geodesic_distance_m": 0.0,
+      "feature_index": 96,
+      "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+      "lon_lat": [
+        -120.7199431,
+        38.7786168
+      ],
+      "permanent_identifier": "156647087",
+      "published_river_mile": 0.0,
+      "reachcode": "18020129000075",
+      "source_id": "south_fork_american_rivers_mile_guide",
+      "source_record_index": 18165,
+      "source_record_number": 18166,
+      "station_id": "chili_bar_put_in_published_0_0_miles",
+      "station_m": 0.0,
+      "station_source": "nhd_source_lengthkm_along_directed_chain",
+      "validation_status": "candidate_matches_current_review_seed_but_exact_access_still_unreviewed"
+    },
     "coloma_bridge_checkpoint": {
       "coordinate_interpolation": "polyline_fraction_within_source_record",
       "current_seed_minus_candidate_station_m": -3761.90706,
