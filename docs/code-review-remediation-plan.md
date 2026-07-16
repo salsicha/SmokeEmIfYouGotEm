@@ -189,6 +189,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Replaced the 11,943-line residual monolith with ten per-concern test files and a non-collected shared support module. The largest test file is 1,900 lines; a layout guard rejects reintroduction of the monolith, a file at or above 2,000 lines, or a missing concern split.
 - Verification: the focused split/retention suite passes **49/49** and the full suite reports **504 passed / 3 skipped in 138.61 seconds**. Relative to the preceding 539-pass run, the count changes only by deleting 36 historical snapshots and adding one layout guard; current V43 and shared behavior remain green.
 
+### 2026-07-16 Finding 2 Final Unity-Build Boundary
+
+- A clean UE 5.8 acceptance build exposed private helper-name collisions when UBT regrouped the decomposed editor sources into unity translation units; prior independent/incremental builds did not exercise that grouping.
+- Set `bUseUnity = false` for `RaftSimEditor` and locked it in the source-layout test. The module's 36 focused implementation files now have an explicit build boundary matching their private namespaces instead of depending on adaptive-unity grouping.
+- Verification: the focused source-layout suite passes **3/3**, and the invalidated UE 5.8 `SmokeEmIfYouGotEmEditor Mac Development` target compiles and links successfully.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
