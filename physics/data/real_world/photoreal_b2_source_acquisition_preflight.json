@@ -1,0 +1,1129 @@
+{
+  "candidate_asset_count": 46,
+  "cc0_download_task_count": 22,
+  "cc0_download_tasks": [
+    {
+      "asset_need_id": "granite_metamorphic_boulders",
+      "asset_url": "https://polyhaven.com/a/rock_01",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_rock_01",
+      "display_name": "South Fork American",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "task_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "asset_url": "https://polyhaven.com/a/leafy_grass",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_leafy_grass",
+      "display_name": "South Fork American",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "task_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "asset_url": "https://polyhaven.com/a/grass_medium_01",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_grass_medium_01",
+      "display_name": "South Fork American",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "task_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "asset_url": "https://polyhaven.com/a/grass_medium_02",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_grass_medium_02",
+      "display_name": "South Fork American",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "task_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_face",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_rock_face",
+      "display_name": "Colorado River Grand Canyon",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_06",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_rock_06",
+      "display_name": "Colorado River Grand Canyon",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_rocks_02",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_aerial_rocks_02",
+      "display_name": "Colorado River Grand Canyon",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_beach_03",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_aerial_beach_03",
+      "display_name": "Colorado River Grand Canyon",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/sand_01",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_sand_01",
+      "display_name": "Colorado River Grand Canyon",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "asset_url": "https://polyhaven.com/a/pachira_aquatica_01",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_pachira_aquatica_01",
+      "display_name": "Pacuare River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "task_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_url": "https://polyhaven.com/a/mossy_rock",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_mossy_rock",
+      "display_name": "Pacuare River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "task_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_url": "https://polyhaven.com/a/rock_moss_set_02",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_rock_moss_set_02",
+      "display_name": "Pacuare River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "task_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "asset_url": "https://polyhaven.com/a/moss_01",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_moss_01",
+      "display_name": "Pacuare River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "task_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "asset_url": "https://polyhaven.com/a/fern_02",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_fern_02",
+      "display_name": "Futaleufu River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "task_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_url": "https://polyhaven.com/a/mountainside",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_mountainside",
+      "display_name": "Futaleufu River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "task_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_url": "https://polyhaven.com/a/dry_riverbed_rock",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "display_name": "Futaleufu River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "task_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "asset_url": "https://polyhaven.com/a/river_small_rocks",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_river_small_rocks",
+      "display_name": "Futaleufu River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "task_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/pine_sapling_small",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_pine_sapling_small",
+      "display_name": "Chilko River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "task_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/fir_sapling",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_fir_sapling",
+      "display_name": "Chilko River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "task_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_url": "https://polyhaven.com/a/volcanic_rock_tiles",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_volcanic_rock_tiles",
+      "display_name": "Chilko River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "task_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_url": "https://polyhaven.com/a/dry_riverbed_rock",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "display_name": "Chilko River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "task_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_url": "https://polyhaven.com/a/river_small_rocks",
+      "blocked_reason": "Exact file sizes, selected source formats, hashes, and owner storage/LFS approval are not recorded yet.",
+      "candidate_id": "polyhaven_river_small_rocks",
+      "display_name": "Chilko River",
+      "execution_allowed": false,
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "planned_source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_B2_SOURCE_ROOT",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "repo_commit_allowed_now": false,
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_execute": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "task_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight"
+    }
+  ],
+  "execution_gate": {
+    "blocking_reasons": [
+      "Selected CC0 assets have exact asset pages but no recorded source-bundle byte sizes, resolution choices, file lists, or hashes.",
+      "Several Poly Haven geometry candidates are large enough that committing source bundles needs explicit size/LFS approval.",
+      "Fab candidates are local-only selection slots and must not be downloaded into the public repo.",
+      "First-party fallbacks are available but do not replace external asset review or human lifelike approval."
+    ],
+    "downloads_allowed_now": false,
+    "imports_allowed_now": false,
+    "next_required_actions": [
+      "For each CC0 task, choose source resolution and exact file formats before downloading.",
+      "Record expected byte size and LFS classification, then get owner storage approval before committing source binaries.",
+      "Download one approved CC0 task at a time into the river-specific reviewed source root and hash every file.",
+      "Keep Fab binaries local-only and commit only URL/license/hash/import reports.",
+      "Run isolated import, capture, review, and performance gates before any corridor substitution."
+    ],
+    "requires_exact_resolution_and_file_selection": true,
+    "requires_hash_report_before_commit": true,
+    "requires_lfs_storage_headroom": true,
+    "requires_owner_size_storage_decision": true,
+    "source_binaries_allowed_in_repo_now": false
+  },
+  "fab_local_only_slot_count": 16,
+  "fab_local_only_slots": [
+    {
+      "asset_need_id": "sierra_oak_gray_pine_foliage",
+      "asset_url": "https://www.fab.com/search?q=california%20oak%20gray%20pine",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_blue_oak_gray_pine_hero_foliage_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "South Fork American",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "slot_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "asset_url": "https://www.fab.com/search?q=chaparral%20shrub%20scrub",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_chaparral_shrub_understory_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "South Fork American",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "slot_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://www.fab.com/search?q=grand%20canyon%20sandstone%20cliff%20megascans",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_grand_canyon_layered_cliff_hero_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Colorado River Grand Canyon",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "slot_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "desert_scrub_riparian_foliage",
+      "asset_url": "https://www.fab.com/search?q=desert%20scrub%20willow%20tamarisk%20cactus",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_desert_scrub_tamarisk_willow_cactus_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Colorado River Grand Canyon",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "slot_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "lava_falls_basalt",
+      "asset_url": "https://www.fab.com/search?q=basalt%20lava%20rock%20megascans",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_lava_falls_basalt_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Colorado River Grand Canyon",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "slot_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "asset_url": "https://www.fab.com/search?q=tropical%20rainforest%20canopy%20jungle%20foliage",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_pacuare_multi_strata_rainforest_canopy_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Pacuare River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "slot_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_url": "https://www.fab.com/search?q=mossy%20basalt%20andesite%20boulder",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_pacuare_mossy_basalt_andesite_boulder_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Pacuare River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "slot_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "waterfall_side_stream_assets",
+      "asset_url": "https://www.fab.com/search?q=waterfall%20mist%20spray%20vfx",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_pacuare_waterfall_mist_vfx_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Pacuare River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "slot_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "asset_url": "https://www.fab.com/search?q=liana%20vine%20epiphyte%20rainforest%20understory",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_pacuare_lianas_epiphytes_understory_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Pacuare River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "slot_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "nothofagus_coigue_canopy_or_reviewed_analog",
+      "asset_url": "https://www.fab.com/search?q=nothofagus%20coigue%20temperate%20rainforest%20tree",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_futaleufu_nothofagus_coigue_canopy_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Futaleufu River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "slot_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_url": "https://www.fab.com/search?q=patagonia%20granite%20boulder%20river",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_futaleufu_patagonian_granite_boulder_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Futaleufu River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "slot_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "asset_url": "https://www.fab.com/search?q=wet%20river%20bank%20rock%20glacial%20turquoise",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_futaleufu_turquoise_wet_bank_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Futaleufu River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "slot_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://www.fab.com/search?q=lodgepole%20spruce%20aspen%20forest%20foliage",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_chilko_lodgepole_spruce_aspen_foliage_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Chilko River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "slot_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_url": "https://www.fab.com/search?q=glacial%20river%20wet%20bank%20rock",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_chilko_glacial_blue_wet_bank_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Chilko River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "slot_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_url": "https://www.fab.com/search?q=volcanic%20basalt%20canyon%20rock",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_chilko_lava_canyon_volcanic_rock_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Chilko River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "slot_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_url": "https://www.fab.com/search?q=cold%20river%20gravel%20debris%20driftwood",
+      "blocked_reason": "Fab Standard items stay local-only until exact item terms prove redistribution rights.",
+      "candidate_id": "fab_chilko_cold_water_debris_gravel_slot",
+      "commit_source_binaries_allowed": false,
+      "display_name": "Chilko River",
+      "download_into_public_repo_allowed": false,
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_local_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "slot_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only"
+    }
+  ],
+  "first_party_entries": [
+    {
+      "asset_need_id": "all_south_fork_asset_needs",
+      "asset_url": "source_manifest://first_party_south_fork_biome_fallback_v1",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "first_party_south_fork_biome_fallback_v1",
+      "display_name": "South Fork American",
+      "entry_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "south_fork_american_chili_bar",
+      "selection_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    },
+    {
+      "asset_need_id": "all_colorado_asset_needs",
+      "asset_url": "source_manifest://first_party_colorado_biome_fallback_v1",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "first_party_colorado_biome_fallback_v1",
+      "display_name": "Colorado River Grand Canyon",
+      "entry_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selection_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    },
+    {
+      "asset_need_id": "all_pacuare_asset_needs",
+      "asset_url": "source_manifest://first_party_pacuare_biome_fallback_v1",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "first_party_pacuare_biome_fallback_v1",
+      "display_name": "Pacuare River",
+      "entry_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "pacuare_river_costa_rica",
+      "selection_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "asset_url": "source_manifest://futaleufu_retained_near_bank_strata",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "project_owned_futaleufu_sapling_fern_strata_v1",
+      "display_name": "Futaleufu River",
+      "entry_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "source_family": "Project-owned procedural",
+      "status": "retained_review_evidence_not_production_promoted"
+    },
+    {
+      "asset_need_id": "all_futaleufu_asset_needs",
+      "asset_url": "source_manifest://first_party_futaleufu_biome_fallback_v1",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "first_party_futaleufu_biome_fallback_v1",
+      "display_name": "Futaleufu River",
+      "entry_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "futaleufu_river_chile",
+      "selection_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    },
+    {
+      "asset_need_id": "all_chilko_asset_needs",
+      "asset_url": "source_manifest://first_party_chilko_biome_fallback_v1",
+      "can_cover_external_asset_gap": true,
+      "can_replace_human_lifelike_review": false,
+      "candidate_id": "first_party_chilko_biome_fallback_v1",
+      "display_name": "Chilko River",
+      "entry_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party",
+      "license_class": "first_party_committable",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "river_id": "chilko_river_lava_canyon",
+      "selection_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    }
+  ],
+  "first_party_entry_count": 6,
+  "generated_on": "2026-07-16",
+  "river_count": 5,
+  "schema": "raftsim.photoreal.b2_source_acquisition_preflight.v1",
+  "selection_manifest_count": 5,
+  "selection_manifests": [
+    {
+      "candidate_asset_count": 9,
+      "display_name": "South Fork American",
+      "production_promoted": false,
+      "relative_path": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/south_fork_b2_asset_selection_manifest.json",
+      "river_id": "south_fork_american_chili_bar",
+      "short_id": "south_fork"
+    },
+    {
+      "candidate_asset_count": 9,
+      "display_name": "Colorado River Grand Canyon",
+      "production_promoted": false,
+      "relative_path": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/colorado_b2_asset_selection_manifest.json",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "short_id": "colorado"
+    },
+    {
+      "candidate_asset_count": 9,
+      "display_name": "Pacuare River",
+      "production_promoted": false,
+      "relative_path": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/pacuare_b2_asset_selection_manifest.json",
+      "river_id": "pacuare_river_costa_rica",
+      "short_id": "pacuare"
+    },
+    {
+      "candidate_asset_count": 9,
+      "display_name": "Futaleufu River",
+      "production_promoted": false,
+      "relative_path": "physics/data/real_world/futaleufu_river_chile/asset_intake/futaleufu_b2_asset_selection_manifest.json",
+      "river_id": "futaleufu_river_chile",
+      "short_id": "futaleufu"
+    },
+    {
+      "candidate_asset_count": 10,
+      "display_name": "Chilko River",
+      "production_promoted": false,
+      "relative_path": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/chilko_b2_asset_selection_manifest.json",
+      "river_id": "chilko_river_lava_canyon",
+      "short_id": "chilko"
+    }
+  ],
+  "status": "preflight_queue_recorded_downloads_disabled_until_size_and_storage_approval"
+}
