@@ -119,6 +119,14 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Fixed a unity-build collision exposed by the refreshed Unreal makefile by giving PVE authoring, atlas, and evaluation translation units unique private log categories. Emitted log behavior is unchanged.
 - Verification: the regenerated inventory preserves all 34 commands, 18 startup flags, and six river paths; the 22 focused source-layout/Milestone 20 tests pass; UE 5.8 compiles and links `SmokeEmIfYouGotEmEditor Mac Development` successfully.
 
+### 2026-07-16 Finding 2 Step 2.1 Environment Decomposition
+
+- Removed the temporary 36,090-line environment legacy translation unit. The implementation now lives in 23 focused files covering catalog/configuration, materials, surface sampling, mesh primitives, canopy geometry/review, terrain, water/banks, atmosphere/foliage, near-field lighting, captures, landscape foliage/geometry/build, automation, and Zambezi/Futaleufu directors.
+- Added `RaftSimEditorEnvironmentInternal.h` as the 2,109-line private contract for the shared types, enums, constants, and function declarations previously hidden by one anonymous namespace. `RaftSimEditorModule.cpp` remains a 1,035-line lifecycle/registration/handler file.
+- Added a source-layout guard that fails if the module exceeds 1,500 lines, the removed legacy file returns, the private contract exceeds 3,000 lines, or any implementation exceeds 3,000 lines except the already documented 4,900-line frozen PVE evaluation lifecycle.
+- Updated the source inventory to include private headers and regenerated it at **36 files, 50,491 lines, 34 commands, 18 flags, and six river paths**. Regenerated the Pacuare preview-centerline provenance through its generator so `GetPreviewRiverCenterY` points to `RaftSimEditorSurfaceSampling.cpp`.
+- Verification: UE 5.8 independently compiled all 23 new translation units and linked the editor target; the 123 focused editor/geospatial/Milestone 20/photoreal tests pass.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
