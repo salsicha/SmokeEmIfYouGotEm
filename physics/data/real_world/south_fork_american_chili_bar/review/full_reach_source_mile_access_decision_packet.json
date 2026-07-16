@@ -1,0 +1,167 @@
+{
+  "current_operating_mode": {
+    "can_bind_solver_windows_now": false,
+    "can_promote_route_now": false,
+    "can_regenerate_corridor_windows_now": false,
+    "can_restation_named_rapids_now": false,
+    "mode": "review_only_no_endpoint_or_station_axis_selected",
+    "reason": "All official downstream access candidates conflict with the published 20.5/21.0-mile source conventions on the current NHD station axis, and the published 21.0-mile point remains far upstream of the official Salmon Falls access lead."
+  },
+  "decision_options": [
+    {
+      "endpoint_option_id": "official_access_50927",
+      "label": "Use the primary official Salmon Falls access lead as the physical downstream endpoint, but separate published guide miles from the simulation station axis.",
+      "option_id": "retain_official_access_with_separate_simulation_station_axis",
+      "requires_route_regeneration": true,
+      "risks": [
+        "The current NHD path places this endpoint near 30.5 source miles, far beyond the 21.0-mile guide convention.",
+        "Published rapid-mile references need a mapping policy instead of direct station equality."
+      ],
+      "route_promotion_allowed_without_review": false,
+      "uses_primary_official_access": true
+    },
+    {
+      "candidate_option_ids": [
+        "official_access_50817",
+        "official_access_50924",
+        "official_access_50927",
+        "official_access_50930",
+        "official_access_50933"
+      ],
+      "label": "Pick the exact guide/geospatial-approved Salmon Falls, Skunk Hollow, or nearby bank endpoint and regenerate all route/window products.",
+      "option_id": "select_guide_approved_access_endpoint_and_regenerate_route",
+      "requires_route_regeneration": true,
+      "risks": [
+        "Every current official access option conflicts with the published 20.5/21.0-mile conventions.",
+        "One access lead also exceeds the manual snap-review threshold and cannot be used without geometry review."
+      ],
+      "route_promotion_allowed_without_review": false
+    },
+    {
+      "label": "Reject the current NHD station axis and replace it with a reviewed centerline or alternate official hydrography before route promotion.",
+      "option_id": "replace_current_nhd_axis_with_reviewed_centerline",
+      "requires_route_regeneration": true,
+      "risks": [
+        "Requires a new source authority or hand-reviewed centerline with CRS, source, and reviewer provenance.",
+        "All existing source-window station assignments must be regenerated against the replacement axis."
+      ],
+      "route_promotion_allowed_without_review": false,
+      "uses_primary_official_access": "decision_dependent"
+    },
+    {
+      "endpoint_option_id": "official_access_50927",
+      "label": "Treat published 20.5/21.0 miles as public/guide conventions, use a reviewed physical endpoint for simulation, and maintain an explicit publication-sensitivity mapping between the two.",
+      "option_id": "split_published_mile_convention_from_simulation_and_publication_axes",
+      "requires_route_regeneration": true,
+      "risks": [
+        "Requires careful UI/editor labeling so guide-source miles do not appear as exact GIS chainage.",
+        "Requires rights/publication review before exposing route-detail screenshots or precise access geometry."
+      ],
+      "route_promotion_allowed_without_review": false,
+      "uses_primary_official_access": true
+    }
+  ],
+  "evidence_summary": {
+    "all_access_options_conflict_with_published_source_miles": true,
+    "excess_source_path_after_21_miles_m": 15281.508,
+    "geodesic_21_mile_point_to_official_access_m": 10426.611,
+    "manual_snap_review_count": 1,
+    "official_access_option_count": 5,
+    "official_access_source_station_miles": 30.495,
+    "options_within_snap_warning_threshold": 4,
+    "primary_access_name": "Salmon Falls  Lower Water Raft Take-out",
+    "primary_access_option_id": "official_access_50927",
+    "primary_access_snap_distance_m": 117.705,
+    "primary_access_source_station_miles": 30.495,
+    "published_breakpoint_count": 2,
+    "source_mile_conflict_count": 4
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "source_mile_access_option_matrix": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_option_matrix.json",
+    "source_mile_access_option_points_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_option_points.geojson",
+    "source_mile_divergence_audit": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_divergence_audit.json",
+    "source_mile_divergence_overlay_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_divergence_overlay.geojson"
+  },
+  "post_decision_regeneration_plan": [
+    {
+      "description": "Regenerate the directed route from Chili Bar to the selected endpoint or reviewed centerline axis.",
+      "requires_decision_fields": [
+        "chosen_option_id",
+        "selected_downstream_endpoint_lon_lat_or_centerline_geometry",
+        "simulation_station_axis_policy"
+      ],
+      "step_id": "a1_regenerate_directed_route"
+    },
+    {
+      "description": "Rebuild the full-reach source-window manifest, source-pull status, stitched validation, and derivatives against the selected route basis.",
+      "requires_decision_fields": [
+        "route_regeneration_scope",
+        "reservoir_stage_or_access_assumptions"
+      ],
+      "step_id": "a1_regenerate_corridor_windows"
+    },
+    {
+      "description": "Restation all South Fork named rapids and regenerate editor markers only after the route/station axis is reviewed.",
+      "requires_decision_fields": [
+        "guide_reviewer",
+        "geospatial_reviewer",
+        "published_mile_convention_policy"
+      ],
+      "step_id": "a1_restation_catalog_and_editor_markers"
+    },
+    {
+      "description": "Bind Meat Grinder and Troublemaker to regenerated production geometry and validated C++ water windows.",
+      "requires_decision_fields": [
+        "selected_downstream_endpoint_lon_lat_or_centerline_geometry",
+        "simulation_station_axis_policy"
+      ],
+      "step_id": "a1_bind_first_solver_windows"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_crop_to_final_downstream_anchor": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_current_nhd_route": false,
+    "can_restation_named_rapids": false,
+    "can_select_endpoint_from_decision_packet_alone": false
+  },
+  "required_decision_record": {
+    "blocks": [
+      "promoting the South Fork full-reach route",
+      "cropping the final downstream corridor",
+      "regenerating full-reach corridor windows from a selected endpoint",
+      "restationing all 20 South Fork named rapids",
+      "binding Meat Grinder or Troublemaker to production geometry",
+      "binding any South Fork full-reach solver window"
+    ],
+    "decision_id": "south_fork_a1_source_mile_access_authority",
+    "must_choose_one_option_id": [
+      "retain_official_access_with_separate_simulation_station_axis",
+      "select_guide_approved_access_endpoint_and_regenerate_route",
+      "replace_current_nhd_axis_with_reviewed_centerline",
+      "split_published_mile_convention_from_simulation_and_publication_axes"
+    ],
+    "required_fields": [
+      "chosen_option_id",
+      "decision_owner",
+      "decision_date",
+      "selected_downstream_endpoint_lon_lat_or_centerline_geometry",
+      "endpoint_source_authority",
+      "simulation_station_axis_policy",
+      "published_mile_convention_policy",
+      "guide_reviewer",
+      "geospatial_reviewer",
+      "rights_publication_reviewer",
+      "reservoir_stage_or_access_assumptions",
+      "route_regeneration_scope"
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_source_mile_access_decision_packet.v1",
+  "status": "source_mile_access_decision_required_route_promotion_blocked",
+  "task_id": "A1"
+}
