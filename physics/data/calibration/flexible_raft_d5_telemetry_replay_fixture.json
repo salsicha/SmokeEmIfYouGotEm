@@ -1,0 +1,1141 @@
+{
+  "frame_count": 2,
+  "frame_hashes": [
+    "06670d555860c98164400cb43cc458ab4230a5e15939cd6dc7582c9567c69583",
+    "596c6347d2ebc075f052d63cca96c0e5b813d18104cbd7051bd35c80daebdcdc"
+  ],
+  "frames": [
+    {
+      "case_id": "starboard_wrap_overwash_neutral",
+      "crew_summary": {
+        "active_action_count": 0,
+        "brace_count": 0,
+        "high_side_count": 0,
+        "occupied_seat_count": 5,
+        "pitch_moment_nm": -404.9567999999997,
+        "recovery_count": 0,
+        "roll_moment_nm": 0.0
+      },
+      "frame_index": 0,
+      "frame_sha256": "06670d555860c98164400cb43cc458ab4230a5e15939cd6dc7582c9567c69583",
+      "rigid_state": {
+        "angular_velocity_rps": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "linear_velocity_mps": {
+          "x": 0.0,
+          "y": 0.7,
+          "z": 0.0
+        },
+        "orientation_quaternion": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "position_m": {
+          "x": 3.0,
+          "y": 2.0,
+          "z": 0.0
+        }
+      },
+      "schema": "raftsim.flexible_raft.d5_telemetry_replay.v1",
+      "scoring_authority": "disabled_reference_only",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_0",
+          "tube": {
+            "compression_m": 0.0029044002949294673,
+            "effective_load_n": 120.25425,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.0029044002949294673,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 726.3923286016309,
+            "pressure_pa": 18726.392328601632,
+            "volume_loss_m3": 0.0004808234688255733,
+            "volume_m3": 0.26429260537572224
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_1",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_2",
+          "tube": {
+            "compression_m": 0.003970597547996709,
+            "effective_load_n": 164.39925,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.003970597547996709,
+            "lacing_load_n": 88.28999999999999,
+            "pressure_delta_pa": 993.0489278163697,
+            "pressure_pa": 18993.04892781637,
+            "volume_loss_m3": 0.0006573324240708552,
+            "volume_m3": 0.26411609642047695
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_3",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "bow_0",
+          "tube": {
+            "compression_m": 0.0033803960568860466,
+            "effective_load_n": 123.68775000000001,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 29.184750000000005,
+            "freeboard_loss_m": 0.0033803960568860466,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 845.4391660970608,
+            "pressure_pa": 18845.43916609706,
+            "volume_loss_m3": 0.0004945519431224287,
+            "volume_m3": 0.2334912688962454
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": 0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "bow_1",
+          "tube": {
+            "compression_m": 0.002582774515373608,
+            "effective_load_n": 94.503,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.002582774515373608,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 645.9535201640464,
+            "pressure_pa": 18645.953520164046,
+            "volume_loss_m3": 0.00037785991159915887,
+            "volume_m3": 0.23360796092776867
+          }
+        },
+        {
+          "combined_roll_moment_nm": 3380.106594176291,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 3344.180996551368,
+            "holding_force_n": 6265.939130380459,
+            "max_indentation_m": 0.1167249924454914,
+            "min_release_margin_n": -3281.665850404621,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.1156465399160568,
+            "retained_water_mass_kg": 3.8548846638685603,
+            "retained_water_pitch_moment_nm": 60.978974915987806,
+            "retained_water_roll_moment_nm": 35.92559762492305,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_3",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 6351.94347035453,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 6322.355359287399,
+            "holding_force_n": 11846.097410033231,
+            "max_indentation_m": 0.22,
+            "min_release_margin_n": -8904.222529332537,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.09524581061365435,
+            "retained_water_mass_kg": 3.1748603537884783,
+            "retained_water_pitch_moment_nm": 16.740641787982426,
+            "retained_water_roll_moment_nm": 29.588111067131724,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_2",
+          "tube": {
+            "compression_m": 0.003970597547996709,
+            "effective_load_n": 164.39925,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.003970597547996709,
+            "lacing_load_n": 88.28999999999999,
+            "pressure_delta_pa": 993.0489278163697,
+            "pressure_pa": 18993.04892781637,
+            "volume_loss_m3": 0.0006573324240708552,
+            "volume_m3": 0.26411609642047695
+          }
+        },
+        {
+          "combined_roll_moment_nm": 6358.280956912322,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 6322.355359287399,
+            "holding_force_n": 11846.097410033231,
+            "max_indentation_m": 0.22,
+            "min_release_margin_n": -8861.824130057394,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.1156465399160568,
+            "retained_water_mass_kg": 3.8548846638685603,
+            "retained_water_pitch_moment_nm": -20.32632497199594,
+            "retained_water_roll_moment_nm": 35.92559762492305,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_1",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 3373.864767792957,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 3344.180996551368,
+            "holding_force_n": 6265.939130380459,
+            "max_indentation_m": 0.1167249924454914,
+            "min_release_margin_n": -3323.4242738416488,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.09555374615029441,
+            "retained_water_mass_kg": 3.1851248716764804,
+            "retained_water_pitch_moment_nm": -50.38429592322336,
+            "retained_water_roll_moment_nm": 29.683771241588957,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_0",
+          "tube": {
+            "compression_m": 0.004112757181739007,
+            "effective_load_n": 170.28525,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.004112757181739007,
+            "lacing_load_n": 94.17599999999999,
+            "pressure_delta_pa": 1028.6031410450014,
+            "pressure_pa": 19028.603141045,
+            "volume_loss_m3": 0.0006808669514368927,
+            "volume_m3": 0.2640925618931109
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": 0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "stern_1",
+          "tube": {
+            "compression_m": 0.0169868811768041,
+            "effective_load_n": 621.54525,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 29.184750000000005,
+            "freeboard_loss_m": 0.0169868811768041,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 4248.42959671907,
+            "pressure_pa": 22248.42959671907,
+            "volume_loss_m3": 0.0024851807161664404,
+            "volume_m3": 0.2315006401232014
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "stern_0",
+          "tube": {
+            "compression_m": 0.0027436393640819993,
+            "effective_load_n": 100.38900000000001,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0027436393640819993,
+            "lacing_load_n": 50.031,
+            "pressure_delta_pa": 686.1859193438141,
+            "pressure_pa": 18686.185919343814,
+            "volume_loss_m3": 0.00040139443896519656,
+            "volume_m3": 0.23358442640040264
+          }
+        }
+      ],
+      "time_s": 0.0,
+      "totals": {
+        "contact_min_release_margin_n": -8904.222529332537,
+        "contact_pinned_obstacle_count": 1,
+        "contact_total_holding_force_n": 36224.07308082738,
+        "overwash_retained_water_mass_kg": 14.06975455320208,
+        "overwash_roll_moment_nm": 131.1230775585668,
+        "overwash_total_flux_m3_s": 0.4220926365960624,
+        "tube_total_applied_load_n": 3776.85,
+        "tube_total_volume_loss_m3": 0.01510132172654078
+      }
+    },
+    {
+      "case_id": "starboard_wrap_overwash_high_side",
+      "crew_summary": {
+        "active_action_count": 5,
+        "brace_count": 0,
+        "high_side_count": 5,
+        "occupied_seat_count": 5,
+        "pitch_moment_nm": -404.9567999999997,
+        "recovery_count": 0,
+        "roll_moment_nm": 1699.5825000000002
+      },
+      "frame_index": 1,
+      "frame_sha256": "596c6347d2ebc075f052d63cca96c0e5b813d18104cbd7051bd35c80daebdcdc",
+      "rigid_state": {
+        "angular_velocity_rps": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "linear_velocity_mps": {
+          "x": 0.0,
+          "y": 0.7,
+          "z": 0.0
+        },
+        "orientation_quaternion": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "position_m": {
+          "x": 3.0,
+          "y": 2.0,
+          "z": 0.0
+        }
+      },
+      "schema": "raftsim.flexible_raft.d5_telemetry_replay.v1",
+      "scoring_authority": "disabled_reference_only",
+      "scoring_authority_enabled": false,
+      "segments": [
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_0",
+          "tube": {
+            "compression_m": 0.0029044002949294673,
+            "effective_load_n": 120.25425,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.0029044002949294673,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 726.3923286016309,
+            "pressure_pa": 18726.392328601632,
+            "volume_loss_m3": 0.0004808234688255733,
+            "volume_m3": 0.26429260537572224
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_1",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_2",
+          "tube": {
+            "compression_m": 0.0029044002949294673,
+            "effective_load_n": 120.25425,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.0029044002949294673,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 726.3923286016309,
+            "pressure_pa": 18726.392328601632,
+            "volume_loss_m3": 0.0004808234688255733,
+            "volume_m3": 0.26429260537572224
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "port_3",
+          "tube": {
+            "compression_m": 0.0022824518973069098,
+            "effective_load_n": 94.503,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0022824518973069098,
+            "lacing_load_n": 44.144999999999996,
+            "pressure_delta_pa": 570.8426457263666,
+            "pressure_pa": 18570.842645726367,
+            "volume_loss_m3": 0.0003778599115991589,
+            "volume_m3": 0.26439556893294863
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "bow_0",
+          "tube": {
+            "compression_m": 0.015947962362229076,
+            "effective_load_n": 583.5314999999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 54.93600000000001,
+            "freeboard_loss_m": 0.015947962362229076,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3988.595352016404,
+            "pressure_pa": 21988.595352016404,
+            "volume_loss_m3": 0.002333186893594114,
+            "volume_m3": 0.23165263394577373
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": 0.0,
+            "retained_water_roll_moment_nm": 0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "bow_1",
+          "tube": {
+            "compression_m": 0.0037892608806865398,
+            "effective_load_n": 138.648,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0037892608806865398,
+            "lacing_load_n": 88.28999999999999,
+            "pressure_delta_pa": 947.6965140123034,
+            "pressure_pa": 18947.696514012303,
+            "volume_loss_m3": 0.0005543688668444408,
+            "volume_m3": 0.2334314519725234
+          }
+        },
+        {
+          "combined_roll_moment_nm": 3415.373555844757,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 3344.180996551368,
+            "holding_force_n": 6265.939130380459,
+            "max_indentation_m": 0.1167249924454914,
+            "min_release_margin_n": -3699.688733699815,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.1156465399160568,
+            "retained_water_mass_kg": 7.639096442232864,
+            "retained_water_pitch_moment_nm": 120.84000195851583,
+            "retained_water_roll_moment_nm": 71.19255929338918,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_3",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 6380.989132718764,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 6322.355359287399,
+            "holding_force_n": 11846.097410033231,
+            "max_indentation_m": 0.22,
+            "min_release_margin_n": -9322.245412627732,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.09524581061365435,
+            "retained_water_mass_kg": 6.291514934424168,
+            "retained_water_pitch_moment_nm": 33.17437180985184,
+            "retained_water_roll_moment_nm": 58.63377343136603,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_2",
+          "tube": {
+            "compression_m": 0.003970597547996709,
+            "effective_load_n": 164.39925,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.003970597547996709,
+            "lacing_load_n": 88.28999999999999,
+            "pressure_delta_pa": 993.0489278163697,
+            "pressure_pa": 18993.04892781637,
+            "volume_loss_m3": 0.0006573324240708552,
+            "volume_m3": 0.26411609642047695
+          }
+        },
+        {
+          "combined_roll_moment_nm": 6393.547918580788,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 6322.355359287399,
+            "holding_force_n": 11846.097410033231,
+            "max_indentation_m": 0.22,
+            "min_release_margin_n": -9279.847013352588,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.1156465399160568,
+            "retained_water_mass_kg": 7.639096442232864,
+            "retained_water_pitch_moment_nm": -40.28000065283862,
+            "retained_water_roll_moment_nm": 71.19255929338918,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_1",
+          "tube": {
+            "compression_m": 0.013388673283424008,
+            "effective_load_n": 554.3467499999999,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 25.751250000000002,
+            "freeboard_loss_m": 0.013388673283424008,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 3348.5155542132284,
+            "pressure_pa": 21348.515554213227,
+            "volume_loss_m3": 0.0022164948620708447,
+            "volume_m3": 0.2625569339824769
+          }
+        },
+        {
+          "combined_roll_moment_nm": 3402.585823298533,
+          "contact": {
+            "active": true,
+            "contact_count": 1,
+            "contact_roll_moment_nm": 3344.180996551368,
+            "holding_force_n": 6265.939130380459,
+            "max_indentation_m": 0.1167249924454914,
+            "min_release_margin_n": -3744.247051428598,
+            "obstacle_ids": [
+              "wrap_starboard_pillow"
+            ],
+            "pinned": true,
+            "recovering": false,
+            "wrapping": true
+          },
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "starboard",
+            "overtopping_flux_m3_s": 0.09420652817749425,
+            "retained_water_mass_kg": 6.26694852161222,
+            "retained_water_pitch_moment_nm": -99.13450855768811,
+            "retained_water_roll_moment_nm": 58.40482674716509,
+            "upstream_exposed": true
+          },
+          "segment_id": "starboard_0",
+          "tube": {
+            "compression_m": 0.0034908087841164503,
+            "effective_load_n": 144.534,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0034908087841164503,
+            "lacing_load_n": 94.17599999999999,
+            "pressure_delta_pa": 873.0534581697372,
+            "pressure_pa": 18873.053458169736,
+            "volume_loss_m3": 0.0005779033942104783,
+            "volume_m3": 0.2641955254503373
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": 0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "stern_1",
+          "tube": {
+            "compression_m": 0.017690664889903316,
+            "effective_load_n": 647.2965,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 54.93600000000001,
+            "freeboard_loss_m": 0.017690664889903316,
+            "lacing_load_n": 0.0,
+            "pressure_delta_pa": 4424.446343130554,
+            "pressure_pa": 22424.446343130556,
+            "volume_loss_m3": 0.0025881442733928554,
+            "volume_m3": 0.23139767656597499
+          }
+        },
+        {
+          "combined_roll_moment_nm": 0.0,
+          "contact": {
+            "active": false,
+            "contact_count": 0,
+            "contact_roll_moment_nm": 0,
+            "holding_force_n": 0,
+            "max_indentation_m": 0.0,
+            "min_release_margin_n": 0.0,
+            "obstacle_ids": [],
+            "pinned": false,
+            "recovering": false,
+            "wrapping": false
+          },
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "overwash": {
+            "entrained_water_side": "none",
+            "overtopping_flux_m3_s": 0.0,
+            "retained_water_mass_kg": 0.0,
+            "retained_water_pitch_moment_nm": -0.0,
+            "retained_water_roll_moment_nm": -0.0,
+            "upstream_exposed": false
+          },
+          "segment_id": "stern_0",
+          "tube": {
+            "compression_m": 0.0027436393640819993,
+            "effective_load_n": 100.38900000000001,
+            "floor_load_n": 50.358000000000004,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0027436393640819993,
+            "lacing_load_n": 50.031,
+            "pressure_delta_pa": 686.1859193438141,
+            "pressure_pa": 18686.185919343814,
+            "volume_loss_m3": 0.00040139443896519656,
+            "volume_m3": 0.23358442640040264
+          }
+        }
+      ],
+      "time_s": 0.03333333333333333,
+      "totals": {
+        "contact_min_release_margin_n": -9322.245412627732,
+        "contact_pinned_obstacle_count": 1,
+        "contact_total_holding_force_n": 36224.07308082738,
+        "overwash_retained_water_mass_kg": 27.836656340502117,
+        "overwash_roll_moment_nm": 259.4237187653095,
+        "overwash_total_flux_m3_s": 0.4207454186232622,
+        "tube_total_applied_load_n": 3776.85,
+        "tube_total_volume_loss_m3": 0.01510132172654078
+      }
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "model_contract": {
+    "contact_patch_release_margin_recorded": true,
+    "deterministic_replay_hash_recorded": true,
+    "floor_lacing_frame_loads_recorded": true,
+    "gameplay_scoring_authority": "disabled_until_d6_fixture_suite_and_design_review",
+    "overwash_flux_side_entrained_water_recorded": true,
+    "per_segment_tube_pressure_volume_freeboard_recorded": true,
+    "water_and_contact_roll_moments_recorded": true
+  },
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_inform_engine_port": true,
+    "requires_before_runtime_authority": [
+      "D6 Chrono-or-reviewed compliant reference comparison",
+      "engine-port replay byte-equivalence",
+      "platform deterministic replay checks",
+      "named-rapid consequence-line review"
+    ]
+  },
+  "replay_id": "flexible_raft_d5_starboard_wrap_overwash_reference",
+  "replay_sha256": "f9a0da2613638af44450631da04247b28c59b2708c61a2d788ef6bac5a009403",
+  "schema": "raftsim.flexible_raft.d5_telemetry_replay.v1",
+  "scoring_authority": "disabled_reference_only",
+  "scoring_authority_enabled": false,
+  "status": "telemetry_replay_reference_recorded_not_gameplay_authority"
+}
