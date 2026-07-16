@@ -1,0 +1,231 @@
+{
+  "catalog_run_length_m": 26250.0,
+  "critical_window_count": 6,
+  "generated_on": "2026-07-16",
+  "preview_length_m": 45642.42,
+  "preview_to_catalog_length_ratio": 1.738759,
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a3": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false,
+    "complete_when": [
+      "reviewed route centerline replaces the preview scaffold",
+      "accepted aerial or orthomosaic source is selected",
+      "each rapid is digitized as exact point or span geometry",
+      "guide/outfitter, geospatial, rights/protected-area, and flow-source reviews approve",
+      "the A3 digitizing result validator passes on reviewed records"
+    ]
+  },
+  "rapid_count": 15,
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_stationing_digitizing_work_window_manifest.v1",
+  "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+  "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+  "status": "work_windows_ready_for_manual_digitizing_review_no_stationing_promotion",
+  "task_id": "A3",
+  "window_policy": {
+    "not_authoritative_reason": "The preview scaffold is a generated route with a material length mismatch, and rapid stations remain order-only until reviewed source geometry exists.",
+    "priority_window_sizes_m": {
+      "critical": {
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0
+      },
+      "high": {
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0
+      },
+      "medium": {
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 90.0
+      }
+    },
+    "stationing_method": "order_distributed_on_preview_scaffold_for_review_focus_only"
+  },
+  "windows": [
+    {
+      "catalog_order_station_m": 1640.625,
+      "coordinate_count": 6,
+      "half_length_m": 450.0,
+      "lateral_review_buffer_m": 90.0,
+      "order": 1,
+      "preview_order_station_m": 2852.651,
+      "rapid_name": "Bienvenidos",
+      "review_priority": "medium",
+      "window_end_m": 3302.651,
+      "window_start_m": 2402.651
+    },
+    {
+      "catalog_order_station_m": 3281.25,
+      "coordinate_count": 7,
+      "half_length_m": 650.0,
+      "lateral_review_buffer_m": 130.0,
+      "order": 2,
+      "preview_order_station_m": 5705.302,
+      "rapid_name": "Pyramid Rock",
+      "review_priority": "high",
+      "window_end_m": 6355.302,
+      "window_start_m": 5055.302
+    },
+    {
+      "catalog_order_station_m": 4921.875,
+      "coordinate_count": 7,
+      "half_length_m": 650.0,
+      "lateral_review_buffer_m": 130.0,
+      "order": 3,
+      "preview_order_station_m": 8557.954,
+      "rapid_name": "Pele El Ojo",
+      "review_priority": "high",
+      "window_end_m": 9207.954,
+      "window_start_m": 7907.954
+    },
+    {
+      "catalog_order_station_m": 6562.5,
+      "coordinate_count": 9,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 4,
+      "preview_order_station_m": 11410.605,
+      "rapid_name": "Upper Huacas",
+      "review_priority": "critical",
+      "window_end_m": 12310.605,
+      "window_start_m": 10510.605
+    },
+    {
+      "catalog_order_station_m": 8203.125,
+      "coordinate_count": 7,
+      "half_length_m": 650.0,
+      "lateral_review_buffer_m": 130.0,
+      "order": 5,
+      "preview_order_station_m": 14263.256,
+      "rapid_name": "Bobo Falls",
+      "review_priority": "high",
+      "window_end_m": 14913.256,
+      "window_start_m": 13613.256
+    },
+    {
+      "catalog_order_station_m": 9843.75,
+      "coordinate_count": 10,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 6,
+      "preview_order_station_m": 17115.908,
+      "rapid_name": "Lower Huacas",
+      "review_priority": "critical",
+      "window_end_m": 18015.908,
+      "window_start_m": 16215.908
+    },
+    {
+      "catalog_order_station_m": 11484.375,
+      "coordinate_count": 5,
+      "half_length_m": 450.0,
+      "lateral_review_buffer_m": 90.0,
+      "order": 7,
+      "preview_order_station_m": 19968.559,
+      "rapid_name": "Rodeo",
+      "review_priority": "medium",
+      "window_end_m": 20418.559,
+      "window_start_m": 19518.559
+    },
+    {
+      "catalog_order_station_m": 13125.0,
+      "coordinate_count": 6,
+      "half_length_m": 450.0,
+      "lateral_review_buffer_m": 90.0,
+      "order": 8,
+      "preview_order_station_m": 22821.21,
+      "rapid_name": "Guatemala",
+      "review_priority": "medium",
+      "window_end_m": 23271.21,
+      "window_start_m": 22371.21
+    },
+    {
+      "catalog_order_station_m": 14765.625,
+      "coordinate_count": 9,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 9,
+      "preview_order_station_m": 25673.861,
+      "rapid_name": "Double Drop",
+      "review_priority": "critical",
+      "window_end_m": 26573.861,
+      "window_start_m": 24773.861
+    },
+    {
+      "catalog_order_station_m": 16406.25,
+      "coordinate_count": 9,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 10,
+      "preview_order_station_m": 28526.512,
+      "rapid_name": "Cimarrones",
+      "review_priority": "critical",
+      "window_end_m": 29426.512,
+      "window_start_m": 27626.512
+    },
+    {
+      "catalog_order_station_m": 18046.875,
+      "coordinate_count": 8,
+      "half_length_m": 650.0,
+      "lateral_review_buffer_m": 130.0,
+      "order": 11,
+      "preview_order_station_m": 31379.164,
+      "rapid_name": "Upper Pinball",
+      "review_priority": "high",
+      "window_end_m": 32029.164,
+      "window_start_m": 30729.164
+    },
+    {
+      "catalog_order_station_m": 19687.5,
+      "coordinate_count": 7,
+      "half_length_m": 650.0,
+      "lateral_review_buffer_m": 130.0,
+      "order": 12,
+      "preview_order_station_m": 34231.815,
+      "rapid_name": "Lower Pinball",
+      "review_priority": "high",
+      "window_end_m": 34881.815,
+      "window_start_m": 33581.815
+    },
+    {
+      "catalog_order_station_m": 21328.125,
+      "coordinate_count": 9,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 13,
+      "preview_order_station_m": 37084.466,
+      "rapid_name": "Wall of Sorrow",
+      "review_priority": "critical",
+      "window_end_m": 37984.466,
+      "window_start_m": 36184.466
+    },
+    {
+      "catalog_order_station_m": 22968.75,
+      "coordinate_count": 9,
+      "half_length_m": 900.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 14,
+      "preview_order_station_m": 39937.118,
+      "rapid_name": "Dos Montanas",
+      "review_priority": "critical",
+      "window_end_m": 40837.118,
+      "window_start_m": 39037.118
+    },
+    {
+      "catalog_order_station_m": 24609.375,
+      "coordinate_count": 5,
+      "half_length_m": 450.0,
+      "lateral_review_buffer_m": 90.0,
+      "order": 15,
+      "preview_order_station_m": 42789.769,
+      "rapid_name": "Las Ranitas",
+      "review_priority": "medium",
+      "window_end_m": 43239.769,
+      "window_start_m": 42339.769
+    }
+  ],
+  "work_windows_geojson": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_work_windows.geojson"
+}
