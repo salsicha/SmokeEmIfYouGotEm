@@ -1,0 +1,323 @@
+{
+  "asset_need_count": 4,
+  "asset_need_coverage": [
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "candidate_ids": [
+        "polyhaven_rock_face",
+        "polyhaven_rock_06",
+        "polyhaven_aerial_rocks_02",
+        "fab_grand_canyon_layered_cliff_hero_slot",
+        "first_party_colorado_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 5,
+      "use": "signature_canyon_walls"
+    },
+    {
+      "asset_need_id": "desert_scrub_riparian_foliage",
+      "candidate_ids": [
+        "fab_desert_scrub_tamarisk_willow_cactus_slot",
+        "first_party_colorado_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": false,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 2,
+      "use": "tamarisk_willow_cactus_bank_set"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "candidate_ids": [
+        "polyhaven_aerial_beach_03",
+        "polyhaven_sand_01",
+        "first_party_colorado_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": false,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 3,
+      "use": "camp_beaches_and_edging"
+    },
+    {
+      "asset_need_id": "lava_falls_basalt",
+      "candidate_ids": [
+        "fab_lava_falls_basalt_slot",
+        "first_party_colorado_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": false,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 2,
+      "use": "rapid_specific_rock_material"
+    }
+  ],
+  "assets_downloaded": false,
+  "assets_imported": false,
+  "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+  "candidate_asset_count": 9,
+  "candidate_assets": [
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_face",
+      "candidate_id": "polyhaven_rock_face",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a rights-clear generic red-brown cliff-face material candidate for isolated canyon-wall shader trials; not Grand Canyon stratigraphy authority.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "reddish_brown_cliff_face_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_06",
+      "candidate_id": "polyhaven_rock_06",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected for striated yellow-brown rock detail review where layering cues are needed; exact Grand Canyon formation identity must still come from source-conditioned first-party or reviewed local-only assets.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "yellow_brown_striated_cliff_detail_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_rocks_02",
+      "candidate_id": "polyhaven_aerial_rocks_02",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a 50 m rough-cliff macro material candidate for distance breakup; not a Grand Canyon geology or color authority.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "large_scale_rough_cliff_macro_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_beach_03",
+      "candidate_id": "polyhaven_aerial_beach_03",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a rights-clear broad sandbar/beach surface candidate for camp-beach and bar-edge isolated review.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "large_scale_brown_sandbar_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/sand_01",
+      "candidate_id": "polyhaven_sand_01",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected for near-field compacted sand/clay detail; Grand Canyon camp-beach color and wet/dry response still need source review.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "close_range_compacted_sand_clay_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://www.fab.com/search?q=grand%20canyon%20sandstone%20cliff%20megascans",
+      "candidate_id": "fab_grand_canyon_layered_cliff_hero_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for signature layered canyon walls where generic Poly Haven materials cannot carry the formation-specific identity.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "hero_canyon_wall_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "desert_scrub_riparian_foliage",
+      "asset_url": "https://www.fab.com/search?q=desert%20scrub%20willow%20tamarisk%20cactus",
+      "candidate_id": "fab_desert_scrub_tamarisk_willow_cactus_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for tamarisk/willow/cactus bank silhouettes and sparse desert-scrub massing; exact item-level license review is open.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "riparian_desert_foliage_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "lava_falls_basalt",
+      "asset_url": "https://www.fab.com/search?q=basalt%20lava%20rock%20megascans",
+      "candidate_id": "fab_lava_falls_basalt_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for Lava Falls dark volcanic rock identity; no generic asset may be promoted as rapid-specific basalt without guide, art, geospatial, and rights review.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "art, ecology, guide/oarsman, rights, and hazard-readability review"
+      ],
+      "role": "lava_falls_basalt_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "all_colorado_asset_needs",
+      "asset_url": "source_manifest://first_party_colorado_biome_fallback_v1",
+      "candidate_id": "first_party_colorado_biome_fallback_v1",
+      "license_class": "first_party_committable",
+      "notes": "Fallback must remain available for canyon walls, sand beaches, riparian/desert foliage, and Lava Falls basalt whenever local-only Fab binaries are absent or CC0 candidates fail review.",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "role": "missing_external_asset_fallback",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    }
+  ],
+  "corridor_substitution_allowed": false,
+  "display_name": "Colorado River Grand Canyon",
+  "generated_on": "2026-07-16",
+  "license_sources_checked": [
+    {
+      "checked_on": "2026-07-16",
+      "decision": "CC0 Poly Haven candidates may be committed only after exact asset URLs, downloaded source-file hashes, import settings, and isolated review evidence are recorded.",
+      "source_family": "Poly Haven",
+      "url": "https://polyhaven.com/license"
+    },
+    {
+      "checked_on": "2026-07-16",
+      "decision": "Fab Standard candidates remain local-only selection slots in this public repo unless item terms explicitly prove broader redistribution rights.",
+      "source_family": "Fab",
+      "url": "https://www.fab.com/eula"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "b2_selection_manifest_recorded": true,
+    "blocking_reasons": [
+      "CC0 canyon-wall and sand candidates still need downloaded source hashes and importer reports.",
+      "Grand Canyon stratigraphy still needs exact source-conditioned materials and geospatial/art review.",
+      "Tamarisk, willow, cactus, desert scrub, and Lava Falls basalt still need exact local-only or first-party selections.",
+      "No isolated turntable, 60 m, 150 m, map-check, desktop, or VR evidence exists for the new selections."
+    ],
+    "can_download_cc0_candidates": true,
+    "can_import_isolated_review_assets": false,
+    "can_request_human_lifelike_review": false,
+    "can_substitute_corridor_assets": false,
+    "next_required_actions": [
+      "Download the selected CC0 candidates into reviewed source roots and hash every source file.",
+      "Pick exact local-only Fab or first-party hero assets for tamarisk, willow, cactus, desert scrub, and Lava Falls basalt.",
+      "Run the B1 importer command for each selected asset set and write fail-closed import reports.",
+      "Capture isolated turntable plus 60 m and 150 m river-distance evidence before any corridor substitution.",
+      "Record oarsman, guide, ecology, art, rights, hazard-readability, and desktop/VR performance reviews."
+    ]
+  },
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.photoreal.colorado_asset_selection_b2.v1",
+  "source_contracts": {
+    "b1_asset_intake": "physics/data/real_world/photoreal_asset_intake_b1.json",
+    "b1_asset_set_commands": "physics/data/real_world/photoreal_asset_set_intake_b1.json"
+  },
+  "status": "b2_item_selection_started_no_assets_imported_no_promotion"
+}
