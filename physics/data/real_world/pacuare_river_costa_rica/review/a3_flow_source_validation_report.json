@@ -1,0 +1,482 @@
+{
+  "errors": [
+    {
+      "field": "source_class",
+      "flow_band": "clear_season_low_planning",
+      "reason": "source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "station_or_source_id",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "provider",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "source_url_or_report",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "reviewed_on",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "units",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "time_zone",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "temporal_resolution",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "record_start_end",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "basin_relation",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "date_or_season_window",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "band_threshold_description",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_behavior",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "flow_band": "clear_season_low_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "variables",
+      "flow_band": "clear_season_low_planning",
+      "reason": "variables_missing"
+    },
+    {
+      "field": "rights_terms_status",
+      "flow_band": "clear_season_low_planning",
+      "reason": "rights_terms_not_approved"
+    },
+    {
+      "field": "source_evidence",
+      "flow_band": "clear_season_low_planning",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "flow_band": "clear_season_low_planning",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "source_class",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "station_or_source_id",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "provider",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "source_url_or_report",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "reviewed_on",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "units",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "time_zone",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "temporal_resolution",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "record_start_end",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "basin_relation",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "date_or_season_window",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "band_threshold_description",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_behavior",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "variables",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "variables_missing"
+    },
+    {
+      "field": "rights_terms_status",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "rights_terms_not_approved"
+    },
+    {
+      "field": "source_evidence",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "flow_band": "rainfed_runnable_planning",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "source_class",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "station_or_source_id",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "provider",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "source_url_or_report",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "reviewed_on",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "units",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "time_zone",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "temporal_resolution",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "record_start_end",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "basin_relation",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "date_or_season_window",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "band_threshold_description",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_behavior",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "variables",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "variables_missing"
+    },
+    {
+      "field": "rights_terms_status",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "rights_terms_not_approved"
+    },
+    {
+      "field": "source_evidence",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "flow_band": "rainy_season_high_planning",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "source_class",
+      "flow_band": "flash_response_review_only",
+      "reason": "source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "station_or_source_id",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "provider",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "source_url_or_report",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "reviewed_on",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "units",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "time_zone",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "temporal_resolution",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "record_start_end",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "basin_relation",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "date_or_season_window",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "band_threshold_description",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_behavior",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "flow_band": "flash_response_review_only",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "variables",
+      "flow_band": "flash_response_review_only",
+      "reason": "variables_missing"
+    },
+    {
+      "field": "rights_terms_status",
+      "flow_band": "flash_response_review_only",
+      "reason": "rights_terms_not_approved"
+    },
+    {
+      "field": "source_evidence",
+      "flow_band": "flash_response_review_only",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "flow_band": "flash_response_review_only",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "flash_safety_status",
+      "flow_band": "flash_response_review_only",
+      "reason": "flash_safety_status_not_review_only"
+    }
+  ],
+  "flow_band_count": 4,
+  "flow_source_valid": false,
+  "generated_on": "2026-07-16",
+  "passing_flow_band_count": 0,
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_flow_sources": false,
+    "can_make_flash_response_playable": false,
+    "can_replace_current_relative_flow_presets": false,
+    "next_after_valid_result": [
+      "regenerate_pacuare_flow_presets_with_source_class_labels",
+      "pair reviewed flow classes with exact rapid stationing",
+      "author flow-specific rapid water-window inputs",
+      "run guide and safety review before numeric tuning or visuals"
+    ]
+  },
+  "promotion_permissions": {
+    "can_enable_numeric_discharge_values": false,
+    "can_promote_a3_from_validation_report_alone": false,
+    "can_record_flow_band_source_classes": false,
+    "can_tune_feature_forcing": false,
+    "can_tune_water_visuals": false,
+    "can_update_flow_presets_source_class_labels": false
+  },
+  "reviewer_failures": [
+    {
+      "reason": "review_not_approved",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "gameplay_safety_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "gameplay_safety_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "gameplay_safety_reviewer"
+    }
+  ],
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_flow_source_validation_report.v1",
+  "source_result_template": "physics/data/real_world/pacuare_river_costa_rica/review/a3_flow_source_result_template.json",
+  "source_review_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_flow_source_review_packet.json",
+  "status": "flow_source_result_incomplete_flow_promotion_blocked",
+  "task_id": "A3",
+  "validation_error_count": 92
+}

@@ -1,0 +1,235 @@
+{
+  "current_flow_policy": {
+    "must_replace_placeholders": true,
+    "numeric_discharge_values_allowed": false,
+    "requires_antecedent_rainfall_context": true,
+    "requires_flash_rise_review": true,
+    "requires_hydrology_gauge_source_review": true,
+    "requires_rights_cleared_guide_review": true
+  },
+  "current_flow_status": "planning_placeholders_require_costa_rica_hydrology_rainfall_and_guide_review",
+  "current_stationing_status": "blocked_pending_official_hydrography_aerial_stationing_and_guide_review",
+  "flow_band_actions": [
+    {
+      "allowed_source_classes": [
+        "official_gauge_or_stage",
+        "rainfall_station_with_basin_relation",
+        "operator_runnable_range",
+        "seasonal_precipitation_regime",
+        "flash_response_review_model",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Clear Season Low Planning",
+      "expected_gameplay_behavior": "More exposed rocks, narrower tongues, slower swims, and greater need for precise low-water paddle timing.",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "clear_season_low_planning",
+      "numeric_values_allowed_now": false,
+      "relative_flow": "low",
+      "required_result_fields": [
+        "source_class",
+        "station_or_source_id",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "basin_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_priority": "high",
+      "runnable": "planning_only",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_gauge_or_stage",
+        "rainfall_station_with_basin_relation",
+        "operator_runnable_range",
+        "seasonal_precipitation_regime",
+        "flash_response_review_model",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Rain-Fed Runnable Planning",
+      "expected_gameplay_behavior": "Default Pacuare planning band with pushy tongues, active wave trains, bank vegetation pressure, and guide-command rhythm changes after showers.",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "rainfed_runnable_planning",
+      "numeric_values_allowed_now": false,
+      "relative_flow": "medium",
+      "required_result_fields": [
+        "source_class",
+        "station_or_source_id",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "basin_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_priority": "high",
+      "runnable": "planning_only",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_gauge_or_stage",
+        "rainfall_station_with_basin_relation",
+        "operator_runnable_range",
+        "seasonal_precipitation_regime",
+        "flash_response_review_model",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Rainy Season High Planning",
+      "expected_gameplay_behavior": "Faster reaction windows, stronger laterals, fewer eddies, higher swimmer drift speed, and more conservative scout/rescue decisions.",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "rainy_season_high_planning",
+      "numeric_values_allowed_now": false,
+      "relative_flow": "high",
+      "required_result_fields": [
+        "source_class",
+        "station_or_source_id",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "basin_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_priority": "high",
+      "runnable": "review_only",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_gauge_or_stage",
+        "rainfall_station_with_basin_relation",
+        "operator_runnable_range",
+        "seasonal_precipitation_regime",
+        "flash_response_review_model",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Flash Response Review Only",
+      "expected_gameplay_behavior": "Not playable until hydrology and guide review define safe game boundaries; reserved for visual, audio, and hazard-behavior study.",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "flash_response_review_only",
+      "numeric_values_allowed_now": false,
+      "relative_flow": "rapid_rise",
+      "required_result_fields": [
+        "source_class",
+        "station_or_source_id",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "basin_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status",
+        "flash_safety_status"
+      ],
+      "review_priority": "critical",
+      "runnable": "blocked_until_review",
+      "water_visual_tuning_allowed_now": false
+    }
+  ],
+  "flow_band_count": 4,
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_enable_numeric_discharge_values": false,
+    "can_promote_a3": false,
+    "can_record_flow_band_source_classes": false,
+    "can_tune_feature_forcing": false,
+    "can_tune_water_visuals": false
+  },
+  "required_workflow": [
+    "select exact station/layer/source IDs and terms for each flow band",
+    "record variables, units, time zone, temporal resolution, and basin relation",
+    "record guide/outfitter runnable range and hydraulic behavior review per band",
+    "keep flash-response scenarios review-only until safety and rescue readability review passes",
+    "update flow presets only after the result template validates reviewed source classes"
+  ],
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_flow_source_review_packet.v1",
+  "source_flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+  "source_inputs": [
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+      "policy": {},
+      "promotion_blockers": [],
+      "schema": "raftsim.pacuare.hydrology_source_research.v1",
+      "source_class": "hydrology_gauge_search",
+      "status": "numeric_flow_bands_blocked_until_authoritative_station_review"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/discharge_or_stage_station_review.json",
+      "policy": {
+        "feature_downloads_performed": false,
+        "numeric_flow_bands_promoted": false,
+        "station_time_series_imported": false,
+        "use_as_metadata_review_only": true
+      },
+      "promotion_blockers": [
+        "No station feature records, station ids, variables, units, time zones, or time series are attached.",
+        "Layer bboxes are broad service extents and do not prove Pacuare-basin relevance.",
+        "DA/SINIGIRH selected WMS candidates advertise metadata only; no WFS or time-series payload is archived by this artifact.",
+        "Guide/outfitter review is required before stage/discharge evidence changes hazards, swimmer drift, rescue timing, or visuals."
+      ],
+      "schema": "raftsim.pacuare_discharge_stage_station_review.v1",
+      "source_class": "discharge_or_stage_station_review",
+      "status": "metadata_only_discharge_stage_candidates_attached_numeric_flow_blocked"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/rainfall_station_review.json",
+      "policy": {
+        "feature_downloads_performed": false,
+        "numeric_flow_bands_promoted": false,
+        "station_time_series_imported": false,
+        "use_as_metadata_review_only": true
+      },
+      "promotion_blockers": [
+        "No station IDs, coordinates, variables, units, time zones, temporal coverage, or quality flags are attached yet.",
+        "No rainfall, discharge, stage, or flash-response time series are imported.",
+        "Layer bboxes and WFS availability are discovery metadata, not proof of Pacuare-basin relevance.",
+        "Guide/outfitter review is required before rain-fed flow bands change gameplay, hazards, swimmer rescue timing, or visuals."
+      ],
+      "schema": "raftsim.pacuare_rainfall_station_review.v1",
+      "source_class": "rainfall_station_review",
+      "status": "metadata_only_rainfall_station_candidates_attached_numeric_flow_blocked"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/production_import_pilot/flash_response_review.json",
+      "policy": {
+        "feature_downloads_performed": false,
+        "flash_gameplay_promoted": false,
+        "lag_model_built": false,
+        "station_time_series_imported": false,
+        "use_as_metadata_review_only": true
+      },
+      "promotion_blockers": [
+        "No rainfall-to-stage or rainfall-to-discharge lag evidence is attached.",
+        "No station time series, station coordinates, basin relation, or quality flags are attached.",
+        "Basin/recharge layers are metadata leads only and do not establish runoff response.",
+        "Flash scenarios remain review-only until guide/outfitter safety review and rescue/readability gates pass."
+      ],
+      "schema": "raftsim.pacuare_flash_response_review.v1",
+      "source_class": "flash_response_review",
+      "status": "metadata_only_flash_response_context_attached_model_blocked"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/rainfall_context.json",
+      "policy": {},
+      "promotion_blockers": [],
+      "schema": "raftsim.pacuare.rainfall_context.v1",
+      "source_class": "rainfall_context",
+      "status": "rainfed_flow_context_blocked_until_station_review"
+    }
+  ],
+  "source_stationing_status": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_repair_status.json",
+  "status": "flow_source_review_packet_ready_no_numeric_flow_promotion",
+  "task_id": "A3"
+}
