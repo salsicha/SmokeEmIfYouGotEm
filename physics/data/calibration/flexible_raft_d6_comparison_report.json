@@ -1,0 +1,367 @@
+{
+  "all_measurements_present": false,
+  "comparison_passed": false,
+  "d6_complete": false,
+  "failed_target_count": 14,
+  "fixtures": [
+    {
+      "fixture_id": "static_seat_load_sag",
+      "objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "traveling_crew_shift",
+      "objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "rock_pinch_wrap",
+      "objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "upstream_tube_overwash_flip",
+      "objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "timed_high_side_save",
+      "objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "post_contact_recovery",
+      "objective": "Verify prior tube indentation decays after contact clears.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    },
+    {
+      "fixture_id": "pressure_flow_sweeps",
+      "objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "passed": false,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "metric_comparisons": [],
+          "metric_summary": {
+            "compared_metric_count": 0,
+            "extra_measured_metric_count": null,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": null
+          },
+          "missing_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "passed": false,
+          "required": true,
+          "status": "missing_measured_result",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ]
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "measured_result_contract": {
+    "required_provenance_fields": [
+      "source_report",
+      "telemetry_sha256"
+    ],
+    "required_targets": [
+      "project_chrono_or_reviewed_compliant_model",
+      "unreal_chaos_rigid_baseline"
+    ],
+    "shape": {
+      "<target_id>": {
+        "<fixture_id>": {
+          "engine_version": "engine build or package version",
+          "metrics": {
+            "<metric_name>": "numeric metric tree"
+          },
+          "source_report": "path or URI for the reviewed run output",
+          "telemetry_sha256": "sha256 of the replay/telemetry payload"
+        }
+      }
+    }
+  },
+  "metric_tolerance": {
+    "absolute": 1e-06,
+    "relative": 0.05
+  },
+  "missing_target_count": 14,
+  "production_promoted": false,
+  "promotion_gate": {
+    "manual_review_required": true,
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "reason": "D6 remains incomplete in the committed artifact until measured engine outputs are attached, source-reviewed, and this report is regenerated with every required fixture passing or recorded."
+  },
+  "schema": "raftsim.flexible_raft.d6_reference_comparison_report.v1",
+  "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
+  "source_suite_schema": "raftsim.flexible_raft.d6_behavioral_validation_suite.v1",
+  "status": "blocked_pending_measured_engine_results",
+  "target_policies": {
+    "project_chrono_or_reviewed_compliant_model": {
+      "comparison_mode": "bounded_numeric_equivalence",
+      "description": "Project Chrono or another reviewed compliant model must match the Python D1-D5 reference metrics within the recorded tolerance band.",
+      "metric_deltas_are_failures": true
+    },
+    "unreal_chaos_rigid_baseline": {
+      "comparison_mode": "baseline_delta_recording",
+      "description": "Unreal Chaos rigid-body output is a same-fixture baseline. It must be measured and provenance-recorded, but local tube-compliance deltas are expected and are not treated as equivalence failures.",
+      "metric_deltas_are_failures": false
+    }
+  }
+}

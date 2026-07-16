@@ -24,7 +24,13 @@ from .scenario2_5d import RaftParameters2_5D
 D6_BEHAVIORAL_SUITE_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_behavioral_suite.json"
 )
+D6_COMPARISON_REPORT_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_comparison_report.json"
+)
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
+D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
+D6_METRIC_ABSOLUTE_TOLERANCE = 1.0e-6
+D6_METRIC_RELATIVE_TOLERANCE = 0.05
 
 REQUIRED_D6_FIXTURE_IDS = (
     "static_seat_load_sag",
@@ -35,6 +41,28 @@ REQUIRED_D6_FIXTURE_IDS = (
     "post_contact_recovery",
     "pressure_flow_sweeps",
 )
+
+D6_TARGET_POLICIES = {
+    "project_chrono_or_reviewed_compliant_model": {
+        "comparison_mode": "bounded_numeric_equivalence",
+        "metric_deltas_are_failures": True,
+        "description": (
+            "Project Chrono or another reviewed compliant model must match the "
+            "Python D1-D5 reference metrics within the recorded tolerance band."
+        ),
+    },
+    "unreal_chaos_rigid_baseline": {
+        "comparison_mode": "baseline_delta_recording",
+        "metric_deltas_are_failures": False,
+        "description": (
+            "Unreal Chaos rigid-body output is a same-fixture baseline. It must "
+            "be measured and provenance-recorded, but local tube-compliance "
+            "deltas are expected and are not treated as equivalence failures."
+        ),
+    },
+}
+
+_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS = ("source_report", "telemetry_sha256")
 
 
 def build_flexible_raft_d6_behavioral_suite(
@@ -95,6 +123,114 @@ def write_flexible_raft_d6_behavioral_suite(repo_root: Path) -> Path:
 
     payload = build_flexible_raft_d6_behavioral_suite()
     path = repo_root / D6_BEHAVIORAL_SUITE_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_flexible_raft_d6_comparison_report(
+    measured_results: dict[str, Any] | None = None,
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Compare D6 Python fixture metrics against measured engine outputs.
+
+    The committed default report intentionally contains no measured engine
+    payloads. It records the exact shape that Project Chrono/reviewed-compliant
+    and Unreal Chaos results must satisfy before D6 can be promoted.
+    """
+
+    suite = build_flexible_raft_d6_behavioral_suite(parameters)
+    measured_by_target = measured_results or {}
+    fixture_reports = []
+    missing_target_count = 0
+    failed_target_count = 0
+
+    for fixture in suite["fixtures"]:
+        target_reports = []
+        for target in fixture["comparison_targets"]:
+            report = _compare_d6_target_fixture(
+                fixture,
+                target["target_id"],
+                measured_by_target.get(target["target_id"], {}).get(fixture["fixture_id"]),
+            )
+            if report["status"] == "missing_measured_result":
+                missing_target_count += 1
+            if not report["passed"]:
+                failed_target_count += 1
+            target_reports.append(report)
+
+        fixture_reports.append(
+            {
+                "fixture_id": fixture["fixture_id"],
+                "objective": fixture["objective"],
+                "target_count": len(target_reports),
+                "passed": all(target["passed"] for target in target_reports),
+                "targets": target_reports,
+            }
+        )
+
+    all_measurements_present = missing_target_count == 0
+    comparison_passed = all_measurements_present and failed_target_count == 0
+    if missing_target_count:
+        status = "blocked_pending_measured_engine_results"
+    elif comparison_passed:
+        status = "measured_comparisons_passed_manual_promotion_required"
+    else:
+        status = "measured_comparisons_failed"
+
+    return {
+        "schema": D6_COMPARISON_REPORT_SCHEMA,
+        "generated_on": "2026-07-16",
+        "source_suite_schema": suite["schema"],
+        "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
+        "status": status,
+        "d6_complete": False,
+        "production_promoted": False,
+        "all_measurements_present": all_measurements_present,
+        "comparison_passed": comparison_passed,
+        "missing_target_count": missing_target_count,
+        "failed_target_count": failed_target_count,
+        "metric_tolerance": {
+            "absolute": D6_METRIC_ABSOLUTE_TOLERANCE,
+            "relative": D6_METRIC_RELATIVE_TOLERANCE,
+        },
+        "measured_result_contract": {
+            "shape": {
+                "<target_id>": {
+                    "<fixture_id>": {
+                        "source_report": "path or URI for the reviewed run output",
+                        "telemetry_sha256": "sha256 of the replay/telemetry payload",
+                        "engine_version": "engine build or package version",
+                        "metrics": {"<metric_name>": "numeric metric tree"},
+                    }
+                }
+            },
+            "required_targets": list(D6_TARGET_POLICIES),
+            "required_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
+        },
+        "target_policies": D6_TARGET_POLICIES,
+        "fixtures": fixture_reports,
+        "promotion_gate": {
+            "may_mark_d6_complete": comparison_passed,
+            "may_drive_runtime_gameplay": False,
+            "manual_review_required": True,
+            "reason": (
+                "D6 remains incomplete in the committed artifact until measured "
+                "engine outputs are attached, source-reviewed, and this report is "
+                "regenerated with every required fixture passing or recorded."
+            ),
+        },
+    }
+
+
+def write_flexible_raft_d6_comparison_report(repo_root: Path) -> Path:
+    """Write the committed pending D6 measured-result comparison report."""
+
+    payload = build_flexible_raft_d6_comparison_report()
+    path = repo_root / D6_COMPARISON_REPORT_RELATIVE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -344,6 +480,148 @@ def _fixture_payload(
         ],
         "can_promote": False,
     }
+
+
+def _compare_d6_target_fixture(
+    fixture: dict[str, Any],
+    target_id: str,
+    measured_result: dict[str, Any] | None,
+) -> dict[str, Any]:
+    policy = D6_TARGET_POLICIES[target_id]
+    if measured_result is None:
+        return {
+            "target_id": target_id,
+            "comparison_mode": policy["comparison_mode"],
+            "status": "missing_measured_result",
+            "passed": False,
+            "required": True,
+            "missing_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
+            "metric_summary": {
+                "compared_metric_count": 0,
+                "failed_metric_count": 0,
+                "missing_reference_metric_count": None,
+                "extra_measured_metric_count": None,
+            },
+            "metric_comparisons": [],
+        }
+
+    missing_provenance = [
+        field for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS if not measured_result.get(field)
+    ]
+    comparison = _compare_metric_trees(
+        fixture["python_reference_metrics"],
+        measured_result.get("metrics", {}),
+        fail_on_missing_reference_metrics=policy["metric_deltas_are_failures"],
+        fail_on_metric_delta=policy["metric_deltas_are_failures"],
+    )
+    if missing_provenance:
+        status = "incomplete_measured_result_provenance"
+        passed = False
+    elif comparison["compared_metric_count"] == 0:
+        status = "no_comparable_numeric_metrics"
+        passed = False
+    elif policy["metric_deltas_are_failures"] and not comparison["passed"]:
+        status = "failed_numeric_equivalence"
+        passed = False
+    elif policy["metric_deltas_are_failures"]:
+        status = "passed_numeric_equivalence"
+        passed = True
+    else:
+        status = "recorded_baseline_delta"
+        passed = True
+
+    return {
+        "target_id": target_id,
+        "comparison_mode": policy["comparison_mode"],
+        "status": status,
+        "passed": passed,
+        "required": True,
+        "source_report": measured_result.get("source_report"),
+        "telemetry_sha256": measured_result.get("telemetry_sha256"),
+        "engine_version": measured_result.get("engine_version"),
+        "missing_provenance_fields": missing_provenance,
+        "metric_summary": {
+            "compared_metric_count": comparison["compared_metric_count"],
+            "failed_metric_count": comparison["failed_metric_count"],
+            "missing_reference_metric_count": comparison["missing_reference_metric_count"],
+            "extra_measured_metric_count": comparison["extra_measured_metric_count"],
+        },
+        "metric_comparisons": comparison["metric_comparisons"],
+        "missing_reference_metrics": comparison["missing_reference_metrics"],
+        "extra_measured_metrics": comparison["extra_measured_metrics"],
+    }
+
+
+def _compare_metric_trees(
+    reference_metrics: dict[str, Any],
+    measured_metrics: dict[str, Any],
+    *,
+    fail_on_missing_reference_metrics: bool,
+    fail_on_metric_delta: bool,
+) -> dict[str, Any]:
+    reference = _flatten_numeric_metrics(reference_metrics)
+    measured = _flatten_numeric_metrics(measured_metrics)
+    common_paths = sorted(set(reference) & set(measured))
+    missing_reference_metrics = sorted(set(reference) - set(measured))
+    extra_measured_metrics = sorted(set(measured) - set(reference))
+    metric_comparisons = []
+    failed_metric_count = 0
+
+    for path in common_paths:
+        reference_value = reference[path]
+        measured_value = measured[path]
+        abs_delta = abs(measured_value - reference_value)
+        tolerance = D6_METRIC_ABSOLUTE_TOLERANCE + (
+            D6_METRIC_RELATIVE_TOLERANCE * max(abs(reference_value), abs(measured_value))
+        )
+        within_tolerance = abs_delta <= tolerance
+        if not within_tolerance:
+            failed_metric_count += 1
+        metric_comparisons.append(
+            {
+                "path": path,
+                "reference_value": reference_value,
+                "measured_value": measured_value,
+                "abs_delta": abs_delta,
+                "tolerance": tolerance,
+                "within_tolerance": within_tolerance,
+            }
+        )
+
+    passed = bool(common_paths)
+    if fail_on_metric_delta:
+        passed = passed and failed_metric_count == 0
+    if fail_on_missing_reference_metrics:
+        passed = passed and not missing_reference_metrics
+
+    return {
+        "passed": passed,
+        "compared_metric_count": len(common_paths),
+        "failed_metric_count": failed_metric_count,
+        "missing_reference_metric_count": len(missing_reference_metrics),
+        "extra_measured_metric_count": len(extra_measured_metrics),
+        "missing_reference_metrics": missing_reference_metrics,
+        "extra_measured_metrics": extra_measured_metrics,
+        "metric_comparisons": metric_comparisons,
+    }
+
+
+def _flatten_numeric_metrics(value: Any, prefix: str = "") -> dict[str, float]:
+    if isinstance(value, dict):
+        flattened: dict[str, float] = {}
+        for key in sorted(value):
+            child_prefix = f"{prefix}.{key}" if prefix else str(key)
+            flattened.update(_flatten_numeric_metrics(value[key], child_prefix))
+        return flattened
+    if isinstance(value, list):
+        flattened = {}
+        for index, item in enumerate(value):
+            child_prefix = f"{prefix}[{index}]"
+            flattened.update(_flatten_numeric_metrics(item, child_prefix))
+        return flattened
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return {prefix: float(value)}
+    return {}
 
 
 def build_d6_replay_channel_probe() -> dict[str, Any]:
