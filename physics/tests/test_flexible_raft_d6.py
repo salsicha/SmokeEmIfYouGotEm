@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.generate_flexible_raft_d6_comparison_report import (
+    main as generate_d6_comparison_report_main,
+)
 from raftsim.flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
     D6_BEHAVIORAL_SUITE_SCHEMA,
@@ -296,6 +299,34 @@ def test_flexible_raft_d6_fixture_input_package_targets_and_metrics_match_manife
             assert "telemetry_sha256" in target["required_provenance_fields"]
             assert target["adapter_contract"]["may_substitute_with_synthetic_python_reference"] is False
             assert target["can_promote_fixture"] is False
+
+
+def test_flexible_raft_d6_comparison_cli_accepts_populated_measured_results(tmp_path):
+    measured_payload = build_flexible_raft_d6_measured_results_template()
+    measured_payload["measured_results"] = _synthetic_measured_results()
+    measured_path = tmp_path / "measured_results.json"
+    report_path = tmp_path / "comparison_report.json"
+    measured_path.write_text(
+        json.dumps(measured_payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    exit_code = generate_d6_comparison_report_main(
+        [
+            "--measured-results",
+            str(measured_path),
+            "--output",
+            str(report_path),
+        ]
+    )
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert report["status"] == "measured_comparisons_passed_manual_promotion_required"
+    assert report["all_measurements_present"] is True
+    assert report["comparison_passed"] is True
+    assert report["d6_complete"] is False
+    assert report["promotion_gate"]["may_mark_d6_complete"] is True
 
 
 def _synthetic_measured_results() -> dict[str, dict[str, dict[str, object]]]:

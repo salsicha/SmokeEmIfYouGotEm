@@ -242,13 +242,24 @@ def write_flexible_raft_d6_comparison_report(repo_root: Path) -> Path:
     """Write the committed pending D6 measured-result comparison report."""
 
     payload = build_flexible_raft_d6_comparison_report()
-    path = repo_root / D6_COMPARISON_REPORT_RELATIVE_PATH
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
+    return write_flexible_raft_d6_comparison_payload(
+        repo_root / D6_COMPARISON_REPORT_RELATIVE_PATH,
+        payload,
+    )
+
+
+def write_flexible_raft_d6_comparison_payload(
+    output_path: Path,
+    payload: dict[str, Any],
+) -> Path:
+    """Write a D6 comparison report payload to a caller-selected path."""
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    return path
+    return output_path
 
 
 def build_flexible_raft_d6_measurement_manifest(
