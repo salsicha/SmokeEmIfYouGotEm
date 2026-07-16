@@ -74,7 +74,11 @@ D6_TARGET_POLICIES = {
     },
 }
 
-_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS = ("source_report", "telemetry_sha256")
+_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS = (
+    "source_report",
+    "telemetry_sha256",
+    "engine_version",
+)
 
 
 def build_flexible_raft_d6_behavioral_suite(
@@ -1113,6 +1117,7 @@ def _compare_d6_target_fixture(
             "passed": False,
             "required": True,
             "missing_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
+            "invalid_provenance_fields": [],
             "metric_summary": {
                 "compared_metric_count": 0,
                 "failed_metric_count": 0,
@@ -1125,13 +1130,14 @@ def _compare_d6_target_fixture(
     missing_provenance = [
         field for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS if not measured_result.get(field)
     ]
+    invalid_provenance = _invalid_measurement_provenance_fields(measured_result)
     comparison = _compare_metric_trees(
         fixture["python_reference_metrics"],
         measured_result.get("metrics", {}),
         fail_on_missing_reference_metrics=policy["metric_deltas_are_failures"],
         fail_on_metric_delta=policy["metric_deltas_are_failures"],
     )
-    if missing_provenance:
+    if missing_provenance or invalid_provenance:
         status = "incomplete_measured_result_provenance"
         passed = False
     elif comparison["compared_metric_count"] == 0:
@@ -1157,6 +1163,7 @@ def _compare_d6_target_fixture(
         "telemetry_sha256": measured_result.get("telemetry_sha256"),
         "engine_version": measured_result.get("engine_version"),
         "missing_provenance_fields": missing_provenance,
+        "invalid_provenance_fields": invalid_provenance,
         "metric_summary": {
             "compared_metric_count": comparison["compared_metric_count"],
             "failed_metric_count": comparison["failed_metric_count"],
@@ -1167,6 +1174,20 @@ def _compare_d6_target_fixture(
         "missing_reference_metrics": comparison["missing_reference_metrics"],
         "extra_measured_metrics": comparison["extra_measured_metrics"],
     }
+
+
+def _invalid_measurement_provenance_fields(
+    measured_result: dict[str, Any],
+) -> list[str]:
+    invalid = []
+    telemetry_sha256 = measured_result.get("telemetry_sha256")
+    if telemetry_sha256 and not _is_sha256_hex(str(telemetry_sha256)):
+        invalid.append("telemetry_sha256")
+    return invalid
+
+
+def _is_sha256_hex(value: str) -> bool:
+    return len(value) == 64 and all(character in "0123456789abcdefABCDEF" for character in value)
 
 
 def _compare_metric_trees(

@@ -80,7 +80,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
       "status": "pending_measured_engine_run",
@@ -122,7 +123,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
       "status": "pending_measured_engine_run",
@@ -163,7 +165,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
       "status": "pending_measured_engine_run",
@@ -204,7 +207,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
       "status": "pending_measured_engine_run",
@@ -245,7 +249,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
       "status": "pending_measured_engine_run",
@@ -286,7 +291,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
       "status": "pending_measured_engine_run",
@@ -326,7 +332,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
       "status": "pending_measured_engine_run",
@@ -366,7 +373,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
       "status": "pending_measured_engine_run",
@@ -407,7 +415,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
       "status": "pending_measured_engine_run",
@@ -448,7 +457,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
       "status": "pending_measured_engine_run",
@@ -487,7 +497,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
       "status": "pending_measured_engine_run",
@@ -526,7 +537,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
       "status": "pending_measured_engine_run",
@@ -608,7 +620,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
       "status": "pending_measured_engine_run",
@@ -690,7 +703,8 @@
       ],
       "required_provenance_fields": [
         "source_report",
-        "telemetry_sha256"
+        "telemetry_sha256",
+        "engine_version"
       ],
       "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
       "status": "pending_measured_engine_run",

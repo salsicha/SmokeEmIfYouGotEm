@@ -12,6 +12,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -21,7 +22,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -30,6 +32,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -39,7 +42,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -56,6 +60,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -65,7 +70,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -74,6 +80,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -83,7 +90,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -100,6 +108,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -109,7 +118,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -118,6 +128,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -127,7 +138,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -144,6 +156,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -153,7 +166,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -162,6 +176,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -171,7 +186,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -188,6 +204,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -197,7 +214,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -206,6 +224,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -215,7 +234,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -232,6 +252,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -241,7 +262,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -250,6 +272,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -259,7 +282,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -276,6 +300,7 @@
       "targets": [
         {
           "comparison_mode": "bounded_numeric_equivalence",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -285,7 +310,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -294,6 +320,7 @@
         },
         {
           "comparison_mode": "baseline_delta_recording",
+          "invalid_provenance_fields": [],
           "metric_comparisons": [],
           "metric_summary": {
             "compared_metric_count": 0,
@@ -303,7 +330,8 @@
           },
           "missing_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "passed": false,
           "required": true,
@@ -317,7 +345,8 @@
   "measured_result_contract": {
     "required_provenance_fields": [
       "source_report",
-      "telemetry_sha256"
+      "telemetry_sha256",
+      "engine_version"
     ],
     "required_targets": [
       "project_chrono_or_reviewed_compliant_model",
