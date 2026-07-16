@@ -51,6 +51,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Owner selected **Option B** on July 15, 2026. Subsequent solver splitting and implementation must preserve the analytic/GeoClaw regression gates and move toward a genuine well-balanced finite-volume core; live custom-water stepping remains disabled until those gates pass.
 - Post-check: the full suite remains **539 passed / 2 failed / 3 skipped in 129.86 seconds**, with only the same production-foundation and Colorado generator snapshot drift recorded in Step 1.2.
 
+### 2026-07-15 Finding 4 Strategy Review
+
+- Added a deterministic miner and tests for all **47** locked Futaleufu cypress reviews (v1-v43 plus four v20.x branches). The committed report records zero promotions, gate-era counts, dates, normalized outcomes, and comparable green/silhouette/luminance evidence without modifying source reviews or captures.
+- Added `docs/futaleufu-canopy-strategy-review.md`. It compares in-repo procedural work, dedicated vegetation middleware, licensed libraries, and a hybrid path against rights, ecology, Unreal integration, and the existing gates.
+- Recommended a bounded hybrid pilot, froze V44 pending the source/ecology decision, and added six-cycle, metric-improvement, family-expansion, rights, and five-iteration stop-loss rules.
+- Post-check: the full suite reports **542 passed / 2 failed / 3 skipped in 133.77 seconds**. The three new miner tests pass; only the same production-foundation and Colorado generator snapshot drift remains.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

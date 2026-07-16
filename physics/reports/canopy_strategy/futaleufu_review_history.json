@@ -1,0 +1,1066 @@
+{
+  "schema": "raftsim.futaleufu.canopy_review_history.v1",
+  "review_count": 47,
+  "production_promotion_count": 0,
+  "date_range": {
+    "first": "2026-07-13",
+    "last": "2026-07-15"
+  },
+  "iterations_per_gate_class": {
+    "hlod_projection_transition": 9,
+    "lit_shape_material_shadow": 8,
+    "morphology_visibility": 28,
+    "temporal_handoff": 2
+  },
+  "late_backlit_silhouette": {
+    "points": [
+      {
+        "version": "v41",
+        "value": 0.4912636668890494
+      },
+      {
+        "version": "v42",
+        "value": 0.7171796002850259
+      }
+    ],
+    "latest": 0.7171796002850259,
+    "gate": 0.9,
+    "gap_to_gate": 0.1828203997149741,
+    "net_improvement": 0.22591593339597654,
+    "trajectory": "not_converged"
+  },
+  "rows": [
+    {
+      "version": "v1",
+      "major": 1,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v1_structurally_valid_visual_gate_rejected_no_corridor_substitution",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.0891015625,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v1_visual_review.json"
+    },
+    {
+      "version": "v2",
+      "major": 2,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v2_distance_visibility_improved_closeup_and_turntable_gate_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.40497287326388887,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v2_visual_review.json"
+    },
+    {
+      "version": "v3",
+      "major": 3,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v3_explicit_ramification_valid_visual_gate_rejected_no_corridor_substitution",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.24820638020833333,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v3_visual_review.json"
+    },
+    {
+      "version": "v4",
+      "major": 4,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v4_distance_mass_recovered_topology_closeup_gate_rejected_no_corridor_substitution",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.262529296875,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v4_visual_review.json"
+    },
+    {
+      "version": "v5",
+      "major": 5,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v5_far_split_improved_near_geometric_spikes_rejected_no_corridor_substitution",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.3456564670138889,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v5_visual_review.json"
+    },
+    {
+      "version": "v6",
+      "major": 6,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v6_visibility_floors_pass_ribbon_closeup_and_handoff_authority_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.41708550347222223,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v6_visual_review.json"
+    },
+    {
+      "version": "v7",
+      "major": 7,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v7_resource_target_pass_authority_overlap_and_closeup_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.3011338975694444,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v7_visual_review.json"
+    },
+    {
+      "version": "v8",
+      "major": 8,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v8_actor_root_authority_pass_far_fallback_retained_near_fidelity_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.14812608506944444,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v8_visual_review.json"
+    },
+    {
+      "version": "v9",
+      "major": 9,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v9_texture_detail_improved_near_topology_and_overdraw_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.14359483506944445,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v9_visual_review.json"
+    },
+    {
+      "version": "v10",
+      "major": 10,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v10_broad_spray_silhouette_and_resource_pass_closeup_topology_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.1977267795138889,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v10_visual_review.json"
+    },
+    {
+      "version": "v11",
+      "major": 11,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v11_card_budget_improved_silhouette_and_branch_system_regressed",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.183994140625,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v11_visual_review.json"
+    },
+    {
+      "version": "v12",
+      "major": 12,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "visual",
+      "gate_class": "morphology_visibility",
+      "status": "v12_branch_scale_and_resource_improved_silhouette_floor_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.11090494791666666,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v12_visual_review.json"
+    },
+    {
+      "version": "v13",
+      "major": 13,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "morphology donor visual",
+      "gate_class": "morphology_visibility",
+      "status": "v13_cc0_fir_direct_donor_rejected_opaque_geometric_reconstruction_required",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 6.727430555555556e-05,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v13_morphology_donor_visual_review.json"
+    },
+    {
+      "version": "v14",
+      "major": 14,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "opaque near visual",
+      "gate_class": "morphology_visibility",
+      "status": "v14_opaque_topology_and_v12_resource_ceiling_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.21548394097222223,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v14_opaque_near_visual_review.json"
+    },
+    {
+      "version": "v15",
+      "major": 15,
+      "minor": null,
+      "date": "2026-07-13",
+      "change": "volumetric near visual",
+      "gate_class": "morphology_visibility",
+      "status": "v15_dense_raster_micro_foliage_visible_morphology_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": 0.4484136284722222,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v15_volumetric_near_visual_review.json"
+    },
+    {
+      "version": "v16",
+      "major": 16,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "pve visual",
+      "gate_class": "morphology_visibility",
+      "status": "production_authoring_workflow_accepted_visual_and_corridor_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v16_pve_visual_review.json"
+    },
+    {
+      "version": "v17",
+      "major": 17,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "curved shell palette visual",
+      "gate_class": "morphology_visibility",
+      "status": "curved_shell_mechanism_retained_visual_and_corridor_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v17_curved_shell_palette_visual_review.json"
+    },
+    {
+      "version": "v18",
+      "major": 18,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "twig hierarchy visual",
+      "gate_class": "morphology_visibility",
+      "status": "connected_geometry_mechanism_retained_source_art_and_corridor_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v18_twig_hierarchy_visual_review.json"
+    },
+    {
+      "version": "v19",
+      "major": 19,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "scale leaf hierarchy visual",
+      "gate_class": "morphology_visibility",
+      "status": "authored_scale_leaf_mechanism_retained_visual_and_corridor_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v19_scale_leaf_hierarchy_visual_review.json"
+    },
+    {
+      "version": "v20",
+      "major": 20,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "botanical spray visual",
+      "gate_class": "morphology_visibility",
+      "status": "botanical_contract_retained_visual_and_corridor_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_botanical_spray_visual_review.json"
+    },
+    {
+      "version": "v20.1",
+      "major": 20,
+      "minor": 1,
+      "date": "2026-07-14",
+      "change": "dense botanical spray visual",
+      "gate_class": "morphology_visibility",
+      "status": "residency_density_and_color_correction_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_1_dense_botanical_spray_visual_review.json"
+    },
+    {
+      "version": "v20.2",
+      "major": 20,
+      "minor": 2,
+      "date": "2026-07-14",
+      "change": "branchlet mass visual",
+      "gate_class": "morphology_visibility",
+      "status": "connected_branchlet_and_fresh_material_gate_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_2_branchlet_mass_visual_review.json"
+    },
+    {
+      "version": "v20.3",
+      "major": 20,
+      "minor": 3,
+      "date": "2026-07-14",
+      "change": "hierarchical shoot visual",
+      "gate_class": "morphology_visibility",
+      "status": "fresh_material_gate_passed_hierarchical_topology_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_3_hierarchical_shoot_visual_review.json"
+    },
+    {
+      "version": "v20.4",
+      "major": 20,
+      "minor": 4,
+      "date": "2026-07-14",
+      "change": "terminal cluster visual",
+      "gate_class": "morphology_visibility",
+      "status": "terminal_cluster_cost_gate_failed_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v20_4_terminal_cluster_visual_review.json"
+    },
+    {
+      "version": "v21",
+      "major": 21,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "compound branchlet visual",
+      "gate_class": "morphology_visibility",
+      "status": "compound_branchlet_source_baseline_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v21_compound_branchlet_visual_review.json"
+    },
+    {
+      "version": "v22",
+      "major": 22,
+      "minor": null,
+      "date": "2026-07-14",
+      "change": "detiered crown visual",
+      "gate_class": "morphology_visibility",
+      "status": "detiered_crown_topology_baseline_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v22_detiered_crown_visual_review.json"
+    },
+    {
+      "version": "v23",
+      "major": 23,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "async secondary crown visual",
+      "gate_class": "morphology_visibility",
+      "status": "async_secondary_crown_baseline_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v23_async_secondary_crown_visual_review.json"
+    },
+    {
+      "version": "v24",
+      "major": 24,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "irregular crown mass visual",
+      "gate_class": "morphology_visibility",
+      "status": "irregular_crown_mass_baseline_retained_visual_promotion_rejected",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v24_irregular_crown_mass_visual_review.json"
+    },
+    {
+      "version": "v25",
+      "major": 25,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "hlod handoff visual",
+      "gate_class": "hlod_projection_transition",
+      "status": "photometry_and_hard_authority_retained_handoff_popping_rejected",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v25_hlod_handoff_visual_review.json"
+    },
+    {
+      "version": "v26",
+      "major": 26,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "high detail hlod visual",
+      "gate_class": "hlod_projection_transition",
+      "status": "high_detail_hlod_not_retained_resolution_isolation_invalid",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v26_high_detail_hlod_visual_review.json"
+    },
+    {
+      "version": "v27",
+      "major": 27,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "frozen wpo repeatability",
+      "gate_class": "hlod_projection_transition",
+      "status": "frozen_wpo_tolerance_bounded_deterministic_validation_baseline_retained",
+      "failed_gate_count": 0,
+      "failed_gates": [],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v27_frozen_wpo_repeatability_review.json"
+    },
+    {
+      "version": "v28",
+      "major": 28,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "frozen wpo resolution",
+      "gate_class": "hlod_projection_transition",
+      "status": "high_detail_hlod_rejected_512_validation_baseline_retained",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "v28_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v28_frozen_wpo_resolution_review.json"
+    },
+    {
+      "version": "v29",
+      "major": 29,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "azimuth registration",
+      "gate_class": "hlod_projection_transition",
+      "status": "azimuth_registration_retained_no_pop_gate_still_open",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "v29_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v29_azimuth_registration_review.json"
+    },
+    {
+      "version": "v30",
+      "major": 30,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "perspective projection",
+      "gate_class": "hlod_projection_transition",
+      "status": "authored_distance_perspective_retained_no_pop_gate_still_open",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "v30_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v30_perspective_projection_review.json"
+    },
+    {
+      "version": "v31",
+      "major": 31,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "depth proxy",
+      "gate_class": "hlod_projection_transition",
+      "status": "depth_displaced_proxy_rejected_v30_flat_proxy_retained",
+      "failed_gate_count": 1,
+      "failed_gates": [
+        "v31_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v31_depth_proxy_review.json"
+    },
+    {
+      "version": "v32",
+      "major": 32,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "complementary transition",
+      "gate_class": "hlod_projection_transition",
+      "status": "complementary_transition_retained_temporal_and_art_gates_open",
+      "failed_gate_count": 2,
+      "failed_gates": [
+        "moving_camera_temporal_gate_passed",
+        "underlying_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v32_complementary_transition_review.json"
+    },
+    {
+      "version": "v33",
+      "major": 33,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "temporal transition path",
+      "gate_class": "hlod_projection_transition",
+      "status": "ordered_path_precursor_retained_same_world_temporal_and_art_gates_open",
+      "failed_gate_count": 2,
+      "failed_gates": [
+        "same_world_moving_camera_temporal_gate_passed",
+        "underlying_no_pop_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v33_temporal_transition_path_review.json"
+    },
+    {
+      "version": "v34",
+      "major": 34,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "persistent motion",
+      "gate_class": "temporal_handoff",
+      "status": "persistent_motion_harness_retained_transition_quantization_rejected",
+      "failed_gate_count": 4,
+      "failed_gates": [
+        "persistent_same_world_motion_gate_passed",
+        "transition_quantization_gate_passed",
+        "underlying_no_pop_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v34_persistent_motion_review.json"
+    },
+    {
+      "version": "v35",
+      "major": 35,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "fine transition",
+      "gate_class": "temporal_handoff",
+      "status": "fine_transition_retained_lit_art_and_performance_gates_open",
+      "failed_gate_count": 2,
+      "failed_gates": [
+        "underlying_no_pop_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v35_fine_transition_review.json"
+    },
+    {
+      "version": "v36",
+      "major": 36,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "lit river view",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "lit_river_view_captured_art_rejected_visible_periodic_pattern_hlod_photometry_and_background_instability",
+      "failed_gate_count": 7,
+      "failed_gates": [
+        "authority_background_stability_gate_passed",
+        "hazard_readability_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "visible_patterning_gate_passed",
+        "visible_periodic_pattern_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v36_lit_river_view_review.json"
+    },
+    {
+      "version": "v37",
+      "major": 37,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "temporal lit handoff",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "temporal_pattern_and_background_isolation_passed_hlod_shape_photometry_and_corridor_art_rejected",
+      "failed_gate_count": 4,
+      "failed_gates": [
+        "hazard_readability_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v37_temporal_lit_handoff_review.json"
+    },
+    {
+      "version": "v38",
+      "major": 38,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "hlod frame search",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "automatic_frame_selection_retained_flat_proxy_and_photometry_rejected",
+      "failed_gate_count": 4,
+      "failed_gates": [
+        "hazard_readability_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v38_hlod_frame_search_review.json"
+    },
+    {
+      "version": "v39",
+      "major": 39,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "split shading",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "split_shading_controls_retained_bounded_gain_insufficient_geometry_rejected",
+      "failed_gate_count": 6,
+      "failed_gates": [
+        "common_pixel_luminance_gate_passed",
+        "hazard_readability_gate_passed",
+        "luminance_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v39_split_shading_review.json"
+    },
+    {
+      "version": "v40",
+      "major": 40,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "dual layer",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "dual_layer_contract_retained_lighting_and_representation_rejected",
+      "failed_gate_count": 8,
+      "failed_gates": [
+        "common_pixel_luminance_gate_passed",
+        "hazard_readability_gate_passed",
+        "luminance_gate_passed",
+        "material_luminance_improvement_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "source_transmission_improvement_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v40_dual_layer_review.json"
+    },
+    {
+      "version": "v41",
+      "major": 41,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "transmission light bracket",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "light_direction_validated_source_tint_response_insufficient_flat_hlod_rejected",
+      "failed_gate_count": 7,
+      "failed_gates": [
+        "hazard_readability_gate_passed",
+        "luminance_gate_passed",
+        "material_luminance_improvement_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "source_transmission_improvement_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": 0.5970498079279326,
+        "backlit_silhouette_iou": 0.4912636668890494,
+        "frontlit_luminance_ratio": 0.982058702338488,
+        "backlit_luminance_ratio": 0.6716702041057373
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v41_transmission_light_bracket_review.json"
+    },
+    {
+      "version": "v42",
+      "major": 42,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "merged geometry shape bracket",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "merged_geometry_upper_bound_still_fails_shape_or_lighting",
+      "failed_gate_count": 11,
+      "failed_gates": [
+        "fidelity_upper_bound_gate_passed",
+        "hazard_readability_gate_passed",
+        "luminance_gate_passed",
+        "merged_geometry_improves_flat_gate_passed",
+        "merged_geometry_photometry_gate_passed",
+        "merged_geometry_shape_gate_passed",
+        "source_art_cleanup_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "temporal_handoff_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": 0.9005226040291084,
+        "backlit_silhouette_iou": 0.7171796002850259,
+        "frontlit_luminance_ratio": 1.0126155187826336,
+        "backlit_luminance_ratio": 1.7519661443026988
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v42_merged_geometry_shape_bracket_review.json"
+    },
+    {
+      "version": "v43",
+      "major": 43,
+      "minor": null,
+      "date": "2026-07-15",
+      "change": "merged component parity",
+      "gate_class": "lit_shape_material_shadow",
+      "status": "material_id_component_partition_validated_shadow_ownership_rejected",
+      "failed_gate_count": 11,
+      "failed_gates": [
+        "backlit_source_shadow_improvement_gate_passed",
+        "component_material_shadow_parity_gate_passed",
+        "hazard_readability_gate_passed",
+        "luminance_gate_passed",
+        "reduced_geometry_gate_passed",
+        "source_art_cleanup_gate_passed",
+        "source_hlod_photometry_gate_passed",
+        "source_hlod_silhouette_gate_passed",
+        "source_shadow_policy_parity_gate_passed",
+        "temporal_handoff_gate_passed",
+        "wall_clock_performance_gate_passed"
+      ],
+      "production_promoted": false,
+      "metrics": {
+        "peak_green_fraction": null,
+        "frontlit_silhouette_iou": null,
+        "backlit_silhouette_iou": null,
+        "frontlit_luminance_ratio": null,
+        "backlit_luminance_ratio": null
+      },
+      "source": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v43_merged_component_parity_review.json"
+    }
+  ]
+}
