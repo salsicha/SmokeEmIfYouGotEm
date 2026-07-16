@@ -205,7 +205,7 @@ def build_south_fork_a1_route_graph_diagnostic(repo_root: Path) -> dict[str, Any
         "schema": "raftsim.south_fork.a1_full_reach_nhd_route_graph_diagnostic.v1",
         "generated_on": "2026-07-16",
         "status": (
-            "blocked_current_coloma_seed_misses_published_checkpoint_"
+            "blocked_shortest_path_does_not_validate_coloma_checkpoint_"
             "and_folsom_anchor_missing"
         ),
         "production_promoted": False,
@@ -249,7 +249,16 @@ def build_south_fork_a1_route_graph_diagnostic(repo_root: Path) -> dict[str, Any
                     edges[edge_index]["source_record_index"]
                     for edge_index in coloma_path_edges
                 ],
-                "seed_is_not_published_coloma_checkpoint": True,
+                "shortest_path_does_not_validate_published_checkpoint": True,
+                "anchor_identity_requires_review": True,
+                "interpretation": (
+                    "The current NHD shortest path to this review seed is 3.762 km "
+                    "short of the published Chili Bar-to-Coloma checkpoint. This "
+                    "blocks route promotion, but it does not by itself prove the "
+                    "seed coordinate is wrong; directed graph order, source "
+                    "fragments, source-mile basis, and exact anchor identity still "
+                    "need review."
+                ),
             },
             "folsom_reservoir_takeout": {
                 "seed_lon_lat": None,
@@ -278,8 +287,8 @@ def build_south_fork_a1_route_graph_diagnostic(repo_root: Path) -> dict[str, Any
             "can_enable_south_fork_editor_geometry": False,
             "can_bind_solver_windows": False,
             "next_required_actions": [
-                "Replace the current Coloma access seed with the published checkpoint or record why the source mile log uses a different reference.",
-                "Attach an exact reviewed Folsom Reservoir take-out anchor.",
+                "Resolve whether the Coloma seed, graph traversal, or source-mile reference is causing the checkpoint mismatch.",
+                "Attach an exact reviewed Salmon Falls/Folsom Reservoir take-out anchor.",
                 "Solve a directed path through the named-flowline pool and clip it to reviewed anchors.",
                 "Regenerate rapid stationing only after the Coloma checkpoint and full-run length checks pass.",
             ],

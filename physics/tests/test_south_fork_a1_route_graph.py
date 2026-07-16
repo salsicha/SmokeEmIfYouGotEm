@@ -27,7 +27,7 @@ def test_south_fork_a1_route_graph_diagnostic_is_reproducible():
         "raftsim.south_fork.a1_full_reach_nhd_route_graph_diagnostic.v1"
     )
     assert committed["status"] == (
-        "blocked_current_coloma_seed_misses_published_checkpoint_"
+        "blocked_shortest_path_does_not_validate_coloma_checkpoint_"
         "and_folsom_anchor_missing"
     )
     assert committed["production_promoted"] is False
@@ -60,7 +60,9 @@ def test_south_fork_a1_route_graph_preserves_anchor_mismatch():
     assert coloma["published_coloma_checkpoint_m"] == 9012.3264
     assert coloma["graph_minus_published_checkpoint_m"] == -3761.90706
     assert coloma["path_edge_count"] == 39
-    assert coloma["seed_is_not_published_coloma_checkpoint"] is True
+    assert coloma["shortest_path_does_not_validate_published_checkpoint"] is True
+    assert coloma["anchor_identity_requires_review"] is True
+    assert "does not by itself prove" in coloma["interpretation"]
     assert len(coloma["path_source_record_indices"]) == 39
     assert folsom["seed_status"] == "missing_exact_anchor"
     assert folsom["published_run_length_m"] == 33796.224
@@ -77,8 +79,8 @@ def test_south_fork_a1_route_graph_blocks_promotion_until_anchor_repair():
     assert gate["can_enable_south_fork_editor_geometry"] is False
     assert gate["can_bind_solver_windows"] is False
     assert gate["next_required_actions"] == [
-        "Replace the current Coloma access seed with the published checkpoint or record why the source mile log uses a different reference.",
-        "Attach an exact reviewed Folsom Reservoir take-out anchor.",
+        "Resolve whether the Coloma seed, graph traversal, or source-mile reference is causing the checkpoint mismatch.",
+        "Attach an exact reviewed Salmon Falls/Folsom Reservoir take-out anchor.",
         "Solve a directed path through the named-flowline pool and clip it to reviewed anchors.",
         "Regenerate rapid stationing only after the Coloma checkpoint and full-run length checks pass.",
     ]

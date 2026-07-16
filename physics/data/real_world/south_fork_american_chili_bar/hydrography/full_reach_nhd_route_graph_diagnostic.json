@@ -13,8 +13,10 @@
       "seed_status": "review_seed_from_nhd_stationing_candidate_not_authoritative"
     },
     "current_coloma_access_seed": {
+      "anchor_identity_requires_review": true,
       "graph_minus_published_checkpoint_m": -3761.90706,
       "graph_station_from_chili_bar_m": 5250.41934,
+      "interpretation": "The current NHD shortest path to this review seed is 3.762 km short of the published Chili Bar-to-Coloma checkpoint. This blocks route promotion, but it does not by itself prove the seed coordinate is wrong; directed graph order, source fragments, source-mile basis, and exact anchor identity still need review.",
       "nearest_graph_node_distance_m": 56.304918,
       "nearest_graph_node_lon_lat": [
         -120.7636923,
@@ -63,11 +65,11 @@
         13374
       ],
       "published_coloma_checkpoint_m": 9012.3264,
-      "seed_is_not_published_coloma_checkpoint": true,
       "seed_lon_lat": [
         -120.7632701,
         38.7784667
-      ]
+      ],
+      "shortest_path_does_not_validate_published_checkpoint": true
     },
     "folsom_reservoir_takeout": {
       "published_run_length_m": 33796.224,
@@ -98,8 +100,8 @@
     "can_bind_solver_windows": false,
     "can_enable_south_fork_editor_geometry": false,
     "next_required_actions": [
-      "Replace the current Coloma access seed with the published checkpoint or record why the source mile log uses a different reference.",
-      "Attach an exact reviewed Folsom Reservoir take-out anchor.",
+      "Resolve whether the Coloma seed, graph traversal, or source-mile reference is causing the checkpoint mismatch.",
+      "Attach an exact reviewed Salmon Falls/Folsom Reservoir take-out anchor.",
       "Solve a directed path through the named-flowline pool and clip it to reviewed anchors.",
       "Regenerate rapid stationing only after the Coloma checkpoint and full-run length checks pass."
     ]
@@ -116,5 +118,5 @@
     "node_count": 199,
     "selected_length_km_source_sum": 65.786574
   },
-  "status": "blocked_current_coloma_seed_misses_published_checkpoint_and_folsom_anchor_missing"
+  "status": "blocked_shortest_path_does_not_validate_coloma_checkpoint_and_folsom_anchor_missing"
 }
