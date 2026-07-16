@@ -106,6 +106,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Replaced byte equality with a monotonic compatibility contract: route identity, endpoints, segments, flow bands, policies, and status remain exact; flow presets remain byte-equivalent; source IDs, fetch IDs, and artifact paths cannot disappear; confidence cannot regress; control semantics/telemetry remain stable while Unreal input-axis bindings may advance.
 - Verification: all **35 Milestone 21 tests pass**; the former Colorado stale-generator failure is closed without rewriting newer source data.
 
+### 2026-07-16 LFS and Generated-Map Retention Decision
+
+- Owner decision: do not prune Git LFS and keep versioning generated preview/candidate maps.
+- Closed Finding 3.1 without running an LFS dry run or prune, changing retention configuration, untracking maps, adding ignore rules, deleting hosted objects, or rewriting history.
+- Updated `docs/generated-artifact-retention-policy.md` to retain the audit as a growth baseline while recording that its prior prune/untracking recommendation was rejected.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
@@ -195,6 +201,8 @@ Do not mass-refactor. Adopt and document (in `docs/raftsim-tools-workflow.md` or
 
 ### Step 3.1 — LFS retention (requires owner approval; destructive)
 
+**Owner decision, July 16, 2026:** keep versioning generated maps and do not prune Git LFS. This closes the decision step with no destructive action. The audit remains documentation only; no dry run, retention-setting change, untracking, ignore-rule change, hosted deletion, or history rewrite is authorized.
+
 1. Check `git remote -v`. Determine whether the LFS store is purely local or hosted.
 2. Propose to the owner: (a) run `git lfs prune` locally with a retention window (`lfs.fetchrecentrefsdays` / `lfs.pruneoffsetdays` tuned so recent history survives) to reclaim local disk; (b) if hosted, a matching server-side retention decision.
 3. Bigger structural fix, also owner-gated: stop versioning volatile generated `.umap` candidates entirely. They are deterministically regenerable from tracked inputs via the `RaftSim.*` editor commands. Keep in git only: locked/promoted maps and the manifests/hashes needed to regenerate everything else; gitignore the volatile candidates the way `Environment/GeneratedLocalReview/PVEFutaleufu*` already is (`.gitignore:33-34`). Document the regeneration command per map in the plan docs so nothing becomes unreproducible.
@@ -216,7 +224,7 @@ Split `test_photoreal_environment_assets.py` into per-concern files (e.g. `test_
 
 - A written retention policy exists in the docs for both LFS maps and versioned generators.
 - Superseded generators/compare scripts/tests removed; suite green (minus intentionally deleted tests); no remaining import of deleted modules (`uv run python -c "import raftsim"` still works).
-- Any LFS pruning was explicitly approved by the owner and logged (what was pruned, with what retention settings) in the plan doc.
+- The owner decision to keep versioning maps and not prune is logged; no LFS pruning or tracking change was performed.
 
 ---
 
