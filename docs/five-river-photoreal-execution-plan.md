@@ -184,7 +184,7 @@ Started July 16, 2026 from clean commit `119239d68`.
   - [x] Prepare bounded per-window terrain/imagery source requests without downloading: `production_corridor/full_reach_window_source_pull_plan.json` records six window bboxes, twelve official USGS 3DEP/USDA NAIP export requests, expected output paths, and no-promotion gates so future source pulls are reproducible and reviewed before any full-reach landscape generation.
 - [ ] B1 asset source survey and intake pipeline hardening.
   - [x] Record the B1 survey baseline and open-source intake contract: `physics/data/real_world/photoreal_asset_intake_b1.json` defines per-river asset needs for all five runnable rivers, Fab/Poly Haven/first-party source candidates, commit-vs-local-only license classes, importer hardening requirements, isolated capture gates, and the Zambezi no-new-intake policy while importing no assets and promoting no river asset set.
-- [ ] D1 compliant-tube Python reference model.
+- [x] D1 compliant-tube Python reference model: `physics/src/raftsim/flexible_raft_d1.py` adds deterministic pressure/volume-compliant perimeter tube segments, floor/lacing/frame load transfer, rigid `RaftState6DoF` layering, generated fixture evidence at `physics/data/calibration/flexible_raft_d1_compliant_tube_fixture.json`, and explicit disabled scoring/gameplay authority.
 - [ ] D2 seat-load coupling into local tube deformation/freeboard.
 
 ## Definition of done (per river)
