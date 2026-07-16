@@ -81,6 +81,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Regenerated the editor-source inventory: **7 implementation files, 47,087 lines, 34 unique registered console commands, 18 automation flags, and all six river build paths**. The extra aggregate lines are translation-unit include scaffolding; the module file itself fell from 46,188 to 44,830 lines.
 - Verification: the focused Python source-layout suite passes **13/13**, and the UE 5.8 `SmokeEmIfYouGotEmEditor Mac Development` target compiled and linked both editor translation units successfully.
 
+### 2026-07-15 Finding 2 Step 2.1 Procedural Vegetation Extraction
+
+- Extracted the reflected PVE graph configuration, cypress palette/atlas baking, async beech/cypress evaluation, structural review-map authoring, and evidence reporting into `Private/Foliage/RaftSimEditorProceduralVegetation.cpp`.
+- Added `RaftSimEditorFoliageInternal.h` as the private boundary for shared environment-preview types and the small set of mesh, material, capture, and asset helpers required by PVE. The bridge keeps defaults and call behavior unchanged and avoids copying implementation into the new translation unit.
+- Regenerated the inventory at **8 implementation files, 47,663 lines, 34 commands, 18 flags, and all six river paths**. `RaftSimEditorModule.cpp` is down to 36,964 lines; the extracted 8,442-line PVE implementation still requires an internal functional split before the god-file acceptance criterion is complete.
+- Verification: the focused source-layout and photoreal asset contracts pass, and UE 5.8 independently compiled `RaftSimEditorModule.cpp` plus `RaftSimEditorProceduralVegetation.cpp` and linked the editor module.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

@@ -1406,7 +1406,9 @@ This milestone turns the five runnable river targets into complete, reviewable, 
 - [x] Map the RaftSim editor monolith before decomposition: aggregate all private C++ sources for tests and lock the 34 command registrations, 18 startup flags, source-file line counts, and six river build paths in `physics/reports/editor_source_inventory/`.
 - [ ] Split `RaftSimEditorModule.cpp` into cohesive tool UI, command registration, environment generation, materials, foliage/PVE, captures, and river-specific implementation files while preserving the locked inventory and Unreal build.
 - [x] Extract the tool UI subsystem into `Private/Tools/RaftSimEditorTools.cpp`: preserve all tool tabs, validation actions, reviewed DataAsset creation, capture evidence, 34 registered commands, 18 startup flags, and six river paths; verify with the source-layout tests and a successful UE 5.8 editor build.
-- [ ] Extract the next cohesive editor subsystem (foliage/PVE authoring), retaining module command lifecycle and recompiling the UE editor target before proceeding to capture/environment directors.
+- [x] Extract foliage/PVE authoring into `Private/Foliage/RaftSimEditorProceduralVegetation.cpp` behind an explicit private helper boundary; preserve inventory and compile/link it independently with UE 5.8.
+- [ ] Split the extracted PVE implementation by graph configuration, palette/material/atlas authoring, evaluation, and evidence reporting so no active touched implementation remains an 8,000-line secondary god-file.
+- [ ] Extract capture/environment directors from `RaftSimEditorModule.cpp`, retaining module command lifecycle and recompiling the UE editor target after each subsystem.
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
