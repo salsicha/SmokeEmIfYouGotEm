@@ -28,6 +28,7 @@ struct CliArgs {
     double roughness_scale = 1.0;
     double bed_slope_source_scale = 0.0;
     bool preserve_initial_mass = true;
+    bool disable_fixture_calibrations = false;
 };
 
 void print_usage(const char* program) {
@@ -47,6 +48,7 @@ void print_usage(const char* program) {
         << "  --roughness-scale <x>          Scale scenario roughness/friction (default: 1.0)\n"
         << "  --bed-slope-source-scale <x>   Scale finite-volume bed slope source term (default: 0.0)\n"
         << "  --no-preserve-initial-mass     Disable reduced-mode global mass correction\n"
+        << "  --disable-fixture-calibrations Run only base dynamics, without fixture-specific treatments\n"
         << "  --help                         Show this help\n";
 }
 
@@ -106,6 +108,8 @@ CliArgs parse_args(int argc, char** argv) {
             args.bed_slope_source_scale = parse_double(require_value(flag), flag);
         } else if (flag == "--no-preserve-initial-mass") {
             args.preserve_initial_mass = false;
+        } else if (flag == "--disable-fixture-calibrations") {
+            args.disable_fixture_calibrations = true;
         } else {
             throw std::runtime_error("Unknown argument: " + flag);
         }
@@ -158,6 +162,7 @@ int main(int argc, char** argv) {
         config.roughness_scale = args.roughness_scale;
         config.bed_slope_source_scale = args.bed_slope_source_scale;
         config.preserve_initial_mass = args.preserve_initial_mass;
+        config.disable_fixture_calibrations = args.disable_fixture_calibrations;
         raftsim::ReducedShallowWaterSolver solver(std::move(scenario), config);
         std::vector<raftsim::Frame> frames = solver.run(steps, args.frame_interval);
         raftsim::ValidationSummary validation = raftsim::validate_frames(solver.scenario(), frames, config);
@@ -171,6 +176,8 @@ int main(int argc, char** argv) {
         std::cout << "solver_mode=" << config.solver_mode << "\n";
         std::cout << "boundary_mode=" << config.boundary_mode << "\n";
         std::cout << "flux_scheme=" << config.flux_scheme << "\n";
+        std::cout << "disable_fixture_calibrations="
+                  << (config.disable_fixture_calibrations ? "true" : "false") << "\n";
         std::cout << "steps=" << steps << "\n";
         std::cout << "frames=" << frames.size() << "\n";
         std::cout << "output=" << run_dir.string() << "\n";

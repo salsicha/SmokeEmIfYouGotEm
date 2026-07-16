@@ -26,6 +26,7 @@ struct SolverConfig {
     double roughness_scale = 1.0;
     double bed_slope_source_scale = 0.0;
     bool preserve_initial_mass = true;
+    bool disable_fixture_calibrations = false;
 };
 
 struct Frame {
