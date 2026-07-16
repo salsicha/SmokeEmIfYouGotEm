@@ -20718,6 +20718,63 @@ bool SetFutaleufuHlodFoliageTransmissionTint(
     return false;
 }
 
+ADirectionalLight* FindFutaleufuTransmissionBracketSun(UWorld* World)
+{
+    for (TActorIterator<ADirectionalLight> It(World); It; ++It)
+    {
+        ADirectionalLight* Candidate = *It;
+        if (!Candidate)
+        {
+            continue;
+        }
+        if (Candidate->GetActorLabel() == TEXT("RaftSim_Sun_LumenPreview"))
+        {
+            return Candidate;
+        }
+    }
+    return nullptr;
+}
+
+bool SetFutaleufuTransmissionBracketLightDirection(
+    UWorld* World,
+    ACameraActor* ReferenceCamera,
+    AActor* HlodActor,
+    bool bBacklit,
+    FString& OutSummary)
+{
+    ADirectionalLight* Sun = FindFutaleufuTransmissionBracketSun(World);
+    UDirectionalLightComponent* SunComponent = Sun
+        ? Cast<UDirectionalLightComponent>(Sun->GetLightComponent())
+        : nullptr;
+    if (!Sun || !SunComponent || !ReferenceCamera || !HlodActor)
+    {
+        OutSummary += TEXT(
+            "V41 transmission bracket could not resolve the sun, camera, or HLOD actor.\n");
+        return false;
+    }
+
+    FVector CameraToTree =
+        HlodActor->GetActorLocation() - ReferenceCamera->GetActorLocation();
+    CameraToTree.Z = 0.0f;
+    if (!CameraToTree.Normalize())
+    {
+        OutSummary += TEXT(
+            "V41 transmission bracket found a degenerate camera-to-tree light basis.\n");
+        return false;
+    }
+    const FVector HorizontalTravel = bBacklit ? -CameraToTree : CameraToTree;
+    const FVector LightTravelDirection = FVector(
+        HorizontalTravel.X,
+        HorizontalTravel.Y,
+        -0.65f).GetSafeNormal();
+    SunComponent->SetMobility(EComponentMobility::Movable);
+    Sun->SetActorRotation(LightTravelDirection.Rotation());
+    SunComponent->MarkRenderStateDirty();
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+    return true;
+}
+
 bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     const FRaftSimEnvironmentPreviewSpec& Spec,
     const FString& RelativeCaptureBase,
@@ -20738,7 +20795,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     bool bHlodFrameSearch = false,
     int32* OutAutomaticHlodFrame = nullptr,
     bool bHlodSplitShadingSearch = false,
-    bool bHlodDualLayerReview = false)
+    bool bHlodDualLayerReview = false,
+    bool bHlodTransmissionLightBracketReview = false)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -21332,6 +21390,142 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             "V40 HLOD dual-layer review saved one source, one combined control, and three temporally independent bark/foliage layer captures at 24.5 m.\n");
         return bAllFramesSaved &&
             OutRelativeCapturePaths.Num() - InitialCapturePathCount == 5;
+    }
+
+    if (bHlodTransmissionLightBracketReview)
+    {
+        constexpr float SearchRadiusCm = 2450.0f;
+        constexpr float TrunkRoughness = 0.62f;
+        constexpr float FoliageRoughness = 0.72f;
+        constexpr float TrunkSpecular = 0.12f;
+        constexpr float FoliageSpecular = 0.18f;
+        const FLinearColor SourceTransmissionTint(0.78f, 1.0f, 0.58f, 1.0f);
+        ADirectionalLight* BracketSun = FindFutaleufuTransmissionBracketSun(World);
+        UDirectionalLightComponent* BracketSunComponent = BracketSun
+            ? Cast<UDirectionalLightComponent>(BracketSun->GetLightComponent())
+            : nullptr;
+        if (!BracketSun || !BracketSunComponent)
+        {
+            RestoreAntiAliasingMethod();
+            SceneCapture->Destroy();
+            RenderTarget->ReleaseResource();
+            OutSummary += TEXT(
+                "V41 transmission bracket could not preserve the physical-corridor sun.\n");
+            return false;
+        }
+        const FRotator OriginalSunRotation = BracketSun->GetActorRotation();
+        const EComponentMobility::Type OriginalSunMobility =
+            BracketSunComponent->Mobility;
+        bool bAllFramesSaved = true;
+        SetCameraState(SearchRadiusCm);
+        bAllFramesSaved &= SetFutaleufuHlodAtlasFrameOverride(
+            World,
+            -1.0f,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodProxyLayerMode(
+            World,
+            true,
+            OutSummary);
+        bAllFramesSaved &= SetFutaleufuHlodSplitShadingOverrides(
+            World,
+            1.0f,
+            1.0f,
+            TrunkRoughness,
+            FoliageRoughness,
+            TrunkSpecular,
+            FoliageSpecular,
+            OutSummary);
+
+        const auto CaptureBracketFrame = [
+            &AdvanceAndCapture,
+            &SaveCurrentFrame,
+            SceneCapture,
+            &OutRelativeCapturePaths](const FString& CapturePath)
+        {
+            SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+            for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+            {
+                AdvanceAndCapture();
+            }
+            const bool bSaved = SaveCurrentFrame(CapturePath);
+            if (bSaved)
+            {
+                OutRelativeCapturePaths.Add(CapturePath);
+            }
+            return bSaved;
+        };
+        struct FTransmissionBracketLightPreset
+        {
+            const TCHAR* Token;
+            bool bBacklit;
+        };
+        static const FTransmissionBracketLightPreset LightPresets[] = {
+            {TEXT("frontlit"), false},
+            {TEXT("backlit"), true},
+        };
+        for (const FTransmissionBracketLightPreset& LightPreset : LightPresets)
+        {
+            bAllFramesSaved &= SetFutaleufuTransmissionBracketLightDirection(
+                World,
+                ReferenceCamera,
+                HlodActor,
+                LightPreset.bBacklit,
+                OutSummary);
+            bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+                World,
+                ReferenceCamera,
+                TEXT("source_only"),
+                1.0f,
+                OutSummary,
+                static_cast<float>(PatternSize),
+                TransitionMode);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_transmission_light_bracket_%s_source_reference.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+
+            bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+                World,
+                ReferenceCamera,
+                TEXT("hlod_only"),
+                0.0f,
+                OutSummary,
+                static_cast<float>(PatternSize),
+                TransitionMode);
+            bAllFramesSaved &= SetFutaleufuHlodFoliageTransmissionTint(
+                World,
+                FLinearColor::Black,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_transmission_light_bracket_%s_two_sided_no_transmission.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+
+            bAllFramesSaved &= SetFutaleufuHlodFoliageTransmissionTint(
+                World,
+                SourceTransmissionTint,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_transmission_light_bracket_%s_two_sided_source_transmission.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+        }
+
+        BracketSunComponent->SetMobility(EComponentMobility::Movable);
+        BracketSun->SetActorRotation(OriginalSunRotation);
+        BracketSunComponent->SetMobility(OriginalSunMobility);
+        BracketSunComponent->MarkRenderStateDirty();
+        bAllFramesSaved &= SetFutaleufuHlodProxyLayerMode(
+            World,
+            false,
+            OutSummary);
+        RestoreAntiAliasingMethod();
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        OutSummary += TEXT(
+            "V41 HLOD transmission light bracket saved source, no-transmission, and source-transmission captures under fixed frontlight and backlight directions at 24.5 m.\n");
+        return bAllFramesSaved &&
+            OutRelativeCapturePaths.Num() - InitialCapturePathCount == 6;
     }
 
     bool bAllFramesSaved = true;
@@ -33178,7 +33372,7 @@ UMaterial* CreateOrUpdateLocalPveAtlasMaterial(
     {
         FinalOpacity = AddComplementaryScreenDitherOpacity(
             Material,
-            OpacitySample,
+            FinalOpacity,
             0,
             false,
             0.0f,
@@ -34022,7 +34216,7 @@ bool BakeFutaleufuCypressMultiViewAtlas(
         TEXT("  },\n")
         TEXT("  \"assets\": {\"base_color_opacity\": \"%s\", \"albedo_opacity\": \"%s\", \"world_normal\": \"%s\", \"opacity\": \"%s\", \"depth\": \"%s\", \"material_identity\": \"%s\", \"legacy_unlit_material\": \"%s\", \"relightable_lit_material\": \"%s\", \"relightable_trunk_material\": \"%s\", \"relightable_foliage_material\": \"%s\"},\n")
         TEXT("  \"runtime_contract\": {\"geometry\": \"%s\", \"frame_selection\": \"nearest 45-degree azimuth plus 0/25-degree elevation row\", \"shading\": \"%s\", \"atlas_color_gain\": [%.6f, %.6f, %.6f], \"material_inputs\": [\"base_color_opacity\", \"opacity\", \"material_identity\"%s], \"captured_but_not_sampled\": [%s], \"texture_residency_for_immediate_exact_camera_review\": \"never_stream\", \"world_normal_relighting_enabled\": %s, \"depth_reserved_for_future_parallax\": %s, \"complementary_screen_dither_enabled\": %s, \"complementary_source_coverage_parameter\": \"ComplementarySourceCoverage\"},\n")
-        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"shading\": \"masked DefaultLit combined control plus disjoint DefaultLit trunk and TwoSidedFoliage layers using captured world normal and frontmost material identity\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"combined_default_roughness\": [0.68, 0.68], \"split_default_roughness\": [0.62, 0.72], \"combined_default_specular\": [0.18, 0.18], \"split_default_specular\": [0.12, 0.18], \"default_gain_multipliers\": [1.0, 1.0], \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
+        TEXT("  \"relightable_runtime_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"shading\": \"masked DefaultLit combined control plus disjoint DefaultLit trunk and TwoSidedFoliage layers using captured world normal and frontmost material identity\", \"base_color_gain\": [1.55, 1.55, 1.55], \"emissive_connected\": false, \"world_normal_relighting_enabled\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"layer_transition_order\": \"material_identity_layer_opacity_then_complementary_temporal_mask\", \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"combined_default_roughness\": [0.68, 0.68], \"split_default_roughness\": [0.62, 0.72], \"combined_default_specular\": [0.18, 0.18], \"split_default_specular\": [0.12, 0.18], \"default_gain_multipliers\": [1.0, 1.0], \"transition_mode_parameter\": \"ComplementaryTransitionMode\", \"production_candidate_mode\": \"engine_DitherTemporalAA_with_exact_inverse_hlod_ownership\", \"legacy_ordered_control_retained\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("  \"git_policy\": \"generated atlases and assets are local and ignored\"\n")
         TEXT("}\n"),
         *EscapeRaftSimJsonString(VariantId),
@@ -35878,6 +36072,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalHlodDualLayerReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalHlodTransmissionLightBracketReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     UStaticMesh* LocalMultiViewHlodMesh = nullptr;
     FTransform LocalMultiViewHlodTransform = FTransform::Identity;
@@ -35944,6 +36140,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalHlodSplitShadingSearchCapturesJson;
     TArray<FString> LocalHlodDualLayerCapturePaths;
     FString LocalHlodDualLayerCapturesJson;
+    TArray<FString> LocalHlodTransmissionLightBracketCapturePaths;
+    FString LocalHlodTransmissionLightBracketCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -37452,6 +37650,37 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 : TEXT(", "),
                             *EscapeRaftSimJsonString(CapturePath));
                     }
+                    const bool bAllHlodTransmissionLightBracketCapturesProduced =
+                        LocalMultiViewAtlas.IsSplitRelightableReady() &&
+                        CaptureFutaleufuComplementaryTransitionMotionSequence(
+                            LitRiverReviewSpec,
+                            LocalVisualCaptureBase,
+                            TEXT("hlod_transmission_light_bracket_review"),
+                            8,
+                            LocalHlodTransmissionLightBracketCapturePaths,
+                            LocalVisualSummary,
+                            true,
+                            SetupLitRiverView,
+                            1.0f,
+                            false,
+                            nullptr,
+                            false,
+                            false,
+                            true);
+                    bLocalHlodTransmissionLightBracketReviewCaptured =
+                        bAllHlodTransmissionLightBracketCapturesProduced &&
+                        LocalHlodTransmissionLightBracketCapturePaths.Num() == 6;
+                    for (const FString& CapturePath :
+                         LocalHlodTransmissionLightBracketCapturePaths)
+                    {
+                        LocalHlodTransmissionLightBracketCapturesJson +=
+                            FString::Printf(
+                                TEXT("%s\"%s\""),
+                                LocalHlodTransmissionLightBracketCapturesJson.IsEmpty()
+                                    ? TEXT("")
+                                    : TEXT(", "),
+                                *EscapeRaftSimJsonString(CapturePath));
+                    }
                     ActiveLitRiverHlodTrunkMaterial = nullptr;
                     ActiveLitRiverHlodFoliageMaterial = nullptr;
                 }
@@ -37470,7 +37699,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalTemporalLitRiverViewMotionTransitionReviewCaptured &&
                     bLocalHlodFrameSearchReviewCaptured &&
                     bLocalHlodSplitShadingSearchReviewCaptured &&
-                    bLocalHlodDualLayerReviewCaptured;
+                    bLocalHlodDualLayerReviewCaptured &&
+                    bLocalHlodTransmissionLightBracketReviewCaptured;
             }
         }
     }
@@ -37505,7 +37735,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, a V39 exact material-identity split-shading search, and a V40 disjoint DefaultLit-bark/TwoSidedFoliage dual-layer review; V33-V40 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V40 remains review-only pending measured dual-layer photometry and silhouette decisions")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, a V39 exact material-identity split-shading search, a V40 disjoint DefaultLit-bark/TwoSidedFoliage dual-layer review, and a V41 fixed frontlit/backlit transmission bracket; V33-V41 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V41 remains review-only pending measured transmission response and a source-matched representation shape")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -37527,7 +37757,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"outputs\": [\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\"],\n")
         TEXT("    \"material_identity_contract\": {\"source\": \"frontmost owner from separate trunk and foliage opacity plus scene-depth passes\", \"encoding\": \"black_trunk_white_foliage\", \"fallback_pixels\": %lld},\n")
         TEXT("    \"material_asset\": \"%s\",\n")
-        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_identity_output\": \"%s\", \"material_identity_md5\": \"%s\", \"material_asset\": \"%s\", \"trunk_material_asset\": \"%s\", \"foliage_material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"split_shading_models\": {\"trunk\": \"DefaultLit\", \"foliage\": \"TwoSidedFoliage\"}, \"split_layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"material_identity_sampled\": true, \"emissive_connected\": false, \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"default_gain_multipliers\": [1.0, 1.0], \"default_roughness\": [0.68, 0.68], \"default_specular\": [0.18, 0.18], \"split_default_roughness\": [0.62, 0.72], \"split_default_specular\": [0.12, 0.18], \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"], \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
+        TEXT("    \"relightable_representation_contract\": {\"ready\": %s, \"split_layer_ready\": %s, \"albedo_source\": \"SCS_BaseColor linear converted to sRGB atlas texels\", \"albedo_output\": \"%s\", \"albedo_md5\": \"%s\", \"material_identity_output\": \"%s\", \"material_identity_md5\": \"%s\", \"material_asset\": \"%s\", \"trunk_material_asset\": \"%s\", \"foliage_material_asset\": \"%s\", \"shading_model\": \"DefaultLit\", \"split_shading_models\": {\"trunk\": \"DefaultLit\", \"foliage\": \"TwoSidedFoliage\"}, \"split_layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"layer_transition_order\": \"material_identity_layer_opacity_then_complementary_temporal_mask\", \"foliage_transmission_parameter\": \"AtlasFoliageTransmissionTint\", \"foliage_transmission_default\": [0.78, 1.0, 0.58], \"base_color_gain\": [1.55, 1.55, 1.55], \"tangent_space_normal\": false, \"world_normal_sampled\": true, \"material_identity_sampled\": true, \"emissive_connected\": false, \"trunk_parameters\": [\"AtlasTrunkGainMultiplier\", \"AtlasTrunkRoughness\", \"AtlasTrunkSpecular\"], \"foliage_parameters\": [\"AtlasFoliageGainMultiplier\", \"AtlasFoliageRoughness\", \"AtlasFoliageSpecular\"], \"default_gain_multipliers\": [1.0, 1.0], \"default_roughness\": [0.68, 0.68], \"default_specular\": [0.18, 0.18], \"split_default_roughness\": [0.62, 0.72], \"split_default_specular\": [0.12, 0.18], \"transition_modes\": [\"legacy_ordered_control\", \"engine_temporal_aa_complementary\"], \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_frame_override_value\": -1.0},\n")
         TEXT("    \"runtime_representation\": \"%s\",\n")
         TEXT("    \"atlas_color_gain\": [%.6f, %.6f, %.6f],\n")
         TEXT("    \"exact_source_camera_60m_capture\": \"%s\",\n")
@@ -37544,6 +37774,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"hlod_frame_search_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement and relightable HLOD as V37\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"lighting\": true, \"temporal_aa\": true, \"atlas_frame_override_parameter\": \"AtlasFrameOverride\", \"automatic_override_value\": -1.0, \"calculated_automatic_row_zero_frame\": %d, \"tested_row_zero_frames\": [0, 1, 2, 3, 4, 5, 6, 7], \"source_reference_count\": 1, \"automatic_selection_count\": 1, \"override_capture_count\": 8, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_split_shading_search_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement, automatic frame, and relightable HLOD as V38\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_preset\": 8, \"temporal_history_reset_per_preset\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"material_identity_parameter\": \"AtlasMaterialIdentity\", \"fixed_roughness\": [0.68, 0.68], \"fixed_specular\": [0.18, 0.18], \"gain_presets\": [{\"id\": \"baseline\", \"trunk\": 1.0, \"foliage\": 1.0}, {\"id\": \"foliage_gain_150\", \"trunk\": 1.0, \"foliage\": 1.5}, {\"id\": \"foliage_gain_200\", \"trunk\": 1.0, \"foliage\": 2.0}, {\"id\": \"foliage_gain_250\", \"trunk\": 1.0, \"foliage\": 2.5}, {\"id\": \"trunk_gain_150\", \"trunk\": 1.5, \"foliage\": 1.0}, {\"id\": \"trunk_gain_200\", \"trunk\": 2.0, \"foliage\": 1.0}, {\"id\": \"trunk_gain_250\", \"trunk\": 2.5, \"foliage\": 1.0}, {\"id\": \"balanced_gain_175\", \"trunk\": 1.75, \"foliage\": 1.75}, {\"id\": \"balanced_gain_200\", \"trunk\": 2.0, \"foliage\": 2.0}], \"source_reference_count\": 1, \"preset_capture_count\": 9, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_dual_layer_review_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement with one combined control component plus disjoint trunk and foliage components sharing one proxy mesh\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"automatic_atlas_frame\": true, \"component_layers\": [\"combined_control\", \"trunk\", \"foliage\"], \"combined_control_shading_model\": \"DefaultLit\", \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"source_transmission_tint\": [0.78, 1.0, 0.58], \"split_roughness\": [0.62, 0.72], \"split_specular\": [0.12, 0.18], \"variants\": [\"source_reference\", \"combined_default_lit_control\", \"two_sided_no_transmission\", \"two_sided_source_transmission\", \"two_sided_source_transmission_foliage_gain_150\"], \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"hlod_transmission_light_bracket_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement and dual-layer proxy as V40 with only the saved labeled sun rotated transiently\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"automatic_atlas_frame\": true, \"sun_actor_label\": \"RaftSim_Sun_LumenPreview\", \"sun_original_transform_restored\": true, \"light_direction_contract\": {\"frontlit_horizontal_travel\": \"camera_to_tree\", \"backlit_horizontal_travel\": \"tree_to_camera\", \"pre_normalized_downward_z\": -0.65}, \"light_modes\": [\"frontlit\", \"backlit\"], \"representations_per_light\": [\"source_reference\", \"two_sided_no_transmission\", \"two_sided_source_transmission\"], \"source_transmission_tint\": [0.78, 1.0, 0.58], \"split_roughness\": [0.62, 0.72], \"split_specular\": [0.12, 0.18], \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -37642,6 +37873,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalMultiViewAtlas.IsSplitRelightableReady() ? TEXT("true") : TEXT("false"),
         LocalHlodDualLayerCapturePaths.Num(),
         *LocalHlodDualLayerCapturesJson,
+        LocalMultiViewAtlas.IsSplitRelightableReady() ? TEXT("true") : TEXT("false"),
+        LocalHlodTransmissionLightBracketCapturePaths.Num(),
+        *LocalHlodTransmissionLightBracketCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -37674,6 +37908,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"hlod_split_shading_search_captures\": [%s],\n")
         TEXT("    \"hlod_dual_layer_capture_count\": %d,\n")
         TEXT("    \"hlod_dual_layer_captures\": [%s],\n")
+        TEXT("    \"hlod_transmission_light_bracket_capture_count\": %d,\n")
+        TEXT("    \"hlod_transmission_light_bracket_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -37711,6 +37947,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalHlodSplitShadingSearchCapturesJson,
         LocalHlodDualLayerCapturePaths.Num(),
         *LocalHlodDualLayerCapturesJson,
+        LocalHlodTransmissionLightBracketCapturePaths.Num(),
+        *LocalHlodTransmissionLightBracketCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(
