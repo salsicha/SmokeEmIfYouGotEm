@@ -112,6 +112,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Closed Finding 3.1 without running an LFS dry run or prune, changing retention configuration, untracking maps, adding ignore rules, deleting hosted objects, or rewriting history.
 - Updated `docs/generated-artifact-retention-policy.md` to retain the audit as a growth baseline while recording that its prior prune/untracking recommendation was rejected.
 
+### 2026-07-16 Finding 2 Step 2.1 Module-Lifecycle Boundary
+
+- Reduced `RaftSimEditorModule.cpp` from 36,964 to 1,035 lines. It now owns module startup/shutdown, the 34 console-command registrations, command handlers, and `IMPLEMENT_MODULE` only.
+- Moved the existing environment implementation without behavioral edits into `Private/Environment/RaftSimEditorEnvironmentLegacy.cpp`. This is an explicitly temporary mechanical boundary, not completion of Step 2.1: materials, geometry, captures, landscape generation, and river-specific directors must still leave the 36,090-line legacy translation unit in focused slices.
+- Fixed a unity-build collision exposed by the refreshed Unreal makefile by giving PVE authoring, atlas, and evaluation translation units unique private log categories. Emitted log behavior is unchanged.
+- Verification: the regenerated inventory preserves all 34 commands, 18 startup flags, and six river paths; the 22 focused source-layout/Milestone 20 tests pass; UE 5.8 compiles and links `SmokeEmIfYouGotEmEditor Mac Development` successfully.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

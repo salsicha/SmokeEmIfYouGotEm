@@ -1410,6 +1410,7 @@ This milestone turns the five runnable river targets into complete, reviewable, 
 - [x] Split PVE into focused graph/palette authoring (2,154 lines), atlas baking (1,684 lines), and async evaluation files; explicitly freeze the 4,898-line legacy evidence-orchestration exception and require all new graph, material, atlas, capture, and reporting behavior to live in focused modules.
 - [x] Add a deterministic production-foundation synchronizer, regenerate enabled plugins from the current `.uproject`, and distinguish the `RaftSimEditor` module from runtime production-domain ownership; all Milestone 20 tests now pass.
 - [x] Repair the Colorado route generator contract so the Milestone 21 seed is checked as a monotonic base for later reviewed gauge/terrain/imagery/hydrography/access enrichment instead of requiring destructive byte equality; all Milestone 21 tests now pass.
+- [x] Reduce `RaftSimEditorModule.cpp` to module lifecycle, 34 command registrations, and handlers; move the unchanged environment body behind a temporary legacy translation-unit boundary, preserve all inventory surfaces, fix unity-safe PVE log categories, and compile the UE 5.8 editor target. Do not mark the broader editor split complete until the legacy environment body is decomposed.
 - [ ] Extract capture/environment directors from `RaftSimEditorModule.cpp`, retaining module command lifecycle and recompiling the UE editor target after each subsystem.
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.

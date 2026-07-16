@@ -155,7 +155,8 @@
 
 #define LOCTEXT_NAMESPACE "FRaftSimEditorModule"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRaftSimEditor, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogRaftSimEditorPveEvaluation, Log, All);
+#define LogRaftSimEditor LogRaftSimEditorPveEvaluation
 
 // Frozen legacy orchestration: add new PVE behavior to focused authoring, atlas,
 // capture, or reporting helpers and keep this file limited to lifecycle fixes.
@@ -4895,4 +4896,5 @@ void FRaftSimEditorModule::FinishProceduralBeechCandidate(bool bSuccess, const F
     }
 }
 
+#undef LogRaftSimEditor
 #undef LOCTEXT_NAMESPACE
