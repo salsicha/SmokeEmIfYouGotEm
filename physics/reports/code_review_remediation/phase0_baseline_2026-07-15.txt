@@ -1,0 +1,46 @@
+Code review remediation Phase 0 baseline
+Date: 2026-07-15 Pacific/Honolulu
+Commit: 630921253fa85b89af743b736e1d841cfc0cc253
+Command: cd physics && uv run pytest -q
+
+Environment note:
+VIRTUAL_ENV=/Users/alexmoran/venv did not match the project environment path
+.venv, so uv ignored the active environment and used the project environment.
+
+Result:
+529 passed, 5 failed, 3 skipped in 131.81s
+537 tests accounted for
+
+Failures:
+tests/test_milestone20.py::test_unreal_production_foundation_matches_locked_project_and_modules
+tests/test_milestone21.py::test_rapid_river_editor_manifest_matches_generator
+tests/test_milestone21.py::test_geospatial_import_pipeline_manifest_matches_generator
+tests/test_milestone21.py::test_south_fork_editor_pass_manifest_matches_generator
+tests/test_milestone21.py::test_colorado_rowing_route_draft_files_match_generator
+
+Skipped:
+tests/test_geoclaw_reference.py:99 - GeoClaw is installed; unavailable CLI path is not active.
+tests/test_pyclaw_reference.py:86 - PyClaw is installed; unavailable-report path is not active.
+tests/test_pyclaw_reference.py:105 - PyClaw is installed; missing-dependency path is not active.
+
+Interpretation:
+The baseline is better than the review-time expectation of 522 passed, 11 failed,
+and 3 skipped. The six previously reported cypress V37-V42 failures and numeric
+drift no longer reproduce. All five current failures are committed generated or
+locked manifest drift in Milestone 20/21. Later phases must not add failures beyond
+this baseline unless an intentional regenerated-lock change is documented.
+
+Worktree guardrails before the test run:
+clean
+
+Hygiene inventory after the test run:
+physics/uv.lock was absent before the run and was generated as an untracked file.
+outputs/videos/raftsim_2d_seed3.mp4 remains tracked in Git LFS despite outputs/
+being ignored. Removing it from the index requires explicit owner approval.
+
+Owner decisions and close verification:
+physics/uv.lock was approved for commit as-is.
+outputs/videos/raftsim_2d_seed3.mp4 was approved for index-only removal; the local
+ignored file remains present and Git history retains the old LFS object.
+The Phase 0 post-check reported 529 passed, 5 failed, and 3 skipped in 123.93s,
+with the same five failures and three skips listed above. No baseline regression.
