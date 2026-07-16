@@ -1,5 +1,7 @@
 # Custom C++ Engine Full Validation Plan
 
+The post-baseline strategy choice is defined in `docs/water-solver-strategy-decision.md`. The owner selected Option B: build a real well-balanced finite-volume core while retaining analytic and GeoClaw parity as release gates.
+
 ## Purpose
 
 This plan defines what is required before the custom C++ shallow-water / height-field engine can be treated as the accepted live-water runtime for Unreal.

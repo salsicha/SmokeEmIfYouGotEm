@@ -44,6 +44,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Updated the governing water, readiness, Unreal, authority, and TODO documents so playback is no longer presented as solver approval. Step 1.3 is the next owner gate.
 - Post-check: the full suite reports **539 passed / 2 failed / 3 skipped in 131.17 seconds**. The remaining failures are the pre-existing production-foundation plugin-list snapshot drift and Colorado rowing-route generator drift; neither is part of the water parity path. The honest-gate tests and regenerated downstream locks pass.
 
+### 2026-07-15 Finding 1 Step 1.3
+
+- Added `docs/water-solver-strategy-decision.md` with the measured 6/40 uncalibrated solver result, the 34/40 playback count, explicit Option A and Option B contracts, implementation sequences, risks, and gate consequences.
+- The memo recommends Option B because flow-dependent rapid features, stitched geometry, real-world South Fork behavior, and raft/crew coupling require trustworthy fields beyond the six simple passing rows.
+- Owner selected **Option B** on July 15, 2026. Subsequent solver splitting and implementation must preserve the analytic/GeoClaw regression gates and move toward a genuine well-balanced finite-volume core; live custom-water stepping remains disabled until those gates pass.
+- Post-check: the full suite remains **539 passed / 2 failed / 3 skipped in 129.86 seconds**, with only the same production-foundation and Colorado generator snapshot drift recorded in Step 1.2.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
