@@ -1,0 +1,628 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -71.9971414,
+            -43.309397
+          ],
+          [
+            -71.9967608,
+            -43.3095188
+          ],
+          [
+            -71.9965602,
+            -43.3097308
+          ],
+          [
+            -71.9965195,
+            -43.3100966
+          ],
+          [
+            -71.9968681,
+            -43.3112012
+          ],
+          [
+            -71.9968628,
+            -43.3115408
+          ],
+          [
+            -71.9962512,
+            -43.3119819
+          ],
+          [
+            -71.9960742,
+            -43.3122902
+          ],
+          [
+            -71.9957255,
+            -43.3124815
+          ],
+          [
+            -71.9948833,
+            -43.3126962
+          ],
+          [
+            -71.9941859,
+            -43.3126259
+          ],
+          [
+            -71.9934028,
+            -43.3128368
+          ],
+          [
+            -71.9929628,
+            -43.3130748
+          ],
+          [
+            -71.9925391,
+            -43.3131919
+          ],
+          [
+            -71.9920938,
+            -43.3131919
+          ],
+          [
+            -71.991552,
+            -43.3132387
+          ],
+          [
+            -71.9909244,
+            -43.3135002
+          ],
+          [
+            -71.9900768,
+            -43.314074
+          ],
+          [
+            -71.9892346,
+            -43.3144604
+          ],
+          [
+            -71.9883387,
+            -43.3145775
+          ],
+          [
+            -71.9874911,
+            -43.3146868
+          ],
+          [
+            -71.9869332,
+            -43.3148586
+          ],
+          [
+            -71.9868351,
+            -43.3148478
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 1666.667,
+        "class": "III-IV",
+        "feature_tags": [
+          "warmup",
+          "wave_train",
+          "surf"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 600.0,
+        "lateral_review_buffer_m": 140.0,
+        "order": 1,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route station axis, GPS/aerial rapid point/span geometry, guide confirmation, rights review, and DGA/guide flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Asleep at the Wheel",
+        "review_priority": "high",
+        "river_id": "futaleufu_river_chile",
+        "route_order_station_m": 2656.129,
+        "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 3256.129,
+        "window_id": "futaleufu_a4_window_01_asleep_at_the_wheel",
+        "window_start_m": 2056.129
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -71.9757101,
+            -43.3149009
+          ],
+          [
+            -71.975904,
+            -43.3151903
+          ],
+          [
+            -71.9766529,
+            -43.316417
+          ],
+          [
+            -71.9764565,
+            -43.3168413
+          ],
+          [
+            -71.9761615,
+            -43.3171379
+          ],
+          [
+            -71.9756733,
+            -43.3172277
+          ],
+          [
+            -71.9750618,
+            -43.3170482
+          ],
+          [
+            -71.9746219,
+            -43.316853
+          ],
+          [
+            -71.9742496,
+            -43.3163741
+          ],
+          [
+            -71.9735168,
+            -43.3155689
+          ],
+          [
+            -71.972769,
+            -43.3146177
+          ],
+          [
+            -71.9722616,
+            -43.3145853
+          ],
+          [
+            -71.9714972,
+            -43.3149172
+          ],
+          [
+            -71.9711003,
+            -43.3150156
+          ],
+          [
+            -71.9711874,
+            -43.3151684
+          ],
+          [
+            -71.9712746,
+            -43.3153212
+          ],
+          [
+            -71.9714785,
+            -43.3157447
+          ],
+          [
+            -71.9716287,
+            -43.3162794
+          ],
+          [
+            -71.9716381,
+            -43.3163282
+          ],
+          [
+            -71.9716394,
+            -43.3165292
+          ],
+          [
+            -71.9715911,
+            -43.3169585
+          ],
+          [
+            -71.9714677,
+            -43.3173684
+          ],
+          [
+            -71.9713497,
+            -43.3179343
+          ],
+          [
+            -71.9712378,
+            -43.3186823
+          ],
+          [
+            -71.9710876,
+            -43.3194239
+          ],
+          [
+            -71.9710171,
+            -43.3202135
+          ],
+          [
+            -71.9710493,
+            -43.3205063
+          ],
+          [
+            -71.9711191,
+            -43.3207912
+          ],
+          [
+            -71.9713987,
+            -43.3212504
+          ],
+          [
+            -71.9715873,
+            -43.3216025
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 3333.333,
+        "class": "V",
+        "feature_tags": [
+          "long_rapid",
+          "multiple_holes",
+          "multiple_lines",
+          "sneak_line",
+          "scout",
+          "portage",
+          "flip_hazard"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 800.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 2,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route station axis, GPS/aerial rapid point/span geometry, guide confirmation, rights review, and DGA/guide flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Terminator",
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "route_order_station_m": 5312.259,
+        "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 6112.259,
+        "window_id": "futaleufu_a4_window_02_terminator",
+        "window_start_m": 4512.259
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -71.9771746,
+            -43.3299275
+          ],
+          [
+            -71.9776107,
+            -43.3304367
+          ],
+          [
+            -71.979112,
+            -43.3322953
+          ],
+          [
+            -71.9801044,
+            -43.333306
+          ],
+          [
+            -71.9804585,
+            -43.3340356
+          ],
+          [
+            -71.9806838,
+            -43.3346599
+          ],
+          [
+            -71.9808018,
+            -43.3355963
+          ],
+          [
+            -71.9809467,
+            -43.3372351
+          ],
+          [
+            -71.9815314,
+            -43.3382963
+          ],
+          [
+            -71.9825031,
+            -43.3392704
+          ],
+          [
+            -71.9837181,
+            -43.3399814
+          ],
+          [
+            -71.9849646,
+            -43.3408206
+          ],
+          [
+            -71.986226,
+            -43.3414475
+          ],
+          [
+            -71.9869451,
+            -43.3416544
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 5000.0,
+        "class": "IV-V",
+        "feature_tags": [
+          "holes",
+          "wave_train",
+          "continuous_whitewater"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 800.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 3,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route station axis, GPS/aerial rapid point/span geometry, guide confirmation, rights review, and DGA/guide flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Son of Terminator",
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "route_order_station_m": 7968.388,
+        "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 8768.388,
+        "window_id": "futaleufu_a4_window_03_son_of_terminator",
+        "window_start_m": 7168.388
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -71.9990216,
+            -43.3417559
+          ],
+          [
+            -71.9995773,
+            -43.3413122
+          ],
+          [
+            -72.0002639,
+            -43.341004
+          ],
+          [
+            -72.0007306,
+            -43.3409416
+          ],
+          [
+            -72.0012188,
+            -43.3409689
+          ],
+          [
+            -72.0017177,
+            -43.3411913
+          ],
+          [
+            -72.0020771,
+            -43.3414527
+          ],
+          [
+            -72.002281,
+            -43.3416906
+          ],
+          [
+            -72.0028067,
+            -43.3425177
+          ],
+          [
+            -72.0032794,
+            -43.3430329
+          ],
+          [
+            -72.0037193,
+            -43.3433255
+          ],
+          [
+            -72.0047808,
+            -43.3435789
+          ],
+          [
+            -72.0063579,
+            -43.3436803
+          ],
+          [
+            -72.0081496,
+            -43.3436413
+          ],
+          [
+            -72.0093459,
+            -43.3438364
+          ],
+          [
+            -72.0109713,
+            -43.3442226
+          ],
+          [
+            -72.0125485,
+            -43.3444606
+          ],
+          [
+            -72.0130098,
+            -43.3444918
+          ],
+          [
+            -72.0133638,
+            -43.3446556
+          ],
+          [
+            -72.013557,
+            -43.3449209
+          ],
+          [
+            -72.0135838,
+            -43.3455607
+          ],
+          [
+            -72.0136213,
+            -43.3460757
+          ],
+          [
+            -72.0139915,
+            -43.3466062
+          ],
+          [
+            -72.0141175,
+            -43.3467774
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [
+          "Kyber Pass",
+          "Kipper Pass"
+        ],
+        "catalog_order_station_m": 6666.667,
+        "class": "IV+",
+        "feature_tags": [
+          "hydraulic_holes",
+          "large_waves",
+          "multiple_moves"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 800.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 4,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route station axis, GPS/aerial rapid point/span geometry, guide confirmation, rights review, and DGA/guide flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Khyber Pass",
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "route_order_station_m": 10624.517,
+        "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 11424.517,
+        "window_id": "futaleufu_a4_window_04_khyber_pass",
+        "window_start_m": 9824.517
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -72.0205293,
+            -43.3537918
+          ],
+          [
+            -72.024082,
+            -43.3537994
+          ],
+          [
+            -72.0251817,
+            -43.3540139
+          ],
+          [
+            -72.0259031,
+            -43.3542653
+          ],
+          [
+            -72.0265603,
+            -43.3545015
+          ],
+          [
+            -72.0280624,
+            -43.3551334
+          ],
+          [
+            -72.0290868,
+            -43.3554433
+          ],
+          [
+            -72.0297547,
+            -43.3554901
+          ],
+          [
+            -72.0313668,
+            -43.3551958
+          ],
+          [
+            -72.032547,
+            -43.3549071
+          ],
+          [
+            -72.0335956,
+            -43.3547802
+          ],
+          [
+            -72.0345344,
+            -43.354632
+          ],
+          [
+            -72.0354116,
+            -43.3543572
+          ],
+          [
+            -72.0359159,
+            -43.3539905
+          ],
+          [
+            -72.036192,
+            -43.3535554
+          ],
+          [
+            -72.0368572,
+            -43.3526739
+          ],
+          [
+            -72.0371392,
+            -43.3521789
+          ],
+          [
+            -72.0375201,
+            -43.3517774
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 8333.333,
+        "class": "IV",
+        "feature_tags": [
+          "very_large_standing_waves",
+          "wave_train",
+          "surf",
+          "flip_hazard"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 800.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 5,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route station axis, GPS/aerial rapid point/span geometry, guide confirmation, rights review, and DGA/guide flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Himalayas",
+        "review_priority": "critical",
+        "river_id": "futaleufu_river_chile",
+        "route_order_station_m": 13280.646,
+        "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 14080.646,
+        "window_id": "futaleufu_a4_window_05_himalayas",
+        "window_start_m": 12480.646
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "review_limits": [
+    "Window center stations are distributed by catalog rapid order over the current route trace.",
+    "The current route trace is OSM-derived technical corridor evidence, not surveyed guide-approved stationing.",
+    "The route length still conflicts with the approximate catalog run length.",
+    "These features only focus human digitizing review and cannot replace GPS/aerial/guide-reviewed stations.",
+    "Do not bind editor geometry, solver windows, public route screenshots, or gameplay hazards from these windows."
+  ],
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.futaleufu.a4_stationing_digitizing_work_windows.geojson.v1",
+  "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+  "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+  "source_status_artifact": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_flow_status.json",
+  "status": "review_only_digitizing_windows_on_route_scaffold_not_authoritative",
+  "type": "FeatureCollection"
+}
