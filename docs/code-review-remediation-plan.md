@@ -155,6 +155,11 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Retired the superseded V10 texture generator, generate driver, and two V10-specific snapshots. Later historical evidence checks read the committed V10 manifest by path and no longer import executable V10 code.
 - Preserved the V10 review/source/capture evidence unchanged; only implementation and version-specific snapshots left the live tree.
 
+### 2026-07-16 Finding 3 Step 3.2 V18 Retirement
+
+- Retired the superseded V18 generator, generate/compare drivers, and V18-specific snapshot. No later live code imports that version.
+- Preserved the V18 twig-hierarchy review, source report, captures, and contact-sheet evidence unchanged.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
