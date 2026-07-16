@@ -8,6 +8,7 @@
 #include "Camera/CameraActor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DirectionalLightComponent.h"
+#include "Components/DynamicMeshComponent.h"
 #include "Components/ExponentialHeightFogComponent.h"
 #include "Components/HierarchicalInstancedStaticMeshComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
@@ -57,6 +58,7 @@
 #include "LandscapeProxy.h"
 #include "GeometryScript/MeshAssetFunctions.h"
 #include "GeometryScript/MeshBasicEditFunctions.h"
+#include "GeometryScript/MeshMaterialFunctions.h"
 #include "Materials/MaterialExpressionLandscapeLayerCoords.h"
 #include "Materials/Material.h"
 #include "Materials/MaterialExpressionAbs.h"
@@ -20468,6 +20470,10 @@ bool ConfigureFutaleufuComplementaryTransitionCapture(
         {
             Actor->SetActorHiddenInGame(true);
         }
+        else if (Label == TEXT("RaftSim_PveCypressMergedGeometrySplitHlod"))
+        {
+            Actor->SetActorHiddenInGame(true);
+        }
         else if (Label == TEXT("RaftSim_PveCypressVolumetricFarProxy") ||
                  Label == TEXT("RaftSim_PveCypressNaniteWholeTree"))
         {
@@ -20581,6 +20587,123 @@ bool SetFutaleufuMergedGeometryHlodBracketMode(
     }
     FlatAtlasActor->SetActorHiddenInGame(!bShowFlatAtlas);
     MergedGeometryActor->SetActorHiddenInGame(!bShowMergedGeometry);
+    return true;
+}
+
+bool SetFutaleufuMergedGeometryComponentParityMode(
+    UWorld* World,
+    bool bShowSingleComponent,
+    bool bShowSplitComponents,
+    bool bBarkCastsShadow,
+    FString& OutSummary)
+{
+    AActor* FlatAtlasActor = nullptr;
+    AActor* SingleComponentActor = nullptr;
+    AActor* SplitComponentActor = nullptr;
+    UMeshComponent* SingleMergedComponent = nullptr;
+    UMeshComponent* SplitBarkComponent = nullptr;
+    UMeshComponent* SplitFoliageComponent = nullptr;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor)
+        {
+            continue;
+        }
+        const FString Label = Actor->GetActorLabel();
+        if (Label == TEXT("RaftSim_PveCypressMultiViewAtlasHlod"))
+        {
+            FlatAtlasActor = Actor;
+        }
+        else if (Label == TEXT("RaftSim_PveCypressMergedGeometryHlod"))
+        {
+            SingleComponentActor = Actor;
+            SingleMergedComponent = Actor->FindComponentByClass<UMeshComponent>();
+        }
+        else if (Label == TEXT("RaftSim_PveCypressMergedGeometrySplitHlod"))
+        {
+            SplitComponentActor = Actor;
+            TInlineComponentArray<UMeshComponent*> Components;
+            Actor->GetComponents(Components);
+            for (UMeshComponent* Component : Components)
+            {
+                if (!Component)
+                {
+                    continue;
+                }
+                if (Component->ComponentTags.Contains(
+                        TEXT("RaftSimMergedGeometrySplitBark")))
+                {
+                    SplitBarkComponent = Component;
+                }
+                else if (Component->ComponentTags.Contains(
+                             TEXT("RaftSimMergedGeometrySplitFoliage")))
+                {
+                    SplitFoliageComponent = Component;
+                }
+            }
+        }
+    }
+    if (!FlatAtlasActor || !SingleComponentActor || !SingleMergedComponent ||
+        !SplitComponentActor || !SplitBarkComponent || !SplitFoliageComponent)
+    {
+        OutSummary += TEXT(
+            "V43 merged-component parity bracket could not resolve the flat, single, and split HLOD actors.\n");
+        return false;
+    }
+
+    auto SetSourceMaterialState = [](UMeshComponent* Component)
+    {
+        bool bUpdated = false;
+        for (int32 MaterialIndex = 0;
+             MaterialIndex < Component->GetNumMaterials();
+             ++MaterialIndex)
+        {
+            UMaterialInstanceDynamic* DynamicMaterial =
+                Cast<UMaterialInstanceDynamic>(Component->GetMaterial(MaterialIndex));
+            if (!DynamicMaterial)
+            {
+                DynamicMaterial = Component->CreateDynamicMaterialInstance(MaterialIndex);
+            }
+            if (DynamicMaterial)
+            {
+                DynamicMaterial->SetScalarParameterValue(
+                    TEXT("ComplementarySourceCoverage"),
+                    1.0f);
+                DynamicMaterial->SetScalarParameterValue(
+                    TEXT("ComplementaryPatternSize"),
+                    8.0f);
+                DynamicMaterial->SetScalarParameterValue(
+                    TEXT("ComplementaryTransitionMode"),
+                    1.0f);
+                bUpdated = true;
+            }
+        }
+        return bUpdated;
+    };
+    if (!SetSourceMaterialState(SingleMergedComponent) ||
+        !SetSourceMaterialState(SplitBarkComponent) ||
+        !SetSourceMaterialState(SplitFoliageComponent))
+    {
+        OutSummary += TEXT(
+            "V43 merged-component parity bracket could not align source material state on all exact-geometry controls.\n");
+        return false;
+    }
+
+    FlatAtlasActor->SetActorHiddenInGame(true);
+    SingleComponentActor->SetActorHiddenInGame(!bShowSingleComponent);
+    SplitComponentActor->SetActorHiddenInGame(!bShowSplitComponents);
+    SplitBarkComponent->SetCastShadow(bBarkCastsShadow);
+    SplitBarkComponent->bCastStaticShadow = bBarkCastsShadow;
+    SplitBarkComponent->bCastDynamicShadow = bBarkCastsShadow;
+    SplitFoliageComponent->SetCastShadow(false);
+    SplitFoliageComponent->bCastStaticShadow = false;
+    SplitFoliageComponent->bCastDynamicShadow = false;
+    SplitFoliageComponent->SetCastContactShadow(false);
+    SplitBarkComponent->MarkRenderStateDirty();
+    SplitFoliageComponent->MarkRenderStateDirty();
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
     return true;
 }
 
@@ -20886,7 +21009,8 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
     bool bHlodSplitShadingSearch = false,
     bool bHlodDualLayerReview = false,
     bool bHlodTransmissionLightBracketReview = false,
-    bool bHlodMergedGeometryShapeBracketReview = false)
+    bool bHlodMergedGeometryShapeBracketReview = false,
+    bool bHlodMergedComponentParityReview = false)
 {
     const int32 InitialCapturePathCount = OutRelativeCapturePaths.Num();
     constexpr int32 CaptureWidth = 1280;
@@ -21616,6 +21740,144 @@ bool CaptureFutaleufuComplementaryTransitionMotionSequence(
             "V41 HLOD transmission light bracket saved source, no-transmission, and source-transmission captures under fixed frontlight and backlight directions at 24.5 m.\n");
         return bAllFramesSaved &&
             OutRelativeCapturePaths.Num() - InitialCapturePathCount == 6;
+    }
+
+    if (bHlodMergedComponentParityReview)
+    {
+        constexpr float SearchRadiusCm = 2450.0f;
+        ADirectionalLight* BracketSun = FindFutaleufuTransmissionBracketSun(World);
+        UDirectionalLightComponent* BracketSunComponent = BracketSun
+            ? Cast<UDirectionalLightComponent>(BracketSun->GetLightComponent())
+            : nullptr;
+        if (!BracketSun || !BracketSunComponent)
+        {
+            RestoreAntiAliasingMethod();
+            SceneCapture->Destroy();
+            RenderTarget->ReleaseResource();
+            OutSummary += TEXT(
+                "V43 merged-component parity bracket could not preserve the physical-corridor sun.\n");
+            return false;
+        }
+        const FRotator OriginalSunRotation = BracketSun->GetActorRotation();
+        const EComponentMobility::Type OriginalSunMobility =
+            BracketSunComponent->Mobility;
+        bool bAllFramesSaved = true;
+        SetCameraState(SearchRadiusCm);
+
+        const auto CaptureBracketFrame = [
+            &AdvanceAndCapture,
+            &SaveCurrentFrame,
+            SceneCapture,
+            &OutRelativeCapturePaths](const FString& CapturePath)
+        {
+            SceneCapture->GetCaptureComponent2D()->bCameraCutThisFrame = true;
+            for (int32 WarmupIndex = 0; WarmupIndex < WarmupFrameCount; ++WarmupIndex)
+            {
+                AdvanceAndCapture();
+            }
+            const bool bSaved = SaveCurrentFrame(CapturePath);
+            if (bSaved)
+            {
+                OutRelativeCapturePaths.Add(CapturePath);
+            }
+            return bSaved;
+        };
+        struct FMergedComponentParityLightPreset
+        {
+            const TCHAR* Token;
+            bool bBacklit;
+        };
+        static const FMergedComponentParityLightPreset LightPresets[] = {
+            {TEXT("frontlit"), false},
+            {TEXT("backlit"), true},
+        };
+        for (const FMergedComponentParityLightPreset& LightPreset : LightPresets)
+        {
+            bAllFramesSaved &= SetFutaleufuTransmissionBracketLightDirection(
+                World,
+                ReferenceCamera,
+                HlodActor,
+                LightPreset.bBacklit,
+                OutSummary);
+
+            bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+                World,
+                ReferenceCamera,
+                TEXT("source_only"),
+                1.0f,
+                OutSummary,
+                static_cast<float>(PatternSize),
+                TransitionMode);
+            bAllFramesSaved &= SetFutaleufuMergedGeometryComponentParityMode(
+                World,
+                false,
+                false,
+                false,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_merged_component_parity_%s_source_reference.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+
+            bAllFramesSaved &= ConfigureFutaleufuComplementaryTransitionCapture(
+                World,
+                ReferenceCamera,
+                TEXT("hlod_only"),
+                0.0f,
+                OutSummary,
+                static_cast<float>(PatternSize),
+                TransitionMode);
+            bAllFramesSaved &= SetFutaleufuMergedGeometryComponentParityMode(
+                World,
+                true,
+                false,
+                false,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_merged_component_parity_%s_merged_single_no_shadow.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+
+            bAllFramesSaved &= SetFutaleufuMergedGeometryComponentParityMode(
+                World,
+                false,
+                true,
+                false,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_merged_component_parity_%s_merged_split_no_shadow.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+
+            bAllFramesSaved &= SetFutaleufuMergedGeometryComponentParityMode(
+                World,
+                false,
+                true,
+                true,
+                OutSummary);
+            bAllFramesSaved &= CaptureBracketFrame(FString::Printf(
+                TEXT("%s_hlod_merged_component_parity_%s_merged_split_source_shadow.png"),
+                *RelativeCaptureBase,
+                LightPreset.Token));
+        }
+
+        BracketSunComponent->SetMobility(EComponentMobility::Movable);
+        BracketSun->SetActorRotation(OriginalSunRotation);
+        BracketSunComponent->SetMobility(OriginalSunMobility);
+        BracketSunComponent->MarkRenderStateDirty();
+        bAllFramesSaved &= SetFutaleufuMergedGeometryComponentParityMode(
+            World,
+            false,
+            false,
+            false,
+            OutSummary);
+        RestoreAntiAliasingMethod();
+        SceneCapture->Destroy();
+        RenderTarget->ReleaseResource();
+        OutSummary += TEXT(
+            "V43 merged-component parity bracket saved source, single-component no-shadow, split-component no-shadow, and split-component source-shadow captures under fixed frontlight and backlight directions at 24.5 m.\n");
+        return bAllFramesSaved &&
+            OutRelativeCapturePaths.Num() - InitialCapturePathCount == 8;
     }
 
     if (bHlodMergedGeometryShapeBracketReview)
@@ -35858,6 +36120,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     int32 LocalImpostorSourceVertexCount = 0;
     int32 LocalImpostorSourceTriangleCount = 0;
     int32 LocalImpostorSourceMaterialSlotCount = 0;
+    int32 LocalImpostorSourceBarkMaterialSlotCount = 0;
+    int32 LocalImpostorSourceFoliageMaterialSlotCount = 0;
+    int32 LocalImpostorSourceSectionCount = 0;
     FVector LocalImpostorSourceBoundsSize = FVector::ZeroVector;
     bool bLocalImpostorSourceNaniteEnabled = false;
     bool bLocalImpostorSourcePreserveArea = false;
@@ -36031,6 +36296,25 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     LocalImpostorSourceTriangleCount = ImpostorSourceMesh->GetNumTriangles(0);
                     LocalImpostorSourceMaterialSlotCount =
                         ImpostorSourceMesh->GetStaticMaterials().Num();
+                    LocalImpostorSourceSectionCount =
+                        ImpostorSourceMesh->GetNumSections(0);
+                    for (const FStaticMaterial& Material :
+                         ImpostorSourceMesh->GetStaticMaterials())
+                    {
+                        const FString MaterialIdentity = Material.MaterialInterface
+                            ? Material.MaterialInterface->GetPathName()
+                            : Material.MaterialSlotName.ToString();
+                        if (MaterialIdentity.Contains(
+                                TEXT("Bark"),
+                                ESearchCase::IgnoreCase))
+                        {
+                            ++LocalImpostorSourceBarkMaterialSlotCount;
+                        }
+                        else
+                        {
+                            ++LocalImpostorSourceFoliageMaterialSlotCount;
+                        }
+                    }
                     LocalImpostorSourceBoundsSize =
                         ImpostorSourceMesh->GetBoundingBox().GetSize();
                     bLocalImpostorSourceNaniteEnabled = ImpostorSourceMesh->IsNaniteEnabled();
@@ -36047,6 +36331,9 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                         LocalImpostorSourceVertexCount > LocalTrunkVertexCount &&
                         LocalImpostorSourceTriangleCount > LocalTrunkTriangleCount &&
                         LocalImpostorSourceMaterialSlotCount >= 2 &&
+                        LocalImpostorSourceBarkMaterialSlotCount == 1 &&
+                        LocalImpostorSourceFoliageMaterialSlotCount >= 1 &&
+                        LocalImpostorSourceSectionCount >= 2 &&
                         LocalImpostorSourceBoundsSize.X >= LocalTrunkBoundsSize.X * 0.90f &&
                         LocalImpostorSourceBoundsSize.X <= LocalTrunkBoundsSize.X * 1.25f &&
                         LocalImpostorSourceBoundsSize.Y >= LocalTrunkBoundsSize.Y * 0.90f &&
@@ -36319,6 +36606,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     bool bLocalHlodMergedGeometryShapeBracketReviewCaptured =
         !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
+    bool bLocalHlodMergedComponentParityReviewCaptured =
+        !bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette;
     FRaftSimPveMultiViewAtlasBakeResult LocalMultiViewAtlas;
     UStaticMesh* LocalMultiViewHlodMesh = nullptr;
     FTransform LocalMultiViewHlodTransform = FTransform::Identity;
@@ -36389,6 +36678,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
     FString LocalHlodTransmissionLightBracketCapturesJson;
     TArray<FString> LocalHlodMergedGeometryShapeBracketCapturePaths;
     FString LocalHlodMergedGeometryShapeBracketCapturesJson;
+    TArray<FString> LocalHlodMergedComponentParityCapturePaths;
+    FString LocalHlodMergedComponentParityCapturesJson;
     if (bHlodCalibratedIrregularCrownMassCypressPalette)
     {
         for (const TCHAR* DistanceToken : HandoffDistanceTokens)
@@ -37588,12 +37879,20 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                 TreeRootTransform,
                                 SpawnParameters)
                             : nullptr;
+                        AActor* MergedGeometrySplitActor =
+                            bSpawnMergedGeometryHlodForCurrentCapture
+                            ? World->SpawnActor<AActor>(
+                                AActor::StaticClass(),
+                                TreeRootTransform,
+                                SpawnParameters)
+                            : nullptr;
                         if (!SourceTrunkActor || !SourceTrunkActor->GetStaticMeshComponent() ||
                             !SourceFoliageActor || !AtlasActor ||
                             !AtlasActor->GetStaticMeshComponent() ||
                             (bSpawnMergedGeometryHlodForCurrentCapture &&
                              (!MergedGeometryActor ||
-                              !MergedGeometryActor->GetStaticMeshComponent())))
+                              !MergedGeometryActor->GetStaticMeshComponent() ||
+                              !MergedGeometrySplitActor)))
                         {
                             SetupSummary += TEXT(
                                 "V36 lit river-view setup could not spawn the transient transition actors.\n");
@@ -37746,6 +38045,178 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                             MergedGeometryComponent->SetAffectDistanceFieldLighting(false);
                             MergedGeometryComponent->SetAffectDynamicIndirectLighting(false);
                             MergedGeometryActor->SetActorHiddenInGame(true);
+                        }
+
+                        if (MergedGeometrySplitActor)
+                        {
+                            TArray<int32> BarkMaterialIndices;
+                            TArray<int32> FoliageMaterialIndices;
+                            const TArray<FStaticMaterial>& SourceMaterials =
+                                MergedGeometryMesh->GetStaticMaterials();
+                            for (int32 MaterialIndex = 0;
+                                 MaterialIndex < SourceMaterials.Num();
+                                 ++MaterialIndex)
+                            {
+                                const UMaterialInterface* Material =
+                                    SourceMaterials[MaterialIndex].MaterialInterface;
+                                const FString MaterialIdentity = Material
+                                    ? Material->GetPathName()
+                                    : SourceMaterials[MaterialIndex]
+                                          .MaterialSlotName.ToString();
+                                if (MaterialIdentity.Contains(
+                                        TEXT("Bark"),
+                                        ESearchCase::IgnoreCase))
+                                {
+                                    BarkMaterialIndices.Add(MaterialIndex);
+                                }
+                                else
+                                {
+                                    FoliageMaterialIndices.Add(MaterialIndex);
+                                }
+                            }
+                            if (BarkMaterialIndices.Num() != 1 ||
+                                FoliageMaterialIndices.IsEmpty())
+                            {
+                                SetupSummary += FString::Printf(
+                                    TEXT("V43 merged-component parity could not classify the merged source into one bark slot and at least one foliage slot (bark=%d foliage=%d).\n"),
+                                    BarkMaterialIndices.Num(),
+                                    FoliageMaterialIndices.Num());
+                                return false;
+                            }
+
+                            MergedGeometrySplitActor->SetActorLabel(
+                                TEXT("RaftSim_PveCypressMergedGeometrySplitHlod"));
+                            MergedGeometrySplitActor->Tags.Add(
+                                TEXT("RaftSim_VisualReviewOnly"));
+                            USceneComponent* SplitRoot = NewObject<USceneComponent>(
+                                MergedGeometrySplitActor,
+                                TEXT("V43MergedGeometrySplitRoot"));
+                            MergedGeometrySplitActor->AddInstanceComponent(SplitRoot);
+                            MergedGeometrySplitActor->SetRootComponent(SplitRoot);
+                            SplitRoot->SetMobility(EComponentMobility::Static);
+                            SplitRoot->SetWorldTransform(TreeRootTransform);
+                            SplitRoot->RegisterComponent();
+
+                            UDynamicMeshComponent* SplitBarkComponent =
+                                NewObject<UDynamicMeshComponent>(
+                                    MergedGeometrySplitActor,
+                                    TEXT("V43MergedGeometrySplitBark"));
+                            UDynamicMeshComponent* SplitFoliageComponent =
+                                NewObject<UDynamicMeshComponent>(
+                                    MergedGeometrySplitActor,
+                                    TEXT("V43MergedGeometrySplitFoliage"));
+                            MergedGeometrySplitActor->AddInstanceComponent(
+                                SplitBarkComponent);
+                            MergedGeometrySplitActor->AddInstanceComponent(
+                                SplitFoliageComponent);
+                            SplitBarkComponent->SetupAttachment(SplitRoot);
+                            SplitFoliageComponent->SetupAttachment(SplitRoot);
+
+                            UDynamicMesh* SplitBarkMesh = NewObject<UDynamicMesh>(
+                                SplitBarkComponent,
+                                TEXT("V43MergedGeometrySplitBarkMesh"));
+                            UDynamicMesh* SplitFoliageMesh = NewObject<UDynamicMesh>(
+                                SplitFoliageComponent,
+                                TEXT("V43MergedGeometrySplitFoliageMesh"));
+                            EGeometryScriptOutcomePins BarkCopyOutcome =
+                                EGeometryScriptOutcomePins::Failure;
+                            EGeometryScriptOutcomePins FoliageCopyOutcome =
+                                EGeometryScriptOutcomePins::Failure;
+                            UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshFromStaticMeshV2(
+                                MergedGeometryMesh,
+                                SplitBarkMesh,
+                                FGeometryScriptCopyMeshFromAssetOptions(),
+                                FGeometryScriptMeshReadLOD(),
+                                BarkCopyOutcome,
+                                false,
+                                nullptr);
+                            UGeometryScriptLibrary_StaticMeshFunctions::CopyMeshFromStaticMeshV2(
+                                MergedGeometryMesh,
+                                SplitFoliageMesh,
+                                FGeometryScriptCopyMeshFromAssetOptions(),
+                                FGeometryScriptMeshReadLOD(),
+                                FoliageCopyOutcome,
+                                false,
+                                nullptr);
+                            int32 DeletedBarkTriangleCount = 0;
+                            int32 DeletedFoliageTriangleCount = 0;
+                            for (int32 FoliageMaterialIndex : FoliageMaterialIndices)
+                            {
+                                int32 DeletedCount = 0;
+                                UGeometryScriptLibrary_MeshMaterialFunctions::
+                                    DeleteTrianglesByMaterialID(
+                                        SplitBarkMesh,
+                                        FoliageMaterialIndex,
+                                        DeletedCount,
+                                        true,
+                                        nullptr);
+                                DeletedBarkTriangleCount += DeletedCount;
+                            }
+                            for (int32 BarkMaterialIndex : BarkMaterialIndices)
+                            {
+                                int32 DeletedCount = 0;
+                                UGeometryScriptLibrary_MeshMaterialFunctions::
+                                    DeleteTrianglesByMaterialID(
+                                        SplitFoliageMesh,
+                                        BarkMaterialIndex,
+                                        DeletedCount,
+                                        true,
+                                        nullptr);
+                                DeletedFoliageTriangleCount += DeletedCount;
+                            }
+                            if (BarkCopyOutcome != EGeometryScriptOutcomePins::Success ||
+                                FoliageCopyOutcome !=
+                                    EGeometryScriptOutcomePins::Success ||
+                                DeletedBarkTriangleCount <= 0 ||
+                                DeletedFoliageTriangleCount <= 0)
+                            {
+                                SetupSummary += FString::Printf(
+                                    TEXT("V43 merged-component parity could not split exact source triangles by material ID (bark copy=%d foliage copy=%d deleted from bark=%d deleted from foliage=%d).\n"),
+                                    static_cast<int32>(BarkCopyOutcome),
+                                    static_cast<int32>(FoliageCopyOutcome),
+                                    DeletedBarkTriangleCount,
+                                    DeletedFoliageTriangleCount);
+                                return false;
+                            }
+
+                            SplitBarkComponent->SetDynamicMesh(SplitBarkMesh);
+                            SplitFoliageComponent->SetDynamicMesh(SplitFoliageMesh);
+                            for (int32 MaterialIndex = 0;
+                                 MaterialIndex < SourceMaterials.Num();
+                                 ++MaterialIndex)
+                            {
+                                SplitBarkComponent->SetMaterial(
+                                    MaterialIndex,
+                                    SourceMaterials[MaterialIndex].MaterialInterface);
+                                SplitFoliageComponent->SetMaterial(
+                                    MaterialIndex,
+                                    SourceMaterials[MaterialIndex].MaterialInterface);
+                            }
+                            SplitBarkComponent->SetMobility(EComponentMobility::Static);
+                            SplitBarkComponent->SetCollisionEnabled(
+                                ECollisionEnabled::NoCollision);
+                            SplitBarkComponent->SetGenerateOverlapEvents(false);
+                            SplitBarkComponent->SetCastShadow(true);
+                            SplitBarkComponent->ComponentTags.Add(
+                                TEXT("RaftSimMergedGeometrySplitBark"));
+                            SplitFoliageComponent->SetMobility(
+                                EComponentMobility::Static);
+                            SplitFoliageComponent->SetCollisionEnabled(
+                                ECollisionEnabled::NoCollision);
+                            SplitFoliageComponent->SetGenerateOverlapEvents(false);
+                            SplitFoliageComponent->SetCastShadow(false);
+                            SplitFoliageComponent->bCastStaticShadow = false;
+                            SplitFoliageComponent->bCastDynamicShadow = false;
+                            SplitFoliageComponent->SetCastContactShadow(false);
+                            SplitFoliageComponent->SetAffectDistanceFieldLighting(
+                                false);
+                            SplitFoliageComponent->SetAffectDynamicIndirectLighting(
+                                false);
+                            SplitFoliageComponent->ComponentTags.Add(
+                                TEXT("RaftSimMergedGeometrySplitFoliage"));
+                            SplitBarkComponent->RegisterComponent();
+                            SplitFoliageComponent->RegisterComponent();
+                            MergedGeometrySplitActor->SetActorHiddenInGame(true);
                         }
 
                         const FVector HlodTarget = AtlasActor->GetActorLocation();
@@ -38001,6 +38472,41 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                                     : TEXT(", "),
                                 *EscapeRaftSimJsonString(CapturePath));
                     }
+                    bSpawnMergedGeometryHlodForCurrentCapture = true;
+                    const bool bAllHlodMergedComponentParityCapturesProduced =
+                        bLocalImpostorSourceValidated && LocalImpostorSourceMesh &&
+                        CaptureFutaleufuComplementaryTransitionMotionSequence(
+                            LitRiverReviewSpec,
+                            LocalVisualCaptureBase,
+                            TEXT("hlod_merged_component_parity_review"),
+                            8,
+                            LocalHlodMergedComponentParityCapturePaths,
+                            LocalVisualSummary,
+                            true,
+                            SetupLitRiverView,
+                            1.0f,
+                            false,
+                            nullptr,
+                            false,
+                            false,
+                            false,
+                            false,
+                            true);
+                    bSpawnMergedGeometryHlodForCurrentCapture = false;
+                    bLocalHlodMergedComponentParityReviewCaptured =
+                        bAllHlodMergedComponentParityCapturesProduced &&
+                        LocalHlodMergedComponentParityCapturePaths.Num() == 8;
+                    for (const FString& CapturePath :
+                         LocalHlodMergedComponentParityCapturePaths)
+                    {
+                        LocalHlodMergedComponentParityCapturesJson +=
+                            FString::Printf(
+                                TEXT("%s\"%s\""),
+                                LocalHlodMergedComponentParityCapturesJson.IsEmpty()
+                                    ? TEXT("")
+                                    : TEXT(", "),
+                                *EscapeRaftSimJsonString(CapturePath));
+                    }
                     ActiveLitRiverHlodTrunkMaterial = nullptr;
                     ActiveLitRiverHlodFoliageMaterial = nullptr;
                 }
@@ -38021,7 +38527,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
                     bLocalHlodSplitShadingSearchReviewCaptured &&
                     bLocalHlodDualLayerReviewCaptured &&
                     bLocalHlodTransmissionLightBracketReviewCaptured &&
-                    bLocalHlodMergedGeometryShapeBracketReviewCaptured;
+                    bLocalHlodMergedGeometryShapeBracketReviewCaptured &&
+                    bLocalHlodMergedComponentParityReviewCaptured;
             }
         }
     }
@@ -38056,7 +38563,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         ? (bFrozenWpoAzimuthRegisteredHlodCalibratedIrregularCrownMassCypressPalette
             ? (bFrozenWpoAzimuthRegisteredPerspectiveHlodCalibratedIrregularCrownMassCypressPalette
                 ? (bFrozenWpoAzimuthRegisteredPerspectiveComplementaryTransitionHlodCalibratedIrregularCrownMassCypressPalette
-                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, a V39 exact material-identity split-shading search, a V40 disjoint DefaultLit-bark/TwoSidedFoliage dual-layer review, a V41 fixed frontlit/backlit transmission bracket, and a V42 merged-source-geometry fidelity upper bound; V33-V42 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V42 remains review-only pending measured shape/photometry response, temporal handoff, source-card cleanup, named-hazard framing, and wall-clock performance")
+                    ? TEXT("V32 registered perspective flat proxy completed with deterministic complementary 4x4 source/HLOD transition captures, the V33 ordered reload-path precursor, the V34 persistent same-world 4x4 diagnostic, a V35 isolated 8x8 sequence, a V36 ordered lit physical-corridor sequence, a V37 temporal-AA plus relightable-albedo/world-normal sequence, a V38 fixed-camera automatic-versus-eight-frame atlas search, a V39 exact material-identity split-shading search, a V40 disjoint DefaultLit-bark/TwoSidedFoliage dual-layer review, a V41 fixed frontlit/backlit transmission bracket, a V42 merged-source-geometry fidelity upper bound, and a V43 exact merged-component material/shadow parity bracket; V33-V43 preserve woody geometry but use traditional raster for the dynamically masked source trunk after the Nanite path leaked wood into HLOD-owned pixels; V43 validates material-ID component partitioning but rejects material ID as source shadow provenance, so source-provenance splitting, reduced geometry, temporal handoff, source-card cleanup, named-hazard framing, and wall-clock performance remain pending")
                     : (bFrozenWpoAzimuthRegisteredPerspectiveDepthHlodCalibratedIrregularCrownMassCypressPalette
                         ? TEXT("V31 registered perspective 512-pixel atlas completed with a 32x32 depth-displaced proxy at the authored 28 m handoff radius; matched representation-shape comparison and any art decision remain pending")
                         : TEXT("V30 registered frozen-WPO 512-pixel atlas completed with perspective capture at the authored 28 m handoff radius; matched projection comparison and any art decision remain pending")))
@@ -38097,6 +38604,7 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"hlod_dual_layer_review_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement with one combined control component plus disjoint trunk and foliage components sharing one proxy mesh\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"automatic_atlas_frame\": true, \"component_layers\": [\"combined_control\", \"trunk\", \"foliage\"], \"combined_control_shading_model\": \"DefaultLit\", \"trunk_shading_model\": \"DefaultLit\", \"foliage_shading_model\": \"TwoSidedFoliage\", \"layer_opacity\": {\"trunk\": \"opacity_times_one_minus_material_identity\", \"foliage\": \"opacity_times_material_identity\"}, \"source_transmission_tint\": [0.78, 1.0, 0.58], \"split_roughness\": [0.62, 0.72], \"split_specular\": [0.12, 0.18], \"variants\": [\"source_reference\", \"combined_default_lit_control\", \"two_sided_no_transmission\", \"two_sided_source_transmission\", \"two_sided_source_transmission_foliage_gain_150\"], \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_transmission_light_bracket_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement and dual-layer proxy as V40 with only the saved labeled sun rotated transiently\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"automatic_atlas_frame\": true, \"sun_actor_label\": \"RaftSim_Sun_LumenPreview\", \"sun_original_transform_restored\": true, \"light_direction_contract\": {\"frontlit_horizontal_travel\": \"camera_to_tree\", \"backlit_horizontal_travel\": \"tree_to_camera\", \"pre_normalized_downward_z\": -0.65}, \"light_modes\": [\"frontlit\", \"backlit\"], \"representations_per_light\": [\"source_reference\", \"two_sided_no_transmission\", \"two_sided_source_transmission\"], \"source_transmission_tint\": [0.78, 1.0, 0.58], \"split_roughness\": [0.62, 0.72], \"split_specular\": [0.12, 0.18], \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"hlod_merged_geometry_shape_bracket_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient non-colliding river-edge placement as V41 with source, flat dual-layer atlas control, and merged source geometry compared in one loaded corridor world\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"sun_actor_label\": \"RaftSim_Sun_LumenPreview\", \"sun_original_transform_restored\": true, \"light_modes\": [\"frontlit\", \"backlit\"], \"representations_per_light\": [\"source_reference\", \"flat_hlod_control\", \"merged_geometry_hlod\"], \"flat_control\": \"V41 dual-layer atlas with source transmission tint\", \"merged_geometry_asset\": \"%s\", \"merged_geometry_vertex_count\": %d, \"merged_geometry_triangle_count\": %d, \"merged_geometry_material_slot_count\": %d, \"geometry_materials\": \"preserved_source_bark_and_foliage\", \"geometry_shadow_policy\": \"no_cast_shadow_for_bounded_shape_and_direct-light_upper-bound\", \"collision_and_overlap\": false, \"temporal_handoff_evaluated\": false, \"wall_clock_performance_evaluated\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
+        TEXT("    \"hlod_merged_component_parity_contract\": {\"enabled\": %s, \"source_map\": \"/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_FutaleufuTerminator_PhysicalCorridorCandidate\", \"scene_setup\": \"same transient source and exact merged geometry as V42, with a single-component control plus material-ID-split bark and foliage components\", \"saved_map_modified\": false, \"landscape_water_collision_solver_or_gameplay_authority_modified\": false, \"sampling\": \"one_loaded_physical_corridor_world_one_fixed_24_5m_camera_and_one_persistent_scene_capture\", \"camera_radius_cm\": 2450.0, \"warmup_frames_per_representation\": 8, \"temporal_history_reset_per_representation\": \"scene_capture_camera_cut_before_warmup\", \"lighting\": true, \"temporal_aa\": true, \"sun_actor_label\": \"RaftSim_Sun_LumenPreview\", \"sun_original_transform_restored\": true, \"light_modes\": [\"frontlit\", \"backlit\"], \"representations_per_light\": [\"source_reference\", \"merged_single_no_shadow\", \"merged_split_no_shadow\", \"merged_split_source_shadow\"], \"merged_geometry_asset\": \"%s\", \"merged_geometry_vertex_count\": %d, \"merged_geometry_triangle_count\": %d, \"merged_geometry_material_slot_count\": %d, \"merged_geometry_section_count\": %d, \"bark_material_slot_count\": %d, \"foliage_material_slot_count\": %d, \"component_partition\": \"exact static mesh copied twice and non-owner triangles deleted by source material ID\", \"material_identity\": \"source parent materials preserved\", \"material_state\": \"identical source-coverage temporal parameters on single and split controls\", \"shadow_partition_basis\": \"material ID\", \"source_component_shadow_provenance_preserved\": false, \"single_component_shadow_policy\": \"bark_and_foliage_no_cast_shadow\", \"split_no_shadow_policy\": \"bark_and_foliage_no_cast_shadow\", \"split_source_shadow_policy\": \"bark_casts_static_and_dynamic_shadow_foliage_casts_none\", \"collision_and_overlap\": false, \"temporal_handoff_evaluated\": false, \"wall_clock_performance_evaluated\": false, \"capture_count\": %d, \"captures\": [%s]},\n")
         TEXT("    \"human_visual_acceptance\": \"%s\",\n")
         TEXT("    \"depth_usage\": \"%s\",\n")
         TEXT("    \"git_policy\": \"generated atlases, assets, manifest, and comparison capture are local and ignored\"\n")
@@ -38207,6 +38715,18 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         LocalImpostorSourceMaterialSlotCount,
         LocalHlodMergedGeometryShapeBracketCapturePaths.Num(),
         *LocalHlodMergedGeometryShapeBracketCapturesJson,
+        bLocalHlodMergedComponentParityReviewCaptured
+            ? TEXT("true")
+            : TEXT("false"),
+        *EscapeRaftSimJsonString(LocalImpostorSourceAssetPath),
+        LocalImpostorSourceVertexCount,
+        LocalImpostorSourceTriangleCount,
+        LocalImpostorSourceMaterialSlotCount,
+        LocalImpostorSourceSectionCount,
+        LocalImpostorSourceBarkMaterialSlotCount,
+        LocalImpostorSourceFoliageMaterialSlotCount,
+        LocalHlodMergedComponentParityCapturePaths.Num(),
+        *LocalHlodMergedComponentParityCapturesJson,
         LocalMultiViewAtlasHumanAcceptance,
         LocalMultiViewAtlas.bDepthParallaxEnabled
             ? TEXT("sampled at proxy vertices to displace the registered perspective billboard through the measured horizontal source depth")
@@ -38243,6 +38763,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         TEXT("    \"hlod_transmission_light_bracket_captures\": [%s],\n")
         TEXT("    \"hlod_merged_geometry_shape_bracket_capture_count\": %d,\n")
         TEXT("    \"hlod_merged_geometry_shape_bracket_captures\": [%s],\n")
+        TEXT("    \"hlod_merged_component_parity_capture_count\": %d,\n")
+        TEXT("    \"hlod_merged_component_parity_captures\": [%s],\n")
         TEXT("    \"multi_view_atlas_manifest\": \"%s\"\n")
         TEXT("  }"),
         bLocalVisualReviewCaptured
@@ -38284,6 +38806,8 @@ bool FRaftSimEditorModule::TickProceduralBeechCandidate(float)
         *LocalHlodTransmissionLightBracketCapturesJson,
         LocalHlodMergedGeometryShapeBracketCapturePaths.Num(),
         *LocalHlodMergedGeometryShapeBracketCapturesJson,
+        LocalHlodMergedComponentParityCapturePaths.Num(),
+        *LocalHlodMergedComponentParityCapturesJson,
         *EscapeRaftSimJsonString(LocalMultiViewAtlas.ManifestRelativePath));
 
     const FString BeechReportRelativePath = FString::Printf(

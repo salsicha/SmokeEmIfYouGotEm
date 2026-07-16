@@ -4,7 +4,7 @@
   "candidate": "v42_merged_source_geometry_hlod_fidelity_upper_bound",
   "status": "merged_geometry_upper_bound_still_fails_shape_or_lighting",
   "source_structural_report": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v32_pve_open_grown_conical_frozen_wpo_azimuth_registered_perspective_complementary_transition_hlod_calibrated_irregular_crown_mass_compound_branchlet_atlas_report.json",
-  "source_structural_report_sha256": "a1dcdab4c691e0d88de4fd7758f116f2f83c3c132901ea0e30003431a46cbd6b",
+  "source_structural_report_sha256": "6963d60aec4ae8bd2d5b4793fabae3c3e3ce446305f03138b96e841127735f9f",
   "capture_contract": {
     "structural_contract_valid": true,
     "expected_capture_count": 6,
@@ -34,10 +34,10 @@
               540
             ],
             "silhouette_classification": "rec709_luminance_below_75_in_fixed_tree_roi",
-            "source_silhouette_pixels": 201697,
-            "hlod_silhouette_pixels": 164569,
-            "source_hlod_silhouette_intersection_over_union": 0.5970088730951187,
-            "hlod_to_source_silhouette_area_ratio": 0.8159219026559641,
+            "source_silhouette_pixels": 201692,
+            "hlod_silhouette_pixels": 164571,
+            "source_hlod_silhouette_intersection_over_union": 0.5970236460118339,
+            "hlod_to_source_silhouette_area_ratio": 0.8159520456934336,
             "minimum_acceptable_silhouette_iou": 0.9,
             "acceptable_silhouette_area_ratio": [
               0.9,
@@ -45,15 +45,15 @@
             ],
             "source_hlod_silhouette_gate_passed": false,
             "photometry_classification": "mean_rec709_luminance_where_source_hlod_max_channel_delta_exceeds_24",
-            "photometry_sample_fraction": 0.3803472222222222,
-            "source_mean_luminance": 55.29342269897461,
-            "hlod_mean_luminance": 71.54084014892578,
-            "hlod_to_source_luminance_ratio": 1.2938399660734416,
+            "photometry_sample_fraction": 0.38036265432098765,
+            "source_mean_luminance": 55.2938346862793,
+            "hlod_mean_luminance": 71.54094696044922,
+            "hlod_to_source_luminance_ratio": 1.2938322575446464,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
-            "source_hlod_roi_mean_absolute_channel_delta": 18.73322105407715,
+            "source_hlod_roi_mean_absolute_channel_delta": 18.73352813720703,
             "maximum_acceptable_roi_mean_absolute_channel_delta": 12.0,
             "source_hlod_photometry_gate_passed": false
           },
@@ -65,17 +65,17 @@
               540
             ],
             "fixed_overlap_definition": "same_light_source_and_no_transmission_hlod_rec709_luminance_below_75",
-            "fixed_overlap_pixel_count": 136921,
-            "fixed_overlap_fraction_of_roi": 0.3521630658436214,
-            "source_mean_luminance": 55.020225524902344,
-            "candidate_mean_luminance": 54.029937744140625,
-            "candidate_to_source_luminance_ratio": 0.9820013863753883,
+            "fixed_overlap_pixel_count": 136922,
+            "fixed_overlap_fraction_of_roi": 0.3521656378600823,
+            "source_mean_luminance": 55.01888656616211,
+            "candidate_mean_luminance": 54.030067443847656,
+            "candidate_to_source_luminance_ratio": 0.9820276420693217,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
             "luminance_gate_passed": true,
-            "mean_absolute_channel_delta": 13.061841011047363
+            "mean_absolute_channel_delta": 13.062833786010742
           }
         },
         "merged_geometry_hlod": {
@@ -89,10 +89,10 @@
               540
             ],
             "silhouette_classification": "rec709_luminance_below_75_in_fixed_tree_roi",
-            "source_silhouette_pixels": 201697,
+            "source_silhouette_pixels": 201692,
             "hlod_silhouette_pixels": 204157,
-            "source_hlod_silhouette_intersection_over_union": 0.9005460181881187,
-            "hlod_to_source_silhouette_area_ratio": 1.0121965125906682,
+            "source_hlod_silhouette_intersection_over_union": 0.9005226040291084,
+            "hlod_to_source_silhouette_area_ratio": 1.01222160521984,
             "minimum_acceptable_silhouette_iou": 0.9,
             "acceptable_silhouette_area_ratio": [
               0.9,
@@ -100,15 +100,15 @@
             ],
             "source_hlod_silhouette_gate_passed": true,
             "photometry_classification": "mean_rec709_luminance_where_source_hlod_max_channel_delta_exceeds_24",
-            "photometry_sample_fraction": 0.11842078189300412,
-            "source_mean_luminance": 54.69598388671875,
-            "hlod_mean_luminance": 48.544708251953125,
-            "hlod_to_source_luminance_ratio": 0.8875369780804094,
+            "photometry_sample_fraction": 0.11843106995884774,
+            "source_mean_luminance": 54.69622039794922,
+            "hlod_mean_luminance": 48.5459098815918,
+            "hlod_to_source_luminance_ratio": 0.887555109446136,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
-            "source_hlod_roi_mean_absolute_channel_delta": 5.926573276519775,
+            "source_hlod_roi_mean_absolute_channel_delta": 5.926494121551514,
             "maximum_acceptable_roi_mean_absolute_channel_delta": 12.0,
             "source_hlod_photometry_gate_passed": false
           },
@@ -120,24 +120,24 @@
               540
             ],
             "fixed_overlap_definition": "same_light_source_and_no_transmission_hlod_rec709_luminance_below_75",
-            "fixed_overlap_pixel_count": 136921,
-            "fixed_overlap_fraction_of_roi": 0.3521630658436214,
-            "source_mean_luminance": 55.020225524902344,
-            "candidate_mean_luminance": 55.71443557739258,
-            "candidate_to_source_luminance_ratio": 1.0126173610861706,
+            "fixed_overlap_pixel_count": 136922,
+            "fixed_overlap_fraction_of_roi": 0.3521656378600823,
+            "source_mean_luminance": 55.01888656616211,
+            "candidate_mean_luminance": 55.71297836303711,
+            "candidate_to_source_luminance_ratio": 1.0126155187826336,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
             "luminance_gate_passed": true,
-            "mean_absolute_channel_delta": 6.295635223388672
+            "mean_absolute_channel_delta": 6.295559883117676
           }
         },
         "merged_geometry_improvement_over_flat": {
-          "silhouette_iou_delta": 0.303537145093,
-          "absolute_silhouette_area_ratio_error_reduction": 0.17188158475336768,
-          "absolute_fixed_overlap_luminance_ratio_error_reduction": 0.005381252538441128,
-          "fixed_overlap_mean_channel_delta_reduction": 6.766205787658691
+          "silhouette_iou_delta": 0.30349895801727456,
+          "absolute_silhouette_area_ratio_error_reduction": 0.17182634908672634,
+          "absolute_fixed_overlap_luminance_ratio_error_reduction": 0.005356839148044745,
+          "fixed_overlap_mean_channel_delta_reduction": 6.767273902893066
         }
       },
       "backlit": {
@@ -152,10 +152,10 @@
               540
             ],
             "silhouette_classification": "rec709_luminance_below_75_in_fixed_tree_roi",
-            "source_silhouette_pixels": 111505,
+            "source_silhouette_pixels": 111507,
             "hlod_silhouette_pixels": 158918,
-            "source_hlod_silhouette_intersection_over_union": 0.49103470330712484,
-            "hlod_to_source_silhouette_area_ratio": 1.4252096318550738,
+            "source_hlod_silhouette_intersection_over_union": 0.49103750958002285,
+            "hlod_to_source_silhouette_area_ratio": 1.4251840691615774,
             "minimum_acceptable_silhouette_iou": 0.9,
             "acceptable_silhouette_area_ratio": [
               0.9,
@@ -163,15 +163,15 @@
             ],
             "source_hlod_silhouette_gate_passed": false,
             "photometry_classification": "mean_rec709_luminance_where_source_hlod_max_channel_delta_exceeds_24",
-            "photometry_sample_fraction": 0.33599022633744857,
-            "source_mean_luminance": 89.97352600097656,
-            "hlod_mean_luminance": 44.369422912597656,
-            "hlod_to_source_luminance_ratio": 0.49313864738518837,
+            "photometry_sample_fraction": 0.3359850823045267,
+            "source_mean_luminance": 89.97331237792969,
+            "hlod_mean_luminance": 44.36812973022461,
+            "hlod_to_source_luminance_ratio": 0.4931254452860184,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
-            "source_hlod_roi_mean_absolute_channel_delta": 28.818374633789062,
+            "source_hlod_roi_mean_absolute_channel_delta": 28.81855010986328,
             "maximum_acceptable_roi_mean_absolute_channel_delta": 12.0,
             "source_hlod_photometry_gate_passed": false
           },
@@ -183,17 +183,17 @@
               540
             ],
             "fixed_overlap_definition": "same_light_source_and_no_transmission_hlod_rec709_luminance_below_75",
-            "fixed_overlap_pixel_count": 89057,
-            "fixed_overlap_fraction_of_roi": 0.22905606995884772,
-            "source_mean_luminance": 29.966835021972656,
-            "candidate_mean_luminance": 20.080978393554688,
-            "candidate_to_source_luminance_ratio": 0.6701067489720106,
+            "fixed_overlap_pixel_count": 89058,
+            "fixed_overlap_fraction_of_roi": 0.22905864197530865,
+            "source_mean_luminance": 29.968446731567383,
+            "candidate_mean_luminance": 20.080690383911133,
+            "candidate_to_source_luminance_ratio": 0.6700611000555814,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
             "luminance_gate_passed": false,
-            "mean_absolute_channel_delta": 10.279847145080566
+            "mean_absolute_channel_delta": 10.279885292053223
           }
         },
         "merged_geometry_hlod": {
@@ -207,10 +207,10 @@
               540
             ],
             "silhouette_classification": "rec709_luminance_below_75_in_fixed_tree_roi",
-            "source_silhouette_pixels": 111505,
+            "source_silhouette_pixels": 111507,
             "hlod_silhouette_pixels": 90921,
-            "source_hlod_silhouette_intersection_over_union": 0.7172063352024499,
-            "hlod_to_source_silhouette_area_ratio": 0.8153984126272364,
+            "source_hlod_silhouette_intersection_over_union": 0.7171796002850259,
+            "hlod_to_source_silhouette_area_ratio": 0.8153837875649063,
             "minimum_acceptable_silhouette_iou": 0.9,
             "acceptable_silhouette_area_ratio": [
               0.9,
@@ -218,15 +218,15 @@
             ],
             "source_hlod_silhouette_gate_passed": false,
             "photometry_classification": "mean_rec709_luminance_where_source_hlod_max_channel_delta_exceeds_24",
-            "photometry_sample_fraction": 0.1522042181069959,
-            "source_mean_luminance": 61.476043701171875,
-            "hlod_mean_luminance": 93.86151123046875,
-            "hlod_to_source_luminance_ratio": 1.5267981733944849,
+            "photometry_sample_fraction": 0.152201646090535,
+            "source_mean_luminance": 61.475528717041016,
+            "hlod_mean_luminance": 93.86223602294922,
+            "hlod_to_source_luminance_ratio": 1.526822753407741,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
-            "source_hlod_roi_mean_absolute_channel_delta": 8.864513397216797,
+            "source_hlod_roi_mean_absolute_channel_delta": 8.86440658569336,
             "maximum_acceptable_roi_mean_absolute_channel_delta": 12.0,
             "source_hlod_photometry_gate_passed": false
           },
@@ -238,52 +238,52 @@
               540
             ],
             "fixed_overlap_definition": "same_light_source_and_no_transmission_hlod_rec709_luminance_below_75",
-            "fixed_overlap_pixel_count": 89057,
-            "fixed_overlap_fraction_of_roi": 0.22905606995884772,
-            "source_mean_luminance": 29.966835021972656,
-            "candidate_mean_luminance": 52.503238677978516,
-            "candidate_to_source_luminance_ratio": 1.7520448402202446,
+            "fixed_overlap_pixel_count": 89058,
+            "fixed_overlap_fraction_of_roi": 0.22905864197530865,
+            "source_mean_luminance": 29.968446731567383,
+            "candidate_mean_luminance": 52.50370407104492,
+            "candidate_to_source_luminance_ratio": 1.7519661443026988,
             "acceptable_luminance_ratio": [
               0.9,
               1.1
             ],
             "luminance_gate_passed": false,
-            "mean_absolute_channel_delta": 19.0004825592041
+            "mean_absolute_channel_delta": 18.999502182006836
           }
         },
         "merged_geometry_improvement_over_flat": {
-          "silhouette_iou_delta": 0.22617163189532508,
-          "absolute_silhouette_area_ratio_error_reduction": 0.2406080444823102,
-          "absolute_fixed_overlap_luminance_ratio_error_reduction": -0.42215158919225526,
-          "fixed_overlap_mean_channel_delta_reduction": -8.720635414123535
+          "silhouette_iou_delta": 0.22614209070500307,
+          "absolute_silhouette_area_ratio_error_reduction": 0.24056785672648362,
+          "absolute_fixed_overlap_luminance_ratio_error_reduction": -0.4220272443582802,
+          "fixed_overlap_mean_channel_delta_reduction": -8.719616889953613
         }
       }
     },
     "frontlit_to_backlit_directional_response": {
       "source_reference": {
-        "frontlit_sha256": "37f74576ab41a3875469abef088e6bbd83e9c3beef2f37fc09e658e54af2a95a",
-        "backlit_sha256": "05122ea02c1137f968d5665ade3ece20606b2bedff57c33f404a9a245ace1fdd",
+        "frontlit_sha256": "cb68b1d351e82061e6f1f2a9361c981cbd858cdc8875fb7de4470c25b2bb43ed",
+        "backlit_sha256": "5b0036a715c4a48f9ed29328ad8d3bb8e9aa3ce15f9936cab150d76e3103ba00",
         "roi_xyxy": [
           280,
           0,
           1000,
           540
         ],
-        "mean_absolute_channel_delta": 38.26361083984375,
-        "changed_pixel_fraction_at_least_one_level": 0.9708641975308642,
+        "mean_absolute_channel_delta": 38.263607025146484,
+        "changed_pixel_fraction_at_least_one_level": 0.9709053497942387,
         "directional_response_gate_minimum_mean_channel_delta": 5.0,
         "directional_response_gate_passed": true
       },
       "flat_hlod_control": {
-        "frontlit_sha256": "8ba863b83b39092954e25432c1ac27bdeb44f9d0b9377aeaf03aa1fd9a000649",
-        "backlit_sha256": "ec61e1b61c32188aa2dac4b2bedaef95e0f670517afc812dcbf71cf144cfb16f",
+        "frontlit_sha256": "309d1c5a6cba7f0ab2765715eaacaeeefebe5d7530598c28037b047ceb18c8a5",
+        "backlit_sha256": "5f6cd230abca6b7cb317483e15f4d348f3fab5bcc292f013e000d2dab3f8779c",
         "roi_xyxy": [
           280,
           0,
           1000,
           540
         ],
-        "mean_absolute_channel_delta": 39.906734466552734,
+        "mean_absolute_channel_delta": 39.90681076049805,
         "changed_pixel_fraction_at_least_one_level": 0.9365020576131687,
         "directional_response_gate_minimum_mean_channel_delta": 5.0,
         "directional_response_gate_passed": true
@@ -322,7 +322,7 @@
   },
   "contact_sheet": {
     "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/futaleufu_cordillera_cypress_v42_merged_geometry_shape_bracket_contact_sheet.png",
-    "sha256": "839aaa6190a9e8a646d4b1233e40fb8dc9b6822b9e04dae7996da716e918b192",
+    "sha256": "7f28647f83590a0f9d37cd2ea9551a8eda3715aa9e64541e852f03a4744b5e6c",
     "columns": 3,
     "rows": 2
   },
