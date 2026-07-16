@@ -1,0 +1,155 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -121.05840946152,
+          38.7522231811928
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50817",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "gisid": "GIS0005206",
+        "name": "Old Salmon Falls Assembly Parking",
+        "nearest_graph_node_distance_m": 582.847,
+        "nearest_published_convention": "full_run_21_0_mile_basis",
+        "nearest_published_convention_absolute_delta_m": 17915.2049,
+        "production_promoted": false,
+        "review_role": "upstream_or_alternate_salmon_falls_context",
+        "review_status": "official_access_seed_needs_manual_snap_review",
+        "river_id": "south_fork_american_chili_bar",
+        "source_station_m": 51711.4289,
+        "source_station_miles": 32.132
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.03444619524,
+          38.7738621515691
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50924",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "gisid": "GIS0005558",
+        "name": "Skunk Hollow Day Use Parking",
+        "nearest_graph_node_distance_m": 192.559,
+        "nearest_published_convention": "full_run_21_0_mile_basis",
+        "nearest_published_convention_absolute_delta_m": 14627.68934,
+        "production_promoted": false,
+        "review_role": "nearby_public_access_context",
+        "review_status": "official_access_seed_snaps_but_source_mile_conflict",
+        "river_id": "south_fork_american_chili_bar",
+        "source_station_m": 48423.91334,
+        "source_station_miles": 30.089
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.043513366612,
+          38.7717445614809
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50927",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "gisid": "GIS0005556",
+        "name": "Salmon Falls  Lower Water Raft Take-out",
+        "nearest_graph_node_distance_m": 117.705,
+        "nearest_published_convention": "full_run_21_0_mile_basis",
+        "nearest_published_convention_absolute_delta_m": 15281.508,
+        "production_promoted": false,
+        "review_role": "primary_official_downstream_access_geometry_lead",
+        "review_status": "official_access_seed_snaps_but_source_mile_conflict",
+        "river_id": "south_fork_american_chili_bar",
+        "source_station_m": 49077.732,
+        "source_station_miles": 30.495
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.042833677013,
+          38.7717617394222
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50930",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "gisid": "GIS0005555",
+        "name": "Salmon Falls Parking",
+        "nearest_graph_node_distance_m": 123.472,
+        "nearest_published_convention": "full_run_21_0_mile_basis",
+        "nearest_published_convention_absolute_delta_m": 15281.508,
+        "production_promoted": false,
+        "review_role": "parking_context_for_primary_takeout",
+        "review_status": "official_access_seed_snaps_but_source_mile_conflict",
+        "river_id": "south_fork_american_chili_bar",
+        "source_station_m": 49077.732,
+        "source_station_miles": 30.495
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.042028800892,
+          38.7719121462091
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50933",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "gisid": "GIS0005554",
+        "name": "Salmon Falls Overflow Parking",
+        "nearest_graph_node_distance_m": 151.099,
+        "nearest_published_convention": "full_run_21_0_mile_basis",
+        "nearest_published_convention_absolute_delta_m": 15281.508,
+        "production_promoted": false,
+        "review_role": "parking_context_for_primary_takeout",
+        "review_status": "official_access_seed_snaps_but_source_mile_conflict",
+        "river_id": "south_fork_american_chili_bar",
+        "source_station_m": 49077.732,
+        "source_station_miles": 30.495
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "policy": {
+    "allowed_use": [
+      "source-mile/access review",
+      "editor/GIS overlay with binding disabled",
+      "route reanchor planning"
+    ],
+    "forbidden_use": [
+      "final downstream endpoint authority",
+      "corridor crop authority",
+      "rapid restationing authority",
+      "solver-window binding"
+    ]
+  },
+  "production_promoted": false,
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_source_mile_access_option_points.geojson.v1",
+  "source_json": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_option_matrix.json",
+  "status": "source_mile_access_options_ready_for_review_no_route_promoted",
+  "task_id": "A1",
+  "type": "FeatureCollection"
+}
