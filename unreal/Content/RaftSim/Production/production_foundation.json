@@ -24,9 +24,12 @@
     "OpenXRHandTracking",
     "Niagara",
     "PCG",
+    "ProceduralVegetationEditor",
+    "ImpostorBaker",
     "Water",
     "AudioGameplay",
     "GeometryScripting",
+    "ProceduralMeshComponent",
     "RaftSim"
   ],
   "module_boundaries": [

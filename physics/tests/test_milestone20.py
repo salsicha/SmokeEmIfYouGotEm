@@ -20,6 +20,7 @@ from raftsim.milestone20 import (
     write_report_set_lock,
 )
 from raftsim.live_water_bridge_manifest import build_live_water_bridge_manifests
+from raftsim.unreal_production_foundation import build_production_foundation
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -183,6 +184,7 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
     }
     project_plugins = {plugin["Name"] for plugin in uproject["Plugins"] if plugin["Enabled"]}
 
+    assert foundation == build_production_foundation(REPO_ROOT)
     assert foundation["schema"] == "raftsim.unreal.production_foundation.v1"
     assert foundation["engine"]["engine_association"] == uproject["EngineAssociation"] == "5.8"
     assert foundation["project"]["accepted_water_report_manifest"] == (
@@ -206,7 +208,16 @@ def test_unreal_production_foundation_matches_locked_project_and_modules():
     assert {boundary["domain"] for boundary in foundation["module_boundaries"]} == (
         REQUIRED_PRODUCTION_DOMAINS
     )
-    assert {module["Name"] for module in uplugin["Modules"]} == REQUIRED_PRODUCTION_MODULES
+    assert {
+        module["Name"]
+        for module in uplugin["Modules"]
+        if module["Type"] != "Editor"
+    } == REQUIRED_PRODUCTION_MODULES
+    assert {
+        module["Name"]
+        for module in uplugin["Modules"]
+        if module["Type"] == "Editor"
+    } == {"RaftSimEditor"}
 
 
 def test_raftsim_production_modules_have_source_skeletons():
