@@ -171,6 +171,7 @@ Started July 16, 2026 from clean commit `119239d68`.
 
 - [x] Reconcile this execution plan with the completed code-review remediation and the owner decision to keep versioning generated maps instead of pruning/untracking them.
 - [ ] A1 South Fork American stationing and full-reach corridor repair.
+  - [x] Record the current A1 blocker as a reproducible status artifact: the committed published-mile scaffold covers all 20 South Fork rapids, while exact geometry, full Chili Bar-to-Folsom corridor coverage, and flow-band promotion remain blocked pending full-reach hydrography, exact anchors, and guide/geospatial review.
 - [ ] B1 asset source survey and intake pipeline hardening.
 - [ ] D1 compliant-tube Python reference model.
 - [ ] D2 seat-load coupling into local tube deformation/freeboard.
