@@ -1,0 +1,966 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.7343289,
+            9.9318219
+          ],
+          [
+            -83.7337406,
+            9.931167
+          ],
+          [
+            -83.7322404,
+            9.9294759
+          ],
+          [
+            -83.7307506,
+            9.9277758
+          ],
+          [
+            -83.7292637,
+            9.9260733
+          ],
+          [
+            -83.7289512,
+            9.9257142
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 1640.625,
+        "class": "III",
+        "feature_tags": [
+          "wave_train",
+          "training_entry"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 90.0,
+        "order": 1,
+        "preview_order_station_m": 2852.651,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Bienvenidos",
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 3302.651,
+        "window_id": "pacuare_a3_window_01_bienvenidos",
+        "window_start_m": 2402.651
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.7183938,
+            9.9138944
+          ],
+          [
+            -83.7171765,
+            9.9126211
+          ],
+          [
+            -83.7155889,
+            9.9110095
+          ],
+          [
+            -83.7139818,
+            9.9094165
+          ],
+          [
+            -83.7123232,
+            9.9078755
+          ],
+          [
+            -83.7106366,
+            9.9063651
+          ],
+          [
+            -83.7099101,
+            9.9057464
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 3281.25,
+        "class": "III",
+        "feature_tags": [
+          "boulder",
+          "channel_choice",
+          "rock_push"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0,
+        "order": 2,
+        "preview_order_station_m": 5705.302,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Pyramid Rock",
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 6355.302,
+        "window_id": "pacuare_a3_window_02_pyramid_rock",
+        "window_start_m": 5055.302
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.698074,
+            9.8982119
+          ],
+          [
+            -83.6973023,
+            9.8978887
+          ],
+          [
+            -83.695145,
+            9.8971696
+          ],
+          [
+            -83.6929326,
+            9.8966337
+          ],
+          [
+            -83.6906777,
+            9.896302
+          ],
+          [
+            -83.6883993,
+            9.8962185
+          ],
+          [
+            -83.6865075,
+            9.8963331
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 4921.875,
+        "class": "III",
+        "feature_tags": [
+          "hole",
+          "wave_train"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0,
+        "order": 3,
+        "preview_order_station_m": 8557.954,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Pele El Ojo",
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 9207.954,
+        "window_id": "pacuare_a3_window_03_pele_el_ojo",
+        "window_start_m": 7907.954
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.6752619,
+            9.8998356
+          ],
+          [
+            -83.6733654,
+            9.9009006
+          ],
+          [
+            -83.671433,
+            9.902091
+          ],
+          [
+            -83.6695432,
+            9.9033466
+          ],
+          [
+            -83.6676972,
+            9.9046647
+          ],
+          [
+            -83.6658983,
+            9.9060443
+          ],
+          [
+            -83.6641246,
+            9.9074551
+          ],
+          [
+            -83.6623743,
+            9.9088942
+          ],
+          [
+            -83.6619578,
+            9.9092521
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 6562.5,
+        "class": "IV",
+        "feature_tags": [
+          "gorge",
+          "drop",
+          "hole",
+          "waterfall_context",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 4,
+        "preview_order_station_m": 11410.605,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Upper Huacas",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 12310.605,
+        "window_id": "pacuare_a3_window_04_upper_huacas",
+        "window_start_m": 10510.605
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.653129,
+            9.9170815
+          ],
+          [
+            -83.6522099,
+            9.9179118
+          ],
+          [
+            -83.6505224,
+            9.9194221
+          ],
+          [
+            -83.6488276,
+            9.9209243
+          ],
+          [
+            -83.6471213,
+            9.9224139
+          ],
+          [
+            -83.645391,
+            9.9238764
+          ],
+          [
+            -83.6442493,
+            9.9248175
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 8203.125,
+        "class": "III",
+        "feature_tags": [
+          "drop",
+          "wave_train"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0,
+        "order": 5,
+        "preview_order_station_m": 14263.256,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Bobo Falls",
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 14913.256,
+        "window_id": "pacuare_a3_window_05_bobo_falls",
+        "window_start_m": 13613.256
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.6346437,
+            9.9316813
+          ],
+          [
+            -83.6343789,
+            9.9318419
+          ],
+          [
+            -83.6323816,
+            9.9329237
+          ],
+          [
+            -83.630333,
+            9.9339064
+          ],
+          [
+            -83.6282304,
+            9.9347709
+          ],
+          [
+            -83.6260731,
+            9.9354957
+          ],
+          [
+            -83.6238607,
+            9.9360387
+          ],
+          [
+            -83.6216081,
+            9.9363807
+          ],
+          [
+            -83.6193349,
+            9.9365226
+          ],
+          [
+            -83.6191901,
+            9.9365184
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 9843.75,
+        "class": "IV",
+        "feature_tags": [
+          "gorge",
+          "drop",
+          "hole",
+          "waterfall_context",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 6,
+        "preview_order_station_m": 17115.908,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Lower Huacas",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 18015.908,
+        "window_id": "pacuare_a3_window_06_lower_huacas",
+        "window_start_m": 16215.908
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.6060504,
+            9.9332337
+          ],
+          [
+            -83.6041985,
+            9.9322384
+          ],
+          [
+            -83.6022506,
+            9.9310733
+          ],
+          [
+            -83.6003503,
+            9.9298325
+          ],
+          [
+            -83.5991124,
+            9.9289348
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 11484.375,
+        "class": "III",
+        "feature_tags": [
+          "wave_train",
+          "laterals"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 90.0,
+        "order": 7,
+        "preview_order_station_m": 19968.559,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Rodeo",
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 20418.559,
+        "window_id": "pacuare_a3_window_07_rodeo",
+        "window_start_m": 19518.559
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.5857845,
+            9.9173247
+          ],
+          [
+            -83.5849461,
+            9.9165144
+          ],
+          [
+            -83.5833306,
+            9.9149297
+          ],
+          [
+            -83.5817161,
+            9.9133439
+          ],
+          [
+            -83.5801029,
+            9.9117569
+          ],
+          [
+            -83.5799655,
+            9.9116228
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 13125.0,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "wave_train"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 90.0,
+        "order": 8,
+        "preview_order_station_m": 22821.21,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Guatemala",
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 23271.21,
+        "window_id": "pacuare_a3_window_08_guatemala",
+        "window_start_m": 22371.21
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.5700218,
+            9.902338
+          ],
+          [
+            -83.5684533,
+            9.9010193
+          ],
+          [
+            -83.5666922,
+            9.8995933
+          ],
+          [
+            -83.5648811,
+            9.898229
+          ],
+          [
+            -83.5630212,
+            9.896931
+          ],
+          [
+            -83.5611161,
+            9.8956988
+          ],
+          [
+            -83.5591597,
+            9.8945458
+          ],
+          [
+            -83.557126,
+            9.8935305
+          ],
+          [
+            -83.5565073,
+            9.8932692
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 14765.625,
+        "class": "IV-",
+        "feature_tags": [
+          "two_stage_drop",
+          "holes",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 9,
+        "preview_order_station_m": 25673.861,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Double Drop",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 26573.861,
+        "window_id": "pacuare_a3_window_09_double_drop",
+        "window_start_m": 24773.861
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.5472746,
+            9.8909275
+          ],
+          [
+            -83.546151,
+            9.8908597
+          ],
+          [
+            -83.5438735,
+            9.8909657
+          ],
+          [
+            -83.5416225,
+            9.8913185
+          ],
+          [
+            -83.5394177,
+            9.8918817
+          ],
+          [
+            -83.5372716,
+            9.8926316
+          ],
+          [
+            -83.5351898,
+            9.8935418
+          ],
+          [
+            -83.5331727,
+            9.8945869
+          ],
+          [
+            -83.5318044,
+            9.8954222
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 16406.25,
+        "class": "III-IV",
+        "feature_tags": [
+          "boulders",
+          "pour_over",
+          "holes",
+          "large_waves"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 10,
+        "preview_order_station_m": 28526.512,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Cimarrones",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 29426.512,
+        "window_id": "pacuare_a3_window_10_cimarrones",
+        "window_start_m": 27626.512
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.5225693,
+            9.9027481
+          ],
+          [
+            -83.5224306,
+            9.902876
+          ],
+          [
+            -83.5208041,
+            9.9044498
+          ],
+          [
+            -83.5192232,
+            9.9060678
+          ],
+          [
+            -83.5176598,
+            9.9077024
+          ],
+          [
+            -83.5161318,
+            9.9093692
+          ],
+          [
+            -83.5146213,
+            9.9110513
+          ],
+          [
+            -83.514447,
+            9.9112492
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 18046.875,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "multiple_moves",
+          "pin_hazard"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0,
+        "order": 11,
+        "preview_order_station_m": 31379.164,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Upper Pinball",
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 32029.164,
+        "window_id": "pacuare_a3_window_11_upper_pinball",
+        "window_start_m": 30729.164
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.5053559,
+            9.9219421
+          ],
+          [
+            -83.5043809,
+            9.9231084
+          ],
+          [
+            -83.50293,
+            9.9248409
+          ],
+          [
+            -83.5014707,
+            9.9265663
+          ],
+          [
+            -83.5000077,
+            9.9282888
+          ],
+          [
+            -83.4985244,
+            9.9299944
+          ],
+          [
+            -83.4977383,
+            9.9308903
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 19687.5,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "multiple_moves",
+          "pin_hazard"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 130.0,
+        "order": 12,
+        "preview_order_station_m": 34231.815,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Lower Pinball",
+        "review_priority": "high",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 34881.815,
+        "window_id": "pacuare_a3_window_12_lower_pinball",
+        "window_start_m": 33581.815
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.4896283,
+            9.9394356
+          ],
+          [
+            -83.4892029,
+            9.939849
+          ],
+          [
+            -83.4875337,
+            9.9413789
+          ],
+          [
+            -83.4858144,
+            9.9428531
+          ],
+          [
+            -83.4840558,
+            9.9442815
+          ],
+          [
+            -83.4822339,
+            9.9456317
+          ],
+          [
+            -83.4803408,
+            9.9468819
+          ],
+          [
+            -83.4783883,
+            9.9480384
+          ],
+          [
+            -83.4764957,
+            9.949016
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 21328.125,
+        "class": "IV",
+        "feature_tags": [
+          "wall_push",
+          "lateral",
+          "flip_hazard"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 13,
+        "preview_order_station_m": 37084.466,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Wall of Sorrow",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 37984.466,
+        "window_id": "pacuare_a3_window_13_wall_of_sorrow",
+        "window_start_m": 36184.466
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.4672881,
+            9.9514305
+          ],
+          [
+            -83.4653504,
+            9.9514671
+          ],
+          [
+            -83.4630819,
+            9.9512783
+          ],
+          [
+            -83.4608421,
+            9.9508692
+          ],
+          [
+            -83.4586476,
+            9.9502604
+          ],
+          [
+            -83.4565252,
+            9.9494399
+          ],
+          [
+            -83.4544685,
+            9.9484739
+          ],
+          [
+            -83.4524734,
+            9.9473901
+          ],
+          [
+            -83.451798,
+            9.9469785
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [
+          "Dos Monta\u00f1as"
+        ],
+        "catalog_order_station_m": 22968.75,
+        "class": "IV",
+        "feature_tags": [
+          "canyon_constriction",
+          "long_rapid",
+          "wave_train",
+          "holes"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 14,
+        "preview_order_station_m": 39937.118,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Dos Montanas",
+        "review_priority": "critical",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 40837.118,
+        "window_id": "pacuare_a3_window_14_dos_montanas",
+        "window_start_m": 39037.118
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -83.4410497,
+            9.9386457
+          ],
+          [
+            -83.4399822,
+            9.937663
+          ],
+          [
+            -83.4383432,
+            9.9361018
+          ],
+          [
+            -83.4367316,
+            9.9345133
+          ],
+          [
+            -83.4351965,
+            9.9329794
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "catalog_order_station_m": 24609.375,
+        "class": "III",
+        "feature_tags": [
+          "wave_train",
+          "boulders"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 90.0,
+        "order": 15,
+        "preview_order_station_m": 42789.769,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with accepted route, aerial/orthomosaic rapid point/span geometry, guide confirmation, rights review, and flow-source review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Las Ranitas",
+        "review_priority": "medium",
+        "river_id": "pacuare_river_costa_rica",
+        "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+        "stationing_status": "order_distributed_preview_work_window_not_authoritative",
+        "window_end_m": 43239.769,
+        "window_id": "pacuare_a3_window_15_las_ranitas",
+        "window_start_m": 42339.769
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "review_limits": [
+    "Window center stations are distributed by catalog rapid order over the preview scaffold length.",
+    "The preview scaffold length still conflicts with the catalog run length.",
+    "These features only focus human digitizing review and cannot replace GPS/aerial/guide-reviewed stations.",
+    "Do not bind editor geometry, solver windows, public route screenshots, or gameplay hazards from these windows."
+  ],
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_stationing_digitizing_work_windows.geojson.v1",
+  "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+  "source_stationing": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/preview_stationing_scaffold.json",
+  "status": "review_only_digitizing_windows_on_preview_scaffold_not_authoritative",
+  "type": "FeatureCollection"
+}
