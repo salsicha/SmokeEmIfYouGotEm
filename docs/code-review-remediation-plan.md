@@ -150,6 +150,11 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Retired the superseded V9 texture generator, generate/review drivers, and two V9-specific snapshots after confirming later locked reviews no longer execute them.
 - Preserved all V9 review JSON, source reports, capture hashes, and contact-sheet evidence under `docs/environment-captures/`; git history remains the implementation archive.
 
+### 2026-07-16 Finding 3 Step 3.2 V10 Retirement
+
+- Retired the superseded V10 texture generator, generate driver, and two V10-specific snapshots. Later historical evidence checks read the committed V10 manifest by path and no longer import executable V10 code.
+- Preserved the V10 review/source/capture evidence unchanged; only implementation and version-specific snapshots left the live tree.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
