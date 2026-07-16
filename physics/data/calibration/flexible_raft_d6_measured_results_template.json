@@ -523,6 +523,7 @@
   },
   "required_result_count": 14,
   "schema": "raftsim.flexible_raft.d6_measured_results_template.v1",
+  "source_fixture_input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
   "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
   "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
   "status": "measured_results_template_empty",

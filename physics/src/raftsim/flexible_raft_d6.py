@@ -33,10 +33,14 @@ D6_MEASUREMENT_MANIFEST_RELATIVE_PATH = (
 D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_measured_results_template.json"
 )
+D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_fixture_input_package.json"
+)
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
 D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
 D6_MEASUREMENT_MANIFEST_SCHEMA = "raftsim.flexible_raft.d6_measurement_manifest.v1"
 D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = "raftsim.flexible_raft.d6_measured_results_template.v1"
+D6_FIXTURE_INPUT_PACKAGE_SCHEMA = "raftsim.flexible_raft.d6_fixture_input_package.v1"
 D6_METRIC_ABSOLUTE_TOLERANCE = 1.0e-6
 D6_METRIC_RELATIVE_TOLERANCE = 0.05
 
@@ -293,6 +297,7 @@ def build_flexible_raft_d6_measurement_manifest(
         "production_promoted": False,
         "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
         "source_comparison_report_path": D6_COMPARISON_REPORT_RELATIVE_PATH,
+        "fixture_input_package_path": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
         "measured_results_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
         "fixture_count": suite["fixture_count"],
         "target_count": len(D6_TARGET_POLICIES),
@@ -372,6 +377,7 @@ def build_flexible_raft_d6_measured_results_template(
         "production_promoted": False,
         "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
         "source_measurement_manifest_path": D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
+        "source_fixture_input_package_path": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
         "target_count": len(measured_results),
         "fixture_count": suite["fixture_count"],
         "required_result_count": manifest["measurement_task_count"],
@@ -392,6 +398,73 @@ def build_flexible_raft_d6_measured_results_template(
 def write_flexible_raft_d6_measured_results_template(repo_root: Path) -> Path:
     payload = build_flexible_raft_d6_measured_results_template()
     path = repo_root / D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_flexible_raft_d6_fixture_input_package(
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Build deterministic fixture inputs for external D6 engine adapters."""
+
+    params = parameters or RaftParameters2_5D(passenger_count=4)
+    context = _build_context(params)
+    suite = build_flexible_raft_d6_behavioral_suite(params)
+    manifest = build_flexible_raft_d6_measurement_manifest(params)
+    fixtures = [
+        _d6_fixture_input_payload(context, fixture, index)
+        for index, fixture in enumerate(suite["fixtures"])
+    ]
+    return {
+        "schema": D6_FIXTURE_INPUT_PACKAGE_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": "fixture_inputs_ready_engine_adapter_runs_pending",
+        "d6_complete": False,
+        "production_promoted": False,
+        "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
+        "source_measurement_manifest_path": D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
+        "source_measured_results_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+        "fixture_count": len(fixtures),
+        "measurement_task_count": manifest["measurement_task_count"],
+        "required_fixture_ids": list(REQUIRED_D6_FIXTURE_IDS),
+        "required_targets": list(D6_TARGET_POLICIES),
+        "common_setup": _d6_common_setup_payload(context),
+        "fixtures": fixtures,
+        "adapter_contract": {
+            "input_package_path": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
+            "result_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+            "comparison_report_path": D6_COMPARISON_REPORT_RELATIVE_PATH,
+            "adapter_must_not_substitute_python_reference": True,
+            "required_output_fields": [
+                "source_report",
+                "telemetry_sha256",
+                "engine_version",
+                "metrics",
+            ],
+            "required_metric_tolerance": {
+                "absolute": D6_METRIC_ABSOLUTE_TOLERANCE,
+                "relative": D6_METRIC_RELATIVE_TOLERANCE,
+            },
+        },
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "reason": (
+                "This package only records deterministic fixture inputs. D6 remains "
+                "incomplete until measured compliant-reference and Unreal Chaos "
+                "outputs populate the measured-results template and pass review."
+            ),
+        },
+    }
+
+
+def write_flexible_raft_d6_fixture_input_package(repo_root: Path) -> Path:
+    payload = build_flexible_raft_d6_fixture_input_package()
+    path = repo_root / D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -422,6 +495,341 @@ def _d6_target_adapter_contract(target_id: str) -> dict[str, Any]:
             "may_substitute_with_synthetic_python_reference": False,
         }
     raise ValueError(f"Unsupported D6 target id: {target_id}")
+
+
+def _d6_common_setup_payload(context: dict[str, Any]) -> dict[str, Any]:
+    params = context["params"]
+    properties = context["properties"]
+    default_layout = build_default_compliant_tube_layout_d1(params)
+    return {
+        "coordinate_frame": {
+            "local_x": "raft longitudinal axis, positive toward bow",
+            "local_y": "raft lateral axis, positive starboard/river-right in fixture space",
+            "local_z": "up",
+        },
+        "fixed_step_s": 1.0 / 30.0,
+        "raft_parameters": params.to_json_dict(),
+        "initial_state": _state_payload(context["state"]),
+        "mass_properties": {
+            "total_mass_kg": properties.total_mass_kg,
+            "inverse_mass_kg": properties.inverse_mass,
+            "inertia_diagonal_kg_m2": _vec3_payload(
+                properties.inertia_diagonal_kg_m2
+            ),
+            "gravity": _vec3_payload(properties.gravity),
+            "guide_offset": _vec3_payload(properties.guide_offset),
+            "passenger_offsets": [
+                _vec3_payload(offset) for offset in properties.passenger_offsets
+            ],
+            "sample_patch_count": len(properties.sample_patches),
+            "sample_patches": [
+                _sample_patch_payload(patch)
+                for patch in properties.sample_patches
+            ],
+        },
+        "crew_seat_count": len(context["seats"]),
+        "crew_seats": [_seat_payload(seat) for seat in context["seats"]],
+        "default_tube_layout": {
+            "segment_count": len(default_layout),
+            "segments": [
+                _tube_segment_payload(segment)
+                for segment in default_layout
+            ],
+        },
+        "reference_evaluator_defaults": {
+            "d3_water_sampler": {
+                "input_kind": "synthetic_uniform_water_field",
+                "note": "Adapters may replace the field implementation, but must preserve the recorded surface height and velocity vectors per fixture.",
+            },
+            "d4_rock_contact": {
+                "dt_s": 1.0 / 30.0,
+                "max_indentation_m": 0.22,
+                "tube_contact_stiffness_n_m": 30_000.0,
+                "contact_damping_n_s_m": 850.0,
+                "pressure_release_area_m2": 0.018,
+                "recovery_rate_per_s": 2.4,
+                "wrap_support_scale": 0.32,
+            },
+        },
+    }
+
+
+def _d6_fixture_input_payload(
+    context: dict[str, Any],
+    fixture: dict[str, Any],
+    source_index: int,
+) -> dict[str, Any]:
+    metric_paths = sorted(_flatten_numeric_metrics(fixture["python_reference_metrics"]))
+    return {
+        "fixture_id": fixture["fixture_id"],
+        "source_fixture_index": source_index,
+        "objective": fixture["objective"],
+        "status": "ready_for_external_engine_adapter_run",
+        "can_promote": False,
+        "input_contract": _d6_fixture_specific_input(context, fixture["fixture_id"]),
+        "required_metric_paths": metric_paths,
+        "required_metric_count": len(metric_paths),
+        "required_d5_replay_channels": fixture["d5_replay_channels_required"],
+        "adapter_targets": [
+            _d6_target_fixture_input_payload(target["target_id"], fixture["fixture_id"])
+            for target in fixture["comparison_targets"]
+        ],
+    }
+
+
+def _d6_fixture_specific_input(
+    context: dict[str, Any],
+    fixture_id: str,
+) -> dict[str, Any]:
+    if fixture_id == "static_seat_load_sag":
+        return {
+            "fixture_kind": "static_occupied_seat_load",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+            ],
+            "expected_engine_setup": "Solve the occupied-seat tube deformation from common_setup with no extra crew action.",
+        }
+    if fixture_id == "traveling_crew_shift":
+        return {
+            "fixture_kind": "multi_phase_crew_weight_transfer",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+                _crew_phase_payload("port_lean_requested", _port_lean_actions(context)),
+                _crew_phase_payload(
+                    "starboard_high_side",
+                    _starboard_high_side_actions(context),
+                ),
+            ],
+            "expected_engine_setup": "Run each phase from the same common initial state and compare side freeboard deltas.",
+        }
+    if fixture_id == "rock_pinch_wrap":
+        return {
+            "fixture_kind": "static_rock_pinch_wrap_contact",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+            ],
+            "obstacles": [
+                _obstacle_payload(_wrap_obstacle("wrap_starboard_pillow")),
+            ],
+            "expected_engine_setup": "Apply the recorded local boulder against the neutral compliant tube state.",
+        }
+    if fixture_id == "upstream_tube_overwash_flip":
+        return {
+            "fixture_kind": "uniform_flow_overwash_flip_probe",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+            ],
+            "water": _water_payload(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)),
+            "expected_engine_setup": "Sample the uniform upstream flow against depressed upstream tube segments.",
+        }
+    if fixture_id == "timed_high_side_save":
+        return {
+            "fixture_kind": "two_phase_overwash_high_side_recovery",
+            "phases": [
+                _crew_phase_payload("neutral_overwash", ()),
+                _crew_phase_payload(
+                    "starboard_high_side_with_retained_water_memory",
+                    _starboard_high_side_actions(context),
+                ),
+            ],
+            "water": _water_payload(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)),
+            "previous_retained_volume_by_segment": _neutral_retained_volume_by_segment(
+                context
+            ),
+            "expected_engine_setup": "Run the neutral overwash phase first, then replay the high-side phase with the recorded retained-water memory.",
+        }
+    if fixture_id == "post_contact_recovery":
+        return {
+            "fixture_kind": "post_contact_indentation_recovery",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+            ],
+            "previous_indentation_by_segment": {
+                "starboard_1": 0.08,
+                "starboard_2": 0.12,
+            },
+            "obstacles": [],
+            "expected_engine_setup": "Start with recorded prior indentation and no current obstacle contact.",
+        }
+    if fixture_id == "pressure_flow_sweeps":
+        pressures = (14_000.0, 18_000.0, 22_000.0)
+        velocities = (1.2, 2.4, 3.6)
+        return {
+            "fixture_kind": "pressure_flow_parameter_sweep",
+            "phases": [
+                _crew_phase_payload("neutral_occupied_seats", ()),
+            ],
+            "nominal_pressure_values_pa": list(pressures),
+            "incoming_velocity_values_mps": list(velocities),
+            "water_surface_height_m": 0.22,
+            "obstacles": [
+                _obstacle_payload(_wrap_obstacle("pressure_sweep_wrap")),
+            ],
+            "sweep_case_count": len(pressures) * len(velocities),
+            "sweep_cases": [
+                {
+                    "case_id": (
+                        f"pressure_{int(pressure)}_velocity_{str(velocity).replace('.', 'p')}"
+                    ),
+                    "nominal_pressure_pa": pressure,
+                    "water": _water_payload(
+                        surface_height_m=0.22,
+                        velocity=Vec3(0.0, -velocity, 0.0),
+                    ),
+                }
+                for pressure in pressures
+                for velocity in velocities
+            ],
+            "expected_engine_setup": "Run every pressure/velocity pair with the same neutral seat state and boulder geometry.",
+        }
+    raise ValueError(f"Unsupported D6 fixture id: {fixture_id}")
+
+
+def _d6_target_fixture_input_payload(target_id: str, fixture_id: str) -> dict[str, Any]:
+    policy = D6_TARGET_POLICIES[target_id]
+    return {
+        "target_id": target_id,
+        "fixture_id": fixture_id,
+        "comparison_mode": policy["comparison_mode"],
+        "metric_deltas_are_failures": policy["metric_deltas_are_failures"],
+        "adapter_contract": _d6_target_adapter_contract(target_id),
+        "expected_result_template_path": (
+            f"physics/data/calibration/d6_measurements/{target_id}/"
+            f"{fixture_id}.json"
+        ),
+        "required_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
+        "can_promote_fixture": False,
+    }
+
+
+def _crew_phase_payload(
+    phase_id: str,
+    actions: tuple[CrewAction2_5D, ...],
+    *,
+    duration_s: float = 1.0 / 30.0,
+) -> dict[str, Any]:
+    return {
+        "phase_id": phase_id,
+        "duration_s": duration_s,
+        "action_count": len(actions),
+        "crew_actions": [_action_payload(action) for action in actions],
+    }
+
+
+def _port_lean_actions(context: dict[str, Any]) -> tuple[CrewAction2_5D, ...]:
+    return tuple(
+        CrewAction2_5D(seat.seat_id, lean_offset=Vec3(0.0, -1.5, 0.0))
+        for seat in context["seats"]
+    )
+
+
+def _starboard_high_side_actions(context: dict[str, Any]) -> tuple[CrewAction2_5D, ...]:
+    return tuple(
+        CrewAction2_5D(seat.seat_id, high_side_direction=1)
+        for seat in context["seats"]
+    )
+
+
+def _neutral_retained_volume_by_segment(context: dict[str, Any]) -> dict[str, float]:
+    water = _synthetic_water_field(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0))
+    neutral = evaluate_overwash_flip_d3(_tube(context), water, parameters=context["params"])
+    return {
+        segment.segment_id: segment.retained_water_volume_m3
+        for segment in neutral.segment_overwash
+    }
+
+
+def _wrap_obstacle(obstacle_id: str) -> RockObstacleD4:
+    return RockObstacleD4(obstacle_id, Vec3(0.0, 1.0, 0.0), 1.45, 0.82)
+
+
+def _water_payload(surface_height_m: float, velocity: Vec3) -> dict[str, Any]:
+    return {
+        "surface_height_m": surface_height_m,
+        "velocity_mps": _vec3_payload(velocity),
+        "field_kind": "synthetic_uniform",
+    }
+
+
+def _tube_segment_payload(segment: Any) -> dict[str, Any]:
+    return {
+        "segment_id": segment.segment_id,
+        "local_position": _vec3_payload(segment.local_position),
+        "outward_normal": _vec3_payload(segment.outward_normal),
+        "tributary_length_m": segment.tributary_length_m,
+        "rest_volume_m3": segment.rest_volume_m3,
+        "contact_area_m2": segment.contact_area_m2,
+        "nominal_pressure_pa": segment.nominal_pressure_pa,
+        "compliance_m3_per_pa": segment.compliance_m3_per_pa,
+        "floor_coupling_fraction": segment.floor_coupling_fraction,
+        "lacing_coupling_fraction": segment.lacing_coupling_fraction,
+        "frame_coupling_fraction": segment.frame_coupling_fraction,
+    }
+
+
+def _state_payload(state: RaftState6DoF) -> dict[str, Any]:
+    return {
+        "position": _vec3_payload(state.position),
+        "orientation": _quaternion_payload(state.orientation),
+        "linear_velocity_mps": _vec3_payload(state.linear_velocity),
+        "angular_velocity_rad_s": _vec3_payload(state.angular_velocity),
+    }
+
+
+def _seat_payload(seat: Any) -> dict[str, Any]:
+    return {
+        "seat_id": seat.seat_id,
+        "role": seat.role,
+        "local_position": _vec3_payload(seat.local_position),
+        "occupant_mass_kg": seat.occupant_mass_kg,
+        "occupied": seat.occupied,
+    }
+
+
+def _action_payload(action: CrewAction2_5D) -> dict[str, Any]:
+    return {
+        "seat_id": action.seat_id,
+        "lean_offset": _vec3_payload(action.lean_offset),
+        "high_side_direction": action.high_side_direction,
+        "brace": action.brace,
+        "recovery": action.recovery,
+        "lean_clamp_expected": action.lean_offset.magnitude > 0.55,
+    }
+
+
+def _sample_patch_payload(patch: Any) -> dict[str, Any]:
+    return {
+        "kind": patch.kind,
+        "local_position": _vec3_payload(patch.local_position),
+        "area_m2": patch.area_m2,
+        "local_normal": _vec3_payload(patch.local_normal),
+    }
+
+
+def _obstacle_payload(obstacle: RockObstacleD4) -> dict[str, Any]:
+    return {
+        "obstacle_id": obstacle.obstacle_id,
+        "local_position": _vec3_payload(obstacle.local_position),
+        "radius_m": obstacle.radius_m,
+        "friction_coefficient": obstacle.friction_coefficient,
+    }
+
+
+def _vec3_payload(value: Vec3) -> dict[str, float]:
+    return {
+        "x": value.x,
+        "y": value.y,
+        "z": value.z,
+    }
+
+
+def _quaternion_payload(value: Any) -> dict[str, float]:
+    return {
+        "w": value.w,
+        "x": value.x,
+        "y": value.y,
+        "z": value.z,
+    }
 
 
 def _null_metric_tree_from_reference(value: Any) -> Any:
