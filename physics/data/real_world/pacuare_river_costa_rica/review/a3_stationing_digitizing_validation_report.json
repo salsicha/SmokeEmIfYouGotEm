@@ -1,0 +1,1225 @@
+{
+  "digitizing_valid": false,
+  "display_name": "Pacuare River: Tres Equis to Siquirres",
+  "errors": [
+    {
+      "field": "geometry_type",
+      "rapid_name": "Bienvenidos",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Bienvenidos",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Bienvenidos",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Bienvenidos",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Bienvenidos",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Bienvenidos",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Bienvenidos",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Bienvenidos",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Bienvenidos",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Bienvenidos",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Pyramid Rock",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Pyramid Rock",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Pyramid Rock",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Pyramid Rock",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Pyramid Rock",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Pyramid Rock",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Pyramid Rock",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Pyramid Rock",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Pyramid Rock",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Pyramid Rock",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Pele El Ojo",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Pele El Ojo",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Pele El Ojo",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Pele El Ojo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Pele El Ojo",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Pele El Ojo",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Pele El Ojo",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Pele El Ojo",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Pele El Ojo",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Pele El Ojo",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Upper Huacas",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Upper Huacas",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Upper Huacas",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Upper Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Upper Huacas",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Upper Huacas",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Upper Huacas",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Upper Huacas",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Upper Huacas",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Upper Huacas",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Bobo Falls",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Bobo Falls",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Bobo Falls",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Bobo Falls",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Bobo Falls",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Bobo Falls",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Bobo Falls",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Bobo Falls",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Bobo Falls",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Bobo Falls",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Lower Huacas",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Lower Huacas",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Lower Huacas",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Lower Huacas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Lower Huacas",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Lower Huacas",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Lower Huacas",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Lower Huacas",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Lower Huacas",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Lower Huacas",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Rodeo",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Rodeo",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Rodeo",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Rodeo",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Rodeo",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Rodeo",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Rodeo",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Rodeo",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Rodeo",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Rodeo",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Guatemala",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Guatemala",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Guatemala",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Guatemala",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Guatemala",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Guatemala",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Guatemala",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Guatemala",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Guatemala",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Guatemala",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Double Drop",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Double Drop",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Double Drop",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Double Drop",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Double Drop",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Double Drop",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Double Drop",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Double Drop",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Double Drop",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Double Drop",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Cimarrones",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Cimarrones",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Cimarrones",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Cimarrones",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Cimarrones",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Cimarrones",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Cimarrones",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Cimarrones",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Cimarrones",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Cimarrones",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Upper Pinball",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Upper Pinball",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Upper Pinball",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Upper Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Upper Pinball",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Upper Pinball",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Upper Pinball",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Upper Pinball",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Upper Pinball",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Upper Pinball",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Lower Pinball",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Lower Pinball",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Lower Pinball",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Lower Pinball",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Lower Pinball",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Lower Pinball",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Lower Pinball",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Lower Pinball",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Lower Pinball",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Lower Pinball",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Wall of Sorrow",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Dos Montanas",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Dos Montanas",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Dos Montanas",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Dos Montanas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Dos Montanas",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Dos Montanas",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Dos Montanas",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Dos Montanas",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Dos Montanas",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Dos Montanas",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Las Ranitas",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "station_m_on_reviewed_route",
+      "rapid_name": "Las Ranitas",
+      "reason": "station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Las Ranitas",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "aerial_or_orthomosaic_source",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Las Ranitas",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Las Ranitas",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Las Ranitas",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "protected_area_publication_status",
+      "rapid_name": "Las Ranitas",
+      "reason": "protected_area_publication_not_approved"
+    },
+    {
+      "field": "flow_band_source_class",
+      "rapid_name": "Las Ranitas",
+      "reason": "flow_source_class_missing_or_not_allowed"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Las Ranitas",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Las Ranitas",
+      "reason": "guide_evidence_missing"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "passing_rapid_count": 0,
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_digitizing_result_alone": false,
+    "can_import_unreal_route_from_empty_or_invalid_result": false,
+    "can_promote_current_preview_route": false,
+    "next_after_valid_result": [
+      "regenerate_named_rapid_source_catalog",
+      "regenerate_named_rapid_editor_markers",
+      "generate_pacuare_rapid_water_window_inputs",
+      "run_guide_geospatial_rights_and_flow_review"
+    ]
+  },
+  "promotion_permissions": {
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a3_from_validation_report_alone": false,
+    "can_regenerate_editor_geometry": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false,
+    "manual_review_still_required_after_valid_result": true
+  },
+  "rapid_count": 15,
+  "reviewer_failures": [
+    {
+      "reason": "review_not_approved",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "pacuare_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "hydrology_or_flow_reviewer"
+    }
+  ],
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_stationing_digitizing_validation_report.v1",
+  "source_action_packet": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_action_packet.json",
+  "source_result_template": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_result_template.json",
+  "source_status_artifact": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_repair_status.json",
+  "status": "digitizing_result_incomplete_stationing_promotion_blocked",
+  "task_id": "A3",
+  "validation_error_count": 240
+}

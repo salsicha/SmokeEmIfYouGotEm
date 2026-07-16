@@ -1,0 +1,719 @@
+{
+  "critical_rapid_count": 6,
+  "current_blockers": {
+    "all_rapids_are_order_only": true,
+    "catalog_run_length_m": 26250.0,
+    "flow_status": "planning_placeholders_require_costa_rica_hydrology_rainfall_and_guide_review",
+    "numeric_discharge_values_allowed": false,
+    "preview_length_m": 45642.42,
+    "preview_length_matches_catalog_run": false
+  },
+  "digitizing_actions": [
+    {
+      "action_id": "pacuare_a3_digitize_01_bienvenidos",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 1640.625,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "wave_train",
+        "training_entry"
+      ],
+      "order": 1,
+      "rapid_name": "Bienvenidos",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "medium"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_02_pyramid_rock",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 3281.25,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "boulder",
+        "channel_choice",
+        "rock_push"
+      ],
+      "order": 2,
+      "rapid_name": "Pyramid Rock",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_03_pele_el_ojo",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 4921.875,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "hole",
+        "wave_train"
+      ],
+      "order": 3,
+      "rapid_name": "Pele El Ojo",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_04_upper_huacas",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "IV",
+      "current_station_m_from_order_interpolation": 6562.5,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "gorge",
+        "drop",
+        "hole",
+        "waterfall_context",
+        "flow_sensitive"
+      ],
+      "order": 4,
+      "rapid_name": "Upper Huacas",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_05_bobo_falls",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 8203.125,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "drop",
+        "wave_train"
+      ],
+      "order": 5,
+      "rapid_name": "Bobo Falls",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_06_lower_huacas",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "IV",
+      "current_station_m_from_order_interpolation": 9843.75,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "gorge",
+        "drop",
+        "hole",
+        "waterfall_context",
+        "flow_sensitive"
+      ],
+      "order": 6,
+      "rapid_name": "Lower Huacas",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_07_rodeo",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 11484.375,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "wave_train",
+        "laterals"
+      ],
+      "order": 7,
+      "rapid_name": "Rodeo",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "medium"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_08_guatemala",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 13125.0,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "boulder_garden",
+        "wave_train"
+      ],
+      "order": 8,
+      "rapid_name": "Guatemala",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "medium"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_09_double_drop",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "IV-",
+      "current_station_m_from_order_interpolation": 14765.625,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "two_stage_drop",
+        "holes",
+        "flow_sensitive"
+      ],
+      "order": 9,
+      "rapid_name": "Double Drop",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_10_cimarrones",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III-IV",
+      "current_station_m_from_order_interpolation": 16406.25,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "boulders",
+        "pour_over",
+        "holes",
+        "large_waves"
+      ],
+      "order": 10,
+      "rapid_name": "Cimarrones",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_11_upper_pinball",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 18046.875,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "boulder_garden",
+        "multiple_moves",
+        "pin_hazard"
+      ],
+      "order": 11,
+      "rapid_name": "Upper Pinball",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_12_lower_pinball",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 19687.5,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "boulder_garden",
+        "multiple_moves",
+        "pin_hazard"
+      ],
+      "order": 12,
+      "rapid_name": "Lower Pinball",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_13_wall_of_sorrow",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "IV",
+      "current_station_m_from_order_interpolation": 21328.125,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "wall_push",
+        "lateral",
+        "flip_hazard"
+      ],
+      "order": 13,
+      "rapid_name": "Wall of Sorrow",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_14_dos_montanas",
+      "aliases": [
+        "Dos Monta\u00f1as"
+      ],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "IV",
+      "current_station_m_from_order_interpolation": 22968.75,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "canyon_constriction",
+        "long_rapid",
+        "wave_train",
+        "holes"
+      ],
+      "order": 14,
+      "rapid_name": "Dos Montanas",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical"
+    },
+    {
+      "action_id": "pacuare_a3_digitize_15_las_ranitas",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a3_promotion"
+      ],
+      "class": "III",
+      "current_station_m_from_order_interpolation": 24609.375,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "wave_train",
+        "boulders"
+      ],
+      "order": 15,
+      "rapid_name": "Las Ranitas",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "guide_or_outfitter_confirmation",
+        "rights_and_protected_area_publication_review",
+        "flow_band_source_class"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "medium"
+    }
+  ],
+  "display_name": "Pacuare River: Tres Equis to Siquirres",
+  "flow_evidence": {
+    "flow_band_count": 4,
+    "flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+    "flow_status": "planning_placeholders_require_costa_rica_hydrology_rainfall_and_guide_review",
+    "hydrology_review_needs": [
+      "authoritative_gauge_or_stage_history",
+      "rainfall_event_history",
+      "guide_reviewed_runnable_ranges",
+      "rapid_rise_and_falling_limb_context",
+      "seasonal_access_and_trip_operator_context"
+    ],
+    "numeric_discharge_values_allowed": false
+  },
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a3": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false
+  },
+  "rapid_count": 15,
+  "required_workflow": [
+    {
+      "complete_when": "official hydrography, aerial-interpreted route, or guide-reviewed route authority replaces the preview scaffold",
+      "required_before": "stationing_digitizing",
+      "step_id": "select_reviewed_route_centerline"
+    },
+    {
+      "complete_when": "cloud, shadow, resolution, protected-area, and rights review approve the scene or orthomosaic for stationing",
+      "required_before": "stationing_digitizing",
+      "step_id": "select_accepted_aerial_or_orthomosaic_scene"
+    },
+    {
+      "complete_when": "all 15 rapids have Point or LineString WGS84 geometry plus route station, source evidence, confidence, and notes",
+      "required_before": "catalog_regeneration",
+      "step_id": "digitize_every_rapid_point_or_span"
+    },
+    {
+      "complete_when": "guide/outfitter, geospatial, rights/publication, and hydrology reviewers approve every record",
+      "required_before": "catalog_regeneration",
+      "step_id": "record_guide_geospatial_rights_and_flow_review"
+    },
+    {
+      "complete_when": "named rapid catalog, editor geometry, flow bands, and water-window inputs are regenerated from the reviewed result",
+      "required_before": "a3_promotion",
+      "step_id": "regenerate_catalog_editor_and_water_window_inputs"
+    }
+  ],
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.a3_stationing_digitizing_action_packet.v1",
+  "source_inputs": [
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/official_source_access_plan.json",
+      "required_before_promotion": "official route/access source selected and reviewed",
+      "source_class": "official_hydrography_access",
+      "status": "lead_recorded_not_route_authority"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/snit_layer_catalog_summary.json",
+      "required_before_promotion": "candidate hydrography/protected-area layers selected and clipped",
+      "source_class": "snit_layer_catalog",
+      "status": "lead_recorded_not_route_authority"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_corridor_bbox_scl_qa_review.json",
+      "required_before_promotion": "cloud/shadow and bank-window suitability accepted",
+      "source_class": "sentinel_corridor_imagery",
+      "status": "review_imagery_available_not_exact_rapid_stationing"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/imagery/production_import_pilot/sentinel_20250320_draft_bank_window_review.json",
+      "required_before_promotion": "aerial-interpreted rapid locations digitized and guide-confirmed",
+      "source_class": "sentinel_bank_window",
+      "status": "draft_bank_window_review_not_rapid_stationing"
+    },
+    {
+      "path": "physics/data/real_world/pacuare_river_costa_rica/hydrology/costa_rica_gauge_search.json",
+      "required_before_promotion": "gauge/stage/rainfall source class selected for flow bands",
+      "source_class": "hydrology_gauge_search",
+      "status": "review_leads_recorded_no_numeric_flow_promotion"
+    }
+  ],
+  "source_status_artifact": "physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_repair_status.json",
+  "status": "digitizing_actions_ready_no_stationing_promotion",
+  "task_id": "A3"
+}
