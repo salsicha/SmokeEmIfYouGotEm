@@ -1,0 +1,453 @@
+{
+  "cases": [
+    {
+      "case_id": "clear_no_contact",
+      "contacts": [],
+      "intent": "Distant rock should produce no contact or water-field mutation.",
+      "scoring_authority_enabled": false,
+      "summary": {
+        "contact_count": 0,
+        "max_indentation_m": 0.0,
+        "min_release_margin_n": 0.0,
+        "pinned_obstacle_count": 0,
+        "recovering_contact_count": 0,
+        "total_holding_force_n": 0,
+        "water_field_modified": false,
+        "wrapping_contact_count": 0
+      }
+    },
+    {
+      "case_id": "single_starboard_indentation",
+      "contacts": [
+        {
+          "clearance_m": -0.18998842617398787,
+          "damping_force_n": 594.9744958100141,
+          "friction_force_n": 4532.131642341348,
+          "holding_force_n": 4532.131642341348,
+          "indentation_m": 0.18998842617398787,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 6294.6272810296505,
+          "obstacle_id": "single_starboard_boulder",
+          "obstacle_local_position_m": {
+            "x": 0.54,
+            "y": 1.22,
+            "z": 0.0
+          },
+          "penetration_m": 0.18998842617398787,
+          "pinned": true,
+          "pressure_pa": 18993.04892781637,
+          "pressure_release_support_n": 341.87488070069463,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2600.0,
+          "release_margin_n": -1590.2567616406532,
+          "release_resistance_n": 4190.256761640653,
+          "segment_id": "starboard_2",
+          "wrap_support_n": 0.0,
+          "wrapping": false
+        }
+      ],
+      "intent": "Single boulder should indent a bounded local tube segment with friction.",
+      "scoring_authority_enabled": false,
+      "summary": {
+        "contact_count": 1,
+        "max_indentation_m": 0.18998842617398787,
+        "min_release_margin_n": -1590.2567616406532,
+        "pinned_obstacle_count": 1,
+        "recovering_contact_count": 0,
+        "total_holding_force_n": 4532.131642341348,
+        "water_field_modified": false,
+        "wrapping_contact_count": 0
+      }
+    },
+    {
+      "case_id": "starboard_wrap_pin",
+      "contacts": [
+        {
+          "clearance_m": -0.1167249924454914,
+          "damping_force_n": 18.44074932090885,
+          "friction_force_n": 2886.556228602233,
+          "holding_force_n": 6265.939130380459,
+          "indentation_m": 0.1167249924454914,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 3520.1905226856506,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 0.1167249924454914,
+          "pinned": true,
+          "pressure_pa": 21348.515554213227,
+          "pressure_release_support_n": 384.2732799758381,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2600.0,
+          "release_margin_n": -3281.665850404621,
+          "release_resistance_n": 5881.665850404621,
+          "segment_id": "starboard_3",
+          "wrap_support_n": 3379.382901778225,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -1.1901794279577702,
+          "damping_force_n": 55.110904513051246,
+          "friction_force_n": 5457.190941700702,
+          "holding_force_n": 11846.097410033231,
+          "indentation_m": 0.22,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 6655.1109045130515,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 1.1901794279577702,
+          "pinned": true,
+          "pressure_pa": 18993.04892781637,
+          "pressure_release_support_n": 341.87488070069463,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2600.0,
+          "release_margin_n": -8904.222529332537,
+          "release_resistance_n": 11504.222529332537,
+          "segment_id": "starboard_2",
+          "wrap_support_n": 6388.90646833253,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -1.1901794279577702,
+          "damping_force_n": 55.110904513051246,
+          "friction_force_n": 5457.190941700702,
+          "holding_force_n": 11846.097410033231,
+          "indentation_m": 0.22,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 6655.1109045130515,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 1.1901794279577702,
+          "pinned": true,
+          "pressure_pa": 21348.515554213227,
+          "pressure_release_support_n": 384.2732799758381,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2600.0,
+          "release_margin_n": -8861.824130057394,
+          "release_resistance_n": 11461.824130057394,
+          "segment_id": "starboard_1",
+          "wrap_support_n": 6388.90646833253,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -0.1167249924454914,
+          "damping_force_n": 18.44074932090885,
+          "friction_force_n": 2886.556228602233,
+          "holding_force_n": 6265.939130380459,
+          "indentation_m": 0.1167249924454914,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 3520.1905226856506,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 0.1167249924454914,
+          "pinned": true,
+          "pressure_pa": 19028.603141045,
+          "pressure_release_support_n": 342.51485653881,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2600.0,
+          "release_margin_n": -3323.4242738416488,
+          "release_resistance_n": 5923.424273841649,
+          "segment_id": "starboard_0",
+          "wrap_support_n": 3379.382901778225,
+          "wrapping": true
+        }
+      ],
+      "intent": "Wide boulder contact should wrap multiple tube segments and create pin risk.",
+      "scoring_authority_enabled": false,
+      "summary": {
+        "contact_count": 4,
+        "max_indentation_m": 0.22,
+        "min_release_margin_n": -8904.222529332537,
+        "pinned_obstacle_count": 1,
+        "recovering_contact_count": 0,
+        "total_holding_force_n": 36224.07308082738,
+        "water_field_modified": false,
+        "wrapping_contact_count": 4
+      }
+    },
+    {
+      "case_id": "high_side_changes_release_margin",
+      "contacts": [
+        {
+          "clearance_m": -0.1167249924454914,
+          "damping_force_n": 18.44074932090885,
+          "friction_force_n": 2886.556228602233,
+          "holding_force_n": 6265.939130380459,
+          "indentation_m": 0.1167249924454914,
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 3520.1905226856506,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 0.1167249924454914,
+          "pinned": true,
+          "pressure_pa": 21348.515554213227,
+          "pressure_release_support_n": 384.2732799758381,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2181.9771167048057,
+          "release_margin_n": -3699.688733699815,
+          "release_resistance_n": 5881.665850404621,
+          "segment_id": "starboard_3",
+          "wrap_support_n": 3379.382901778225,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -1.1901794279577702,
+          "damping_force_n": 55.110904513051246,
+          "friction_force_n": 5457.190941700702,
+          "holding_force_n": 11846.097410033231,
+          "indentation_m": 0.22,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 6655.1109045130515,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 1.1901794279577702,
+          "pinned": true,
+          "pressure_pa": 18993.04892781637,
+          "pressure_release_support_n": 341.87488070069463,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2181.9771167048057,
+          "release_margin_n": -9322.245412627732,
+          "release_resistance_n": 11504.222529332537,
+          "segment_id": "starboard_2",
+          "wrap_support_n": 6388.90646833253,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -1.1901794279577702,
+          "damping_force_n": 55.110904513051246,
+          "friction_force_n": 5457.190941700702,
+          "holding_force_n": 11846.097410033231,
+          "indentation_m": 0.22,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 6655.1109045130515,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 1.1901794279577702,
+          "pinned": true,
+          "pressure_pa": 21348.515554213227,
+          "pressure_release_support_n": 384.2732799758381,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2181.9771167048057,
+          "release_margin_n": -9279.847013352588,
+          "release_resistance_n": 11461.824130057394,
+          "segment_id": "starboard_1",
+          "wrap_support_n": 6388.90646833253,
+          "wrapping": true
+        },
+        {
+          "clearance_m": -0.1167249924454914,
+          "damping_force_n": 18.44074932090885,
+          "friction_force_n": 2886.556228602233,
+          "holding_force_n": 6265.939130380459,
+          "indentation_m": 0.1167249924454914,
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 3520.1905226856506,
+          "obstacle_id": "wrap_starboard_pillow",
+          "obstacle_local_position_m": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "penetration_m": 0.1167249924454914,
+          "pinned": true,
+          "pressure_pa": 18873.053458169736,
+          "pressure_release_support_n": 339.7149622470552,
+          "recovered_previous_indentation_m": 0.0,
+          "recovering": false,
+          "release_authority_n": 2181.9771167048057,
+          "release_margin_n": -3744.247051428598,
+          "release_resistance_n": 5926.2241681334035,
+          "segment_id": "starboard_0",
+          "wrap_support_n": 3379.382901778225,
+          "wrapping": true
+        }
+      ],
+      "intent": "High-side load changes tube pressure and the pressure-dependent release margin.",
+      "scoring_authority_enabled": false,
+      "summary": {
+        "contact_count": 4,
+        "max_indentation_m": 0.22,
+        "min_release_margin_n": -9322.245412627732,
+        "pinned_obstacle_count": 1,
+        "recovering_contact_count": 0,
+        "total_holding_force_n": 36224.07308082738,
+        "water_field_modified": false,
+        "wrapping_contact_count": 4
+      }
+    },
+    {
+      "case_id": "post_contact_shape_recovery",
+      "contacts": [
+        {
+          "clearance_m": 0.0,
+          "damping_force_n": 0.0,
+          "friction_force_n": 0.0,
+          "holding_force_n": 0.0,
+          "indentation_m": 0.1104,
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 3312.0,
+          "obstacle_id": "shape_recovery",
+          "obstacle_local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "penetration_m": 0.0,
+          "pinned": false,
+          "pressure_pa": 18993.04892781637,
+          "pressure_release_support_n": 341.87488070069463,
+          "recovered_previous_indentation_m": 0.1104,
+          "recovering": true,
+          "release_authority_n": 2600.0,
+          "release_margin_n": 2600.0,
+          "release_resistance_n": 0.0,
+          "segment_id": "starboard_2",
+          "wrap_support_n": 0.0,
+          "wrapping": false
+        },
+        {
+          "clearance_m": 0.0,
+          "damping_force_n": 0.0,
+          "friction_force_n": 0.0,
+          "holding_force_n": 0.0,
+          "indentation_m": 0.0736,
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "normal_force_n": 2208.0,
+          "obstacle_id": "shape_recovery",
+          "obstacle_local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "penetration_m": 0.0,
+          "pinned": false,
+          "pressure_pa": 21348.515554213227,
+          "pressure_release_support_n": 384.2732799758381,
+          "recovered_previous_indentation_m": 0.0736,
+          "recovering": true,
+          "release_authority_n": 2600.0,
+          "release_margin_n": 2600.0,
+          "release_resistance_n": 0.0,
+          "segment_id": "starboard_1",
+          "wrap_support_n": 0.0,
+          "wrapping": false
+        }
+      ],
+      "intent": "Previously indented segments recover deterministically after contact clears.",
+      "scoring_authority_enabled": false,
+      "summary": {
+        "contact_count": 2,
+        "max_indentation_m": 0.1104,
+        "min_release_margin_n": 2600.0,
+        "pinned_obstacle_count": 0,
+        "recovering_contact_count": 2,
+        "total_holding_force_n": 0.0,
+        "water_field_modified": false,
+        "wrapping_contact_count": 0
+      }
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "model_contract": {
+    "accepted_water_fields_modified": false,
+    "bounded_indentation_recorded": true,
+    "friction_wrap_pin_release_recorded": true,
+    "gameplay_scoring_authority": "disabled_until_d6_fixture_suite_and_design_review",
+    "pressure_dependent_release_recorded": true,
+    "stable_post_contact_shape_recovery_recorded": true,
+    "uses_deformed_d2_tube_state": true
+  },
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_inform_engine_port": true,
+    "requires_before_runtime_authority": [
+      "D5 replay telemetry",
+      "D6 Chrono-or-reviewed compliant reference comparison",
+      "contact-stability sweeps",
+      "named-rapid pin/release consequence-line review"
+    ]
+  },
+  "schema": "raftsim.flexible_raft.d4_rock_contact_wrap_pin_reference.v1",
+  "scoring_authority": "disabled_reference_only",
+  "scoring_authority_enabled": false,
+  "status": "rock_contact_wrap_pin_reference_fixture_recorded_not_gameplay_authority"
+}
