@@ -140,6 +140,11 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - This is a mechanical Option B prerequisite, not a new parity claim: the uncalibrated result remains 6 of 40 genuine solver rows, retained playback remains calibration-only, and live custom-water stepping remains blocked.
 - Verification: all native C++ targets compile without warnings, focused C++ solver tests pass, and all pre-split dam-break/bed-step playback manifest and frame hashes remain byte-identical.
 
+### 2026-07-16 Finding 3 Step 3.2 Current-Review Dependency Boundary
+
+- Adopted the versioned-generator retirement policy in the photoreal production plan: governed review evidence remains, while superseded generators, one-off drivers, exports, and version-specific snapshots leave the live tree after the successor review locks.
+- Extracted the six constants/metrics still needed by V43 into `futaleufu_cypress_review_metrics.py`; the current locked driver no longer imports V32, V37, V40, or V41 scripts. This removes the historical driver chain before oldest-first deletion begins.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
