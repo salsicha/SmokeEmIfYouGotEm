@@ -1,0 +1,1458 @@
+{
+  "asset_set_count": 20,
+  "asset_sets": [
+    {
+      "asset_need_id": "sierra_oak_gray_pine_foliage",
+      "asset_set_id": "south_fork_american_chili_bar:sierra_oak_gray_pine_foliage",
+      "biome": "Sierra foothill oak woodland, gray pine, chaparral, granite/metamorphic river rock, summer-dry grass banks",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_SIERRA_OAK_GRAY_PINE_FOLIAGE_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_SIERRA_OAK_GRAY_PINE_FOLIAGE_REPORT_PATH=Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/sierra_oak_gray_pine_foliage_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "South Fork American",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/sierra_oak_gray_pine_foliage_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_SIERRA_OAK_GRAY_PINE_FOLIAGE_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_SIERRA_OAK_GRAY_PINE_FOLIAGE_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_SIERRA_OAK_GRAY_PINE_FOLIAGE_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/south_fork_american_chili_bar_sierra_oak_gray_pine_foliage_review.json",
+        "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/sierra_oak_gray_pine_foliage_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/SouthForkAmericanChiliBar/SierraOakGrayPineFoliage"
+      },
+      "promotion_allowed": false,
+      "river_id": "south_fork_american_chili_bar",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=sierra%20oak%20gray%20pine%20foliage"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=sierra+oak+gray+pine+foliage"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "hero_and_midground_foliage"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "asset_set_id": "south_fork_american_chili_bar:chaparral_shrub_understory",
+      "biome": "Sierra foothill oak woodland, gray pine, chaparral, granite/metamorphic river rock, summer-dry grass banks",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_CHAPARRAL_SHRUB_UNDERSTORY_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_CHAPARRAL_SHRUB_UNDERSTORY_REPORT_PATH=Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/chaparral_shrub_understory_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "South Fork American",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/chaparral_shrub_understory_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_CHAPARRAL_SHRUB_UNDERSTORY_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_CHAPARRAL_SHRUB_UNDERSTORY_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_CHAPARRAL_SHRUB_UNDERSTORY_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/south_fork_american_chili_bar_chaparral_shrub_understory_review.json",
+        "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/chaparral_shrub_understory_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/SouthForkAmericanChiliBar/ChaparralShrubUnderstory"
+      },
+      "promotion_allowed": false,
+      "river_id": "south_fork_american_chili_bar",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=chaparral%20shrub%20understory"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=chaparral+shrub+understory"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "understory_and_bank_breakup"
+    },
+    {
+      "asset_need_id": "granite_metamorphic_boulders",
+      "asset_set_id": "south_fork_american_chili_bar:granite_metamorphic_boulders",
+      "biome": "Sierra foothill oak woodland, gray pine, chaparral, granite/metamorphic river rock, summer-dry grass banks",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+        "template": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_GRANITE_METAMORPHIC_BOULDERS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_GRANITE_METAMORPHIC_BOULDERS_REPORT_PATH=Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/granite_metamorphic_boulders_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "South Fork American",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/granite_metamorphic_boulders_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_GRANITE_METAMORPHIC_BOULDERS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_GRANITE_METAMORPHIC_BOULDERS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_GRANITE_METAMORPHIC_BOULDERS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/south_fork_american_chili_bar_granite_metamorphic_boulders_review.json",
+        "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/granite_metamorphic_boulders_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/SouthForkAmericanChiliBar/GraniteMetamorphicBoulders"
+      },
+      "promotion_allowed": false,
+      "river_id": "south_fork_american_chili_bar",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=granite%20metamorphic%20boulders"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=granite+metamorphic+boulders"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "riverbed_boulders_and_banks"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "asset_set_id": "south_fork_american_chili_bar:dry_grass_bank_materials",
+      "biome": "Sierra foothill oak woodland, gray pine, chaparral, granite/metamorphic river rock, summer-dry grass banks",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_DRY_GRASS_BANK_MATERIALS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_DRY_GRASS_BANK_MATERIALS_REPORT_PATH=Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/dry_grass_bank_materials_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "South Fork American",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/south_fork_american_chili_bar/dry_grass_bank_materials_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_DRY_GRASS_BANK_MATERIALS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_DRY_GRASS_BANK_MATERIALS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_SOUTH_FORK_AMERICAN_CHILI_BAR_DRY_GRASS_BANK_MATERIALS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/south_fork_american_chili_bar_dry_grass_bank_materials_review.json",
+        "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/asset_intake/dry_grass_bank_materials_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/SouthForkAmericanChiliBar/DryGrassBankMaterials"
+      },
+      "promotion_allowed": false,
+      "river_id": "south_fork_american_chili_bar",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=dry%20grass%20bank%20materials"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=dry+grass+bank+materials"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "near_field_ground_materials"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_set_id": "colorado_river_grand_canyon_rowing:grand_canyon_layered_cliff_materials",
+      "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_terrain_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_GRAND_CANYON_LAYERED_CLIFF_MATERIALS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_GRAND_CANYON_LAYERED_CLIFF_MATERIALS_REPORT_PATH=Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/grand_canyon_layered_cliff_materials_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_terrain_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Colorado River Grand Canyon",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/grand_canyon_layered_cliff_materials_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_GRAND_CANYON_LAYERED_CLIFF_MATERIALS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_GRAND_CANYON_LAYERED_CLIFF_MATERIALS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_GRAND_CANYON_LAYERED_CLIFF_MATERIALS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/colorado_river_grand_canyon_rowing_grand_canyon_layered_cliff_materials_review.json",
+        "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/grand_canyon_layered_cliff_materials_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ColoradoRiverGrandCanyonRowing/GrandCanyonLayeredCliffMaterials"
+      },
+      "promotion_allowed": false,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=grand%20canyon%20layered%20cliff%20materials"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=grand+canyon+layered+cliff+materials"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "signature_canyon_walls"
+    },
+    {
+      "asset_need_id": "desert_scrub_riparian_foliage",
+      "asset_set_id": "colorado_river_grand_canyon_rowing:desert_scrub_riparian_foliage",
+      "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_DESERT_SCRUB_RIPARIAN_FOLIAGE_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_DESERT_SCRUB_RIPARIAN_FOLIAGE_REPORT_PATH=Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/desert_scrub_riparian_foliage_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Colorado River Grand Canyon",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/desert_scrub_riparian_foliage_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_DESERT_SCRUB_RIPARIAN_FOLIAGE_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_DESERT_SCRUB_RIPARIAN_FOLIAGE_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_DESERT_SCRUB_RIPARIAN_FOLIAGE_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/colorado_river_grand_canyon_rowing_desert_scrub_riparian_foliage_review.json",
+        "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/desert_scrub_riparian_foliage_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ColoradoRiverGrandCanyonRowing/DesertScrubRiparianFoliage"
+      },
+      "promotion_allowed": false,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=desert%20scrub%20riparian%20foliage"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=desert+scrub+riparian+foliage"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "tamarisk_willow_cactus_bank_set"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_set_id": "colorado_river_grand_canyon_rowing:sand_beach_materials",
+      "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_SAND_BEACH_MATERIALS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_SAND_BEACH_MATERIALS_REPORT_PATH=Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/sand_beach_materials_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Colorado River Grand Canyon",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/sand_beach_materials_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_SAND_BEACH_MATERIALS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_SAND_BEACH_MATERIALS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_SAND_BEACH_MATERIALS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/colorado_river_grand_canyon_rowing_sand_beach_materials_review.json",
+        "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/sand_beach_materials_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ColoradoRiverGrandCanyonRowing/SandBeachMaterials"
+      },
+      "promotion_allowed": false,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=sand%20beach%20materials"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=sand+beach+materials"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "camp_beaches_and_edging"
+    },
+    {
+      "asset_need_id": "lava_falls_basalt",
+      "asset_set_id": "colorado_river_grand_canyon_rowing:lava_falls_basalt",
+      "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+        "template": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_LAVA_FALLS_BASALT_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_LAVA_FALLS_BASALT_REPORT_PATH=Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/lava_falls_basalt_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Colorado River Grand Canyon",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/colorado_river_grand_canyon_rowing/lava_falls_basalt_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_LAVA_FALLS_BASALT_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_LAVA_FALLS_BASALT_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_COLORADO_RIVER_GRAND_CANYON_ROWING_LAVA_FALLS_BASALT_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/colorado_river_grand_canyon_rowing_lava_falls_basalt_review.json",
+        "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/asset_intake/lava_falls_basalt_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ColoradoRiverGrandCanyonRowing/LavaFallsBasalt"
+      },
+      "promotion_allowed": false,
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=lava%20falls%20basalt"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=lava+falls+basalt"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "rapid_specific_rock_material"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "asset_set_id": "pacuare_river_costa_rica:multi_strata_tropical_canopy",
+      "biome": "tropical rainforest canopy, mossy basalt/andesite boulders, waterfalls, mist and atmosphere",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MULTI_STRATA_TROPICAL_CANOPY_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MULTI_STRATA_TROPICAL_CANOPY_REPORT_PATH=Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/multi_strata_tropical_canopy_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Pacuare River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/multi_strata_tropical_canopy_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MULTI_STRATA_TROPICAL_CANOPY_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MULTI_STRATA_TROPICAL_CANOPY_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MULTI_STRATA_TROPICAL_CANOPY_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/pacuare_river_costa_rica_multi_strata_tropical_canopy_review.json",
+        "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/multi_strata_tropical_canopy_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/PacuareRiverCostaRica/MultiStrataTropicalCanopy"
+      },
+      "promotion_allowed": false,
+      "river_id": "pacuare_river_costa_rica",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=multi%20strata%20tropical%20canopy"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=multi+strata+tropical+canopy"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "hero_and_background_rainforest"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_set_id": "pacuare_river_costa_rica:mossy_basalt_andesite_boulders",
+      "biome": "tropical rainforest canopy, mossy basalt/andesite boulders, waterfalls, mist and atmosphere",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+        "template": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MOSSY_BASALT_ANDESITE_BOULDERS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MOSSY_BASALT_ANDESITE_BOULDERS_REPORT_PATH=Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/mossy_basalt_andesite_boulders_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Pacuare River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/mossy_basalt_andesite_boulders_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MOSSY_BASALT_ANDESITE_BOULDERS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MOSSY_BASALT_ANDESITE_BOULDERS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_MOSSY_BASALT_ANDESITE_BOULDERS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/pacuare_river_costa_rica_mossy_basalt_andesite_boulders_review.json",
+        "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/mossy_basalt_andesite_boulders_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/PacuareRiverCostaRica/MossyBasaltAndesiteBoulders"
+      },
+      "promotion_allowed": false,
+      "river_id": "pacuare_river_costa_rica",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=mossy%20basalt%20andesite%20boulders"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=mossy+basalt+andesite+boulders"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "riverbed_and_bank_rocks"
+    },
+    {
+      "asset_need_id": "waterfall_side_stream_assets",
+      "asset_set_id": "pacuare_river_costa_rica:waterfall_side_stream_assets",
+      "biome": "tropical rainforest canopy, mossy basalt/andesite boulders, waterfalls, mist and atmosphere",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_WATERFALL_SIDE_STREAM_ASSETS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_WATERFALL_SIDE_STREAM_ASSETS_REPORT_PATH=Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/waterfall_side_stream_assets_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Pacuare River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/waterfall_side_stream_assets_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_WATERFALL_SIDE_STREAM_ASSETS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_WATERFALL_SIDE_STREAM_ASSETS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_WATERFALL_SIDE_STREAM_ASSETS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/pacuare_river_costa_rica_waterfall_side_stream_assets_review.json",
+        "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/waterfall_side_stream_assets_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/PacuareRiverCostaRica/WaterfallSideStreamAssets"
+      },
+      "promotion_allowed": false,
+      "river_id": "pacuare_river_costa_rica",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=waterfall%20side%20stream%20assets"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=waterfall+side+stream+assets"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "side_streams_and_spray_sources"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "asset_set_id": "pacuare_river_costa_rica:rainforest_floor_and_lianas",
+      "biome": "tropical rainforest canopy, mossy basalt/andesite boulders, waterfalls, mist and atmosphere",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_RAINFOREST_FLOOR_AND_LIANAS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_RAINFOREST_FLOOR_AND_LIANAS_REPORT_PATH=Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/rainforest_floor_and_lianas_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Pacuare River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/pacuare_river_costa_rica/rainforest_floor_and_lianas_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_RAINFOREST_FLOOR_AND_LIANAS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_RAINFOREST_FLOOR_AND_LIANAS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_PACUARE_RIVER_COSTA_RICA_RAINFOREST_FLOOR_AND_LIANAS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/pacuare_river_costa_rica_rainforest_floor_and_lianas_review.json",
+        "source_manifest": "physics/data/real_world/pacuare_river_costa_rica/asset_intake/rainforest_floor_and_lianas_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/PacuareRiverCostaRica/RainforestFloorAndLianas"
+      },
+      "promotion_allowed": false,
+      "river_id": "pacuare_river_costa_rica",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=rainforest%20floor%20and%20lianas"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=rainforest+floor+and+lianas"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "near_field_understory"
+    },
+    {
+      "asset_need_id": "nothofagus_coigue_canopy_or_reviewed_analog",
+      "asset_set_id": "futaleufu_river_chile:nothofagus_coigue_canopy_or_reviewed_analog",
+      "biome": "Patagonian temperate rainforest, Nothofagus/coigue analogs, granite boulders, turquoise water grading",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NOTHOFAGUS_COIGUE_CANOPY_OR_REVIEWED_ANALOG_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NOTHOFAGUS_COIGUE_CANOPY_OR_REVIEWED_ANALOG_REPORT_PATH=Saved/RaftSim/AssetIntake/futaleufu_river_chile/nothofagus_coigue_canopy_or_reviewed_analog_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Futaleufu River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/futaleufu_river_chile/nothofagus_coigue_canopy_or_reviewed_analog_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NOTHOFAGUS_COIGUE_CANOPY_OR_REVIEWED_ANALOG_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NOTHOFAGUS_COIGUE_CANOPY_OR_REVIEWED_ANALOG_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NOTHOFAGUS_COIGUE_CANOPY_OR_REVIEWED_ANALOG_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/futaleufu_river_chile_nothofagus_coigue_canopy_or_reviewed_analog_review.json",
+        "source_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/nothofagus_coigue_canopy_or_reviewed_analog_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/FutaleufuRiverChile/NothofagusCoigueCanopyOrReviewedAnalog"
+      },
+      "promotion_allowed": false,
+      "river_id": "futaleufu_river_chile",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=nothofagus%20coigue%20canopy%20or%20reviewed%20analog"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=nothofagus+coigue+canopy+or+reviewed+analog"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "hero_canopy"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "asset_set_id": "futaleufu_river_chile:near_bank_sapling_fern_strata",
+      "biome": "Patagonian temperate rainforest, Nothofagus/coigue analogs, granite boulders, turquoise water grading",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NEAR_BANK_SAPLING_FERN_STRATA_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NEAR_BANK_SAPLING_FERN_STRATA_REPORT_PATH=Saved/RaftSim/AssetIntake/futaleufu_river_chile/near_bank_sapling_fern_strata_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Futaleufu River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/futaleufu_river_chile/near_bank_sapling_fern_strata_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NEAR_BANK_SAPLING_FERN_STRATA_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NEAR_BANK_SAPLING_FERN_STRATA_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_NEAR_BANK_SAPLING_FERN_STRATA_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/futaleufu_river_chile_near_bank_sapling_fern_strata_review.json",
+        "source_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/near_bank_sapling_fern_strata_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/FutaleufuRiverChile/NearBankSaplingFernStrata"
+      },
+      "promotion_allowed": false,
+      "river_id": "futaleufu_river_chile",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=near%20bank%20sapling%20fern%20strata"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=near+bank+sapling+fern+strata"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "retained_project_owned_near_bank_strata"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_set_id": "futaleufu_river_chile:patagonian_granite_boulders",
+      "biome": "Patagonian temperate rainforest, Nothofagus/coigue analogs, granite boulders, turquoise water grading",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+        "template": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_PATAGONIAN_GRANITE_BOULDERS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_PATAGONIAN_GRANITE_BOULDERS_REPORT_PATH=Saved/RaftSim/AssetIntake/futaleufu_river_chile/patagonian_granite_boulders_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Futaleufu River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/futaleufu_river_chile/patagonian_granite_boulders_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_PATAGONIAN_GRANITE_BOULDERS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_PATAGONIAN_GRANITE_BOULDERS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_PATAGONIAN_GRANITE_BOULDERS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/futaleufu_river_chile_patagonian_granite_boulders_review.json",
+        "source_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/patagonian_granite_boulders_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/FutaleufuRiverChile/PatagonianGraniteBoulders"
+      },
+      "promotion_allowed": false,
+      "river_id": "futaleufu_river_chile",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=patagonian%20granite%20boulders"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=patagonian+granite+boulders"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "riverbed_and_boulder_gardens"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "asset_set_id": "futaleufu_river_chile:turquoise_wet_bank_materials",
+      "biome": "Patagonian temperate rainforest, Nothofagus/coigue analogs, granite boulders, turquoise water grading",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_TURQUOISE_WET_BANK_MATERIALS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_TURQUOISE_WET_BANK_MATERIALS_REPORT_PATH=Saved/RaftSim/AssetIntake/futaleufu_river_chile/turquoise_wet_bank_materials_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Futaleufu River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/futaleufu_river_chile/turquoise_wet_bank_materials_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_TURQUOISE_WET_BANK_MATERIALS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_TURQUOISE_WET_BANK_MATERIALS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_FUTALEUFU_RIVER_CHILE_TURQUOISE_WET_BANK_MATERIALS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/futaleufu_river_chile_turquoise_wet_bank_materials_review.json",
+        "source_manifest": "physics/data/real_world/futaleufu_river_chile/asset_intake/turquoise_wet_bank_materials_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/FutaleufuRiverChile/TurquoiseWetBankMaterials"
+      },
+      "promotion_allowed": false,
+      "river_id": "futaleufu_river_chile",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=turquoise%20wet%20bank%20materials"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=turquoise+wet+bank+materials"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "river_color_and_wet_bank_support"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_set_id": "chilko_river_lava_canyon:lodgepole_spruce_aspen_foliage",
+      "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_LODGEPOLE_SPRUCE_ASPEN_FOLIAGE_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_LODGEPOLE_SPRUCE_ASPEN_FOLIAGE_REPORT_PATH=Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/lodgepole_spruce_aspen_foliage_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Chilko River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/lodgepole_spruce_aspen_foliage_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_LODGEPOLE_SPRUCE_ASPEN_FOLIAGE_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_LODGEPOLE_SPRUCE_ASPEN_FOLIAGE_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_LODGEPOLE_SPRUCE_ASPEN_FOLIAGE_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": true,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/chilko_river_lava_canyon_lodgepole_spruce_aspen_foliage_review.json",
+        "source_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/lodgepole_spruce_aspen_foliage_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ChilkoRiverLavaCanyon/LodgepoleSpruceAspenFoliage"
+      },
+      "promotion_allowed": false,
+      "river_id": "chilko_river_lava_canyon",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=lodgepole%20spruce%20aspen%20foliage"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=lodgepole+spruce+aspen+foliage"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "river_corridor_forest"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_set_id": "chilko_river_lava_canyon:glacial_blue_wet_bank_materials",
+      "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "template": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_GLACIAL_BLUE_WET_BANK_MATERIALS_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_GLACIAL_BLUE_WET_BANK_MATERIALS_REPORT_PATH=Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/glacial_blue_wet_bank_materials_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_ground_detail_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Chilko River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/glacial_blue_wet_bank_materials_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_GLACIAL_BLUE_WET_BANK_MATERIALS_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_GLACIAL_BLUE_WET_BANK_MATERIALS_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_GLACIAL_BLUE_WET_BANK_MATERIALS_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/chilko_river_lava_canyon_glacial_blue_wet_bank_materials_review.json",
+        "source_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/glacial_blue_wet_bank_materials_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ChilkoRiverLavaCanyon/GlacialBlueWetBankMaterials"
+      },
+      "promotion_allowed": false,
+      "river_id": "chilko_river_lava_canyon",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=glacial%20blue%20wet%20bank%20materials"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=glacial+blue+wet+bank+materials"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "water_and_bank_material_support"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_set_id": "chilko_river_lava_canyon:volcanic_canyon_rock",
+      "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_rock_asset.py",
+        "template": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_VOLCANIC_CANYON_ROCK_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_VOLCANIC_CANYON_ROCK_REPORT_PATH=Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/volcanic_canyon_rock_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_rock_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Chilko River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/volcanic_canyon_rock_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_VOLCANIC_CANYON_ROCK_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_VOLCANIC_CANYON_ROCK_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_VOLCANIC_CANYON_ROCK_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/chilko_river_lava_canyon_volcanic_canyon_rock_review.json",
+        "source_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/volcanic_canyon_rock_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ChilkoRiverLavaCanyon/VolcanicCanyonRock"
+      },
+      "promotion_allowed": false,
+      "river_id": "chilko_river_lava_canyon",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=volcanic%20canyon%20rock"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=volcanic+canyon+rock"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "lava_canyon_rock_materials"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_set_id": "chilko_river_lava_canyon:cold_water_debris_and_gravel",
+      "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+      "command": {
+        "idempotency": [
+          "verify source hashes before import",
+          "reuse existing imported assets unless reimport env is set to 1",
+          "write report on success and failure",
+          "never promote into corridor maps from this command alone"
+        ],
+        "script": "unreal/Scripts/import_reviewed_biome_asset.py",
+        "template": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_COLD_WATER_DEBRIS_AND_GRAVEL_SOURCE_ROOT=/path/to/reviewed/source RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_COLD_WATER_DEBRIS_AND_GRAVEL_REPORT_PATH=Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/cold_water_debris_and_gravel_import_report.json UnrealEditor-Cmd RaftSim.uproject -ExecutePythonScript=Scripts/import_reviewed_biome_asset.py",
+        "working_directory": "unreal"
+      },
+      "display_name": "Chilko River",
+      "environment": {
+        "default_report_path": "Saved/RaftSim/AssetIntake/chilko_river_lava_canyon/cold_water_debris_and_gravel_import_report.json",
+        "reimport_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_COLD_WATER_DEBRIS_AND_GRAVEL_REIMPORT",
+        "report_path_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_COLD_WATER_DEBRIS_AND_GRAVEL_REPORT_PATH",
+        "source_root_env": "RAFTSIM_REVIEWED_CHILKO_RIVER_LAVA_CANYON_COLD_WATER_DEBRIS_AND_GRAVEL_SOURCE_ROOT"
+      },
+      "importer_hardening": {
+        "alpha_opacity_textures_as_masks": true,
+        "isolated_gate_required": [
+          "turntable",
+          "60m_river_distance",
+          "150m_river_distance",
+          "map_check_zero_errors",
+          "desktop_and_vr_performance_review"
+        ],
+        "masked_foliage_nanite_disabled_by_default": false,
+        "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+        "procedural_fallback_required": true
+      },
+      "license_boundary": {
+        "fab_standard": "local_only_source_binaries_until_item_terms_prove_redistributable",
+        "first_party": "committable_with_recipe_seed_tool_version_and_hashes",
+        "poly_haven": "cc0_committable_after_hash_and_license_snapshot"
+      },
+      "planned_outputs": {
+        "isolated_review_report": "docs/environment-captures/photoreal_river_previews/asset_intake/chilko_river_lava_canyon_cold_water_debris_and_gravel_review.json",
+        "source_manifest": "physics/data/real_world/chilko_river_lava_canyon/asset_intake/cold_water_debris_and_gravel_source_manifest.json",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/ChilkoRiverLavaCanyon/ColdWaterDebrisAndGravel"
+      },
+      "promotion_allowed": false,
+      "river_id": "chilko_river_lava_canyon",
+      "source_candidates": [
+        {
+          "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+          "repo_binary_policy": "do_not_commit_source_binaries",
+          "source_family": "Fab",
+          "source_url": "https://www.fab.com/search?q=cold%20water%20debris%20and%20gravel"
+        },
+        {
+          "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+          "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+          "source_family": "Poly Haven",
+          "source_url": "https://polyhaven.com/all?q=cold+water+debris+and+gravel"
+        },
+        {
+          "license_class": "first_party_committable",
+          "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+          "source_family": "First-party procedural",
+          "source_url": "source_manifest://first_party_procedural_environment_assets"
+        }
+      ],
+      "status": "intake_command_recorded_no_asset_selected",
+      "use": "near_field_banks_and_bars"
+    }
+  ],
+  "assets_imported": false,
+  "generated_on": "2026-07-16",
+  "global_importer_hardening": {
+    "alpha_opacity_textures_as_masks": true,
+    "desktop_and_vr_performance_review_required": true,
+    "hash_locked_report_required": true,
+    "map_check_zero_errors_required": true,
+    "masked_foliage_nanite_disabled_by_default": true,
+    "may_commit_fab_standard_source_binaries": false,
+    "nanite_preserve_area_only_for_reviewed_opaque_woody_or_rock": true,
+    "procedural_fallback_required": true,
+    "river_distance_captures_required_m": [
+      60,
+      150
+    ],
+    "turntable_capture_required": true
+  },
+  "license_sources": [
+    {
+      "source_family": "Fab",
+      "url": "https://www.fab.com/eula"
+    },
+    {
+      "source_family": "Poly Haven",
+      "url": "https://polyhaven.com/license"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "b1_hardening_complete_for_planning": true,
+    "can_promote_any_river_asset_set": false,
+    "next_required_actions": [
+      "Pick item-level assets for B2 per river.",
+      "Bind the correct existing or specialized Unreal importer script.",
+      "Fill source hash expectations from reviewed local or CC0 sources.",
+      "Run the generated command and attach isolated review captures."
+    ]
+  },
+  "schema": "raftsim.photoreal.asset_set_intake_b1.v1",
+  "source_contract": "physics/data/real_world/photoreal_asset_intake_b1.json",
+  "status": "idempotent_asset_set_intake_commands_recorded_not_assets_imported",
+  "unreal_command_contract": {
+    "command_status": "generated_per_asset_set_command_shape; selected item-level asset may still require a specialized importer binding before execution",
+    "existing_importer_script_candidates": [
+      "unreal/Scripts/import_reviewed_biome_asset.py",
+      "unreal/Scripts/import_reviewed_rock_asset.py",
+      "unreal/Scripts/import_reviewed_rock_ground_detail_asset.py",
+      "unreal/Scripts/import_reviewed_terrain_detail_asset.py"
+    ],
+    "project": "unreal/RaftSim.uproject",
+    "runner": "UnrealEditor-Cmd",
+    "script_argument": "-ExecutePythonScript"
+  }
+}

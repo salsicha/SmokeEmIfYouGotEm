@@ -44,6 +44,8 @@ Canonical Unreal-facing policy: `unreal/Content/RaftSim/development_asset_source
 
 The B1 photoreal asset intake contract is
 `physics/data/real_world/photoreal_asset_intake_b1.json`.
+The B1 per-asset-set command contract is
+`physics/data/real_world/photoreal_asset_set_intake_b1.json`.
 
 - Poly Haven assets are treated as CC0 candidates: they may be committed only
   after the exact asset URL, license URL, source hashes, import settings, and
@@ -56,3 +58,7 @@ The B1 photoreal asset intake contract is
   disable Nanite for masked foliage unless a measured review says otherwise,
   use `PreserveArea` only for reviewed opaque woody/rock geometry, and preserve
   a procedural fallback when local-only binaries are absent.
+- Every river/biome asset set gets a source-controlled command record with
+  source-root/report env vars, expected report paths, isolated turntable and
+  60/150 m river-distance gates, map-check/performance gates, and promotion
+  disabled until B2 item-level asset review is complete.
