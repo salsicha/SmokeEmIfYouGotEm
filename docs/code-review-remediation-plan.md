@@ -94,6 +94,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - The evaluation file's long completion function is now a documented frozen-legacy exception: only lifecycle fixes belong there; new graph, material, atlas, capture, or report behavior must be added to focused modules. The same function-owned-module policy now applies to Python milestone coordinators in `docs/raftsim-tools-workflow.md`.
 - Verification: UE 5.8 independently compiled the authoring, atlas, and evaluation translation units and linked `libUnrealEditor-RaftSimEditor.dylib` successfully.
 
+### 2026-07-15 Finding 2 Step 2.1 Production Foundation Lock Repair
+
+- Added `raftsim.unreal_production_foundation` and a CLI generator that preserve authored foundation policy while deriving engine association and enabled plugin order from the current `.uproject`.
+- Regenerated `production_foundation.json` to include `ProceduralVegetationEditor`, `ImpostorBaker`, and `ProceduralMeshComponent`. Updated the module assertion to keep `RaftSimEditor` explicitly outside runtime/production domain boundaries.
+- Verification: all **20 Milestone 20 tests pass**; the former production-foundation stale-lock failure is closed.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
