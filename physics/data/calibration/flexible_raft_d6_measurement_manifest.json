@@ -1,0 +1,700 @@
+{
+  "d6_complete": false,
+  "fixture_count": 7,
+  "generated_on": "2026-07-16",
+  "measured_results_template_path": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
+  "measurement_task_count": 14,
+  "metric_tolerance": {
+    "absolute": 1e-06,
+    "relative": 0.05
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "next_required_actions": [
+      "Run or import every listed target/fixture task from a reviewed compliant model and Unreal Chaos.",
+      "Fill the measured-results template with source_report, telemetry_sha256, engine_version, and numeric metrics for every task.",
+      "Regenerate the D6 comparison report from the completed measured-results payload.",
+      "Require manual review before D6 can enable scoring-critical flexible-raft outcomes."
+    ]
+  },
+  "required_fixture_ids": [
+    "static_seat_load_sag",
+    "traveling_crew_shift",
+    "rock_pinch_wrap",
+    "upstream_tube_overwash_flip",
+    "timed_high_side_save",
+    "post_contact_recovery",
+    "pressure_flow_sweeps"
+  ],
+  "required_targets": [
+    "project_chrono_or_reviewed_compliant_model",
+    "unreal_chaos_rigid_baseline"
+  ],
+  "schema": "raftsim.flexible_raft.d6_measurement_manifest.v1",
+  "source_comparison_report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
+  "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
+  "status": "measurement_manifest_ready_engine_runs_pending",
+  "summary": {
+    "can_regenerate_comparison_report_after_template_is_filled": true,
+    "pending_measurement_task_count": 14,
+    "required_chaos_baseline_task_count": 7,
+    "required_compliant_reference_task_count": 7
+  },
+  "target_count": 2,
+  "tasks": [
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/static_seat_load_sag.json",
+      "fixture_id": "static_seat_load_sag",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 6,
+      "required_metric_paths": [
+        "loaded_crew_mass_kg",
+        "max_seat_freeboard_loss_m",
+        "port_total_freeboard_loss_m",
+        "raft_length_m",
+        "raft_width_m",
+        "starboard_total_freeboard_loss_m"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__static_seat_load_sag"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/static_seat_load_sag.json",
+      "fixture_id": "static_seat_load_sag",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 6,
+      "required_metric_paths": [
+        "loaded_crew_mass_kg",
+        "max_seat_freeboard_loss_m",
+        "port_total_freeboard_loss_m",
+        "raft_length_m",
+        "raft_width_m",
+        "starboard_total_freeboard_loss_m"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__static_seat_load_sag"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/traveling_crew_shift.json",
+      "fixture_id": "traveling_crew_shift",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "neutral_roll_load_bias_nm",
+        "port_roll_load_bias_nm",
+        "port_total_freeboard_delta_m",
+        "starboard_roll_load_bias_nm",
+        "starboard_total_freeboard_delta_m"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__traveling_crew_shift"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/traveling_crew_shift.json",
+      "fixture_id": "traveling_crew_shift",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "neutral_roll_load_bias_nm",
+        "port_roll_load_bias_nm",
+        "port_total_freeboard_delta_m",
+        "starboard_roll_load_bias_nm",
+        "starboard_total_freeboard_delta_m"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__traveling_crew_shift"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/rock_pinch_wrap.json",
+      "fixture_id": "rock_pinch_wrap",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "contact_count",
+        "max_indentation_m",
+        "min_release_margin_n",
+        "pinned_obstacle_count",
+        "wrapping_contact_count"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__rock_pinch_wrap"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/rock_pinch_wrap.json",
+      "fixture_id": "rock_pinch_wrap",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "contact_count",
+        "max_indentation_m",
+        "min_release_margin_n",
+        "pinned_obstacle_count",
+        "wrapping_contact_count"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__rock_pinch_wrap"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/upstream_tube_overwash_flip.json",
+      "fixture_id": "upstream_tube_overwash_flip",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 4,
+      "required_metric_paths": [
+        "reference_flip_margin_nm",
+        "retained_water_roll_moment_nm",
+        "total_overtopping_flux_m3_s",
+        "total_retained_water_mass_kg"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__upstream_tube_overwash_flip"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/upstream_tube_overwash_flip.json",
+      "fixture_id": "upstream_tube_overwash_flip",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 4,
+      "required_metric_paths": [
+        "reference_flip_margin_nm",
+        "retained_water_roll_moment_nm",
+        "total_overtopping_flux_m3_s",
+        "total_retained_water_mass_kg"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__upstream_tube_overwash_flip"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/timed_high_side_save.json",
+      "fixture_id": "timed_high_side_save",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "high_side_flip_margin_nm",
+        "high_side_flip_threshold_nm",
+        "margin_delta_nm",
+        "neutral_flip_margin_nm",
+        "neutral_flip_threshold_nm"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__timed_high_side_save"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/timed_high_side_save.json",
+      "fixture_id": "timed_high_side_save",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "high_side_flip_margin_nm",
+        "high_side_flip_threshold_nm",
+        "margin_delta_nm",
+        "neutral_flip_margin_nm",
+        "neutral_flip_threshold_nm"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__timed_high_side_save"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/post_contact_recovery.json",
+      "fixture_id": "post_contact_recovery",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 3,
+      "required_metric_paths": [
+        "max_recovered_indentation_m",
+        "recovering_contact_count",
+        "total_holding_force_n"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__post_contact_recovery"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/post_contact_recovery.json",
+      "fixture_id": "post_contact_recovery",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 3,
+      "required_metric_paths": [
+        "max_recovered_indentation_m",
+        "recovering_contact_count",
+        "total_holding_force_n"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__post_contact_recovery"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+        "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "bounded_numeric_equivalence",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/pressure_flow_sweeps.json",
+      "fixture_id": "pressure_flow_sweeps",
+      "metric_deltas_are_failures": true,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 46,
+      "required_metric_paths": [
+        "sweep_case_count",
+        "sweeps[0].contact_min_release_margin_n",
+        "sweeps[0].incoming_velocity_mps",
+        "sweeps[0].nominal_pressure_pa",
+        "sweeps[0].overwash_flux_m3_s",
+        "sweeps[0].retained_water_roll_moment_nm",
+        "sweeps[1].contact_min_release_margin_n",
+        "sweeps[1].incoming_velocity_mps",
+        "sweeps[1].nominal_pressure_pa",
+        "sweeps[1].overwash_flux_m3_s",
+        "sweeps[1].retained_water_roll_moment_nm",
+        "sweeps[2].contact_min_release_margin_n",
+        "sweeps[2].incoming_velocity_mps",
+        "sweeps[2].nominal_pressure_pa",
+        "sweeps[2].overwash_flux_m3_s",
+        "sweeps[2].retained_water_roll_moment_nm",
+        "sweeps[3].contact_min_release_margin_n",
+        "sweeps[3].incoming_velocity_mps",
+        "sweeps[3].nominal_pressure_pa",
+        "sweeps[3].overwash_flux_m3_s",
+        "sweeps[3].retained_water_roll_moment_nm",
+        "sweeps[4].contact_min_release_margin_n",
+        "sweeps[4].incoming_velocity_mps",
+        "sweeps[4].nominal_pressure_pa",
+        "sweeps[4].overwash_flux_m3_s",
+        "sweeps[4].retained_water_roll_moment_nm",
+        "sweeps[5].contact_min_release_margin_n",
+        "sweeps[5].incoming_velocity_mps",
+        "sweeps[5].nominal_pressure_pa",
+        "sweeps[5].overwash_flux_m3_s",
+        "sweeps[5].retained_water_roll_moment_nm",
+        "sweeps[6].contact_min_release_margin_n",
+        "sweeps[6].incoming_velocity_mps",
+        "sweeps[6].nominal_pressure_pa",
+        "sweeps[6].overwash_flux_m3_s",
+        "sweeps[6].retained_water_roll_moment_nm",
+        "sweeps[7].contact_min_release_margin_n",
+        "sweeps[7].incoming_velocity_mps",
+        "sweeps[7].nominal_pressure_pa",
+        "sweeps[7].overwash_flux_m3_s",
+        "sweeps[7].retained_water_roll_moment_nm",
+        "sweeps[8].contact_min_release_margin_n",
+        "sweeps[8].incoming_velocity_mps",
+        "sweeps[8].nominal_pressure_pa",
+        "sweeps[8].overwash_flux_m3_s",
+        "sweeps[8].retained_water_roll_moment_nm"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "status": "pending_measured_engine_run",
+      "target_id": "project_chrono_or_reviewed_compliant_model",
+      "task_id": "project_chrono_or_reviewed_compliant_model__pressure_flow_sweeps"
+    },
+    {
+      "adapter_contract": {
+        "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+        "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+        "may_substitute_with_synthetic_python_reference": false,
+        "required_output": "baseline delta metrics plus telemetry hash"
+      },
+      "can_promote_fixture": false,
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/pressure_flow_sweeps.json",
+      "fixture_id": "pressure_flow_sweeps",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 46,
+      "required_metric_paths": [
+        "sweep_case_count",
+        "sweeps[0].contact_min_release_margin_n",
+        "sweeps[0].incoming_velocity_mps",
+        "sweeps[0].nominal_pressure_pa",
+        "sweeps[0].overwash_flux_m3_s",
+        "sweeps[0].retained_water_roll_moment_nm",
+        "sweeps[1].contact_min_release_margin_n",
+        "sweeps[1].incoming_velocity_mps",
+        "sweeps[1].nominal_pressure_pa",
+        "sweeps[1].overwash_flux_m3_s",
+        "sweeps[1].retained_water_roll_moment_nm",
+        "sweeps[2].contact_min_release_margin_n",
+        "sweeps[2].incoming_velocity_mps",
+        "sweeps[2].nominal_pressure_pa",
+        "sweeps[2].overwash_flux_m3_s",
+        "sweeps[2].retained_water_roll_moment_nm",
+        "sweeps[3].contact_min_release_margin_n",
+        "sweeps[3].incoming_velocity_mps",
+        "sweeps[3].nominal_pressure_pa",
+        "sweeps[3].overwash_flux_m3_s",
+        "sweeps[3].retained_water_roll_moment_nm",
+        "sweeps[4].contact_min_release_margin_n",
+        "sweeps[4].incoming_velocity_mps",
+        "sweeps[4].nominal_pressure_pa",
+        "sweeps[4].overwash_flux_m3_s",
+        "sweeps[4].retained_water_roll_moment_nm",
+        "sweeps[5].contact_min_release_margin_n",
+        "sweeps[5].incoming_velocity_mps",
+        "sweeps[5].nominal_pressure_pa",
+        "sweeps[5].overwash_flux_m3_s",
+        "sweeps[5].retained_water_roll_moment_nm",
+        "sweeps[6].contact_min_release_margin_n",
+        "sweeps[6].incoming_velocity_mps",
+        "sweeps[6].nominal_pressure_pa",
+        "sweeps[6].overwash_flux_m3_s",
+        "sweeps[6].retained_water_roll_moment_nm",
+        "sweeps[7].contact_min_release_margin_n",
+        "sweeps[7].incoming_velocity_mps",
+        "sweeps[7].nominal_pressure_pa",
+        "sweeps[7].overwash_flux_m3_s",
+        "sweeps[7].retained_water_roll_moment_nm",
+        "sweeps[8].contact_min_release_margin_n",
+        "sweeps[8].incoming_velocity_mps",
+        "sweeps[8].nominal_pressure_pa",
+        "sweeps[8].overwash_flux_m3_s",
+        "sweeps[8].retained_water_roll_moment_nm"
+      ],
+      "required_provenance_fields": [
+        "source_report",
+        "telemetry_sha256"
+      ],
+      "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "status": "pending_measured_engine_run",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "task_id": "unreal_chaos_rigid_baseline__pressure_flow_sweeps"
+    }
+  ]
+}
