@@ -1,0 +1,95 @@
+{
+  "allowed_option_ids": [
+    "retain_official_access_with_separate_simulation_station_axis",
+    "select_guide_approved_access_endpoint_and_regenerate_route",
+    "replace_current_nhd_axis_with_reviewed_centerline",
+    "split_published_mile_convention_from_simulation_and_publication_axes"
+  ],
+  "decision_summary": {
+    "chosen_option_id": "",
+    "decision_date": "",
+    "decision_owner": "",
+    "decision_status": "not_recorded",
+    "route_regeneration_scope_count": 0
+  },
+  "decision_valid": false,
+  "generated_on": "2026-07-16",
+  "invalid_fields": [],
+  "missing_required_fields": [
+    "chosen_option_id",
+    "decision_owner",
+    "decision_date",
+    "selected_downstream_endpoint_lon_lat_or_centerline_geometry",
+    "endpoint_source_authority",
+    "simulation_station_axis_policy",
+    "published_mile_convention_policy",
+    "guide_reviewer",
+    "geospatial_reviewer",
+    "rights_publication_reviewer",
+    "reservoir_stage_or_access_assumptions",
+    "route_regeneration_scope"
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_empty_or_invalid_result": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_current_route_without_regenerated_artifacts": false,
+    "can_select_endpoint_from_validation_report_alone": false,
+    "next_after_valid_result": [
+      "a1_regenerate_directed_route",
+      "a1_regenerate_corridor_windows",
+      "a1_restation_catalog_and_editor_markers",
+      "a1_bind_first_solver_windows"
+    ]
+  },
+  "regeneration_permissions": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_promote_current_nhd_route": false,
+    "can_regenerate_corridor_windows": false,
+    "can_regenerate_directed_route": false,
+    "can_restation_named_rapids": false,
+    "manual_review_still_required_after_valid_result": true
+  },
+  "reviewer_failures": [
+    {
+      "reason": "review_not_approved",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "river_guide_or_oarsman_domain_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "river_guide_or_oarsman_domain_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "rights_publication_reviewer"
+    }
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_source_mile_access_decision_validation_report.v1",
+  "source_decision_packet": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_decision_packet.json",
+  "source_result_template": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_decision_result_template.json",
+  "status": "decision_result_incomplete_route_promotion_blocked",
+  "task_id": "A1",
+  "validation_error_count": 20
+}
