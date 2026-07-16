@@ -1,0 +1,591 @@
+{
+  "evidence_windows": {
+    "multiyear_context": {
+      "high_flow_outlier_review": {
+        "interpretation": "Official CDEC CBR event-flow values at or above 20,000 cfs are retained as source evidence, but must be reviewed as flood/high-water context before any runnable high-flow presets, sticky holes, washout behavior, unsafe-flow visuals, feature forcing, or gameplay difficulty tuning use them.",
+        "peak_cfs": 38489.0,
+        "peak_time_local": "2022-12-31T13:00",
+        "promotion_gate": "Do not promote high-flow visual or gameplay variants from these peaks until A25 release/routing, station-to-rapid timing, hydrologic plausibility, legal/redistribution signoff, and guide/outfitter validation pass.",
+        "required": true,
+        "sample_count_ge_trigger": 92,
+        "trigger_cfs": 20000.0
+      },
+      "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+      "promotion_blockers": [
+        "Official high-flow peak/outlier interpretation remains unresolved for CBR flood-event samples.",
+        "A25 release-routing interpretation remains unresolved for station-to-rapid timing.",
+        "CBR is a station context, not accepted rapid-scale hydraulics or guide-validated route behavior by itself.",
+        "Legal/redistribution signoff and guide/outfitter validation remain open before production use.",
+        "Feature forcing and lifelike water visuals must not use this context to hide water-simulation conservation failures."
+      ],
+      "request_window": {
+        "label": "water_year_2022_through_partial_2026",
+        "note": "CDEC event services returned a 2021-09-30 23:00 local first sample for the requested 2021-10-01 start; that row is retained in daily evidence but excluded from requested-window rollups.",
+        "requested_end": "2026-07-06T23:59",
+        "requested_start": "2021-10-01T00:00"
+      },
+      "series": {
+        "duration_code": "E",
+        "first_datetime_local": "2021-09-30T23:00",
+        "last_datetime_local": "2026-07-06T22:45",
+        "max": 38489.0,
+        "median": 1128.0,
+        "min": 0.0,
+        "no_data_or_excluded_count": 1938,
+        "p10": 301.0,
+        "p90": 3308.0,
+        "sample_count": 166930,
+        "sensor_num": 20,
+        "sensor_type": "FLOW",
+        "station_id": "CBR",
+        "units": "CFS",
+        "valid_sample_count": 164992
+      },
+      "status": "multiyear_cdec_cbr_flow_context_attached_review_gated",
+      "summary": {
+        "day_count": 1740,
+        "days_peak_ge_1600_cfs": 1076,
+        "days_peak_ge_3000_cfs": 364,
+        "days_peak_ge_900_cfs": 1439,
+        "flow_median_of_daily_medians_cfs": 880.75,
+        "flow_min_cfs": 0.0,
+        "flow_peak_max_cfs": 38489.0,
+        "total_hours_ge_1600_cfs": 16622.25,
+        "total_hours_ge_3000_cfs": 4995.5,
+        "total_hours_ge_900_cfs": 23082.25,
+        "valid_flow_day_count": 1740
+      }
+    },
+    "thirty_day_context": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+      "promotion_blockers": [
+        "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+        "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+        "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+        "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+      ],
+      "status": "review_gated_do_not_promote_presets",
+      "summary": {
+        "a25_unlisted_flags_observed": [
+          "X"
+        ],
+        "a25_valid_daily_generation_samples": 20,
+        "days_peak_ge_1600_cfs": 9,
+        "days_peak_ge_3000_cfs": 0,
+        "days_peak_ge_900_cfs": 25,
+        "flow_median_of_daily_medians_cfs": 321.0,
+        "flow_min_cfs": 291.0,
+        "flow_peak_max_cfs": 1688.0,
+        "requested_end": "2026-07-06T23:59",
+        "requested_start": "2026-06-07T00:00",
+        "stage_peak_max_ft": 4.04,
+        "total_hours_ge_1600_cfs": 58.5,
+        "total_hours_ge_900_cfs": 165.5,
+        "valid_day_count": 31,
+        "valid_sample_count": 2744
+      }
+    },
+    "water_year_2026_to_date": {
+      "path": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+      "promotion_blockers": [
+        "Water-year-to-date coverage is broader than the first 30-day window but still not a multi-year seasonal climatology.",
+        "A25 X-flag and release-routing interpretation remain unresolved for station-to-rapid timing.",
+        "High-flow 3000 cfs planning events are observed but need guide validation before they become accepted high-flow visuals or gameplay tuning.",
+        "Legal/redistribution signoff and guide/outfitter validation remain open before production use."
+      ],
+      "request_window": {
+        "label": "water_year_2026_to_2026_07_06",
+        "note": "CDEC event services returned records beginning 2025-09-30 23:00 local time for the requested 2025-10-01 start; that row is retained in daily evidence but excluded from water-year rollups.",
+        "requested_end": "2026-07-06T23:59",
+        "requested_start": "2025-10-01T00:00"
+      },
+      "series": {
+        "a25_power_generation_discharge_cfs": {
+          "duration_code": "D",
+          "first_datetime_local": "2025-10-01T00:00",
+          "last_datetime_local": "2026-07-06T00:00",
+          "max": 1901.0,
+          "median": 991.0,
+          "min": 0.0,
+          "no_data_or_excluded_count": 16,
+          "p10": 411.2,
+          "p90": 1841.0,
+          "sample_count": 279,
+          "sensor_num": 48,
+          "sensor_type": "DIS PWR",
+          "station_id": "A25",
+          "unique_flags": [
+            "",
+            "X"
+          ],
+          "units": "CFS",
+          "valid_sample_count": 263,
+          "value_key": "power_generation_discharge_cfs"
+        },
+        "cbr_flow_cfs": {
+          "duration_code": "E",
+          "first_datetime_local": "2025-09-30T23:00",
+          "last_datetime_local": "2026-07-06T22:45",
+          "max": 5660.0,
+          "median": 1388.0,
+          "min": 198.0,
+          "no_data_or_excluded_count": 152,
+          "p10": 311.0,
+          "p90": 2741.0,
+          "sample_count": 26733,
+          "sensor_num": 20,
+          "sensor_type": "FLOW",
+          "station_id": "CBR",
+          "unique_flags": [
+            ""
+          ],
+          "units": "CFS",
+          "valid_sample_count": 26581,
+          "value_key": "flow_cfs"
+        },
+        "cbr_stage_ft": {
+          "duration_code": "E",
+          "first_datetime_local": "2025-09-30T23:00",
+          "last_datetime_local": "2026-07-06T22:45",
+          "max": 7.53,
+          "median": 3.64,
+          "min": 1.19,
+          "no_data_or_excluded_count": 105,
+          "p10": 1.56,
+          "p90": 5.23,
+          "sample_count": 26733,
+          "sensor_num": 1,
+          "sensor_type": "RIV STG",
+          "station_id": "CBR",
+          "unique_flags": [
+            ""
+          ],
+          "units": "FEET",
+          "valid_sample_count": 26628,
+          "value_key": "stage_ft"
+        }
+      },
+      "status": "water_year_to_date_cdec_context_attached_review_gated",
+      "summary": {
+        "a25_no_data_or_flagged_daily_samples": 16,
+        "a25_valid_daily_generation_samples": 263,
+        "daily_summary_count": 279,
+        "days_peak_ge_1600_cfs": 182,
+        "days_peak_ge_3000_cfs": 48,
+        "days_peak_ge_900_cfs": 245,
+        "flow_median_of_daily_medians_cfs": 1077.0,
+        "flow_min_cfs": 198.0,
+        "flow_peak_max_cfs": 5660.0,
+        "stage_peak_max_ft": 7.53,
+        "total_hours_ge_1600_cfs": 2966.0,
+        "total_hours_ge_3000_cfs": 527.75,
+        "total_hours_ge_900_cfs": 4187.0,
+        "valid_flow_day_count": 279
+      }
+    }
+  },
+  "flow_dependent_feature_tuning_policy": {
+    "feature_forcing_allowed_now": false,
+    "feature_forcing_default_scale": 0.0,
+    "forbidden_use": [
+      "solver retuning",
+      "hiding conservation failures",
+      "claiming lifelike water visuals",
+      "approving live named-rapid water windows"
+    ],
+    "may_use_for_planning": [
+      "holes and wave trains that appear/disappear by flow band",
+      "wet-bank and exposed-rock visual review",
+      "boulder push/damping hypotheses",
+      "guide discussion of sticky/washout flow windows"
+    ],
+    "promotion_dependency": "Only promote after exact anchors, guide review, C++/GeoClaw parity, and conservation gates agree for the rapid windows."
+  },
+  "full_reach_scope": {
+    "can_promote_full_reach_flow_bands": false,
+    "flow_applies_to": "Chili Bar-to-Salmon Falls/Folsom review candidates as station context only; exact reach hydraulics still require solver, bed, and guide review.",
+    "named_rapid_candidate_count": 20,
+    "route_candidate_count": 2,
+    "route_candidates_status": "review_only_directed_route_clips_not_production_geometry",
+    "station_candidates_status": "review_only_directed_nhd_station_candidates_not_promoted"
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "anchor_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_anchor_review.json",
+    "flow_band_review_30_day": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+    "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+    "flow_source_selection": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+    "full_reach_acquisition_plan": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_acquisition_plan.json",
+    "multiyear_flow_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+    "route_clip_candidates": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "seasonal_window_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+    "station_candidates": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_directed_station_candidates.json",
+    "station_candidates_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_directed_station_candidates.geojson"
+  },
+  "official_source_selection": {
+    "primary_source_status": "cdec_cbr_primary_candidate_first_window_terms_flag_review_and_30d_context_attached_promotion_blocked",
+    "primary_station_id": "CBR",
+    "primary_station_name": "AMERICAN RIVER AT CHILI BAR",
+    "required_before_flow_band_promotion": [
+      "Treat the attached CDEC terms/flags/station relation review as engineering provenance only until legal/redistribution signoff is complete.",
+      "Resolve or document the observed A25 X flag against CDEC/station metadata before using A25 daily discharge for release interpretation.",
+      "Expand reproducible CBR/A25 pulls across representative seasonal, low, commercial, high, too-low, and washout windows with timestamps, units, sensor numbers, and QA/flag meanings.",
+      "Compare CBR flow/stage to existing low/median/high presets and guide/outfitter notes for the Chili Bar to Coloma section.",
+      "Use A25 powerhouse data only as release-operation context unless hydrologic routing and guide review confirm direct relation to raftable flow at the target reach.",
+      "Record how selected flow bands alter holes, exposed rocks, wave trains, wet banks, boulder push/damping, and rescue visibility before Unreal promotion."
+    ],
+    "secondary_station_id": "A25",
+    "secondary_station_role": "powerhouse release-operation context only until routing is reviewed",
+    "usgs_screening": {
+      "diagnostic_artifact": "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+      "inactive_or_no_current_series_site": "USGS 11445500 SF AMERICAN R NR LOTUS CA",
+      "nearby_active_iv_query_url": "https://waterservices.usgs.gov/nwis/site/?format=rdb&bBox=-121.10,38.65,-120.55,38.95&parameterCd=00060&siteStatus=active&hasDataTypeCd=iv",
+      "nearby_active_iv_result": [
+        {
+          "agency": "USGS",
+          "note": "Active IV discharge station found in the broad American River bounding box, but it is North Fork context and not the South Fork Chili Bar corridor.",
+          "site_no": "11427000",
+          "station_name": "NF AMERICAN R A NORTH FORK DAM CA"
+        }
+      ]
+    }
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_approve_named_rapid_water_windows": false,
+    "can_bind_unreal_flow_variants": false,
+    "can_enable_feature_forcing_for_review_runs": false,
+    "can_promote_flow_bands": false,
+    "exit_criteria": [
+      "Resolve A25 flag/routing and station-to-rapid timing.",
+      "Record guide/outfitter validation for low/reference/high bands.",
+      "Resolve exact downstream anchor and full-reach corridor windows.",
+      "Pass live C++ water parity/conservation gates for rapid windows.",
+      "Record legal/redistribution signoff for CDEC-derived artifacts."
+    ]
+  },
+  "reviewed_flow_bands": [
+    {
+      "flow_band": "low_runnable",
+      "full_reach_decision": "attached_for_full_reach_review_but_not_accepted_for_gameplay_or_visual_tuning",
+      "multiyear_context": {
+        "complete_water_year_peak_day_counts": {
+          "2022": 276,
+          "2023": 329,
+          "2024": 303,
+          "2025": 286
+        },
+        "days_median_ge_threshold": 862,
+        "days_peak_ge_threshold": 1439,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 900.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2022-12-31",
+            "flow_peak_cfs": 38489.0,
+            "flow_peak_time_local": "2022-12-31T13:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-01-01",
+            "flow_peak_cfs": 21263.0,
+            "flow_peak_time_local": "2023-01-01T00:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-15",
+            "flow_peak_cfs": 16044.0,
+            "flow_peak_time_local": "2023-03-15T01:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-14",
+            "flow_peak_cfs": 15786.0,
+            "flow_peak_time_local": "2023-03-14T23:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2021-10-25",
+            "flow_peak_cfs": 12061.0,
+            "flow_peak_time_local": "2021-10-25T05:15",
+            "water_year": 2022
+          }
+        ],
+        "total_hours_ge_threshold": 23082.25
+      },
+      "planning_confidence": 0.3,
+      "planning_discharge_cfs": 900.0,
+      "planning_discharge_m3s": 25.4851619328,
+      "planning_notes": "Lower training-oriented flow; expect exposed rocks, shallows, and slower recovery from mistakes.",
+      "preset_status": "planning_preset_attached_not_promoted",
+      "season": "late_summer_low_water",
+      "thirty_day_window": {
+        "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+        "observed_hours_ge_planning_flow": 165.5,
+        "observed_peak_days_ge_planning_flow": 25,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      },
+      "water_year_2026_to_date": {
+        "days_median_ge_threshold": 163,
+        "days_peak_ge_threshold": 245,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 900.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2026-01-04",
+            "flow_peak_cfs": 5660.0,
+            "flow_peak_time_local": "2026-01-04T20:30",
+            "stage_peak_ft": 7.53
+          },
+          {
+            "date_local": "2026-02-27",
+            "flow_peak_cfs": 5624.0,
+            "flow_peak_time_local": "2026-02-27T18:15",
+            "stage_peak_ft": 7.51
+          },
+          {
+            "date_local": "2026-02-26",
+            "flow_peak_cfs": 5554.0,
+            "flow_peak_time_local": "2026-02-26T19:00",
+            "stage_peak_ft": 7.47
+          },
+          {
+            "date_local": "2026-01-05",
+            "flow_peak_cfs": 5432.0,
+            "flow_peak_time_local": "2026-01-05T00:00",
+            "stage_peak_ft": 7.4
+          },
+          {
+            "date_local": "2026-01-03",
+            "flow_peak_cfs": 5414.0,
+            "flow_peak_time_local": "2026-01-03T23:00",
+            "stage_peak_ft": 7.39
+          }
+        ],
+        "total_hours_ge_threshold": 4187.0
+      },
+      "why_not_promoted": [
+        "CBR/A25 evidence is station context, not rapid-scale hydraulic validation.",
+        "A25 release-routing and flagged samples still need interpretation.",
+        "Guide/outfitter validation and legal/redistribution signoff remain open.",
+        "C++ water parity and conservation gates still control live rapid approval."
+      ]
+    },
+    {
+      "flow_band": "median_runnable",
+      "full_reach_decision": "attached_for_full_reach_review_but_not_accepted_for_gameplay_or_visual_tuning",
+      "multiyear_context": {
+        "complete_water_year_peak_day_counts": {
+          "2022": 170,
+          "2023": 295,
+          "2024": 232,
+          "2025": 197
+        },
+        "days_median_ge_threshold": 645,
+        "days_peak_ge_threshold": 1076,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 1600.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2022-12-31",
+            "flow_peak_cfs": 38489.0,
+            "flow_peak_time_local": "2022-12-31T13:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-01-01",
+            "flow_peak_cfs": 21263.0,
+            "flow_peak_time_local": "2023-01-01T00:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-15",
+            "flow_peak_cfs": 16044.0,
+            "flow_peak_time_local": "2023-03-15T01:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-14",
+            "flow_peak_cfs": 15786.0,
+            "flow_peak_time_local": "2023-03-14T23:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2021-10-25",
+            "flow_peak_cfs": 12061.0,
+            "flow_peak_time_local": "2021-10-25T05:15",
+            "water_year": 2022
+          }
+        ],
+        "total_hours_ge_threshold": 16622.25
+      },
+      "planning_confidence": 0.35,
+      "planning_discharge_cfs": 1600.0,
+      "planning_discharge_m3s": 45.3069545472,
+      "planning_notes": "Default validation band for intermediate commercial-style runs.",
+      "preset_status": "planning_preset_attached_not_promoted",
+      "season": "summer_commercial",
+      "thirty_day_window": {
+        "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+        "observed_hours_ge_planning_flow": 58.5,
+        "observed_peak_days_ge_planning_flow": 9,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      },
+      "water_year_2026_to_date": {
+        "days_median_ge_threshold": 122,
+        "days_peak_ge_threshold": 182,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 1600.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2026-01-04",
+            "flow_peak_cfs": 5660.0,
+            "flow_peak_time_local": "2026-01-04T20:30",
+            "stage_peak_ft": 7.53
+          },
+          {
+            "date_local": "2026-02-27",
+            "flow_peak_cfs": 5624.0,
+            "flow_peak_time_local": "2026-02-27T18:15",
+            "stage_peak_ft": 7.51
+          },
+          {
+            "date_local": "2026-02-26",
+            "flow_peak_cfs": 5554.0,
+            "flow_peak_time_local": "2026-02-26T19:00",
+            "stage_peak_ft": 7.47
+          },
+          {
+            "date_local": "2026-01-05",
+            "flow_peak_cfs": 5432.0,
+            "flow_peak_time_local": "2026-01-05T00:00",
+            "stage_peak_ft": 7.4
+          },
+          {
+            "date_local": "2026-01-03",
+            "flow_peak_cfs": 5414.0,
+            "flow_peak_time_local": "2026-01-03T23:00",
+            "stage_peak_ft": 7.39
+          }
+        ],
+        "total_hours_ge_threshold": 2966.0
+      },
+      "why_not_promoted": [
+        "CBR/A25 evidence is station context, not rapid-scale hydraulic validation.",
+        "A25 release-routing and flagged samples still need interpretation.",
+        "Guide/outfitter validation and legal/redistribution signoff remain open.",
+        "C++ water parity and conservation gates still control live rapid approval."
+      ]
+    },
+    {
+      "flow_band": "high_runnable",
+      "full_reach_decision": "attached_for_full_reach_review_but_not_accepted_for_gameplay_or_visual_tuning",
+      "multiyear_context": {
+        "complete_water_year_peak_day_counts": {
+          "2022": 27,
+          "2023": 157,
+          "2024": 72,
+          "2025": 60
+        },
+        "days_median_ge_threshold": 201,
+        "days_peak_ge_threshold": 364,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 3000.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2022-12-31",
+            "flow_peak_cfs": 38489.0,
+            "flow_peak_time_local": "2022-12-31T13:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-01-01",
+            "flow_peak_cfs": 21263.0,
+            "flow_peak_time_local": "2023-01-01T00:00",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-15",
+            "flow_peak_cfs": 16044.0,
+            "flow_peak_time_local": "2023-03-15T01:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2023-03-14",
+            "flow_peak_cfs": 15786.0,
+            "flow_peak_time_local": "2023-03-14T23:30",
+            "water_year": 2023
+          },
+          {
+            "date_local": "2021-10-25",
+            "flow_peak_cfs": 12061.0,
+            "flow_peak_time_local": "2021-10-25T05:15",
+            "water_year": 2022
+          }
+        ],
+        "total_hours_ge_threshold": 4995.5
+      },
+      "planning_confidence": 0.25,
+      "planning_discharge_cfs": 3000.0,
+      "planning_discharge_m3s": 84.950539776,
+      "planning_notes": "Higher consequence preset with stronger holes, wave trains, eddy-line shear, and faster raft response.",
+      "preset_status": "planning_preset_attached_not_promoted",
+      "season": "spring_runoff_or_release",
+      "thirty_day_window": {
+        "evidence_status": "not_observed_in_attached_30_day_context",
+        "observed_hours_ge_planning_flow": 0.0,
+        "observed_peak_days_ge_planning_flow": 0,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      },
+      "water_year_2026_to_date": {
+        "days_median_ge_threshold": 18,
+        "days_peak_ge_threshold": 48,
+        "promotion_decision": "review_evidence_only_do_not_retune_presets",
+        "threshold_cfs": 3000.0,
+        "top_peak_dates": [
+          {
+            "date_local": "2026-01-04",
+            "flow_peak_cfs": 5660.0,
+            "flow_peak_time_local": "2026-01-04T20:30",
+            "stage_peak_ft": 7.53
+          },
+          {
+            "date_local": "2026-02-27",
+            "flow_peak_cfs": 5624.0,
+            "flow_peak_time_local": "2026-02-27T18:15",
+            "stage_peak_ft": 7.51
+          },
+          {
+            "date_local": "2026-02-26",
+            "flow_peak_cfs": 5554.0,
+            "flow_peak_time_local": "2026-02-26T19:00",
+            "stage_peak_ft": 7.47
+          },
+          {
+            "date_local": "2026-01-05",
+            "flow_peak_cfs": 5432.0,
+            "flow_peak_time_local": "2026-01-05T00:00",
+            "stage_peak_ft": 7.4
+          },
+          {
+            "date_local": "2026-01-03",
+            "flow_peak_cfs": 5414.0,
+            "flow_peak_time_local": "2026-01-03T23:00",
+            "stage_peak_ft": 7.39
+          }
+        ],
+        "total_hours_ge_threshold": 527.75
+      },
+      "why_not_promoted": [
+        "CBR/A25 evidence is station context, not rapid-scale hydraulic validation.",
+        "A25 release-routing and flagged samples still need interpretation.",
+        "Guide/outfitter validation and legal/redistribution signoff remain open.",
+        "C++ water parity and conservation gates still control live rapid approval."
+      ]
+    }
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_flow_window_review.v1",
+  "status": "full_reach_flow_windows_attached_review_gated_not_promoted",
+  "task_id": "A1"
+}
