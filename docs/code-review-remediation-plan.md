@@ -100,6 +100,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Regenerated `production_foundation.json` to include `ProceduralVegetationEditor`, `ImpostorBaker`, and `ProceduralMeshComponent`. Updated the module assertion to keep `RaftSimEditor` explicitly outside runtime/production domain boundaries.
 - Verification: all **20 Milestone 20 tests pass**; the former production-foundation stale-lock failure is closed.
 
+### 2026-07-15 Baseline Colorado Generator Contract Repair
+
+- Reclassified the Milestone 21 Colorado builder as the route/source seed it actually is. The committed source manifest has later official gauge, 3DEP, NAIP, NHD, release, access, and review attachments; regenerating the old seed over it would discard reviewed provenance.
+- Replaced byte equality with a monotonic compatibility contract: route identity, endpoints, segments, flow bands, policies, and status remain exact; flow presets remain byte-equivalent; source IDs, fetch IDs, and artifact paths cannot disappear; confidence cannot regress; control semantics/telemetry remain stable while Unreal input-axis bindings may advance.
+- Verification: all **35 Milestone 21 tests pass**; the former Colorado stale-generator failure is closed without rewriting newer source data.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
