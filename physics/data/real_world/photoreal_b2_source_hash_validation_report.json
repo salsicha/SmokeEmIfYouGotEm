@@ -1,0 +1,985 @@
+{
+  "failing_record_count": 44,
+  "failing_record_ids": [
+    "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only:local_hash_report",
+    "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only:local_hash_report",
+    "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only:local_hash_report",
+    "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only:local_hash_report",
+    "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report",
+    "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report",
+    "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report",
+    "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report",
+    "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report",
+    "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report",
+    "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only:local_hash_report",
+    "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only:local_hash_report",
+    "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only:local_hash_report",
+    "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report",
+    "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report",
+    "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report",
+    "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report",
+    "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report",
+    "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report",
+    "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only:local_hash_report",
+    "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only:local_hash_report",
+    "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only:local_hash_report",
+    "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report",
+    "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report",
+    "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report",
+    "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report",
+    "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report",
+    "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report",
+    "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only:local_hash_report",
+    "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only:local_hash_report",
+    "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only:local_hash_report",
+    "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only:local_hash_report",
+    "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report",
+    "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report",
+    "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report",
+    "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report",
+    "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report",
+    "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only:local_hash_report",
+    "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only:local_hash_report",
+    "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report",
+    "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report",
+    "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report",
+    "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report",
+    "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_commit_source_binaries": false,
+    "can_download_from_validation_report_alone": false,
+    "can_mark_any_asset_source_reviewed": false,
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_run_corridor_substitution": false,
+    "can_run_imports": false,
+    "manual_rights_import_capture_and_performance_review_required": true
+  },
+  "record_errors": [
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_resolution",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "selected_file_formats",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "actual_local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "source_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "local_source_root",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "license_snapshot_url",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only:local_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "generated_files",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "recipe_source_path",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "tool_version",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report"
+    },
+    {
+      "field": "seed",
+      "reason": "missing",
+      "record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report"
+    }
+  ],
+  "schema": "raftsim.photoreal.b2_source_hash_validation_report.v1",
+  "source_file_hash_count": 0,
+  "source_hash_report_template": "physics/data/real_world/photoreal_b2_source_hash_report_template.json",
+  "source_hashes_valid": false,
+  "status": "source_hash_records_incomplete_promotion_blocked",
+  "summary": {
+    "cc0_hash_record_count": 22,
+    "fab_local_only_hash_record_count": 16,
+    "filled_hash_record_count": 0,
+    "first_party_recipe_hash_record_count": 6,
+    "required_hash_record_count": 44
+  },
+  "validation_error_count": 182
+}

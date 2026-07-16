@@ -19,8 +19,14 @@ from .photoreal_b2_source_storage_decision import (
 B2_SOURCE_HASH_REPORT_TEMPLATE_RELATIVE_PATH = (
     "physics/data/real_world/photoreal_b2_source_hash_report_template.json"
 )
+B2_SOURCE_HASH_VALIDATION_REPORT_RELATIVE_PATH = (
+    "physics/data/real_world/photoreal_b2_source_hash_validation_report.json"
+)
 B2_SOURCE_HASH_REPORT_TEMPLATE_SCHEMA = (
     "raftsim.photoreal.b2_source_hash_report_template.v1"
+)
+B2_SOURCE_HASH_VALIDATION_REPORT_SCHEMA = (
+    "raftsim.photoreal.b2_source_hash_validation_report.v1"
 )
 
 
@@ -114,6 +120,102 @@ def write_b2_source_hash_report_template(repo_root: Path) -> Path:
     return path
 
 
+def build_b2_source_hash_validation_report(
+    hash_report_payload: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate a B2 source-hash report without promoting any asset."""
+
+    payload = hash_report_payload or build_b2_source_hash_report_template()
+    record_errors = []
+    source_file_hash_count = 0
+    for record in payload["cc0_hash_records"]:
+        errors, count = _validate_source_file_record(record, "source_files")
+        record_errors.extend(errors)
+        source_file_hash_count += count
+        if not record["selected_resolution"]:
+            record_errors.append(_record_error(record["record_id"], "selected_resolution", "missing"))
+        if not record["selected_file_formats"]:
+            record_errors.append(_record_error(record["record_id"], "selected_file_formats", "missing"))
+        if not record["actual_local_source_root"]:
+            record_errors.append(_record_error(record["record_id"], "actual_local_source_root", "missing"))
+        if not record["license_snapshot_url"]:
+            record_errors.append(_record_error(record["record_id"], "license_snapshot_url", "missing"))
+    for record in payload["fab_local_only_hash_records"]:
+        errors, count = _validate_source_file_record(record, "source_files")
+        record_errors.extend(errors)
+        source_file_hash_count += count
+        if not record["local_source_root"]:
+            record_errors.append(_record_error(record["record_id"], "local_source_root", "missing"))
+        if not record["license_snapshot_url"]:
+            record_errors.append(_record_error(record["record_id"], "license_snapshot_url", "missing"))
+    for record in payload["first_party_recipe_hash_records"]:
+        errors, count = _validate_source_file_record(record, "generated_files")
+        record_errors.extend(errors)
+        source_file_hash_count += count
+        if not record["recipe_source_path"]:
+            record_errors.append(_record_error(record["record_id"], "recipe_source_path", "missing"))
+        if not record["tool_version"]:
+            record_errors.append(_record_error(record["record_id"], "tool_version", "missing"))
+        if not record["seed"]:
+            record_errors.append(_record_error(record["record_id"], "seed", "missing"))
+
+    failing_record_ids = sorted({error["record_id"] for error in record_errors})
+    source_hashes_valid = not record_errors
+    status = (
+        "source_hash_records_valid_manual_review_required"
+        if source_hashes_valid
+        else "source_hash_records_incomplete_promotion_blocked"
+    )
+    return {
+        "schema": B2_SOURCE_HASH_VALIDATION_REPORT_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": status,
+        "source_hash_report_template": B2_SOURCE_HASH_REPORT_TEMPLATE_RELATIVE_PATH,
+        "production_promoted": False,
+        "source_hashes_valid": source_hashes_valid,
+        "validation_error_count": len(record_errors),
+        "failing_record_count": len(failing_record_ids),
+        "failing_record_ids": failing_record_ids,
+        "source_file_hash_count": source_file_hash_count,
+        "record_errors": record_errors,
+        "summary": {
+            "required_hash_record_count": payload["summary"][
+                "required_hash_record_count"
+            ],
+            "filled_hash_record_count": payload["summary"][
+                "filled_hash_record_count"
+            ],
+            "cc0_hash_record_count": len(payload["cc0_hash_records"]),
+            "fab_local_only_hash_record_count": len(
+                payload["fab_local_only_hash_records"]
+            ),
+            "first_party_recipe_hash_record_count": len(
+                payload["first_party_recipe_hash_records"]
+            ),
+        },
+        "promotion_gate": {
+            "can_download_from_validation_report_alone": False,
+            "can_commit_source_binaries": False,
+            "can_run_imports": source_hashes_valid,
+            "can_run_corridor_substitution": False,
+            "can_mark_any_asset_source_reviewed": source_hashes_valid,
+            "can_mark_any_b2_asset_set_promotion_ready": False,
+            "manual_rights_import_capture_and_performance_review_required": True,
+        },
+    }
+
+
+def write_b2_source_hash_validation_report(repo_root: Path) -> Path:
+    payload = build_b2_source_hash_validation_report()
+    path = repo_root / B2_SOURCE_HASH_VALIDATION_REPORT_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def _cc0_hash_record(task: dict[str, Any]) -> dict[str, Any]:
     return {
         "record_id": f"{task['task_id']}:source_hash_report",
@@ -184,3 +286,45 @@ def _first_party_hash_record(entry: dict[str, Any]) -> dict[str, Any]:
         ],
         "can_promote_candidate_now": False,
     }
+
+
+def _validate_source_file_record(
+    record: dict[str, Any],
+    file_list_field: str,
+) -> tuple[list[dict[str, str]], int]:
+    files = record[file_list_field]
+    if not files:
+        return ([_record_error(record["record_id"], file_list_field, "missing")], 0)
+    errors = []
+    valid_hash_count = 0
+    for index, source_file in enumerate(files):
+        prefix = f"{file_list_field}[{index}]"
+        for field in (
+            "relative_path",
+            "byte_size",
+            "sha256",
+            "media_type_or_extension",
+            "source_bundle_role",
+        ):
+            if source_file.get(field) in ("", None, []):
+                errors.append(_record_error(record["record_id"], f"{prefix}.{field}", "missing"))
+        sha256 = source_file.get("sha256", "")
+        if sha256 and not _valid_sha256(sha256):
+            errors.append(_record_error(record["record_id"], f"{prefix}.sha256", "invalid_sha256"))
+        elif sha256:
+            valid_hash_count += 1
+    if record["hash_status"] != "recorded":
+        errors.append(_record_error(record["record_id"], "hash_status", "not_recorded"))
+    return errors, valid_hash_count
+
+
+def _record_error(record_id: str, field: str, reason: str) -> dict[str, str]:
+    return {
+        "record_id": record_id,
+        "field": field,
+        "reason": reason,
+    }
+
+
+def _valid_sha256(value: str) -> bool:
+    return len(value) == 64 and all(character in "0123456789abcdef" for character in value)
