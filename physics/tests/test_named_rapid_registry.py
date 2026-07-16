@@ -3,6 +3,7 @@ from pathlib import Path
 
 from PIL import Image
 
+from raftsim.editor_source_layout import read_raftsim_editor_source
 from raftsim.named_rapid_registry import (
     EDITOR_GEOMETRY_RELATIVE_PATH,
     EDITOR_MARKERS_RELATIVE_PATH,
@@ -19,10 +20,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 EDITOR_SHELL_HEADER = (
     REPO_ROOT
     / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Public/RaftSimRapidRiverEditorShell.h"
-)
-EDITOR_MODULE = (
-    REPO_ROOT
-    / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp"
 )
 VALIDATION_ACTIONS = (
     REPO_ROOT
@@ -210,7 +207,7 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
 
 def test_unreal_rapid_editor_exposes_named_markers_and_review_run_queue():
     header = EDITOR_SHELL_HEADER.read_text(encoding="utf-8")
-    module = EDITOR_MODULE.read_text(encoding="utf-8")
+    module = read_raftsim_editor_source(REPO_ROOT)
     actions = VALIDATION_ACTIONS.read_text(encoding="utf-8")
     shell = json.loads(EDITOR_SHELL_MANIFEST.read_text(encoding="utf-8"))
 

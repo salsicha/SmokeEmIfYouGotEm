@@ -1403,6 +1403,8 @@ This milestone turns the five runnable river targets into complete, reviewable, 
 - [x] Owner decision: Option B. Build a real well-balanced finite-volume shallow-water core, retain GeoClaw and analytic field parity as release gates, and keep live custom-water stepping disabled until genuine solver parity passes.
 - [x] Audit repository/LFS retention without destructive changes: record the current hosted endpoints, 8.6 GB local LFS store, 961 tracked LFS files, 6.36 GiB generated environment-preview payload, 169 preview-map commits, regeneration commands, retention classes, and owner gates in `docs/generated-artifact-retention-policy.md`.
 - [ ] Owner retention decision: approve or reject untracking volatile generated preview/candidate maps and authorize only a dry-run LFS prune audit; a real prune, hosted deletion, ignore/tracking change, or history rewrite requires a separate explicit approval after reviewing exact impact.
+- [x] Map the RaftSim editor monolith before decomposition: aggregate all private C++ sources for tests and lock the 34 command registrations, 18 startup flags, source-file line counts, and six river build paths in `physics/reports/editor_source_inventory/`.
+- [ ] Split `RaftSimEditorModule.cpp` into cohesive tool UI, command registration, environment generation, materials, foliage/PVE, captures, and river-specific implementation files while preserving the locked inventory and Unreal build.
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.
 - [x] Add fixture scenario generation for flat pool, channel flow, dam-break/bore, bed step, constriction, and wet/dry shoreline.
