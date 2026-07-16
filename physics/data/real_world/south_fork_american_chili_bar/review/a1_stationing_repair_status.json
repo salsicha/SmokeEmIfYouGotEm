@@ -1,0 +1,414 @@
+{
+  "a1_acceptance": [
+    {
+      "evidence": [
+        "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
+      ],
+      "next_action": "Acquire or derive a full-reach official hydrography route, select the correct South Fork mainstem path, and record exact reviewed put-in/take-out anchors.",
+      "requirement": "Fix NHD flowline conflict and re-anchor Chili Bar plus Folsom take-out.",
+      "status": "blocked"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json"
+      ],
+      "next_action": "Replace the current 0-2.5 km physical corridor slice with windowed full-run corridor packages after official route selection.",
+      "requirement": "Extend corridor to the full Chili Bar-to-Folsom reach.",
+      "status": "blocked"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json"
+      ],
+      "next_action": "Expand CBR/A25 seasonal windows, resolve A25 flag/routing/legal review, and obtain guide/outfitter validation before promotion.",
+      "requirement": "Attach official low/reference/high flow bands.",
+      "status": "attached_but_review_gated"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/named_rapid_source_catalog.json"
+      ],
+      "next_action": "Project the published miles only after the corrected centerline and anchors are reviewed; then regenerate editor markers through the catalog generator.",
+      "requirement": "Re-station all 20 catalog markers with no order interpolation.",
+      "status": "published_mile_scaffold_ready_exact_geometry_blocked"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json"
+      ],
+      "next_action": "Do not enable South Fork editor-map geometry or Meat Grinder/Troublemaker solver windows until the alignment review status changes to resolved.",
+      "requirement": "Exit gate: conflict resolved and zero South Fork markers use order interpolation.",
+      "status": "not_met"
+    }
+  ],
+  "catalog_stationing_scaffold": {
+    "all_rapids_have_published_miles": true,
+    "downstreammost_catalog_rapid": "Surprise",
+    "rapid_count": 20,
+    "rapid_mile_max": 19.3,
+    "rapid_mile_min": 0.0,
+    "rapid_stations": [
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "hole",
+          "surf_wave",
+          "recovery_pool"
+        ],
+        "name": "Chili Bar Hole",
+        "order": 1,
+        "review_priority": "high",
+        "river_mile": 0.0,
+        "station_m_from_published_mile": 0.0
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "constriction",
+          "wave_train",
+          "pin_hazard"
+        ],
+        "name": "Meat Grinder",
+        "order": 2,
+        "review_priority": "critical",
+        "river_mile": 0.6,
+        "station_m_from_published_mile": 965.606
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "bend",
+          "lateral",
+          "boulder"
+        ],
+        "name": "Racehorse Bend",
+        "order": 3,
+        "review_priority": "medium",
+        "river_mile": 1.3,
+        "station_m_from_published_mile": 2092.147
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "hole",
+          "ledge",
+          "surf_wave",
+          "flow_sensitive"
+        ],
+        "name": "Maya",
+        "order": 4,
+        "review_priority": "high",
+        "river_mile": 1.5,
+        "station_m_from_published_mile": 2414.016
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "shallow_shelf",
+          "pin_hazard"
+        ],
+        "name": "Rock Garden",
+        "order": 5,
+        "review_priority": "high",
+        "river_mile": 1.7,
+        "station_m_from_published_mile": 2735.885
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "wave_train",
+          "boulder"
+        ],
+        "name": "African Queen",
+        "order": 6,
+        "review_priority": "medium",
+        "river_mile": 2.0,
+        "station_m_from_published_mile": 3218.688
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "multiple_channels",
+          "pin_hazard"
+        ],
+        "name": "Triple Threat",
+        "order": 7,
+        "review_priority": "high",
+        "river_mile": 3.1,
+        "station_m_from_published_mile": 4988.966
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "hole",
+          "diagonal_wave",
+          "eddy",
+          "wrap_hazard",
+          "multiple_lines"
+        ],
+        "name": "Troublemaker",
+        "order": 8,
+        "review_priority": "critical",
+        "river_mile": 5.2,
+        "station_m_from_published_mile": 8368.589
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "constriction",
+          "pin_hazard",
+          "slalom"
+        ],
+        "name": "Fowler's Rock",
+        "order": 9,
+        "review_priority": "high",
+        "river_mile": 15.8,
+        "station_m_from_published_mile": 25427.635
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "wave_train",
+          "canyon_constriction"
+        ],
+        "name": "Upper Haystack Canyon",
+        "order": 10,
+        "review_priority": "medium",
+        "river_mile": 16.2,
+        "station_m_from_published_mile": 26071.373
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "wave_train",
+          "continuous_entry"
+        ],
+        "name": "Lost Hat",
+        "order": 11,
+        "review_priority": "medium",
+        "river_mile": 16.7,
+        "station_m_from_published_mile": 26876.045
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "hole",
+          "curling_wave",
+          "central_island",
+          "eddy",
+          "swimmer_hazard",
+          "flow_sensitive"
+        ],
+        "name": "Satan's Cesspool",
+        "order": 12,
+        "review_priority": "critical",
+        "river_mile": 16.9,
+        "station_m_from_published_mile": 27197.914
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "submerged_rock",
+          "wall_push",
+          "swimmer_hazard"
+        ],
+        "name": "Son of Satan",
+        "order": 13,
+        "review_priority": "high",
+        "river_mile": 17.0,
+        "station_m_from_published_mile": 27358.848
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "diagonal_ledge",
+          "boulder",
+          "lateral"
+        ],
+        "name": "Scissors",
+        "order": 14,
+        "review_priority": "high",
+        "river_mile": 17.4,
+        "station_m_from_published_mile": 28002.586
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "wave_train",
+          "canyon_constriction"
+        ],
+        "name": "Lower Haystack Canyon",
+        "order": 15,
+        "review_priority": "medium",
+        "river_mile": 17.6,
+        "station_m_from_published_mile": 28324.454
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "rock_push",
+          "hole",
+          "flip_hazard"
+        ],
+        "name": "Bouncing Rock",
+        "order": 16,
+        "review_priority": "critical",
+        "river_mile": 18.2,
+        "station_m_from_published_mile": 29290.061
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "wave_train",
+          "bank_holes",
+          "boulders"
+        ],
+        "name": "Pre-Op",
+        "order": 17,
+        "review_priority": "medium",
+        "river_mile": 18.4,
+        "station_m_from_published_mile": 29611.93
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "boulder_garden",
+          "chute",
+          "diagonal_hole",
+          "flip_hazard"
+        ],
+        "name": "Hospital Bar",
+        "order": 18,
+        "review_priority": "critical",
+        "river_mile": 18.6,
+        "station_m_from_published_mile": 29933.798
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "hole",
+          "reservoir_stage_sensitive",
+          "recovery"
+        ],
+        "name": "Recovery Room",
+        "order": 19,
+        "review_priority": "high",
+        "river_mile": 18.8,
+        "station_m_from_published_mile": 30255.667
+      },
+      {
+        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "feature_tags": [
+          "seasonal_rock",
+          "chute",
+          "hole",
+          "low_flow_sensitive"
+        ],
+        "name": "Surprise",
+        "order": 20,
+        "review_priority": "high",
+        "river_mile": 19.3,
+        "station_m_from_published_mile": 31060.339
+      }
+    ],
+    "run_length_m": 33796.224,
+    "run_length_miles": 21.0,
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "stationing_authority": "published_river_miles"
+  },
+  "current_geometry_evidence": {
+    "access_seed_to_published_coloma_delta_m": 3812.3264,
+    "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
+    "alignment_status": "failed_alignment_binding_disabled",
+    "candidate_centerline_path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
+    "candidate_covers_catalog_full_run_length": false,
+    "candidate_declared_length_m": 26204.692,
+    "candidate_declared_section_id": "chili_bar_to_coloma",
+    "candidate_to_published_coloma_length_ratio": 2.90765,
+    "existing_full_run_catalog_length_m": 33796.224,
+    "geometry_binding_enabled": false,
+    "published_chili_bar_to_coloma_length_m": 9012.3264,
+    "why_blocked": "Do not project published named-rapid miles onto this candidate centerline until the route is clipped and anchored to reviewed Chili Bar and Coloma locations."
+  },
+  "current_source_coverage": {
+    "coverage_blocker": "The committed NHD extract is a pilot bbox and the physical corridor is a 0-2.5 km Chili Bar slice; neither covers the full Chili Bar-to-Folsom run or proves exact Coloma/Folsom anchors.",
+    "nhd_bbox_bounds_wgs84": {
+      "max_lat": 38.83,
+      "max_lon": -120.72,
+      "min_lat": 38.74,
+      "min_lon": -120.9
+    },
+    "nhd_bbox_extract": "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+    "nhd_extract_is_full_reach": false,
+    "nhd_extract_method": "bbox_intersection_full_feature",
+    "production_corridor_local_centerline": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/centerline_local.json",
+    "production_corridor_local_centerline_status": "source_aligned_review_gated_not_gameplay_authority",
+    "production_corridor_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json",
+    "production_corridor_point_count": 799,
+    "production_corridor_reach_id": "chili_bar_0_2500m",
+    "production_corridor_station_range_m": [
+      0.0,
+      2531.325
+    ],
+    "production_corridor_status": "official_source_attached_physical_landscape_inputs_generated_review_gated"
+  },
+  "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
+  "do_not_use_for": [
+    "exact rapid geometry",
+    "solver water-window binding",
+    "public access or rescue geometry",
+    "production-playable South Fork completion"
+  ],
+  "flow_evidence": {
+    "flow_band_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
+    "flow_band_review_status": "review_gated_do_not_promote_presets",
+    "primary_candidate": "CDEC CBR American River at Chili Bar",
+    "promotion_blockers": [
+      "Attached evidence is a 30-day early-summer CDEC context window, not representative seasonal coverage.",
+      "A25 X-flag meaning and station-to-reach release routing are unresolved.",
+      "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
+      "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
+    ],
+    "reviewed_band_count": 3,
+    "reviewed_bands": [
+      {
+        "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+        "flow_band": "low_runnable",
+        "planning_discharge_cfs": 900.0,
+        "planning_discharge_m3s": 25.4851619328,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      },
+      {
+        "evidence_status": "observed_as_short_release_window_not_seasonal_validation",
+        "flow_band": "median_runnable",
+        "planning_discharge_cfs": 1600.0,
+        "planning_discharge_m3s": 45.3069545472,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      },
+      {
+        "evidence_status": "not_observed_in_attached_30_day_context",
+        "flow_band": "high_runnable",
+        "planning_discharge_cfs": 3000.0,
+        "planning_discharge_m3s": 84.950539776,
+        "promotion_decision": "blocked_pending_broader_windows_release_context_station_routing_guide_review"
+      }
+    ],
+    "secondary_context": "CDEC A25 Chili Bar Powerhouse",
+    "source_selection": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+    "source_selection_status": "cdec_cbr_primary_candidate_first_window_terms_flag_review_and_30d_context_attached_promotion_blocked"
+  },
+  "generated_on": "2026-07-16",
+  "plan": "docs/five-river-photoreal-execution-plan.md#workstream-a--source-data-stationing-and-seasonal-flows-per-river",
+  "production_promoted": false,
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_stationing_repair_status.v1",
+  "status": "blocked_pending_full_reach_hydrography_exact_anchors_and_guide_review",
+  "task_id": "A1"
+}
