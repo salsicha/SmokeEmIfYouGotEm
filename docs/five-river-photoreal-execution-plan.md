@@ -185,7 +185,7 @@ Started July 16, 2026 from clean commit `119239d68`.
 - [ ] B1 asset source survey and intake pipeline hardening.
   - [x] Record the B1 survey baseline and open-source intake contract: `physics/data/real_world/photoreal_asset_intake_b1.json` defines per-river asset needs for all five runnable rivers, Fab/Poly Haven/first-party source candidates, commit-vs-local-only license classes, importer hardening requirements, isolated capture gates, and the Zambezi no-new-intake policy while importing no assets and promoting no river asset set.
 - [x] D1 compliant-tube Python reference model: `physics/src/raftsim/flexible_raft_d1.py` adds deterministic pressure/volume-compliant perimeter tube segments, floor/lacing/frame load transfer, rigid `RaftState6DoF` layering, generated fixture evidence at `physics/data/calibration/flexible_raft_d1_compliant_tube_fixture.json`, and explicit disabled scoring/gameplay authority.
-- [ ] D2 seat-load coupling into local tube deformation/freeboard.
+- [x] D2 seat-load coupling into local tube deformation/freeboard: `physics/src/raftsim/flexible_raft_d2.py` converts existing crew seats/actions into local tube loads, including lean clamps, high-side shifts, brace/recovery downforce, per-seat target segments, side freeboard summaries, generated fixture evidence at `physics/data/calibration/flexible_raft_d2_seat_load_fixture.json`, and explicit disabled scoring/gameplay authority.
 
 ## Definition of done (per river)
 
