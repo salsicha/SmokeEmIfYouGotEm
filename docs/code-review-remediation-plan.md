@@ -67,6 +67,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - No prune, LFS configuration change, untracking, ignore change, server deletion, or history rewrite was performed.
 - Post-check: the full suite remains **542 passed / 2 failed / 3 skipped in 132.60 seconds**, with only the two previously recorded snapshot-drift failures.
 
+### 2026-07-15 Finding 2 Step 2.1 Source Map
+
+- Added `raftsim.editor_source_layout` so tests inspect the complete `RaftSimEditor/Private/**/*.cpp` source set instead of coupling implementation checks to `RaftSimEditorModule.cpp`.
+- Updated all four directly coupled test files before moving C++ code. The geospatial manifest's function provenance remains on the current file until that function moves.
+- Added a generated editor-source inventory with **6 implementation files, 46,915 lines, 34 unique registered console commands, 18 automation flags, and all six river build paths**. The report and tests become the split-completeness guard.
+- Post-check: the full suite reports **544 passed / 2 failed / 3 skipped in 130.49 seconds**. The two source-layout tests pass and only the same production-foundation and Colorado generator snapshot drift remains.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

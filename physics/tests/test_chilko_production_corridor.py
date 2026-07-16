@@ -12,6 +12,7 @@ from raftsim.chilko_production_corridor import (
     UNREAL_LANDSCAPE_SIZE,
     stitch_official_route,
 )
+from raftsim.editor_source_layout import read_raftsim_editor_source
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -159,10 +160,7 @@ def test_unreal_candidate_is_captured_with_nanite_but_not_promoted() -> None:
 
 
 def test_unreal_command_supports_an_isolated_chilko_build() -> None:
-    source = (
-        REPO_ROOT
-        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp"
-    ).read_text(encoding="utf-8")
+    source = read_raftsim_editor_source(REPO_ROOT)
 
     assert 'TEXT("chilko_river_lava_canyon")' in source
     assert "L_ChilkoRiver_PhysicalCorridorCandidate" in source

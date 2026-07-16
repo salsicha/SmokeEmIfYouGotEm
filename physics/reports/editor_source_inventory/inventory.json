@@ -1,0 +1,263 @@
+{
+  "schema": "raftsim.editor.source_inventory.v1",
+  "implementation_files": [
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
+      "line_count": 46188
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp",
+      "line_count": 1
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimFeatureTuningEditorShell.cpp",
+      "line_count": 196
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimRapidRiverEditorShell.cpp",
+      "line_count": 90
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimReplayDebugViewer.cpp",
+      "line_count": 90
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimToolValidationActions.cpp",
+      "line_count": 350
+    }
+  ],
+  "implementation_file_count": 6,
+  "implementation_line_count": 46915,
+  "registered_console_command_count": 34,
+  "registered_console_commands": [
+    {
+      "command": "RaftSim.OpenTool",
+      "member": "OpenToolConsoleCommand",
+      "handler": "HandleOpenToolCommand"
+    },
+    {
+      "command": "RaftSim.OpenAllTools",
+      "member": "OpenAllToolsConsoleCommand",
+      "handler": null
+    },
+    {
+      "command": "RaftSim.CreateReviewedDataAssets",
+      "member": "CreateReviewedDataAssetsConsoleCommand",
+      "handler": "HandleCreateReviewedDataAssetsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureToolEvidence",
+      "member": "CaptureToolEvidenceConsoleCommand",
+      "handler": "HandleCaptureToolEvidenceCommand"
+    },
+    {
+      "command": "RaftSim.CreatePhotorealEnvironmentPreviewMaps",
+      "member": "CreatePhotorealEnvironmentPreviewMapsConsoleCommand",
+      "handler": "HandleCreatePhotorealEnvironmentPreviewMapsCommand"
+    },
+    {
+      "command": "RaftSim.CapturePhotorealEnvironmentPreviews",
+      "member": "CapturePhotorealEnvironmentPreviewsConsoleCommand",
+      "handler": "HandleCapturePhotorealEnvironmentPreviewsCommand"
+    },
+    {
+      "command": "RaftSim.CreateLandscapeImportCandidateMaps",
+      "member": "CreateLandscapeImportCandidateMapsConsoleCommand",
+      "handler": "HandleCreateLandscapeImportCandidateMapsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureZambeziCliffComparison",
+      "member": "CaptureZambeziCliffComparisonConsoleCommand",
+      "handler": "HandleCaptureZambeziCliffComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CreateZambeziBatokaBasaltFamily",
+      "member": "CreateZambeziBatokaBasaltFamilyConsoleCommand",
+      "handler": "HandleCreateZambeziBatokaBasaltFamilyCommand"
+    },
+    {
+      "command": "RaftSim.CaptureZambeziBatokaBasaltCorridorComparison",
+      "member": "CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand",
+      "handler": "HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureZambeziBatokaTerrainIntegratedComparison",
+      "member": "CaptureZambeziBatokaTerrainIntegratedComparisonConsoleCommand",
+      "handler": "HandleCaptureZambeziBatokaTerrainIntegratedComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureZambeziBatokaWorldAlignedTerrainComparison",
+      "member": "CaptureZambeziBatokaWorldAlignedTerrainComparisonConsoleCommand",
+      "handler": "HandleCaptureZambeziBatokaWorldAlignedTerrainComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureZambeziBatokaVisualMorphologyComparison",
+      "member": "CaptureZambeziBatokaVisualMorphologyComparisonConsoleCommand",
+      "handler": "HandleCaptureZambeziBatokaVisualMorphologyComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyCorridorComparison",
+      "member": "CaptureFutaleufuNativeCanopyCorridorComparisonConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyCorridorComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuDenseCanopyComparison",
+      "member": "CaptureFutaleufuDenseCanopyComparisonConsoleCommand",
+      "handler": "HandleCaptureFutaleufuDenseCanopyComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuAreaSampledCanopyComparison",
+      "member": "CaptureFutaleufuAreaSampledCanopyComparisonConsoleCommand",
+      "handler": "HandleCaptureFutaleufuAreaSampledCanopyComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuWorldStableCanopyComparison",
+      "member": "CaptureFutaleufuWorldStableCanopyComparisonConsoleCommand",
+      "handler": "HandleCaptureFutaleufuWorldStableCanopyComparisonCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyRenderDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyRenderDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyRenderDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyOpacityDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyOpacityDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyOpacityDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyLightingDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyLightingDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyLightingDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyCorridorLightRigDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyCorridorLightRigDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyReflectanceDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyReflectanceDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyReflectanceDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyShadingModelDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyShadingModelDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyShadingModelDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyMipPaddingDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyMipPaddingDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyMipPaddingDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyOpacitySelectionDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyOpacitySelectionDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.CaptureFutaleufuNativeCanopyBoundedShadowDiagnostics",
+      "member": "CaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsConsoleCommand",
+      "handler": "HandleCaptureFutaleufuNativeCanopyBoundedShadowDiagnosticsCommand"
+    },
+    {
+      "command": "RaftSim.InspectProceduralVegetationSample",
+      "member": "InspectProceduralVegetationSampleConsoleCommand",
+      "handler": "HandleInspectProceduralVegetationSampleCommand"
+    },
+    {
+      "command": "RaftSim.EvaluateProceduralBeechCandidate",
+      "member": "EvaluateProceduralBeechCandidateConsoleCommand",
+      "handler": "HandleEvaluateProceduralBeechCandidateCommand"
+    },
+    {
+      "command": "RaftSim.EvaluateFutaleufuCordilleraCypressPveCandidate",
+      "member": "EvaluateFutaleufuCordilleraCypressPveCandidateConsoleCommand",
+      "handler": "HandleEvaluateFutaleufuCordilleraCypressPveCandidateCommand"
+    },
+    {
+      "command": "RaftSim.CreateFutaleufuNativeCanopyPrototype",
+      "member": "CreateFutaleufuNativeCanopyPrototypeConsoleCommand",
+      "handler": "HandleCreateFutaleufuNativeCanopyPrototypeCommand"
+    },
+    {
+      "command": "RaftSim.CreateFutaleufuCordilleraCypressFamily",
+      "member": "CreateFutaleufuCordilleraCypressFamilyConsoleCommand",
+      "handler": "HandleCreateFutaleufuCordilleraCypressFamilyCommand"
+    },
+    {
+      "command": "RaftSim.CreateFutaleufuCordilleraCypressOpaqueNearReview",
+      "member": "CreateFutaleufuCordilleraCypressOpaqueNearReviewConsoleCommand",
+      "handler": "HandleCreateFutaleufuCordilleraCypressOpaqueNearReviewCommand"
+    },
+    {
+      "command": "RaftSim.CreateFutaleufuCordilleraCypressVolumetricNearReview",
+      "member": "CreateFutaleufuCordilleraCypressVolumetricNearReviewConsoleCommand",
+      "handler": "HandleCreateFutaleufuCordilleraCypressVolumetricNearReviewCommand"
+    },
+    {
+      "command": "RaftSim.CreateFutaleufuCordilleraCypressDonorReview",
+      "member": "CreateFutaleufuCordilleraCypressDonorReviewConsoleCommand",
+      "handler": "HandleCreateFutaleufuCordilleraCypressDonorReviewCommand"
+    }
+  ],
+  "startup_flags": [
+    "RaftSimCaptureFutaleufuAreaSampledCanopyComparison",
+    "RaftSimCaptureFutaleufuDenseCanopyComparison",
+    "RaftSimCaptureFutaleufuWorldStableCanopyComparison",
+    "RaftSimCapturePhotorealEnvironmentPreviews",
+    "RaftSimCaptureZambeziBatokaBasaltCorridorComparison",
+    "RaftSimCaptureZambeziBatokaTerrainIntegratedComparison",
+    "RaftSimCaptureZambeziBatokaVisualMorphologyComparison",
+    "RaftSimCaptureZambeziBatokaWorldAlignedTerrainComparison",
+    "RaftSimCreateFutaleufuCordilleraCypressDonorReview",
+    "RaftSimCreateFutaleufuCordilleraCypressFamily",
+    "RaftSimCreateFutaleufuCordilleraCypressOpaqueNearReview",
+    "RaftSimCreateFutaleufuCordilleraCypressVolumetricNearReview",
+    "RaftSimCreateLandscapeImportCandidateMaps",
+    "RaftSimCreatePhotorealEnvironmentPreviewMaps",
+    "RaftSimCreateZambeziBatokaBasaltFamily",
+    "RaftSimExitAfterEnvironmentAutomation",
+    "RaftSimExitAfterPveGeneration",
+    "RaftSimSkipPhotorealFlowVariantCaptures"
+  ],
+  "river_build_targets": [
+    {
+      "river_id": "american_south_fork",
+      "map_package_token": "L_SouthForkAmerican_PhysicalCorridorCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    },
+    {
+      "river_id": "colorado_river",
+      "map_package_token": "L_ColoradoGrandCanyon_PhysicalCorridorCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    },
+    {
+      "river_id": "pacuare",
+      "map_package_token": "L_Pacuare_SourceLandscapeCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    },
+    {
+      "river_id": "zambezi_batoka_gorge",
+      "map_package_token": "L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    },
+    {
+      "river_id": "futaleufu_terminator",
+      "map_package_token": "L_FutaleufuTerminator_PhysicalCorridorCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    },
+    {
+      "river_id": "chilko_river_lava_canyon",
+      "map_package_token": "L_ChilkoRiver_PhysicalCorridorCandidate",
+      "river_id_present": true,
+      "map_package_present": true
+    }
+  ],
+  "all_river_build_targets_present": true
+}

@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from raftsim.editor_source_layout import read_raftsim_editor_source
 from raftsim.real_world import (
     CANDIDATE_RIVER_INVENTORY_FILE,
     CANDIDATE_RIVER_INVENTORY_SCHEMA_VERSION,
@@ -2190,10 +2191,7 @@ def test_pacuare_sentinel_augmented_preview_drape_is_unreal_preview_only():
             / "unreal/Content/RaftSim/Rendering/photoreal_river_environment_sources.json"
         ).read_text()
     )
-    editor_module = (
-        Path(__file__).resolve().parents[2]
-        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp"
-    ).read_text()
+    editor_module = read_raftsim_editor_source(Path(__file__).resolve().parents[2])
     manifest = json.loads((pacuare_dir / PACUARE_SENTINEL_AUGMENTED_SOURCE_DRAPE_PREVIEW_MANIFEST_FILE).read_text())
     rivers = {river["river_id"]: river for river in readiness["rivers"]}
     gap_rivers = {river["river_id"]: river for river in gap_register["rivers"]}
