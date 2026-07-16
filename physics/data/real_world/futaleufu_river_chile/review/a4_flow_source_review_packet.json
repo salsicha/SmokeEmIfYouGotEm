@@ -1,0 +1,199 @@
+{
+  "current_flow_status": {
+    "numeric_flow_bands_promoted": false,
+    "numeric_ranges_present": true,
+    "promotion_gate": "Planning bands remain review-only until DGA time-series acquisition, upstream release/rain/snowmelt interpretation, route translation, and Futaleufu guide validation are complete.",
+    "provider": "Direccion General de Aguas, Chile",
+    "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+    "station": "Rio Futaleufu ante junta rio Malito",
+    "station_code": "10704002-1",
+    "units": "m3/s"
+  },
+  "current_stationing_status": "blocked_pending_exact_rapid_stationing_dga_route_translation_and_guide_review",
+  "flow_band_actions": [
+    {
+      "allowed_source_classes": [
+        "official_dga_station_time_series",
+        "downstream_station_route_translation",
+        "snowmelt_rainfall_seasonal_context",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "low_technical",
+      "numeric_values_allowed_now": false,
+      "provider": "Direccion General de Aguas, Chile",
+      "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+      "required_result_fields": [
+        "source_class",
+        "dga_station_code",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "route_translation_method",
+        "travel_time_assumption",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_range_m3_s": [
+        60.0,
+        160.0
+      ],
+      "station": "Rio Futaleufu ante junta rio Malito",
+      "station_code": "10704002-1",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_dga_station_time_series",
+        "downstream_station_route_translation",
+        "snowmelt_rainfall_seasonal_context",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "normal_runnable",
+      "numeric_values_allowed_now": false,
+      "provider": "Direccion General de Aguas, Chile",
+      "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+      "required_result_fields": [
+        "source_class",
+        "dga_station_code",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "route_translation_method",
+        "travel_time_assumption",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_range_m3_s": [
+        160.0,
+        300.0
+      ],
+      "station": "Rio Futaleufu ante junta rio Malito",
+      "station_code": "10704002-1",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_dga_station_time_series",
+        "downstream_station_route_translation",
+        "snowmelt_rainfall_seasonal_context",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "high_big_water",
+      "numeric_values_allowed_now": false,
+      "provider": "Direccion General de Aguas, Chile",
+      "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+      "required_result_fields": [
+        "source_class",
+        "dga_station_code",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "route_translation_method",
+        "travel_time_assumption",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status"
+      ],
+      "review_range_m3_s": [
+        300.0,
+        500.0
+      ],
+      "station": "Rio Futaleufu ante junta rio Malito",
+      "station_code": "10704002-1",
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "official_dga_station_time_series",
+        "downstream_station_route_translation",
+        "snowmelt_rainfall_seasonal_context",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_band": "unsafe_review_only",
+      "numeric_values_allowed_now": false,
+      "provider": "Direccion General de Aguas, Chile",
+      "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+      "required_result_fields": [
+        "source_class",
+        "dga_station_code",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "route_translation_method",
+        "travel_time_assumption",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "rights_terms_status",
+        "safety_status"
+      ],
+      "review_range_m3_s": [
+        500.0,
+        900.0
+      ],
+      "station": "Rio Futaleufu ante junta rio Malito",
+      "station_code": "10704002-1",
+      "water_visual_tuning_allowed_now": false
+    }
+  ],
+  "flow_band_count": 4,
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_enable_numeric_discharge_values": false,
+    "can_promote_a4": false,
+    "can_record_flow_band_source_classes": false,
+    "can_tune_feature_forcing": false,
+    "can_tune_water_visuals": false
+  },
+  "required_workflow": [
+    "acquire or record DGA time-series metadata and terms for station 10704002-1",
+    "record route translation from the downstream station to the playable reach",
+    "record travel-time, snowmelt, rainfall, and upstream operation assumptions",
+    "record guide/outfitter hydraulic behavior review for each flow band",
+    "keep unsafe high-water scenarios review-only until safety and rescue readability review passes",
+    "update flow presets only after the result template validates reviewed source classes"
+  ],
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.futaleufu.a4_flow_source_review_packet.v1",
+  "source_inputs": [
+    {
+      "path": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json",
+      "promotion_gate": "Planning bands remain review-only until DGA time-series acquisition, upstream release/rain/snowmelt interpretation, route translation, and Futaleufu guide validation are complete.",
+      "provider": "Direccion General de Aguas, Chile",
+      "source_class": "seasonal_flow_context",
+      "source_urls": [
+        "https://climatologia.meteochile.gob.cl/application/informacion/fichaDeEstacion/430011",
+        "https://www.camara.cl/verdoc.aspx?prmID=132134&prmTIPO=OFICIO_FISCALIZACION_RESPUESTA"
+      ],
+      "station": "Rio Futaleufu ante junta rio Malito",
+      "station_code": "10704002-1",
+      "units": "m3/s"
+    }
+  ],
+  "source_seasonal_flow_context": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json",
+  "source_stationing_status": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_flow_status.json",
+  "status": "flow_source_review_packet_ready_dga_ranges_review_only_no_numeric_promotion",
+  "task_id": "A4"
+}
