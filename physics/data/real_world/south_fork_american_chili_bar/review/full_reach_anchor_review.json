@@ -1,0 +1,150 @@
+{
+  "anchor_reviews": [
+    {
+      "anchor_id": "chili_bar_put_in",
+      "current_seed_lon_lat": [
+        -120.7199431,
+        38.7786168
+      ],
+      "current_seed_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+      "promotion_blockers": [
+        "official access/land-status geometry not attached",
+        "guide/local review not attached",
+        "full directed route not clipped to this anchor"
+      ],
+      "role": "upstream_start",
+      "source_mile_evidence": [
+        {
+          "published_river_mile": 0.0,
+          "source_id": "south_fork_american_rivers_mile_guide",
+          "station_m": 0.0
+        },
+        {
+          "published_river_mile": 0.0,
+          "source_id": "south_fork_americanwhitewater_map",
+          "station_m": 0.0
+        }
+      ],
+      "validation_status": "source_mile_agrees_but_exact_access_geometry_unreviewed"
+    },
+    {
+      "anchor_id": "coloma_bridge_checkpoint",
+      "current_seed_lon_lat": [
+        -120.7632701,
+        38.7784667
+      ],
+      "current_seed_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+      "interpretation": "This is a strict promotion blocker, not a final rejection of the seed coordinate. The next repair must decide whether the mismatch comes from the Coloma seed, directed graph traversal, source fragments, or source-mile reference.",
+      "role": "station_checkpoint_not_final_takeout",
+      "shortest_path_validation": {
+        "anchor_identity_requires_review": true,
+        "graph_minus_published_checkpoint_m": -3761.90706,
+        "graph_station_from_chili_bar_m": 5250.41934,
+        "nearest_graph_node_distance_m": 56.304918,
+        "published_coloma_checkpoint_m": 9012.3264,
+        "shortest_path_does_not_validate_published_checkpoint": true
+      },
+      "source_mile_evidence": [
+        {
+          "published_river_mile": 5.6,
+          "source_id": "south_fork_american_rivers_mile_guide",
+          "station_m": 9012.3264
+        },
+        {
+          "published_river_mile": 5.6,
+          "source_id": "south_fork_americanwhitewater_map",
+          "station_m": 9012.3264
+        }
+      ],
+      "validation_status": "shortest_path_does_not_validate_source_checkpoint"
+    },
+    {
+      "anchor_id": "salmon_falls_folsom_reservoir_takeout",
+      "current_seed_lon_lat": null,
+      "current_seed_status": "missing_exact_anchor",
+      "promotion_blockers": [
+        "exact take-out/access coordinate missing",
+        "20.5 vs 21.0 mile source basis needs review",
+        "reservoir-stage/access geometry not attached"
+      ],
+      "role": "downstream_end",
+      "source_mile_evidence": [
+        {
+          "published_river_mile": 20.5,
+          "source_id": "south_fork_american_rivers_mile_guide",
+          "station_m": 32991.552
+        },
+        {
+          "published_river_mile": 21.0,
+          "source_id": "south_fork_americanwhitewater_map",
+          "station_m": 33796.224
+        }
+      ],
+      "source_mile_window": {
+        "delta_m": 804.672,
+        "delta_miles": 0.5,
+        "maximum_mile": 21.0,
+        "minimum_mile": 20.5
+      },
+      "validation_status": "exact_anchor_missing_source_mile_window_only"
+    }
+  ],
+  "decisions_needed": [
+    "Choose the authoritative full-run downstream anchor: Salmon Falls Bridge, Folsom Reservoir access, or another reviewed take-out point.",
+    "Resolve the 20.5-mile vs 21.0-mile downstream-end source basis and record the chosen stationing convention.",
+    "Resolve whether the Coloma checkpoint mismatch comes from the seed coordinate, directed graph traversal, source fragments, or source-mile reference.",
+    "Clip a directed route through the named-flowline pool only after reviewed upstream, checkpoint, and downstream anchors are attached."
+  ],
+  "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "access_points": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson",
+    "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
+    "full_reach_acquisition_plan": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_acquisition_plan.json",
+    "route_graph_diagnostic": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_nhd_route_graph_diagnostic.json",
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows": false,
+    "can_enable_south_fork_editor_geometry": false,
+    "can_promote_full_reach_centerline": false,
+    "can_regenerate_rapid_stationing": false,
+    "exit_criteria": [
+      "Reviewed Chili Bar, Coloma checkpoint, and Salmon Falls/Folsom anchors attached.",
+      "Directed mainstem route validates Coloma within the configured tolerance.",
+      "Directed mainstem route full length matches the chosen downstream source-mile basis.",
+      "Guide/geospatial review approves any source-mile ambiguity before editor or solver binding."
+    ]
+  },
+  "rights_policy": "Link-only factual indexing. Do not vendor guide text, photos, video, maps, or social-media content without item-level permission.",
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_anchor_review.v1",
+  "source_leads": [
+    {
+      "rights_status": "link_only_factual_index",
+      "source_id": "south_fork_american_rivers_mile_guide",
+      "source_kind": "guide_mile_log",
+      "title": "South Fork American River Rafting: Mile-by-Mile",
+      "url": "https://www.american-rivers.com/sf-rio-descr.htm",
+      "used_for": [
+        "Chili Bar source mile 0.0",
+        "Coloma Bridge checkpoint source mile 5.6",
+        "Salmon Falls Bridge/Folsom-area take-out source mile 20.5"
+      ]
+    },
+    {
+      "rights_status": "link_only_factual_index",
+      "source_id": "south_fork_americanwhitewater_map",
+      "source_kind": "guide_feature_description",
+      "title": "South Fork American River Map",
+      "url": "https://www.americanwhitewater.com/american-river-rafting/south-fork/map",
+      "used_for": [
+        "Chili Bar put-in source mile 0.0",
+        "Full Chili Bar-to-Folsom/Salmon Falls run length 21.0 miles"
+      ]
+    }
+  ],
+  "status": "blocked_source_mile_anchors_recorded_exact_geometry_pending_review",
+  "task_id": "A1"
+}
