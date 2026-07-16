@@ -160,6 +160,11 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Retired the superseded V18 generator, generate/compare drivers, and V18-specific snapshot. No later live code imports that version.
 - Preserved the V18 twig-hierarchy review, source report, captures, and contact-sheet evidence unchanged.
 
+### 2026-07-16 Finding 3 Step 3.2 V19 Retirement
+
+- Retired the superseded V19 generator, compare driver, and V19-specific snapshot after confirming zero downstream executable imports.
+- Preserved the V19 scale-leaf hierarchy review, source report, captures, and contact-sheet evidence unchanged.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
