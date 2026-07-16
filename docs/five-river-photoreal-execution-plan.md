@@ -2,6 +2,8 @@
 
 Written July 15, 2026. This is a self-contained execution plan for an agent with no prior context. It consolidates the goals below into ordered, committable tasks, building on infrastructure that already exists in this repo. Read `docs/code-review-remediation-plan.md` first — its Finding 1 (water-solver validation honesty) and Finding 3 (LFS retention) are prerequisites woven into this plan.
 
+**Execution status, July 16, 2026:** active goal started. `docs/code-review-remediation-plan.md` is complete under the owner's Option B water-solver decision and keep-versioning/no-prune retention decision. The current baseline is `504 passed, 3 skipped` for `cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run pytest -q`. This plan now executes from that state: live custom-water rapid approval remains blocked until genuine solver parity gates pass, while generated preview/candidate maps remain versioned in Git LFS unless the owner later reverses that decision.
+
 ## Mission
 
 Build complete photorealistic Unreal river environments, with realistic named-rapid behavior and flexible-raft gameplay mechanics, for the five-river runnable portfolio, continuing until lifelike in-engine guide-seat and river-eye screenshots can be captured for each river:
@@ -30,7 +32,7 @@ This matches the existing portfolio decision in `docs/chilko-futaleufu-photoreal
 2. **Tests first-class**: run `cd physics && uv run pytest -q` before and after each task; regenerate hash-locked manifests through their generators, never by hand. New data attachments and generated assets get the same manifest + regression-test treatment the repo already uses.
 3. **Rights discipline** (existing policy, keep it): factual rapid names/miles/classes and source URLs are committed; third-party guide prose, maps, photos, and social posts stay **link-only** unless item-level reuse permission is recorded. Reference photos inform art review but are never committed. Exact hazard/access geometry needs publication review before public screenshots expose it.
 4. **Asset licensing for an open-source repo**: Poly Haven (CC0) assets may be committed (follow the existing hash-locked intake path used for the jacaranda/fir/island-tree experiments). **Fab assets: check each item's license before intake.** Most Fab Standard License content may be *used* in the project but **not redistributed as source assets in a public repo** — such assets stay local-only under the existing `RAFTSIM_REVIEWED_*_SOURCE_ROOT` / `unreal/Scripts/*.py` import pattern with committed manifests (URL, license, hash) but uncommitted binaries, and the environment must degrade gracefully (procedural fallback) when they are absent. CC0/appropriately-licensed Fab items may be committed like Poly Haven. Record every intake decision in `docs/free-and-ai-asset-policy.md`.
-5. **LFS retention**: this plan will regenerate giant corridor `.umap`s repeatedly. Before Workstream B starts, adopt the retention policy from the remediation plan (volatile candidate maps gitignored + regenerable; only locked/promoted maps in LFS). Do not recreate the 291 GB LFS problem.
+5. **LFS retention**: this plan will regenerate giant corridor `.umap`s repeatedly. The owner's July 16, 2026 retention decision controls this work: keep versioning generated preview/candidate maps and do not prune Git LFS. Do not run `git lfs prune`, including dry runs; do not untrack or ignore current candidate maps; do not delete hosted LFS objects or rewrite history. Commit meaningful generated map revisions when a task intentionally changes them, but do not create meaningless LFS churn from verification-only binary resaves when the logical manifests are byte-identical.
 6. **Water authority**: named-rapid behavior review is only meaningful against honestly validated water. The remediation plan's Step 1.1–1.2 (uncalibrated solver truth measurement + honest gate labeling) must land before any rapid's "validated C++ water window" is signed off in Workstream C. Fixture-playback water must never be presented as rapid-behavior evidence.
 7. **Never weaken a gate to pass it.** All the existing review gates (art, guide, geospatial, rights, hazard-readability, performance) stay. "Lifelike" is decided by the human owner viewing captures, not by a metric alone.
 
@@ -154,7 +156,7 @@ Parallel tracks: **A and D start immediately**; B1 starts immediately; remediati
 
 | Stage | Work | Depends on |
 |---|---|---|
-| 1 | Remediation F1 (solver truth) · A1 South Fork stationing fix · D1–D2 · B1 intake hardening | — |
+| 1 | Remediation F1 (solver truth, complete) · A1 South Fork stationing fix · D1–D2 · B1 intake hardening | — |
 | 2 | A2–A5 (staggered, one river task at a time) · B2 South Fork assets · D3–D4 · C1 research (per river as A lands) | Stage 1 |
 | 3 | C2–C3 South Fork (Meat Grinder + Troublemaker first — the designated first executable named-rapid runs) · B2 remaining rivers · D5–D6 | Stage 2 |
 | 4 | C4 South Fork runs + review · B3 water/effects · B4 Nanite/Lumen per river · E1–E2 | Stage 3 + Ground Rule 6 |
@@ -162,6 +164,16 @@ Parallel tracks: **A and D start immediately**; B1 starts immediately; remediati
 | 6 | C5 flexible-raft re-review of all rapids · D8 · E3 packaged perf evidence · final lifelike capture sets per river | Stage 5 |
 
 Per-river completion order is deliberate: **South Fork first** (shortest, best data, cheapest iteration — it debugs the whole pipeline), then Futaleufú (corridor most mature), Colorado (largest, windowed), Pacuare, Chilko.
+
+## Active execution queue
+
+Started July 16, 2026 from clean commit `119239d68`.
+
+- [x] Reconcile this execution plan with the completed code-review remediation and the owner decision to keep versioning generated maps instead of pruning/untracking them.
+- [ ] A1 South Fork American stationing and full-reach corridor repair.
+- [ ] B1 asset source survey and intake pipeline hardening.
+- [ ] D1 compliant-tube Python reference model.
+- [ ] D2 seat-load coupling into local tube deformation/freeboard.
 
 ## Definition of done (per river)
 
