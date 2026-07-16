@@ -1,0 +1,760 @@
+{
+  "decision_errors": [
+    {
+      "field": "readiness.promotion_ready",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "decision_date",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "decision_status",
+      "reason": "not_approved",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "approved_for_corridor_substitution",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "selected_candidate_ids",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "source_hash_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "import_review_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.approved",
+      "reason": "false",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "south_fork_american_chili_bar"
+    },
+    {
+      "field": "readiness.promotion_ready",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "decision_date",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "decision_status",
+      "reason": "not_approved",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "approved_for_corridor_substitution",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "selected_candidate_ids",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "source_hash_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "import_review_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.approved",
+      "reason": "false",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "colorado_river_grand_canyon_rowing"
+    },
+    {
+      "field": "readiness.promotion_ready",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "decision_date",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "decision_status",
+      "reason": "not_approved",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "approved_for_corridor_substitution",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "selected_candidate_ids",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "source_hash_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "import_review_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.approved",
+      "reason": "false",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "pacuare_river_costa_rica"
+    },
+    {
+      "field": "readiness.promotion_ready",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "decision_date",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "decision_status",
+      "reason": "not_approved",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "approved_for_corridor_substitution",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "selected_candidate_ids",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "source_hash_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "import_review_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.approved",
+      "reason": "false",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "futaleufu_river_chile"
+    },
+    {
+      "field": "readiness.promotion_ready",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "decision_date",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "decision_status",
+      "reason": "not_approved",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "approved_for_corridor_substitution",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "selected_candidate_ids",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "source_hash_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "import_review_record_ids",
+      "reason": "insufficient_coverage",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.owner_or_producer_acceptance.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.environment_art_direction.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.river_guide_or_ecology_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.rights_or_license_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.hazard_readability_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.technical_art_import_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer",
+      "reason": "reviewer_or_date_missing",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.approved",
+      "reason": "false",
+      "river_id": "chilko_river_lava_canyon"
+    },
+    {
+      "field": "reviewer_signoff.desktop_vr_performance_reviewer.evidence",
+      "reason": "missing",
+      "river_id": "chilko_river_lava_canyon"
+    }
+  ],
+  "decisions_valid": false,
+  "failing_river_count": 5,
+  "failing_river_ids": [
+    "chilko_river_lava_canyon",
+    "colorado_river_grand_canyon_rowing",
+    "futaleufu_river_chile",
+    "pacuare_river_costa_rica",
+    "south_fork_american_chili_bar"
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_mark_chilko_b2_complete": false,
+    "can_mark_colorado_b2_complete": false,
+    "can_mark_futaleufu_b2_complete": false,
+    "can_mark_pacuare_b2_complete": false,
+    "can_mark_south_fork_b2_complete": false,
+    "can_run_corridor_substitution": false,
+    "manual_plan_checkbox_update_required_after_valid_decisions": true
+  },
+  "schema": "raftsim.photoreal.b2_asset_promotion_decision_validation.v1",
+  "source_decision_template": "physics/data/real_world/photoreal_b2_asset_promotion_decision_template.json",
+  "source_readiness_report": "physics/data/real_world/photoreal_b2_asset_promotion_readiness_report.json",
+  "status": "b2_asset_promotion_decisions_incomplete_promotion_blocked",
+  "summary": {
+    "readiness_blocked_river_count": 5,
+    "readiness_ready_river_count": 0,
+    "river_decision_count": 5,
+    "valid_decision_count": 0
+  },
+  "validation_error_count": 145
+}
