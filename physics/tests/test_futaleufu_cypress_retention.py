@@ -4,9 +4,15 @@ from raftsim.futaleufu_cypress_review_metrics import ROI_XYXY, V32_NAMESPACE, V3
 
 
 PHYSICS_ROOT = Path(__file__).resolve().parents[1]
+PACKAGE_ROOT = PHYSICS_ROOT / "src/raftsim"
+EXAMPLES_ROOT = PACKAGE_ROOT / "examples"
+EVIDENCE_ROOT = (
+    PHYSICS_ROOT.parent
+    / "docs/environment-captures/photoreal_river_previews/landscape_candidates"
+)
 CURRENT_REVIEW_DRIVER = (
-    PHYSICS_ROOT
-    / "src/raftsim/examples/compare_futaleufu_cordillera_cypress_v43_merged_component_parity.py"
+    EXAMPLES_ROOT
+    / "compare_futaleufu_cordillera_cypress_v43_merged_component_parity.py"
 )
 
 
@@ -18,3 +24,20 @@ def test_locked_v43_review_has_no_historical_driver_import_chain():
     assert ROI_XYXY == (280, 0, 1000, 540)
     assert V32_NAMESPACE.startswith("FutaleufuCordilleraCypressFrozenWpo")
     assert V32_REPORT.endswith("compound_branchlet_atlas_report.json")
+
+
+def test_only_current_cypress_review_driver_remains_executable():
+    compare_drivers = sorted(
+        EXAMPLES_ROOT.glob("compare_futaleufu_cordillera_cypress_v*.py")
+    )
+
+    assert compare_drivers == [CURRENT_REVIEW_DRIVER]
+    assert not list(EXAMPLES_ROOT.glob("review_futaleufu_cordillera_cypress_v*.py"))
+    assert not list(PACKAGE_ROOT.glob("futaleufu_cordillera_cypress_v*_assets.py"))
+
+
+def test_locked_cypress_review_evidence_is_retained():
+    reviews = sorted(EVIDENCE_ROOT.glob("futaleufu_cordillera_cypress_v*review.json"))
+
+    assert len(reviews) == 47
+    assert all(review.stat().st_size > 0 for review in reviews)
