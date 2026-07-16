@@ -1,0 +1,2135 @@
+{
+  "crosscheck_valid": false,
+  "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+  "errors": [
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Badger Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Badger Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Badger Creek",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Badger Creek",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Badger Creek",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Soap Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Soap Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Soap Creek",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Soap Creek",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Soap Creek",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "House Rock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "House Rock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "House Rock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "House Rock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "House Rock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "House Rock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "House Rock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "House Rock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "House Rock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "House Rock",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "House Rock",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "House Rock",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Georgie",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Georgie",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Georgie",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Georgie",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Georgie",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Georgie",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Georgie",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Georgie",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Georgie",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Georgie",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Georgie",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Georgie",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Unkar",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Unkar",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Unkar",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Unkar",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Unkar",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Unkar",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Unkar",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Unkar",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Unkar",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Unkar",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Unkar",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Unkar",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Hance",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Hance",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Hance",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Hance",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Hance",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Hance",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Hance",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Hance",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Hance",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Hance",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Hance",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Hance",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Hance",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Hance",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Hance",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Hance",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Hance",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Sockdolager",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Sockdolager",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Sockdolager",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Sockdolager",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Sockdolager",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Grapevine",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Grapevine",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Grapevine",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Grapevine",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Grapevine",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Horn Creek",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Horn Creek",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Horn Creek",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Horn Creek",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Horn Creek",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Granite",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Granite",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Granite",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Granite",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Granite",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Granite",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Granite",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Granite",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Granite",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Granite",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Granite",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Granite",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Granite",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Granite",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Granite",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Granite",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Granite",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Hermit",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Hermit",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Hermit",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Hermit",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Hermit",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Hermit",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Hermit",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Hermit",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Hermit",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Hermit",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Hermit",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Hermit",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Crystal",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Crystal",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Crystal",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Crystal",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Crystal",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Crystal",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Crystal",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Crystal",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Crystal",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Crystal",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Crystal",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Crystal",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Bedrock",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Bedrock",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Bedrock",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Bedrock",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Bedrock",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Upset",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Upset",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Upset",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Upset",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Upset",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Upset",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Upset",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Upset",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Upset",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Upset",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Upset",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Upset",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Upset",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Upset",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Upset",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Upset",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Upset",
+      "reason": "source_disagreement_unresolved"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_title_or_reviewer",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.source_url_or_report",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.checked_on",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.reviewed_position",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.evidence",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.nps_or_gcmrc_river_mile_reference.approved",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_title_or_reviewer",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.source_url_or_report",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.checked_on",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.reviewed_position",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.evidence",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.usgs_hydraulic_map_or_geospatial_reference.approved",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_title_or_reviewer",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.source_url_or_report",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.checked_on",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.reviewed_position",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.evidence",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.grand_canyon_oarsman_or_guide_review.approved",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_title_or_reviewer",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.source_url_or_report",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.checked_on",
+      "rapid_name": "Lava Falls",
+      "reason": "required_source_check_field_empty"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.reviewed_position",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_mile_or_station_required"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.evidence",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_evidence_missing"
+    },
+    {
+      "field": "source_checks.published_guide_or_secondary_index_crosscheck.approved",
+      "rapid_name": "Lava Falls",
+      "reason": "source_check_not_approved"
+    },
+    {
+      "field": "reviewed_river_mile",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_river_mile_missing"
+    },
+    {
+      "field": "reviewed_station_m",
+      "rapid_name": "Lava Falls",
+      "reason": "reviewed_station_m_missing"
+    },
+    {
+      "field": "station_delta_m",
+      "rapid_name": "Lava Falls",
+      "reason": "station_delta_missing"
+    },
+    {
+      "field": "unresolved_source_disagreement",
+      "rapid_name": "Lava Falls",
+      "reason": "source_disagreement_unresolved"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "passing_rapid_count": 0,
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_empty_or_invalid_crosscheck": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_current_published_mile_stations": false,
+    "next_after_valid_result": [
+      "regenerate_named_rapid_stationing",
+      "regenerate_editor_markers",
+      "generate_rapid_water_windows",
+      "run_oarsman_or_guide_visual_review"
+    ]
+  },
+  "promotion_permissions": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_from_validation_report_alone": false,
+    "can_restation_major_rapids": false,
+    "manual_review_still_required_after_valid_result": true
+  },
+  "rapid_count": 15,
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.a2_rapid_mile_crosscheck_validation_report.v1",
+  "source_template": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_rapid_mile_crosscheck_template.json",
+  "status": "rapid_mile_crosscheck_incomplete_stationing_promotion_blocked",
+  "task_id": "A2",
+  "validation_error_count": 420
+}
