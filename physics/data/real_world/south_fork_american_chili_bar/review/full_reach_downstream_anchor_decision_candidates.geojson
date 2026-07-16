@@ -1,0 +1,96 @@
+{
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -120.938291,
+          38.8220775
+        ],
+        "type": "Point"
+      },
+      "id": "select_20_5_mile_salmon_falls_basis",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "production_promoted": false,
+        "published_river_mile": 20.5,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "station_id": "salmon_falls_bridge_takeout_published_20_5_miles",
+        "station_m": 32991.552,
+        "task_id": "A1"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9441395,
+          38.8246066
+        ],
+        "type": "Point"
+      },
+      "id": "select_21_0_mile_full_run_folsom_basis",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "production_promoted": false,
+        "published_river_mile": 21.0,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_americanwhitewater_map",
+        "station_id": "full_run_downstream_window_published_21_0_miles",
+        "station_m": 33796.224,
+        "task_id": "A1"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.938291,
+            38.8220775
+          ],
+          [
+            -120.9441395,
+            38.8246066
+          ]
+        ],
+        "type": "LineString"
+      },
+      "id": "downstream_anchor_decision_span_20_5_to_21_0_miles",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "geometry_status": "review_span_only_exact_anchor_not_selected",
+        "production_promoted": false,
+        "river_id": "south_fork_american_chili_bar",
+        "station_delta_m": 804.672,
+        "station_end_m": 33796.224,
+        "station_start_m": 32991.552,
+        "task_id": "A1"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "policy": {
+    "allowed_use": [
+      "anchor decision review",
+      "GIS/editor overlay",
+      "guide/geospatial source comparison"
+    ],
+    "forbidden_use": [
+      "final access geometry",
+      "corridor crop authority",
+      "named-rapid stationing authority",
+      "solver-window binding"
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_downstream_anchor_decision_candidates.geojson.v1",
+  "status": "decision_packet_ready_exact_anchor_not_selected",
+  "type": "FeatureCollection"
+}

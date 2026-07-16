@@ -1,0 +1,232 @@
+{
+  "candidate_window": {
+    "geojson_candidates": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson",
+    "maximum_station_m": 33796.224,
+    "minimum_station_m": 32991.552,
+    "station_delta_m": 804.672,
+    "station_delta_miles": 0.5,
+    "validation_status": "candidate_review_window_generated_exact_takeout_still_missing"
+  },
+  "decision_required": {
+    "acceptable_answers": [
+      "Select the 20.5-mile Salmon Falls basis after guide/geospatial review.",
+      "Select the 21.0-mile Folsom/full-run basis after guide/geospatial review.",
+      "Replace both candidates with another exact, reviewed take-out/access point."
+    ],
+    "current_state": "missing_exact_anchor",
+    "exact_anchor_selected": false,
+    "must_record_before_promotion": [
+      "exact lon/lat and station_m",
+      "source-mile convention",
+      "access/land-status authority",
+      "reservoir-stage/access interpretation",
+      "guide/geospatial reviewer approval",
+      "publication-sensitivity decision for screenshots and maps"
+    ],
+    "question": "Which reviewed downstream anchor and station convention should define the South Fork full-run endpoint?"
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "anchor_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_anchor_review.json",
+    "directed_station_candidates": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_directed_station_candidates.json",
+    "source_pull_preflight": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_preflight_review.json",
+    "window_derivative_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_derivative_manifest.json"
+  },
+  "options": [
+    {
+      "can_bind_editor_geometry": false,
+      "can_bind_solver_windows": false,
+      "can_crop_final_corridor": false,
+      "can_select_without_guide_geospatial_review": false,
+      "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+      "interpretation": "Use the American Rivers 20.5-mile Salmon Falls Bridge/Folsom-area take-out basis as the downstream station convention.",
+      "lon_lat": [
+        -120.938291,
+        38.8220775
+      ],
+      "option_id": "select_20_5_mile_salmon_falls_basis",
+      "permanent_identifier": "63414776",
+      "published_river_mile": 20.5,
+      "reachcode": "18020129000044",
+      "review_consequence": "Final crop would end at the upstream edge of the current anchor review window; the 21.0-mile over-cover would remain source context unless a reviewer selects it for access/stage reasons.",
+      "source_id": "south_fork_american_rivers_mile_guide",
+      "source_record_index": 22469,
+      "station_id": "salmon_falls_bridge_takeout_published_20_5_miles",
+      "station_m": 32991.552
+    },
+    {
+      "can_bind_editor_geometry": false,
+      "can_bind_solver_windows": false,
+      "can_crop_final_corridor": false,
+      "can_select_without_guide_geospatial_review": false,
+      "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+      "interpretation": "Use the American Whitewater 21.0-mile full-run/Folsom basis as the downstream station convention.",
+      "lon_lat": [
+        -120.9441395,
+        38.8246066
+      ],
+      "option_id": "select_21_0_mile_full_run_folsom_basis",
+      "permanent_identifier": "{77575978-B9EE-4BC8-9395-3B05958E06E5}",
+      "published_river_mile": 21.0,
+      "reachcode": "18020129000042",
+      "review_consequence": "Final crop would preserve the full 804.672 m downstream review window beyond the 20.5-mile candidate; access, reservoir stage, and publication-sensitivity review must justify the extra context.",
+      "source_id": "south_fork_americanwhitewater_map",
+      "source_record_index": 19144,
+      "station_id": "full_run_downstream_window_published_21_0_miles",
+      "station_m": 33796.224
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_crop_to_final_downstream_anchor": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_full_reach_centerline": false,
+    "can_regenerate_rapid_stationing": false,
+    "can_select_anchor_without_human_review": false,
+    "next_required_actions": [
+      "Open the derivative NAIP overlays and the candidate GeoJSON in the editor/GIS review tool.",
+      "Compare the two candidate points against official access, reservoir-stage, land-status, and guide evidence.",
+      "Record the selected exact downstream anchor or a replacement reviewed take-out point.",
+      "Regenerate clipped corridor windows, rapid stationing, and editor geometry only after that decision."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_downstream_anchor_decision_packet.v1",
+  "source_review_state": {
+    "overcover_interpretation": "The final planned source-pull window intentionally over-covers the 20.5-21.0 mile Salmon Falls/Folsom ambiguity. This is acceptable for source acquisition, but not for corridor cropping, editor binding, or solver-window promotion.",
+    "preflight_status": "nonpromotional_source_manifests_ready_for_stitched_validation_exact_anchor_pending",
+    "source_leads": [
+      {
+        "rights_status": "link_only_factual_index",
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "source_kind": "guide_mile_log",
+        "title": "South Fork American River Rafting: Mile-by-Mile",
+        "url": "https://www.american-rivers.com/sf-rio-descr.htm",
+        "used_for": [
+          "Chili Bar source mile 0.0",
+          "Coloma Bridge checkpoint source mile 5.6",
+          "Salmon Falls Bridge/Folsom-area take-out source mile 20.5"
+        ]
+      },
+      {
+        "rights_status": "link_only_factual_index",
+        "source_id": "south_fork_americanwhitewater_map",
+        "source_kind": "guide_feature_description",
+        "title": "South Fork American River Map",
+        "url": "https://www.americanwhitewater.com/american-river-rafting/south-fork/map",
+        "used_for": [
+          "Chili Bar put-in source mile 0.0",
+          "Full Chili Bar-to-Folsom/Salmon Falls run length 21.0 miles"
+        ]
+      }
+    ],
+    "source_mile_evidence": [
+      {
+        "published_river_mile": 20.5,
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "station_m": 32991.552
+      },
+      {
+        "published_river_mile": 21.0,
+        "source_id": "south_fork_americanwhitewater_map",
+        "station_m": 33796.224
+      }
+    ]
+  },
+  "status": "decision_packet_ready_exact_anchor_not_selected",
+  "task_id": "A1",
+  "visual_review_inputs": {
+    "anchor_review_window": {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 292.522797,
+          "elevation_min_m": 195.549942,
+          "elevation_span_m": 96.972855,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "378bd3dfd53e23768af02bf33550b6122206daaee66ea9f800eb727b84be7d4c"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "056cc14e15114251567a46dfb95037152198d316240b0f15a7590a40158876fe"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "526e7d075373def8cf18185a97da3259d9c88bb3654a888e52dd78b3878a6b4e"
+        }
+      },
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/review/stitched_edge_report.json",
+        "sha256": "bbe9f15aac9594b1801a2c98b54b6fe523bca66d1aacec6053fafcae05bc844b"
+      },
+      "station_range_m": {
+        "end": 33796.224,
+        "length": 804.672,
+        "start": 32991.552
+      },
+      "window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    "lower_gorge_window": {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 491.868042,
+          "elevation_min_m": 196.579407,
+          "elevation_span_m": 295.288635,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "220474acacc5da81b567ebec7c3988bb4aea43601faddbab238694c239731ae6"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "cfab372bd9bf3a860cc6e74fb14fe2cb82a139e8440a4ea2acb2639fffc55fc1"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "250d1780fc1fa4327fa06e0dbafc7541b8a5dbf0f602717f87d9eddf9f39224a"
+        }
+      },
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/review/stitched_edge_report.json",
+        "sha256": "0b0c829b6ea56c3a232146ae948f1c80c25f8e27975154a98c7c2aa1fc09448a"
+      },
+      "station_range_m": {
+        "end": 32991.552,
+        "length": 4491.552,
+        "start": 28500.0
+      },
+      "window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+    }
+  }
+}
