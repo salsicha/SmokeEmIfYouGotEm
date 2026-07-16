@@ -1,0 +1,462 @@
+{
+  "cases": [
+    {
+      "case_id": "neutral_crew",
+      "crew_telemetry": {
+        "active_action_count": 0,
+        "brace_count": 0,
+        "high_side_count": 0,
+        "occupied_seat_count": 5,
+        "pitch_moment_nm": -404.9567999999997,
+        "recovery_count": 0,
+        "roll_moment_nm": 0.0,
+        "total_crew_mass_kg": 385.0
+      },
+      "freeboard_summary": {
+        "bow_freeboard_loss_m": 0.0033803960568860466,
+        "bow_total_freeboard_loss_m": 0.005963170572259655,
+        "max_seat_freeboard_loss_m": 0.0169868811768041,
+        "port_freeboard_loss_m": 0.013388673283424008,
+        "port_total_freeboard_loss_m": 0.033652344409774194,
+        "starboard_freeboard_loss_m": 0.013388673283424008,
+        "starboard_total_freeboard_loss_m": 0.03486070129658373,
+        "stern_freeboard_loss_m": 0.0169868811768041,
+        "stern_total_freeboard_loss_m": 0.0197305205408861,
+        "tube_pitch_load_bias_nm": -182.9687625000002,
+        "tube_roll_load_bias_nm": 281.2159124999999
+      },
+      "intent": "Occupied guide/passenger seats sag local tube segments while preserving lateral balance.",
+      "scoring_authority_enabled": false,
+      "seat_loads": [
+        {
+          "base_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": 0.0,
+            "z": 0.15
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": 0.0,
+            "z": 0.15
+          },
+          "force_n": 833.85,
+          "high_side_direction": 0,
+          "lean_was_clamped": false,
+          "mass_kg": 85.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "guide",
+          "seat_id": "guide",
+          "target_freeboard_loss_m": 0.0169868811768041,
+          "target_segment_id": "stern_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 0,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_0",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "port_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 0,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_1",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "starboard_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 0,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_2",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "port_3"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 0,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_3",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "starboard_3"
+        }
+      ]
+    },
+    {
+      "case_id": "starboard_high_side",
+      "crew_telemetry": {
+        "active_action_count": 5,
+        "brace_count": 0,
+        "high_side_count": 5,
+        "occupied_seat_count": 5,
+        "pitch_moment_nm": -404.9567999999997,
+        "recovery_count": 0,
+        "roll_moment_nm": 1699.5825000000002,
+        "total_crew_mass_kg": 385.0
+      },
+      "freeboard_summary": {
+        "bow_freeboard_loss_m": 0.015947962362229076,
+        "bow_total_freeboard_loss_m": 0.019737223242915616,
+        "max_seat_freeboard_loss_m": 0.017690664889903316,
+        "port_freeboard_loss_m": 0.013388673283424008,
+        "port_total_freeboard_loss_m": 0.021479925770589853,
+        "starboard_freeboard_loss_m": 0.013388673283424008,
+        "starboard_total_freeboard_loss_m": 0.034238752898961174,
+        "stern_freeboard_loss_m": 0.017690664889903316,
+        "stern_total_freeboard_loss_m": 0.020434304253985316,
+        "tube_pitch_load_bias_nm": 121.5397687499996,
+        "tube_roll_load_bias_nm": 550.3164749999999
+      },
+      "intent": "High-side actions shift local load onto the starboard tube and change freeboard.",
+      "scoring_authority_enabled": false,
+      "seat_loads": [
+        {
+          "base_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": 0.0,
+            "z": 0.15
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": 0.45,
+            "z": 0.15
+          },
+          "force_n": 833.85,
+          "high_side_direction": 1,
+          "lean_was_clamped": false,
+          "mass_kg": 85.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "guide",
+          "seat_id": "guide",
+          "target_freeboard_loss_m": 0.017690664889903316,
+          "target_segment_id": "stern_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -0.15799999999999997,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 1,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_0",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "port_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 1.058,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 1,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_1",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "starboard_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -0.15799999999999997,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 1,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_2",
+          "target_freeboard_loss_m": 0.015947962362229076,
+          "target_segment_id": "bow_0"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 1.058,
+            "z": 0.12
+          },
+          "force_n": 735.75,
+          "high_side_direction": 1,
+          "lean_was_clamped": false,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_3",
+          "target_freeboard_loss_m": 0.013388673283424008,
+          "target_segment_id": "starboard_3"
+        }
+      ]
+    },
+    {
+      "case_id": "port_lean_with_brace",
+      "crew_telemetry": {
+        "active_action_count": 5,
+        "brace_count": 4,
+        "high_side_count": 0,
+        "occupied_seat_count": 5,
+        "pitch_moment_nm": -404.9567999999997,
+        "recovery_count": 0,
+        "roll_moment_nm": -2077.2675,
+        "total_crew_mass_kg": 385.0
+      },
+      "freeboard_summary": {
+        "bow_freeboard_loss_m": 0.017135681161859366,
+        "bow_total_freeboard_loss_m": 0.021203774446973783,
+        "max_seat_freeboard_loss_m": 0.01783276217292906,
+        "port_freeboard_loss_m": 0.014438285245887982,
+        "port_total_freeboard_loss_m": 0.03679525697909352,
+        "starboard_freeboard_loss_m": 0.014438285245887982,
+        "starboard_total_freeboard_loss_m": 0.023112392231397254,
+        "stern_freeboard_loss_m": 0.01783276217292906,
+        "stern_total_freeboard_loss_m": 0.020662196122988866,
+        "tube_pitch_load_bias_nm": 239.54671125000004,
+        "tube_roll_load_bias_nm": -571.84452
+      },
+      "intent": "Clamped port lean plus passenger brace drives port-side tube depression.",
+      "scoring_authority_enabled": false,
+      "seat_loads": [
+        {
+          "base_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": 0.0,
+            "z": 0.15
+          },
+          "brace": false,
+          "effective_local_position_m": {
+            "x": -1.8059999999999998,
+            "y": -0.55,
+            "z": 0.15
+          },
+          "force_n": 833.85,
+          "high_side_direction": 0,
+          "lean_was_clamped": true,
+          "mass_kg": 85.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "guide",
+          "seat_id": "guide",
+          "target_freeboard_loss_m": 0.01783276217292906,
+          "target_segment_id": "stern_0"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": true,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": -1.158,
+            "z": 0.07999999999999999
+          },
+          "force_n": 794.61,
+          "high_side_direction": 0,
+          "lean_was_clamped": true,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_0",
+          "target_freeboard_loss_m": 0.014438285245887982,
+          "target_segment_id": "port_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": true,
+          "effective_local_position_m": {
+            "x": -0.8728999999999999,
+            "y": 0.05799999999999994,
+            "z": 0.07999999999999999
+          },
+          "force_n": 794.61,
+          "high_side_direction": 0,
+          "lean_was_clamped": true,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_1",
+          "target_freeboard_loss_m": 0.014438285245887982,
+          "target_segment_id": "starboard_1"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -0.608,
+            "z": 0.12
+          },
+          "brace": true,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": -1.158,
+            "z": 0.07999999999999999
+          },
+          "force_n": 794.61,
+          "high_side_direction": 0,
+          "lean_was_clamped": true,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_2",
+          "target_freeboard_loss_m": 0.014438285245887982,
+          "target_segment_id": "port_3"
+        },
+        {
+          "base_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 0.608,
+            "z": 0.12
+          },
+          "brace": true,
+          "effective_local_position_m": {
+            "x": 1.6210999999999998,
+            "y": 0.05799999999999994,
+            "z": 0.07999999999999999
+          },
+          "force_n": 794.61,
+          "high_side_direction": 0,
+          "lean_was_clamped": true,
+          "mass_kg": 75.0,
+          "occupied": true,
+          "recovery": false,
+          "role": "passenger",
+          "seat_id": "passenger_3",
+          "target_freeboard_loss_m": 0.017135681161859366,
+          "target_segment_id": "bow_1"
+        }
+      ]
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "model_contract": {
+    "brace_and_recovery_add_bounded_downforce": true,
+    "center_of_gravity_telemetry_retained": true,
+    "gameplay_scoring_authority": "disabled_until_d6_fixture_suite_and_design_review",
+    "lean_and_high_side_shift_effective_local_position": true,
+    "occupancy_drives_local_tube_loads": true,
+    "uses_existing_crew_seats_and_actions": true
+  },
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_inform_engine_port": true,
+    "requires_before_runtime_authority": [
+      "D3 overwash/flip water coupling",
+      "D4 rock wrap/pin/release contact coupling",
+      "D5 replay telemetry",
+      "D6 flexible-raft behavioral fixture suite"
+    ]
+  },
+  "schema": "raftsim.flexible_raft.d2_seat_load_coupling.v1",
+  "scoring_authority": "disabled_reference_only",
+  "scoring_authority_enabled": false,
+  "status": "seat_load_reference_fixture_recorded_not_gameplay_authority"
+}
