@@ -1,0 +1,349 @@
+{
+  "asset_need_count": 4,
+  "asset_need_coverage": [
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "candidate_ids": [
+        "polyhaven_pine_sapling_small",
+        "polyhaven_fir_sapling",
+        "fab_chilko_lodgepole_spruce_aspen_foliage_slot",
+        "first_party_chilko_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 4,
+      "use": "river_corridor_forest"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "candidate_ids": [
+        "polyhaven_river_small_rocks",
+        "fab_chilko_glacial_blue_wet_bank_slot",
+        "first_party_chilko_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 3,
+      "use": "water_and_bank_material_support"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "candidate_ids": [
+        "polyhaven_volcanic_rock_tiles",
+        "fab_chilko_lava_canyon_volcanic_rock_slot",
+        "first_party_chilko_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 3,
+      "use": "lava_canyon_rock_materials"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "candidate_ids": [
+        "polyhaven_dry_riverbed_rock",
+        "fab_chilko_cold_water_debris_gravel_slot",
+        "first_party_chilko_biome_fallback_v1"
+      ],
+      "has_cc0_download_candidate": true,
+      "has_first_party_fallback": true,
+      "has_local_only_selection_slot": true,
+      "promotion_status": "blocked_pending_source_hashes_import_captures_and_reviews",
+      "selected_candidate_count": 3,
+      "use": "near_field_banks_and_bars"
+    }
+  ],
+  "assets_downloaded": false,
+  "assets_imported": false,
+  "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+  "candidate_asset_count": 10,
+  "candidate_assets": [
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/pine_sapling_small",
+      "candidate_id": "polyhaven_pine_sapling_small",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a rights-clear young conifer structure candidate; not lodgepole pine, spruce, or aspen species authority.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "cc0_young_conifer_structure_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/fir_sapling",
+      "candidate_id": "polyhaven_fir_sapling",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a conifer sapling variation for isolated review; masked foliage must stay non-Nanite unless measured review passes.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "cc0_conifer_understory_variation_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_url": "https://polyhaven.com/a/volcanic_rock_tiles",
+      "candidate_id": "polyhaven_volcanic_rock_tiles",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected as a dark volcanic surface material candidate; not Lava Canyon geometry, wall stratigraphy, or natural talus authority.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "dark_pitted_volcanic_surface_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_url": "https://polyhaven.com/a/dry_riverbed_rock",
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected for weathered bank and gravel material review; cold-water debris scale and distribution still need corridor source review.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "weathered_cold_bank_rock_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_url": "https://polyhaven.com/a/river_small_rocks",
+      "candidate_id": "polyhaven_river_small_rocks",
+      "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+      "notes": "Selected for wet-bank pebble and broken-rock detail under the glacial-blue water support path; not river color or hydrology authority.",
+      "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+      "required_before_import": [
+        "download source bundle from exact asset URL",
+        "record file list and SHA-256 hashes",
+        "record source resolution/format choices",
+        "record importer settings and Unreal destination path"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "wet_bank_pebble_rock_material_trial",
+      "source_family": "Poly Haven",
+      "status": "selected_for_download_hash_import_and_isolated_review"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://www.fab.com/search?q=lodgepole%20spruce%20aspen%20forest%20foliage",
+      "candidate_id": "fab_chilko_lodgepole_spruce_aspen_foliage_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for lodgepole/spruce/aspen mix, age variation, burned or regenerating stands, and corridor silhouette.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "interior_bc_foliage_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_url": "https://www.fab.com/search?q=glacial%20river%20wet%20bank%20rock",
+      "candidate_id": "fab_chilko_glacial_blue_wet_bank_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for wet/dry bank response, glacial-blue water support, and source-conditioned bank material variation.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "glacial_wet_bank_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_url": "https://www.fab.com/search?q=volcanic%20basalt%20canyon%20rock",
+      "candidate_id": "fab_chilko_lava_canyon_volcanic_rock_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for Lava Canyon volcanic walls, talus, hoodoo-like forms, and source-matched rock identity.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "lava_canyon_volcanic_rock_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_url": "https://www.fab.com/search?q=cold%20river%20gravel%20debris%20driftwood",
+      "candidate_id": "fab_chilko_cold_water_debris_gravel_slot",
+      "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+      "notes": "Needed for cold-water gravel bars, debris, driftwood, and near-bank scale cues that generic materials cannot validate alone.",
+      "repo_binary_policy": "do_not_commit_source_binaries",
+      "required_before_import": [
+        "select exact Fab item URL",
+        "record publisher, license tier, and acquisition date",
+        "store source binaries only in reviewed local source root",
+        "record source-file hashes in committed manifest without committing binaries"
+      ],
+      "required_before_promotion": [
+        "isolated turntable capture",
+        "60 m river-distance capture",
+        "150 m river-distance capture",
+        "map-check zero errors",
+        "desktop and VR performance measurements",
+        "guide, ecology, art, rights, and hazard-readability review"
+      ],
+      "role": "cold_water_gravel_debris_exact_item_selection_required",
+      "source_family": "Fab",
+      "status": "local_only_exact_item_selection_pending"
+    },
+    {
+      "asset_need_id": "all_chilko_asset_needs",
+      "asset_url": "source_manifest://first_party_chilko_biome_fallback_v1",
+      "candidate_id": "first_party_chilko_biome_fallback_v1",
+      "license_class": "first_party_committable",
+      "notes": "Fallback must remain available for interior BC foliage, glacial wet banks, volcanic canyon rock, and cold-water debris whenever local-only Fab binaries are absent or CC0 candidates fail review.",
+      "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+      "role": "missing_external_asset_fallback",
+      "source_family": "First-party procedural",
+      "status": "required_fallback_until_external_assets_pass"
+    }
+  ],
+  "corridor_substitution_allowed": false,
+  "display_name": "Chilko River",
+  "generated_on": "2026-07-16",
+  "license_sources_checked": [
+    {
+      "checked_on": "2026-07-16",
+      "decision": "CC0 Poly Haven candidates may be committed only after exact asset URLs, downloaded source-file hashes, import settings, and isolated review evidence are recorded.",
+      "source_family": "Poly Haven",
+      "url": "https://polyhaven.com/license"
+    },
+    {
+      "checked_on": "2026-07-16",
+      "decision": "Fab Standard candidates remain local-only selection slots in this public repo unless item terms explicitly prove broader redistribution rights.",
+      "source_family": "Fab",
+      "url": "https://www.fab.com/eula"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "b2_selection_manifest_recorded": true,
+    "blocking_reasons": [
+      "CC0 conifer, volcanic-rock, river-rock, and dry-riverbed candidates still need downloaded source hashes and importer reports.",
+      "Lodgepole/spruce/aspen species mix and glacial-blue wet-bank identity still need exact source-conditioned review.",
+      "Volcanic Rock Tiles is a texture candidate only and is not Lava Canyon geometry or geology authority.",
+      "No isolated turntable, 60 m, 150 m, map-check, desktop, or VR evidence exists for the new selections."
+    ],
+    "can_download_cc0_candidates": true,
+    "can_import_isolated_review_assets": false,
+    "can_request_human_lifelike_review": false,
+    "can_substitute_corridor_assets": false,
+    "next_required_actions": [
+      "Download the selected CC0 candidates into reviewed source roots and hash every source file.",
+      "Pick exact local-only Fab or first-party hero assets for lodgepole, spruce, aspen, volcanic canyon rock, and cold-water gravel/debris.",
+      "Run the B1 importer command for each selected asset set and write fail-closed import reports.",
+      "Capture isolated turntable plus 60 m and 150 m river-distance evidence before any corridor substitution.",
+      "Record guide, ecology, art, rights, hazard-readability, and desktop/VR performance reviews."
+    ]
+  },
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.photoreal.chilko_asset_selection_b2.v1",
+  "source_contracts": {
+    "b1_asset_intake": "physics/data/real_world/photoreal_asset_intake_b1.json",
+    "b1_asset_set_commands": "physics/data/real_world/photoreal_asset_set_intake_b1.json"
+  },
+  "status": "b2_item_selection_started_no_assets_imported_no_promotion"
+}
