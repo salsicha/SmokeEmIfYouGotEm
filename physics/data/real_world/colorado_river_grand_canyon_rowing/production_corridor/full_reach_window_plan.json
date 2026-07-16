@@ -1,0 +1,937 @@
+{
+  "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+  "flow_band_status": "planning_placeholders_require_usgs_gauge_history_and_release_context",
+  "full_reach_source_pull_ready": false,
+  "full_reach_source_requirements": [
+    {
+      "required_before": "window_bbox_generation",
+      "requirement_id": "full_length_centerline",
+      "source_family": "NHD/USGS/NPS/GCMRC",
+      "status": "missing_full_reach_authority"
+    },
+    {
+      "required_before": "per_window_manifest_generation",
+      "requirement_id": "terrain_dem",
+      "source_family": "USGS 3DEP",
+      "status": "planned_not_downloaded"
+    },
+    {
+      "required_before": "per_window_manifest_generation",
+      "requirement_id": "aerial_imagery",
+      "source_family": "USDA NAIP",
+      "status": "planned_not_downloaded"
+    },
+    {
+      "required_before": "rapid_stationing_promotion",
+      "requirement_id": "major_rapid_hydraulic_maps",
+      "source_family": "USGS hydraulic maps plus NPS/oarsman review",
+      "status": "link_only_crosscheck_required"
+    },
+    {
+      "required_before": "flow_variant_promotion",
+      "requirement_id": "release_flow_context",
+      "source_family": "USGS 09380000/09402500 and USBR Glen Canyon releases",
+      "status": "pilot_data_exists_full_reach_review_required"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "a2_window_plan_recorded": true,
+    "blocking_reasons": [
+      "The current official-source pilot covers only a Lees Ferry slice, not the full Lees Ferry to Pearce Ferry run.",
+      "The planning axis still uses published river miles until a full-length centerline and canyon working CRS are selected.",
+      "Major rapid miles still need NPS/USGS hydraulic-map and oarsman/geospatial cross-checks.",
+      "No full-reach per-window DEM/imagery source URLs, hashes, stitched validation outputs, or review manifests exist yet."
+    ],
+    "can_promote_a2": false,
+    "exact_put_in_take_out_anchors_reviewed": false,
+    "full_length_centerline_selected": false,
+    "full_reach_source_pull_urls_generated": false,
+    "full_reach_sources_downloaded_and_hashed": false,
+    "next_required_actions": [
+      "Select or build the full-length Colorado River centerline and canyon working CRS.",
+      "Generate per-window USGS 3DEP/NAIP source-pull requests from reviewed window bboxes.",
+      "Cross-check each major rapid mile against NPS, USGS hydraulic maps, and oarsman review evidence.",
+      "Generate hash-locked per-window source manifests and stitched validation reports before Unreal import."
+    ],
+    "nps_usgs_rapid_miles_crosschecked": false,
+    "oarsman_geospatial_rights_review_complete": false,
+    "per_window_manifests_generated": false,
+    "stitched_validation_exported": false
+  },
+  "rapid_assignment_summary": {
+    "all_rapids_blocked_from_promotion": true,
+    "all_rapids_have_window": true,
+    "critical_rapid_count": 9,
+    "critical_rapid_names": [
+      "Bedrock",
+      "Crystal",
+      "Granite",
+      "Hance",
+      "Hermit",
+      "Horn Creek",
+      "House Rock",
+      "Lava Falls",
+      "Upset"
+    ],
+    "rapid_count": 15
+  },
+  "rapid_assignments": [
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_01",
+      "class": "5/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "pour_over",
+        "hole",
+        "debris_fan"
+      ],
+      "name": "Badger Creek",
+      "planning_station_m": 12874.752,
+      "published_river_mile": 8.0,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "high",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_01",
+      "class": "5/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "lateral",
+        "debris_fan"
+      ],
+      "name": "Soap Creek",
+      "planning_station_m": 18346.522,
+      "published_river_mile": 11.4,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "medium",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_02",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "right_run",
+        "lateral",
+        "flow_sensitive"
+      ],
+      "name": "House Rock",
+      "planning_station_m": 27519.782,
+      "published_river_mile": 17.1,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [
+        "24 Mile"
+      ],
+      "assigned_window_id": "colorado_a2_window_03",
+      "class": "6/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "drop",
+        "wave_train",
+        "hole"
+      ],
+      "name": "Georgie",
+      "planning_station_m": 39267.994,
+      "published_river_mile": 24.4,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "high",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_06",
+      "class": "6/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "boulder_garden",
+        "laterals",
+        "debris_fan"
+      ],
+      "name": "Unkar",
+      "planning_station_m": 117321.178,
+      "published_river_mile": 72.9,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "high",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "boulder_garden",
+        "multiple_moves",
+        "holes",
+        "low_flow_difficulty"
+      ],
+      "name": "Hance",
+      "planning_station_m": 124080.422,
+      "published_river_mile": 77.1,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "holes",
+        "canyon_constriction"
+      ],
+      "name": "Sockdolager",
+      "planning_station_m": 127299.11,
+      "published_river_mile": 79.1,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "high",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "laterals",
+        "debris_fan"
+      ],
+      "name": "Grapevine",
+      "planning_station_m": 131322.47,
+      "published_river_mile": 81.6,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "high",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "rock_ledge",
+        "right_to_left_move",
+        "low_flow_difficulty"
+      ],
+      "name": "Horn Creek",
+      "planning_station_m": 146128.435,
+      "published_river_mile": 90.8,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [
+        "Granite Falls"
+      ],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_waves",
+        "laterals",
+        "debris_fan"
+      ],
+      "name": "Granite",
+      "planning_station_m": 151117.402,
+      "published_river_mile": 93.9,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_wave_train",
+        "hydraulics",
+        "flow_sensitive"
+      ],
+      "name": "Hermit",
+      "planning_station_m": 153692.352,
+      "published_river_mile": 95.5,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_09",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_holes",
+        "rock_garden",
+        "debris_fan",
+        "multiple_lines",
+        "flip_hazard"
+      ],
+      "name": "Crystal",
+      "planning_station_m": 158037.581,
+      "published_river_mile": 98.2,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_11",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "central_island",
+        "channel_choice",
+        "wrap_hazard",
+        "rock_push"
+      ],
+      "name": "Bedrock",
+      "planning_station_m": 210984.998,
+      "published_river_mile": 131.1,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_13",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "wave_train",
+        "flip_hazard"
+      ],
+      "name": "Upset",
+      "planning_station_m": 241723.469,
+      "published_river_mile": 150.2,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    },
+    {
+      "aliases": [
+        "Vulcan"
+      ],
+      "assigned_window_id": "colorado_a2_window_15",
+      "class": "9/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "ledge_hole",
+        "large_waves",
+        "laterals",
+        "multiple_lines",
+        "flip_hazard",
+        "flow_sensitive"
+      ],
+      "name": "Lava Falls",
+      "planning_station_m": 289199.117,
+      "published_river_mile": 179.7,
+      "required_reviews_before_promotion": [
+        "NPS or USGS river-mile cross-check",
+        "USGS hydraulic-map or equivalent geospatial rapid evidence",
+        "oarsman or guide line/feature review",
+        "rights/publication review before exposing exact public screenshots",
+        "stitched source-window terrain/imagery validation"
+      ],
+      "review_priority": "critical",
+      "solver_window_enabled": false,
+      "stationing_status": "published_mile_only_pending_nps_usgs_hydraulic_map_and_oarsman_geospatial_crosscheck"
+    }
+  ],
+  "rapid_stationing_promotion_allowed": false,
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "run_length_m": 451420.0,
+  "run_length_river_miles": 280.499,
+  "schema": "raftsim.colorado.a2_full_reach_window_plan.v1",
+  "solver_window_binding_allowed": false,
+  "source_contracts": {
+    "existing_lees_ferry_pilot": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+    "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+    "named_rapid_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json"
+  },
+  "source_manifest_status": "draft_target_needs_geospatial_pull_and_guide_review",
+  "source_windows": [
+    {
+      "existing_pilot_overlap": true,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 1,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 2,
+      "rapid_names": [
+        "Badger Creek",
+        "Soap Creek"
+      ],
+      "review_priority": "high",
+      "river_mile_end": 12.196,
+      "river_mile_start": 0.0,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 19626.957,
+      "station_start_m": 0.0,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_01",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 2,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "House Rock"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 24.391,
+      "river_mile_start": 12.196,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 39253.913,
+      "station_start_m": 19626.957,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_02",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 3,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Georgie"
+      ],
+      "review_priority": "high",
+      "river_mile_end": 36.587,
+      "river_mile_start": 24.391,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 58880.87,
+      "station_start_m": 39253.913,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_03",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 4,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 48.783,
+      "river_mile_start": 36.587,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 78507.826,
+      "station_start_m": 58880.87,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_04",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 5,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 60.978,
+      "river_mile_start": 48.783,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 98134.783,
+      "station_start_m": 78507.826,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_05",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 6,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Unkar"
+      ],
+      "review_priority": "high",
+      "river_mile_end": 73.174,
+      "river_mile_start": 60.978,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 117761.739,
+      "station_start_m": 98134.783,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_06",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 7,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 3,
+      "rapid_names": [
+        "Hance",
+        "Sockdolager",
+        "Grapevine"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 85.369,
+      "river_mile_start": 73.174,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 137388.696,
+      "station_start_m": 117761.739,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_07",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 8,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 3,
+      "rapid_names": [
+        "Horn Creek",
+        "Granite",
+        "Hermit"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 97.565,
+      "river_mile_start": 85.369,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 157015.652,
+      "station_start_m": 137388.696,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_08",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 9,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Crystal"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 109.761,
+      "river_mile_start": 97.565,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 176642.609,
+      "station_start_m": 157015.652,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_09",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 10,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 121.956,
+      "river_mile_start": 109.761,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 196269.565,
+      "station_start_m": 176642.609,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_10",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 11,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Bedrock"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 134.152,
+      "river_mile_start": 121.956,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 215896.522,
+      "station_start_m": 196269.565,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_11",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 12,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 146.348,
+      "river_mile_start": 134.152,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 235523.478,
+      "station_start_m": 215896.522,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_12",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 13,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Upset"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 158.543,
+      "river_mile_start": 146.348,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 255150.435,
+      "station_start_m": 235523.478,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_13",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 14,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 170.739,
+      "river_mile_start": 158.543,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 274777.391,
+      "station_start_m": 255150.435,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_14",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 15,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 1,
+      "rapid_names": [
+        "Lava Falls"
+      ],
+      "review_priority": "critical",
+      "river_mile_end": 182.934,
+      "river_mile_start": 170.739,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 294404.348,
+      "station_start_m": 274777.391,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_15",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 16,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 195.13,
+      "river_mile_start": 182.934,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 314031.304,
+      "station_start_m": 294404.348,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_16",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 17,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 207.326,
+      "river_mile_start": 195.13,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 333658.261,
+      "station_start_m": 314031.304,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_17",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 18,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 219.521,
+      "river_mile_start": 207.326,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 353285.217,
+      "station_start_m": 333658.261,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_18",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 19,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 231.717,
+      "river_mile_start": 219.521,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 372912.174,
+      "station_start_m": 353285.217,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_19",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 20,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 243.913,
+      "river_mile_start": 231.717,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 392539.13,
+      "station_start_m": 372912.174,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_20",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 21,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 256.108,
+      "river_mile_start": 243.913,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 412166.087,
+      "station_start_m": 392539.13,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_21",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 22,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 268.304,
+      "river_mile_start": 256.108,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 431793.043,
+      "station_start_m": 412166.087,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_22",
+      "window_length_m": 19626.957
+    },
+    {
+      "existing_pilot_overlap": false,
+      "hydrography_source_plan": "NHD/USGS mainstem centerline cross-checked to river miles",
+      "imagery_source_plan": "USDA NAIP plus rights-reviewed canyon reference imagery",
+      "order": 23,
+      "promotion_status": "blocked_pending_source_pull_window_bbox_and_review",
+      "rapid_count": 0,
+      "rapid_names": [],
+      "review_priority": "setup",
+      "river_mile_end": 280.499,
+      "river_mile_start": 268.304,
+      "source_bbox_status": "pending_full_centerline_and_canyon_working_crs",
+      "station_end_m": 451420.0,
+      "station_start_m": 431793.043,
+      "terrain_source_plan": "USGS 3DEP 10 m or better, with lidar slots where available",
+      "window_id": "colorado_a2_window_23",
+      "window_length_m": 19626.957
+    }
+  ],
+  "stationing_authority": "published_river_miles_secondary_index_pending_nps_usgs_crosscheck",
+  "status": "a2_full_reach_window_plan_recorded_no_source_download_no_promotion",
+  "unreal_import_allowed": false,
+  "windowing_policy": {
+    "maximum_allowed_length_m": 20000.0,
+    "minimum_allowed_length_m": 10000.0,
+    "rapid_assignment_basis": "published river-mile station converted to meters; every assignment requires NPS/USGS/oarsman/geospatial review before promotion",
+    "target_window_length_m": 19626.957,
+    "window_count": 23,
+    "window_length_policy": "equal_station_windows_across_catalog_run_length_until_full_centerline_and_canyon_crs_are_selected"
+  }
+}
