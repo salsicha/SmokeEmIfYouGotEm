@@ -1,0 +1,178 @@
+{
+  "anchor_review_targets": [
+    {
+      "anchor_id": "chili_bar_put_in",
+      "current_seed_lon_lat": [
+        -120.7199431,
+        38.7786168
+      ],
+      "current_seed_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+      "promotion_gate": "Replace the seed with official land/access geometry or record guide/geospatial approval before publishing or gameplay use.",
+      "role": "upstream_start",
+      "search_window_wgs84": {
+        "max_lat": 38.786617,
+        "max_lon": -120.709943,
+        "min_lat": 38.770617,
+        "min_lon": -120.729943
+      }
+    },
+    {
+      "anchor_id": "coloma_bridge_checkpoint",
+      "current_seed_lon_lat": [
+        -120.7632701,
+        38.7784667
+      ],
+      "current_seed_status": "review_seed_from_nhd_stationing_candidate_not_authoritative",
+      "maximum_allowed_station_delta_m_before_manual_review": 250.0,
+      "promotion_gate": "The corrected route must hit the published Chili Bar-to-Coloma station checkpoint before any Gorge or Folsom projection is trusted.",
+      "published_station_m": 9012.3264,
+      "published_station_miles": 5.6,
+      "role": "station_checkpoint_not_final_takeout"
+    },
+    {
+      "anchor_id": "folsom_reservoir_takeout",
+      "current_seed_lon_lat": null,
+      "current_seed_status": "missing_exact_anchor",
+      "promotion_gate": "Attach an exact reviewed take-out/access point near the Folsom Reservoir reach before full-run stationing is promoted.",
+      "published_run_length_m": 33796.224,
+      "published_run_length_miles": 21.0,
+      "role": "downstream_end",
+      "search_window_wgs84": {
+        "max_lat": 38.84,
+        "max_lon": -120.88,
+        "min_lat": 38.68,
+        "min_lon": -121.12
+      }
+    }
+  ],
+  "current_blockers": [
+    "Current NHD bbox extract is pilot-only and not full reach.",
+    "Current production corridor is the 0-2.531 km Chili Bar slice.",
+    "Current alignment review records a 26.2 km candidate vs. 9.0 km Coloma checkpoint conflict.",
+    "Flow bands are attached but review-gated, not promoted gameplay bands."
+  ],
+  "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "a1_status": "physics/data/real_world/south_fork_american_chili_bar/review/a1_stationing_repair_status.json",
+    "access_points": "physics/data/real_world/south_fork_american_chili_bar/review/production_import_pilot/access_points.geojson",
+    "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json"
+  },
+  "planned_outputs": [
+    "hydrography/full_reach_centerline.geojson",
+    "hydrography/full_reach_stationing.json",
+    "hydrography/full_reach_alignment_review.json",
+    "production_corridor/full_reach_window_manifest.json",
+    "review/full_reach_named_rapid_stationing_review.json",
+    "review/named_rapid_station_alignment_review.json",
+    "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson"
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_meat_grinder_troublemaker_solver_windows": false,
+    "can_enable_south_fork_editor_geometry": false,
+    "exit_criteria": [
+      "Full-reach official hydrography or 3DHP/NHD route selected and clipped.",
+      "Chili Bar, Coloma checkpoint, and Folsom take-out anchors reviewed.",
+      "All 20 rapid stations regenerated from corrected route geometry.",
+      "Flow windows reviewed against CDEC/USGS context and guide notes.",
+      "Corridor regression tests pass on stitched whole-window outputs."
+    ]
+  },
+  "review_envelope_policy": {
+    "authority": "download_and_search_window_only_not_final_access_geometry",
+    "must_clip_to_reviewed_anchors_before_promotion": true,
+    "reason": "The envelope intentionally over-covers Chili Bar, Coloma, the Gorge sequence, and the Folsom Reservoir approach so the next source pull cannot hide the current endpoint conflict."
+  },
+  "review_envelope_wgs84": {
+    "max_lat": 38.86,
+    "max_lon": -120.7,
+    "min_lat": 38.68,
+    "min_lon": -121.12
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "route_solution_requirements": [
+    {
+      "acceptance": "One ordered route chain, no unexplained reversals or branch jumps, and every source segment preserves ID/provenance.",
+      "requirement": "Select a directed South Fork American mainstem graph from Chili Bar to Folsom Reservoir."
+    },
+    {
+      "acceptance": "Route start/end are exact reviewed anchors, not the broad source download envelope or unreviewed access seeds.",
+      "requirement": "Clip route to reviewed Chili Bar and Folsom anchors."
+    },
+    {
+      "acceptance": "Corrected station at Coloma is within 250 m of the published 9012.326 m checkpoint, or manual review remains blocked.",
+      "requirement": "Validate Coloma checkpoint before projecting Gorge rapids."
+    },
+    {
+      "acceptance": "Every South Fork marker has exact route geometry and zero markers fall back to downstream-order interpolation.",
+      "requirement": "Project all 20 published rapid miles onto the corrected route."
+    },
+    {
+      "acceptance": "Chili Bar, Coloma, Gorge, and Folsom windows are stitched for validation outputs; seams cannot hide physics or art errors.",
+      "requirement": "Generate windowed full-run corridor packages."
+    }
+  ],
+  "schema": "raftsim.south_fork.a1_full_reach_acquisition_plan.v1",
+  "source_pull_queue": [
+    {
+      "preferred_products": [
+        "3DHP if available for the full envelope",
+        "NHD Best Resolution state/HU products",
+        "NHDPlus HR only as supplemental network-order evidence"
+      ],
+      "source_class": "hydrography",
+      "source_id": "usgs_3dhp_or_nhd_full_reach",
+      "status": "planned",
+      "target_artifacts": [
+        "hydrography/full_reach_raw_flowline_extract.geojson",
+        "hydrography/full_reach_raw_support_layers.geojson",
+        "hydrography/full_reach_source_manifest.json"
+      ],
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-121.12,38.68,-120.7,38.86"
+    },
+    {
+      "source_class": "terrain_dem_or_lidar",
+      "source_id": "usgs_3dep_full_reach_tiles",
+      "status": "planned",
+      "target_artifacts": [
+        "terrain/full_reach_3dep_tile_manifest.json",
+        "terrain/full_reach_windowed_heightfields/"
+      ],
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20%283D%20Elevation%20Program%20Products%20and%20Services%29&bbox=-121.12,38.68,-120.7,38.86"
+    },
+    {
+      "source_class": "aerial_imagery",
+      "source_id": "usda_naip_full_reach_tiles",
+      "status": "planned",
+      "target_artifacts": [
+        "imagery/full_reach_naip_tile_manifest.json",
+        "imagery/full_reach_windowed_drapes/"
+      ],
+      "url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20%281%20meter%20to%20.5%20foot%29&bbox=-121.12,38.68,-120.7,38.86"
+    },
+    {
+      "existing_evidence": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+      "source_class": "flow_history",
+      "source_id": "cdec_cbr_a25_plus_usgs_context",
+      "status": "attached_but_needs_full_window_review",
+      "target_artifacts": [
+        "hydrology/production_import_pilot/flow_band_review.json",
+        "hydrology/full_reach_flow_window_review.json"
+      ]
+    },
+    {
+      "source_class": "guide_and_access_review",
+      "source_id": "guide_outfitter_land_manager_review",
+      "status": "planned_link_and_annotation_only",
+      "target_artifacts": [
+        "review/full_reach_anchor_review.json",
+        "review/full_reach_sensitive_publication_review.json",
+        "review/full_reach_guide_stationing_notes.json"
+      ]
+    }
+  ],
+  "status": "planned_no_source_downloaded_not_geometry_authority",
+  "task_id": "A1"
+}
