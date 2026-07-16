@@ -6,6 +6,8 @@ from raftsim.flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_SCHEMA,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_COMPARISON_REPORT_SCHEMA,
+    D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
+    D6_FIXTURE_INPUT_PACKAGE_SCHEMA,
     D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
     D6_MEASURED_RESULTS_TEMPLATE_SCHEMA,
     D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
@@ -14,6 +16,7 @@ from raftsim.flexible_raft_d6 import (
     build_d6_replay_channel_probe,
     build_flexible_raft_d6_behavioral_suite,
     build_flexible_raft_d6_comparison_report,
+    build_flexible_raft_d6_fixture_input_package,
     build_flexible_raft_d6_measured_results_template,
     build_flexible_raft_d6_measurement_manifest,
 )
@@ -149,6 +152,7 @@ def test_flexible_raft_d6_measurement_manifest_is_reproducible_and_pending():
     assert committed["d6_complete"] is False
     assert committed["production_promoted"] is False
     assert committed["measurement_task_count"] == len(REQUIRED_D6_FIXTURE_IDS) * 2
+    assert committed["fixture_input_package_path"] == D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH
 
 
 def test_flexible_raft_d6_measurement_manifest_covers_every_target_fixture_pair():
@@ -185,6 +189,7 @@ def test_flexible_raft_d6_measured_results_template_is_reproducible_and_empty():
     assert committed["filled_result_count"] == 0
     assert committed["d6_complete"] is False
     assert committed["production_promoted"] is False
+    assert committed["source_fixture_input_package_path"] == D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH
 
 
 def test_flexible_raft_d6_measured_results_template_matches_comparison_contract():
@@ -205,6 +210,92 @@ def test_flexible_raft_d6_measured_results_template_matches_comparison_contract(
             assert payload["engine_version"] == ""
             assert payload["metric_paths_required"]
             assert payload["metrics"]
+
+
+def test_flexible_raft_d6_fixture_input_package_is_reproducible_and_pending():
+    generated = build_flexible_raft_d6_fixture_input_package()
+    committed = json.loads(
+        (REPO_ROOT / D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_FIXTURE_INPUT_PACKAGE_SCHEMA
+    assert committed["status"] == "fixture_inputs_ready_engine_adapter_runs_pending"
+    assert committed["fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert committed["measurement_task_count"] == len(REQUIRED_D6_FIXTURE_IDS) * 2
+    assert committed["d6_complete"] is False
+    assert committed["production_promoted"] is False
+    assert committed["promotion_gate"]["may_mark_d6_complete"] is False
+
+
+def test_flexible_raft_d6_fixture_input_package_covers_required_inputs():
+    package = build_flexible_raft_d6_fixture_input_package()
+    by_id = {fixture["fixture_id"]: fixture for fixture in package["fixtures"]}
+
+    assert list(by_id) == list(REQUIRED_D6_FIXTURE_IDS)
+    assert package["common_setup"]["crew_seat_count"] == 5
+    assert package["common_setup"]["default_tube_layout"]["segment_count"] > 0
+    assert package["common_setup"]["initial_state"]["position"] == {
+        "x": 3.0,
+        "y": 2.0,
+        "z": 0.0,
+    }
+
+    shift_phases = by_id["traveling_crew_shift"]["input_contract"]["phases"]
+    assert [phase["phase_id"] for phase in shift_phases] == [
+        "neutral_occupied_seats",
+        "port_lean_requested",
+        "starboard_high_side",
+    ]
+    assert shift_phases[1]["action_count"] == 5
+    assert {action["lean_clamp_expected"] for action in shift_phases[1]["crew_actions"]} == {True}
+    assert {action["high_side_direction"] for action in shift_phases[2]["crew_actions"]} == {1}
+
+    rock = by_id["rock_pinch_wrap"]["input_contract"]["obstacles"][0]
+    assert rock["obstacle_id"] == "wrap_starboard_pillow"
+    assert rock["local_position"] == {"x": 0.0, "y": 1.0, "z": 0.0}
+    assert rock["radius_m"] == 1.45
+
+    overwash = by_id["upstream_tube_overwash_flip"]["input_contract"]["water"]
+    assert overwash["surface_height_m"] == 0.24
+    assert overwash["velocity_mps"] == {"x": 0.0, "y": -3.0, "z": 0.0}
+
+    timed = by_id["timed_high_side_save"]["input_contract"]
+    assert timed["previous_retained_volume_by_segment"]
+    assert timed["phases"][1]["phase_id"] == "starboard_high_side_with_retained_water_memory"
+
+    recovery = by_id["post_contact_recovery"]["input_contract"]
+    assert recovery["previous_indentation_by_segment"] == {
+        "starboard_1": 0.08,
+        "starboard_2": 0.12,
+    }
+
+    sweeps = by_id["pressure_flow_sweeps"]["input_contract"]
+    assert sweeps["nominal_pressure_values_pa"] == [14000.0, 18000.0, 22000.0]
+    assert sweeps["incoming_velocity_values_mps"] == [1.2, 2.4, 3.6]
+    assert sweeps["sweep_case_count"] == 9
+    assert len(sweeps["sweep_cases"]) == 9
+
+
+def test_flexible_raft_d6_fixture_input_package_targets_and_metrics_match_manifest():
+    package = build_flexible_raft_d6_fixture_input_package()
+
+    for fixture in package["fixtures"]:
+        assert fixture["can_promote"] is False
+        assert fixture["required_metric_count"] == len(fixture["required_metric_paths"])
+        assert fixture["required_metric_count"] > 0
+        assert {target["target_id"] for target in fixture["adapter_targets"]} == {
+            "project_chrono_or_reviewed_compliant_model",
+            "unreal_chaos_rigid_baseline",
+        }
+        for target in fixture["adapter_targets"]:
+            assert target["fixture_id"] == fixture["fixture_id"]
+            assert "source_report" in target["required_provenance_fields"]
+            assert "telemetry_sha256" in target["required_provenance_fields"]
+            assert target["adapter_contract"]["may_substitute_with_synthetic_python_reference"] is False
+            assert target["can_promote_fixture"] is False
 
 
 def _synthetic_measured_results() -> dict[str, dict[str, dict[str, object]]]:

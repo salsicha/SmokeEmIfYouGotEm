@@ -1,6 +1,7 @@
 {
   "d6_complete": false,
   "fixture_count": 7,
+  "fixture_input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
   "generated_on": "2026-07-16",
   "measured_results_template_path": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
   "measurement_task_count": 14,

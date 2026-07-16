@@ -1,0 +1,1631 @@
+{
+  "adapter_contract": {
+    "adapter_must_not_substitute_python_reference": true,
+    "comparison_report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
+    "input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+    "required_metric_tolerance": {
+      "absolute": 1e-06,
+      "relative": 0.05
+    },
+    "required_output_fields": [
+      "source_report",
+      "telemetry_sha256",
+      "engine_version",
+      "metrics"
+    ],
+    "result_template_path": "physics/data/calibration/flexible_raft_d6_measured_results_template.json"
+  },
+  "common_setup": {
+    "coordinate_frame": {
+      "local_x": "raft longitudinal axis, positive toward bow",
+      "local_y": "raft lateral axis, positive starboard/river-right in fixture space",
+      "local_z": "up"
+    },
+    "crew_seat_count": 5,
+    "crew_seats": [
+      {
+        "local_position": {
+          "x": -1.8059999999999998,
+          "y": 0.0,
+          "z": 0.15
+        },
+        "occupant_mass_kg": 85.0,
+        "occupied": true,
+        "role": "guide",
+        "seat_id": "guide"
+      },
+      {
+        "local_position": {
+          "x": -0.8728999999999999,
+          "y": -0.608,
+          "z": 0.12
+        },
+        "occupant_mass_kg": 75.0,
+        "occupied": true,
+        "role": "passenger",
+        "seat_id": "passenger_0"
+      },
+      {
+        "local_position": {
+          "x": -0.8728999999999999,
+          "y": 0.608,
+          "z": 0.12
+        },
+        "occupant_mass_kg": 75.0,
+        "occupied": true,
+        "role": "passenger",
+        "seat_id": "passenger_1"
+      },
+      {
+        "local_position": {
+          "x": 1.6210999999999998,
+          "y": -0.608,
+          "z": 0.12
+        },
+        "occupant_mass_kg": 75.0,
+        "occupied": true,
+        "role": "passenger",
+        "seat_id": "passenger_2"
+      },
+      {
+        "local_position": {
+          "x": 1.6210999999999998,
+          "y": 0.608,
+          "z": 0.12
+        },
+        "occupant_mass_kg": 75.0,
+        "occupied": true,
+        "role": "passenger",
+        "seat_id": "passenger_3"
+      }
+    ],
+    "default_tube_layout": {
+      "segment_count": 12,
+      "segments": [
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "port_0",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "port_1",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "port_2",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": -1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "port_3",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 5.849645520984197e-07,
+          "contact_area_m2": 0.1463,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.23398582083936784,
+          "segment_id": "bow_0",
+          "tributary_length_m": 0.95
+        },
+        {
+          "compliance_m3_per_pa": 5.849645520984197e-07,
+          "contact_area_m2": 0.1463,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.23398582083936784,
+          "segment_id": "bow_1",
+          "tributary_length_m": 0.95
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "starboard_3",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "starboard_2",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "starboard_1",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 6.619335721113696e-07,
+          "contact_area_m2": 0.16555,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.2647734288445478,
+          "segment_id": "starboard_0",
+          "tributary_length_m": 1.075
+        },
+        {
+          "compliance_m3_per_pa": 5.849645520984197e-07,
+          "contact_area_m2": 0.1463,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.23398582083936784,
+          "segment_id": "stern_1",
+          "tributary_length_m": 0.95
+        },
+        {
+          "compliance_m3_per_pa": 5.849645520984197e-07,
+          "contact_area_m2": 0.1463,
+          "floor_coupling_fraction": 0.16,
+          "frame_coupling_fraction": 0.07,
+          "lacing_coupling_fraction": 0.12,
+          "local_position": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "nominal_pressure_pa": 18000.0,
+          "outward_normal": {
+            "x": -1.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rest_volume_m3": 0.23398582083936784,
+          "segment_id": "stern_0",
+          "tributary_length_m": 0.95
+        }
+      ]
+    },
+    "fixed_step_s": 0.03333333333333333,
+    "initial_state": {
+      "angular_velocity_rad_s": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "linear_velocity_mps": {
+        "x": 0.0,
+        "y": 0.7,
+        "z": 0.0
+      },
+      "orientation": {
+        "w": 1.0,
+        "x": 0.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "position": {
+        "x": 3.0,
+        "y": 2.0,
+        "z": 0.0
+      }
+    },
+    "mass_properties": {
+      "gravity": {
+        "x": 0.0,
+        "y": 0.0,
+        "z": -9.81
+      },
+      "guide_offset": {
+        "x": -1.8059999999999998,
+        "y": 0.0,
+        "z": 0.15
+      },
+      "inertia_diagonal_kg_m2": {
+        "x": 263.20816666666667,
+        "y": 1261.4081666666666,
+        "z": 1482.5416666666667
+      },
+      "inverse_mass_kg": 0.0012422360248447205,
+      "passenger_offsets": [
+        {
+          "x": -0.8728999999999999,
+          "y": -0.608,
+          "z": 0.12
+        },
+        {
+          "x": -0.8728999999999999,
+          "y": 0.608,
+          "z": 0.12
+        },
+        {
+          "x": 1.6210999999999998,
+          "y": -0.608,
+          "z": 0.12
+        },
+        {
+          "x": 1.6210999999999998,
+          "y": 0.608,
+          "z": 0.12
+        }
+      ],
+      "sample_patch_count": 14,
+      "sample_patches": [
+        {
+          "area_m2": 0.301,
+          "kind": "left_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -1.634,
+            "y": -0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "right_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -1.634,
+            "y": 0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "left_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -0.516,
+            "y": -0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "right_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -0.516,
+            "y": 0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "left_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 0.602,
+            "y": -0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "right_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 0.602,
+            "y": 0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "left_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 1.72,
+            "y": -0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.301,
+          "kind": "right_tube",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 1.72,
+            "y": 0.95,
+            "z": 0.0
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -1.075,
+            "y": -0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": -1.075,
+            "y": 0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 0.0,
+            "y": -0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 0.0,
+            "y": 0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 1.075,
+            "y": -0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        },
+        {
+          "area_m2": 0.354578,
+          "kind": "floor",
+          "local_normal": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 1.0
+          },
+          "local_position": {
+            "x": 1.075,
+            "y": 0.34199999999999997,
+            "z": -0.15400000000000003
+          }
+        }
+      ],
+      "total_mass_kg": 805.0
+    },
+    "raft_parameters": {
+      "drag_coefficient": 1.25,
+      "grounding_friction": 0.65,
+      "guide_mass_kg": 85.0,
+      "length_m": 4.3,
+      "mass_kg": 420.0,
+      "passenger_count": 4,
+      "passenger_mass_kg": 75.0,
+      "tube_radius_m": 0.28,
+      "width_m": 1.9
+    },
+    "reference_evaluator_defaults": {
+      "d3_water_sampler": {
+        "input_kind": "synthetic_uniform_water_field",
+        "note": "Adapters may replace the field implementation, but must preserve the recorded surface height and velocity vectors per fixture."
+      },
+      "d4_rock_contact": {
+        "contact_damping_n_s_m": 850.0,
+        "dt_s": 0.03333333333333333,
+        "max_indentation_m": 0.22,
+        "pressure_release_area_m2": 0.018,
+        "recovery_rate_per_s": 2.4,
+        "tube_contact_stiffness_n_m": 30000.0,
+        "wrap_support_scale": 0.32
+      }
+    }
+  },
+  "d6_complete": false,
+  "fixture_count": 7,
+  "fixtures": [
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/static_seat_load_sag.json",
+          "fixture_id": "static_seat_load_sag",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/static_seat_load_sag.json",
+          "fixture_id": "static_seat_load_sag",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "static_seat_load_sag",
+      "input_contract": {
+        "expected_engine_setup": "Solve the occupied-seat tube deformation from common_setup with no extra crew action.",
+        "fixture_kind": "static_occupied_seat_load",
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          }
+        ]
+      },
+      "objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 6,
+      "required_metric_paths": [
+        "loaded_crew_mass_kg",
+        "max_seat_freeboard_loss_m",
+        "port_total_freeboard_loss_m",
+        "raft_length_m",
+        "raft_width_m",
+        "starboard_total_freeboard_loss_m"
+      ],
+      "source_fixture_index": 0,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/traveling_crew_shift.json",
+          "fixture_id": "traveling_crew_shift",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/traveling_crew_shift.json",
+          "fixture_id": "traveling_crew_shift",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "traveling_crew_shift",
+      "input_contract": {
+        "expected_engine_setup": "Run each phase from the same common initial state and compare side freeboard deltas.",
+        "fixture_kind": "multi_phase_crew_weight_transfer",
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          },
+          {
+            "action_count": 5,
+            "crew_actions": [
+              {
+                "brace": false,
+                "high_side_direction": 0,
+                "lean_clamp_expected": true,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": -1.5,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "guide"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 0,
+                "lean_clamp_expected": true,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": -1.5,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_0"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 0,
+                "lean_clamp_expected": true,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": -1.5,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_1"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 0,
+                "lean_clamp_expected": true,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": -1.5,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_2"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 0,
+                "lean_clamp_expected": true,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": -1.5,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_3"
+              }
+            ],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "port_lean_requested"
+          },
+          {
+            "action_count": 5,
+            "crew_actions": [
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "guide"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_0"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_1"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_2"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_3"
+              }
+            ],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "starboard_high_side"
+          }
+        ]
+      },
+      "objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "neutral_roll_load_bias_nm",
+        "port_roll_load_bias_nm",
+        "port_total_freeboard_delta_m",
+        "starboard_roll_load_bias_nm",
+        "starboard_total_freeboard_delta_m"
+      ],
+      "source_fixture_index": 1,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/rock_pinch_wrap.json",
+          "fixture_id": "rock_pinch_wrap",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/rock_pinch_wrap.json",
+          "fixture_id": "rock_pinch_wrap",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "rock_pinch_wrap",
+      "input_contract": {
+        "expected_engine_setup": "Apply the recorded local boulder against the neutral compliant tube state.",
+        "fixture_kind": "static_rock_pinch_wrap_contact",
+        "obstacles": [
+          {
+            "friction_coefficient": 0.82,
+            "local_position": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "obstacle_id": "wrap_starboard_pillow",
+            "radius_m": 1.45
+          }
+        ],
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          }
+        ]
+      },
+      "objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "contact_count",
+        "max_indentation_m",
+        "min_release_margin_n",
+        "pinned_obstacle_count",
+        "wrapping_contact_count"
+      ],
+      "source_fixture_index": 2,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/upstream_tube_overwash_flip.json",
+          "fixture_id": "upstream_tube_overwash_flip",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/upstream_tube_overwash_flip.json",
+          "fixture_id": "upstream_tube_overwash_flip",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "upstream_tube_overwash_flip",
+      "input_contract": {
+        "expected_engine_setup": "Sample the uniform upstream flow against depressed upstream tube segments.",
+        "fixture_kind": "uniform_flow_overwash_flip_probe",
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          }
+        ],
+        "water": {
+          "field_kind": "synthetic_uniform",
+          "surface_height_m": 0.24,
+          "velocity_mps": {
+            "x": 0.0,
+            "y": -3.0,
+            "z": 0.0
+          }
+        }
+      },
+      "objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 4,
+      "required_metric_paths": [
+        "reference_flip_margin_nm",
+        "retained_water_roll_moment_nm",
+        "total_overtopping_flux_m3_s",
+        "total_retained_water_mass_kg"
+      ],
+      "source_fixture_index": 3,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/timed_high_side_save.json",
+          "fixture_id": "timed_high_side_save",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/timed_high_side_save.json",
+          "fixture_id": "timed_high_side_save",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "timed_high_side_save",
+      "input_contract": {
+        "expected_engine_setup": "Run the neutral overwash phase first, then replay the high-side phase with the recorded retained-water memory.",
+        "fixture_kind": "two_phase_overwash_high_side_recovery",
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_overwash"
+          },
+          {
+            "action_count": 5,
+            "crew_actions": [
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "guide"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_0"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_1"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_2"
+              },
+              {
+                "brace": false,
+                "high_side_direction": 1,
+                "lean_clamp_expected": false,
+                "lean_offset": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "recovery": false,
+                "seat_id": "passenger_3"
+              }
+            ],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "starboard_high_side_with_retained_water_memory"
+          }
+        ],
+        "previous_retained_volume_by_segment": {
+          "bow_0": 0.0,
+          "bow_1": 0.0,
+          "port_0": 0.0,
+          "port_1": 0.0,
+          "port_2": 0.0,
+          "port_3": 0.0,
+          "starboard_0": 0.007248767319957949,
+          "starboard_1": 0.008048158039671077,
+          "starboard_2": 0.007236516121188398,
+          "starboard_3": 0.008048158039671077,
+          "stern_0": 0.0,
+          "stern_1": 0.0
+        },
+        "water": {
+          "field_kind": "synthetic_uniform",
+          "surface_height_m": 0.24,
+          "velocity_mps": {
+            "x": 0.0,
+            "y": -3.0,
+            "z": 0.0
+          }
+        }
+      },
+      "objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "high_side_flip_margin_nm",
+        "high_side_flip_threshold_nm",
+        "margin_delta_nm",
+        "neutral_flip_margin_nm",
+        "neutral_flip_threshold_nm"
+      ],
+      "source_fixture_index": 4,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/post_contact_recovery.json",
+          "fixture_id": "post_contact_recovery",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/post_contact_recovery.json",
+          "fixture_id": "post_contact_recovery",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "post_contact_recovery",
+      "input_contract": {
+        "expected_engine_setup": "Start with recorded prior indentation and no current obstacle contact.",
+        "fixture_kind": "post_contact_indentation_recovery",
+        "obstacles": [],
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          }
+        ],
+        "previous_indentation_by_segment": {
+          "starboard_1": 0.08,
+          "starboard_2": 0.12
+        }
+      },
+      "objective": "Verify prior tube indentation decays after contact clears.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 3,
+      "required_metric_paths": [
+        "max_recovered_indentation_m",
+        "recovering_contact_count",
+        "total_holding_force_n"
+      ],
+      "source_fixture_index": 5,
+      "status": "ready_for_external_engine_adapter_run"
+    },
+    {
+      "adapter_targets": [
+        {
+          "adapter_contract": {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": "Project Chrono or reviewed offline compliant model reproducing the D1-D5 tube, overwash, contact, and recovery fixture semantics.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "bounded_numeric_equivalence",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/pressure_flow_sweeps.json",
+          "fixture_id": "pressure_flow_sweeps",
+          "metric_deltas_are_failures": true,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "adapter_contract": {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "may_substitute_with_synthetic_python_reference": false,
+            "required_output": "baseline delta metrics plus telemetry hash"
+          },
+          "can_promote_fixture": false,
+          "comparison_mode": "baseline_delta_recording",
+          "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/pressure_flow_sweeps.json",
+          "fixture_id": "pressure_flow_sweeps",
+          "metric_deltas_are_failures": false,
+          "required_provenance_fields": [
+            "source_report",
+            "telemetry_sha256"
+          ],
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "can_promote": false,
+      "fixture_id": "pressure_flow_sweeps",
+      "input_contract": {
+        "expected_engine_setup": "Run every pressure/velocity pair with the same neutral seat state and boulder geometry.",
+        "fixture_kind": "pressure_flow_parameter_sweep",
+        "incoming_velocity_values_mps": [
+          1.2,
+          2.4,
+          3.6
+        ],
+        "nominal_pressure_values_pa": [
+          14000.0,
+          18000.0,
+          22000.0
+        ],
+        "obstacles": [
+          {
+            "friction_coefficient": 0.82,
+            "local_position": {
+              "x": 0.0,
+              "y": 1.0,
+              "z": 0.0
+            },
+            "obstacle_id": "pressure_sweep_wrap",
+            "radius_m": 1.45
+          }
+        ],
+        "phases": [
+          {
+            "action_count": 0,
+            "crew_actions": [],
+            "duration_s": 0.03333333333333333,
+            "phase_id": "neutral_occupied_seats"
+          }
+        ],
+        "sweep_case_count": 9,
+        "sweep_cases": [
+          {
+            "case_id": "pressure_14000_velocity_1p2",
+            "nominal_pressure_pa": 14000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -1.2,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_14000_velocity_2p4",
+            "nominal_pressure_pa": 14000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -2.4,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_14000_velocity_3p6",
+            "nominal_pressure_pa": 14000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -3.6,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_18000_velocity_1p2",
+            "nominal_pressure_pa": 18000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -1.2,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_18000_velocity_2p4",
+            "nominal_pressure_pa": 18000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -2.4,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_18000_velocity_3p6",
+            "nominal_pressure_pa": 18000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -3.6,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_22000_velocity_1p2",
+            "nominal_pressure_pa": 22000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -1.2,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_22000_velocity_2p4",
+            "nominal_pressure_pa": 22000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -2.4,
+                "z": 0.0
+              }
+            }
+          },
+          {
+            "case_id": "pressure_22000_velocity_3p6",
+            "nominal_pressure_pa": 22000.0,
+            "water": {
+              "field_kind": "synthetic_uniform",
+              "surface_height_m": 0.22,
+              "velocity_mps": {
+                "x": 0.0,
+                "y": -3.6,
+                "z": 0.0
+              }
+            }
+          }
+        ],
+        "water_surface_height_m": 0.22
+      },
+      "objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 46,
+      "required_metric_paths": [
+        "sweep_case_count",
+        "sweeps[0].contact_min_release_margin_n",
+        "sweeps[0].incoming_velocity_mps",
+        "sweeps[0].nominal_pressure_pa",
+        "sweeps[0].overwash_flux_m3_s",
+        "sweeps[0].retained_water_roll_moment_nm",
+        "sweeps[1].contact_min_release_margin_n",
+        "sweeps[1].incoming_velocity_mps",
+        "sweeps[1].nominal_pressure_pa",
+        "sweeps[1].overwash_flux_m3_s",
+        "sweeps[1].retained_water_roll_moment_nm",
+        "sweeps[2].contact_min_release_margin_n",
+        "sweeps[2].incoming_velocity_mps",
+        "sweeps[2].nominal_pressure_pa",
+        "sweeps[2].overwash_flux_m3_s",
+        "sweeps[2].retained_water_roll_moment_nm",
+        "sweeps[3].contact_min_release_margin_n",
+        "sweeps[3].incoming_velocity_mps",
+        "sweeps[3].nominal_pressure_pa",
+        "sweeps[3].overwash_flux_m3_s",
+        "sweeps[3].retained_water_roll_moment_nm",
+        "sweeps[4].contact_min_release_margin_n",
+        "sweeps[4].incoming_velocity_mps",
+        "sweeps[4].nominal_pressure_pa",
+        "sweeps[4].overwash_flux_m3_s",
+        "sweeps[4].retained_water_roll_moment_nm",
+        "sweeps[5].contact_min_release_margin_n",
+        "sweeps[5].incoming_velocity_mps",
+        "sweeps[5].nominal_pressure_pa",
+        "sweeps[5].overwash_flux_m3_s",
+        "sweeps[5].retained_water_roll_moment_nm",
+        "sweeps[6].contact_min_release_margin_n",
+        "sweeps[6].incoming_velocity_mps",
+        "sweeps[6].nominal_pressure_pa",
+        "sweeps[6].overwash_flux_m3_s",
+        "sweeps[6].retained_water_roll_moment_nm",
+        "sweeps[7].contact_min_release_margin_n",
+        "sweeps[7].incoming_velocity_mps",
+        "sweeps[7].nominal_pressure_pa",
+        "sweeps[7].overwash_flux_m3_s",
+        "sweeps[7].retained_water_roll_moment_nm",
+        "sweeps[8].contact_min_release_margin_n",
+        "sweeps[8].incoming_velocity_mps",
+        "sweeps[8].nominal_pressure_pa",
+        "sweeps[8].overwash_flux_m3_s",
+        "sweeps[8].retained_water_roll_moment_nm"
+      ],
+      "source_fixture_index": 6,
+      "status": "ready_for_external_engine_adapter_run"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "measurement_task_count": 14,
+  "production_promoted": false,
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "reason": "This package only records deterministic fixture inputs. D6 remains incomplete until measured compliant-reference and Unreal Chaos outputs populate the measured-results template and pass review."
+  },
+  "required_fixture_ids": [
+    "static_seat_load_sag",
+    "traveling_crew_shift",
+    "rock_pinch_wrap",
+    "upstream_tube_overwash_flip",
+    "timed_high_side_save",
+    "post_contact_recovery",
+    "pressure_flow_sweeps"
+  ],
+  "required_targets": [
+    "project_chrono_or_reviewed_compliant_model",
+    "unreal_chaos_rigid_baseline"
+  ],
+  "schema": "raftsim.flexible_raft.d6_fixture_input_package.v1",
+  "source_measured_results_template_path": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
+  "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+  "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
+  "status": "fixture_inputs_ready_engine_adapter_runs_pending"
+}
