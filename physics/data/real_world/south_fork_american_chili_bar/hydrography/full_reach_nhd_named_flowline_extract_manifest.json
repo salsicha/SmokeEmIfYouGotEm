@@ -1,0 +1,41 @@
+{
+  "generated_on": "2026-07-16",
+  "outputs": {
+    "geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_nhd_named_flowline_extract.geojson"
+  },
+  "review_gates": [
+    "Resolve directed route order through the 198 selected NHD records.",
+    "Clip to reviewed Chili Bar put-in and Folsom Reservoir take-out anchors.",
+    "Validate the Coloma station checkpoint before projecting Gorge rapids.",
+    "Inspect reservoirs, side channels, braided fragments, and duplicate paths before promotion.",
+    "Do not bind editor markers or solver windows to this candidate pool directly."
+  ],
+  "schema": "raftsim.south_fork.a1_full_reach_nhd_named_flowline_extract.manifest.v1",
+  "selection": {
+    "gnis_name": "South Fork American River",
+    "named_record_count_in_hu8": 586,
+    "review_envelope_wgs84": {
+      "max_lat": 38.86,
+      "max_lon": -120.7,
+      "min_lat": 38.68,
+      "min_lon": -121.12
+    },
+    "selected_bounds_wgs84": {
+      "max_lat": 38.82511,
+      "max_lon": -120.698556,
+      "min_lat": 38.7054284,
+      "min_lon": -121.1396311
+    },
+    "selected_length_km_source_sum": 65.786574,
+    "selected_record_count": 198
+  },
+  "source_archive": {
+    "committed_to_repo": false,
+    "expected_sha256": "d75ca0bf998021d71b34c5b52f36a4ce9465a110cae9c3bb4350475a9eda0473",
+    "expected_size_bytes": 19558205,
+    "sha256": "d75ca0bf998021d71b34c5b52f36a4ce9465a110cae9c3bb4350475a9eda0473",
+    "size_bytes": 19558205,
+    "url": "https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/HU8/Shape/NHD_H_18020129_HU8_Shape.zip"
+  },
+  "status": "official_nhd_hu8_named_flowlines_extracted_review_gated_not_route"
+}
