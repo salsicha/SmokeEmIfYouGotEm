@@ -58,6 +58,15 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Recommended a bounded hybrid pilot, froze V44 pending the source/ecology decision, and added six-cycle, metric-improvement, family-expansion, rights, and five-iteration stop-loss rules.
 - Post-check: the full suite reports **542 passed / 2 failed / 3 skipped in 133.77 seconds**. The three new miner tests pass; only the same production-foundation and Colorado generator snapshot drift remains.
 
+### 2026-07-15 Finding 3 Step 3.1 Audit and Proposal
+
+- Confirmed hosted LFS endpoints on GitHub `origin` and the GitLab mirror. The active LFS/prune remote is GitHub `origin`.
+- The current local audit is **8.6 GB `.git/lfs`, 3.7 GB `.git/objects`, and 28 GB working tree**. This differs from the plan's earlier 291 GB LFS snapshot; no undocumented cleanup is inferred. Current tracked LFS has 961 files and approximately 8.86 GiB of payload.
+- Forty-nine tracked `.umap` files account for approximately 6.37 GiB; 21 generated `EnvironmentPreviews` files account for approximately 6.36 GiB and have been touched by 169 commits.
+- Added `docs/generated-artifact-retention-policy.md` with keep/regenerate/evidence classes, exact Unreal regeneration commands, a conservative dry-run-first local retention proposal, hosted-retention separation, and explicit owner gates.
+- No prune, LFS configuration change, untracking, ignore change, server deletion, or history rewrite was performed.
+- Post-check: the full suite remains **542 passed / 2 failed / 3 skipped in 132.60 seconds**, with only the two previously recorded snapshot-drift failures.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
