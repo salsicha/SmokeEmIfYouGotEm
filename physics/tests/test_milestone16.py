@@ -135,6 +135,12 @@ def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override()
         "reduced",
         gate_scenario_id="uniform_channel",
     )
+    uncalibrated = _cpp_config_for_mode(
+        "/tmp/raftsim-water-m16-build/raftsim_water_solver",
+        "finite_volume",
+        gate_scenario_id="constriction",
+        disable_fixture_calibrations=True,
+    )
 
     assert uniform.flux_scheme == "hll"
     assert uniform.feature_strength_scale == 0.0
@@ -149,6 +155,7 @@ def test_milestone16_cpp_config_applies_uniform_channel_finite_volume_override()
     assert reduced.bed_slope_source_scale == 0.0
     assert reduced.preserve_initial_mass is False
     assert reduced_bed_step.preserve_initial_mass is False
+    assert uncalibrated.disable_fixture_calibrations is True
 
 
 def test_milestone16_comparison_report_tracks_threshold_failures():

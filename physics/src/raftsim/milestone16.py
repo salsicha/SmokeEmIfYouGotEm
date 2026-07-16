@@ -1539,6 +1539,7 @@ def run_milestone16_cpp_solver_matrix(
     *,
     cpp_solver: str | Path,
     output_root: str | Path = "outputs/m16cpp",
+    disable_fixture_calibrations: bool = False,
 ) -> Milestone16CppRunReport:
     """Run C++ reduced and finite-volume modes on the GeoClaw scenario packages."""
 
@@ -1559,7 +1560,12 @@ def run_milestone16_cpp_solver_matrix(
             scenario_package = export_dir / "shared_scenario"
         gate_scenario_id = str(geoclaw_record["gate_scenario_id"])
         for solver_mode in ("reduced", "finite_volume"):
-            config = _cpp_config_for_mode(executable, solver_mode, gate_scenario_id=gate_scenario_id)
+            config = _cpp_config_for_mode(
+                executable,
+                solver_mode,
+                gate_scenario_id=gate_scenario_id,
+                disable_fixture_calibrations=disable_fixture_calibrations,
+            )
             result = run_cpp_solver_scenario(
                 scenario_package,
                 output_dir=root / _case_dir(gate_scenario_id) / solver_mode,
@@ -2580,6 +2586,7 @@ def _cpp_config_for_mode(
     solver_mode: str,
     *,
     gate_scenario_id: str | None = None,
+    disable_fixture_calibrations: bool = False,
 ) -> CppSolverRunConfig:
     finite_volume = solver_mode == "finite_volume"
     flux_scheme = "hll" if finite_volume else "rusanov"
@@ -2634,6 +2641,7 @@ def _cpp_config_for_mode(
         roughness_scale=roughness_scale,
         bed_slope_source_scale=bed_slope_source_scale,
         preserve_initial_mass=preserve_initial_mass,
+        disable_fixture_calibrations=disable_fixture_calibrations,
         allow_validation_failure=True,
     )
 
@@ -2683,6 +2691,7 @@ def _cpp_record_from_result(
             "roughness_scale": manifest.get("roughness_scale"),
             "bed_slope_source_scale": manifest.get("bed_slope_source_scale"),
             "preserve_initial_mass": manifest.get("preserve_initial_mass"),
+            "disable_fixture_calibrations": manifest.get("disable_fixture_calibrations", False),
         },
         cascading=dict(manifest.get("cascading", {})),
         required_manifest_fields_present=all(name in manifest for name in required_settings),

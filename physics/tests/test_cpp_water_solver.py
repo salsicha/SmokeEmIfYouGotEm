@@ -131,6 +131,35 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert uniform_balance["depth_quadratic_fraction"] == pytest.approx(0.70)
     assert uniform_balance["requires_feature_forcing"] is False
 
+    uncalibrated_uniform_output_dir = tmp_path / "cpp_uniform_uncalibrated_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(uniform_scenario_dir),
+            "--output",
+            str(uncalibrated_uniform_output_dir),
+            "--steps",
+            "12",
+            "--frame-interval",
+            "6",
+            "--feature-strength-scale",
+            "0",
+            "--disable-fixture-calibrations",
+        ],
+        check=True,
+    )
+    uncalibrated_uniform_run_dir = uncalibrated_uniform_output_dir / uniform_scenario.metadata.scenario_id
+    uncalibrated_uniform_manifest = json.loads(
+        (uncalibrated_uniform_run_dir / "manifest.json").read_text(encoding="utf-8")
+    )
+    assert uncalibrated_uniform_manifest["disable_fixture_calibrations"] is True
+    assert uncalibrated_uniform_manifest["fixture_calibration_mode"] == "disabled"
+    assert "fixture_scoped_uniform_channel_reduced_slope_profile_balance" not in uncalibrated_uniform_manifest
+    calibrated_final_frame = uniform_output_dir / uniform_scenario.metadata.scenario_id / uniform_manifest["frames"][-1]
+    uncalibrated_final_frame = uncalibrated_uniform_run_dir / uncalibrated_uniform_manifest["frames"][-1]
+    assert calibrated_final_frame.read_bytes() != uncalibrated_final_frame.read_bytes()
+
     dam_scenario = generate_fixture_scenario2_5d(
         FixtureScenario2_5DParameters(fixture="dam_break", seed=16, nx=24, ny=12, duration=0.2)
     )
@@ -426,6 +455,59 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     constriction_manifest = json.loads((constriction_run / "manifest.json").read_text(encoding="utf-8"))
     constriction_final_frame = constriction_run / constriction_manifest["frames"][-1]
     constriction_audit_path = constriction_run / constriction_manifest["constriction_y_face_flux_source_audit"]["path"]
+
+    uncalibrated_constriction_output_dir = tmp_path / "cpp_constriction_uncalibrated_output"
+    fixture_free_scenario_dir = tmp_path / "scenario" / "constriction_without_fixture_kind"
+    shutil.copytree(constriction_scenario_dir, fixture_free_scenario_dir)
+    fixture_free_payload_path = fixture_free_scenario_dir / "scenario.json"
+    fixture_free_payload = json.loads(fixture_free_payload_path.read_text(encoding="utf-8"))
+    fixture_free_payload["fixture_kind"] = ""
+    fixture_free_payload_path.write_text(json.dumps(fixture_free_payload, indent=2), encoding="utf-8")
+    uncalibrated_base_args = [
+        "--steps",
+        "12",
+        "--frame-interval",
+        "6",
+        "--solver-mode",
+        "finite_volume",
+        "--boundary-mode",
+        "scenario",
+        "--flux-scheme",
+        "roe",
+        "--feature-strength-scale",
+        "0",
+        "--roughness-scale",
+        "0.5",
+        "--bed-slope-source-scale",
+        "0.75",
+        "--no-preserve-initial-mass",
+        "--disable-fixture-calibrations",
+    ]
+    for scenario_package, output_root in (
+        (constriction_scenario_dir, uncalibrated_constriction_output_dir),
+        (fixture_free_scenario_dir, tmp_path / "cpp_constriction_fixture_free_output"),
+    ):
+        subprocess.run(
+            [
+                str(build_dir / "raftsim_water_solver"),
+                "--scenario",
+                str(scenario_package),
+                "--output",
+                str(output_root),
+                *uncalibrated_base_args,
+            ],
+            check=True,
+        )
+    uncalibrated_run = uncalibrated_constriction_output_dir / constriction_scenario.metadata.scenario_id
+    fixture_free_run = tmp_path / "cpp_constriction_fixture_free_output" / constriction_scenario.metadata.scenario_id
+    uncalibrated_manifest = json.loads((uncalibrated_run / "manifest.json").read_text(encoding="utf-8"))
+    fixture_free_manifest = json.loads((fixture_free_run / "manifest.json").read_text(encoding="utf-8"))
+    assert uncalibrated_manifest["disable_fixture_calibrations"] is True
+    assert fixture_free_manifest["disable_fixture_calibrations"] is True
+    assert [
+        (uncalibrated_run / frame).read_bytes() for frame in uncalibrated_manifest["frames"]
+    ] == [(fixture_free_run / frame).read_bytes() for frame in fixture_free_manifest["frames"]]
+
     constriction_features = json.loads((constriction_scenario_dir / "features.json").read_text(encoding="utf-8"))
     constriction_scenario_json = json.loads((constriction_scenario_dir / "scenario.json").read_text(encoding="utf-8"))
     constriction_feature = next(feature for feature in constriction_features["features"] if feature["kind"] == "constriction")

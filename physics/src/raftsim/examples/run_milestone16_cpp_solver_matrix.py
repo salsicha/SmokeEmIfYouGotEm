@@ -14,12 +14,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--cpp-solver", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, default=Path("outputs/m16cpp"))
     parser.add_argument("--report-dir", type=Path, default=Path("reports/milestone16"))
+    parser.add_argument(
+        "--disable-fixture-calibrations",
+        action="store_true",
+        help="Run only base dynamics for solver-truth measurement.",
+    )
     args = parser.parse_args(argv)
 
     report = run_milestone16_cpp_solver_matrix(
         args.geoclaw_report,
         cpp_solver=args.cpp_solver,
         output_root=args.output_dir,
+        disable_fixture_calibrations=args.disable_fixture_calibrations,
     )
     json_path = report.write_json(args.report_dir / "cpp_solver_runs.json")
     markdown_path = report.write_markdown(args.report_dir / "cpp_solver_runs.md")
