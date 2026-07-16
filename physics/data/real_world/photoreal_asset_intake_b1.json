@@ -1,0 +1,897 @@
+{
+  "generated_on": "2026-07-16",
+  "intake_hardening_contract": {
+    "existing_local_source_root_pattern": "RAFTSIM_REVIEWED_*_SOURCE_ROOT",
+    "existing_report_path_pattern": "RAFTSIM_REVIEWED_*_REPORT_PATH",
+    "isolated_gate_required": [
+      "turntable capture",
+      "60 m river-distance capture",
+      "150 m river-distance capture",
+      "map-check zero errors",
+      "source/license/hash report",
+      "desktop and VR performance review before corridor substitution"
+    ],
+    "new_importers_must": [
+      "verify every source file hash before import",
+      "write an import report even when assets remain local-only",
+      "classify alpha/opacity textures as masks",
+      "disable Nanite for masked foliage unless a measured review proves otherwise",
+      "use Nanite PreserveArea for opaque woody/rock geometry only when captures pass",
+      "preserve procedural fallback when external binaries are absent",
+      "avoid committing Fab Standard source binaries to the public repo"
+    ]
+  },
+  "license_classes": {
+    "cc0_committable_after_hash_and_attribution_snapshot": {
+      "may_commit_source_binaries": true,
+      "requires_attribution": false,
+      "requires_hash_manifest": true
+    },
+    "fab_standard_local_only_until_item_terms_prove_redistributable": {
+      "may_commit_source_binaries": false,
+      "requires_attribution": false,
+      "requires_hash_manifest": true,
+      "requires_local_source_root": true
+    },
+    "first_party_committable": {
+      "may_commit_source_binaries": true,
+      "requires_hash_manifest": true,
+      "requires_recipe_or_prompt_manifest": true
+    }
+  },
+  "license_sources_checked": [
+    {
+      "checked_on": "2026-07-16",
+      "decision": "Fab Standard assets are allowed for project use only through local-only source roots unless item terms prove redistributable.",
+      "source_family": "Fab",
+      "url": "https://www.fab.com/eula"
+    },
+    {
+      "checked_on": "2026-07-16",
+      "decision": "Poly Haven CC0 assets may be committed after source URL, license snapshot, hashes, and import reports are recorded.",
+      "source_family": "Poly Haven",
+      "url": "https://polyhaven.com/license"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "assets_imported": false,
+    "b1_complete_for_planning": true,
+    "can_promote_any_river_asset_set": false,
+    "next_required_actions": [
+      "Select item-level assets per river from the shopping lists.",
+      "Run each selected asset through a reviewed importer with hash reports.",
+      "Capture isolated turntable and 60/150 m evidence.",
+      "Preserve procedural fallbacks for missing local-only assets."
+    ]
+  },
+  "river_shopping_lists": [
+    {
+      "asset_needs": [
+        {
+          "asset_need_id": "sierra_oak_gray_pine_foliage",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=sierra%20oak%20gray%20pine%20foliage"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=sierra+oak+gray+pine+foliage"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "hero_and_midground_foliage"
+        },
+        {
+          "asset_need_id": "chaparral_shrub_understory",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=chaparral%20shrub%20understory"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=chaparral+shrub+understory"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "understory_and_bank_breakup"
+        },
+        {
+          "asset_need_id": "granite_metamorphic_boulders",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=granite%20metamorphic%20boulders"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=granite+metamorphic+boulders"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "riverbed_boulders_and_banks"
+        },
+        {
+          "asset_need_id": "dry_grass_bank_materials",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=dry%20grass%20bank%20materials"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=dry+grass+bank+materials"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "near_field_ground_materials"
+        }
+      ],
+      "biome": "Sierra foothill oak woodland, gray pine, chaparral, granite/metamorphic river rock, summer-dry grass banks",
+      "display_name": "South Fork American",
+      "river_id": "south_fork_american_chili_bar",
+      "status": "survey_baseline_not_asset_promotion"
+    },
+    {
+      "asset_needs": [
+        {
+          "asset_need_id": "grand_canyon_layered_cliff_materials",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=grand%20canyon%20layered%20cliff%20materials"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=grand+canyon+layered+cliff+materials"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "signature_canyon_walls"
+        },
+        {
+          "asset_need_id": "desert_scrub_riparian_foliage",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=desert%20scrub%20riparian%20foliage"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=desert+scrub+riparian+foliage"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "tamarisk_willow_cactus_bank_set"
+        },
+        {
+          "asset_need_id": "sand_beach_materials",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=sand%20beach%20materials"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=sand+beach+materials"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "camp_beaches_and_edging"
+        },
+        {
+          "asset_need_id": "lava_falls_basalt",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=lava%20falls%20basalt"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=lava+falls+basalt"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "rapid_specific_rock_material"
+        }
+      ],
+      "biome": "layered sandstone, limestone, schist cliffs, desert scrub, tamarisk/willow, sand beaches, basalt at Lava Falls",
+      "display_name": "Colorado River Grand Canyon",
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "status": "survey_baseline_not_asset_promotion"
+    },
+    {
+      "asset_needs": [
+        {
+          "asset_need_id": "multi_strata_tropical_canopy",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=multi%20strata%20tropical%20canopy"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=multi+strata+tropical+canopy"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "hero_and_background_rainforest"
+        },
+        {
+          "asset_need_id": "mossy_basalt_andesite_boulders",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=mossy%20basalt%20andesite%20boulders"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=mossy+basalt+andesite+boulders"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "riverbed_and_bank_rocks"
+        },
+        {
+          "asset_need_id": "waterfall_side_stream_assets",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=waterfall%20side%20stream%20assets"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=waterfall+side+stream+assets"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "side_streams_and_spray_sources"
+        },
+        {
+          "asset_need_id": "rainforest_floor_and_lianas",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=rainforest%20floor%20and%20lianas"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=rainforest+floor+and+lianas"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "near_field_understory"
+        }
+      ],
+      "biome": "tropical rainforest canopy, mossy basalt/andesite boulders, waterfalls, mist and atmosphere",
+      "display_name": "Pacuare River",
+      "river_id": "pacuare_river_costa_rica",
+      "status": "survey_baseline_not_asset_promotion"
+    },
+    {
+      "asset_needs": [
+        {
+          "asset_need_id": "nothofagus_coigue_canopy_or_reviewed_analog",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=nothofagus%20coigue%20canopy%20or%20reviewed%20analog"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=nothofagus+coigue+canopy+or+reviewed+analog"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "hero_canopy"
+        },
+        {
+          "asset_need_id": "near_bank_sapling_fern_strata",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=near%20bank%20sapling%20fern%20strata"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=near+bank+sapling+fern+strata"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "retained_project_owned_near_bank_strata"
+        },
+        {
+          "asset_need_id": "patagonian_granite_boulders",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=patagonian%20granite%20boulders"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=patagonian+granite+boulders"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "riverbed_and_boulder_gardens"
+        },
+        {
+          "asset_need_id": "turquoise_wet_bank_materials",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=turquoise%20wet%20bank%20materials"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=turquoise+wet+bank+materials"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "river_color_and_wet_bank_support"
+        }
+      ],
+      "biome": "Patagonian temperate rainforest, Nothofagus/coigue analogs, granite boulders, turquoise water grading",
+      "display_name": "Futaleufu River",
+      "river_id": "futaleufu_river_chile",
+      "status": "survey_baseline_not_asset_promotion"
+    },
+    {
+      "asset_needs": [
+        {
+          "asset_need_id": "lodgepole_spruce_aspen_foliage",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=lodgepole%20spruce%20aspen%20foliage"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=lodgepole+spruce+aspen+foliage"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "river_corridor_forest"
+        },
+        {
+          "asset_need_id": "glacial_blue_wet_bank_materials",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=glacial%20blue%20wet%20bank%20materials"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=glacial+blue+wet+bank+materials"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "water_and_bank_material_support"
+        },
+        {
+          "asset_need_id": "volcanic_canyon_rock",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=volcanic%20canyon%20rock"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=volcanic+canyon+rock"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "lava_canyon_rock_materials"
+        },
+        {
+          "asset_need_id": "cold_water_debris_and_gravel",
+          "promotion_gate": [
+            "item-level license review",
+            "hash-locked source manifest",
+            "isolated Unreal import command/report",
+            "turntable plus 60/150 m river-distance captures",
+            "zero map-check errors",
+            "masked-foliage and Nanite settings reviewed",
+            "procedural fallback preserved"
+          ],
+          "source_candidates": [
+            {
+              "license_class": "fab_standard_local_only_until_item_terms_prove_redistributable",
+              "manifest_policy": "commit_url_license_snapshot_hashes_and_local_import_report",
+              "reason": "Fab Standard permits project use and collaborator sharing, but standalone redistribution is not allowed by default.",
+              "repo_binary_policy": "do_not_commit_source_binaries",
+              "source_family": "Fab",
+              "source_url": "https://www.fab.com/search?q=cold%20water%20debris%20and%20gravel"
+            },
+            {
+              "license_class": "cc0_committable_after_hash_and_attribution_snapshot",
+              "manifest_policy": "commit_license_url_asset_url_hashes_and_import_report",
+              "reason": "Poly Haven assets are CC0; still record provenance, hashes, source URL, and import settings.",
+              "repo_binary_policy": "may_commit_source_or_derived_binaries_if_size_is_approved",
+              "source_family": "Poly Haven",
+              "source_url": "https://polyhaven.com/all?q=cold+water+debris+and+gravel"
+            },
+            {
+              "license_class": "first_party_committable",
+              "manifest_policy": "commit_recipe_seed_tool_version_hashes_and_review_report",
+              "reason": "Procedural fallback remains required when external assets are absent.",
+              "repo_binary_policy": "may_commit_generated_outputs_when_manifested",
+              "source_family": "First-party procedural",
+              "source_url": "source_manifest://first_party_procedural_environment_assets"
+            }
+          ],
+          "use": "near_field_banks_and_bars"
+        }
+      ],
+      "biome": "interior British Columbia lodgepole/spruce/aspen, glacial-blue water, volcanic canyon rock",
+      "display_name": "Chilko River",
+      "river_id": "chilko_river_lava_canyon",
+      "status": "survey_baseline_not_asset_promotion"
+    }
+  ],
+  "schema": "raftsim.photoreal.asset_intake_b1.v1",
+  "status": "survey_baseline_and_intake_contract_recorded_not_assets_imported",
+  "zambezi_policy": {
+    "decision": "Retain existing evidence and catalog entries only; do no new Zambezi asset intake while its terrain/centerline source gate is backlogged.",
+    "portfolio_role": "additional_active_environment_backlogged",
+    "river_id": "zambezi_batoka_gorge"
+  }
+}

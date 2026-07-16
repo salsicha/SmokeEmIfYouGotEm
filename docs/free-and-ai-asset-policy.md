@@ -39,3 +39,20 @@ Only buy assets after that review, and only for gaps where free/open and AI-gene
 Keep all existing research notes about high-quality asset sources. The vendor comparisons, license URLs, and purchase notes are now reference material for the release gate, not active buying instructions.
 
 Canonical Unreal-facing policy: `unreal/Content/RaftSim/development_asset_source_policy.json`.
+
+## Open-Source Repo Intake Rules
+
+The B1 photoreal asset intake contract is
+`physics/data/real_world/photoreal_asset_intake_b1.json`.
+
+- Poly Haven assets are treated as CC0 candidates: they may be committed only
+  after the exact asset URL, license URL, source hashes, import settings, and
+  isolated review report are recorded.
+- Fab Standard License assets may be used in the project, but source binaries
+  stay local-only by default under `RAFTSIM_REVIEWED_*_SOURCE_ROOT`; commit only
+  URLs, license snapshots, hashes, import reports, and procedural fallbacks
+  unless item-level terms prove redistribution is allowed.
+- Every new external importer must classify alpha/opacity textures as masks,
+  disable Nanite for masked foliage unless a measured review says otherwise,
+  use `PreserveArea` only for reviewed opaque woody/rock geometry, and preserve
+  a procedural fallback when local-only binaries are absent.
