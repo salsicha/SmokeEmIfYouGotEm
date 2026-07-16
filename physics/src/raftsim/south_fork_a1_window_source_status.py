@@ -148,11 +148,12 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
     unexpected = _unexpected_files(repo_root, expected_paths)
     all_source_files_present = present_source_count == len(source_file_records)
     all_window_manifests_present = present_manifest_count == len(window_manifest_records)
-    status = (
-        "ready_for_stitched_validation_review"
-        if all_source_files_present and all_window_manifests_present and not unexpected
-        else "pending_window_source_files"
-    )
+    if all_source_files_present and all_window_manifests_present and not unexpected:
+        status = "ready_for_stitched_validation_review"
+    elif all_source_files_present and not all_window_manifests_present:
+        status = "pending_window_manifests"
+    else:
+        status = "pending_window_source_files"
 
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_status.v1",

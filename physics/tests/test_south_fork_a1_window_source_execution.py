@@ -45,11 +45,15 @@ def test_south_fork_a1_window_source_execution_plan_covers_official_dem_and_naip
     assert summary["task_count"] == 12
     assert summary["terrain_task_count"] == 6
     assert summary["aerial_task_count"] == 6
-    assert summary["destination_missing_count"] == 12
+    assert summary["destination_present_count"] == 12
+    assert summary["destination_missing_count"] == 0
     assert {task["role"] for task in tasks} == {"terrain_dem", "aerial_imagery"}
     assert all(task["official_export_url"].startswith("https://") for task in tasks)
     assert all(task["lfs_tracking_required"] is True for task in tasks)
     assert all(task["production_promoted"] is False for task in tasks)
+    assert all(task["destination_present"] is True for task in tasks)
+    assert all(task["destination_byte_count"] > 0 for task in tasks)
+    assert all(len(task["destination_sha256"]) == 64 for task in tasks)
 
 
 def test_south_fork_a1_full_reach_window_png_sources_are_lfs_tracked():
