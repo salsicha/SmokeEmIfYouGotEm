@@ -1,0 +1,186 @@
+{
+  "allowed_use": [
+    "source-lead triage",
+    "anchor decision review",
+    "editor/GIS overlay planning",
+    "publication-sensitivity checklist preparation"
+  ],
+  "candidate_support": [
+    {
+      "option_id": "select_20_5_mile_salmon_falls_basis",
+      "still_required": [
+        "confirm exact riverbank take-out point relative to bridge",
+        "confirm whether the candidate should be named Salmon Falls Bridge, Salmon Falls BTAF, Skunk Hollow, or another reviewed access label",
+        "confirm reservoir-stage effects on landing/access",
+        "attach guide/geospatial review"
+      ],
+      "support_status": "official_access_and_takeout_leads_attached_exact_geometry_pending",
+      "supporting_sources": [
+        "ca_state_parks_dbw_salmon_falls_btaf",
+        "ca_state_parks_dbw_american_south_fork_facilities",
+        "blm_south_fork_american_river"
+      ]
+    },
+    {
+      "option_id": "select_21_0_mile_full_run_folsom_basis",
+      "still_required": [
+        "confirm whether the extra 804.672 m over-cover represents a real playable take-out extension or only guide/source-mile wording",
+        "confirm Folsom Reservoir stage/access implications",
+        "attach exact access geometry and public/private land status",
+        "attach guide/geospatial review"
+      ],
+      "support_status": "official_21_mile_route_context_attached_exact_full_run_endpoint_pending",
+      "supporting_sources": [
+        "blm_south_fork_american_river",
+        "ca_state_parks_dbw_salmon_falls_btaf",
+        "ca_state_parks_folsom_lake_boat_launch_status"
+      ]
+    }
+  ],
+  "forbidden_use": [
+    "final access geometry",
+    "public/private land authority",
+    "reservoir-stage access authority",
+    "Unreal corridor crop",
+    "named-rapid stationing authority",
+    "solver-window binding",
+    "public route-detail screenshots without review"
+  ],
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "downstream_anchor_candidates_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson",
+    "downstream_anchor_decision_packet": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_packet.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_crop_to_final_downstream_anchor": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_restation_named_rapids": false,
+    "can_select_downstream_anchor": false,
+    "next_required_actions": [
+      "Review official California State Parks facility/map context and BLM route context in the editor/GIS tool.",
+      "Attach exact take-out/access geometry from an accepted official layer, survey, or guide-reviewed field point.",
+      "Record reservoir-stage/access implications for the selected endpoint.",
+      "Record guide/geospatial/publication-sensitivity approval before route crop or rapid restationing."
+    ]
+  },
+  "required_editor_annotations": [
+    "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson",
+    "review/full_reach_downstream_access_publication_review.json",
+    "future: reviewed downstream access polygon/point GeoJSON",
+    "future: reservoir-stage/access note",
+    "future: guide/geospatial reviewer decision"
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_downstream_access_publication_review.v1",
+  "scope": "Downstream Salmon Falls/Folsom access, publication-sensitivity, and source-authority review for choosing the South Fork full-run endpoint.",
+  "sources_checked": [
+    {
+      "blocked_from": [
+        "exact take-out coordinate",
+        "bank-side landing point",
+        "parking polygon",
+        "public/private parcel boundary",
+        "reservoir-stage-dependent access rule"
+      ],
+      "evidence": [
+        "Facility name is Folsom Lake SRA Salmon Falls BTAF.",
+        "Facility address is Salmon Falls Road, Folsom, California.",
+        "Body of water is American River-South Fork.",
+        "Facility type is boating access and access is public.",
+        "Jurisdiction/authority is California Department of Parks and Recreation."
+      ],
+      "http_status": 200,
+      "provider": "California Department of Parks and Recreation / Division of Boating and Waterways",
+      "retrieved_on": "2026-07-16",
+      "review_status": "official_facility_page_reviewed_geometry_pending",
+      "rights_status": "link_only_factual_index",
+      "source_id": "ca_state_parks_dbw_salmon_falls_btaf",
+      "url": "https://www.parks.ca.gov/BoatingFacilities/f/1200",
+      "used_for": [
+        "Official public boating-access lead for Folsom Lake SRA Salmon Falls BTAF.",
+        "Confirms body-of-water context as American River-South Fork.",
+        "Confirms California State Parks jurisdiction/authority and El Dorado County context."
+      ]
+    },
+    {
+      "blocked_from": [
+        "final take-out identity",
+        "exact ramp or shore coordinate",
+        "current operating restriction",
+        "publication-sensitive route geometry"
+      ],
+      "evidence": [
+        "The American River-South Fork facility index lists Folsom Lake SRA Salmon Falls BTAF.",
+        "The same index lists its facility type as boating access.",
+        "The same index lists access as public."
+      ],
+      "http_status": 200,
+      "provider": "California Department of Parks and Recreation / Division of Boating and Waterways",
+      "retrieved_on": "2026-07-16",
+      "review_status": "official_facility_index_reviewed_geometry_pending",
+      "rights_status": "link_only_factual_index",
+      "source_id": "ca_state_parks_dbw_american_south_fork_facilities",
+      "url": "https://dbw.parks.ca.gov/BoatingFacilities/Body-of-Water/American%20River-South%20Fork",
+      "used_for": [
+        "Cross-check that Folsom Lake SRA Salmon Falls BTAF is in the official American River-South Fork boating-facility index.",
+        "Cross-check that the facility class is boating access and public access.",
+        "Compare downstream access with Gorge Run, Greenwood Creek, Henningsen-Lotus, Skunk Hollow, and Slab Creek entries during station review."
+      ]
+    },
+    {
+      "blocked_from": [
+        "exact Salmon Falls Bridge landing coordinate",
+        "final source-mile convention",
+        "parking or route-publication authority",
+        "commercial permit interpretation",
+        "guide-reviewed line or rescue access"
+      ],
+      "evidence": [
+        "BLM identifies the South Fork American as a whitewater rafting and kayaking destination.",
+        "BLM describes a twenty-one-mile river run.",
+        "BLM lists Salmon Falls Bridge among take-out options.",
+        "BLM lists multiple upstream put-in/access options, including Chili Bar."
+      ],
+      "http_status": 200,
+      "provider": "Bureau of Land Management",
+      "retrieved_on": "2026-07-16",
+      "review_status": "official_route_context_reviewed_exact_anchor_pending",
+      "rights_status": "u_s_government_link_only_factual_index",
+      "source_id": "blm_south_fork_american_river",
+      "url": "https://www.blm.gov/visit/south-fork-american-river",
+      "used_for": [
+        "Official federal route-context lead for South Fork American public-land recreation.",
+        "Confirms BLM route context for a 21-mile South Fork run.",
+        "Confirms Salmon Falls Bridge appears as an official take-out option."
+      ]
+    },
+    {
+      "blocked_from": [
+        "Salmon Falls exact access claim",
+        "future operating status",
+        "river take-out coordinate",
+        "gameplay or public screenshot authority"
+      ],
+      "evidence": [
+        "California State Parks publishes current Folsom Lake SRA boat-launch status.",
+        "The status page records open/closed launch areas and current operation notes."
+      ],
+      "http_status": 200,
+      "provider": "California Department of Parks and Recreation",
+      "retrieved_on": "2026-07-16",
+      "review_status": "current_park_operations_lead_not_anchor_authority",
+      "rights_status": "link_only_factual_index",
+      "source_id": "ca_state_parks_folsom_lake_boat_launch_status",
+      "url": "https://www.parks.ca.gov/?page_id=31951",
+      "used_for": [
+        "Current Folsom Lake SRA operations and launch-status lead for reservoir-stage/access review.",
+        "Reminder that launch/access status can change and must be checked at review time."
+      ]
+    }
+  ],
+  "status": "official_downstream_access_source_leads_attached_exact_geometry_pending",
+  "task_id": "A1"
+}
