@@ -7,20 +7,14 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from raftsim.examples.compare_futaleufu_cordillera_cypress_v32_complementary_transition import (
+from raftsim.futaleufu_cypress_review_metrics import (
     V32_NAMESPACE,
     V32_REPORT,
-)
-from raftsim.examples.compare_futaleufu_cordillera_cypress_v37_temporal_lit_handoff import (
-    _silhouette_and_photometry_metrics,
-)
-from raftsim.examples.compare_futaleufu_cordillera_cypress_v40_dual_layer import (
-    _sha256,
-)
-from raftsim.examples.compare_futaleufu_cordillera_cypress_v41_transmission_light_bracket import (
-    _directional_response,
-    _fixed_overlap_mask,
-    _overlap_photometry,
+    directional_response as _directional_response,
+    fixed_overlap_mask as _fixed_overlap_mask,
+    overlap_photometry as _overlap_photometry,
+    sha256 as _sha256,
+    silhouette_and_photometry_metrics as _silhouette_and_photometry_metrics,
 )
 
 LIGHT_MODES = ("frontlit", "backlit")

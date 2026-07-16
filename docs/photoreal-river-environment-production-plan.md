@@ -1,5 +1,11 @@
 # Photoreal River Environment Production Plan
 
+## Versioned generator retention policy
+
+Once version N+1 has a locked review, version N's generator module, generate/compare driver, package export, and version-specific snapshot tests are removed together; git history is the code archive. Review JSON, source reports, contact sheets, and other small governed evidence under `docs/environment-captures/` remain versioned and are never deleted by this policy.
+
+The latest locked review driver and any code it actively needs remain runnable. Reusable behavior needed by the current review must move into a function-named support module before a historical driver is retired; a current driver may not retain an import chain through superseded one-off scripts. Historical removals proceed oldest first and keep `import raftsim`, test collection, and the full physics suite green. This code-retention policy is separate from the July 16, 2026 owner decision to keep versioning generated Unreal maps and not prune Git LFS.
+
 ## Goal
 
 Construct complete, photorealistic Unreal river environments for the five planned runnable rivers:
@@ -16,7 +22,7 @@ The portfolio decision is machine-readable in `physics/data/real_world/river_por
 
 Each river environment must be driven by traceable river maps, seasonal or release-driven flow levels, aerial/satellite imagery, reviewed terrain and hydrography, and rights-reviewed visual reference. Procedural generation is expected for terrain dressing, foliage, rock scatter, debris, foam cues, wetness masks, lighting variants, and placeholder art until imported or first-party assets are approved.
 
-Generated-map retention is governed by `docs/generated-artifact-retention-policy.md`. The proposed rule is to keep promoted or deliberately milestone-locked maps plus their manifests in git, while regenerating volatile Landscape, flow-variant, capture, and asset-review candidates locally from recorded commands and inputs. This is a proposal only: no current map may be untracked, ignored, pruned, or removed from hosted LFS without the explicit owner approvals named in that policy.
+Generated-map retention is governed by `docs/generated-artifact-retention-policy.md`. The owner decided on July 16, 2026 to keep versioning generated preview/candidate maps and not prune Git LFS. No dry run, retention-setting change, untracking, ignore-rule change, hosted deletion, or history rewrite is authorized unless a future explicit owner decision reverses or narrows that choice.
 
 ## Source Rules
 
