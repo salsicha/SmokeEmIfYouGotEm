@@ -9,6 +9,24 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - The working tree may contain in-flight, uncommitted photoreal iteration work (at review time: cypress v42 artifacts and edits to `RaftSimEditorModule.cpp`). **Do not revert, clobber, or commit anyone else's in-flight changes.** If the tree is dirty when you start, treat those files as read-only context and confirm with the owner before any step that would rewrite them.
 - Expected baseline test state at review time: 536 tests, **522 passed / 11 failed / 3 skipped** (~4 min). The 11 failures are snapshot/manifest tests that fail *because* the tree is mid-iteration (5 in `tests/test_milestone20.py` + `tests/test_milestone21.py` about locked manifests, 6 in `tests/test_photoreal_environment_assets.py` for cypress v37–v42). One numeric drift also exists: `tests/test_photoreal_environment_assets.py:5704` expects `mean_absolute_channel_delta` between 35 and 45 but gets 55.6.
 
+## Execution log
+
+### 2026-07-15 Phase 0 baseline
+
+- Started from clean commit `630921253fa85b89af743b736e1d841cfc0cc253`.
+- `cd physics && uv run pytest -q` accounts for 537 tests: **529 passed / 5 failed / 3 skipped in 131.81 seconds**. The five failures are stale generated/locked manifests in one Milestone 20 and four Milestone 21 tests. The six review-time cypress failures and numeric drift no longer reproduce.
+- The exact command result, failure list, skip list, and interpretation are preserved in `physics/reports/code_review_remediation/phase0_baseline_2026-07-15.txt`.
+- `physics/uv.lock` was absent before the run and `uv` generated it as an untracked file. Commit-versus-ignore remains an explicit owner choice; committing is recommended for reproducible builds.
+- `outputs/videos/raftsim_2d_seed3.mp4` remains a tracked 9.5 MB LFS object despite `outputs/` being ignored. Removing it from the index remains owner-gated.
+- This 529/5/3 result is the no-regression baseline for every later phase.
+
+### 2026-07-15 Owner decisions (unblocks Phase 0 step 3)
+
+- **`physics/uv.lock`: commit it.** Owner chose reproducible builds; add the file to git as-is (do not regenerate it first).
+- **`outputs/videos/raftsim_2d_seed3.mp4`: removal approved.** Run `git rm --cached outputs/videos/raftsim_2d_seed3.mp4` so the `outputs/` ignore rule holds; the local file stays on disk and history keeps the old LFS blob.
+- With these two items resolved, Phase 0 is complete. **Proceed directly into Finding 1, Steps 1.1–1.2 — no further owner input is required until the Step 1.3 decision memo.** Do not stop again for anything except the owner gates explicitly named in this plan (Step 1.3, LFS pruning in 3.1, policy sign-off in 3.2, and the Finding 4 memo).
+- Phase 0 post-check: `cd physics && uv run pytest -q` remained at **529 passed / 5 failed / 3 skipped in 123.93 seconds**. There is no regression from the recorded baseline.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
