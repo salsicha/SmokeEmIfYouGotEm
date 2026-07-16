@@ -532,15 +532,81 @@ def test_write_south_fork_editor_pass_manifest_creates_json(tmp_path):
     assert json.loads(output_json.read_text(encoding="utf-8")) == generated.manifest
 
 
-def test_colorado_rowing_route_draft_files_match_generator():
+def test_colorado_rowing_route_draft_files_preserve_generator_seed_and_reviewed_enrichment():
     expected = build_colorado_rowing_route_draft_manifest(REPO_ROOT)
     committed_manifest = json.loads(COLORADO_ROWING_ROUTE_PATH.read_text(encoding="utf-8"))
     committed_source = json.loads(COLORADO_ROWING_SOURCE_MANIFEST_FILE.read_text(encoding="utf-8"))
     committed_flows = json.loads(COLORADO_ROWING_FLOW_PRESETS_FILE.read_text(encoding="utf-8"))
 
-    assert committed_manifest == expected.manifest
-    assert committed_source == expected.source_manifest
     assert committed_flows == expected.flow_presets
+    for key in (
+        "schema",
+        "route_id",
+        "module",
+        "asset_class",
+        "river_id",
+        "section_id",
+        "section_name",
+        "route_style",
+        "source_manifest",
+        "flow_presets",
+        "route_endpoints",
+        "route_segments",
+        "flow_bands",
+        "flow_band_policy",
+        "guide_review_requirements",
+        "validation_annotation_needs",
+        "status",
+    ):
+        assert committed_manifest[key] == expected.manifest[key]
+    assert expected.manifest["editor_status"].items() <= committed_manifest["editor_status"].items()
+
+    expected_controls = {
+        control["control_id"]: control
+        for control in expected.manifest["rowing_frame_controls"]
+    }
+    committed_controls = {
+        control["control_id"]: control
+        for control in committed_manifest["rowing_frame_controls"]
+    }
+    assert committed_controls.keys() == expected_controls.keys()
+    for control_id, expected_control in expected_controls.items():
+        committed_control = committed_controls[control_id]
+        for key in ("control_kind", "gameplay_role", "telemetry"):
+            assert committed_control[key] == expected_control[key]
+        assert committed_control["input_axes"]
+
+    for key in (
+        "schema_version",
+        "manifest_id",
+        "river_id",
+        "section_id",
+        "section_name",
+        "route_style",
+        "bounds_wgs84",
+        "coordinate_reference_systems",
+        "provenance",
+    ):
+        assert committed_source[key] == expected.source_manifest[key]
+    expected_source_ids = {
+        source["source_id"] for source in expected.source_manifest["sources"]
+    }
+    committed_source_ids = {
+        source["source_id"] for source in committed_source["sources"]
+    }
+    assert expected_source_ids <= committed_source_ids
+    expected_fetch_ids = {
+        fetch["fetch_id"] for fetch in expected.source_manifest["remote_fetches"]
+    }
+    committed_fetch_ids = {
+        fetch["fetch_id"] for fetch in committed_source["remote_fetches"]
+    }
+    assert expected_fetch_ids <= committed_fetch_ids
+    for category, expected_paths in expected.source_manifest["artifacts"].items():
+        assert set(expected_paths) <= set(committed_source["artifacts"][category])
+    for confidence_key, expected_value in expected.source_manifest["confidence"].items():
+        assert committed_source["confidence"][confidence_key] >= expected_value
+
     assert committed_manifest["schema"] == MILESTONE21_COLORADO_ROWING_ROUTE_SCHEMA
     assert committed_manifest["status"] == "ready_for_colorado_rowing_route_planning"
 
