@@ -117,8 +117,8 @@ def render_editor_source_inventory_markdown(inventory: dict[str, Any]) -> str:
     lines = [
         "# RaftSim Editor Source Inventory",
         "",
-        f"Implementation files: **{inventory['implementation_file_count']}**. ",
-        f"Implementation lines: **{inventory['implementation_line_count']}**. ",
+        f"Implementation files: **{inventory['implementation_file_count']}**.",
+        f"Implementation lines: **{inventory['implementation_line_count']}**.",
         f"Registered console commands: **{inventory['registered_console_command_count']}**.",
         "",
         "## Source Files",

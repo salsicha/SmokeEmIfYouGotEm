@@ -3,7 +3,7 @@
   "implementation_files": [
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
-      "line_count": 46188
+      "line_count": 44830
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp",
@@ -24,10 +24,14 @@
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimToolValidationActions.cpp",
       "line_count": 350
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tools/RaftSimEditorTools.cpp",
+      "line_count": 1530
     }
   ],
-  "implementation_file_count": 6,
-  "implementation_line_count": 46915,
+  "implementation_file_count": 7,
+  "implementation_line_count": 47087,
   "registered_console_command_count": 34,
   "registered_console_commands": [
     {
