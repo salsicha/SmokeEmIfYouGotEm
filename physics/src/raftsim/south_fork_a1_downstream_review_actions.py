@@ -13,6 +13,10 @@ from .south_fork_a1_downstream_anchor_decision import (
     FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_CANDIDATES_GEOJSON_RELATIVE_PATH,
     FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_PACKET_RELATIVE_PATH,
 )
+from .south_fork_a1_official_access_geometry_review import (
+    FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_DISCREPANCY_REVIEW_RELATIVE_PATH,
+    FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_LEADS_GEOJSON_RELATIVE_PATH,
+)
 
 
 FULL_REACH_DOWNSTREAM_ANCHOR_REVIEW_ACTIONS_RELATIVE_PATH = (
@@ -96,6 +100,10 @@ def build_south_fork_a1_downstream_anchor_review_actions(
     repo_root = repo_root.resolve()
     packet = _load_json(repo_root, FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_PACKET_RELATIVE_PATH)
     access_review = _load_json(repo_root, FULL_REACH_DOWNSTREAM_ACCESS_REVIEW_RELATIVE_PATH)
+    official_access_geometry_review = _load_json(
+        repo_root,
+        FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_DISCREPANCY_REVIEW_RELATIVE_PATH,
+    )
     geojson = _load_json(
         repo_root,
         FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_CANDIDATES_GEOJSON_RELATIVE_PATH,
@@ -125,6 +133,12 @@ def build_south_fork_a1_downstream_anchor_review_actions(
             "candidate_geojson": (
                 FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_CANDIDATES_GEOJSON_RELATIVE_PATH
             ),
+            "official_access_geometry_discrepancy_review": (
+                FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_DISCREPANCY_REVIEW_RELATIVE_PATH
+            ),
+            "official_access_geometry_leads_geojson": (
+                FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_LEADS_GEOJSON_RELATIVE_PATH
+            ),
         },
         "evidence_bundle": {
             "candidate_geojson": {
@@ -138,6 +152,26 @@ def build_south_fork_a1_downstream_anchor_review_actions(
             "station_delta_m": packet["candidate_window"]["station_delta_m"],
             "review_windows": _review_window_inputs(packet),
             "official_source_leads": _source_document_summary(access_review),
+            "official_access_geometry_discrepancy": {
+                "path": FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_DISCREPANCY_REVIEW_RELATIVE_PATH,
+                "geojson_overlay_path": FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_LEADS_GEOJSON_RELATIVE_PATH,
+                "status": official_access_geometry_review["status"],
+                "primary_official_access_geometry_lead": official_access_geometry_review[
+                    "primary_official_access_geometry_lead"
+                ],
+                "rejected_candidate_count": official_access_geometry_review["summary"][
+                    "rejected_candidate_count"
+                ],
+                "minimum_distance_to_any_official_access_m": official_access_geometry_review[
+                    "summary"
+                ]["minimum_distance_to_any_official_access_m"],
+                "minimum_distance_to_primary_raft_takeout_m": official_access_geometry_review[
+                    "summary"
+                ]["minimum_distance_to_primary_raft_takeout_m"],
+                "replacement_or_reanchored_endpoint_required": official_access_geometry_review[
+                    "summary"
+                ]["replacement_or_reanchored_endpoint_required"],
+            },
         },
         "required_review_roles": [
             {
@@ -187,16 +221,19 @@ def build_south_fork_a1_downstream_anchor_review_actions(
             },
             {
                 "action_id": "verify_official_access_context",
-                "title": "Check official access/source leads against the candidate points.",
+                "title": "Check official access/source leads and geometry against the candidate points.",
                 "required_inputs": [
                     "ca_state_parks_dbw_salmon_falls_btaf",
                     "ca_state_parks_dbw_american_south_fork_facilities",
                     "blm_south_fork_american_river",
                     "ca_state_parks_folsom_lake_boat_launch_status",
+                    FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_DISCREPANCY_REVIEW_RELATIVE_PATH,
+                    FULL_REACH_OFFICIAL_ACCESS_GEOMETRY_LEADS_GEOJSON_RELATIVE_PATH,
                 ],
                 "expected_output": (
-                    "Exact geometry source, unresolved source disagreement, and "
-                    "unsupported access claims are recorded separately."
+                    "Current NHD candidate-point mismatch, exact geometry source, "
+                    "unresolved source disagreement, and unsupported access claims "
+                    "are recorded separately."
                 ),
             },
             {
@@ -204,14 +241,17 @@ def build_south_fork_a1_downstream_anchor_review_actions(
                 "title": "Choose 20.5-mile, 21.0-mile, or replacement reviewed endpoint basis.",
                 "required_inputs": option_ids,
                 "expected_output": (
-                    "Selected option id plus source-mile convention are recorded; "
-                    "selection remains invalid without exact geometry and reviewers."
+                    "Selected source-mile convention or replacement endpoint basis "
+                    "is recorded; current NHD candidate points remain invalid after "
+                    "the official access-geometry discrepancy unless a corrected "
+                    "route is regenerated and approved."
                 ),
             },
             {
                 "action_id": "record_exact_anchor_geometry",
                 "title": "Attach exact lon/lat, station_m, and geometry authority.",
                 "required_inputs": [
+                    "official Salmon Falls Lower Water Raft Take-out access seed",
                     "accepted official layer, field point, survey, or guide-reviewed GIS point",
                     "CRS/datum note",
                     "reservoir-stage/access interpretation",

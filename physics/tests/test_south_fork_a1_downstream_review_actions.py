@@ -49,6 +49,14 @@ def test_south_fork_a1_downstream_review_actions_bind_real_evidence_paths():
     ]
     assert len(evidence["official_source_leads"]) == 4
     assert evidence["station_delta_m"] == 804.672
+    discrepancy = evidence["official_access_geometry_discrepancy"]
+    assert (
+        discrepancy["status"]
+        == "official_access_geometry_disagrees_with_current_nhd_downstream_candidates"
+    )
+    assert discrepancy["rejected_candidate_count"] == 2
+    assert discrepancy["replacement_or_reanchored_endpoint_required"] is True
+    assert discrepancy["minimum_distance_to_primary_raft_takeout_m"] > 10400.0
 
     review_windows = {window["role"]: window for window in evidence["review_windows"]}
     assert set(review_windows) == {"anchor_review_window", "lower_gorge_window"}
@@ -84,6 +92,13 @@ def test_south_fork_a1_downstream_review_actions_define_all_required_decisions()
     assert template["production_promoted"] is False
     for reviewer in template["reviewers"].values():
         assert reviewer["approved"] is False
+    access_action = actions["action_sequence"][1]
+    assert "full_reach_official_access_geometry_discrepancy_review.json" in " ".join(
+        access_action["required_inputs"]
+    )
+    assert "full_reach_official_access_geometry_leads.geojson" in " ".join(
+        access_action["required_inputs"]
+    )
 
 
 def test_south_fork_a1_downstream_review_actions_block_promotion_until_review_result_exists():

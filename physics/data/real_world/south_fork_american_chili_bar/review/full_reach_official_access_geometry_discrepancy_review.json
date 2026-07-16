@@ -1,0 +1,255 @@
+{
+  "candidate_comparisons": [
+    {
+      "all_official_access_distances_m": [
+        {
+          "distance_m": 9908.631,
+          "official_fid": 50924,
+          "official_name": "Skunk Hollow Day Use Parking",
+          "official_review_role": "nearby_public_access_context"
+        },
+        {
+          "distance_m": 10580.093,
+          "official_fid": 50933,
+          "official_name": "Salmon Falls Overflow Parking",
+          "official_review_role": "parking_context_for_primary_takeout"
+        },
+        {
+          "distance_m": 10648.212,
+          "official_fid": 50930,
+          "official_name": "Salmon Falls Parking",
+          "official_review_role": "parking_context_for_primary_takeout"
+        },
+        {
+          "distance_m": 10699.374,
+          "official_fid": 50927,
+          "official_name": "Salmon Falls  Lower Water Raft Take-out",
+          "official_review_role": "primary_official_downstream_access_geometry_lead"
+        },
+        {
+          "distance_m": 12989.448,
+          "official_fid": 50817,
+          "official_name": "Old Salmon Falls Assembly Parking",
+          "official_review_role": "upstream_or_alternate_salmon_falls_context"
+        }
+      ],
+      "candidate_geometry_status": "rejected_for_exact_anchor_review",
+      "candidate_lon_lat": [
+        -120.938291,
+        38.8220775
+      ],
+      "nearest_official_access": {
+        "distance_m": 9908.631,
+        "official_fid": 50924,
+        "official_name": "Skunk Hollow Day Use Parking",
+        "official_review_role": "nearby_public_access_context"
+      },
+      "option_id": "select_20_5_mile_salmon_falls_basis",
+      "primary_raft_takeout_distance_m": 10699.374,
+      "published_river_mile": 20.5,
+      "station_id": "salmon_falls_bridge_takeout_published_20_5_miles"
+    },
+    {
+      "all_official_access_distances_m": [
+        {
+          "distance_m": 9647.972,
+          "official_fid": 50924,
+          "official_name": "Skunk Hollow Day Use Parking",
+          "official_review_role": "nearby_public_access_context"
+        },
+        {
+          "distance_m": 10309.995,
+          "official_fid": 50933,
+          "official_name": "Salmon Falls Overflow Parking",
+          "official_review_role": "parking_context_for_primary_takeout"
+        },
+        {
+          "distance_m": 10376.931,
+          "official_fid": 50930,
+          "official_name": "Salmon Falls Parking",
+          "official_review_role": "parking_context_for_primary_takeout"
+        },
+        {
+          "distance_m": 10426.611,
+          "official_fid": 50927,
+          "official_name": "Salmon Falls  Lower Water Raft Take-out",
+          "official_review_role": "primary_official_downstream_access_geometry_lead"
+        },
+        {
+          "distance_m": 12762.13,
+          "official_fid": 50817,
+          "official_name": "Old Salmon Falls Assembly Parking",
+          "official_review_role": "upstream_or_alternate_salmon_falls_context"
+        }
+      ],
+      "candidate_geometry_status": "rejected_for_exact_anchor_review",
+      "candidate_lon_lat": [
+        -120.9441395,
+        38.8246066
+      ],
+      "nearest_official_access": {
+        "distance_m": 9647.972,
+        "official_fid": 50924,
+        "official_name": "Skunk Hollow Day Use Parking",
+        "official_review_role": "nearby_public_access_context"
+      },
+      "option_id": "select_21_0_mile_full_run_folsom_basis",
+      "primary_raft_takeout_distance_m": 10426.611,
+      "published_river_mile": 21.0,
+      "station_id": "full_run_downstream_window_published_21_0_miles"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "impacted_artifacts": [
+    {
+      "impact": "current downstream candidate points rejected for exact-anchor use",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson"
+    },
+    {
+      "impact": "directed downstream route clips must be regenerated after re-anchoring",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson"
+    },
+    {
+      "impact": "full-reach window station spans and final source windows remain review-only until regenerated",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json"
+    },
+    {
+      "impact": "review derivatives remain useful discrepancy evidence but cannot promote to Unreal import",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_derivative_manifest.json"
+    }
+  ],
+  "inputs": {
+    "downstream_anchor_decision_candidates_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson"
+  },
+  "official_access_records": [
+    {
+      "fid": 50817,
+      "gisid": "GIS0005206",
+      "lon_lat": [
+        -121.05840946152,
+        38.7522231811928
+      ],
+      "name": "Old Salmon Falls Assembly Parking",
+      "review_role": "upstream_or_alternate_salmon_falls_context",
+      "share": "Public",
+      "trailhead": "Yes",
+      "use_type": "Day Use (No Fee)"
+    },
+    {
+      "fid": 50924,
+      "gisid": "GIS0005558",
+      "lon_lat": [
+        -121.03444619524,
+        38.7738621515691
+      ],
+      "name": "Skunk Hollow Day Use Parking",
+      "review_role": "nearby_public_access_context",
+      "share": "Public",
+      "trailhead": "Yes",
+      "use_type": "Day Use (Fee)"
+    },
+    {
+      "fid": 50927,
+      "gisid": "GIS0005556",
+      "lon_lat": [
+        -121.043513366612,
+        38.7717445614809
+      ],
+      "name": "Salmon Falls  Lower Water Raft Take-out",
+      "review_role": "primary_official_downstream_access_geometry_lead",
+      "share": "Public",
+      "trailhead": "Yes",
+      "use_type": "Day Use (Fee)"
+    },
+    {
+      "fid": 50930,
+      "gisid": "GIS0005555",
+      "lon_lat": [
+        -121.042833677013,
+        38.7717617394222
+      ],
+      "name": "Salmon Falls Parking",
+      "review_role": "parking_context_for_primary_takeout",
+      "share": "Public",
+      "trailhead": "Yes",
+      "use_type": "Day Use (Fee)"
+    },
+    {
+      "fid": 50933,
+      "gisid": "GIS0005554",
+      "lon_lat": [
+        -121.042028800892,
+        38.7719121462091
+      ],
+      "name": "Salmon Falls Overflow Parking",
+      "review_role": "parking_context_for_primary_takeout",
+      "share": "Public",
+      "trailhead": "",
+      "use_type": "Day Use (Fee)"
+    }
+  ],
+  "primary_official_access_geometry_lead": {
+    "fid": 50927,
+    "gisid": "GIS0005556",
+    "lon_lat": [
+      -121.043513366612,
+      38.7717445614809
+    ],
+    "name": "Salmon Falls  Lower Water Raft Take-out",
+    "review_role": "primary_official_downstream_access_geometry_lead",
+    "share": "Public",
+    "trailhead": "Yes",
+    "use_type": "Day Use (Fee)"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_crop_to_final_downstream_anchor": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_full_reach_centerline": false,
+    "can_restation_named_rapids": false,
+    "can_select_current_nhd_downstream_candidate": false,
+    "can_select_official_parking_point_without_bank_review": false,
+    "next_required_actions": [
+      "Use the official Salmon Falls Lower Water Raft Take-out and nearby parking points as new downstream access seeds.",
+      "Re-run the NHD/3DHP route selection and clipping against the official access seed instead of the rejected downstream candidate points.",
+      "Attach guide/geospatial review to choose the exact riverbank endpoint and source-mile convention.",
+      "Regenerate corridor windows, derivatives, rapid stationing, and editor outputs only after the corrected route is accepted."
+    ]
+  },
+  "review_interpretation": [
+    "The current 20.5-mile and 21.0-mile NHD-derived downstream candidate points are more than 9 km from the nearest official Salmon Falls/Skunk Hollow access geometry returned by State Parks.",
+    "This rejects the current candidate point geometry for exact downstream-anchor selection.",
+    "The published 20.5/21.0 mile disagreement may still be used as a source-mile convention question, but the physical endpoint must be re-anchored to official/guide-reviewed access geometry.",
+    "The State Parks ParkingPoints feature is a parking/access lead and does not by itself define the riverbank landing, reservoir-stage usability, or public screenshot policy."
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_official_access_geometry_discrepancy_review.v1",
+  "source": {
+    "dataset_note": "Parking Points is a simplified point layer of California State Parks parking-area centroids. It is a strong access-geometry lead, not a surveyed riverbank landing or reservoir-stage authority.",
+    "dataset_url": "https://lab.data.ca.gov/dataset/parking-points",
+    "feature_layer_url": "https://services2.arcgis.com/AhxrK3F6WM8ECvDi/arcgis/rest/services/ParkingPoints/FeatureServer/0",
+    "http_status": 200,
+    "license": "Creative Commons Attribution",
+    "provider": "California Department of Parks and Recreation / California Open Data",
+    "query_url": "https://services2.arcgis.com/AhxrK3F6WM8ECvDi/arcgis/rest/services/ParkingPoints/FeatureServer/0/query?where=UPPER(UNITNAME)%20LIKE%20%27%25FOLSOM%25%27%20OR%20UPPER(NAME)%20LIKE%20%27%25SALMON%25%27%20OR%20UPPER(NAME)%20LIKE%20%27%25SKUNK%25%27&outFields=*&f=geojson",
+    "retrieved_on": "2026-07-16",
+    "source_id": "ca_state_parks_parking_points_arcgis"
+  },
+  "status": "official_access_geometry_disagrees_with_current_nhd_downstream_candidates",
+  "summary": {
+    "candidate_point_count": 2,
+    "current_nhd_candidate_points_can_be_selected_as_exact_anchor": false,
+    "minimum_distance_to_any_official_access_m": 9647.972,
+    "minimum_distance_to_primary_raft_takeout_m": 10426.611,
+    "official_access_record_count": 5,
+    "rejected_candidate_count": 2,
+    "replacement_or_reanchored_endpoint_required": true
+  },
+  "task_id": "A1",
+  "thresholds": {
+    "reject_exact_anchor_distance_m": 1000.0,
+    "warn_anchor_distance_m": 250.0
+  }
+}
