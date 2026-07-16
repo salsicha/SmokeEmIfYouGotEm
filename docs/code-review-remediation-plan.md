@@ -2,6 +2,8 @@
 
 This plan addresses the four findings from the July 15, 2026 project review. It is written to be executed by an agent with no prior context. Read the whole plan before starting any phase. Phases are ordered by dependency and risk; do not reorder Phase 0.
 
+**Status: complete as of July 16, 2026.** Every numbered step and acceptance criterion is closed under the owner's recorded decisions. In particular, generated maps remain versioned and no Git LFS prune, dry run, tracking change, hosted deletion, or history rewrite was performed.
+
 ## Context you need before touching anything
 
 - This repo is a whitewater rafting simulator: `physics/` is a Python research/validation harness (`raftsim` package, run tests with `cd physics && uv run pytest -q`), `unreal/` is a UE 5.8 project whose substance is editor tooling, and the two sides communicate only through committed JSON report locks (e.g. `physics/reports/milestone20/report_set_lock.json`).
@@ -90,7 +92,7 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 
 ### 2026-07-15 Finding 2 Step 2.1 PVE Functional Split
 
-- Split the extracted subsystem into graph/palette authoring (`RaftSimEditorProceduralVegetation.cpp`, 2,154 lines), atlas baking (`RaftSimEditorPveAtlas.cpp`, 1,684 lines), and async evaluation (`RaftSimEditorPveEvaluation.cpp`, 4,898 lines) behind `RaftSimEditorPveAuthoringInternal.h`.
+- Split the extracted subsystem into graph/palette authoring (`RaftSimEditorProceduralVegetation.cpp`, 2,154 lines), atlas baking (`RaftSimEditorPveAtlas.cpp`, 1,684 lines), and async evaluation (`RaftSimEditorPveEvaluation.cpp`, 4,900 lines) behind `RaftSimEditorPveAuthoringInternal.h`.
 - The evaluation file's long completion function is now a documented frozen-legacy exception: only lifecycle fixes belong there; new graph, material, atlas, capture, or report behavior must be added to focused modules. The same function-owned-module policy now applies to Python milestone coordinators in `docs/raftsim-tools-workflow.md`.
 - Verification: UE 5.8 independently compiled the authoring, atlas, and evaluation translation units and linked `libUnrealEditor-RaftSimEditor.dylib` successfully.
 
@@ -186,7 +188,7 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 ### 2026-07-16 Finding 3 Step 3.3 Snapshot Suite Split
 
 - Deleted 36 executable snapshots for rejected V1-V42 cypress iterations while retaining the two source/current invariants, the current V43 gate, and all 47 governed review JSONs. This is the intentional collection/runtime reduction required by the retirement policy; the reviews, not live tests, preserve historical outcomes.
-- Replaced the 11,943-line residual monolith with ten per-concern test files and a non-collected shared support module. The largest test file is 1,900 lines; a layout guard rejects reintroduction of the monolith, a file at or above 2,000 lines, or a missing concern split.
+- Replaced the 11,943-line residual monolith with ten per-concern test files and a non-collected shared support module. The largest test file is 1,902 lines; a layout guard rejects reintroduction of the monolith, a file at or above 2,000 lines, or a missing concern split.
 - Verification: the focused split/retention suite passes **49/49** and the full suite reports **504 passed / 3 skipped in 138.61 seconds**. Relative to the preceding 539-pass run, the count changes only by deleting 36 historical snapshots and adding one layout guard; current V43 and shared behavior remain green.
 
 ### 2026-07-16 Finding 2 Final Unity-Build Boundary
@@ -194,6 +196,14 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - A clean UE 5.8 acceptance build exposed private helper-name collisions when UBT regrouped the decomposed editor sources into unity translation units; prior independent/incremental builds did not exercise that grouping.
 - Set `bUseUnity = false` for `RaftSimEditor` and locked it in the source-layout test. The module's 36 focused implementation files now have an explicit build boundary matching their private namespaces instead of depending on adaptive-unity grouping.
 - Verification: the focused source-layout suite passes **3/3**, and the invalidated UE 5.8 `SmokeEmIfYouGotEmEditor Mac Development` target compiles and links successfully.
+
+### 2026-07-16 Final Acceptance Audit
+
+- Finding 1 remains honest and closed at the selected Option B decision boundary: the committed truth baseline is 6/40 genuine solver rows and 34/40 reference-playback rows, live custom-water stepping remains blocked, and no playback evidence is presented as solver parity.
+- Finding 2 is closed: the editor and C++ solver sources are decomposed below 3,000 lines except the explicit 4,900-line frozen PVE lifecycle; the Python milestone coordinators have a documented frozen-legacy policy; a fresh CMake Release build compiled every native target without warnings; `raftsim_water_tests` passed `flat_pool_seed_16`; and the UE 5.8 editor target compiled and linked.
+- Finding 3 is closed under the owner's no-prune/keep-versioning decision: all six superseded generators, historical comparison/review launchers, and rejected-version snapshots are retired; only the isolated V43 driver remains; all 47 governed reviews remain; the largest split photoreal test file is 1,902 lines; `import raftsim` and Ruff pass; and no LFS configuration, tracking, hosted object, or history was changed.
+- A Pacuare-only Unreal candidate regeneration rebuilt and validated 20 touched assets. Its filtered logical candidate record was byte-identical to the committed Pacuare entry; the collective manifest stayed byte-identical. Volatile package/capture rewrites were restored rather than committed as meaningless LFS versions, consistent with the retention policy's logical-regeneration contract.
+- Finding 4's miner, options memo, and stop-loss recommendations remain complete with no asset/gate/evidence mutation. Final Python verification reports **504 passed / 3 skipped in 139.54 seconds**; the three skips are the expected installed-GeoClaw/PyClaw unavailable-path tests.
 
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
