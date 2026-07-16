@@ -40,6 +40,9 @@ def test_south_fork_a1_window_source_pull_status_records_current_downloaded_file
     assert summary["present_window_manifest_count"] == 6
     assert summary["missing_window_manifest_count"] == 0
     assert summary["present_existing_pilot_artifact_count"] == 1
+    assert summary["expected_review_derivative_count"] == 24
+    assert summary["present_review_derivative_count"] == 24
+    assert summary["missing_review_derivative_count"] == 0
     assert summary["unexpected_file_count"] == 0
     assert summary["all_source_files_present"] is True
     assert summary["all_window_manifests_present"] is True
@@ -60,6 +63,11 @@ def test_south_fork_a1_window_source_pull_status_keeps_official_urls_and_hashes(
         assert len(window["aerial_imagery"]["sha256"]) == 64
         assert window["window_manifest"]["byte_count"] > 0
         assert len(window["window_manifest"]["sha256"]) == 64
+        assert window["review_derivative_expected_count"] == 4
+        assert window["review_derivative_present_count"] == 4
+        for derivative in window["review_derivatives"]:
+            assert derivative["byte_count"] > 0
+            assert len(derivative["sha256"]) == 64
 
 
 def test_south_fork_a1_window_source_pull_status_blocks_promotion_until_review():

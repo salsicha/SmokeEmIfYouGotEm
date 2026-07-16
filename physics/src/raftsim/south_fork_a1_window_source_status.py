@@ -80,6 +80,7 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
     source_file_records: list[dict[str, Any]] = []
     window_manifest_records: list[dict[str, Any]] = []
     existing_artifact_records: list[dict[str, Any]] = []
+    review_derivative_records: list[dict[str, Any]] = []
 
     for window in plan["windows"]:
         expected_outputs = window["expected_outputs"]
@@ -104,6 +105,19 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
         source_file_records.extend(source_files)
         window_manifest_records.append(manifest)
         expected_paths.update(record["relative_path"] for record in [terrain, aerial, manifest])
+
+        review_derivatives: list[dict[str, Any]] = []
+        if manifest["present"]:
+            window_manifest = _load_json(repo_root, manifest["relative_path"])
+            for role, relative_path in sorted(window_manifest["derivative_targets"].items()):
+                derivative = _file_record(
+                    repo_root,
+                    relative_path,
+                    role=f"review_derivative_{role}",
+                )
+                review_derivatives.append(derivative)
+            review_derivative_records.extend(review_derivatives)
+            expected_paths.update(record["relative_path"] for record in review_derivatives)
 
         existing_artifact = None
         if window.get("existing_artifact"):
@@ -134,6 +148,11 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
                 "terrain_dem": terrain,
                 "aerial_imagery": aerial,
                 "window_manifest": manifest,
+                "review_derivatives": review_derivatives,
+                "review_derivative_present_count": sum(
+                    1 for record in review_derivatives if record["present"]
+                ),
+                "review_derivative_expected_count": len(review_derivatives),
                 "existing_artifact": existing_artifact,
                 "can_generate_window_derivatives": source_file_present_count == len(source_files),
                 "can_enter_stitched_validation": (
@@ -177,6 +196,13 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
             "existing_pilot_artifact_count": len(existing_artifact_records),
             "present_existing_pilot_artifact_count": sum(
                 1 for record in existing_artifact_records if record["present"]
+            ),
+            "expected_review_derivative_count": len(review_derivative_records),
+            "present_review_derivative_count": sum(
+                1 for record in review_derivative_records if record["present"]
+            ),
+            "missing_review_derivative_count": sum(
+                1 for record in review_derivative_records if not record["present"]
             ),
             "unexpected_file_count": len(unexpected),
             "all_source_files_present": all_source_files_present,
