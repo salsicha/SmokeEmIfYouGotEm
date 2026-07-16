@@ -1,0 +1,272 @@
+{
+  "critical_rapid_count": 4,
+  "current_blockers": {
+    "all_rapids_are_order_only": true,
+    "catalog_run_length_m": 10000.0,
+    "corridor_status": "source_scale_technical_corridor_not_yet_lifelike",
+    "flow_station_code": "10704002-1",
+    "geometry_authority": "osm_named_river_cross_reference_with_rapid_tags_not_surveyed_centerline",
+    "numeric_flow_bands_promoted": false,
+    "route_stationing_length_m": 15936.77551712958,
+    "route_to_catalog_length_ratio": 1.593678
+  },
+  "digitizing_actions": [
+    {
+      "action_id": "futaleufu_a4_digitize_01_asleep_at_the_wheel",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a4_promotion"
+      ],
+      "catalog_station_m_from_order_interpolation": 1666.667,
+      "class": "III-IV",
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "warmup",
+        "wave_train",
+        "surf"
+      ],
+      "order": 1,
+      "rapid_name": "Asleep at the Wheel",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_station_axis",
+        "gps_or_aerial_rapid_geometry",
+        "guide_or_outfitter_confirmation",
+        "rights_and_publication_review",
+        "dga_or_guide_flow_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high",
+      "route_order_station_m_for_review_focus": 2656.129
+    },
+    {
+      "action_id": "futaleufu_a4_digitize_02_terminator",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a4_promotion"
+      ],
+      "catalog_station_m_from_order_interpolation": 3333.333,
+      "class": "V",
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "long_rapid",
+        "multiple_holes",
+        "multiple_lines",
+        "sneak_line",
+        "scout",
+        "portage",
+        "flip_hazard"
+      ],
+      "order": 2,
+      "rapid_name": "Terminator",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_station_axis",
+        "gps_or_aerial_rapid_geometry",
+        "guide_or_outfitter_confirmation",
+        "rights_and_publication_review",
+        "dga_or_guide_flow_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 5312.259
+    },
+    {
+      "action_id": "futaleufu_a4_digitize_03_son_of_terminator",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a4_promotion"
+      ],
+      "catalog_station_m_from_order_interpolation": 5000.0,
+      "class": "IV-V",
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "holes",
+        "wave_train",
+        "continuous_whitewater"
+      ],
+      "order": 3,
+      "rapid_name": "Son of Terminator",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_station_axis",
+        "gps_or_aerial_rapid_geometry",
+        "guide_or_outfitter_confirmation",
+        "rights_and_publication_review",
+        "dga_or_guide_flow_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 7968.388
+    },
+    {
+      "action_id": "futaleufu_a4_digitize_04_khyber_pass",
+      "aliases": [
+        "Kyber Pass",
+        "Kipper Pass"
+      ],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a4_promotion"
+      ],
+      "catalog_station_m_from_order_interpolation": 6666.667,
+      "class": "IV+",
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "hydraulic_holes",
+        "large_waves",
+        "multiple_moves"
+      ],
+      "order": 4,
+      "rapid_name": "Khyber Pass",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_station_axis",
+        "gps_or_aerial_rapid_geometry",
+        "guide_or_outfitter_confirmation",
+        "rights_and_publication_review",
+        "dga_or_guide_flow_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 10624.517
+    },
+    {
+      "action_id": "futaleufu_a4_digitize_05_himalayas",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a4_promotion"
+      ],
+      "catalog_station_m_from_order_interpolation": 8333.333,
+      "class": "IV",
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "very_large_standing_waves",
+        "wave_train",
+        "surf",
+        "flip_hazard"
+      ],
+      "order": 5,
+      "rapid_name": "Himalayas",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_route_station_axis",
+        "gps_or_aerial_rapid_geometry",
+        "guide_or_outfitter_confirmation",
+        "rights_and_publication_review",
+        "dga_or_guide_flow_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 13280.646
+    }
+  ],
+  "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a4": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false
+  },
+  "rapid_count": 5,
+  "required_workflow": [
+    {
+      "complete_when": "OSM route trace is replaced or approved by guide/geospatial review for rapid-stationing use",
+      "required_before": "stationing_digitizing",
+      "step_id": "select_reviewed_route_station_axis"
+    },
+    {
+      "complete_when": "all five rapids have Point or LineString WGS84 geometry, route station, confidence, source evidence, and guide review",
+      "required_before": "catalog_regeneration",
+      "step_id": "digitize_every_rapid_point_or_span"
+    },
+    {
+      "complete_when": "DGA station translation, guide-reviewed low/normal/high/unsafe context, and hydrology reviewer signoff are recorded",
+      "required_before": "rapid_water_window_generation",
+      "step_id": "attach_flow_context_to_stationing_review"
+    },
+    {
+      "complete_when": "named rapid catalog, editor geometry, flow context labels, and water-window inputs are regenerated from the reviewed result",
+      "required_before": "a4_promotion",
+      "step_id": "regenerate_catalog_editor_and_water_window_inputs"
+    }
+  ],
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.futaleufu.a4_stationing_digitizing_action_packet.v1",
+  "source_inputs": {
+    "route_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+    "seasonal_flow_context": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json",
+    "status_artifact": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_flow_status.json"
+  },
+  "source_status_artifact": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_flow_status.json",
+  "status": "digitizing_actions_ready_no_stationing_or_flow_promotion",
+  "task_id": "A4"
+}
