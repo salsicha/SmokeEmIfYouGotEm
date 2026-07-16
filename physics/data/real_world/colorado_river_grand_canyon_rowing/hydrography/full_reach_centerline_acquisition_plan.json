@@ -1,0 +1,148 @@
+{
+  "centerline_binding_allowed": false,
+  "centerline_source_candidates": [
+    {
+      "candidate_id": "usgs_3dhp_or_nhd_full_reach",
+      "promotion_caveat": "Hydrography linework alone is not rapid, bank, sandbar, or runnable-line authority.",
+      "query_url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-114.35,35.65,-111.45,36.95",
+      "source_family": "USGS hydrography",
+      "status": "planned_metadata_and_product_selection_required",
+      "use_if": "official flowline coverage can be clipped and station-calibrated to reviewed river miles"
+    },
+    {
+      "candidate_id": "nps_or_gcmrc_river_mile_reference",
+      "promotion_caveat": "Do not vendor maps or guide text without item-level rights.",
+      "query_url": "link_only_source_selection_required",
+      "source_family": "NPS/GCMRC river-mile reference",
+      "status": "needed_for_river_mile_calibration",
+      "use_if": "station-zero, river-mile ticks, and endpoint policy can be cited and reviewed"
+    },
+    {
+      "candidate_id": "usgs_hydraulic_maps_major_rapids",
+      "promotion_caveat": "Rapid hydraulic maps cross-check rapid windows; they do not replace a full centerline.",
+      "query_url": "https://pubs.usgs.gov/imap/1897j/",
+      "source_family": "USGS hydraulic map series",
+      "status": "link_only_crosscheck_required",
+      "use_if": "major rapid locations/features can be used as cross-check evidence under source terms"
+    }
+  ],
+  "current_scope_gap": {
+    "a2_window_count_waiting_for_bboxes": 23,
+    "existing_editor_binding_max_station_m": 4700.0,
+    "existing_source_manifest_bounds_status": "pilot_and_partial_canyon_bounds_insufficient_for_pearce_ferry_full_run",
+    "existing_source_manifest_bounds_wgs84": {
+      "max_lat": 36.95,
+      "max_lon": -111.55,
+      "min_lat": 35.75,
+      "min_lon": -113.55,
+      "status": "draft_planning_bounds_needs_crs_review"
+    },
+    "planned_run_length_m": 451420.0,
+    "planned_run_length_river_miles": 280.499
+  },
+  "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+  "endpoint_review_targets": [
+    {
+      "anchor_id": "lees_ferry_put_in",
+      "current_seed_lon_lat": [
+        -111.5167285,
+        36.8777351
+      ],
+      "current_seed_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+      "current_seed_status": "NHD pilot station zero seed requires NPS/access/oarsman review",
+      "promotion_gate": "Confirm put-in/access geometry and station zero before using the seed as full-run coordinate authority.",
+      "river_mile": 0.0,
+      "role": "upstream_start"
+    },
+    {
+      "anchor_id": "pearce_ferry_takeout",
+      "current_seed_lon_lat": null,
+      "current_seed_status": "missing_exact_anchor",
+      "promotion_gate": "Attach reviewed Pearce Ferry take-out/access geometry and publication sensitivity before clipping the full centerline.",
+      "river_mile": 280.499,
+      "role": "downstream_end"
+    }
+  ],
+  "flow_context_status": "planning_placeholders_require_usgs_gauge_history_and_release_context",
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json",
+    "lees_ferry_stationing_candidate": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/nhd_hu8_lees_ferry_mainstem_stationing_candidate.json",
+    "named_rapid_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/source_manifest.json",
+    "window_plan": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/full_reach_window_plan.json"
+  },
+  "planned_outputs": [
+    {
+      "artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/full_reach_centerline_candidate.geojson",
+      "blocked_by": "centerline_source_selection_and_endpoint_review",
+      "status": "not_generated"
+    },
+    {
+      "artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/hydrography/full_reach_stationing_candidate.json",
+      "blocked_by": "working_crs_and_river_mile_calibration",
+      "status": "not_generated"
+    },
+    {
+      "artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/full_reach_source_pull_plan.json",
+      "blocked_by": "reviewed_centerline_window_bboxes",
+      "status": "not_generated"
+    },
+    {
+      "artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_rapid_mile_crosscheck.json",
+      "blocked_by": "nps_usgs_hydraulic_maps_and_oarsman_review",
+      "status": "not_generated"
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "acquisition_contract_recorded": true,
+    "can_download_full_reach_sources": false,
+    "can_promote_a2_centerline": false,
+    "full_length_centerline_source_selected": false,
+    "lees_ferry_anchor_reviewed": false,
+    "pearce_ferry_anchor_reviewed": false,
+    "rapid_mile_crosscheck_complete": false,
+    "source_window_bboxes_generated": false,
+    "working_crs_selected": false
+  },
+  "rapid_stationing_promotion_allowed": false,
+  "review_envelope_policy": {
+    "authority": "source_discovery_and_bbox_planning_only_not_route_geometry",
+    "must_clip_to_reviewed_centerline_before_download": true,
+    "reason": "The envelope intentionally over-covers the full Lees Ferry to Pearce Ferry planning span so source discovery cannot inherit the current Lees Ferry pilot bounds."
+  },
+  "review_envelope_wgs84": {
+    "max_lat": 36.95,
+    "max_lon": -111.45,
+    "min_lat": 35.65,
+    "min_lon": -114.35
+  },
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.a2_centerline_acquisition_plan.v1",
+  "source_downloads_allowed": false,
+  "source_request_prerequisites": [
+    "Choose the full-length centerline source family and preserve source feature IDs.",
+    "Record exact Lees Ferry and Pearce Ferry anchors with publication review.",
+    "Select and test the canyon working CRS or local river-mile transform for distortion.",
+    "Generate window bboxes from the reviewed centerline, not from equal-station placeholders.",
+    "Cross-check all major rapid miles against NPS/USGS sources and oarsman review before promotion."
+  ],
+  "source_window_bbox_generation_allowed": false,
+  "status": "planned_no_source_downloaded_not_centerline_or_crs_authority",
+  "task_id": "A2",
+  "working_crs_candidates": [
+    {
+      "crs_id": "EPSG:26912",
+      "name": "NAD83 / UTM zone 12N",
+      "notes": "Covers most of the Grand Canyon working span but must be checked near the western take-out and against Unreal/world-partition precision needs.",
+      "status": "candidate_needs_full_reach_distortion_and_zone_edge_review"
+    },
+    {
+      "crs_id": "local_river_mile_station_axis",
+      "name": "Reviewed river-mile station axis with local cross-stream offsets",
+      "notes": "Useful for long-corridor authoring and streaming, but source rasters still need their native CRS and per-window transforms preserved.",
+      "status": "candidate_needs_centerline_and_anchor_selection"
+    }
+  ]
+}
