@@ -6,6 +6,7 @@ from pathlib import Path
 
 from raftsim.south_fork_a1_directed_station_candidates import (
     build_south_fork_a1_directed_station_candidates,
+    write_south_fork_a1_directed_route_clips_geojson,
     write_south_fork_a1_directed_station_candidates,
     write_south_fork_a1_directed_station_candidates_geojson,
 )
@@ -15,6 +16,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[4]
     output_path = write_south_fork_a1_directed_station_candidates(repo_root)
     geojson_path = write_south_fork_a1_directed_station_candidates_geojson(repo_root)
+    route_clips_path = write_south_fork_a1_directed_route_clips_geojson(repo_root)
     payload = build_south_fork_a1_directed_station_candidates(repo_root)
     direction = payload["direction_evidence"]
     coloma = payload["source_anchor_station_candidates"][
@@ -28,6 +30,7 @@ def main() -> None:
     print(f"coloma_candidate_lon_lat={coloma['lon_lat']}")
     print(output_path.relative_to(repo_root))
     print(geojson_path.relative_to(repo_root))
+    print(route_clips_path.relative_to(repo_root))
 
 
 if __name__ == "__main__":

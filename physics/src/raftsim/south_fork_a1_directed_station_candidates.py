@@ -26,6 +26,10 @@ FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/review/"
     "full_reach_directed_station_candidates.geojson"
 )
+FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/hydrography/"
+    "full_reach_directed_route_clips.geojson"
+)
 EARTH_RADIUS_M = 6_371_008.8
 
 
@@ -250,6 +254,94 @@ def _geojson_feature(
         },
         "properties": properties,
     }
+
+
+def _line_geojson_feature(
+    feature_id: str,
+    coordinates: list[list[float]],
+    properties: dict[str, Any],
+) -> dict[str, Any]:
+    return {
+        "type": "Feature",
+        "id": feature_id,
+        "geometry": {
+            "type": "LineString",
+            "coordinates": coordinates,
+        },
+        "properties": properties,
+    }
+
+
+def _feature_coordinates_to_alpha(
+    feature: dict[str, Any],
+    alpha: float,
+) -> list[list[float]]:
+    coordinates = _feature_coordinates(feature)
+    if len(coordinates) == 1:
+        point = _node(coordinates[0])
+        return [[point[0], point[1]]]
+
+    segment_lengths = [
+        _haversine_m(start, stop)
+        for start, stop in zip(coordinates, coordinates[1:], strict=False)
+    ]
+    geometry_length_m = sum(segment_lengths)
+    if geometry_length_m <= 0.0:
+        start = _node(coordinates[0])
+        return [[start[0], start[1]]]
+
+    target_m = max(0.0, min(alpha, 1.0)) * geometry_length_m
+    clipped = [[round(coordinates[0][0], 7), round(coordinates[0][1], 7)]]
+    accumulated_m = 0.0
+    for start, stop, segment_length_m in zip(
+        coordinates,
+        coordinates[1:],
+        segment_lengths,
+        strict=False,
+    ):
+        if accumulated_m + segment_length_m < target_m:
+            clipped.append([round(stop[0], 7), round(stop[1], 7)])
+            accumulated_m += segment_length_m
+            continue
+        segment_alpha = (
+            0.0
+            if segment_length_m <= 0.0
+            else (target_m - accumulated_m) / segment_length_m
+        )
+        clipped.append(
+            [
+                round(start[0] + (stop[0] - start[0]) * segment_alpha, 7),
+                round(start[1] + (stop[1] - start[1]) * segment_alpha, 7),
+            ]
+        )
+        break
+    return clipped
+
+
+def _clip_chain_coordinates(
+    features: list[dict[str, Any]],
+    chain: list[dict[str, Any]],
+    end_station_m: float,
+) -> list[list[float]]:
+    coordinates: list[list[float]] = []
+    for edge in chain:
+        feature = features[edge["feature_index"]]
+        span_m = max(edge["station_end_m"] - edge["station_start_m"], 1e-9)
+        if end_station_m >= edge["station_end_m"]:
+            edge_coordinates = [
+                [round(lon, 7), round(lat, 7)]
+                for lon, lat in _feature_coordinates(feature)
+            ]
+        else:
+            alpha = (end_station_m - edge["station_start_m"]) / span_m
+            edge_coordinates = _feature_coordinates_to_alpha(feature, alpha)
+        if coordinates and edge_coordinates and coordinates[-1] == edge_coordinates[0]:
+            coordinates.extend(edge_coordinates[1:])
+        else:
+            coordinates.extend(edge_coordinates)
+        if end_station_m <= edge["station_end_m"]:
+            break
+    return coordinates
 
 
 def _rapid_station_candidates(
@@ -555,6 +647,99 @@ def build_south_fork_a1_directed_station_candidates_geojson(
     }
 
 
+def build_south_fork_a1_directed_route_clips_geojson(
+    repo_root: Path,
+) -> dict[str, Any]:
+    """Build review-only full-reach route clips for downstream anchor review."""
+
+    repo_root = repo_root.resolve()
+    geojson = _load_json(repo_root, FULL_REACH_NHD_GEOJSON_RELATIVE_PATH)
+    access_points = _load_json(repo_root, ACCESS_POINTS_RELATIVE_PATH)
+    catalog = _load_json(repo_root, SOURCE_CATALOG_RELATIVE_PATH)
+    river = _south_fork_catalog_record(catalog)
+    features = geojson["features"]
+    chili_seed = _access_feature(access_points, "chili_bar_put_in_review_seed")
+    chili_node = _node(
+        (
+            float(chili_seed["properties"]["station_lon"]),
+            float(chili_seed["properties"]["station_lat"]),
+        )
+    )
+    edges, outgoing, _in_degree, _out_degree = _build_directed_graph(features)
+    chain = _follow_unique_chain(edges, outgoing, chili_node)
+    payload = build_south_fork_a1_directed_station_candidates(repo_root)
+    downstream = payload["source_anchor_station_candidates"]["downstream_source_window"]
+    clip_specs = [
+        (
+            "chili_bar_to_salmon_falls_20_5_mile_candidate",
+            downstream["minimum_source_mile_candidate"],
+        ),
+        (
+            "chili_bar_to_full_run_21_0_mile_candidate",
+            downstream["maximum_source_mile_candidate"],
+        ),
+    ]
+    features_out: list[dict[str, Any]] = []
+    for feature_id, station_candidate in clip_specs:
+        coordinates = _clip_chain_coordinates(
+            features,
+            chain,
+            station_candidate["station_m"],
+        )
+        features_out.append(
+            _line_geojson_feature(
+                feature_id,
+                coordinates,
+                {
+                    "river_id": river["river_id"],
+                    "clip_id": feature_id,
+                    "station_start_m": 0.0,
+                    "station_end_m": station_candidate["station_m"],
+                    "published_river_mile_end": station_candidate[
+                        "published_river_mile"
+                    ],
+                    "source_id": station_candidate["source_id"],
+                    "point_count": len(coordinates),
+                    "geometry_status": (
+                        "review_candidate_clip_from_directed_nhd_chain_not_authoritative"
+                    ),
+                    "production_promoted": False,
+                    "can_bind_editor_geometry": False,
+                    "can_bind_solver_window": False,
+                },
+            )
+        )
+
+    return {
+        "type": "FeatureCollection",
+        "schema": "raftsim.south_fork.a1_directed_route_clips.geojson.v1",
+        "generated_on": payload["generated_on"],
+        "status": "review_only_directed_route_clips_not_production_geometry",
+        "production_promoted": False,
+        "river_id": river["river_id"],
+        "source_station_candidates": (
+            FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH
+        ),
+        "source_station_candidates_geojson": (
+            FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH
+        ),
+        "feature_count": len(features_out),
+        "policy": {
+            "allowed_use": [
+                "downstream anchor review",
+                "corridor window planning",
+                "editor overlay with binding disabled",
+            ],
+            "forbidden_use": [
+                "shipping gameplay centerline",
+                "rapid restationing authority",
+                "solver-window binding",
+            ],
+        },
+        "features": features_out,
+    }
+
+
 def write_south_fork_a1_directed_station_candidates(repo_root: Path) -> Path:
     payload = build_south_fork_a1_directed_station_candidates(repo_root)
     path = repo_root / FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH
@@ -569,6 +754,17 @@ def write_south_fork_a1_directed_station_candidates(repo_root: Path) -> Path:
 def write_south_fork_a1_directed_station_candidates_geojson(repo_root: Path) -> Path:
     payload = build_south_fork_a1_directed_station_candidates_geojson(repo_root)
     path = repo_root / FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def write_south_fork_a1_directed_route_clips_geojson(repo_root: Path) -> Path:
+    payload = build_south_fork_a1_directed_route_clips_geojson(repo_root)
+    path = repo_root / FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",

@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 
 from raftsim.south_fork_a1_directed_station_candidates import (
+    FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
     FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH,
     FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH,
+    build_south_fork_a1_directed_route_clips_geojson,
     build_south_fork_a1_directed_station_candidates,
     build_south_fork_a1_directed_station_candidates_geojson,
 )
@@ -25,6 +27,14 @@ def _load_geojson() -> dict:
         (
             REPO_ROOT / FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH
         ).read_text(encoding="utf-8")
+    )
+
+
+def _load_route_clips() -> dict:
+    return json.loads(
+        (REPO_ROOT / FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
     )
 
 
@@ -150,4 +160,47 @@ def test_south_fork_a1_directed_station_candidates_geojson_blocks_binding():
     assert all(
         feature["properties"]["production_promoted"] is False
         for feature in geojson["features"]
+    )
+
+
+def test_south_fork_a1_directed_route_clips_geojson_is_reproducible():
+    generated = build_south_fork_a1_directed_route_clips_geojson(REPO_ROOT)
+    committed = _load_route_clips()
+
+    assert generated == committed
+    assert committed["schema"] == (
+        "raftsim.south_fork.a1_directed_route_clips.geojson.v1"
+    )
+    assert committed["status"] == (
+        "review_only_directed_route_clips_not_production_geometry"
+    )
+    assert committed["production_promoted"] is False
+    assert committed["feature_count"] == 2
+
+
+def test_south_fork_a1_directed_route_clips_geojson_records_downstream_windows():
+    route_clips = _load_route_clips()
+    features = {feature["id"]: feature for feature in route_clips["features"]}
+
+    assert set(features) == {
+        "chili_bar_to_salmon_falls_20_5_mile_candidate",
+        "chili_bar_to_full_run_21_0_mile_candidate",
+    }
+    lower = features["chili_bar_to_salmon_falls_20_5_mile_candidate"]
+    upper = features["chili_bar_to_full_run_21_0_mile_candidate"]
+
+    assert lower["geometry"]["coordinates"][0] == [-120.7199431, 38.7786168]
+    assert lower["geometry"]["coordinates"][-1] == [-120.938291, 38.8220775]
+    assert lower["properties"]["station_end_m"] == 32991.552
+    assert lower["properties"]["published_river_mile_end"] == 20.5
+    assert lower["properties"]["point_count"] > 150
+
+    assert upper["geometry"]["coordinates"][0] == [-120.7199431, 38.7786168]
+    assert upper["geometry"]["coordinates"][-1] == [-120.9441395, 38.8246066]
+    assert upper["properties"]["station_end_m"] == 33796.224
+    assert upper["properties"]["published_river_mile_end"] == 21.0
+    assert upper["properties"]["point_count"] > lower["properties"]["point_count"]
+    assert all(
+        feature["properties"]["can_bind_editor_geometry"] is False
+        for feature in route_clips["features"]
     )
