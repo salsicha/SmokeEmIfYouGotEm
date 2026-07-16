@@ -16,6 +16,8 @@ The portfolio decision is machine-readable in `physics/data/real_world/river_por
 
 Each river environment must be driven by traceable river maps, seasonal or release-driven flow levels, aerial/satellite imagery, reviewed terrain and hydrography, and rights-reviewed visual reference. Procedural generation is expected for terrain dressing, foliage, rock scatter, debris, foam cues, wetness masks, lighting variants, and placeholder art until imported or first-party assets are approved.
 
+Generated-map retention is governed by `docs/generated-artifact-retention-policy.md`. The proposed rule is to keep promoted or deliberately milestone-locked maps plus their manifests in git, while regenerating volatile Landscape, flow-variant, capture, and asset-review candidates locally from recorded commands and inputs. This is a proposal only: no current map may be untracked, ignored, pruned, or removed from hosted LFS without the explicit owner approvals named in that policy.
+
 ## Source Rules
 
 - Official/open geospatial and hydrology sources are preferred over guidebook or social sources.
