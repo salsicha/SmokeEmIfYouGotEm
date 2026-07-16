@@ -1,0 +1,391 @@
+{
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "source_manifest_index": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_manifest_index.json",
+    "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_full_reach_corridor": false,
+    "next_required_actions": [
+      "Visually review every heightfield, hillshade, NAIP overlay, and edge report.",
+      "Resolve the exact Salmon Falls/Folsom downstream anchor before final crop.",
+      "Add bank/cross-section interpretation and named rapid geometry review.",
+      "Only after review, generate hydrologically conditioned terrain for Unreal import tests."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_window_derivatives.v1",
+  "status": "review_derivatives_generated_anchor_and_bank_review_pending",
+  "summary": {
+    "all_route_overlays_drawn": true,
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_full_reach_corridor": false,
+    "derived_png_count": 18,
+    "edge_report_count": 6,
+    "heightfield_count": 6,
+    "hillshade_count": 6,
+    "naip_centerline_preview_count": 6,
+    "seam_count": 5,
+    "window_count": 6
+  },
+  "task_id": "A1",
+  "windows": [
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 792.427551,
+          "elevation_min_m": 405.089996,
+          "elevation_span_m": 387.337555,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "1d08083174ce3a3a148e2e5befb024556ff39299aeab6977950cd844b704d5bd"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "6fbca4505baa5d7dc337af7d9d4621ecdbe4ed3a1b56132c6fc828db21664ba4"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "d59f9a2122e266f0ef97ce09cd3d57d8aa083178e1e97c3d8643f64a30e6a7a7"
+        }
+      },
+      "display_name": "Chili Bar Existing Pilot",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/review/stitched_edge_report.json",
+        "sha256": "101d21203b6fd36315ce6e97ba969bea563e9f0f6b22e9958d6646abd2c767f4"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 41,
+        "visible_pixel_count": 41
+      },
+      "station_range_m": {
+        "end": 2500.0,
+        "length": 2500.0,
+        "start": 0.0
+      },
+      "window_id": "chili_bar_existing_pilot_0_2500m"
+    },
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 842.322815,
+          "elevation_min_m": 303.693512,
+          "elevation_span_m": 538.629303,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "402c2fba7b343f3ecbbc006ed063b407c9195fa327c6048071dad4f341bbb0af"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "5f8d1baca7a32d95b9218d4ebd1e8d62aa06215d0d49c7a5984e8ee0fc0b34d2"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "68b6301b4320530f828fc92e818d6d5c89805c0b1ed7412a706554aecbd3c1c8"
+        }
+      },
+      "display_name": "Upper Chili Bar To Coloma Checkpoint",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/review/stitched_edge_report.json",
+        "sha256": "f7c9b97c354eba28d520138f48d6bc4e90ad5db47abe46903ed21266a9563097"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 118,
+        "visible_pixel_count": 118
+      },
+      "station_range_m": {
+        "end": 10000.0,
+        "length": 7500.0,
+        "start": 2500.0
+      },
+      "window_id": "upper_chili_bar_to_coloma_2500_10000m"
+    },
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 777.765747,
+          "elevation_min_m": 224.898407,
+          "elevation_span_m": 552.86734,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "e1565dabcce2e47e6b859cbb6d0dd5233824794f8f36e3a708beb325a06a0bd3"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "1248b4ee7f246b9e457b473a26639b38833d1233d3a6980e4c662396ded64ba1"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "186e25d7ca5a58e3dd84d5fbfd2f6a1995e2bcd802f30de241499fb09c81d4e6"
+        }
+      },
+      "display_name": "Coloma Valley Transit",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/review/stitched_edge_report.json",
+        "sha256": "8b1bf3b847e22cef062189f5de161f5f8697779588fb052e697c2172bf666522"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 171,
+        "visible_pixel_count": 171
+      },
+      "station_range_m": {
+        "end": 24000.0,
+        "length": 14000.0,
+        "start": 10000.0
+      },
+      "window_id": "coloma_valley_10000_24000m"
+    },
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 497.077667,
+          "elevation_min_m": 211.542007,
+          "elevation_span_m": 285.53566,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "ebd97c7a5fdadff416a6561a5bc4d5e1e84b8dc47ddc9682986bd0a60bf00fb8"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "7833fc19b4c4ee7d67ee6f080bc513c7d1d61a131418d7e19581ebe7cbd7aa68"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "ac520ef07abd561f4754c6ee8cddef6bb255e2c65effc9751f0573daa6f1b336"
+        }
+      },
+      "display_name": "Upper Gorge Rapid Windows",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/review/stitched_edge_report.json",
+        "sha256": "fe6db8dd0bdf843d2e03248f6de8b4823c1fdb779a65b4852faea2233569fc75"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 72,
+        "visible_pixel_count": 72
+      },
+      "station_range_m": {
+        "end": 28500.0,
+        "length": 4500.0,
+        "start": 24000.0
+      },
+      "window_id": "upper_gorge_24000_28500m"
+    },
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 491.868042,
+          "elevation_min_m": 196.579407,
+          "elevation_span_m": 295.288635,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "220474acacc5da81b567ebec7c3988bb4aea43601faddbab238694c239731ae6"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "cfab372bd9bf3a860cc6e74fb14fe2cb82a139e8440a4ea2acb2639fffc55fc1"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "250d1780fc1fa4327fa06e0dbafc7541b8a5dbf0f602717f87d9eddf9f39224a"
+        }
+      },
+      "display_name": "Lower Gorge To Salmon Falls Source Window",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/review/stitched_edge_report.json",
+        "sha256": "0b0c829b6ea56c3a232146ae948f1c80c25f8e27975154a98c7c2aa1fc09448a"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 85,
+        "visible_pixel_count": 85
+      },
+      "station_range_m": {
+        "end": 32991.552,
+        "length": 4491.552,
+        "start": 28500.0
+      },
+      "window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+    },
+    {
+      "derived_artifacts": {
+        "heightfield": {
+          "dimensions": [
+            2017,
+            2017
+          ],
+          "elevation_max_m": 292.522797,
+          "elevation_min_m": 195.549942,
+          "elevation_span_m": 96.972855,
+          "normalization": "source DEM min/max mapped linearly to 0..65535",
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/heightfield_2017.png",
+          "pixel_format": "16_bit_grayscale_png",
+          "sha256": "378bd3dfd53e23768af02bf33550b6122206daaee66ea9f800eb727b84be7d4c"
+        },
+        "hillshade": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/hillshade_2048.png",
+          "pixel_format": "8_bit_grayscale_png",
+          "sha256": "056cc14e15114251567a46dfb95037152198d316240b0f15a7590a40158876fe"
+        },
+        "naip_centerline_preview": {
+          "dimensions": [
+            2048,
+            2048
+          ],
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/naip_centerline_preview_2048.png",
+          "pixel_format": "8_bit_rgb_png",
+          "sha256": "526e7d075373def8cf18185a97da3259d9c88bb3654a888e52dd78b3878a6b4e"
+        }
+      },
+      "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
+      "edge_report": {
+        "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/review/stitched_edge_report.json",
+        "sha256": "bbe9f15aac9594b1801a2c98b54b6fe523bca66d1aacec6053fafcae05bc844b"
+      },
+      "promotion_gate": {
+        "can_bind_named_rapid_geometry": false,
+        "can_bind_solver_windows": false,
+        "can_enter_visual_derivative_review": true,
+        "can_import_unreal_landscape": false,
+        "can_promote_full_reach_corridor": false
+      },
+      "route_overlay": {
+        "line_drawn": true,
+        "route_sample_count": 14,
+        "visible_pixel_count": 14
+      },
+      "station_range_m": {
+        "end": 33796.224,
+        "length": 804.672,
+        "start": 32991.552
+      },
+      "window_id": "salmon_falls_folsom_review_32991_33796m"
+    }
+  ]
+}

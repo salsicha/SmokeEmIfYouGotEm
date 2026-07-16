@@ -1,0 +1,133 @@
+{
+  "derived_artifacts": {
+    "heightfield": {
+      "dimensions": [
+        2017,
+        2017
+      ],
+      "elevation_max_m": 777.765747,
+      "elevation_min_m": 224.898407,
+      "elevation_span_m": 552.86734,
+      "normalization": "source DEM min/max mapped linearly to 0..65535",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/heightfield_2017.png",
+      "pixel_format": "16_bit_grayscale_png",
+      "sha256": "e1565dabcce2e47e6b859cbb6d0dd5233824794f8f36e3a708beb325a06a0bd3"
+    },
+    "hillshade": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/hillshade_2048.png",
+      "pixel_format": "8_bit_grayscale_png",
+      "sha256": "1248b4ee7f246b9e457b473a26639b38833d1233d3a6980e4c662396ded64ba1"
+    },
+    "naip_centerline_preview": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/naip_centerline_preview_2048.png",
+      "pixel_format": "8_bit_rgb_png",
+      "sha256": "186e25d7ca5a58e3dd84d5fbfd2f6a1995e2bcd802f30de241499fb09c81d4e6"
+    }
+  },
+  "display_name": "Coloma Valley Transit",
+  "edge_seams": {
+    "downstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "upper_gorge_24000_28500m",
+      "review_required": true,
+      "seam_id": "coloma_valley_10000_24000m__to__upper_gorge_24000_28500m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 465.939,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 650.406
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 3.897714,
+          "y_ratio": 2.320017
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 3.897717,
+          "y_ratio": 2.320016
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "coloma_valley_10000_24000m"
+    },
+    "upstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "coloma_valley_10000_24000m",
+      "review_required": true,
+      "seam_id": "upper_chili_bar_to_coloma_2500_10000m__to__coloma_valley_10000_24000m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 842.711,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 3492.789
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 2.208202,
+          "y_ratio": 1.733902
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 2.208203,
+          "y_ratio": 1.733903
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "upper_chili_bar_to_coloma_2500_10000m"
+    }
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
+    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/manifest.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false
+  },
+  "review_notes": [
+    "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
+    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
+    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "route_overlay": {
+    "line_drawn": true,
+    "route_sample_count": 171,
+    "visible_pixel_count": 171
+  },
+  "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
+  "station_range_m": {
+    "end": 24000.0,
+    "length": 14000.0,
+    "start": 10000.0
+  },
+  "status": "review_derivatives_generated_not_promoted",
+  "task_id": "A1",
+  "window_id": "coloma_valley_10000_24000m"
+}

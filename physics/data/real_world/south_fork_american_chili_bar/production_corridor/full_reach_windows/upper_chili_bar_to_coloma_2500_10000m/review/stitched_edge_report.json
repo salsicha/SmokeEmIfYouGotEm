@@ -1,0 +1,133 @@
+{
+  "derived_artifacts": {
+    "heightfield": {
+      "dimensions": [
+        2017,
+        2017
+      ],
+      "elevation_max_m": 842.322815,
+      "elevation_min_m": 303.693512,
+      "elevation_span_m": 538.629303,
+      "normalization": "source DEM min/max mapped linearly to 0..65535",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/heightfield_2017.png",
+      "pixel_format": "16_bit_grayscale_png",
+      "sha256": "402c2fba7b343f3ecbbc006ed063b407c9195fa327c6048071dad4f341bbb0af"
+    },
+    "hillshade": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/hillshade_2048.png",
+      "pixel_format": "8_bit_grayscale_png",
+      "sha256": "5f8d1baca7a32d95b9218d4ebd1e8d62aa06215d0d49c7a5984e8ee0fc0b34d2"
+    },
+    "naip_centerline_preview": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/naip_centerline_preview_2048.png",
+      "pixel_format": "8_bit_rgb_png",
+      "sha256": "68b6301b4320530f828fc92e818d6d5c89805c0b1ed7412a706554aecbd3c1c8"
+    }
+  },
+  "display_name": "Upper Chili Bar To Coloma Checkpoint",
+  "edge_seams": {
+    "downstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "coloma_valley_10000_24000m",
+      "review_required": true,
+      "seam_id": "upper_chili_bar_to_coloma_2500_10000m__to__coloma_valley_10000_24000m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 842.711,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 3492.789
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 2.208202,
+          "y_ratio": 1.733902
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 2.208203,
+          "y_ratio": 1.733903
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "upper_chili_bar_to_coloma_2500_10000m"
+    },
+    "upstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "upper_chili_bar_to_coloma_2500_10000m",
+      "review_required": true,
+      "seam_id": "chili_bar_existing_pilot_0_2500m__to__upper_chili_bar_to_coloma_2500_10000m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 689.402,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 1678.703
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 1.883036,
+          "y_ratio": 2.080646
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 1.883036,
+          "y_ratio": 2.080647
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "chili_bar_existing_pilot_0_2500m"
+    }
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
+    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false
+  },
+  "review_notes": [
+    "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
+    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
+    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "route_overlay": {
+    "line_drawn": true,
+    "route_sample_count": 118,
+    "visible_pixel_count": 118
+  },
+  "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
+  "station_range_m": {
+    "end": 10000.0,
+    "length": 7500.0,
+    "start": 2500.0
+  },
+  "status": "review_derivatives_generated_not_promoted",
+  "task_id": "A1",
+  "window_id": "upper_chili_bar_to_coloma_2500_10000m"
+}

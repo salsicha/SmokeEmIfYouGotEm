@@ -1,0 +1,133 @@
+{
+  "derived_artifacts": {
+    "heightfield": {
+      "dimensions": [
+        2017,
+        2017
+      ],
+      "elevation_max_m": 497.077667,
+      "elevation_min_m": 211.542007,
+      "elevation_span_m": 285.53566,
+      "normalization": "source DEM min/max mapped linearly to 0..65535",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/heightfield_2017.png",
+      "pixel_format": "16_bit_grayscale_png",
+      "sha256": "ebd97c7a5fdadff416a6561a5bc4d5e1e84b8dc47ddc9682986bd0a60bf00fb8"
+    },
+    "hillshade": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/hillshade_2048.png",
+      "pixel_format": "8_bit_grayscale_png",
+      "sha256": "7833fc19b4c4ee7d67ee6f080bc513c7d1d61a131418d7e19581ebe7cbd7aa68"
+    },
+    "naip_centerline_preview": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/naip_centerline_preview_2048.png",
+      "pixel_format": "8_bit_rgb_png",
+      "sha256": "ac520ef07abd561f4754c6ee8cddef6bb255e2c65effc9751f0573daa6f1b336"
+    }
+  },
+  "display_name": "Upper Gorge Rapid Windows",
+  "edge_seams": {
+    "downstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "lower_gorge_to_salmon_falls_28500_32991m",
+      "review_required": true,
+      "seam_id": "upper_gorge_24000_28500m__to__lower_gorge_to_salmon_falls_28500_32991m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 666.86,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 2610.395
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 1.261388,
+          "y_ratio": 1.411999
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 1.261388,
+          "y_ratio": 1.411998
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "upper_gorge_24000_28500m"
+    },
+    "upstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "upper_gorge_24000_28500m",
+      "review_required": true,
+      "seam_id": "coloma_valley_10000_24000m__to__upper_gorge_24000_28500m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 465.939,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 650.406
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 3.897714,
+          "y_ratio": 2.320017
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 3.897717,
+          "y_ratio": 2.320016
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "coloma_valley_10000_24000m"
+    }
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
+    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/manifest.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false
+  },
+  "review_notes": [
+    "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
+    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
+    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "route_overlay": {
+    "line_drawn": true,
+    "route_sample_count": 72,
+    "visible_pixel_count": 72
+  },
+  "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
+  "station_range_m": {
+    "end": 28500.0,
+    "length": 4500.0,
+    "start": 24000.0
+  },
+  "status": "review_derivatives_generated_not_promoted",
+  "task_id": "A1",
+  "window_id": "upper_gorge_24000_28500m"
+}

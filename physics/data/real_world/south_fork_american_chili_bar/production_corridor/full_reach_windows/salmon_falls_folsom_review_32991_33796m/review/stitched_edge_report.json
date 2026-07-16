@@ -1,0 +1,104 @@
+{
+  "derived_artifacts": {
+    "heightfield": {
+      "dimensions": [
+        2017,
+        2017
+      ],
+      "elevation_max_m": 292.522797,
+      "elevation_min_m": 195.549942,
+      "elevation_span_m": 96.972855,
+      "normalization": "source DEM min/max mapped linearly to 0..65535",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/heightfield_2017.png",
+      "pixel_format": "16_bit_grayscale_png",
+      "sha256": "378bd3dfd53e23768af02bf33550b6122206daaee66ea9f800eb727b84be7d4c"
+    },
+    "hillshade": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/hillshade_2048.png",
+      "pixel_format": "8_bit_grayscale_png",
+      "sha256": "056cc14e15114251567a46dfb95037152198d316240b0f15a7590a40158876fe"
+    },
+    "naip_centerline_preview": {
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/naip_centerline_preview_2048.png",
+      "pixel_format": "8_bit_rgb_png",
+      "sha256": "526e7d075373def8cf18185a97da3259d9c88bb3654a888e52dd78b3878a6b4e"
+    }
+  },
+  "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
+  "edge_seams": {
+    "downstream": null,
+    "upstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "salmon_falls_folsom_review_32991_33796m",
+      "review_required": true,
+      "seam_id": "lower_gorge_to_salmon_falls_28500_32991m__to__salmon_falls_folsom_review_32991_33796m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 966.477,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 585.436
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 2.791317,
+          "y_ratio": 3.342512
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 2.791311,
+          "y_ratio": 3.34252
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+    }
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
+    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/manifest.json"
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_visual_derivative_review": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false
+  },
+  "review_notes": [
+    "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
+    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
+    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "route_overlay": {
+    "line_drawn": true,
+    "route_sample_count": 14,
+    "visible_pixel_count": 14
+  },
+  "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
+  "station_range_m": {
+    "end": 33796.224,
+    "length": 804.672,
+    "start": 32991.552
+  },
+  "status": "review_derivatives_generated_not_promoted",
+  "task_id": "A1",
+  "window_id": "salmon_falls_folsom_review_32991_33796m"
+}

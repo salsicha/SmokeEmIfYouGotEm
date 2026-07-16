@@ -26,11 +26,14 @@
     "all_source_files_present": true,
     "all_window_manifests_present": true,
     "existing_pilot_artifact_count": 1,
+    "expected_review_derivative_count": 24,
     "expected_source_file_count": 12,
     "expected_window_manifest_count": 6,
+    "missing_review_derivative_count": 0,
     "missing_source_file_count": 0,
     "missing_window_manifest_count": 0,
     "present_existing_pilot_artifact_count": 1,
+    "present_review_derivative_count": 24,
     "present_source_file_count": 12,
     "present_window_manifest_count": 6,
     "unexpected_file_count": 0,
@@ -61,6 +64,42 @@
         "status": "present"
       },
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 4691573,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "1d08083174ce3a3a148e2e5befb024556ff39299aeab6977950cd844b704d5bd",
+          "status": "present"
+        },
+        {
+          "byte_count": 2418315,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "6fbca4505baa5d7dc337af7d9d4621ecdbe4ed3a1b56132c6fc828db21664ba4",
+          "status": "present"
+        },
+        {
+          "byte_count": 7770338,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "d59f9a2122e266f0ef97ce09cd3d57d8aa083178e1e97c3d8643f64a30e6a7a7",
+          "status": "present"
+        },
+        {
+          "byte_count": 4125,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "101d21203b6fd36315ce6e97ba969bea563e9f0f6b22e9958d6646abd2c767f4",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 2500.0,
@@ -100,6 +139,42 @@
       "display_name": "Upper Chili Bar To Coloma Checkpoint",
       "existing_artifact": null,
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 5123828,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "402c2fba7b343f3ecbbc006ed063b407c9195fa327c6048071dad4f341bbb0af",
+          "status": "present"
+        },
+        {
+          "byte_count": 2619117,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "5f8d1baca7a32d95b9218d4ebd1e8d62aa06215d0d49c7a5984e8ee0fc0b34d2",
+          "status": "present"
+        },
+        {
+          "byte_count": 8147719,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "68b6301b4320530f828fc92e818d6d5c89805c0b1ed7412a706554aecbd3c1c8",
+          "status": "present"
+        },
+        {
+          "byte_count": 5122,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "f7c9b97c354eba28d520138f48d6bc4e90ad5db47abe46903ed21266a9563097",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 10000.0,
@@ -139,6 +214,42 @@
       "display_name": "Coloma Valley Transit",
       "existing_artifact": null,
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 5430147,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "e1565dabcce2e47e6b859cbb6d0dd5233824794f8f36e3a708beb325a06a0bd3",
+          "status": "present"
+        },
+        {
+          "byte_count": 2667689,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "1248b4ee7f246b9e457b473a26639b38833d1233d3a6980e4c662396ded64ba1",
+          "status": "present"
+        },
+        {
+          "byte_count": 8890652,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "186e25d7ca5a58e3dd84d5fbfd2f6a1995e2bcd802f30de241499fb09c81d4e6",
+          "status": "present"
+        },
+        {
+          "byte_count": 5014,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "8b1bf3b847e22cef062189f5de161f5f8697779588fb052e697c2172bf666522",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 24000.0,
@@ -178,6 +289,42 @@
       "display_name": "Upper Gorge Rapid Windows",
       "existing_artifact": null,
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 4564459,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "ebd97c7a5fdadff416a6561a5bc4d5e1e84b8dc47ddc9682986bd0a60bf00fb8",
+          "status": "present"
+        },
+        {
+          "byte_count": 2222909,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "7833fc19b4c4ee7d67ee6f080bc513c7d1d61a131418d7e19581ebe7cbd7aa68",
+          "status": "present"
+        },
+        {
+          "byte_count": 8310088,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "ac520ef07abd561f4754c6ee8cddef6bb255e2c65effc9751f0573daa6f1b336",
+          "status": "present"
+        },
+        {
+          "byte_count": 5006,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "fe6db8dd0bdf843d2e03248f6de8b4823c1fdb779a65b4852faea2233569fc75",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 28500.0,
@@ -217,6 +364,42 @@
       "display_name": "Lower Gorge To Salmon Falls Source Window",
       "existing_artifact": null,
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 4720662,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "220474acacc5da81b567ebec7c3988bb4aea43601faddbab238694c239731ae6",
+          "status": "present"
+        },
+        {
+          "byte_count": 2235361,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "cfab372bd9bf3a860cc6e74fb14fe2cb82a139e8440a4ea2acb2639fffc55fc1",
+          "status": "present"
+        },
+        {
+          "byte_count": 8566459,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "250d1780fc1fa4327fa06e0dbafc7541b8a5dbf0f602717f87d9eddf9f39224a",
+          "status": "present"
+        },
+        {
+          "byte_count": 5164,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "0b0c829b6ea56c3a232146ae948f1c80c25f8e27975154a98c7c2aa1fc09448a",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 32991.552,
@@ -256,6 +439,42 @@
       "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
       "existing_artifact": null,
       "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 4365140,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "378bd3dfd53e23768af02bf33550b6122206daaee66ea9f800eb727b84be7d4c",
+          "status": "present"
+        },
+        {
+          "byte_count": 1727150,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "056cc14e15114251567a46dfb95037152198d316240b0f15a7590a40158876fe",
+          "status": "present"
+        },
+        {
+          "byte_count": 6650183,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "526e7d075373def8cf18185a97da3259d9c88bb3654a888e52dd78b3878a6b4e",
+          "status": "present"
+        },
+        {
+          "byte_count": 4207,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "bbe9f15aac9594b1801a2c98b54b6fe523bca66d1aacec6053fafcae05bc844b",
+          "status": "present"
+        }
+      ],
       "source_file_expected_count": 2,
       "source_file_present_count": 2,
       "station_end_m": 33796.224,
