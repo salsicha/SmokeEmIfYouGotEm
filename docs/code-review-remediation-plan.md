@@ -171,6 +171,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Removed the V21 texture generator, compound-branchlet compare driver, and two V21-specific snapshots. Preserved the V21 manifest, source report, review JSON, captures, and contact-sheet evidence unchanged; V22 may continue reading that governed evidence as its historical baseline.
 - Verification: `import raftsim` succeeds, no Python source imports the deleted generator, and the full suite reports **542 passed / 3 skipped**. The pass count changed only by the two intentionally retired V21 snapshots.
 
+### 2026-07-16 Finding 3 Step 3.2 V20 Family Retirement
+
+- After V21's removal eliminated the last live dependency, retired the V20 texture generator, the V20/V20.1-V20.4 compare drivers, and the five corresponding executable snapshots as one locked experiment family.
+- Preserved every V20-family manifest, source report, review JSON, capture, and contact sheet. Later historical drivers that still import V20 metric helpers are superseded and are removed in the following driver-cleanup slice; the current V43 driver remains independent.
+- Verification: `import raftsim` succeeds, no Python source imports the deleted V20 generator, and the full suite reports **537 passed / 3 skipped**. The pass count changed only by the five intentionally retired V20-family snapshots.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
