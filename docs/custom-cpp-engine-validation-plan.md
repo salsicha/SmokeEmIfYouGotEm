@@ -20,7 +20,25 @@ Fallback or initial-state-only GeoClaw normalization is useful for schema smoke 
 
 ## Current Closure State
 
-The regenerated Milestone 16/18 gate now approves live Unreal custom water after target-hardware confirmation. GeoClaw reference runs, C++ run manifests, GeoClaw/C++ threshold comparisons, geometry validation, raft-coupling agreement, promoted regression fixtures, runtime budgets, deterministic replay checks, the full C++ validation gate, and the GeoClaw-to-Unreal readiness report all pass.
+### 2026-07-15 Uncalibrated solver-truth measurement
+
+The opt-in `disable_fixture_calibrations` path disables fixture-scoped profile playback, correction chains, boundary exceptions, and `fixture_kind` source treatments while preserving the ordinary calibrated runtime default. `physics/reports/solver_truth_baseline/uncalibrated_baseline.json` and `.md` record the full Milestone 16 matrix from source commit `accfaeeef1b88baf9c33a024c00023cdfa9c80c4`, including every row's actual threshold values and the solver binary SHA-256.
+
+With fixture calibrations and reference playback disabled, **6 of 40 rows pass and 34 fail**. The passing rows are flat pool in both modes, finite-volume uniform channel, reduced wet/dry shoreline, and sloping Manning channel in both modes. No rafting-feature, South Fork real-world, or stitched cascading row passes. Several reduced-mode whitewater rows are unstable by very large margins, including lateral-wave and boulder-garden field, mass, slope, and energy metrics.
+
+Therefore the prior 40-of-40 result is calibrated/reference-playback evidence, not solver-parity evidence. It does not approve live Unreal custom water. Live-water approval is suspended until the comparison gate labels solver versus playback rows honestly and the owner chooses the validation strategy described by the forthcoming water-solver decision memo.
+
+Reproduce the measurement from `physics/` with:
+
+```text
+cmake -S cpp -B /private/tmp/raftsim-solver-truth-build -DCMAKE_BUILD_TYPE=Release
+cmake --build /private/tmp/raftsim-solver-truth-build --target raftsim_water_solver
+uv run python -m raftsim.examples.generate_solver_truth_baseline --cpp-solver /private/tmp/raftsim-solver-truth-build/raftsim_water_solver
+```
+
+### Calibrated closure record
+
+The regenerated Milestone 16/18 calibrated gate previously recorded live Unreal custom-water approval after target-hardware confirmation. GeoClaw reference runs, C++ run manifests, calibrated GeoClaw/C++ threshold comparisons, geometry validation, raft-coupling agreement, promoted regression fixtures, runtime budgets, deterministic replay checks, the full C++ validation gate, and the GeoClaw-to-Unreal readiness report all passed under that calibrated configuration. This record is retained for audit history but is superseded for solver approval by the uncalibrated measurement above.
 
 The accepted closure evidence is:
 
