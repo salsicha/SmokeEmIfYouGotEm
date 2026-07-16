@@ -183,6 +183,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Added a retention guard that rejects any returning historical driver or versioned texture generator and requires all 47 governed cypress review JSONs to remain present and nonempty. No report, review, capture, contact sheet, manifest, or map was removed.
 - Verification: the retention guard passes **3/3**, `import raftsim` succeeds, and the full suite reports **539 passed / 3 skipped**. The two-test increase is exactly the new executable-surface and evidence-presence guards.
 
+### 2026-07-16 Finding 3 Step 3.3 Snapshot Suite Split
+
+- Deleted 36 executable snapshots for rejected V1-V42 cypress iterations while retaining the two source/current invariants, the current V43 gate, and all 47 governed review JSONs. This is the intentional collection/runtime reduction required by the retirement policy; the reviews, not live tests, preserve historical outcomes.
+- Replaced the 11,943-line residual monolith with ten per-concern test files and a non-collected shared support module. The largest test file is 1,900 lines; a layout guard rejects reintroduction of the monolith, a file at or above 2,000 lines, or a missing concern split.
+- Verification: the focused split/retention suite passes **49/49** and the full suite reports **504 passed / 3 skipped in 138.61 seconds**. Relative to the preceding 539-pass run, the count changes only by deleting 36 historical snapshots and adding one layout guard; current V43 and shared behavior remain green.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

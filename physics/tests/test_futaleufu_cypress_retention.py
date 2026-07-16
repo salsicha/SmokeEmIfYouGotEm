@@ -41,3 +41,12 @@ def test_locked_cypress_review_evidence_is_retained():
 
     assert len(reviews) == 47
     assert all(review.stat().st_size > 0 for review in reviews)
+
+
+def test_photoreal_test_suite_stays_split_by_concern():
+    tests_root = PHYSICS_ROOT / "tests"
+    split_tests = sorted(tests_root.glob("test_photoreal_*.py"))
+
+    assert not (tests_root / "test_photoreal_environment_assets.py").exists()
+    assert len(split_tests) == 10
+    assert all(len(path.read_text(encoding="utf-8").splitlines()) < 2_000 for path in split_tests)
