@@ -1,0 +1,1489 @@
+{
+  "cases": [
+    {
+      "case_id": "uniform_reference_download",
+      "intent": "Symmetric perimeter load should keep roll and pitch bias near zero.",
+      "loads": [
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_port_0",
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_port_1",
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_port_2",
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_port_3",
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_bow_0",
+          "local_position_m": {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_bow_1",
+          "local_position_m": {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_starboard_3",
+          "local_position_m": {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_starboard_2",
+          "local_position_m": {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_starboard_1",
+          "local_position_m": {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_starboard_0",
+          "local_position_m": {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_stern_1",
+          "local_position_m": {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        },
+        {
+          "force_n": 80.0,
+          "load_id": "uniform_stern_0",
+          "local_position_m": {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          "source": "uniform_reference_guardrail"
+        }
+      ],
+      "result": {
+        "bounded_segment_count": 0,
+        "max_freeboard_loss_m": 0.002186406370484414,
+        "max_pressure_delta_pa": 546.8215994531782,
+        "pitch_load_bias_nm": 0.0,
+        "roll_load_bias_nm": -1.4210854715202004e-14,
+        "schema": "raftsim.flexible_raft.d1_compliant_tube_reference.v1",
+        "scoring_authority": "disabled_reference_only",
+        "scoring_authority_enabled": false,
+        "segments": [
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "port_0",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "port_1",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "port_2",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "port_3",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.002186406370484414,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.002186406370484414,
+            "local_position_m": {
+              "x": 2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 546.8215994531782,
+            "pressure_pa": 18546.82159945318,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "bow_0",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.23366594958736597
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.002186406370484414,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.002186406370484414,
+            "local_position_m": {
+              "x": 2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 546.8215994531782,
+            "pressure_pa": 18546.82159945318,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "bow_1",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.23366594958736597
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "starboard_3",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "starboard_2",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "starboard_1",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.001932173071590878,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.001932173071590878,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 483.23769254001803,
+            "pressure_pa": 18483.237692540017,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "starboard_0",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.2644535575925459
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.002186406370484414,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.002186406370484414,
+            "local_position_m": {
+              "x": -2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 546.8215994531782,
+            "pressure_pa": 18546.82159945318,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "stern_1",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.23366594958736597
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.002186406370484414,
+            "direct_load_n": 51.99999999999999,
+            "effective_load_n": 79.99999999999999,
+            "floor_load_n": 12.799999999999999,
+            "frame_load_n": 5.6000000000000005,
+            "freeboard_loss_m": 0.002186406370484414,
+            "local_position_m": {
+              "x": -2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 546.8215994531782,
+            "pressure_pa": 18546.82159945318,
+            "received_lacing_load_n": 9.6,
+            "segment_id": "stern_0",
+            "volume_loss_m3": 0.00031987125200186984,
+            "volume_m3": 0.23366594958736597
+          }
+        ],
+        "total_applied_load_n": 960.0,
+        "total_effective_tube_load_n": 959.9999999999998,
+        "total_volume_loss_m3": 0.003838455024022438
+      },
+      "rigid_state_layer": {
+        "state_orientation_quaternion": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "state_position_m": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "world_segment_positions_m": [
+          {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "starboard_contact_push",
+      "intent": "Side contact should deform the contacted tube and lacing neighbors.",
+      "loads": [
+        {
+          "force_n": 1450.0,
+          "load_id": "starboard_mid_contact",
+          "local_position_m": {
+            "x": 0.35,
+            "y": 0.95,
+            "z": 0.0
+          },
+          "source": "abstract_side_contact_guardrail"
+        }
+      ],
+      "result": {
+        "bounded_segment_count": 0,
+        "max_freeboard_loss_m": 0.024456078117604956,
+        "max_pressure_delta_pa": 6116.480418806,
+        "pitch_load_bias_nm": 600.11875,
+        "roll_load_bias_nm": 1060.675,
+        "schema": "raftsim.flexible_raft.d1_compliant_tube_reference.v1",
+        "scoring_authority": "disabled_reference_only",
+        "scoring_authority_enabled": false,
+        "segments": [
+          {
+            "bounded": false,
+            "compression_m": 0.0004669418256344622,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0004669418256344622,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 116.7824423638377,
+            "pressure_pa": 18116.782442363838,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_0",
+            "volume_loss_m3": 7.730221923378522e-05,
+            "volume_m3": 0.264696126625314
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0016926641179249259,
+            "direct_load_n": 0.0,
+            "effective_load_n": 70.08333333333334,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 50.75000000000001,
+            "freeboard_loss_m": 0.0016926641179249259,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 423.33635356891176,
+            "pressure_pa": 18423.336353568913,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_1",
+            "volume_loss_m3": 0.00028022054472247147,
+            "volume_m3": 0.2644932082998253
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0004669418256344622,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0004669418256344622,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 116.7824423638377,
+            "pressure_pa": 18116.782442363838,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_2",
+            "volume_loss_m3": 7.730221923378522e-05,
+            "volume_m3": 0.264696126625314
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0004669418256344622,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0004669418256344622,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 116.7824423638377,
+            "pressure_pa": 18116.782442363838,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_3",
+            "volume_loss_m3": 7.730221923378522e-05,
+            "volume_m3": 0.264696126625314
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0005283815395337336,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0005283815395337336,
+            "local_position_m": {
+              "x": 2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 132.14855320118477,
+            "pressure_pa": 18132.148553201187,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "bow_0",
+            "volume_loss_m3": 7.730221923378523e-05,
+            "volume_m3": 0.23390851862013404
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0005283815395337336,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0005283815395337336,
+            "local_position_m": {
+              "x": 2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 132.14855320118477,
+            "pressure_pa": 18132.148553201187,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "bow_1",
+            "volume_loss_m3": 7.730221923378523e-05,
+            "volume_m3": 0.23390851862013404
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0025681800409895423,
+            "direct_load_n": 0.0,
+            "effective_load_n": 106.33333333333333,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0025681800409895423,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 642.3034330011074,
+            "pressure_pa": 18642.303433001107,
+            "received_lacing_load_n": 87.0,
+            "segment_id": "starboard_3",
+            "volume_loss_m3": 0.0004251622057858187,
+            "volume_m3": 0.264348266638762
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.024456078117604956,
+            "direct_load_n": 942.4999999999999,
+            "effective_load_n": 1012.5833333333333,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 50.75000000000001,
+            "freeboard_loss_m": 0.024456078117604956,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 6116.480418806,
+            "pressure_pa": 24116.480418806,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "starboard_2",
+            "volume_loss_m3": 0.004048703732369501,
+            "volume_m3": 0.2607247251121783
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0025681800409895423,
+            "direct_load_n": 0.0,
+            "effective_load_n": 106.33333333333333,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0025681800409895423,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 642.3034330011074,
+            "pressure_pa": 18642.303433001107,
+            "received_lacing_load_n": 87.0,
+            "segment_id": "starboard_1",
+            "volume_loss_m3": 0.0004251622057858187,
+            "volume_m3": 0.264348266638762
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0004669418256344622,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0004669418256344622,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 116.7824423638377,
+            "pressure_pa": 18116.782442363838,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "starboard_0",
+            "volume_loss_m3": 7.730221923378522e-05,
+            "volume_m3": 0.264696126625314
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0005283815395337336,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0005283815395337336,
+            "local_position_m": {
+              "x": -2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 132.14855320118477,
+            "pressure_pa": 18132.148553201187,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "stern_1",
+            "volume_loss_m3": 7.730221923378523e-05,
+            "volume_m3": 0.23390851862013404
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0005283815395337336,
+            "direct_load_n": 0.0,
+            "effective_load_n": 19.333333333333332,
+            "floor_load_n": 19.333333333333332,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0005283815395337336,
+            "local_position_m": {
+              "x": -2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 132.14855320118477,
+            "pressure_pa": 18132.148553201187,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "stern_0",
+            "volume_loss_m3": 7.730221923378523e-05,
+            "volume_m3": 0.23390851862013404
+          }
+        ],
+        "total_applied_load_n": 1450.0,
+        "total_effective_tube_load_n": 1450.0,
+        "total_volume_loss_m3": 0.005797666442533891
+      },
+      "rigid_state_layer": {
+        "state_orientation_quaternion": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "state_position_m": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "world_segment_positions_m": [
+          {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "case_id": "bow_floor_frame_transfer",
+      "intent": "Bow load should show floor spread and frame transfer across the perimeter.",
+      "loads": [
+        {
+          "force_n": 1050.0,
+          "load_id": "bow_floor_download",
+          "local_position_m": {
+            "x": 2.05,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "source": "abstract_floor_frame_guardrail"
+        }
+      ],
+      "result": {
+        "bounded_segment_count": 0,
+        "max_freeboard_loss_m": 0.02003978088947121,
+        "max_pressure_delta_pa": 5011.961722488037,
+        "pitch_load_bias_nm": 1704.4124999999997,
+        "roll_load_bias_nm": 354.1124999999999,
+        "schema": "raftsim.flexible_raft.d1_compliant_tube_reference.v1",
+        "scoring_authority": "disabled_reference_only",
+        "scoring_authority_enabled": false,
+        "segments": [
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_0",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_1",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_2",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": -0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "port_3",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0021044161315912496,
+            "direct_load_n": 0.0,
+            "effective_load_n": 77.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0021044161315912496,
+            "local_position_m": {
+              "x": 2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 526.3157894736842,
+            "pressure_pa": 18526.315789473683,
+            "received_lacing_load_n": 63.0,
+            "segment_id": "bow_0",
+            "volume_loss_m3": 0.00030787608005179983,
+            "volume_m3": 0.23367794475931603
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.02003978088947121,
+            "direct_load_n": 682.4999999999999,
+            "effective_load_n": 733.2499999999999,
+            "floor_load_n": 14.0,
+            "frame_load_n": 36.75,
+            "freeboard_loss_m": 0.02003978088947121,
+            "local_position_m": {
+              "x": 2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 5011.961722488037,
+            "pressure_pa": 23011.961722488035,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "bow_1",
+            "volume_loss_m3": 0.002931819944129638,
+            "volume_m3": 0.2310540008952382
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0018597165814062202,
+            "direct_load_n": 0.0,
+            "effective_load_n": 77.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0018597165814062202,
+            "local_position_m": {
+              "x": 1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 465.1162790697674,
+            "pressure_pa": 18465.116279069767,
+            "received_lacing_load_n": 63.0,
+            "segment_id": "starboard_3",
+            "volume_loss_m3": 0.0003078760800517998,
+            "volume_m3": 0.264465552764496
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": 0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "starboard_2",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": -0.5375000000000001,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "starboard_1",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.00033813028752840377,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.00033813028752840377,
+            "local_position_m": {
+              "x": -1.6124999999999998,
+              "y": 0.95,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 84.56659619450318,
+            "pressure_pa": 18084.5665961945,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "starboard_0",
+            "volume_loss_m3": 5.5977469100327243e-05,
+            "volume_m3": 0.26471745137544744
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0003826211148347726,
+            "direct_load_n": 0.0,
+            "effective_load_n": 14.0,
+            "floor_load_n": 14.0,
+            "frame_load_n": 0.0,
+            "freeboard_loss_m": 0.0003826211148347726,
+            "local_position_m": {
+              "x": -2.15,
+              "y": 0.47499999999999987,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 95.69377990430621,
+            "pressure_pa": 18095.693779904308,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "stern_1",
+            "volume_loss_m3": 5.597746910032724e-05,
+            "volume_m3": 0.2339298433702675
+          },
+          {
+            "bounded": false,
+            "compression_m": 0.0013870015412760506,
+            "direct_load_n": 0.0,
+            "effective_load_n": 50.75,
+            "floor_load_n": 14.0,
+            "frame_load_n": 36.75,
+            "freeboard_loss_m": 0.0013870015412760506,
+            "local_position_m": {
+              "x": -2.15,
+              "y": -0.475,
+              "z": 0.0
+            },
+            "pressure_delta_pa": 346.88995215311,
+            "pressure_pa": 18346.88995215311,
+            "received_lacing_load_n": 0.0,
+            "segment_id": "stern_0",
+            "volume_loss_m3": 0.00020291832548868623,
+            "volume_m3": 0.23378290251387915
+          }
+        ],
+        "total_applied_load_n": 1050.0,
+        "total_effective_tube_load_n": 1050.0,
+        "total_volume_loss_m3": 0.004198310182524542
+      },
+      "rigid_state_layer": {
+        "state_orientation_quaternion": {
+          "w": 1.0,
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "state_position_m": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "world_segment_positions_m": [
+          {
+            "x": -1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": -0.95,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": -0.475,
+            "z": 0.0
+          },
+          {
+            "x": 2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": 1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": 0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -0.5375000000000001,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -1.6124999999999998,
+            "y": 0.95,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": 0.47499999999999987,
+            "z": 0.0
+          },
+          {
+            "x": -2.15,
+            "y": -0.475,
+            "z": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "layout": [
+    {
+      "closed_loop_next_index": 1,
+      "closed_loop_previous_index": 11,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 0,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -1.6124999999999998,
+        "y": -0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "port_0",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 2,
+      "closed_loop_previous_index": 0,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 1,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -0.5375000000000001,
+        "y": -0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "port_1",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 3,
+      "closed_loop_previous_index": 1,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 2,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 0.5375000000000001,
+        "y": -0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "port_2",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 4,
+      "closed_loop_previous_index": 2,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 3,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 1.6124999999999998,
+        "y": -0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": -1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "port_3",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 5,
+      "closed_loop_previous_index": 3,
+      "compliance_m3_per_pa": 5.849645520984197e-07,
+      "contact_area_m2": 0.1463,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 4,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 2.15,
+        "y": -0.475,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.23398582083936784,
+      "segment_id": "bow_0",
+      "tributary_length_m": 0.95
+    },
+    {
+      "closed_loop_next_index": 6,
+      "closed_loop_previous_index": 4,
+      "compliance_m3_per_pa": 5.849645520984197e-07,
+      "contact_area_m2": 0.1463,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 5,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 2.15,
+        "y": 0.47499999999999987,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.23398582083936784,
+      "segment_id": "bow_1",
+      "tributary_length_m": 0.95
+    },
+    {
+      "closed_loop_next_index": 7,
+      "closed_loop_previous_index": 5,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 6,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 1.6124999999999998,
+        "y": 0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "starboard_3",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 8,
+      "closed_loop_previous_index": 6,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 7,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": 0.5375000000000001,
+        "y": 0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "starboard_2",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 9,
+      "closed_loop_previous_index": 7,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 8,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -0.5375000000000001,
+        "y": 0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "starboard_1",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 10,
+      "closed_loop_previous_index": 8,
+      "compliance_m3_per_pa": 6.619335721113696e-07,
+      "contact_area_m2": 0.16555,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 9,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -1.6124999999999998,
+        "y": 0.95,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": 0.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.2647734288445478,
+      "segment_id": "starboard_0",
+      "tributary_length_m": 1.075
+    },
+    {
+      "closed_loop_next_index": 11,
+      "closed_loop_previous_index": 9,
+      "compliance_m3_per_pa": 5.849645520984197e-07,
+      "contact_area_m2": 0.1463,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 10,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -2.15,
+        "y": 0.47499999999999987,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": -1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.23398582083936784,
+      "segment_id": "stern_1",
+      "tributary_length_m": 0.95
+    },
+    {
+      "closed_loop_next_index": 0,
+      "closed_loop_previous_index": 10,
+      "compliance_m3_per_pa": 5.849645520984197e-07,
+      "contact_area_m2": 0.1463,
+      "floor_coupling_fraction": 0.16,
+      "frame_coupling_fraction": 0.07,
+      "index": 11,
+      "lacing_coupling_fraction": 0.12,
+      "local_position_m": {
+        "x": -2.15,
+        "y": -0.475,
+        "z": 0.0
+      },
+      "next_segment_id": null,
+      "nominal_pressure_pa": 18000.0,
+      "outward_normal": {
+        "x": -1.0,
+        "y": 0.0,
+        "z": 0.0
+      },
+      "previous_segment_id": null,
+      "rest_volume_m3": 0.23398582083936784,
+      "segment_id": "stern_0",
+      "tributary_length_m": 0.95
+    }
+  ],
+  "model_contract": {
+    "crew_seat_load_authority": "deferred_to_d2",
+    "deterministic_python_reference_first": true,
+    "floor_lacing_frame_coupling_recorded": true,
+    "gameplay_scoring_authority": "disabled_until_d6_fixture_suite_and_design_review",
+    "layers_on_rigid_6dof_raft_state": true,
+    "pressure_volume_compliant_perimeter_tubes": true
+  },
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_inform_engine_port": true,
+    "requires_before_runtime_authority": [
+      "D2 crew/seat loads coupled into tube deformation and freeboard",
+      "D3-D6 flexible-raft fixture suite",
+      "C++/Unreal implementation parity against this reference",
+      "human gameplay review for flips, wraps, pins, and releases"
+    ]
+  },
+  "schema": "raftsim.flexible_raft.d1_compliant_tube_reference.v1",
+  "scoring_authority": "disabled_reference_only",
+  "scoring_authority_enabled": false,
+  "status": "reference_fixture_recorded_not_gameplay_authority"
+}
