@@ -15,7 +15,21 @@ add_library(raftsim_water
   src/json.cpp
   src/numpy_io.cpp
   src/scenario.cpp
-  src/solver.cpp
+  src/solver_constriction_01.cpp
+  src/solver_constriction_02.cpp
+  src/solver_constriction_03.cpp
+  src/solver_constriction_04.cpp
+  src/solver_constriction_05.cpp
+  src/solver_constriction_06.cpp
+  src/solver_constriction_07.cpp
+  src/solver_constriction_08.cpp
+  src/solver_constriction_09.cpp
+  src/solver_constriction_10.cpp
+  src/solver_constriction_11.cpp
+  src/solver_diagnostics.cpp
+  src/solver_numerics.cpp
+  src/solver_output.cpp
+  src/solver_runtime.cpp
 )
 target_include_directories(raftsim_water PUBLIC include)
 target_link_libraries(raftsim_water PUBLIC ZLIB::ZLIB)

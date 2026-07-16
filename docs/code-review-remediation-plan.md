@@ -133,6 +133,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Added a strict schema/shape loader and explicit `calibration_only_not_solver_parity` provenance. This changes storage only: playback enablement, interpolation, bounded response, and emitted manifest fields remain unchanged.
 - Verification: the native C++ targets compile, and fresh dam-break finite-volume, dam-break reduced, and bed-step reduced runs reproduce the pre-change manifest and frame SHA-256 hashes byte for byte.
 
+### 2026-07-16 Finding 2 Step 2.2 Solver Decomposition
+
+- Replaced the 38,573-line `solver.cpp` translation unit with focused runtime, numerics/playback, diagnostics, output, and eleven ordered constriction-correction translation units. Shared private types/declarations and fixture constants now live in bounded internal headers.
+- Kept every solver source/header/output fragment below 3,000 lines and added a source-layout regression guard. The large manifest writer remains one public I/O concern but is physically bounded into include fragments and 100-insertion stream statements so AppleClang no longer reports stack exhaustion while compiling it.
+- This is a mechanical Option B prerequisite, not a new parity claim: the uncalibrated result remains 6 of 40 genuine solver rows, retained playback remains calibration-only, and live custom-water stepping remains blocked.
+- Verification: all native C++ targets compile without warnings, focused C++ solver tests pass, and all pre-split dam-break/bed-step playback manifest and frame hashes remain byte-identical.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
