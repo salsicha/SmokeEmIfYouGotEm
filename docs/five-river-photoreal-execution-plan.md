@@ -173,6 +173,7 @@ Started July 16, 2026 from clean commit `119239d68`.
 - [ ] A1 South Fork American stationing and full-reach corridor repair.
   - [x] Record the current A1 blocker as a reproducible status artifact: the committed published-mile scaffold covers all 20 South Fork rapids, while exact geometry, full Chili Bar-to-Folsom corridor coverage, and flow-band promotion remain blocked pending full-reach hydrography, exact anchors, and guide/geospatial review.
   - [x] Encode the full-reach acquisition and route-validation contract: `hydrography/full_reach_acquisition_plan.json` defines the over-covering Chili Bar-to-Folsom review envelope, planned USGS 3DHP/NHD, 3DEP, NAIP, flow-history, and guide/access pulls, explicit missing Folsom anchor, Coloma checkpoint tolerance, and no-promotion gates for South Fork editor geometry and Meat Grinder/Troublemaker solver windows.
+  - [x] Run and record the small full-reach metadata probe: TNM NHD metadata returns 38 candidate products for the review envelope, while TNM 3DEP and NAIP product metadata return zero hits, so terrain and imagery must use bounded official 3DEP and USDA/APFO NAIP ImageServer/tile-index exports instead of pretending TNM product metadata is sufficient.
 - [ ] B1 asset source survey and intake pipeline hardening.
 - [ ] D1 compliant-tube Python reference model.
 - [ ] D2 seat-load coupling into local tube deformation/freeboard.

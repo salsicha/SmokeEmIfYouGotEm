@@ -30,7 +30,29 @@ def test_south_fork_a1_full_reach_acquisition_plan_is_reproducible():
     assert committed["status"] == "planned_no_source_downloaded_not_geometry_authority"
     assert committed["production_promoted"] is False
     assert committed["review_envelope_wgs84"] == FULL_REACH_REVIEW_ENVELOPE_WGS84
-    assert committed["review_envelope_policy"]["must_clip_to_reviewed_anchors_before_promotion"] is True
+    assert committed["review_envelope_policy"][
+        "must_clip_to_reviewed_anchors_before_promotion"
+    ] is True
+
+
+def test_south_fork_a1_full_reach_acquisition_records_metadata_probe():
+    plan = _load_plan()
+    probe = plan["metadata_probe_2026_07_16"]
+    results = {result["source_class"]: result for result in probe["results"]}
+
+    assert probe["status"] == "metadata_only_no_archives_tiles_or_media_downloaded"
+    assert set(results) == {"hydrography", "terrain_dem_or_lidar", "aerial_imagery"}
+    assert results["hydrography"]["http_status"] == 200
+    assert results["hydrography"]["item_total"] == 38
+    assert results["terrain_dem_or_lidar"]["http_status"] == 200
+    assert results["terrain_dem_or_lidar"]["item_total"] == 0
+    assert results["aerial_imagery"]["http_status"] == 200
+    assert results["aerial_imagery"]["item_total"] == 0
+    assert "bbox=-121.12,38.68,-120.7,38.86" in results["hydrography"][
+        "query_url"
+    ]
+    assert "USGS 3DEP ImageServer" in results["terrain_dem_or_lidar"]["next_action"]
+    assert "USDA/APFO NAIP ImageServer" in results["aerial_imagery"]["next_action"]
 
 
 def test_south_fork_a1_full_reach_acquisition_keeps_anchor_gates_explicit():
@@ -75,12 +97,21 @@ def test_south_fork_a1_full_reach_acquisition_records_source_pull_classes():
         "flow_history",
         "guide_and_access_review",
     }
-    assert source_classes["hydrography"]["status"] == "planned"
+    assert (
+        source_classes["hydrography"]["status"]
+        == "metadata_probe_passed_products_available"
+    )
     assert "bbox=-121.12,38.68,-120.7,38.86" in source_classes["hydrography"]["url"]
+    assert source_classes["terrain_dem_or_lidar"]["status"] == (
+        "tnm_metadata_zero_hits_use_official_3dep_image_service"
+    )
     assert source_classes["terrain_dem_or_lidar"]["target_artifacts"] == [
         "terrain/full_reach_3dep_tile_manifest.json",
         "terrain/full_reach_windowed_heightfields/",
     ]
+    assert source_classes["aerial_imagery"]["status"] == (
+        "tnm_metadata_zero_hits_use_official_naip_image_service"
+    )
     assert source_classes["aerial_imagery"]["target_artifacts"] == [
         "imagery/full_reach_naip_tile_manifest.json",
         "imagery/full_reach_windowed_drapes/",
