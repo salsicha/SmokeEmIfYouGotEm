@@ -61,5 +61,29 @@
       "risk_reduction_from_paid_libraries"
     ]
   },
-  "research_notes_status": "preserve_vendor_and_license_research_as_release_gate_reference_material"
+  "research_notes_status": "preserve_vendor_and_license_research_as_release_gate_reference_material",
+  "open_source_repo_intake": {
+    "b1_contract": "physics/data/real_world/photoreal_asset_intake_b1.json",
+    "poly_haven_cc0": {
+      "may_commit_source_binaries": true,
+      "requirements": [
+        "asset_url",
+        "license_url",
+        "source_hashes",
+        "import_settings",
+        "isolated_review_report"
+      ]
+    },
+    "fab_standard": {
+      "may_commit_source_binaries_by_default": false,
+      "local_source_root_pattern": "RAFTSIM_REVIEWED_*_SOURCE_ROOT",
+      "commit_only": [
+        "source_url",
+        "license_snapshot",
+        "source_hashes",
+        "import_report",
+        "procedural_fallback"
+      ]
+    }
+  }
 }
