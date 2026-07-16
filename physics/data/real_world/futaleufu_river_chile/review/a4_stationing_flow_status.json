@@ -1,0 +1,215 @@
+{
+  "a4_acceptance": [
+    {
+      "evidence": [
+        "physics/data/real_world/named_rapid_source_catalog.json",
+        "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json"
+      ],
+      "next_action": "Replace every order-only rapid record with GPS/aerial/guide-reviewed point or span geometry tied to the reviewed route stationing.",
+      "requirement": "Exact stationing for Terminator, Khyber Pass, Himalayas, and other catalog markers.",
+      "status": "not_met"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json"
+      ],
+      "next_action": "Acquire/record DGA time-series metadata, route translation, travel-time assumptions, and guide-reviewed low/normal/high/unsafe thresholds.",
+      "requirement": "DGA Chile gauge research and flow bands reviewed for the game reach.",
+      "status": "partial_review_gated"
+    },
+    {
+      "evidence": [
+        "physics/data/real_world/named_rapid_source_catalog.json"
+      ],
+      "next_action": "Keep Futaleufu editor geometry, rapid water windows, and solver binding disabled until all rapid stationing_kind values are exact reviewed records.",
+      "requirement": "Exit gate: no Futaleufu marker uses provisional order interpolation.",
+      "status": "not_met"
+    }
+  ],
+  "catalog_stationing_scaffold": {
+    "all_rapids_are_order_only": true,
+    "catalog_run_length_m": 10000.0,
+    "critical_rapid_count": 4,
+    "rapid_count": 5,
+    "rapid_stations": [
+      {
+        "aliases": [],
+        "catalog_station_m_from_order_interpolation": 1666.667,
+        "class": "III-IV",
+        "exact_geometry_status": "blocked_pending_gps_aerial_digitizing_and_guide_review",
+        "feature_tags": [
+          "warmup",
+          "wave_train",
+          "surf"
+        ],
+        "name": "Asleep at the Wheel",
+        "order": 1,
+        "review_priority": "high",
+        "route_order_station_m_for_review_focus": 2656.129,
+        "stationing_kind": "provisional_downstream_order_interpolation"
+      },
+      {
+        "aliases": [],
+        "catalog_station_m_from_order_interpolation": 3333.333,
+        "class": "V",
+        "exact_geometry_status": "blocked_pending_gps_aerial_digitizing_and_guide_review",
+        "feature_tags": [
+          "long_rapid",
+          "multiple_holes",
+          "multiple_lines",
+          "sneak_line",
+          "scout",
+          "portage",
+          "flip_hazard"
+        ],
+        "name": "Terminator",
+        "order": 2,
+        "review_priority": "critical",
+        "route_order_station_m_for_review_focus": 5312.259,
+        "stationing_kind": "provisional_downstream_order_interpolation"
+      },
+      {
+        "aliases": [],
+        "catalog_station_m_from_order_interpolation": 5000.0,
+        "class": "IV-V",
+        "exact_geometry_status": "blocked_pending_gps_aerial_digitizing_and_guide_review",
+        "feature_tags": [
+          "holes",
+          "wave_train",
+          "continuous_whitewater"
+        ],
+        "name": "Son of Terminator",
+        "order": 3,
+        "review_priority": "critical",
+        "route_order_station_m_for_review_focus": 7968.388,
+        "stationing_kind": "provisional_downstream_order_interpolation"
+      },
+      {
+        "aliases": [
+          "Kyber Pass",
+          "Kipper Pass"
+        ],
+        "catalog_station_m_from_order_interpolation": 6666.667,
+        "class": "IV+",
+        "exact_geometry_status": "blocked_pending_gps_aerial_digitizing_and_guide_review",
+        "feature_tags": [
+          "hydraulic_holes",
+          "large_waves",
+          "multiple_moves"
+        ],
+        "name": "Khyber Pass",
+        "order": 4,
+        "review_priority": "critical",
+        "route_order_station_m_for_review_focus": 10624.517,
+        "stationing_kind": "provisional_downstream_order_interpolation"
+      },
+      {
+        "aliases": [],
+        "catalog_station_m_from_order_interpolation": 8333.333,
+        "class": "IV",
+        "exact_geometry_status": "blocked_pending_gps_aerial_digitizing_and_guide_review",
+        "feature_tags": [
+          "very_large_standing_waves",
+          "wave_train",
+          "surf",
+          "flip_hazard"
+        ],
+        "name": "Himalayas",
+        "order": 5,
+        "review_priority": "critical",
+        "route_order_station_m_for_review_focus": 13280.646,
+        "stationing_kind": "provisional_downstream_order_interpolation"
+      }
+    ],
+    "route_stationing_length_m": 15936.77551712958,
+    "route_to_catalog_length_ratio": 1.593678,
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "stationing_authority": "published_order_only_route_length_approximate"
+  },
+  "current_corridor_evidence": {
+    "corridor_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json",
+    "corridor_status": "source_scale_technical_corridor_not_yet_lifelike",
+    "editor_geometry_binding_allowed_by_a4": false,
+    "editor_geometry_binding_enabled_in_catalog": true,
+    "geometry_authority": "osm_named_river_cross_reference_with_rapid_tags_not_surveyed_centerline",
+    "guide_approval": null,
+    "route_length_m": 15936.776,
+    "route_sample_count": 205,
+    "route_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+    "route_stationing_schema": "raftsim.route_stationing.v1",
+    "why_blocked": "The corridor is useful technical evidence, but its OSM route trace is review-gated, the catalog stations are order-only, and guide/geospatial rapid stationing has not replaced the approximate route-length scaffold."
+  },
+  "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",
+  "do_not_use_for": [
+    "exact rapid geometry",
+    "flow-calibrated feature behavior",
+    "solver water-window binding",
+    "production-playable Futaleufu completion"
+  ],
+  "editor_binding_allowed": false,
+  "exact_stationing_promoted": false,
+  "flow_bands_promoted": false,
+  "flow_evidence": {
+    "numeric_flow_bands_promoted": false,
+    "numeric_ranges_present": true,
+    "planning_band_count": 4,
+    "planning_bands": [
+      {
+        "id": "low_technical",
+        "range_m3_s": [
+          60.0,
+          160.0
+        ]
+      },
+      {
+        "id": "normal_runnable",
+        "range_m3_s": [
+          160.0,
+          300.0
+        ]
+      },
+      {
+        "id": "high_big_water",
+        "range_m3_s": [
+          300.0,
+          500.0
+        ]
+      },
+      {
+        "id": "unsafe_review_only",
+        "range_m3_s": [
+          500.0,
+          900.0
+        ]
+      }
+    ],
+    "promotion_gate": "Planning bands remain review-only until DGA time-series acquisition, upstream release/rain/snowmelt interpretation, route translation, and Futaleufu guide validation are complete.",
+    "provider": "Direccion General de Aguas, Chile",
+    "relation_to_reach": "downstream mainstem station; route translation and travel-time review required",
+    "seasonal_flow_context": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json",
+    "source_urls": [
+      "https://climatologia.meteochile.gob.cl/application/informacion/fichaDeEstacion/430011",
+      "https://www.camara.cl/verdoc.aspx?prmID=132134&prmTIPO=OFICIO_FISCALIZACION_RESPUESTA"
+    ],
+    "station": "Rio Futaleufu ante junta rio Malito",
+    "station_code": "10704002-1",
+    "units": "m3/s",
+    "why_blocked": "The DGA downstream station and planning ranges are source evidence, not accepted reach flow bands until time-series acquisition, route translation, travel-time review, and Futaleufu guide validation are complete."
+  },
+  "generated_on": "2026-07-16",
+  "plan": "docs/five-river-photoreal-execution-plan.md#workstream-a--source-data-stationing-and-seasonal-flows-per-river",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a4_flow_bands": false,
+    "can_promote_a4_stationing": false,
+    "can_request_human_lifelike_route_review": false
+  },
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.futaleufu.a4_stationing_flow_status.v1",
+  "solver_window_binding_allowed": false,
+  "status": "blocked_pending_exact_rapid_stationing_dga_route_translation_and_guide_review",
+  "task_id": "A4"
+}
