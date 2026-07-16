@@ -27,8 +27,16 @@ D6_BEHAVIORAL_SUITE_RELATIVE_PATH = (
 D6_COMPARISON_REPORT_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_comparison_report.json"
 )
+D6_MEASUREMENT_MANIFEST_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_measurement_manifest.json"
+)
+D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_measured_results_template.json"
+)
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
 D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
+D6_MEASUREMENT_MANIFEST_SCHEMA = "raftsim.flexible_raft.d6_measurement_manifest.v1"
+D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = "raftsim.flexible_raft.d6_measured_results_template.v1"
 D6_METRIC_ABSOLUTE_TOLERANCE = 1.0e-6
 D6_METRIC_RELATIVE_TOLERANCE = 0.05
 
@@ -237,6 +245,196 @@ def write_flexible_raft_d6_comparison_report(repo_root: Path) -> Path:
         encoding="utf-8",
     )
     return path
+
+
+def build_flexible_raft_d6_measurement_manifest(
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Build the external-engine measurement manifest for D6 fixtures."""
+
+    suite = build_flexible_raft_d6_behavioral_suite(parameters)
+    comparison_report = build_flexible_raft_d6_comparison_report(parameters=parameters)
+    tasks = []
+    for fixture in suite["fixtures"]:
+        metric_paths = sorted(_flatten_numeric_metrics(fixture["python_reference_metrics"]))
+        for target in fixture["comparison_targets"]:
+            target_id = target["target_id"]
+            tasks.append(
+                {
+                    "task_id": f"{target_id}__{fixture['fixture_id']}",
+                    "target_id": target_id,
+                    "fixture_id": fixture["fixture_id"],
+                    "comparison_mode": D6_TARGET_POLICIES[target_id]["comparison_mode"],
+                    "metric_deltas_are_failures": D6_TARGET_POLICIES[target_id][
+                        "metric_deltas_are_failures"
+                    ],
+                    "status": "pending_measured_engine_run",
+                    "source_fixture_objective": fixture["objective"],
+                    "required_metric_paths": metric_paths,
+                    "required_metric_count": len(metric_paths),
+                    "required_d5_replay_channels": fixture["d5_replay_channels_required"],
+                    "required_provenance_fields": list(
+                        _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS
+                    ),
+                    "expected_result_template_path": (
+                        f"physics/data/calibration/d6_measurements/{target_id}/"
+                        f"{fixture['fixture_id']}.json"
+                    ),
+                    "adapter_contract": _d6_target_adapter_contract(target_id),
+                    "can_promote_fixture": False,
+                }
+            )
+
+    return {
+        "schema": D6_MEASUREMENT_MANIFEST_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": "measurement_manifest_ready_engine_runs_pending",
+        "d6_complete": False,
+        "production_promoted": False,
+        "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
+        "source_comparison_report_path": D6_COMPARISON_REPORT_RELATIVE_PATH,
+        "measured_results_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+        "fixture_count": suite["fixture_count"],
+        "target_count": len(D6_TARGET_POLICIES),
+        "measurement_task_count": len(tasks),
+        "required_fixture_ids": list(REQUIRED_D6_FIXTURE_IDS),
+        "required_targets": list(D6_TARGET_POLICIES),
+        "metric_tolerance": comparison_report["metric_tolerance"],
+        "tasks": tasks,
+        "summary": {
+            "pending_measurement_task_count": len(tasks),
+            "required_compliant_reference_task_count": sum(
+                task["target_id"] == "project_chrono_or_reviewed_compliant_model"
+                for task in tasks
+            ),
+            "required_chaos_baseline_task_count": sum(
+                task["target_id"] == "unreal_chaos_rigid_baseline"
+                for task in tasks
+            ),
+            "can_regenerate_comparison_report_after_template_is_filled": True,
+        },
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "next_required_actions": [
+                "Run or import every listed target/fixture task from a reviewed compliant model and Unreal Chaos.",
+                "Fill the measured-results template with source_report, telemetry_sha256, engine_version, and numeric metrics for every task.",
+                "Regenerate the D6 comparison report from the completed measured-results payload.",
+                "Require manual review before D6 can enable scoring-critical flexible-raft outcomes.",
+            ],
+        },
+    }
+
+
+def write_flexible_raft_d6_measurement_manifest(repo_root: Path) -> Path:
+    payload = build_flexible_raft_d6_measurement_manifest()
+    path = repo_root / D6_MEASUREMENT_MANIFEST_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_flexible_raft_d6_measured_results_template(
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Build a fillable measured-results payload template for D6."""
+
+    suite = build_flexible_raft_d6_behavioral_suite(parameters)
+    manifest = build_flexible_raft_d6_measurement_manifest(parameters)
+    measured_results: dict[str, dict[str, Any]] = {
+        target_id: {} for target_id in D6_TARGET_POLICIES
+    }
+    fixture_lookup = {fixture["fixture_id"]: fixture for fixture in suite["fixtures"]}
+    for task in manifest["tasks"]:
+        fixture = fixture_lookup[task["fixture_id"]]
+        metric_paths = task["required_metric_paths"]
+        measured_results[task["target_id"]][task["fixture_id"]] = {
+            "status": "not_measured",
+            "source_report": "",
+            "telemetry_sha256": "",
+            "engine_version": "",
+            "fixture_id": task["fixture_id"],
+            "target_id": task["target_id"],
+            "metric_paths_required": metric_paths,
+            "metrics": _null_metric_tree_from_reference(
+                fixture["python_reference_metrics"]
+            ),
+        }
+
+    return {
+        "schema": D6_MEASURED_RESULTS_TEMPLATE_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": "measured_results_template_empty",
+        "d6_complete": False,
+        "production_promoted": False,
+        "source_suite_path": D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
+        "source_measurement_manifest_path": D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
+        "target_count": len(measured_results),
+        "fixture_count": suite["fixture_count"],
+        "required_result_count": manifest["measurement_task_count"],
+        "filled_result_count": 0,
+        "measured_results": measured_results,
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "reason": (
+                "This committed artifact is intentionally empty. It becomes input "
+                "to build_flexible_raft_d6_comparison_report only after every "
+                "source report, telemetry hash, engine version, and metric tree is filled."
+            ),
+        },
+    }
+
+
+def write_flexible_raft_d6_measured_results_template(repo_root: Path) -> Path:
+    payload = build_flexible_raft_d6_measured_results_template()
+    path = repo_root / D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _d6_target_adapter_contract(target_id: str) -> dict[str, Any]:
+    if target_id == "project_chrono_or_reviewed_compliant_model":
+        return {
+            "adapter_id": "chrono_or_reviewed_compliant_d6_fixture_runner",
+            "expected_runner": (
+                "Project Chrono or reviewed offline compliant model reproducing "
+                "the D1-D5 tube, overwash, contact, and recovery fixture semantics."
+            ),
+            "required_output": "bounded numeric-equivalence metrics plus telemetry hash",
+            "may_substitute_with_synthetic_python_reference": False,
+        }
+    if target_id == "unreal_chaos_rigid_baseline":
+        return {
+            "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
+            "expected_runner": (
+                "Unreal Chaos rigid-body fixture pass using the same initial "
+                "raft state, crew actions, obstacle definitions, and flow probes."
+            ),
+            "required_output": "baseline delta metrics plus telemetry hash",
+            "may_substitute_with_synthetic_python_reference": False,
+        }
+    raise ValueError(f"Unsupported D6 target id: {target_id}")
+
+
+def _null_metric_tree_from_reference(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: _null_metric_tree_from_reference(value[key])
+            for key in sorted(value)
+        }
+    if isinstance(value, list):
+        return [_null_metric_tree_from_reference(item) for item in value]
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return None
+    return value
 
 
 def _build_context(params: RaftParameters2_5D) -> dict[str, Any]:

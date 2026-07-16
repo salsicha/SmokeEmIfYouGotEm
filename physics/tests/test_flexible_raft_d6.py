@@ -6,10 +6,16 @@ from raftsim.flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_SCHEMA,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_COMPARISON_REPORT_SCHEMA,
+    D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+    D6_MEASURED_RESULTS_TEMPLATE_SCHEMA,
+    D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
+    D6_MEASUREMENT_MANIFEST_SCHEMA,
     REQUIRED_D6_FIXTURE_IDS,
     build_d6_replay_channel_probe,
     build_flexible_raft_d6_behavioral_suite,
     build_flexible_raft_d6_comparison_report,
+    build_flexible_raft_d6_measured_results_template,
+    build_flexible_raft_d6_measurement_manifest,
 )
 
 
@@ -129,6 +135,76 @@ def test_flexible_raft_d6_comparison_harness_flags_compliant_reference_metric_de
     assert static_targets["project_chrono_or_reviewed_compliant_model"]["status"] == "failed_numeric_equivalence"
     assert static_targets["project_chrono_or_reviewed_compliant_model"]["metric_summary"]["failed_metric_count"] >= 1
     assert static_targets["unreal_chaos_rigid_baseline"]["status"] == "recorded_baseline_delta"
+
+
+def test_flexible_raft_d6_measurement_manifest_is_reproducible_and_pending():
+    generated = build_flexible_raft_d6_measurement_manifest()
+    committed = json.loads(
+        (REPO_ROOT / D6_MEASUREMENT_MANIFEST_RELATIVE_PATH).read_text(encoding="utf-8")
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_MEASUREMENT_MANIFEST_SCHEMA
+    assert committed["status"] == "measurement_manifest_ready_engine_runs_pending"
+    assert committed["d6_complete"] is False
+    assert committed["production_promoted"] is False
+    assert committed["measurement_task_count"] == len(REQUIRED_D6_FIXTURE_IDS) * 2
+
+
+def test_flexible_raft_d6_measurement_manifest_covers_every_target_fixture_pair():
+    manifest = build_flexible_raft_d6_measurement_manifest()
+    task_pairs = {(task["target_id"], task["fixture_id"]) for task in manifest["tasks"]}
+
+    assert manifest["summary"]["pending_measurement_task_count"] == 14
+    assert manifest["summary"]["required_compliant_reference_task_count"] == 7
+    assert manifest["summary"]["required_chaos_baseline_task_count"] == 7
+    for fixture_id in REQUIRED_D6_FIXTURE_IDS:
+        assert ("project_chrono_or_reviewed_compliant_model", fixture_id) in task_pairs
+        assert ("unreal_chaos_rigid_baseline", fixture_id) in task_pairs
+    for task in manifest["tasks"]:
+        assert task["status"] == "pending_measured_engine_run"
+        assert task["required_metric_count"] == len(task["required_metric_paths"])
+        assert task["required_metric_count"] > 0
+        assert "source_report" in task["required_provenance_fields"]
+        assert "telemetry_sha256" in task["required_provenance_fields"]
+        assert task["can_promote_fixture"] is False
+
+
+def test_flexible_raft_d6_measured_results_template_is_reproducible_and_empty():
+    generated = build_flexible_raft_d6_measured_results_template()
+    committed = json.loads(
+        (REPO_ROOT / D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_MEASURED_RESULTS_TEMPLATE_SCHEMA
+    assert committed["status"] == "measured_results_template_empty"
+    assert committed["required_result_count"] == len(REQUIRED_D6_FIXTURE_IDS) * 2
+    assert committed["filled_result_count"] == 0
+    assert committed["d6_complete"] is False
+    assert committed["production_promoted"] is False
+
+
+def test_flexible_raft_d6_measured_results_template_matches_comparison_contract():
+    template = build_flexible_raft_d6_measured_results_template()
+
+    assert set(template["measured_results"]) == {
+        "project_chrono_or_reviewed_compliant_model",
+        "unreal_chaos_rigid_baseline",
+    }
+    for target_id, fixtures in template["measured_results"].items():
+        assert set(fixtures) == set(REQUIRED_D6_FIXTURE_IDS)
+        for fixture_id, payload in fixtures.items():
+            assert payload["target_id"] == target_id
+            assert payload["fixture_id"] == fixture_id
+            assert payload["status"] == "not_measured"
+            assert payload["source_report"] == ""
+            assert payload["telemetry_sha256"] == ""
+            assert payload["engine_version"] == ""
+            assert payload["metric_paths_required"]
+            assert payload["metrics"]
 
 
 def _synthetic_measured_results() -> dict[str, dict[str, dict[str, object]]]:
