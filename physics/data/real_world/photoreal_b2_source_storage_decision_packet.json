@@ -1,0 +1,578 @@
+{
+  "cc0_task_decision_requirements": [
+    {
+      "asset_need_id": "granite_metamorphic_boulders",
+      "asset_url": "https://polyhaven.com/a/rock_01",
+      "candidate_id": "polyhaven_rock_01",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "task_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "asset_url": "https://polyhaven.com/a/leafy_grass",
+      "candidate_id": "polyhaven_leafy_grass",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "task_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "asset_url": "https://polyhaven.com/a/grass_medium_01",
+      "candidate_id": "polyhaven_grass_medium_01",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "task_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "asset_url": "https://polyhaven.com/a/grass_medium_02",
+      "candidate_id": "polyhaven_grass_medium_02",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "task_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_face",
+      "candidate_id": "polyhaven_rock_face",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/rock_06",
+      "candidate_id": "polyhaven_rock_06",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_rocks_02",
+      "candidate_id": "polyhaven_aerial_rocks_02",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/aerial_beach_03",
+      "candidate_id": "polyhaven_aerial_beach_03",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "asset_url": "https://polyhaven.com/a/sand_01",
+      "candidate_id": "polyhaven_sand_01",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "task_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "asset_url": "https://polyhaven.com/a/pachira_aquatica_01",
+      "candidate_id": "polyhaven_pachira_aquatica_01",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "task_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_url": "https://polyhaven.com/a/mossy_rock",
+      "candidate_id": "polyhaven_mossy_rock",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "task_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "asset_url": "https://polyhaven.com/a/rock_moss_set_02",
+      "candidate_id": "polyhaven_rock_moss_set_02",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "task_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "asset_url": "https://polyhaven.com/a/moss_01",
+      "candidate_id": "polyhaven_moss_01",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "task_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "asset_url": "https://polyhaven.com/a/fern_02",
+      "candidate_id": "polyhaven_fern_02",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "task_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_url": "https://polyhaven.com/a/mountainside",
+      "candidate_id": "polyhaven_mountainside",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "task_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "asset_url": "https://polyhaven.com/a/dry_riverbed_rock",
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "task_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "asset_url": "https://polyhaven.com/a/river_small_rocks",
+      "candidate_id": "polyhaven_river_small_rocks",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "futaleufu_river_chile",
+      "task_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/pine_sapling_small",
+      "candidate_id": "polyhaven_pine_sapling_small",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "task_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "asset_url": "https://polyhaven.com/a/fir_sapling",
+      "candidate_id": "polyhaven_fir_sapling",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "task_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "asset_url": "https://polyhaven.com/a/volcanic_rock_tiles",
+      "candidate_id": "polyhaven_volcanic_rock_tiles",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "task_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "asset_url": "https://polyhaven.com/a/dry_riverbed_rock",
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "task_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "asset_url": "https://polyhaven.com/a/river_small_rocks",
+      "candidate_id": "polyhaven_river_small_rocks",
+      "required_before_commit": [
+        "record file list",
+        "record SHA-256 hash for every source file",
+        "record import settings and Unreal destination path",
+        "record license snapshot URL",
+        "run isolated import and capture gates"
+      ],
+      "required_before_download": [
+        "choose exact resolution and file formats",
+        "record expected byte size before download",
+        "record LFS classification and retention policy",
+        "record owner storage approval for source binaries",
+        "record target reviewed source root"
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "task_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight"
+    }
+  ],
+  "current_operating_mode": {
+    "downloads_allowed_now": false,
+    "hash_manifests_allowed_in_repo_now": true,
+    "import_reports_allowed_in_repo_now": true,
+    "mode": "local_only_until_owner_storage_decision",
+    "reason": "The five-river B2 queue contains many third-party source bundles and the GitLab mirror is already failing LFS uploads because the project exceeds allocated storage.",
+    "source_binaries_allowed_in_repo_now": false
+  },
+  "decision_options": [
+    {
+      "cons": [
+        "Future collaborators must reacquire exact source bundles from recorded URLs.",
+        "Offline rebuilds depend on local source-root retention.",
+        "Long-term archival is weaker than committed source bundles."
+      ],
+      "hash_reports_committed": true,
+      "import_reports_committed": true,
+      "label": "Keep CC0 source binaries local-only; commit hashes, import reports, and derived review captures.",
+      "option_id": "local_only_hash_report_public_repo",
+      "pros": [
+        "Avoids adding large source bundles while the mirror is over quota.",
+        "Still preserves provenance, exact file hashes, and importer reproducibility.",
+        "Allows isolated local review to continue one asset at a time."
+      ],
+      "recommended_until_gitlab_quota_resolved": true,
+      "source_binaries_committed": false
+    },
+    {
+      "cons": [
+        "Cannot proceed while GitLab LFS upload is failing for storage quota.",
+        "High storage and clone/cache cost for geometry-heavy asset bundles.",
+        "Requires explicit LFS retention and pruning policy before scale-out."
+      ],
+      "hash_reports_committed": true,
+      "import_reports_committed": true,
+      "label": "Commit approved CC0 source binaries through Git LFS after storage capacity is fixed.",
+      "option_id": "commit_all_cc0_source_binaries_after_storage_capacity",
+      "pros": [
+        "Strongest reproducibility and archival story for CC0 inputs.",
+        "Collaborators can rebuild from the repository without external reacquisition.",
+        "Matches the owner preference to keep generated maps versioned, if extended to CC0 source assets."
+      ],
+      "recommended_until_gitlab_quota_resolved": false,
+      "source_binaries_committed": true
+    },
+    {
+      "cons": [
+        "Requires a bright-line byte threshold and per-asset classification.",
+        "Rebuild behavior differs by asset size class.",
+        "Still cannot commit any LFS source binaries until the GitLab quota is resolved."
+      ],
+      "hash_reports_committed": true,
+      "import_reports_committed": true,
+      "label": "Commit small CC0 texture/source bundles; keep large geometry bundles local-only with hashes.",
+      "option_id": "hybrid_commit_small_local_only_large",
+      "pros": [
+        "Balances reproducibility against storage pressure.",
+        "Can preserve small texture/material sources while avoiding huge model bundles.",
+        "Creates a clear threshold for future asset-intake automation."
+      ],
+      "recommended_until_gitlab_quota_resolved": false,
+      "source_binaries_committed": "size_threshold_dependent"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "guardrails": [
+    "Fab Standard source binaries stay local-only regardless of the CC0 storage decision.",
+    "First-party generated assets may be committed only with recipe, tool version, seed, and hash manifests.",
+    "No B2 source binary can be committed while the GitLab mirror rejects LFS uploads for quota.",
+    "No corridor substitution is allowed from local-only source binaries without committed hash and import reports.",
+    "Promotion captures must cite the exact source policy used for every visible third-party asset."
+  ],
+  "pending_scope": {
+    "cc0_download_task_count": 22,
+    "cc0_download_tasks_by_river": {
+      "chilko_river_lava_canyon": 5,
+      "colorado_river_grand_canyon_rowing": 5,
+      "futaleufu_river_chile": 4,
+      "pacuare_river_costa_rica": 4,
+      "south_fork_american_chili_bar": 4
+    },
+    "fab_local_only_slot_count": 16,
+    "first_party_entry_count": 6,
+    "river_count": 5,
+    "selection_manifest_count": 5
+  },
+  "required_owner_decision": {
+    "blocks": [
+      "executing any B2 CC0 source download task into a committed source root",
+      "committing any B2 third-party source binary",
+      "running promotion import reports that assume committed source binaries",
+      "marking any B2 asset set as promotion-ready"
+    ],
+    "decision_id": "b2_cc0_source_binary_storage_policy",
+    "must_choose_one_option_id": [
+      "local_only_hash_report_public_repo",
+      "commit_all_cc0_source_binaries_after_storage_capacity",
+      "hybrid_commit_small_local_only_large"
+    ],
+    "required_fields": [
+      "chosen_option_id",
+      "decision_owner",
+      "decision_date",
+      "max_source_bundle_bytes_without_extra_approval",
+      "gitlab_storage_resolution",
+      "lfs_retention_policy",
+      "rollback_policy"
+    ]
+  },
+  "schema": "raftsim.photoreal.b2_source_storage_decision.v1",
+  "source_preflight": "physics/data/real_world/photoreal_b2_source_acquisition_preflight.json",
+  "status": "owner_storage_policy_decision_required_downloads_remain_disabled"
+}
