@@ -1,0 +1,125 @@
+{
+  "bounds": {
+    "buffer_m": 350.0,
+    "epsg3857_buffered": [
+      -13463790.024,
+      4695898.228,
+      -13462368.907,
+      4697000.952
+    ],
+    "wgs84": {
+      "max_lat": 38.82511,
+      "max_lon": -120.9376616,
+      "min_lat": 38.8222915,
+      "min_lon": -120.9441395
+    }
+  },
+  "derivative_targets": {
+    "heightfield": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/heightfield_2017.png",
+    "hillshade": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/hillshade_2048.png",
+    "naip_centerline_preview": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/derived/naip_centerline_preview_2048.png",
+    "window_stitched_edge_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/review/stitched_edge_report.json"
+  },
+  "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_stitched_validation_review": true,
+    "can_generate_window_derivatives": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false,
+    "exit_criteria": [
+      "Generate review derivatives from the hash-locked DEM and NAIP source files.",
+      "Validate seams against adjacent window derivatives and the whole-window route.",
+      "Attach bank/cross-section interpretation and guide/geospatial review.",
+      "Resolve exact downstream anchor before final cropping or Unreal import."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_window_source_manifest.v1",
+  "source_artifacts": {
+    "aerial": {
+      "attribution": "USDA/FSA/APFO National Agriculture Imagery Program",
+      "byte_count": 18990707,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "format": "png",
+      "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13463790.024%2C4695898.228%2C-13462368.907%2C4697000.952&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/naip.png",
+      "pixel_resolution_m_approx": [
+        0.346952,
+        0.26922
+      ],
+      "rights": "U.S. Public Domain; credit USDA/FSA/APFO NAIP",
+      "rights_url": "https://agdatacommons.nal.usda.gov/articles/dataset/NAIP_Digital_Ortho_Photo_Image_Geospatial_Data_Presentation_Form_remote-sensing_image/24664908",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+      "sha256": "38f5cd09bdc0f7147fb5ff88f6e87689352248b324876d4012a7d4012a67fc74",
+      "source_bounds_epsg3857": [
+        -13463790.024,
+        4695898.228,
+        -13462368.907,
+        4697000.952
+      ],
+      "source_kind": "aerial_imagery"
+    },
+    "dem": {
+      "attribution": "U.S. Geological Survey 3D Elevation Program",
+      "byte_count": 16780410,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "format": "tiff",
+      "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13463790.024%2C4695898.228%2C-13462368.907%2C4697000.952&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/3dep_dem.tif",
+      "pixel_resolution_m_approx": [
+        0.693905,
+        0.538439
+      ],
+      "rights": "U.S. Public Domain; credit U.S. Geological Survey",
+      "rights_url": "https://www.usgs.gov/faqs/what-are-terms-uselicensing-map-services-and-data-national-map",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "sha256": "52ba01a222b7d5c8c659112e52bbb6e73a730caff82488d1138dbfe2cecf5d8a",
+      "source_bounds_epsg3857": [
+        -13463790.024,
+        4695898.228,
+        -13462368.907,
+        4697000.952
+      ],
+      "source_kind": "terrain_dem"
+    }
+  },
+  "source_policy": {
+    "authority": "official_source_files_for_review_not_final_game_geometry",
+    "do_not_promote_from_source_files_alone": true,
+    "download_review": "Source files were pulled through the bounded A1 executor from the recorded official URLs and are hash-locked here for review.",
+    "redistribution_basis": "U.S. public-domain government source files with required attribution."
+  },
+  "station_range_m": {
+    "end": 33796.224,
+    "length": 804.672,
+    "start": 32991.552
+  },
+  "status": "source_files_attached_derivatives_pending_review_gated",
+  "task_id": "A1",
+  "window_id": "salmon_falls_folsom_review_32991_33796m",
+  "window_requirements": {
+    "rapid_count": 0,
+    "rapid_names": [],
+    "required_source_classes": [
+      "3DEP terrain",
+      "NAIP/aerial imagery",
+      "directed centerline clip",
+      "bank/cross-section interpretation",
+      "guide/geospatial review notes"
+    ],
+    "requires_bank_cross_section_interpretation": true,
+    "requires_stitched_validation_preview": true
+  }
+}

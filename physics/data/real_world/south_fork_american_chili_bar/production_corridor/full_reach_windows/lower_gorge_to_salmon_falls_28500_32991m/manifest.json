@@ -1,0 +1,131 @@
+{
+  "bounds": {
+    "buffer_m": 350.0,
+    "epsg3857_buffered": [
+      -13463335.384,
+      4692797.791,
+      -13459368.602,
+      4696483.664
+    ],
+    "wgs84": {
+      "max_lat": 38.8214897,
+      "max_lon": -120.9107094,
+      "min_lat": 38.8005891,
+      "min_lon": -120.9400554
+    }
+  },
+  "derivative_targets": {
+    "heightfield": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/heightfield_2017.png",
+    "hillshade": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/hillshade_2048.png",
+    "naip_centerline_preview": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/derived/naip_centerline_preview_2048.png",
+    "window_stitched_edge_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/review/stitched_edge_report.json"
+  },
+  "display_name": "Lower Gorge To Salmon Falls Source Window",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_stitched_validation_review": true,
+    "can_generate_window_derivatives": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false,
+    "exit_criteria": [
+      "Generate review derivatives from the hash-locked DEM and NAIP source files.",
+      "Validate seams against adjacent window derivatives and the whole-window route.",
+      "Attach bank/cross-section interpretation and guide/geospatial review.",
+      "Resolve exact downstream anchor before final cropping or Unreal import."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_window_source_manifest.v1",
+  "source_artifacts": {
+    "aerial": {
+      "attribution": "USDA/FSA/APFO National Agriculture Imagery Program",
+      "byte_count": 29264572,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "format": "png",
+      "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13463335.384%2C4692797.791%2C-13459368.602%2C4696483.664&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/naip.png",
+      "pixel_resolution_m_approx": [
+        0.968453,
+        0.899871
+      ],
+      "rights": "U.S. Public Domain; credit USDA/FSA/APFO NAIP",
+      "rights_url": "https://agdatacommons.nal.usda.gov/articles/dataset/NAIP_Digital_Ortho_Photo_Image_Geospatial_Data_Presentation_Form_remote-sensing_image/24664908",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+      "sha256": "f208d7054420cfbd8b0119c6f890a011df923d253fc47b9c7fd5d407e71861c7",
+      "source_bounds_epsg3857": [
+        -13463335.384,
+        4692797.791,
+        -13459368.602,
+        4696483.664
+      ],
+      "source_kind": "aerial_imagery"
+    },
+    "dem": {
+      "attribution": "U.S. Geological Survey 3D Elevation Program",
+      "byte_count": 16780410,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "format": "tiff",
+      "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13463335.384%2C4692797.791%2C-13459368.602%2C4696483.664&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/3dep_dem.tif",
+      "pixel_resolution_m_approx": [
+        1.936905,
+        1.799743
+      ],
+      "rights": "U.S. Public Domain; credit U.S. Geological Survey",
+      "rights_url": "https://www.usgs.gov/faqs/what-are-terms-uselicensing-map-services-and-data-national-map",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "sha256": "3b65c0358321a104bbe9ac9e4440329c29c18a273b66a460defc021c8c001df2",
+      "source_bounds_epsg3857": [
+        -13463335.384,
+        4692797.791,
+        -13459368.602,
+        4696483.664
+      ],
+      "source_kind": "terrain_dem"
+    }
+  },
+  "source_policy": {
+    "authority": "official_source_files_for_review_not_final_game_geometry",
+    "do_not_promote_from_source_files_alone": true,
+    "download_review": "Source files were pulled through the bounded A1 executor from the recorded official URLs and are hash-locked here for review.",
+    "redistribution_basis": "U.S. public-domain government source files with required attribution."
+  },
+  "station_range_m": {
+    "end": 32991.552,
+    "length": 4491.552,
+    "start": 28500.0
+  },
+  "status": "source_files_attached_derivatives_pending_review_gated",
+  "task_id": "A1",
+  "window_id": "lower_gorge_to_salmon_falls_28500_32991m",
+  "window_requirements": {
+    "rapid_count": 5,
+    "rapid_names": [
+      "Bouncing Rock",
+      "Pre-Op",
+      "Hospital Bar",
+      "Recovery Room",
+      "Surprise"
+    ],
+    "required_source_classes": [
+      "3DEP terrain",
+      "NAIP/aerial imagery",
+      "directed centerline clip",
+      "bank/cross-section interpretation",
+      "guide/geospatial review notes"
+    ],
+    "requires_bank_cross_section_interpretation": true,
+    "requires_stitched_validation_preview": true
+  }
+}
