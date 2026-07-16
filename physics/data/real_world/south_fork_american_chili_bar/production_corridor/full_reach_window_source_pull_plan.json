@@ -1,0 +1,414 @@
+{
+  "coverage_summary": {
+    "all_windows_have_terrain_and_imagery_requests": true,
+    "planned_download_count": 0,
+    "planned_request_count": 12,
+    "window_count": 6
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "corridor_window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json",
+    "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
+    "full_reach_acquisition_plan": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_acquisition_plan.json"
+  },
+  "policy": {
+    "authority": "source_request_manifest_only_not_source_data",
+    "do_not_promote_from_urls_alone": true,
+    "downloads_performed": false,
+    "reason": "A1 needs full-reach terrain and imagery, but each source pull must be bounded, reproducible, and reviewed before committing source or derived corridor assets."
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_download_without_review": false,
+    "can_generate_full_reach_landscapes": false,
+    "can_promote_source_assets": false,
+    "exit_criteria": [
+      "Review every bbox against the exact downstream anchor decision.",
+      "Perform bounded downloads with hashes and terms metadata recorded.",
+      "Generate per-window manifests and stitched validation previews.",
+      "Pass geospatial/art review before Unreal landscape import."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_window_source_pull_plan.v1",
+  "service_sources": {
+    "aerial_naip": {
+      "provider": "USDA/FSA/APFO NAIP",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage"
+    },
+    "terrain_3dep": {
+      "provider": "USGS 3D Elevation Program",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage"
+    }
+  },
+  "status": "bounded_window_source_requests_planned_not_downloaded",
+  "task_id": "A1",
+  "windows": [
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13441080.424,
+          4688682.011,
+          -13438132.594,
+          4690360.714
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13441080.424%2C4688682.011%2C-13438132.594%2C4690360.714&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13441080.424,
+        4688682.011,
+        -13438132.594,
+        4690360.714
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.7786235,
+        "max_lon": -120.7199431,
+        "min_lat": 38.7717693,
+        "min_lon": -120.7401357
+      },
+      "buffer_m": 350.0,
+      "display_name": "Chili Bar Existing Pilot",
+      "existing_artifact": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json",
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 41,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 2500.0,
+      "station_start_m": 0.0,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13441080.424,
+          4688682.011,
+          -13438132.594,
+          4690360.714
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13441080.424%2C4688682.011%2C-13438132.594%2C4690360.714&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "chili_bar_existing_pilot_0_2500m"
+    },
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13445941.891,
+          4687555.381,
+          -13440391.022,
+          4691048.17
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13445941.891%2C4687555.381%2C-13440391.022%2C4691048.17&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13445941.891,
+        4687555.381,
+        -13440391.022,
+        4691048.17
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.7834376,
+        "max_lon": -120.7402309,
+        "min_lat": 38.7638783,
+        "min_lon": -120.783807
+      },
+      "buffer_m": 350.0,
+      "display_name": "Upper Chili Bar To Coloma Checkpoint",
+      "existing_artifact": null,
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 118,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 10000.0,
+      "station_start_m": 2500.0,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13445941.891,
+          4687555.381,
+          -13440391.022,
+          4691048.17
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13445941.891%2C4687555.381%2C-13440391.022%2C4691048.17&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "upper_chili_bar_to_coloma_2500_10000m"
+    },
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13457356.625,
+          4687426.05,
+          -13445099.18,
+          4693482.207
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13457356.625%2C4687426.05%2C-13445099.18%2C4693482.207&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13457356.625,
+        4687426.05,
+        -13445099.18,
+        4693482.207
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.80048,
+        "max_lon": -120.782525,
+        "min_lat": 38.7629724,
+        "min_lon": -120.8863473
+      },
+      "buffer_m": 350.0,
+      "display_name": "Coloma Valley Transit",
+      "existing_artifact": null,
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 171,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 24000.0,
+      "station_start_m": 10000.0,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13457356.625,
+          4687426.05,
+          -13445099.18,
+          4693482.207
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13457356.625%2C4687426.05%2C-13445099.18%2C4693482.207&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "coloma_valley_10000_24000m"
+    },
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13460035.462,
+          4692831.801,
+          -13456890.686,
+          4695442.196
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13460035.462%2C4692831.801%2C-13456890.686%2C4695442.196&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13460035.462,
+        4692831.801,
+        -13456890.686,
+        4695442.196
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.8142003,
+        "max_lon": -120.8884499,
+        "min_lat": 38.8008272,
+        "min_lon": -120.9104117
+      },
+      "buffer_m": 350.0,
+      "display_name": "Upper Gorge Rapid Windows",
+      "existing_artifact": null,
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 72,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 28500.0,
+      "station_start_m": 24000.0,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13460035.462,
+          4692831.801,
+          -13456890.686,
+          4695442.196
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13460035.462%2C4692831.801%2C-13456890.686%2C4695442.196&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "upper_gorge_24000_28500m"
+    },
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13463335.384,
+          4692797.791,
+          -13459368.602,
+          4696483.664
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13463335.384%2C4692797.791%2C-13459368.602%2C4696483.664&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13463335.384,
+        4692797.791,
+        -13459368.602,
+        4696483.664
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.8214897,
+        "max_lon": -120.9107094,
+        "min_lat": 38.8005891,
+        "min_lon": -120.9400554
+      },
+      "buffer_m": 350.0,
+      "display_name": "Lower Gorge To Salmon Falls Source Window",
+      "existing_artifact": null,
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 85,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 32991.552,
+      "station_start_m": 28500.0,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13463335.384,
+          4692797.791,
+          -13459368.602,
+          4696483.664
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13463335.384%2C4692797.791%2C-13459368.602%2C4696483.664&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+    },
+    {
+      "aerial_naip_export": {
+        "bbox_epsg3857": [
+          -13463790.024,
+          4695898.228,
+          -13462368.907,
+          4697000.952
+        ],
+        "downloaded": false,
+        "format": "png",
+        "query_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13463790.024%2C4695898.228%2C-13462368.907%2C4697000.952&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+        "size_px": [
+          4096,
+          4096
+        ]
+      },
+      "bounds_epsg3857_buffered": [
+        -13463790.024,
+        4695898.228,
+        -13462368.907,
+        4697000.952
+      ],
+      "bounds_wgs84": {
+        "max_lat": 38.82511,
+        "max_lon": -120.9376616,
+        "min_lat": 38.8222915,
+        "min_lon": -120.9441395
+      },
+      "buffer_m": 350.0,
+      "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
+      "existing_artifact": null,
+      "expected_outputs": {
+        "aerial_imagery": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/naip.png",
+        "terrain_dem": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/3dep_dem.tif",
+        "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/manifest.json"
+      },
+      "production_promoted": false,
+      "route_point_count": 14,
+      "source_pull_status": "planned_not_downloaded",
+      "station_end_m": 33796.224,
+      "station_start_m": 32991.552,
+      "terrain_3dep_export": {
+        "bbox_epsg3857": [
+          -13463790.024,
+          4695898.228,
+          -13462368.907,
+          4697000.952
+        ],
+        "downloaded": false,
+        "format": "tiff",
+        "pixel_type": "F32",
+        "query_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13463790.024%2C4695898.228%2C-13462368.907%2C4697000.952&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+        "size_px": [
+          2048,
+          2048
+        ]
+      },
+      "window_id": "salmon_falls_folsom_review_32991_33796m"
+    }
+  ]
+}
