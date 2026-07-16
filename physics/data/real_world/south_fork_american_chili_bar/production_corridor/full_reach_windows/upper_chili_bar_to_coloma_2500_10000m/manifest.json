@@ -1,0 +1,130 @@
+{
+  "bounds": {
+    "buffer_m": 350.0,
+    "epsg3857_buffered": [
+      -13445941.891,
+      4687555.381,
+      -13440391.022,
+      4691048.17
+    ],
+    "wgs84": {
+      "max_lat": 38.7834376,
+      "max_lon": -120.7402309,
+      "min_lat": 38.7638783,
+      "min_lon": -120.783807
+    }
+  },
+  "derivative_targets": {
+    "heightfield": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/heightfield_2017.png",
+    "hillshade": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/hillshade_2048.png",
+    "naip_centerline_preview": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/derived/naip_centerline_preview_2048.png",
+    "window_stitched_edge_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/review/stitched_edge_report.json"
+  },
+  "display_name": "Upper Chili Bar To Coloma Checkpoint",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_enter_stitched_validation_review": true,
+    "can_generate_window_derivatives": true,
+    "can_import_unreal_landscape": false,
+    "can_promote_full_reach_corridor": false,
+    "exit_criteria": [
+      "Generate review derivatives from the hash-locked DEM and NAIP source files.",
+      "Validate seams against adjacent window derivatives and the whole-window route.",
+      "Attach bank/cross-section interpretation and guide/geospatial review.",
+      "Resolve exact downstream anchor before final cropping or Unreal import."
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_full_reach_window_source_manifest.v1",
+  "source_artifacts": {
+    "aerial": {
+      "attribution": "USDA/FSA/APFO National Agriculture Imagery Program",
+      "byte_count": 28387262,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        4096,
+        4096
+      ],
+      "format": "png",
+      "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13445941.891%2C4687555.381%2C-13440391.022%2C4691048.17&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/naip.png",
+      "pixel_resolution_m_approx": [
+        1.355193,
+        0.852732
+      ],
+      "rights": "U.S. Public Domain; credit USDA/FSA/APFO NAIP",
+      "rights_url": "https://agdatacommons.nal.usda.gov/articles/dataset/NAIP_Digital_Ortho_Photo_Image_Geospatial_Data_Presentation_Form_remote-sensing_image/24664908",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+      "sha256": "279a08ca61d65820aa6baf797ce385f5c4708a949be5e4a8e4e8cb73b14b69aa",
+      "source_bounds_epsg3857": [
+        -13445941.891,
+        4687555.381,
+        -13440391.022,
+        4691048.17
+      ],
+      "source_kind": "aerial_imagery"
+    },
+    "dem": {
+      "attribution": "U.S. Geological Survey 3D Elevation Program",
+      "byte_count": 16780410,
+      "coordinate_reference_system": "EPSG:3857 Web Mercator export grid",
+      "dimensions": [
+        2048,
+        2048
+      ],
+      "format": "tiff",
+      "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13445941.891%2C4687555.381%2C-13440391.022%2C4691048.17&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/3dep_dem.tif",
+      "pixel_resolution_m_approx": [
+        2.710385,
+        1.705463
+      ],
+      "rights": "U.S. Public Domain; credit U.S. Geological Survey",
+      "rights_url": "https://www.usgs.gov/faqs/what-are-terms-uselicensing-map-services-and-data-national-map",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "sha256": "ebb6682d52a6a011854b4679d43ba56f1a1d62642852cce9e045b805820e59f0",
+      "source_bounds_epsg3857": [
+        -13445941.891,
+        4687555.381,
+        -13440391.022,
+        4691048.17
+      ],
+      "source_kind": "terrain_dem"
+    }
+  },
+  "source_policy": {
+    "authority": "official_source_files_for_review_not_final_game_geometry",
+    "do_not_promote_from_source_files_alone": true,
+    "download_review": "Source files were pulled through the bounded A1 executor from the recorded official URLs and are hash-locked here for review.",
+    "redistribution_basis": "U.S. public-domain government source files with required attribution."
+  },
+  "station_range_m": {
+    "end": 10000.0,
+    "length": 7500.0,
+    "start": 2500.0
+  },
+  "status": "source_files_attached_derivatives_pending_review_gated",
+  "task_id": "A1",
+  "window_id": "upper_chili_bar_to_coloma_2500_10000m",
+  "window_requirements": {
+    "rapid_count": 4,
+    "rapid_names": [
+      "Rock Garden",
+      "African Queen",
+      "Triple Threat",
+      "Troublemaker"
+    ],
+    "required_source_classes": [
+      "3DEP terrain",
+      "NAIP/aerial imagery",
+      "directed centerline clip",
+      "bank/cross-section interpretation",
+      "guide/geospatial review notes"
+    ],
+    "requires_bank_cross_section_interpretation": true,
+    "requires_stitched_validation_preview": true
+  }
+}

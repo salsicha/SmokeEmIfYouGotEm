@@ -25,6 +25,7 @@
       "per-window manifest generation",
       "stitched validation preview preparation"
     ],
+    "can_enter_stitched_validation_review": true,
     "can_execute_overcover_source_pull": true,
     "destination_missing_count": 0,
     "download_command": "cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run python -m raftsim.examples.generate_south_fork_a1_window_source_execution --repo-root .. --execute",
@@ -37,9 +38,11 @@
       "Meat Grinder or Troublemaker solver-window promotion"
     ],
     "present_source_file_count": 12,
+    "present_window_manifest_count": 6,
     "source_files_present": true,
     "source_pull_needed": false,
-    "source_pull_task_count": 12
+    "source_pull_task_count": 12,
+    "window_manifests_present": true
   },
   "generated_on": "2026-07-16",
   "inputs": {
@@ -57,14 +60,14 @@
     "can_import_unreal_full_reach_landscape": false,
     "can_promote_full_reach_corridor": false,
     "next_required_actions": [
-      "Generate per-window manifests plus source terms, CRS, resolution, bounds, and derivative targets.",
       "Produce stitched seam-validation previews before Unreal import.",
+      "Attach bank/cross-section interpretation and guide/geospatial review.",
       "Resolve the exact Salmon Falls/Folsom downstream anchor before any cropping, Unreal import, or rapid binding."
     ]
   },
   "river_id": "south_fork_american_chili_bar",
   "schema": "raftsim.south_fork.a1_window_source_pull_preflight_review.v1",
-  "status": "nonpromotional_source_files_present_window_manifests_pending_exact_anchor_pending",
+  "status": "nonpromotional_source_manifests_ready_for_stitched_validation_exact_anchor_pending",
   "task_id": "A1",
   "window_continuity": {
     "contiguous": true,
