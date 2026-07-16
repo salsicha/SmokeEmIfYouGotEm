@@ -646,7 +646,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -664,7 +665,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -724,7 +726,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -742,7 +745,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -935,7 +939,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -953,7 +958,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -1024,7 +1030,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -1042,7 +1049,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -1109,7 +1117,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -1127,7 +1136,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -1276,7 +1286,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -1294,7 +1305,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }
@@ -1356,7 +1368,8 @@
           "metric_deltas_are_failures": true,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "project_chrono_or_reviewed_compliant_model"
         },
@@ -1374,7 +1387,8 @@
           "metric_deltas_are_failures": false,
           "required_provenance_fields": [
             "source_report",
-            "telemetry_sha256"
+            "telemetry_sha256",
+            "engine_version"
           ],
           "target_id": "unreal_chaos_rigid_baseline"
         }

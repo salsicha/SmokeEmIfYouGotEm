@@ -143,6 +143,27 @@ def test_flexible_raft_d6_comparison_harness_flags_compliant_reference_metric_de
     assert static_targets["unreal_chaos_rigid_baseline"]["status"] == "recorded_baseline_delta"
 
 
+def test_flexible_raft_d6_comparison_harness_requires_engine_version_and_valid_hash():
+    measured = _synthetic_measured_results()
+    target_result = measured["project_chrono_or_reviewed_compliant_model"][
+        "static_seat_load_sag"
+    ]
+    target_result["engine_version"] = ""
+    target_result["telemetry_sha256"] = "not-a-sha256"
+
+    report = build_flexible_raft_d6_comparison_report(measured)
+    by_id = {fixture["fixture_id"]: fixture for fixture in report["fixtures"]}
+    static_targets = {
+        target["target_id"]: target for target in by_id["static_seat_load_sag"]["targets"]
+    }
+    target = static_targets["project_chrono_or_reviewed_compliant_model"]
+
+    assert report["comparison_passed"] is False
+    assert target["status"] == "incomplete_measured_result_provenance"
+    assert "engine_version" in target["missing_provenance_fields"]
+    assert target["invalid_provenance_fields"] == ["telemetry_sha256"]
+
+
 def test_flexible_raft_d6_measurement_manifest_is_reproducible_and_pending():
     generated = build_flexible_raft_d6_measurement_manifest()
     committed = json.loads(
@@ -174,6 +195,7 @@ def test_flexible_raft_d6_measurement_manifest_covers_every_target_fixture_pair(
         assert task["required_metric_count"] > 0
         assert "source_report" in task["required_provenance_fields"]
         assert "telemetry_sha256" in task["required_provenance_fields"]
+        assert "engine_version" in task["required_provenance_fields"]
         assert task["can_promote_fixture"] is False
 
 
@@ -297,6 +319,7 @@ def test_flexible_raft_d6_fixture_input_package_targets_and_metrics_match_manife
             assert target["fixture_id"] == fixture["fixture_id"]
             assert "source_report" in target["required_provenance_fields"]
             assert "telemetry_sha256" in target["required_provenance_fields"]
+            assert "engine_version" in target["required_provenance_fields"]
             assert target["adapter_contract"]["may_substitute_with_synthetic_python_reference"] is False
             assert target["can_promote_fixture"] is False
 
