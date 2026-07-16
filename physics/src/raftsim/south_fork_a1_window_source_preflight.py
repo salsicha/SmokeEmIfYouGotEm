@@ -77,17 +77,34 @@ def build_south_fork_a1_window_source_pull_preflight(repo_root: Path) -> dict[st
         and execution_plan["summary"]["task_count"] == 12
         and status_report["summary"]["expected_source_file_count"] == 12
     )
+    source_files_present = status_report["summary"]["all_source_files_present"]
+    if not can_execute_overcover:
+        status = "source_pull_preflight_blocked"
+    elif source_files_present:
+        status = "nonpromotional_source_files_present_window_manifests_pending_exact_anchor_pending"
+    else:
+        status = "nonpromotional_overcover_source_pull_preflight_passed_exact_anchor_pending"
+    next_required_actions = (
+        [
+            "Generate per-window manifests plus source terms, CRS, resolution, bounds, and derivative targets.",
+            "Produce stitched seam-validation previews before Unreal import.",
+            "Resolve the exact Salmon Falls/Folsom downstream anchor before any cropping, Unreal import, or rapid binding.",
+        ]
+        if source_files_present
+        else [
+            "Run the bounded source-pull executor for the official DEM/NAIP URLs.",
+            "Regenerate the source-pull status report and verify all 12 source files have byte counts and SHA-256 hashes.",
+            "Generate per-window manifests plus stitched seam-validation previews.",
+            "Resolve the exact Salmon Falls/Folsom downstream anchor before any cropping, Unreal import, or rapid binding.",
+        ]
+    )
 
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_preflight_review.v1",
         "generated_on": "2026-07-16",
         "task_id": "A1",
         "river_id": window_manifest["river_id"],
-        "status": (
-            "nonpromotional_overcover_source_pull_preflight_passed_exact_anchor_pending"
-            if can_execute_overcover
-            else "source_pull_preflight_blocked"
-        ),
+        "status": status,
         "production_promoted": False,
         "inputs": {
             "anchor_review": FULL_REACH_ANCHOR_REVIEW_RELATIVE_PATH,
@@ -122,8 +139,11 @@ def build_south_fork_a1_window_source_pull_preflight(repo_root: Path) -> dict[st
         },
         "execution_readiness": {
             "can_execute_overcover_source_pull": can_execute_overcover,
+            "source_pull_needed": not source_files_present,
+            "source_files_present": source_files_present,
             "source_pull_task_count": execution_plan["summary"]["task_count"],
             "expected_source_file_count": status_report["summary"]["expected_source_file_count"],
+            "present_source_file_count": status_report["summary"]["present_source_file_count"],
             "destination_missing_count": execution_plan["summary"]["destination_missing_count"],
             "download_command": execution_plan["download_command"],
             "allowed_use": [
@@ -147,12 +167,7 @@ def build_south_fork_a1_window_source_pull_preflight(repo_root: Path) -> dict[st
             "can_import_unreal_full_reach_landscape": False,
             "can_bind_named_rapid_geometry": False,
             "can_bind_solver_windows": False,
-            "next_required_actions": [
-                "Run the bounded source-pull executor for the official DEM/NAIP URLs.",
-                "Regenerate the source-pull status report and verify all 12 source files have byte counts and SHA-256 hashes.",
-                "Generate per-window manifests plus stitched seam-validation previews.",
-                "Resolve the exact Salmon Falls/Folsom downstream anchor before any cropping, Unreal import, or rapid binding.",
-            ],
+            "next_required_actions": next_required_actions,
         },
     }
 

@@ -26,7 +26,7 @@ def test_south_fork_a1_window_source_preflight_is_reproducible():
     assert committed["schema"] == "raftsim.south_fork.a1_window_source_pull_preflight_review.v1"
     assert (
         committed["status"]
-        == "nonpromotional_overcover_source_pull_preflight_passed_exact_anchor_pending"
+        == "nonpromotional_source_files_present_window_manifests_pending_exact_anchor_pending"
     )
     assert committed["production_promoted"] is False
 
@@ -53,9 +53,12 @@ def test_south_fork_a1_window_source_preflight_allows_only_nonpromotional_source
     assert preflight["window_continuity"]["contiguous"] is True
     assert preflight["window_continuity"]["gap_count"] == 0
     assert readiness["can_execute_overcover_source_pull"] is True
+    assert readiness["source_pull_needed"] is False
+    assert readiness["source_files_present"] is True
     assert readiness["source_pull_task_count"] == 12
     assert readiness["expected_source_file_count"] == 12
-    assert readiness["destination_missing_count"] == 12
+    assert readiness["present_source_file_count"] == 12
+    assert readiness["destination_missing_count"] == 0
     assert gate["can_download_source_files"] is True
     assert gate["can_promote_full_reach_corridor"] is False
     assert gate["can_crop_to_final_downstream_anchor"] is False

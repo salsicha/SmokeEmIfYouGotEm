@@ -38,8 +38,8 @@
   "status": "ready_to_execute_review_gated_source_downloads",
   "summary": {
     "aerial_task_count": 6,
-    "destination_missing_count": 12,
-    "destination_present_count": 0,
+    "destination_missing_count": 0,
+    "destination_present_count": 12,
     "task_count": 12,
     "terrain_task_count": 6
   },
@@ -47,9 +47,9 @@
   "tasks": [
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "15a08aa3a5857c36f69c34e3aaaf64fb3a618f552a8ca1b10026982ea05ef5b9",
       "display_name": "Chili Bar Existing Pilot",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -68,9 +68,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 24848474,
+      "destination_present": true,
+      "destination_sha256": "d4db4ee9e3648cc9dfcb530e594eddf51a0b152a27dc23d1def3ca6a7c7fd343",
       "display_name": "Chili Bar Existing Pilot",
       "expected_format": "png",
       "expected_size_px": [
@@ -89,9 +89,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "ebb6682d52a6a011854b4679d43ba56f1a1d62642852cce9e045b805820e59f0",
       "display_name": "Upper Chili Bar To Coloma Checkpoint",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -110,9 +110,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 28387262,
+      "destination_present": true,
+      "destination_sha256": "279a08ca61d65820aa6baf797ce385f5c4708a949be5e4a8e4e8cb73b14b69aa",
       "display_name": "Upper Chili Bar To Coloma Checkpoint",
       "expected_format": "png",
       "expected_size_px": [
@@ -131,9 +131,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "03f4221679764654f0d41dc6433a0589bc4ab74e91938954cfeeb94e5d0dafa9",
       "display_name": "Coloma Valley Transit",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -152,9 +152,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 32670797,
+      "destination_present": true,
+      "destination_sha256": "5dc8296dfc06d501699a0284cad7d009ff640dcff76534adb093e98cdb77fadd",
       "display_name": "Coloma Valley Transit",
       "expected_format": "png",
       "expected_size_px": [
@@ -173,9 +173,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "c0bf9a88df94f3c8b71a6a64f4c3ed8e03472ae3e2f830c334ba73a1a1554236",
       "display_name": "Upper Gorge Rapid Windows",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -194,9 +194,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 27060168,
+      "destination_present": true,
+      "destination_sha256": "f68f6de316ad5867bca36955d7b942001d0d9295946dc0779a5550e0e70f9e63",
       "display_name": "Upper Gorge Rapid Windows",
       "expected_format": "png",
       "expected_size_px": [
@@ -215,9 +215,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "3b65c0358321a104bbe9ac9e4440329c29c18a273b66a460defc021c8c001df2",
       "display_name": "Lower Gorge To Salmon Falls Source Window",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -236,9 +236,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 29264572,
+      "destination_present": true,
+      "destination_sha256": "f208d7054420cfbd8b0119c6f890a011df923d253fc47b9c7fd5d407e71861c7",
       "display_name": "Lower Gorge To Salmon Falls Source Window",
       "expected_format": "png",
       "expected_size_px": [
@@ -257,9 +257,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/3dep_dem.tif",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "52ba01a222b7d5c8c659112e52bbb6e73a730caff82488d1138dbfe2cecf5d8a",
       "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
       "expected_format": "tiff",
       "expected_size_px": [
@@ -278,9 +278,9 @@
     },
     {
       "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/source/naip.png",
-      "destination_byte_count": 0,
-      "destination_present": false,
-      "destination_sha256": null,
+      "destination_byte_count": 18990707,
+      "destination_present": true,
+      "destination_sha256": "38f5cd09bdc0f7147fb5ff88f6e87689352248b324876d4012a7d4012a67fc74",
       "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
       "expected_format": "png",
       "expected_size_px": [
