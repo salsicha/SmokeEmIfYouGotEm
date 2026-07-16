@@ -1,0 +1,727 @@
+{
+  "feature_count": 24,
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7199431,
+          38.7786168
+        ],
+        "type": "Point"
+      },
+      "id": "anchor_chili_bar_put_in",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Chili Bar put-in",
+        "marker_kind": "anchor_candidate",
+        "production_promoted": false,
+        "published_river_mile": 0.0,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "station_id": "chili_bar_put_in_published_0_0_miles",
+        "station_m": 0.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7812546,
+          38.7718837
+        ],
+        "type": "Point"
+      },
+      "id": "anchor_coloma_bridge_checkpoint",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Coloma Bridge checkpoint",
+        "marker_kind": "anchor_checkpoint_candidate",
+        "production_promoted": false,
+        "published_river_mile": 5.6,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "station_id": "coloma_bridge_checkpoint_published_5_6_miles",
+        "station_m": 9012.3264
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.938291,
+          38.8220775
+        ],
+        "type": "Point"
+      },
+      "id": "anchor_salmon_falls_20_5",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Salmon Falls/Folsom source window 20.5 mi",
+        "marker_kind": "downstream_window_candidate",
+        "production_promoted": false,
+        "published_river_mile": 20.5,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_american_rivers_mile_guide",
+        "station_id": "salmon_falls_bridge_takeout_published_20_5_miles",
+        "station_m": 32991.552
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9441395,
+          38.8246066
+        ],
+        "type": "Point"
+      },
+      "id": "anchor_full_run_21_0",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Salmon Falls/Folsom source window 21.0 mi",
+        "marker_kind": "downstream_window_candidate",
+        "production_promoted": false,
+        "published_river_mile": 21.0,
+        "river_id": "south_fork_american_chili_bar",
+        "source_id": "south_fork_americanwhitewater_map",
+        "station_id": "full_run_downstream_window_published_21_0_miles",
+        "station_m": 33796.224
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7199431,
+          38.7786168
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_01_chili_bar_hole",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "surf feature",
+        "feature_tags": [
+          "hole",
+          "surf_wave",
+          "recovery_pool"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Chili Bar Hole",
+        "marker_kind": "named_rapid_candidate",
+        "order": 1,
+        "production_promoted": false,
+        "published_river_mile": 0.0,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 0.0
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7290462,
+          38.7772729
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_02_meat_grinder",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III+",
+        "feature_tags": [
+          "boulder_garden",
+          "constriction",
+          "wave_train",
+          "pin_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Meat Grinder",
+        "marker_kind": "named_rapid_candidate",
+        "order": 2,
+        "production_promoted": false,
+        "published_river_mile": 0.6,
+        "review_priority": "critical",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 965.6064
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7383971,
+          38.7722948
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_03_racehorse_bend",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "bend",
+          "lateral",
+          "boulder"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Racehorse Bend",
+        "marker_kind": "named_rapid_candidate",
+        "order": 3,
+        "production_promoted": false,
+        "published_river_mile": 1.3,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 2092.1472
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7398037,
+          38.7747887
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_04_maya",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II-III",
+        "feature_tags": [
+          "hole",
+          "ledge",
+          "surf_wave",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Maya",
+        "marker_kind": "named_rapid_candidate",
+        "order": 4,
+        "production_promoted": false,
+        "published_river_mile": 1.5,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 2414.016
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7418644,
+          38.7770399
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_05_rock_garden",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II",
+        "feature_tags": [
+          "boulder_garden",
+          "shallow_shelf",
+          "pin_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Rock Garden",
+        "marker_kind": "named_rapid_candidate",
+        "order": 5,
+        "production_promoted": false,
+        "published_river_mile": 1.7,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 2735.8848
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7471694,
+          38.7765129
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_06_african_queen",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II",
+        "feature_tags": [
+          "wave_train",
+          "boulder"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "African Queen",
+        "marker_kind": "named_rapid_candidate",
+        "order": 6,
+        "production_promoted": false,
+        "published_river_mile": 2.0,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 3218.688
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7618089,
+          38.7799137
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_07_triple_threat",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "multiple_channels",
+          "pin_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Triple Threat",
+        "marker_kind": "named_rapid_candidate",
+        "order": 7,
+        "production_promoted": false,
+        "published_river_mile": 3.1,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 4988.9664
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.7767335,
+          38.7763812
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_08_troublemaker",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III+",
+        "feature_tags": [
+          "boulder_garden",
+          "hole",
+          "diagonal_wave",
+          "eddy",
+          "wrap_hazard",
+          "multiple_lines"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Troublemaker",
+        "marker_kind": "named_rapid_candidate",
+        "order": 8,
+        "production_promoted": false,
+        "published_river_mile": 5.2,
+        "review_priority": "critical",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 8368.5888
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.8964121,
+          38.8093193
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_09_fowlers_rock",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "constriction",
+          "pin_hazard",
+          "slalom"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Fowler's Rock",
+        "marker_kind": "named_rapid_candidate",
+        "order": 9,
+        "production_promoted": false,
+        "published_river_mile": 15.8,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 25427.6352
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9001328,
+          38.8137704
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_10_upper_haystack_canyon",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "wave_train",
+          "canyon_constriction"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Upper Haystack Canyon",
+        "marker_kind": "named_rapid_candidate",
+        "order": 10,
+        "production_promoted": false,
+        "published_river_mile": 16.2,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 26071.3728
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9053397,
+          38.8113154
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_11_lost_hat",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III-",
+        "feature_tags": [
+          "wave_train",
+          "continuous_entry"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Lost Hat",
+        "marker_kind": "named_rapid_candidate",
+        "order": 11,
+        "production_promoted": false,
+        "published_river_mile": 16.7,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 26876.0448
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9021894,
+          38.8099593
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_12_satans_cesspool",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III+",
+        "feature_tags": [
+          "hole",
+          "curling_wave",
+          "central_island",
+          "eddy",
+          "swimmer_hazard",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Satan's Cesspool",
+        "marker_kind": "named_rapid_candidate",
+        "order": 12,
+        "production_promoted": false,
+        "published_river_mile": 16.9,
+        "review_priority": "critical",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 27197.9136
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9013332,
+          38.8086827
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_13_son_of_satan",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II+-III",
+        "feature_tags": [
+          "submerged_rock",
+          "wall_push",
+          "swimmer_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Son of Satan",
+        "marker_kind": "named_rapid_candidate",
+        "order": 13,
+        "production_promoted": false,
+        "published_river_mile": 17.0,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 27358.848
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9051419,
+          38.8048158
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_14_scissors",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "diagonal_ledge",
+          "boulder",
+          "lateral"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Scissors",
+        "marker_kind": "named_rapid_candidate",
+        "order": 14,
+        "production_promoted": false,
+        "published_river_mile": 17.4,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 28002.5856
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9087679,
+          38.8043388
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_15_lower_haystack_canyon",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II+",
+        "feature_tags": [
+          "wave_train",
+          "canyon_constriction"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Lower Haystack Canyon",
+        "marker_kind": "named_rapid_candidate",
+        "order": 15,
+        "production_promoted": false,
+        "published_river_mile": 17.6,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 28324.4544
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9168841,
+          38.801105
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_16_bouncing_rock",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "rock_push",
+          "hole",
+          "flip_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Bouncing Rock",
+        "marker_kind": "named_rapid_candidate",
+        "order": 16,
+        "production_promoted": false,
+        "published_river_mile": 18.2,
+        "review_priority": "critical",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 29290.0608
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9176316,
+          38.8039112
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_17_pre-op",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III-",
+        "feature_tags": [
+          "wave_train",
+          "bank_holes",
+          "boulders"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Pre-Op",
+        "marker_kind": "named_rapid_candidate",
+        "order": 17,
+        "production_promoted": false,
+        "published_river_mile": 18.4,
+        "review_priority": "medium",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 29611.9296
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9173471,
+          38.8064519
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_18_hospital_bar",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "III",
+        "feature_tags": [
+          "boulder_garden",
+          "chute",
+          "diagonal_hole",
+          "flip_hazard"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Hospital Bar",
+        "marker_kind": "named_rapid_candidate",
+        "order": 18,
+        "production_promoted": false,
+        "published_river_mile": 18.6,
+        "review_priority": "critical",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 29933.7984
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9204227,
+          38.8078396
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_19_recovery_room",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II-III",
+        "feature_tags": [
+          "hole",
+          "reservoir_stage_sensitive",
+          "recovery"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Recovery Room",
+        "marker_kind": "named_rapid_candidate",
+        "order": 19,
+        "production_promoted": false,
+        "published_river_mile": 18.8,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 30255.6672
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -120.9267035,
+          38.8126016
+        ],
+        "type": "Point"
+      },
+      "id": "rapid_20_surprise",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_window": false,
+        "class": "II-III",
+        "feature_tags": [
+          "seasonal_rock",
+          "chute",
+          "hole",
+          "low_flow_sensitive"
+        ],
+        "geometry_status": "review_candidate_from_directed_nhd_chain_not_authoritative",
+        "label": "Surprise",
+        "marker_kind": "named_rapid_candidate",
+        "order": 20,
+        "production_promoted": false,
+        "published_river_mile": 19.3,
+        "review_priority": "high",
+        "river_id": "south_fork_american_chili_bar",
+        "station_m": 31060.3392
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "policy": {
+    "allowed_use": [
+      "visual review",
+      "anchor and guide review queue",
+      "editor overlay with binding disabled"
+    ],
+    "forbidden_use": [
+      "shipping gameplay geometry",
+      "solver-window binding",
+      "public access or rescue geometry"
+    ]
+  },
+  "production_promoted": false,
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_directed_station_candidates.geojson.v1",
+  "source_json": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_directed_station_candidates.json",
+  "status": "review_only_visual_layer_not_production_geometry",
+  "type": "FeatureCollection"
+}

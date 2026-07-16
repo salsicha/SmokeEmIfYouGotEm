@@ -2,8 +2,10 @@ import json
 from pathlib import Path
 
 from raftsim.south_fork_a1_directed_station_candidates import (
+    FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH,
     FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH,
     build_south_fork_a1_directed_station_candidates,
+    build_south_fork_a1_directed_station_candidates_geojson,
 )
 
 
@@ -15,6 +17,14 @@ def _load_candidates() -> dict:
         (REPO_ROOT / FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH).read_text(
             encoding="utf-8"
         )
+    )
+
+
+def _load_geojson() -> dict:
+    return json.loads(
+        (
+            REPO_ROOT / FULL_REACH_DIRECTED_STATION_CANDIDATES_GEOJSON_RELATIVE_PATH
+        ).read_text(encoding="utf-8")
     )
 
 
@@ -51,10 +61,16 @@ def test_south_fork_a1_directed_station_candidates_record_chain_shape():
 def test_south_fork_a1_directed_station_candidates_record_anchor_points():
     candidates = _load_candidates()
     anchors = candidates["source_anchor_station_candidates"]
+    chili_bar = anchors["chili_bar_put_in"]
     coloma = anchors["coloma_bridge_checkpoint"]
     downstream = anchors["downstream_source_window"]
     lower = downstream["minimum_source_mile_candidate"]
     upper = downstream["maximum_source_mile_candidate"]
+
+    assert chili_bar["published_river_mile"] == 0.0
+    assert chili_bar["station_m"] == 0.0
+    assert chili_bar["lon_lat"] == [-120.7199431, 38.7786168]
+    assert chili_bar["current_seed_to_candidate_geodesic_distance_m"] == 0.0
 
     assert coloma["published_river_mile"] == 5.6
     assert coloma["station_m"] == 9012.3264
@@ -98,3 +114,40 @@ def test_south_fork_a1_directed_station_candidates_keep_rapids_review_only():
     assert gate["can_enable_south_fork_editor_geometry"] is False
     assert gate["can_bind_meat_grinder_troublemaker_solver_windows"] is False
     assert gate["can_restation_catalog_from_candidates"] is False
+
+
+def test_south_fork_a1_directed_station_candidates_geojson_is_reproducible():
+    generated = build_south_fork_a1_directed_station_candidates_geojson(REPO_ROOT)
+    committed = _load_geojson()
+
+    assert generated == committed
+    assert committed["schema"] == (
+        "raftsim.south_fork.a1_directed_station_candidates.geojson.v1"
+    )
+    assert committed["status"] == "review_only_visual_layer_not_production_geometry"
+    assert committed["production_promoted"] is False
+    assert committed["feature_count"] == 24
+
+
+def test_south_fork_a1_directed_station_candidates_geojson_blocks_binding():
+    geojson = _load_geojson()
+    features = {feature["id"]: feature for feature in geojson["features"]}
+
+    assert set(features) >= {
+        "anchor_chili_bar_put_in",
+        "anchor_coloma_bridge_checkpoint",
+        "anchor_salmon_falls_20_5",
+        "anchor_full_run_21_0",
+        "rapid_08_troublemaker",
+    }
+    coloma = features["anchor_coloma_bridge_checkpoint"]
+    troublemaker = features["rapid_08_troublemaker"]
+
+    assert coloma["geometry"]["coordinates"] == [-120.7812546, 38.7718837]
+    assert coloma["properties"]["can_bind_editor_geometry"] is False
+    assert troublemaker["geometry"]["coordinates"] == [-120.7767335, 38.7763812]
+    assert troublemaker["properties"]["marker_kind"] == "named_rapid_candidate"
+    assert all(
+        feature["properties"]["production_promoted"] is False
+        for feature in geojson["features"]
+    )
