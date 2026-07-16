@@ -177,6 +177,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Preserved every V20-family manifest, source report, review JSON, capture, and contact sheet. Later historical drivers that still import V20 metric helpers are superseded and are removed in the following driver-cleanup slice; the current V43 driver remains independent.
 - Verification: `import raftsim` succeeds, no Python source imports the deleted V20 generator, and the full suite reports **537 passed / 3 skipped**. The pass count changed only by the five intentionally retired V20-family snapshots.
 
+### 2026-07-16 Finding 3 Step 3.2 Historical Driver Retirement
+
+- Removed the superseded V17 and V22-V42 comparison graph plus the V1-V8/V14/V15 review launchers. V43 is the sole live locked comparison driver and depends only on the stable current-review metrics module; the unversioned source generator remains available for current asset generation.
+- Added a retention guard that rejects any returning historical driver or versioned texture generator and requires all 47 governed cypress review JSONs to remain present and nonempty. No report, review, capture, contact sheet, manifest, or map was removed.
+- Verification: the retention guard passes **3/3**, `import raftsim` succeeds, and the full suite reports **539 passed / 3 skipped**. The two-test increase is exactly the new executable-surface and evidence-presence guards.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
