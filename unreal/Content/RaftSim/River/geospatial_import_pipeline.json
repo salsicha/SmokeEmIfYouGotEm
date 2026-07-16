@@ -42,9 +42,20 @@
       "requires_source_manifest": true,
       "seed_status": "available_in_seed_manifest",
       "source_paths": [
-        "physics/data/real_world/south_fork_american_chili_bar/hydrography/centerline.geojson",
-        "physics/data/real_world/south_fork_american_chili_bar/hydrography/banks.geojson",
-        "physics/data/real_world/south_fork_american_chili_bar/hydrography/cross_sections.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/tnm_nhd_products.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/hydrography_draft_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/banks.geojson",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/cross_sections.geojson",
         "physics/data/real_world/south_fork_american_chili_bar/rapid_candidates.geojson",
         "physics/data/real_world/south_fork_american_chili_bar/review/rapid_candidates.geojson"
       ],
@@ -66,6 +77,20 @@
       "requires_source_manifest": true,
       "seed_status": "available_in_seed_manifest",
       "source_paths": [
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/tnm_naip_products.json",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_sample_512.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_sample_1024.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_water_mask_1024.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_vegetation_mask_1024.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/usda_naip_chili_bar_corridor_masks_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/naip_tiles",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_drape_4096.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/water_mask_2048.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/vegetation_mask_2048.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/source_masks_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/nhd_mainstem_water_prior_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/nhd_mainstem_water_prior_2048.png",
+        "physics/data/real_world/south_fork_american_chili_bar/imagery/production_import_pilot/wet_rock_review.geojson",
         "physics/data/real_world/south_fork_american_chili_bar/imagery/naip_tiles",
         "physics/data/real_world/south_fork_american_chili_bar/imagery/water_mask.tif",
         "physics/data/real_world/south_fork_american_chili_bar/imagery/foam_texture_mask.tif"
@@ -110,6 +135,14 @@
       "seed_status": "available_in_seed_manifest",
       "source_paths": [
         "physics/data/real_world/south_fork_american_chili_bar/hydrology/usgs_11445500_daily_discharge.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_seasonal_window_review_wy2026_to_2026-07-06.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/cdec_multiyear_flow_review_2021-10-01_2026-07-06.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
         "physics/data/real_world/south_fork_american_chili_bar/hydrology/flow_presets.json"
       ],
       "stage_id": "gauge_history_tables",
@@ -168,29 +201,6 @@
     "solver_neutral_scenario_package",
     "geoclaw_cpp_comparison_inputs",
     "unreal_fidelity_review_overlays"
-  ],
-  "review_gated_import_tests": [
-    {
-      "river_id": "american_south_fork",
-      "stage_id": "south_fork_heightfield_import_test",
-      "config": "unreal/Content/RaftSim/River/south_fork_heightfield_import_test.json",
-      "status": "review_gated_not_enabled_for_preview_maps",
-      "source_artifact": "physics/data/real_world/south_fork_american_chili_bar/terrain/usgs_3dep_chili_bar_corridor_heightfield_1009.png"
-    },
-    {
-      "river_id": "colorado_river",
-      "stage_id": "colorado_heightfield_import_test",
-      "config": "unreal/Content/RaftSim/River/colorado_heightfield_import_test.json",
-      "status": "review_gated_not_enabled_for_preview_maps",
-      "source_artifact": "physics/data/real_world/colorado_river_grand_canyon_rowing/terrain/usgs_3dep_lees_ferry_corridor_heightfield_1009.png"
-    },
-    {
-      "river_id": "pacuare",
-      "stage_id": "pacuare_heightfield_import_test",
-      "config": "unreal/Content/RaftSim/River/pacuare_heightfield_import_test.json",
-      "status": "review_gated_not_enabled_for_preview_maps",
-      "source_artifact": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_1009.png"
-    }
   ],
   "schema": "raftsim.unreal.geospatial_import_pipeline.v1",
   "shapefile_canonical_allowed": false,

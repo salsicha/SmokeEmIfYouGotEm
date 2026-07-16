@@ -1,6 +1,6 @@
 {
   "accepted_report_set_lock": {
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
     "manifest": "physics/reports/milestone20/report_set_lock.json"
   },
   "automation_module": "RaftSimAutomation",
@@ -8,7 +8,7 @@
   "checks": [
     {
       "check_id": "accepted_report_set_lock",
-      "passed": true,
+      "passed": false,
       "summary": "Accepted Milestone 16 report-set lock is present, passing, and hash-addressed."
     },
     {
@@ -62,7 +62,7 @@
     "traceable_river_data_assets": "unreal/Content/RaftSim/River/traceable_river_data_assets.json"
   },
   "schema": "raftsim.unreal.live_water_smoke_suite.v1",
-  "status": "ready_for_unreal_automation_execution",
+  "status": "blocked",
   "suite_id": "milestone20_live_water_smoke",
   "target_profiles": [
     {

@@ -3,7 +3,7 @@
   "cpp_run_report": "reports/milestone16/cpp_solver_runs.json",
   "geoclaw_reference_report": "reports/milestone16/geoclaw_reference_runs.json",
   "output_root": "outputs/m16cmp",
-  "passed": true,
+  "passed": false,
   "records": [
     {
       "actual_scenario_id": "flat_pool_seed_16",
@@ -86,11 +86,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "flat_pool",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -178,11 +183,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "flat_pool",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -270,11 +280,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "uniform_channel",
+      "parity_evidence": [
+        "fixture_scoped_uniform_channel_reduced_slope_profile_balance"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -362,11 +377,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "uniform_channel",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -454,11 +474,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "dam_break",
+      "parity_evidence": [
+        "fixture_scoped_dam_break_geoclaw_profile_calibration"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -546,11 +571,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "dam_break",
+      "parity_evidence": [
+        "fixture_scoped_dam_break_geoclaw_profile_calibration"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -638,11 +668,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "bed_step",
+      "parity_evidence": [
+        "fixture_scoped_bed_step_reduced_geoclaw_profile_calibration"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -730,11 +765,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "bed_step",
+      "parity_evidence": [
+        "fixture_scoped_bed_step_finite_volume_hydrostatic_face_source"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -822,11 +862,17 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "constriction",
+      "parity_evidence": [
+        "fixture_scoped_constriction_reduced_geoclaw_profile_calibration",
+        "constriction_reduced_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -914,11 +960,17 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "constriction",
+      "parity_evidence": [
+        "fixture_scoped_constriction_finite_volume_geoclaw_profile_calibration",
+        "constriction_finite_volume_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1006,11 +1058,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "wet_dry_shoreline",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1098,11 +1155,16 @@
       "feature_count": 1,
       "frame_comparisons": 2,
       "gate_scenario_id": "wet_dry_shoreline",
+      "parity_evidence": [
+        "fixture_scoped_wet_dry_reconstruction"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1190,11 +1252,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "sloping_manning_channel",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1282,11 +1349,16 @@
       "feature_count": 0,
       "frame_comparisons": 2,
       "gate_scenario_id": "sloping_manning_channel",
+      "parity_evidence": [
+        "no_active_fixture_scoped_behavior"
+      ],
+      "parity_mode": "solver",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": true,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1374,11 +1446,17 @@
       "feature_count": 2,
       "frame_comparisons": 2,
       "gate_scenario_id": "drop_ledge",
+      "parity_evidence": [
+        "fixture_scoped_drop_ledge_reduced_geoclaw_profile_calibration",
+        "drop_ledge_reduced_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1466,11 +1544,16 @@
       "feature_count": 2,
       "frame_comparisons": 2,
       "gate_scenario_id": "drop_ledge",
+      "parity_evidence": [
+        "fixture_scoped_drop_ledge_hydraulic_control_balance"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 3,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "canonical",
       "threshold_passed": true,
@@ -1558,11 +1641,17 @@
       "feature_count": 14,
       "frame_comparisons": 2,
       "gate_scenario_id": "boulder_garden",
+      "parity_evidence": [
+        "fixture_scoped_boulder_garden_reduced_geoclaw_profile_calibration",
+        "boulder_garden_reduced_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -1650,11 +1739,17 @@
       "feature_count": 14,
       "frame_comparisons": 2,
       "gate_scenario_id": "boulder_garden",
+      "parity_evidence": [
+        "fixture_scoped_boulder_garden_finite_volume_geoclaw_profile_calibration",
+        "boulder_garden_finite_volume_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -1742,11 +1837,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "cascading_wave_train",
+      "parity_evidence": [
+        "fixture_scoped_cascading_wave_train_reduced_geoclaw_profile_calibration",
+        "cascading_wave_train_reduced_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -1834,11 +1935,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "cascading_wave_train",
+      "parity_evidence": [
+        "fixture_scoped_cascading_wave_train_finite_volume_geoclaw_profile_calibration",
+        "cascading_wave_train_finite_volume_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -1926,11 +2033,17 @@
       "feature_count": 11,
       "frame_comparisons": 2,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2018,11 +2131,17 @@
       "feature_count": 11,
       "frame_comparisons": 2,
       "gate_scenario_id": "hydraulic_hole_downstream_boil",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2110,11 +2229,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "lateral_wave",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2202,11 +2327,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "lateral_wave",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2294,11 +2425,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "eddy_line_shear",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2386,11 +2523,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "eddy_line_shear",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2478,11 +2621,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "shallow_shelf",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2570,11 +2719,17 @@
       "feature_count": 10,
       "frame_comparisons": 2,
       "gate_scenario_id": "shallow_shelf",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 9,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "rafting",
       "threshold_passed": true,
@@ -2662,11 +2817,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_low_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "real_world",
       "threshold_passed": true,
@@ -2754,11 +2915,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_low_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "real_world",
       "threshold_passed": true,
@@ -2846,11 +3013,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_median_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "real_world",
       "threshold_passed": true,
@@ -2938,11 +3111,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_median_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "real_world",
       "threshold_passed": true,
@@ -3030,11 +3209,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_high_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "real_world",
       "threshold_passed": true,
@@ -3122,11 +3307,17 @@
       "feature_count": 8,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_high_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "passed": true,
         "required": false
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "real_world",
       "threshold_passed": true,
@@ -3214,6 +3405,11 @@
       "feature_count": 19,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3223,6 +3419,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3310,6 +3507,10 @@
       "feature_count": 19,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_low_runnable",
+      "parity_evidence": [
+        "cascading_geoclaw_profile_reconstruction.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3319,6 +3520,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3406,6 +3608,11 @@
       "feature_count": 20,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3415,6 +3622,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3502,6 +3710,10 @@
       "feature_count": 20,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_median_runnable",
+      "parity_evidence": [
+        "cascading_geoclaw_profile_reconstruction.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3511,6 +3723,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3598,6 +3811,11 @@
       "feature_count": 21,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "parity_evidence": [
+        "fixture_scoped_scenario_geoclaw_profile_calibration",
+        "scenario_geoclaw_profile_calibration.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3607,6 +3825,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "reduced",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3694,6 +3913,10 @@
       "feature_count": 21,
       "frame_comparisons": 2,
       "gate_scenario_id": "south_fork_cascading_high_runnable",
+      "parity_evidence": [
+        "cascading_geoclaw_profile_reconstruction.enabled"
+      ],
+      "parity_mode": "reference_playback",
       "point_probes": 7,
       "reach_drop_check": {
         "cpp_drop_transition_count": 1,
@@ -3703,6 +3926,7 @@
         "passed": true,
         "required": true
       },
+      "solver_approval_passed": false,
       "solver_mode": "finite_volume",
       "suite": "cascading",
       "threshold_passed": true,
@@ -3710,7 +3934,13 @@
       "threshold_tier": "unreal_prototype"
     }
   ],
-  "schema_version": "raftsim.milestone16.geoclaw_cpp_comparisons.v0",
+  "reference_playback_count": 34,
+  "reference_playback_threshold_passed_count": 34,
+  "schema_version": "raftsim.milestone16.geoclaw_cpp_comparisons.v1",
+  "solver_approval_blocked_count": 34,
+  "solver_parity_count": 6,
+  "solver_parity_threshold_failed_count": 0,
+  "solver_parity_threshold_passed_count": 6,
   "threshold_failed_count": 0,
   "threshold_passed_count": 40
 }

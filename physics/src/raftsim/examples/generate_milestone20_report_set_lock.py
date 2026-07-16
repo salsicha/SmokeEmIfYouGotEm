@@ -1,4 +1,4 @@
-"""Generate the Milestone 20 accepted report-set lock."""
+"""Generate the current Milestone 20 report-set lock."""
 
 from __future__ import annotations
 

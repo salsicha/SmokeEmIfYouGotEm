@@ -11,7 +11,6 @@ from raftsim.milestone22 import (
     MILESTONE22_CONTACT_TELEMETRY_SCHEMA,
     MILESTONE22_CONTACT_TELEMETRY_STATUS,
     MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
-    MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
     MILESTONE22_SWIMMER_RESCUE_SCHEMA,
     MILESTONE22_SWIMMER_RESCUE_STATUS,
     MILESTONE22_SWIMMING_SKILL_SCHEMA,
@@ -73,10 +72,12 @@ def test_raft_contact_authority_integration_manifest_matches_generator():
 
     assert committed == expected
     assert committed["schema"] == MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA
-    assert committed["status"] == MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS
+    assert committed["status"] == (
+        "raft_contact_integrated_over_frozen_water_live_custom_water_blocked"
+    )
 
 
-def test_raft_contact_authority_integration_uses_approved_custom_water_and_runtime():
+def test_raft_contact_authority_integration_uses_frozen_water_while_live_gate_is_blocked():
     manifest = json.loads(AUTHORITY_INTEGRATION_PATH.read_text(encoding="utf-8"))
     report_lock = json.loads(REPORT_SET_LOCK_PATH.read_text(encoding="utf-8"))
     authority_selection = json.loads(AUTHORITY_SELECTION_PATH.read_text(encoding="utf-8"))
@@ -84,13 +85,17 @@ def test_raft_contact_authority_integration_uses_approved_custom_water_and_runti
     raft_runtime = json.loads(RAFT_RUNTIME_PATH.read_text(encoding="utf-8"))
     fixed_step = json.loads(FIXED_STEP_BRIDGE_PATH.read_text(encoding="utf-8"))
 
-    assert manifest["approved_custom_water"]["authority"] == (
+    assert manifest["custom_water_evidence"]["candidate_authority"] == (
         "custom_cxx_shallow_water_solver"
     )
-    assert manifest["approved_custom_water"]["lock_hash"] == report_lock["lock"][
+    assert manifest["custom_water_evidence"]["lock_hash"] == report_lock["lock"][
         "lock_hash"
     ]
-    assert manifest["approved_custom_water"]["source_gate_passed"] is True
+    assert manifest["custom_water_evidence"]["source_gate_passed"] is False
+    assert manifest["custom_water_evidence"]["live_water_approved"] is False
+    assert manifest["custom_water_evidence"]["operating_mode"] == (
+        "frozen_validation_snapshot_only"
+    )
     assert {
         manifest["selected_raft_contact_authority"]["runtime"],
         authority_selection["selected_runtime"],

@@ -186,7 +186,50 @@ def test_milestone16_comparison_report_tracks_threshold_failures():
     payload = report.to_json_dict()
     assert report.passed is False
     assert payload["threshold_failed_count"] == 1
+    assert payload["solver_parity_count"] == 1
+    assert payload["solver_approval_blocked_count"] == 1
     assert payload["records"][0]["compared"] is True
+
+
+def test_milestone16_comparison_report_separates_solver_and_playback_rows():
+    common = {
+        "gate_scenario_id": "flat_pool",
+        "actual_scenario_id": "flat_pool_seed_16",
+        "suite": "canonical",
+        "solver_mode": "reduced",
+        "threshold_tier": "production_candidate",
+        "comparison_dir": "outputs/m16cmp/c_flat/reduced",
+        "threshold_report": "outputs/m16cmp/c_flat/reduced/threshold_evaluation.json",
+        "threshold_passed": True,
+        "failing_checks": (),
+        "check_values": {},
+        "frame_comparisons": 2,
+        "point_probes": 3,
+        "cross_sections": 1,
+        "feature_count": 0,
+        "reach_drop_check": {"required": False, "passed": True},
+    }
+    solver = Milestone16ComparisonRecord(**common, parity_mode="solver")
+    playback = Milestone16ComparisonRecord(
+        **{**common, "solver_mode": "finite_volume"},
+        parity_mode="reference_playback",
+        parity_evidence=("fixture_scoped_dam_break_geoclaw_profile_calibration",),
+    )
+    report = Milestone16ComparisonReport(
+        geoclaw_reference_report="reports/milestone16/geoclaw_reference_runs.json",
+        cpp_run_report="reports/milestone16/cpp_solver_runs.json",
+        output_root="outputs/m16cmp",
+        records=(solver, playback),
+    )
+
+    payload = report.to_json_dict()
+    assert report.passed is False
+    assert payload["threshold_passed_count"] == 2
+    assert payload["solver_parity_count"] == 1
+    assert payload["solver_parity_threshold_passed_count"] == 1
+    assert payload["reference_playback_count"] == 1
+    assert payload["solver_approval_blocked_count"] == 1
+    assert payload["records"][1]["solver_approval_passed"] is False
 
 
 def test_milestone16_geometry_report_blocks_on_failed_case():
@@ -741,9 +784,25 @@ def _write_component_reports(report_dir):
           "comparison_count": 2,
           "threshold_passed_count": 1,
           "threshold_failed_count": 1,
+          "solver_parity_count": 2,
+          "solver_parity_threshold_passed_count": 1,
+          "solver_parity_threshold_failed_count": 1,
+          "reference_playback_count": 0,
+          "solver_approval_blocked_count": 1,
           "records": [
-            {"gate_scenario_id": "flat_pool", "threshold_passed": true},
-            {"gate_scenario_id": "wet_dry_shoreline", "threshold_passed": false, "failing_checks": ["field_linf"]}
+            {
+              "gate_scenario_id": "flat_pool",
+              "threshold_passed": true,
+              "solver_approval_passed": true,
+              "parity_mode": "solver"
+            },
+            {
+              "gate_scenario_id": "wet_dry_shoreline",
+              "threshold_passed": false,
+              "solver_approval_passed": false,
+              "parity_mode": "solver",
+              "failing_checks": ["field_linf"]
+            }
           ]
         }""",
         encoding="utf-8",

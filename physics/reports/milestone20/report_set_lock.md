@@ -1,13 +1,13 @@
 # Milestone 20 Report Set Lock
 
-Decision: `accepted_milestone16_report_set_locked_target_profiles_pass`
+Decision: `blocked`
 
-Locked 27 artifacts with SHA-256 lock `267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627`.
+Locked 27 artifacts with SHA-256 lock `4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486`.
 
 ## Source Gates
 
-- Milestone 16 full C++ validation gate: `PASS`, 7 of 7 components passed.
-- GeoClaw-to-Unreal readiness gate: `approved`, approved=True.
+- Milestone 16 full C++ validation gate: `BLOCKED`, 6 of 7 components passed.
+- GeoClaw-to-Unreal readiness gate: `blocked`, approved=False.
 
 ## Target Profile Confirmation
 
@@ -25,10 +25,10 @@ Runtime evidence scope: `committed_milestone16_runtime_records_evaluated_against
 
 ## Production Use
 
-The live-water Unreal bridge can use this lock as its accepted report manifest. Physical desktop, VR, and handheld device captures should replace or extend it before platform release sign-off.
+This lock records a blocked evidence set. The Unreal bridge must keep live custom water disabled; telemetry and frozen playback remain available while solver-parity evidence is repaired.
 
 ## Notes
 
-- The lock hash covers the accepted Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.
+- The lock hash covers the current Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.
 - Runtime profile evidence is repeated here by evaluating every committed Milestone 16 profile record against desktop, VR, and handheld budget profiles.
-- This artifact is the manifest Unreal live-water bridge work should load until a newer accepted report-set lock supersedes it.
+- A blocked lock must keep live custom water disabled until a newer passing report-set lock supersedes it.

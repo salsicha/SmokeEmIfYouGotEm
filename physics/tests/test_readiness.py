@@ -132,7 +132,13 @@ def test_milestone16_geoclaw_readiness_report_blocks_live_custom_water():
     report = build_milestone16_geoclaw_readiness_report(
         geoclaw_reference_summary={"passed": True, "passed_count": 20, "scenario_count": 20},
         cpp_summary={"passed": True, "passed_count": 40, "run_count": 40},
-        comparison_summary={"passed": False, "threshold_passed_count": 4, "comparison_count": 40},
+        comparison_summary={
+            "passed": False,
+            "threshold_passed_count": 40,
+            "solver_parity_threshold_passed_count": 6,
+            "reference_playback_count": 34,
+            "comparison_count": 40,
+        },
         geometry_summary={"passed": False, "passed_count": 2, "case_count": 6},
         raft_coupling_summary={"passed": False, "passed_count": 7, "comparison_count": 50},
         runtime_profile_summary={"passed": True, "budget_passed_count": 8, "run_count": 8},
@@ -148,6 +154,11 @@ def test_milestone16_geoclaw_readiness_report_blocks_live_custom_water():
     assert "milestone16_geoclaw_cpp_thresholds" in check_ids
     assert "milestone16_geometry_validation" in check_ids
     assert "milestone16_raft_coupling" in check_ids
+    parity_check = next(
+        check for check in report.checks if check.check_id == "milestone16_geoclaw_cpp_thresholds"
+    )
+    assert "6 of 40 rows provide passing solver parity" in parity_check.details
+    assert "34 rows are reference playback" in parity_check.details
 
 
 def test_generate_milestone16_readiness_writes_blocked_report(tmp_path):

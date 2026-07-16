@@ -1,7 +1,7 @@
 {
-  "schema": "raftsim.unreal.cpp_solver_visualization_fields.v1",
+  "schema": "raftsim.unreal.cpp_solver_visualization_fields.v2",
   "generated_on": "2026-07-10",
-  "status": "validated_cpp_solver_visualization_fields_generated_for_south_fork_review",
+  "status": "reference_playback_visualization_fields_generated_for_south_fork_review",
   "river_id": "american_south_fork",
   "scenario_id": "american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading",
   "flow_band": "median",
@@ -30,32 +30,36 @@
     },
     "run_manifest": {
       "path": "physics/outputs/m16cpp/cg_med/finite_volume/cpp_solver/american_south_fork_chili_bar_to_coloma_median_runnable_intermediate_cascading/manifest.json",
-      "sha256": "5699739661357f0887f42a2aac606024eedccf1f696ec6447d7e4b5896edd471",
-      "size_bytes": 218438
+      "sha256": "bc8adeb368f6883bbf9541c14001d45fb417a5cdad8872072c7a5292278ef9fe",
+      "size_bytes": 218553
     },
     "geoclaw_cpp_parity": {
       "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
-      "sha256": "487e569864a0db35c53d34939eff835027c9b66a9f61367c29659ba39fa2c22a",
-      "size_bytes": 129862
+      "sha256": "6d10bdee6266542b539a72897e49aaa9d21e8a60838a32d8c442676970b87e25",
+      "size_bytes": 138709
     },
     "full_cpp_validation_gate": {
       "path": "physics/reports/milestone16/full_cpp_validation_gate.json",
-      "sha256": "485e113704cb8f3f07a9f4cf922377b491f0f21a4cfa6369f606b0aa8a0b2db0",
-      "size_bytes": 3017
+      "sha256": "455a66ff71120dafa323cb980d86445a74c488090da80e788ad25d0ef4e6117e",
+      "size_bytes": 4274
     },
-    "accepted_report_set_lock": {
+    "current_report_set_lock": {
       "path": "physics/reports/milestone20/report_set_lock.json",
-      "sha256": "a1dbe30b42d9167a068398dfe7395aea4b60f79aec39c6bf756970ffb51ba97e",
-      "size_bytes": 10508
+      "sha256": "d91dfa857af52b0a39e6f814485af5f680e617d98014d8bc92e807548ba8f136",
+      "size_bytes": 10487
     }
   },
-  "acceptance_evidence": {
+  "visualization_source_evidence": {
     "feature_strength_scale": 0,
     "boundary_mode": "scenario",
     "flux_scheme": "hll",
     "threshold_tier": "unreal_prototype",
     "threshold_report": "outputs/m16cmp/cg_med/finite_volume/threshold_evaluation.json",
-    "report_set_lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627"
+    "parity_mode": "reference_playback",
+    "solver_approval_passed": false,
+    "full_gate_passed": false,
+    "live_water_approved": false,
+    "report_set_lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486"
   },
   "field_ranges": {
     "depth_m": [
@@ -95,7 +99,7 @@
       "froude": 7.0,
       "surface_relief_m": 4.0
     },
-    "reason": "stable cross-frame authoring scale; accepted frame extrema remain inside every cap"
+    "reason": "stable cross-frame authoring scale; calibrated playback frame extrema remain inside every cap"
   },
   "surface_relief_derivation": {
     "source_field": "eta",
@@ -137,7 +141,7 @@
       "target_world_x_cm": 4740.0,
       "camera_solver_u": 0.31322751322751324,
       "target_solver_u": 0.43227513227513226,
-      "intent": "frame the accepted median field approach spanning the strongest mean-Froude columns"
+      "intent": "frame the calibrated median playback field spanning the strongest mean-Froude columns"
     }
   },
   "render_binding": {
@@ -146,7 +150,7 @@
     "river_scope": [
       "american_south_fork"
     ],
-    "other_river_status": "not_bound_until_equivalent_river_specific_validated_cpp_exports_exist",
+    "other_river_status": "not_bound_until_equivalent_river_specific_playback_or_solver_exports_exist",
     "feature_weights": {
       "macro_normal": 0.22,
       "depth_color": 0.2,
@@ -169,12 +173,15 @@
     }
   },
   "authority_policy": {
-    "physical_authority": "custom_cxx_shallow_water_solver",
+    "physical_authority": "none_reference_playback_visualization_only",
+    "source_runtime_candidate": "custom_cxx_shallow_water_solver",
+    "parity_mode": "reference_playback",
+    "live_water_approved": false,
     "derivative_scope": "review_only_noncolliding_render_geometry_and_material_response_on_landscape_candidate_ribbon",
     "feature_forcing_enabled": false,
     "changes_collision_or_raft_forces": false,
     "changes_solver_state": false,
     "may_hide_conservation_or_parity_failures": false,
-    "promotion_requires_river_specific_live_bridge_alignment": true
+    "promotion_requires_future_solver_parity_and_live_bridge_alignment": true
   }
 }

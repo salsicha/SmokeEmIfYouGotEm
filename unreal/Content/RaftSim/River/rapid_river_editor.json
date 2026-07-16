@@ -1,7 +1,8 @@
 {
   "accepted_report_set_lock": {
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "manifest": "physics/reports/milestone20/report_set_lock.json"
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "passed": false
   },
   "annotation_templates": [
     {
@@ -201,6 +202,11 @@
       },
       "gauge_history_snippets": [
         "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/flow_presets.json"
       ],
       "guide_notes": [
@@ -230,6 +236,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -312,6 +320,11 @@
       },
       "gauge_history_snippets": [
         "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/flow_presets.json"
       ],
       "guide_notes": [
@@ -341,6 +354,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -423,6 +438,11 @@
       },
       "gauge_history_snippets": [
         "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/flow_presets.json"
       ],
       "guide_notes": [
@@ -452,6 +472,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -534,6 +556,11 @@
       },
       "gauge_history_snippets": [
         "hydrology/usgs_11445500_daily_discharge.json",
+        "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+        "hydrology/south_fork_modern_flow_source_selection.json",
+        "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+        "hydrology/cdec_terms_flags_and_station_relation_review.json",
+        "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
         "hydrology/flow_presets.json"
       ],
       "guide_notes": [
@@ -563,6 +590,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",

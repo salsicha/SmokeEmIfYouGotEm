@@ -1,13 +1,13 @@
 {
   "accepted_report_set_lock": {
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "manifest": "physics/reports/milestone20/report_set_lock.json"
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "passed": false
   },
   "automation_module": "RaftSimAutomation",
   "automation_test_prefix": "RaftSim.Milestone20.LiveWaterRegression",
   "comparison_modes": [
-    "replayed_water_field_vs_accepted_cpp_output",
-    "live_water_field_vs_accepted_cpp_output"
+    "replayed_water_field_vs_calibrated_cpp_output"
   ],
   "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
   "pass_policy": {
@@ -2427,6 +2427,6 @@
       ]
     }
   },
-  "status": "ready_for_unreal_automation_execution",
+  "status": "live_water_blocked_replay_fixtures_available",
   "total_fixture_count": 109
 }

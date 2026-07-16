@@ -36,6 +36,14 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Step 1.2 must now relabel calibrated comparison rows as reference playback and remove playback rows from the solver-parity approval count.
 - Post-check: the full suite reports **531 passed / 5 failed / 3 skipped in 124.64 seconds**. The two added passes are the new truth-baseline tests; the five failures and three skips are identical to Phase 0, so there is no regression.
 
+### 2026-07-15 Finding 1 Step 1.2
+
+- Added `parity_mode: solver | reference_playback` and manifest-derived `parity_evidence` to every v1 Milestone 16 comparison row. Missing fixture-scoped audit flags are rejected instead of guessed.
+- Regenerated the calibrated C++ matrix after adding the missing finite-volume bed-step hydrostatic-source audit flag. The honest headline is **6 of 40 passing solver-parity rows, 34 of 40 reference-playback rows, and 40 of 40 raw calibrated threshold checks passing**.
+- Regenerated the full C++ gate, GeoClaw-to-Unreal readiness package, and Milestone 20 report-set lock through their generators. All three are blocked, and the lock keeps live custom water disabled while preserving telemetry/frozen-playback use.
+- Updated the governing water, readiness, Unreal, authority, and TODO documents so playback is no longer presented as solver approval. Step 1.3 is the next owner gate.
+- Post-check: the full suite reports **539 passed / 2 failed / 3 skipped in 131.17 seconds**. The remaining failures are the pre-existing production-foundation plugin-list snapshot drift and Colorado rowing-route generator drift; neither is part of the water parity path. The honest-gate tests and regenerated downstream locks pass.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

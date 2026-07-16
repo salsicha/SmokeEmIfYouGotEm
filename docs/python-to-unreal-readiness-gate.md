@@ -2,9 +2,9 @@
 
 Milestone 10 generated the first Python-to-Unreal readiness gate artifacts in `physics/data/readiness/milestone_10/`.
 
-Current decision: **approved for the Milestone 20 live-water bridge foundation from the locked Milestone 16 report set**. The Milestone 10 audit remains useful for telemetry/replay playback and historical regression, and the regenerated Milestone 16 GeoClaw-to-Unreal readiness report now approves live custom water because the full GeoClaw/C++ geometry, raft-coupling, runtime, and regression-promotion gate passes.
+Current decision: **blocked for live custom water**. The v1 Milestone 16 comparison report separates 6 passing solver-parity rows from 34 reference-playback rows. The Milestone 10 audit and calibrated Milestone 16/18 artifacts remain useful for telemetry, frozen playback, and historical regression, but they do not approve the C++ solver as live Unreal water.
 
-Production Unreal work can move from telemetry/replay playback into live custom-water integration using the Milestone 20 report-set lock. The committed evidence confirms desktop, VR, and handheld target budget profiles; measured physical device captures should replace or extend the lock before platform release sign-off.
+Production Unreal tooling and playback work may continue, but the blocked Milestone 20 report-set lock must keep live custom-water stepping disabled. Runtime budget evidence remains valid for the calibrated configurations; physical device captures are still required after solver approval.
 
 ## Artifacts
 
@@ -12,16 +12,16 @@ Current packaged Milestone 16 GeoClaw/C++ gate artifacts from the last full-gate
 
 - `geoclaw_reference_summary.json`: 20 of 20 full GeoClaw fixed-grid reference runs passed.
 - `cpp_solver_summary.json`: 40 of 40 reduced and finite-volume C++ runs completed with manifests.
-- `geoclaw_cpp_comparison_summary.json`: 40 of 40 GeoClaw/C++ threshold comparisons pass, so the comparison gate no longer blocks.
+- `geoclaw_cpp_comparison_summary.json`: 6 of 40 rows provide passing solver parity, 34 are reference playback, and all 40 raw calibrated threshold checks pass; solver approval is blocked.
 - `geometry_validation_summary.json`: 6 of 6 geometry families pass after Milestone 18 focused closure evidence is consumed by the aggregate gate.
 - `raft_coupling_validation_summary.json`: 50 of 50 raft-coupling comparisons pass under the GeoClaw-vs-C++ water-field agreement gate.
 - `runtime_profile_summary.json`: 80 of 80 promoted C++ profile repetitions pass local desktop, VR, and handheld water-solver budgets, and 40 of 40 deterministic replay groups match.
 - `regression_promotion_summary.json`: 98 passing artifacts were promoted as regression fixtures or manifests in the latest packaged readiness snapshot.
-- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is approved after target-profile confirmation.
+- `geoclaw_to_unreal_readiness_report.json` and `.md`: final Milestone 16 decision; live custom water is blocked by missing solver-parity evidence.
 
-Milestone 20 now locks the accepted Milestone 16 report set in `physics/reports/milestone20/report_set_lock.json` and `.md`. The lock hashes 27 artifacts: the full Milestone 16 source report set, packaged Milestone 16 readiness summaries, and runtime budget contract. It confirms 80 of 80 committed runtime profile records pass the desktop, VR, and handheld target budget profiles, and 40 of 40 deterministic replay groups match. The artifact records physical hardware captures as `not_recorded_in_repo`; those captures remain release/platform sign-off evidence rather than a blocker for starting the Unreal live-water bridge foundation.
+Milestone 20 locks the current blocked evidence set in `physics/reports/milestone20/report_set_lock.json` and `.md`. The lock hashes 27 artifacts so Unreal can detect the blocked state rather than loading an obsolete approval. Runtime and replay counts remain recorded, but they cannot override the solver-parity blocker.
 
-Milestone 18 source reports are now consumed by the packaged readiness snapshot: `physics/reports/milestone18/remaining_geometry_closure.json` passes with six of six geometry families promotion-ready, the generic GeoClaw-profile catalog closes every aggregate GeoClaw/C++ comparison row through the South Fork cascading high-flow closure, and `physics/reports/milestone18/geoclaw_cpp_failure_triage_matrix.json` now passes with zero entries. `physics/reports/milestone16/geoclaw_cpp_comparisons.json` records 40 of 40 threshold comparisons passing, `physics/reports/milestone16/raft_coupling_validation.json` records 50 of 50 raft-coupling comparisons passing, and `physics/reports/milestone16/full_cpp_validation_gate.json` records a suite-level `PASS`. The packaged GeoClaw-to-Unreal readiness report is approved, with the accepted report-set lock now recorded in Milestone 20.
+Milestone 18 source reports are still consumed by the packaged readiness snapshot. They establish calibrated geometry, raft-coupling, runtime, and replay behavior, but the fixture profile catalog is now classified as reference playback. `physics/reports/milestone16/full_cpp_validation_gate.json` is therefore `BLOCKED`, and the packaged readiness report and report-set lock are blocked with it.
 
 Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 
@@ -41,20 +41,20 @@ Legacy Milestone 10 artifacts live in `physics/data/readiness/milestone_10/`:
 - Authoritative water candidate: custom C++ reduced or finite-volume shallow-water / height-field solver.
 - Reference solver: GeoClaw after Milestone 14 transition; PyClaw artifacts are legacy regression data only.
 - Raft/contact candidate: selected after the Chaos/Jolt shared fixture evaluation, with Chrono kept as high-fidelity reference/research and the custom reduced runtime as fallback if neither candidate passes.
-- Unreal integration order: telemetry/replay playback first, Milestone 18 water-validation closure, live custom water approval, Milestone 19 Chaos/Jolt raft/contact authority evaluation, then Milestone 20-25 Unreal full-game production.
+- Unreal integration order: telemetry/replay playback first, owner water-strategy decision and honest solver gate, then live custom water and raft/contact authority integration.
 - Chrono::FSI remains an optional research path, not the baseline runtime dependency.
 
 ## Next Action
 
-Use `physics/reports/milestone20/report_set_lock.json` as the accepted report manifest for Unreal live-water bridge work, then continue TODO Milestone 20 item by item: refresh the production Unreal module/plugin foundation, integrate the authoritative custom C++ water plugin path, import the promoted regression fixtures into Unreal automation, load traceable river data assets, add in-engine debug views, and close the live-water Unreal smoke gate. Physical desktop, VR, and handheld captures should be appended before release/platform sign-off.
+Use `physics/reports/milestone20/report_set_lock.json` as the machine-readable blocked manifest. Keep live custom water disabled, continue telemetry/frozen-playback tooling, and wait for the owner water-strategy decision before changing solver authority.
 
 Milestone 18 closure results:
 
-- Failure triage, GeoClaw/C++ comparison, geometry validation, raft coupling, runtime, regression promotion, full gate, and readiness reports now pass.
-- Preserve the generic GeoClaw-profile catalog path, stitched whole-window validation outputs, and Milestone 17 analytic guardrails in every future retune.
+- Historical calibrated threshold, geometry, raft coupling, runtime, and regression reports pass; the honest solver-parity full gate and readiness report are blocked.
+- Preserve stitched whole-window validation outputs and Milestone 17 analytic guardrails in every future solver path. Profile playback may remain diagnostic only.
 - Keep wet/dry, bed-step, constriction, drop/ledge, tailwater, and stitched reach/drop geometry families closed in every future full-gate rerun.
-- Keep flow-dependent pin/release, high-side/crew-weight gameplay, swimmer/rescue behavior, and future feature forcing as separately tuned gameplay layers over the approved water evidence.
-- Continue Chaos/Jolt raft/contact/swimmer authority evaluation over the approved custom water outputs.
+- Keep flow-dependent pin/release, high-side/crew-weight gameplay, swimmer/rescue behavior, and future feature forcing as separately tuned gameplay layers over future approved water evidence.
+- Continue Chaos/Jolt raft/contact/swimmer evaluation over frozen water snapshots until live water is approved.
 
 Regenerate the Milestone 16 GeoClaw-to-Unreal report from completed full-gate reports:
 

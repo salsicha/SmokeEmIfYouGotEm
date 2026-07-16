@@ -58,11 +58,12 @@ from .raft_coupling2_5d import (
 from .real_world import default_player_selections, generate_real_world_scenario2_5d
 from .scenario2_5d import Scenario2_5D
 from .scenario2_5d import FixtureScenario2_5DParameters, generate_fixture_scenario2_5d, read_scenario2_5d_package
+from .solver_parity import SolverParityMode, classify_solver_parity
 from .validation_gate import CUSTOM_CPP_VALIDATION_SCENARIOS, CUSTOM_CPP_VALIDATION_THRESHOLD_TIERS
 
 MILESTONE16_GEOCLAW_REFERENCE_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_reference_runs.v0"
 MILESTONE16_CPP_RUN_REPORT_SCHEMA = "raftsim.milestone16.cpp_solver_runs.v0"
-MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v0"
+MILESTONE16_COMPARISON_REPORT_SCHEMA = "raftsim.milestone16.geoclaw_cpp_comparisons.v1"
 MILESTONE16_GEOMETRY_VALIDATION_REPORT_SCHEMA = "raftsim.milestone16.geometry_validation.v0"
 MILESTONE16_RAFT_COUPLING_REPORT_SCHEMA = "raftsim.milestone16.raft_coupling_validation.v0"
 MILESTONE16_REGRESSION_PROMOTION_REPORT_SCHEMA = "raftsim.milestone16.regression_promotion.v0"
@@ -334,15 +335,23 @@ class Milestone16ComparisonRecord:
     cross_sections: int
     feature_count: int
     reach_drop_check: dict[str, object]
+    parity_mode: SolverParityMode = "solver"
+    parity_evidence: tuple[str, ...] = ()
 
     @property
     def compared(self) -> bool:
         return self.frame_comparisons > 0 and self.point_probes >= 0 and self.cross_sections >= 0
 
+    @property
+    def solver_approval_passed(self) -> bool:
+        return self.parity_mode == "solver" and self.threshold_passed
+
     def to_json_dict(self) -> dict[str, object]:
         data = asdict(self)
         data["failing_checks"] = list(self.failing_checks)
+        data["parity_evidence"] = list(self.parity_evidence)
         data["compared"] = self.compared
+        data["solver_approval_passed"] = self.solver_approval_passed
         return data
 
 
@@ -357,9 +366,12 @@ class Milestone16ComparisonReport:
 
     @property
     def passed(self) -> bool:
-        return bool(self.records) and all(record.threshold_passed for record in self.records)
+        return bool(self.records) and all(record.solver_approval_passed for record in self.records)
 
     def to_json_dict(self) -> dict[str, object]:
+        solver_records = tuple(record for record in self.records if record.parity_mode == "solver")
+        playback_records = tuple(record for record in self.records if record.parity_mode == "reference_playback")
+        solver_passed = sum(1 for record in solver_records if record.threshold_passed)
         return {
             "schema_version": MILESTONE16_COMPARISON_REPORT_SCHEMA,
             "passed": self.passed,
@@ -369,6 +381,14 @@ class Milestone16ComparisonReport:
             "comparison_count": len(self.records),
             "threshold_passed_count": sum(1 for record in self.records if record.threshold_passed),
             "threshold_failed_count": sum(1 for record in self.records if not record.threshold_passed),
+            "solver_parity_count": len(solver_records),
+            "solver_parity_threshold_passed_count": solver_passed,
+            "solver_parity_threshold_failed_count": len(solver_records) - solver_passed,
+            "reference_playback_count": len(playback_records),
+            "reference_playback_threshold_passed_count": sum(
+                1 for record in playback_records if record.threshold_passed
+            ),
+            "solver_approval_blocked_count": len(self.records) - solver_passed,
             "records": [record.to_json_dict() for record in self.records],
         }
 
@@ -390,8 +410,26 @@ class Milestone16ComparisonReport:
             "",
             f"Comparison count: {len(self.records)}",
             "",
-            "| Suite | Gate scenario | Mode | Tier | Thresholds | Failing checks | Reach/drop |",
-            "| --- | --- | --- | --- | --- | --- | --- |",
+            (
+                "Solver parity: "
+                f"{sum(1 for record in self.records if record.solver_approval_passed)} of "
+                f"{len(self.records)} rows"
+            ),
+            "",
+            (
+                "Reference playback: "
+                f"{sum(1 for record in self.records if record.parity_mode == 'reference_playback')} of "
+                f"{len(self.records)} rows"
+            ),
+            "",
+            (
+                "Raw threshold checks: "
+                f"{sum(1 for record in self.records if record.threshold_passed)} of "
+                f"{len(self.records)} rows"
+            ),
+            "",
+            "| Suite | Gate scenario | Mode | Parity | Tier | Thresholds | Failing checks | Reach/drop |",
+            "| --- | --- | --- | --- | --- | --- | --- | --- |",
         ]
         for record in self.records:
             reach_drop = record.reach_drop_check
@@ -404,6 +442,7 @@ class Milestone16ComparisonReport:
                 f"{record.suite} | "
                 f"{record.gate_scenario_id} | "
                 f"{record.solver_mode} | "
+                f"{record.parity_mode} | "
                 f"{record.threshold_tier} | "
                 f"{'PASS' if record.threshold_passed else 'FAIL'} | "
                 f"{', '.join(record.failing_checks) if record.failing_checks else 'none'} | "
@@ -944,17 +983,17 @@ def build_milestone16_full_cpp_validation_gate_report(report_dir: str | Path) ->
         ),
         _full_gate_component(
             "geoclaw_cpp_comparisons",
-            "GeoClaw/C++ Threshold Comparisons",
+            "GeoClaw/C++ Solver-Parity Comparisons",
             root / MILESTONE16_FULL_GATE_REPORT_FILES["geoclaw_cpp_comparisons"],
             reports["geoclaw_cpp_comparisons"],
             total_key="comparison_count",
-            passed_key="threshold_passed_count",
-            failed_key="threshold_failed_count",
+            passed_key="solver_parity_threshold_passed_count",
+            failed_key="solver_approval_blocked_count",
             blocker_records_key="records",
             blocker_label_key="gate_scenario_id",
-            blocker_detail="GeoClaw/C++ threshold comparison failed",
-            pass_field="threshold_passed",
-            detail_field="failing_checks",
+            blocker_detail="row does not provide passing solver-parity evidence",
+            pass_field="solver_approval_passed",
+            detail_field="parity_evidence",
         ),
         _full_gate_component(
             "geometry",
@@ -1491,6 +1530,8 @@ def run_milestone16_comparison_matrix(
         geoclaw_record = geoclaw_by_gate[gate_id]
         comparison_dir = root / _case_dir(gate_id) / str(cpp_record["solver_mode"])
         comparison_dir.mkdir(parents=True, exist_ok=True)
+        cpp_manifest = _read_json(Path(str(cpp_record["manifest"])))
+        parity = classify_solver_parity(cpp_manifest)
         manifest_path = _write_milestone16_comparison_manifest(comparison_dir, geoclaw_record, cpp_record)
         thresholds = _thresholds_for_gate(gate_id)
         field_report = compare_dual_solver_fields(manifest_path, output_path=comparison_dir / "field_comparison.json")
@@ -1522,6 +1563,8 @@ def run_milestone16_comparison_matrix(
                 cross_sections=len(probe_report.cross_sections),
                 feature_count=feature_report.feature_count,
                 reach_drop_check=_reach_drop_check(geoclaw_record, cpp_record),
+                parity_mode=parity.mode,
+                parity_evidence=parity.evidence,
             )
         )
         _ = diagnostic_report

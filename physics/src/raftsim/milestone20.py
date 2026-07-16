@@ -127,7 +127,7 @@ class Milestone20LiveWaterSmokeSuite:
 
 
 def build_report_set_lock(repo_root: Path) -> Milestone20ReportSetLock:
-    """Build the accepted Milestone 16 report-set lock and profile summary."""
+    """Build the current Milestone 16 report-set lock and profile summary."""
 
     root = repo_root.resolve()
     artifacts = [
@@ -205,9 +205,9 @@ def build_report_set_lock(repo_root: Path) -> Milestone20ReportSetLock:
         },
         "artifacts": artifacts,
         "notes": [
-            "The lock hash covers the accepted Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.",
+            "The lock hash covers the current Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.",
             "Runtime profile evidence is repeated here by evaluating every committed Milestone 16 profile record against desktop, VR, and handheld budget profiles.",
-            "This artifact is the manifest Unreal live-water bridge work should load until a newer accepted report-set lock supersedes it.",
+            "A blocked lock must keep live custom water disabled until a newer passing report-set lock supersedes it.",
         ],
     }
     return Milestone20ReportSetLock(report=report, markdown=_report_set_lock_markdown(report))
@@ -249,14 +249,19 @@ def build_unreal_regression_fixture_import(repo_root: Path) -> Milestone20Unreal
         "accepted_report_set_lock": {
             "manifest": "physics/reports/milestone20/report_set_lock.json",
             "lock_hash": report_lock["lock"]["lock_hash"],
+            "passed": bool(report_lock["passed"]),
         },
         "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
         "automation_module": "RaftSimAutomation",
         "automation_test_prefix": "RaftSim.Milestone20.LiveWaterRegression",
-        "comparison_modes": [
-            "replayed_water_field_vs_accepted_cpp_output",
-            "live_water_field_vs_accepted_cpp_output",
-        ],
+        "comparison_modes": (
+            [
+                "replayed_water_field_vs_calibrated_cpp_output",
+                "live_water_field_vs_solver_approved_cpp_output",
+            ]
+            if report_lock["passed"]
+            else ["replayed_water_field_vs_calibrated_cpp_output"]
+        ),
         "source_milestones": {
             "milestone16": {
                 "registry": "physics/regression_fixtures/milestone16/registry.json",
@@ -286,7 +291,11 @@ def build_unreal_regression_fixture_import(repo_root: Path) -> Milestone20Unreal
             "stitched_whole_window_outputs_required_for_reach_local_content": True,
             "feature_forcing_must_remain_off_unless_manifest_recorded": True,
         },
-        "status": "ready_for_unreal_automation_execution",
+        "status": (
+            "ready_for_unreal_automation_execution"
+            if report_lock["passed"]
+            else "live_water_blocked_replay_fixtures_available"
+        ),
     }
     return Milestone20UnrealRegressionImport(manifest=manifest)
 
@@ -376,6 +385,7 @@ def build_traceable_unreal_data_assets(repo_root: Path) -> Milestone20TraceableD
         "accepted_report_set_lock": {
             "manifest": "physics/reports/milestone20/report_set_lock.json",
             "lock_hash": report_lock["lock"]["lock_hash"],
+            "passed": bool(report_lock["passed"]),
         },
         "source_manifests": {
             "regression_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
@@ -385,7 +395,7 @@ def build_traceable_unreal_data_assets(repo_root: Path) -> Milestone20TraceableD
         "data_assets": assets,
         "asset_count": len(assets),
         "traceability_rules": [
-            "Every data asset must point back to repo-relative source paths and the accepted report-set lock.",
+            "Every data asset must point back to repo-relative source paths and the current report-set lock.",
             "Reach-local grid assets must include ghost-zone metadata and stitched whole-window validation outputs.",
             "Geospatial and corridor package assets must preserve CRS/provenance and validation-matrix paths.",
             "Unreal may cache or convert these assets, but converted assets cannot replace the source manifests.",
@@ -532,8 +542,12 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
         "status": "ready_for_unreal_automation_execution" if contract_passed else "blocked",
     }
     notes = [
-        "This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.",
-        "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
+        (
+            "This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace."
+            if passed
+            else "This report keeps the Milestone 20 live-water Unreal smoke gate blocked."
+        ),
+        "The suite is anchored to the current C++ report-set lock and must be regenerated if that lock changes.",
     ]
     if unreal_editor_result:
         notes.append(
@@ -556,7 +570,7 @@ def build_live_water_unreal_smoke_suite(repo_root: Path) -> Milestone20LiveWater
             else "not_run_in_text_first_workspace"
         ),
         "unreal_editor_execution_required_before_release_signoff": not unreal_editor_passed,
-        "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
+        "gate_scope": "manifest_links_current_cpp_outputs_debug_views_and_target_profile_budget_evidence",
         "checks": checks,
         "target_profiles": manifest["target_profiles"],
         "deterministic_replay": report_lock["target_profile_confirmation"]["deterministic_replay"],
@@ -958,6 +972,14 @@ def _report_set_lock_markdown(report: dict[str, Any]) -> str:
             f"{profile['max_runtime_budget_ms']:.6f} |"
         )
     replay = target["deterministic_replay"]
+    production_use = (
+        "The live-water Unreal bridge can use this lock as its accepted report manifest. "
+        "Physical desktop, VR, and handheld device captures should replace or extend it "
+        "before platform release sign-off."
+        if report["passed"]
+        else "This lock records a blocked evidence set. The Unreal bridge must keep live custom water "
+        "disabled; telemetry and frozen playback remain available while solver-parity evidence is repaired."
+    )
     lines.extend(
         [
             "",
@@ -970,11 +992,7 @@ def _report_set_lock_markdown(report: dict[str, Any]) -> str:
             "",
             "## Production Use",
             "",
-            (
-                "The live-water Unreal bridge can use this lock as its accepted report "
-                "manifest. Physical desktop, VR, and handheld device captures should "
-                "replace or extend it before platform release sign-off."
-            ),
+            production_use,
             "",
             "## Notes",
             "",

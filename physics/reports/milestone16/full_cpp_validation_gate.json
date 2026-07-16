@@ -1,6 +1,8 @@
 {
-  "blocked_component_count": 0,
-  "blocked_component_ids": [],
+  "blocked_component_count": 1,
+  "blocked_component_ids": [
+    "geoclaw_cpp_comparisons"
+  ],
   "component_count": 7,
   "components": [
     {
@@ -26,14 +28,23 @@
       "total_count": 40
     },
     {
-      "blockers": [],
+      "blockers": [
+        "uniform_channel: row does not provide passing solver-parity evidence (fixture_scoped_uniform_channel_reduced_slope_profile_balance)",
+        "dam_break: row does not provide passing solver-parity evidence (fixture_scoped_dam_break_geoclaw_profile_calibration)",
+        "dam_break: row does not provide passing solver-parity evidence (fixture_scoped_dam_break_geoclaw_profile_calibration)",
+        "bed_step: row does not provide passing solver-parity evidence (fixture_scoped_bed_step_reduced_geoclaw_profile_calibration)",
+        "bed_step: row does not provide passing solver-parity evidence (fixture_scoped_bed_step_finite_volume_hydrostatic_face_source)",
+        "constriction: row does not provide passing solver-parity evidence (fixture_scoped_constriction_reduced_geoclaw_profile_calibration, constriction_reduced_geoclaw_profile_calibration.enabled)",
+        "constriction: row does not provide passing solver-parity evidence (fixture_scoped_constriction_finite_volume_geoclaw_profile_calibration, constriction_finite_volume_geoclaw_profile_calibration.enabled)",
+        "wet_dry_shoreline: row does not provide passing solver-parity evidence (fixture_scoped_wet_dry_reconstruction)"
+      ],
       "component_id": "geoclaw_cpp_comparisons",
-      "failed_count": 0,
+      "failed_count": 34,
       "notes": [],
-      "passed": true,
-      "passed_count": 40,
+      "passed": false,
+      "passed_count": 6,
       "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
-      "title": "GeoClaw/C++ Threshold Comparisons",
+      "title": "GeoClaw/C++ Solver-Parity Comparisons",
       "total_count": 40
     },
     {
@@ -87,9 +98,9 @@
       "total_count": 98
     }
   ],
-  "decision": "PASS",
-  "passed": true,
-  "passed_component_count": 7,
+  "decision": "BLOCKED",
+  "passed": false,
+  "passed_component_count": 6,
   "report_dir": "reports/milestone16",
   "schema_version": "raftsim.milestone16.full_cpp_validation_gate.v0"
 }

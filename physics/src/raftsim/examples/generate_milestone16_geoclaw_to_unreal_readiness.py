@@ -150,6 +150,20 @@ def _comparison_summary(report: dict[str, Any], source_report: Path) -> dict[str
         "comparison_count": _int_or_count(report, "comparison_count", records),
         "threshold_passed_count": _int_or_count(report, "threshold_passed_count", threshold_passed),
         "threshold_failed_count": _int_or_count(report, "threshold_failed_count", threshold_failed),
+        "solver_parity_count": int(report.get("solver_parity_count", 0)),
+        "solver_parity_threshold_passed_count": int(
+            report.get("solver_parity_threshold_passed_count", 0)
+        ),
+        "solver_parity_threshold_failed_count": int(
+            report.get("solver_parity_threshold_failed_count", 0)
+        ),
+        "reference_playback_count": int(report.get("reference_playback_count", 0)),
+        "reference_playback_threshold_passed_count": int(
+            report.get("reference_playback_threshold_passed_count", 0)
+        ),
+        "solver_approval_blocked_count": int(
+            report.get("solver_approval_blocked_count", len(records))
+        ),
     }
 
 

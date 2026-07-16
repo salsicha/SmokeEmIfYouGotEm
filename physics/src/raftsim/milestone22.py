@@ -9,7 +9,7 @@ from typing import Any
 
 
 MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA = (
-    "raftsim.unreal.raft_contact_authority_integration.v1"
+    "raftsim.unreal.raft_contact_authority_integration.v2"
 )
 MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS = (
     "custom_reduced_authority_integrated_over_approved_custom_cxx_water"
@@ -66,11 +66,26 @@ def build_raft_contact_authority_integration(repo_root: Path) -> Milestone22Mani
     selected_runtime = authority_selection["selected_runtime"]
     water_authority = authority_selection["water_authority"]
 
+    live_water_approved = bool(report_lock.get("passed")) and bool(
+        report_lock.get("production_use", {}).get(
+            "live_water_unreal_bridge_foundation_unblocked"
+        )
+    )
     manifest: dict[str, Any] = {
         "schema": MILESTONE22_RAFT_CONTACT_AUTHORITY_SCHEMA,
-        "status": MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS,
-        "approved_custom_water": {
-            "authority": water_authority,
+        "status": (
+            MILESTONE22_RAFT_CONTACT_AUTHORITY_STATUS
+            if live_water_approved
+            else "raft_contact_integrated_over_frozen_water_live_custom_water_blocked"
+        ),
+        "custom_water_evidence": {
+            "candidate_authority": water_authority,
+            "live_water_approved": live_water_approved,
+            "operating_mode": (
+                "live_custom_cxx_water"
+                if live_water_approved
+                else "frozen_validation_snapshot_only"
+            ),
             "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
             "lock_hash": report_lock["lock"]["lock_hash"],
             "source_gate_report": report_lock["source_gate"]["report"],
@@ -164,6 +179,25 @@ def build_raft_contact_authority_integration(repo_root: Path) -> Milestone22Mani
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)
+
+
+def write_raft_contact_authority_integration(
+    repo_root: Path,
+    output_path: Path | None = None,
+) -> Milestone22ManifestBuild:
+    """Generate the authority manifest from the current report lock and selection."""
+
+    root = repo_root.resolve()
+    generated = build_raft_contact_authority_integration(root)
+    target = output_path or (
+        root / "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return generated
 
 
 def build_raft_contact_response_telemetry(repo_root: Path) -> Milestone22ManifestBuild:
@@ -283,7 +317,7 @@ def build_raft_contact_response_telemetry(repo_root: Path) -> Milestone22Manifes
             "unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json"
         ),
         "selected_runtime": authority["selected_raft_contact_authority"]["runtime"],
-        "water_authority": authority["approved_custom_water"]["authority"],
+        "water_authority": authority["custom_water_evidence"]["candidate_authority"],
         "source_manifests": {
             "rock_contact_presets": "unreal/Content/RaftSim/Physics/rock_contact_presets.json",
             "bed_grounding_presets": (
@@ -954,3 +988,22 @@ def build_gameplay_telemetry_scoring_manifest(repo_root: Path) -> Milestone22Man
         },
     }
     return Milestone22ManifestBuild(manifest=manifest)
+
+
+def write_gameplay_telemetry_scoring_manifest(
+    repo_root: Path,
+    output_path: Path | None = None,
+) -> Milestone22ManifestBuild:
+    """Generate the gameplay scoring manifest from the current Milestone 22 contracts."""
+
+    root = repo_root.resolve()
+    generated = build_gameplay_telemetry_scoring_manifest(root)
+    target = output_path or (
+        root / "unreal/Content/RaftSim/Crew/gameplay_telemetry_scoring.json"
+    )
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(generated.manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return generated
