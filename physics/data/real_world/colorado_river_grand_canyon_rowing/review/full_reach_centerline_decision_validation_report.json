@@ -1,0 +1,123 @@
+{
+  "allowed_option_ids": [
+    "official_hydrography_with_nps_gcmrc_river_mile_calibration",
+    "reviewed_local_river_mile_axis_with_source_raster_transforms",
+    "defer_until_pearce_ferry_anchor_or_source_family_is_reviewed"
+  ],
+  "decision_summary": {
+    "chosen_option_id": "",
+    "decision_date": "",
+    "decision_owner": "",
+    "decision_status": "not_recorded",
+    "route_regeneration_scope_count": 0,
+    "source_window_count": 0
+  },
+  "decision_valid": false,
+  "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+  "generated_on": "2026-07-16",
+  "invalid_fields": [],
+  "missing_required_fields": [
+    "chosen_option_id",
+    "decision_owner",
+    "decision_date",
+    "full_length_centerline_source",
+    "lees_ferry_anchor_geometry",
+    "pearce_ferry_anchor_geometry",
+    "working_crs_or_station_axis_policy",
+    "river_mile_calibration_policy",
+    "major_rapid_crosscheck_policy",
+    "source_window_bbox_generation_scope",
+    "route_regeneration_scope",
+    "rights_publication_policy"
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_empty_or_invalid_result": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_current_lees_ferry_pilot_to_full_run": false,
+    "next_after_valid_result": [
+      "generate_full_reach_centerline_candidate",
+      "generate_source_window_bboxes",
+      "generate_rapid_mile_crosscheck",
+      "generate_full_reach_source_pull_plan"
+    ]
+  },
+  "regeneration_permissions": {
+    "can_bind_solver_windows": false,
+    "can_download_full_reach_sources": false,
+    "can_generate_full_reach_centerline_candidate": false,
+    "can_generate_rapid_mile_crosscheck": false,
+    "can_generate_source_window_bboxes": false,
+    "can_promote_from_validation_report_alone": false,
+    "can_restation_major_rapids": false,
+    "manual_review_still_required_after_valid_result": true
+  },
+  "reviewer_failures": [
+    {
+      "reason": "review_not_approved",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "grand_canyon_oarsman_or_guide_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "grand_canyon_oarsman_or_guide_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "grand_canyon_oarsman_or_guide_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "technical_world_partition_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "technical_world_partition_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "technical_world_partition_reviewer"
+    }
+  ],
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.a2_centerline_decision_validation_report.v1",
+  "source_result_template": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_centerline_decision_template.json",
+  "status": "centerline_decision_incomplete_a2_promotion_blocked",
+  "task_id": "A2",
+  "validation_error_count": 27
+}
