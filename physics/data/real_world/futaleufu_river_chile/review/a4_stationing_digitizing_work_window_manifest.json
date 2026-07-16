@@ -1,0 +1,112 @@
+{
+  "catalog_run_length_m": 10000.0,
+  "critical_window_count": 4,
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a4": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false,
+    "complete_when": [
+      "reviewed route station axis replaces or approves the current OSM scaffold",
+      "accepted aerial or orthomosaic source is selected",
+      "each rapid is digitized as exact point or span geometry",
+      "guide/outfitter, geospatial, rights/publication, and DGA/guide flow-context reviews approve",
+      "the A4 digitizing result validator passes on reviewed records"
+    ]
+  },
+  "rapid_count": 5,
+  "river_id": "futaleufu_river_chile",
+  "route_stationing_length_m": 15936.77551712958,
+  "route_to_catalog_length_ratio": 1.593678,
+  "schema": "raftsim.futaleufu.a4_stationing_digitizing_work_window_manifest.v1",
+  "source_action_packet": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_action_packet.json",
+  "source_stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+  "source_status_artifact": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_flow_status.json",
+  "status": "work_windows_ready_for_manual_digitizing_review_no_stationing_promotion",
+  "task_id": "A4",
+  "window_policy": {
+    "not_authoritative_reason": "The current route trace is OSM-derived technical corridor evidence, not a surveyed guide-approved station axis, and rapid stations remain order-only until reviewed source geometry exists.",
+    "priority_window_sizes_m": {
+      "critical": {
+        "half_length_m": 800.0,
+        "lateral_review_buffer_m": 180.0
+      },
+      "high": {
+        "half_length_m": 600.0,
+        "lateral_review_buffer_m": 140.0
+      },
+      "medium": {
+        "half_length_m": 450.0,
+        "lateral_review_buffer_m": 100.0
+      }
+    },
+    "stationing_method": "order_distributed_on_current_route_scaffold_for_review_focus_only"
+  },
+  "windows": [
+    {
+      "catalog_order_station_m": 1666.667,
+      "coordinate_count": 23,
+      "half_length_m": 600.0,
+      "lateral_review_buffer_m": 140.0,
+      "order": 1,
+      "rapid_name": "Asleep at the Wheel",
+      "review_priority": "high",
+      "route_order_station_m": 2656.129,
+      "window_end_m": 3256.129,
+      "window_start_m": 2056.129
+    },
+    {
+      "catalog_order_station_m": 3333.333,
+      "coordinate_count": 30,
+      "half_length_m": 800.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 2,
+      "rapid_name": "Terminator",
+      "review_priority": "critical",
+      "route_order_station_m": 5312.259,
+      "window_end_m": 6112.259,
+      "window_start_m": 4512.259
+    },
+    {
+      "catalog_order_station_m": 5000.0,
+      "coordinate_count": 14,
+      "half_length_m": 800.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 3,
+      "rapid_name": "Son of Terminator",
+      "review_priority": "critical",
+      "route_order_station_m": 7968.388,
+      "window_end_m": 8768.388,
+      "window_start_m": 7168.388
+    },
+    {
+      "catalog_order_station_m": 6666.667,
+      "coordinate_count": 24,
+      "half_length_m": 800.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 4,
+      "rapid_name": "Khyber Pass",
+      "review_priority": "critical",
+      "route_order_station_m": 10624.517,
+      "window_end_m": 11424.517,
+      "window_start_m": 9824.517
+    },
+    {
+      "catalog_order_station_m": 8333.333,
+      "coordinate_count": 18,
+      "half_length_m": 800.0,
+      "lateral_review_buffer_m": 180.0,
+      "order": 5,
+      "rapid_name": "Himalayas",
+      "review_priority": "critical",
+      "route_order_station_m": 13280.646,
+      "window_end_m": 14080.646,
+      "window_start_m": 12480.646
+    }
+  ],
+  "work_windows_geojson": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_work_windows.geojson"
+}

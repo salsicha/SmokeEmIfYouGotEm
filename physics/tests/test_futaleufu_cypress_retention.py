@@ -48,7 +48,7 @@ def test_photoreal_test_suite_stays_split_by_concern():
     split_tests = sorted(tests_root.glob("test_photoreal_*.py"))
 
     assert not (tests_root / "test_photoreal_environment_assets.py").exists()
-    assert len(split_tests) == 34
+    assert len(split_tests) == 35
     assert tests_root / "test_photoreal_asset_intake_b1.py" in split_tests
     assert tests_root / "test_photoreal_asset_set_intake_b1.py" in split_tests
     assert tests_root / "test_photoreal_b2_asset_promotion_decision.py" in split_tests
@@ -65,6 +65,7 @@ def test_photoreal_test_suite_stays_split_by_concern():
     assert tests_root / "test_photoreal_colorado_a2_rapid_mile_crosscheck.py" in split_tests
     assert tests_root / "test_photoreal_colorado_asset_selection_b2.py" in split_tests
     assert tests_root / "test_photoreal_futaleufu_a4_digitizing.py" in split_tests
+    assert tests_root / "test_photoreal_futaleufu_a4_digitizing_windows.py" in split_tests
     assert tests_root / "test_photoreal_futaleufu_a4_status.py" in split_tests
     assert tests_root / "test_photoreal_futaleufu_asset_selection_b2.py" in split_tests
     assert tests_root / "test_photoreal_pacuare_asset_selection_b2.py" in split_tests
