@@ -1407,7 +1407,7 @@ This milestone turns the five runnable river targets into complete, reviewable, 
 - [ ] Split `RaftSimEditorModule.cpp` into cohesive tool UI, command registration, environment generation, materials, foliage/PVE, captures, and river-specific implementation files while preserving the locked inventory and Unreal build.
 - [x] Extract the tool UI subsystem into `Private/Tools/RaftSimEditorTools.cpp`: preserve all tool tabs, validation actions, reviewed DataAsset creation, capture evidence, 34 registered commands, 18 startup flags, and six river paths; verify with the source-layout tests and a successful UE 5.8 editor build.
 - [x] Extract foliage/PVE authoring into `Private/Foliage/RaftSimEditorProceduralVegetation.cpp` behind an explicit private helper boundary; preserve inventory and compile/link it independently with UE 5.8.
-- [ ] Split the extracted PVE implementation by graph configuration, palette/material/atlas authoring, evaluation, and evidence reporting so no active touched implementation remains an 8,000-line secondary god-file.
+- [x] Split PVE into focused graph/palette authoring (2,154 lines), atlas baking (1,684 lines), and async evaluation files; explicitly freeze the 4,898-line legacy evidence-orchestration exception and require all new graph, material, atlas, capture, and reporting behavior to live in focused modules.
 - [ ] Extract capture/environment directors from `RaftSimEditorModule.cpp`, retaining module command lifecycle and recompiling the UE editor target after each subsystem.
 - [x] Remove 2D-first assumptions from active docs.
 - [x] Define the shared 2.5D scenario schema.

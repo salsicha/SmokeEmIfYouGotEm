@@ -38,6 +38,14 @@ Run `RaftSim.CreateReviewedDataAssets` from the Unreal console or `-ExecCmds` to
 
 Run `RaftSim.CaptureToolEvidence` to open every tool tab and write panel screenshots plus a manifest under `docs/tool-captures/milestone25a/`. The capture manifest records the screenshot sequence; native automated video capture is still a follow-up unless a reviewer records the editor screen manually.
 
+## Editor Source Ownership
+
+Keep new RaftSim editor implementation in function-owned files under `Private/Tools/`, `Private/Foliage/`, `Private/Materials/`, `Private/Landscape/`, `Private/Captures/`, or a river-specific director. `RaftSimEditorModule.cpp` owns module lifecycle and console-command registration while the decomposition is in progress; do not add new environment features to it.
+
+`RaftSimEditorPveEvaluation.cpp` is a frozen legacy orchestration exception. Its async completion function preserves a long evidence-producing workflow whose behavior is locked by committed reports. Only lifecycle bug fixes may change that file. New graph configuration, palette/material construction, atlas baking, capture setup, and report generation must go into focused helpers and receive their own tests.
+
+The Python `milestone*.py` modules are likewise frozen legacy coordinators. Add new behavior to function-named modules and let milestone modules import or call it. Extract a shared helper only when the active change needs it; do not mass-refactor historical milestone code.
+
 ## Vertical Slice Launcher
 
 Use this after the replay/debug and validation paths are clean. Launch the selected South Fork vertical-slice scenario, then capture replay/debug evidence for the acceptance gate.
