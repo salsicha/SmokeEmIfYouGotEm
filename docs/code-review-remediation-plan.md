@@ -74,6 +74,13 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Added a generated editor-source inventory with **6 implementation files, 46,915 lines, 34 unique registered console commands, 18 automation flags, and all six river build paths**. The report and tests become the split-completeness guard.
 - Post-check: the full suite reports **544 passed / 2 failed / 3 skipped in 130.49 seconds**. The two source-layout tests pass and only the same production-foundation and Colorado generator snapshot drift remains.
 
+### 2026-07-15 Finding 2 Step 2.1 Tool UI Extraction
+
+- Extracted the editor tool subsystem from `RaftSimEditorModule.cpp` into `Private/Tools/RaftSimEditorTools.cpp`: menu/tab registration, tool descriptors and panels, validation actions, reviewed DataAsset creation, and screenshot evidence capture now compile as an independent translation unit.
+- Kept module startup, console-command ownership, and shutdown in the module file so command lifetimes remain unchanged. Environment generation, foliage/PVE, captures, and river directors remain in the monolith and are still open work.
+- Regenerated the editor-source inventory: **7 implementation files, 47,087 lines, 34 unique registered console commands, 18 automation flags, and all six river build paths**. The extra aggregate lines are translation-unit include scaffolding; the module file itself fell from 46,188 to 44,830 lines.
+- Verification: the focused Python source-layout suite passes **13/13**, and the UE 5.8 `SmokeEmIfYouGotEmEditor Mac Development` target compiled and linked both editor translation units successfully.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.

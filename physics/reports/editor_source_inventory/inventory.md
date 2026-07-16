@@ -1,19 +1,20 @@
 # RaftSim Editor Source Inventory
 
-Implementation files: **6**. 
-Implementation lines: **46915**. 
+Implementation files: **7**.
+Implementation lines: **47087**.
 Registered console commands: **34**.
 
 ## Source Files
 
 | File | Lines |
 | --- | ---: |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp` | 46188 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp` | 44830 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp` | 1 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimFeatureTuningEditorShell.cpp` | 196 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimRapidRiverEditorShell.cpp` | 90 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimReplayDebugViewer.cpp` | 90 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimToolValidationActions.cpp` | 350 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tools/RaftSimEditorTools.cpp` | 1530 |
 
 ## Registered Commands
 
