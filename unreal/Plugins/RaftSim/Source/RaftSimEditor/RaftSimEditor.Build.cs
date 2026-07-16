@@ -5,6 +5,9 @@ public class RaftSimEditor : ModuleRules
     public RaftSimEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        // The decomposed editor subsystems use private helper namespaces that must
+        // remain isolated at translation-unit boundaries.
+        bUseUnity = false;
 
         PublicDependencyModuleNames.AddRange(new[]
         {

@@ -53,6 +53,12 @@ def test_editor_source_split_keeps_module_and_focused_implementations_bounded():
     )
     assert len(internal_header.read_text(encoding="utf-8").splitlines()) <= 3000
 
+    build_rules = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/RaftSimEditor.Build.cs"
+    ).read_text(encoding="utf-8")
+    assert "bUseUnity = false;" in build_rules
+
 
 def test_editor_source_inventory_matches_generator():
     expected = build_editor_source_inventory(REPO_ROOT)
