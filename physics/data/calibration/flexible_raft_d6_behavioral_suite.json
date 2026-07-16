@@ -1,0 +1,377 @@
+{
+  "d6_complete": false,
+  "fixture_count": 7,
+  "fixtures": [
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "freeboard shape and loaded side balance within reviewed tolerance",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline records no local tube sag but matches global mass/CG telemetry",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "static_seat_load_sag",
+      "objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "python_reference_metrics": {
+        "loaded_crew_mass_kg": 385.0,
+        "max_seat_freeboard_loss_m": 0.0169868811768041,
+        "port_total_freeboard_loss_m": 0.033652344409774194,
+        "raft_length_m": 4.3,
+        "raft_width_m": 1.9,
+        "starboard_total_freeboard_loss_m": 0.03486070129658373
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "tube depression peak follows the crew shift direction over time",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline reports CG shift but no compliant local freeboard shape",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "traveling_crew_shift",
+      "objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "python_reference_metrics": {
+        "neutral_roll_load_bias_nm": 281.2159124999999,
+        "port_roll_load_bias_nm": -550.3164750000001,
+        "port_total_freeboard_delta_m": 0.0005864084891869792,
+        "starboard_roll_load_bias_nm": 550.3164749999999,
+        "starboard_total_freeboard_delta_m": -0.000621948397622557
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "wrap support and pressure release margins track compliant indentation",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid contact has no pressure-dependent release support and should be recorded as baseline-only",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "rock_pinch_wrap",
+      "objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "python_reference_metrics": {
+        "contact_count": 4,
+        "max_indentation_m": 0.22,
+        "min_release_margin_n": -8904.222529332537,
+        "pinned_obstacle_count": 1,
+        "wrapping_contact_count": 4
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "overtopping/retention grows with upstream tube depression and flow speed",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline cannot produce local tube-top overtopping without D2 deformation input",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "upstream_tube_overwash_flip",
+      "objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "python_reference_metrics": {
+        "reference_flip_margin_nm": 1514.9947832688074,
+        "reference_flip_risk": false,
+        "retained_water_roll_moment_nm": 285.0052167311926,
+        "total_overtopping_flux_m3_s": 0.917447985614655,
+        "total_retained_water_mass_kg": 30.5815995204885
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "reviewed save case must improve or explain flip margin under same flow",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline can only alter CG/recovery thresholds, not tube depression or retained water",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "timed_high_side_save",
+      "objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "python_reference_metrics": {
+        "high_side_flip_margin_nm": 1738.4372901361644,
+        "high_side_flip_threshold_nm": 2302.7231121281466,
+        "margin_delta_nm": 223.442506867357,
+        "neutral_flip_margin_nm": 1514.9947832688074,
+        "neutral_flip_threshold_nm": 1800.0
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "post-contact shape recovers monotonically without residual pin force",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline has no persistent tube indentation state",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "post_contact_recovery",
+      "objective": "Verify prior tube indentation decays after contact clears.",
+      "python_reference_metrics": {
+        "max_recovered_indentation_m": 0.1104,
+        "recovering_contact_count": 2,
+        "total_holding_force_n": 0.0
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    },
+    {
+      "can_promote": false,
+      "comparison_targets": [
+        {
+          "acceptance_note": "pressure and flow sweeps stay monotonic or record reviewed nonlinearity",
+          "required": true,
+          "status": "pending_measured_reference",
+          "target_id": "project_chrono_or_reviewed_compliant_model"
+        },
+        {
+          "acceptance_note": "rigid baseline comparison isolates non-compliant contact response",
+          "required": true,
+          "status": "pending_measured_chaos_baseline",
+          "target_id": "unreal_chaos_rigid_baseline"
+        }
+      ],
+      "d5_replay_channels_required": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "fixture_id": "pressure_flow_sweeps",
+      "objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "python_reference_metrics": {
+        "sweep_case_count": 9,
+        "sweeps": [
+          {
+            "contact_min_release_margin_n": -8976.222529332537,
+            "incoming_velocity_mps": 1.2,
+            "nominal_pressure_pa": 14000.0,
+            "overwash_flux_m3_s": 0.3649119385588768,
+            "retained_water_roll_moment_nm": 113.35989371331509
+          },
+          {
+            "contact_min_release_margin_n": -8976.222529332537,
+            "incoming_velocity_mps": 2.4,
+            "nominal_pressure_pa": 14000.0,
+            "overwash_flux_m3_s": 0.5953826365960622,
+            "retained_water_roll_moment_nm": 184.9556160585667
+          },
+          {
+            "contact_min_release_margin_n": -8976.222529332537,
+            "incoming_velocity_mps": 3.6,
+            "nominal_pressure_pa": 14000.0,
+            "overwash_flux_m3_s": 0.8258533346332476,
+            "retained_water_roll_moment_nm": 256.55133840381836
+          },
+          {
+            "contact_min_release_margin_n": -8904.222529332537,
+            "incoming_velocity_mps": 1.2,
+            "nominal_pressure_pa": 18000.0,
+            "overwash_flux_m3_s": 0.3649119385588768,
+            "retained_water_roll_moment_nm": 113.35989371331509
+          },
+          {
+            "contact_min_release_margin_n": -8904.222529332537,
+            "incoming_velocity_mps": 2.4,
+            "nominal_pressure_pa": 18000.0,
+            "overwash_flux_m3_s": 0.5953826365960622,
+            "retained_water_roll_moment_nm": 184.9556160585667
+          },
+          {
+            "contact_min_release_margin_n": -8904.222529332537,
+            "incoming_velocity_mps": 3.6,
+            "nominal_pressure_pa": 18000.0,
+            "overwash_flux_m3_s": 0.8258533346332476,
+            "retained_water_roll_moment_nm": 256.55133840381836
+          },
+          {
+            "contact_min_release_margin_n": -8832.222529332537,
+            "incoming_velocity_mps": 1.2,
+            "nominal_pressure_pa": 22000.0,
+            "overwash_flux_m3_s": 0.3649119385588768,
+            "retained_water_roll_moment_nm": 113.35989371331509
+          },
+          {
+            "contact_min_release_margin_n": -8832.222529332537,
+            "incoming_velocity_mps": 2.4,
+            "nominal_pressure_pa": 22000.0,
+            "overwash_flux_m3_s": 0.5953826365960622,
+            "retained_water_roll_moment_nm": 184.9556160585667
+          },
+          {
+            "contact_min_release_margin_n": -8832.222529332537,
+            "incoming_velocity_mps": 3.6,
+            "nominal_pressure_pa": 22000.0,
+            "overwash_flux_m3_s": 0.8258533346332476,
+            "retained_water_roll_moment_nm": 256.55133840381836
+          }
+        ]
+      },
+      "python_reference_status": "generated_from_d1_d5_reference_stack"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "next_required_actions": [
+      "Run every fixture against Project Chrono or another reviewed compliant reference.",
+      "Run every fixture against the measured Unreal Chaos rigid baseline.",
+      "Attach telemetry/replay outputs with matching D5 segment channels.",
+      "Compare behavior against fixture acceptance bands and record pass/fail evidence."
+    ]
+  },
+  "reference_requirements": {
+    "chaos_rigid_baseline": {
+      "required": true,
+      "source_contract": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+      "status": "missing_measured_unreal_chaos_results"
+    },
+    "compliant_reference": {
+      "accepted_sources": [
+        "ProjectChrono",
+        "reviewed_offline_compliant_model"
+      ],
+      "required": true,
+      "status": "missing_measured_reference_results"
+    }
+  },
+  "required_fixture_ids": [
+    "static_seat_load_sag",
+    "traveling_crew_shift",
+    "rock_pinch_wrap",
+    "upstream_tube_overwash_flip",
+    "timed_high_side_save",
+    "post_contact_recovery",
+    "pressure_flow_sweeps"
+  ],
+  "schema": "raftsim.flexible_raft.d6_behavioral_validation_suite.v1",
+  "status": "behavioral_fixture_contract_recorded_reference_comparisons_pending"
+}
