@@ -59,6 +59,41 @@
     "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
     "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json"
   },
+  "metadata_probe_2026_07_16": {
+    "probe_scope": "Small TNM product metadata queries for the full-review envelope; large hydrography archives, DEM rasters, NAIP tiles, and media were not downloaded.",
+    "results": [
+      {
+        "http_status": 200,
+        "item_total": 38,
+        "next_action": "Select the smallest official product family that covers the full review envelope, then extract only the needed flowline and support layers with source IDs preserved.",
+        "observed_product_examples": [
+          "NHD Best Resolution national FileGDB/GeoPackage",
+          "NHD Best Resolution California State Shapefile",
+          "NHDPlus HR HU4/National products for network-order review"
+        ],
+        "query_url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=National%20Hydrography%20Dataset%20%28NHD%29&bbox=-121.12,38.68,-120.7,38.86",
+        "source_class": "hydrography",
+        "source_id": "usgs_3dhp_or_nhd_full_reach"
+      },
+      {
+        "http_status": 200,
+        "item_total": 0,
+        "next_action": "Record the TNM metadata zero-hit and use bounded official USGS 3DEP ImageServer/tile exports for full-reach terrain.",
+        "query_url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Elevation%20Products%20%283D%20Elevation%20Program%20Products%20and%20Services%29&bbox=-121.12,38.68,-120.7,38.86",
+        "source_class": "terrain_dem_or_lidar",
+        "source_id": "usgs_3dep_full_reach_tiles"
+      },
+      {
+        "http_status": 200,
+        "item_total": 0,
+        "next_action": "Record the TNM metadata zero-hit and use bounded official USDA/APFO NAIP ImageServer or tile-index exports.",
+        "query_url": "https://tnmaccess.nationalmap.gov/api/v1/products?datasets=Imagery%20-%20NAIP%20%281%20meter%20to%20.5%20foot%29&bbox=-121.12,38.68,-120.7,38.86",
+        "source_class": "aerial_imagery",
+        "source_id": "usda_naip_full_reach_tiles"
+      }
+    ],
+    "status": "metadata_only_no_archives_tiles_or_media_downloaded"
+  },
   "planned_outputs": [
     "hydrography/full_reach_centerline.geojson",
     "hydrography/full_reach_stationing.json",
@@ -124,7 +159,7 @@
       ],
       "source_class": "hydrography",
       "source_id": "usgs_3dhp_or_nhd_full_reach",
-      "status": "planned",
+      "status": "metadata_probe_passed_products_available",
       "target_artifacts": [
         "hydrography/full_reach_raw_flowline_extract.geojson",
         "hydrography/full_reach_raw_support_layers.geojson",
@@ -135,7 +170,7 @@
     {
       "source_class": "terrain_dem_or_lidar",
       "source_id": "usgs_3dep_full_reach_tiles",
-      "status": "planned",
+      "status": "tnm_metadata_zero_hits_use_official_3dep_image_service",
       "target_artifacts": [
         "terrain/full_reach_3dep_tile_manifest.json",
         "terrain/full_reach_windowed_heightfields/"
@@ -145,7 +180,7 @@
     {
       "source_class": "aerial_imagery",
       "source_id": "usda_naip_full_reach_tiles",
-      "status": "planned",
+      "status": "tnm_metadata_zero_hits_use_official_naip_image_service",
       "target_artifacts": [
         "imagery/full_reach_naip_tile_manifest.json",
         "imagery/full_reach_windowed_drapes/"

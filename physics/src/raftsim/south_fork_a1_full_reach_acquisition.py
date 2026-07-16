@@ -135,6 +135,64 @@ def build_south_fork_a1_full_reach_acquisition_plan(
             ),
             "must_clip_to_reviewed_anchors_before_promotion": True,
         },
+        "metadata_probe_2026_07_16": {
+            "status": "metadata_only_no_archives_tiles_or_media_downloaded",
+            "probe_scope": (
+                "Small TNM product metadata queries for the full-review envelope; "
+                "large hydrography archives, DEM rasters, NAIP tiles, and media were "
+                "not downloaded."
+            ),
+            "results": [
+                {
+                    "source_class": "hydrography",
+                    "source_id": "usgs_3dhp_or_nhd_full_reach",
+                    "http_status": 200,
+                    "item_total": 38,
+                    "query_url": _tnm_products_url(
+                        "National Hydrography Dataset (NHD)",
+                        envelope,
+                    ),
+                    "observed_product_examples": [
+                        "NHD Best Resolution national FileGDB/GeoPackage",
+                        "NHD Best Resolution California State Shapefile",
+                        "NHDPlus HR HU4/National products for network-order review",
+                    ],
+                    "next_action": (
+                        "Select the smallest official product family that covers the "
+                        "full review envelope, then extract only the needed flowline "
+                        "and support layers with source IDs preserved."
+                    ),
+                },
+                {
+                    "source_class": "terrain_dem_or_lidar",
+                    "source_id": "usgs_3dep_full_reach_tiles",
+                    "http_status": 200,
+                    "item_total": 0,
+                    "query_url": _tnm_products_url(
+                        "Elevation Products (3D Elevation Program Products and Services)",
+                        envelope,
+                    ),
+                    "next_action": (
+                        "Record the TNM metadata zero-hit and use bounded official "
+                        "USGS 3DEP ImageServer/tile exports for full-reach terrain."
+                    ),
+                },
+                {
+                    "source_class": "aerial_imagery",
+                    "source_id": "usda_naip_full_reach_tiles",
+                    "http_status": 200,
+                    "item_total": 0,
+                    "query_url": _tnm_products_url(
+                        "Imagery - NAIP (1 meter to .5 foot)",
+                        envelope,
+                    ),
+                    "next_action": (
+                        "Record the TNM metadata zero-hit and use bounded official "
+                        "USDA/APFO NAIP ImageServer or tile-index exports."
+                    ),
+                },
+            ],
+        },
         "anchor_review_targets": [
             {
                 "anchor_id": "chili_bar_put_in",
@@ -194,7 +252,7 @@ def build_south_fork_a1_full_reach_acquisition_plan(
             {
                 "source_class": "hydrography",
                 "source_id": "usgs_3dhp_or_nhd_full_reach",
-                "status": "planned",
+                "status": "metadata_probe_passed_products_available",
                 "url": _tnm_products_url("National Hydrography Dataset (NHD)", envelope),
                 "preferred_products": [
                     "3DHP if available for the full envelope",
@@ -210,7 +268,7 @@ def build_south_fork_a1_full_reach_acquisition_plan(
             {
                 "source_class": "terrain_dem_or_lidar",
                 "source_id": "usgs_3dep_full_reach_tiles",
-                "status": "planned",
+                "status": "tnm_metadata_zero_hits_use_official_3dep_image_service",
                 "url": _tnm_products_url(
                     "Elevation Products (3D Elevation Program Products and Services)",
                     envelope,
@@ -223,7 +281,7 @@ def build_south_fork_a1_full_reach_acquisition_plan(
             {
                 "source_class": "aerial_imagery",
                 "source_id": "usda_naip_full_reach_tiles",
-                "status": "planned",
+                "status": "tnm_metadata_zero_hits_use_official_naip_image_service",
                 "url": _tnm_products_url(
                     "Imagery - NAIP (1 meter to .5 foot)",
                     envelope,
