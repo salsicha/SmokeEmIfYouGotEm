@@ -8,13 +8,13 @@ The Unreal game should deliver the first-person guide fantasy: seated in the ste
 
 See [Real-World River Content And Seasonal Flow Plan](real-world-river-content-plan.md) for the geospatial extraction, rapid identification, seasonal flow, adaptive fluid-parameter, and river-selection work that must feed Unreal content.
 See [Free And AI Asset Policy](free-and-ai-asset-policy.md) for the current art and sound sourcing decision, and [Audio Asset Sourcing Plan](audio-asset-sourcing-plan.md) for audio-specific source research, library shortlist, field-recording plan, AI-audio limits, and asset manifest.
-See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current readiness audit. The regenerated Milestone 16/18 gate approves live custom water, and the Milestone 20 report-set lock records the accepted source reports plus desktop, VR, and handheld target budget-profile confirmation. Production Unreal work should now move through the Milestone 20-25 full-game production sequence while physical device captures remain release/platform sign-off evidence.
+See [Python-To-Unreal Readiness Gate](python-to-unreal-readiness-gate.md) for the current readiness audit. The honest v1 Milestone 16 gate blocks live custom water: 6 of 40 rows provide passing solver parity and 34 are reference playback. Unreal tooling, content, telemetry, and frozen playback may continue, but live custom-water authority must remain disabled behind the blocked Milestone 20 report-set lock.
 See [Unreal Engine Version Lock](unreal-engine-version-lock.md) for the UE 5.8 feature review and version decision.
 See [Chaos And Jolt Runtime Evaluation](chaos-jolt-runtime-evaluation.md) for the split/hybrid raft/contact runtime plan and the shared Chaos/Jolt fixture suite.
 
 ## Hard Dependency Gate
 
-Do not treat the production Unreal Engine project as ready for live custom-water gameplay until the Python/GeoClaw/C++ physics program reaches an explicit exit gate. As of the Milestone 20 report-set lock, the custom C++ water gate passes, the accepted Milestone 16 source reports are locked by hash, and the committed runtime profile records pass desktop, VR, and handheld target budget profiles. Physical device captures still need to be appended before platform release sign-off.
+Do not treat the production Unreal Engine project as ready for live custom-water gameplay until the Python/GeoClaw/C++ physics program reaches an explicit exit gate. The current Milestone 20 lock is intentionally blocked because reference playback cannot count as solver parity. Runtime profile records still pass their target budget profiles, but correctness approval and later physical-device captures remain open.
 
 Required before Unreal production begins:
 
@@ -343,7 +343,7 @@ Recommended modules/plugins:
 
 - `RaftSimCore`: shared game types, units, data schemas, telemetry types.
 - `RaftSimPhysics`: native raft/contact runtime bridge, replay, coupling, and selected runtime integration.
-- `RaftSimWater`: authoritative custom C++ live-water bridge, accepted report manifest, fixed-step water scheduling, interpolation contracts, and solver telemetry.
+- `RaftSimWater`: gated custom C++ live-water candidate, blocked/current report manifest loading, fixed-step water scheduling, interpolation contracts, and solver telemetry.
 - `RaftSimRiver`: river data assets, scenario loading, flow visualization, hazard volumes.
 - `RaftSimGeo`: geospatial import/conversion tooling for source manifests, coordinate transforms, terrain/corridor packages, imagery masks, reach-local grids, stitched validation exports, and rapid annotations.
 - `RaftSimRaft`: raft actor, passenger attachment points, animation hooks, damage/safety state.

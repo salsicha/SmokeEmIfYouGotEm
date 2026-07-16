@@ -1,6 +1,12 @@
 {
   "comparison_count": 40,
-  "passed": true,
+  "passed": false,
+  "reference_playback_count": 34,
+  "reference_playback_threshold_passed_count": 34,
+  "solver_approval_blocked_count": 34,
+  "solver_parity_count": 6,
+  "solver_parity_threshold_failed_count": 0,
+  "solver_parity_threshold_passed_count": 6,
   "source_report": "reports/milestone16/geoclaw_cpp_comparisons.json",
   "summary_version": "raftsim.milestone16.readiness_summary.v0",
   "threshold_failed_count": 0,

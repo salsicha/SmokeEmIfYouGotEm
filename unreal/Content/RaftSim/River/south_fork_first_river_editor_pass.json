@@ -1,9 +1,9 @@
 {
   "accepted_report_set_lock": {
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "manifest": "physics/reports/milestone20/report_set_lock.json"
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "passed": false
   },
-  "alpha_content_expansion": "unreal/Content/RaftSim/River/south_fork_alpha_content_expansion.json",
   "asset_class": "URaftSimSouthForkEditorPassConfig",
   "corridor_package": "physics/data/real_world/south_fork_american_chili_bar/corridor_package_manifest.json",
   "corridor_package_version": "raftsim.real_world_corridor.v0",
@@ -34,9 +34,9 @@
       "visible_by_default": true
     },
     {
-      "artifact_path": "hydrography/centerline.geojson",
+      "artifact_path": "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
       "display_name": "Flowlines And Centerline",
-      "display_role": "River centerline, stationing, flow direction, and named/access hydrography context.",
+      "display_role": "Derived NHD mainstem candidate, source flowlines, future reviewed centerline, stationing, flow direction, and named/access hydrography context.",
       "layer_id": "flowlines",
       "layer_kind": "vector",
       "required_for_review": true,
@@ -47,9 +47,9 @@
       "visible_by_default": true
     },
     {
-      "artifact_path": "hydrography/cross_sections.geojson",
+      "artifact_path": "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
       "display_name": "Cross Sections",
-      "display_role": "Bank offsets, width, slope, constriction, and section sampling for solver authoring.",
+      "display_role": "Review-gated cross-section seed lines, future bank offsets, width, slope, constriction, and solver section sampling.",
       "layer_id": "cross_sections",
       "layer_kind": "vector",
       "required_for_review": true,
@@ -331,6 +331,9 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "source_ids": [
@@ -359,6 +362,12 @@
         },
         "flowlines": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+            "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -370,10 +379,17 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+            "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            "hydrology/cdec_terms_flags_and_station_relation_review.json",
+            "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "source_ids": [
             "usgs_nwis",
+            "cdec_cbr",
+            "cdec_a25_powerhouse_context",
             "noaa_nwps_nwm",
             "usgs_streamstats"
           ]
@@ -514,6 +530,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -597,6 +615,9 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "source_ids": [
@@ -625,6 +646,12 @@
         },
         "flowlines": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+            "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -636,10 +663,17 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+            "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            "hydrology/cdec_terms_flags_and_station_relation_review.json",
+            "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "source_ids": [
             "usgs_nwis",
+            "cdec_cbr",
+            "cdec_a25_powerhouse_context",
             "noaa_nwps_nwm",
             "usgs_streamstats"
           ]
@@ -780,6 +814,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -863,6 +899,9 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "source_ids": [
@@ -891,6 +930,12 @@
         },
         "flowlines": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+            "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -902,10 +947,17 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+            "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            "hydrology/cdec_terms_flags_and_station_relation_review.json",
+            "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "source_ids": [
             "usgs_nwis",
+            "cdec_cbr",
+            "cdec_a25_powerhouse_context",
             "noaa_nwps_nwm",
             "usgs_streamstats"
           ]
@@ -1044,6 +1096,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",
@@ -1127,6 +1181,9 @@
         },
         "cross_sections": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_cross_section_seed_manifest.json",
+            "hydrography/nhd_hu8_18020129_cross_section_seed_candidates.geojson",
+            "hydrography/nhd_hu8_18020129_naip_dem_alignment_diagnostic.json",
             "hydrography/cross_sections.geojson"
           ],
           "source_ids": [
@@ -1155,6 +1212,12 @@
         },
         "flowlines": {
           "artifacts": [
+            "hydrography/nhd_hu8_18020129_bbox_extract_manifest.json",
+            "hydrography/nhd_hu8_18020129_flowline_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_support_layers_bbox_extract.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_candidate_manifest.json",
+            "hydrography/nhd_hu8_18020129_south_fork_mainstem_candidate.geojson",
+            "hydrography/nhd_hu8_18020129_mainstem_stationing_candidate.json",
             "hydrography/centerline.geojson",
             "hydrography/banks.geojson"
           ],
@@ -1166,10 +1229,17 @@
         "gauge_history": {
           "artifacts": [
             "hydrology/usgs_11445500_daily_discharge.json",
+            "hydrology/usgs_11445500_instantaneous_discharge_stage_p30d_diagnostic.json",
+            "hydrology/south_fork_modern_flow_source_selection.json",
+            "hydrology/cdec_cbr_event_flow_stage_2026-07-05_2026-07-06.json",
+            "hydrology/cdec_terms_flags_and_station_relation_review.json",
+            "hydrology/cdec_cbr_a25_flow_context_2026-06-07_2026-07-06.json",
             "hydrology/flow_presets.json"
           ],
           "source_ids": [
             "usgs_nwis",
+            "cdec_cbr",
+            "cdec_a25_powerhouse_context",
             "noaa_nwps_nwm",
             "usgs_streamstats"
           ]
@@ -1317,6 +1387,8 @@
         ],
         "required": true,
         "source_ids": [
+          "cdec_a25_powerhouse_context",
+          "cdec_cbr",
           "field_media",
           "guide_references",
           "noaa_nwps_nwm",

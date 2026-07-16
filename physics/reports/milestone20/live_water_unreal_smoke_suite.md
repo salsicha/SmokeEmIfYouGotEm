@@ -1,8 +1,8 @@
 # Milestone 20 Live-Water Unreal Smoke Suite
 
-Decision: `pass_unreal_editor_smoke_gate`
+Decision: `blocked`
 
-Passed: `True`
+Passed: `False`
 
 Unreal editor execution status: `passed_in_unreal_editor`.
 
@@ -16,7 +16,7 @@ Result: 2 succeeded, 0 succeeded with warnings, 0 failed, 0 not run.
 
 ## Checks
 
-- `accepted_report_set_lock`: PASS - Accepted Milestone 16 report-set lock is present, passing, and hash-addressed.
+- `accepted_report_set_lock`: FAIL - Accepted Milestone 16 report-set lock is present, passing, and hash-addressed.
 - `live_water_bridge_lock_match`: PASS - Live-water bridge references the accepted report-set lock hash.
 - `regression_fixture_import_coverage`: PASS - Unreal automation import covers Milestone 16/17/18 accepted fixtures.
 - `traceable_data_assets_stitched_outputs`: PASS - Traceable data assets include reach-local grids and stitched whole-window outputs.
@@ -34,6 +34,6 @@ Result: 2 succeeded, 0 succeeded with warnings, 0 failed, 0 not run.
 
 ## Notes
 
-- This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.
-- The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.
+- This report keeps the Milestone 20 live-water Unreal smoke gate blocked.
+- The suite is anchored to the current C++ report-set lock and must be regenerated if that lock changes.
 - UE 5.8 MacEditor headless automation executed successfully; physical desktop, VR, and handheld captures remain platform sign-off evidence.

@@ -47,7 +47,7 @@ Jolt must consume the same custom-water query API and emit the same telemetry/re
 
 `CustomReducedRigidBody` is the selected first vertical-slice raft/contact/swimmer authority because the Milestone 19 comparison report currently blocks Chaos or Jolt selection pending measured runtime telemetry.
 
-Milestone 22 integrates that selection through `unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json`: approved custom C++ water remains the only authoritative water source, `URaftSimPhysicsBridgeSubsystem` advances water and the selected raft/contact runtime on fixed steps, and Chaos remains visual/non-authoritative unless the shared fixture suite later allows scoring-critical authority.
+Milestone 22 implements that selection through `unreal/Content/RaftSim/Physics/raft_contact_authority_integration.json`, but the blocked Milestone 20 report-set lock must prevent live C++ water authority. `URaftSimPhysicsBridgeSubsystem` may use frozen validation snapshots for the raft/contact evaluation; Chaos remains visual/non-authoritative unless the shared fixture suite later allows scoring-critical authority.
 
 Contact response telemetry is defined in `unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json` and surfaced through `FRaftSimRaftContactTelemetryEvent` / `FRaftSimRaftContactRuntimeSummary`. Every scoring-critical raft-rock, bank, ledge, shallow-shelf, bed-grounding, boulder-garden, pin/release, surf/flush, and flip path must record material response, stick/slip state, contact loading, release thresholds, and outcome tags.
 

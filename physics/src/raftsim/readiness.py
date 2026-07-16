@@ -520,11 +520,13 @@ def build_milestone16_geoclaw_readiness_report(
         ),
         check_from_summary(
             "milestone16_geoclaw_cpp_thresholds",
-            "Milestone 16 GeoClaw/C++ Thresholds",
+            "Milestone 16 GeoClaw/C++ Solver Parity",
             bool(comparison_summary.get("passed")),
             (
-                f"{comparison_summary.get('threshold_passed_count', 0)} of "
-                f"{comparison_summary.get('comparison_count', 0)} threshold comparisons pass."
+                f"{comparison_summary.get('solver_parity_threshold_passed_count', 0)} of "
+                f"{comparison_summary.get('comparison_count', 0)} rows provide passing solver parity; "
+                f"{comparison_summary.get('reference_playback_count', 0)} rows are reference playback "
+                f"and {comparison_summary.get('threshold_passed_count', 0)} raw threshold checks pass."
             ),
             ("geoclaw_cpp_comparison_summary.json",),
         ),
@@ -569,7 +571,9 @@ def build_milestone16_geoclaw_readiness_report(
     blocked_titles = ", ".join(check.title for check in blocking_failures)
     blocked_actions: list[str] = []
     if "milestone16_geoclaw_cpp_thresholds" in failed_check_ids:
-        blocked_actions.append("Fix remaining GeoClaw/C++ threshold failures outside accepted guardrail rows.")
+        blocked_actions.append(
+            "Replace reference-playback rows with passing solver-parity evidence under the owner-selected water strategy."
+        )
     if "milestone16_geometry_validation" in failed_check_ids:
         blocked_actions.append(
             "Retune wet/dry, bed-step, constriction, drop/ledge, and cascading reach/drop dynamics until geometry families pass."
@@ -590,7 +594,7 @@ def build_milestone16_geoclaw_readiness_report(
         status="approved" if approved else "blocked",
         approved_for_unreal_production_start=approved,
         reason=(
-            "The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom water can proceed after target-hardware confirmation."
+            "The full Milestone 16 solver-parity/geometry/raft/runtime gate passed; live Unreal custom water can proceed after target-hardware confirmation."
             if approved
             else f"The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by: {blocked_titles}."
         ),
@@ -606,7 +610,7 @@ def build_milestone16_geoclaw_readiness_report(
     accepted_model_limitations = (
         "2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.",
         "GeoClaw remains offline reference infrastructure and does not ship inside Unreal.",
-        "The approved Milestone 16/18 gate validates the current C++ water evidence set; new authored rivers, feature-forcing defaults, and gameplay tuning must add matching regression evidence.",
+        "Only rows classified as solver parity can approve the C++ water model; fixture-scoped reference playback remains diagnostic evidence only.",
         "Flow-dependent pin/release, crew high-side, swimmer, and rescue behavior remain dedicated gameplay fixtures layered over the approved water-field agreement gate.",
     )
     risks = (
@@ -623,7 +627,7 @@ def build_milestone16_geoclaw_readiness_report(
             "Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.",
         )
         risks = (
-            "Most GeoClaw/C++ threshold comparisons still fail outside hydrostatic/sloping cases.",
+            "Fixture-scoped reference playback cannot approve live custom water even when its raw threshold checks pass.",
             "Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.",
             "Runtime profile passes only the promoted configurations and still needs target hardware confirmation.",
             "Real-world river source licensing, guide review, and field-media validation remain production gates.",

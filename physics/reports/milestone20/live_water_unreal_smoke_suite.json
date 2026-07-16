@@ -3,7 +3,7 @@
   "checks": [
     {
       "check_id": "accepted_report_set_lock",
-      "passed": true,
+      "passed": false,
       "summary": "Accepted Milestone 16 report-set lock is present, passing, and hash-addressed."
     },
     {
@@ -38,21 +38,21 @@
     }
   ],
   "debug_view_count": 9,
-  "decision": "pass_unreal_editor_smoke_gate",
+  "decision": "blocked",
   "deterministic_replay": {
     "failed_count": 0,
     "group_count": 40,
     "passed": true,
     "passed_count": 40
   },
-  "gate_scope": "manifest_links_accepted_cpp_outputs_debug_views_and_target_profile_budget_evidence",
-  "milestone20_closed": true,
+  "gate_scope": "manifest_links_current_cpp_outputs_debug_views_and_target_profile_budget_evidence",
+  "milestone20_closed": false,
   "notes": [
-    "This report closes the Milestone 20 live-water Unreal smoke gate in this repo workspace.",
-    "The suite is anchored to the accepted C++ report-set lock and must be regenerated if that lock changes.",
+    "This report keeps the Milestone 20 live-water Unreal smoke gate blocked.",
+    "The suite is anchored to the current C++ report-set lock and must be regenerated if that lock changes.",
     "UE 5.8 MacEditor headless automation executed successfully; physical desktop, VR, and handheld captures remain platform sign-off evidence."
   ],
-  "passed": true,
+  "passed": false,
   "regression_fixture_count": 109,
   "schema": "raftsim.milestone20.live_water_smoke_report.v1",
   "stitched_whole_window_asset_count": 6,

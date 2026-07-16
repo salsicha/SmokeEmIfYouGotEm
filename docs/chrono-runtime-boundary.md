@@ -29,7 +29,7 @@ Project Chrono remains useful for high-fidelity reference, compliant-contact exp
 
 1. Complete the Milestone 18 custom-water validation closure, or label any Chaos/Jolt runs as snapshot-only comparisons while live water remains blocked.
 2. Build the Chaos automation fixtures and Jolt smoke fixtures from `chaos_jolt_runtime_evaluation.json`.
-3. Feed the approved custom C++ water field, or a frozen validation snapshot, into both runtime targets as buoyancy/contact samples.
+3. Feed a frozen validation snapshot into both runtime targets as buoyancy/contact samples; switch to live custom C++ water only after a future solver-parity gate approves it.
 4. Add distinct material presets for elastic rock impacts and inelastic bed grounding in both targets.
 5. Compare Chaos/Jolt telemetry, determinism, contact outcomes, and runtime cost against the same fixture summaries.
 6. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.

@@ -1,43 +1,15 @@
 {
-  "schema": "raftsim.unreal.live_water_bridge.v1",
-  "status": "authoritative_custom_cxx_water_path_integrated_text_first",
   "accepted_report_set_lock": {
+    "loader": "URaftSimWaterRuntimeAdapter::LoadAcceptedReportManifest",
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
     "manifest": "physics/reports/milestone20/report_set_lock.json",
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "required": true,
-    "loader": "URaftSimWaterRuntimeAdapter::LoadAcceptedReportManifest"
-  },
-  "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
-  "water_runtime": {
-    "module": "RaftSimWater",
-    "adapter_class": "URaftSimWaterRuntimeAdapter",
-    "config_struct": "FRaftSimWaterRuntimeConfig",
-    "sample_struct": "FRaftSimWaterSample",
-    "authority": "custom_cxx_shallow_water_solver",
-    "native_runtime_name": "raftsim_water_cpp_v1",
-    "native_header_root": "../../physics/cpp/include",
-    "primary_headers": [
-      "raftsim_water/solver.hpp",
-      "raftsim_water/scenario.hpp",
-      "raftsim_water/chrono_coupling.hpp"
-    ]
-  },
-  "fixed_step_scheduling": {
-    "subsystem": "URaftSimPhysicsBridgeSubsystem",
-    "water_step_seconds": 0.0166666667,
-    "raft_contact_substep_seconds": 0.0083333333,
-    "render_tick_may_advance_authority": false,
-    "input_collection_stage": "collect_deterministic_inputs"
-  },
-  "render_interpolation": {
-    "manifest": "unreal/Content/RaftSim/Physics/fixed_step_render_interpolation.json",
-    "clock_subsystem": "URaftSimPhysicsClockSubsystem",
-    "enabled_by_default": true,
-    "policy": "interpolate_between_last_two_committed_physics_poses"
+    "passed": false,
+    "required": true
   },
   "deterministic_capture": {
-    "enabled_by_default": true,
     "capture_path": "Saved/Automation/RaftSim/Water/live_water_capture.jsonl",
+    "capture_writer": "URaftSimWaterRuntimeAdapter::AppendDeterministicCaptureFrame",
+    "enabled_by_default": true,
     "frame_hash_scope": [
       "runtime_name",
       "scenario_package_path",
@@ -46,13 +18,46 @@
       "committed_water_frame",
       "fixed_step_seconds",
       "sim_time_seconds"
-    ],
-    "capture_writer": "URaftSimWaterRuntimeAdapter::AppendDeterministicCaptureFrame"
+    ]
+  },
+  "fixed_step_scheduling": {
+    "input_collection_stage": "collect_deterministic_inputs",
+    "raft_contact_substep_seconds": 0.0083333333,
+    "render_tick_may_advance_authority": false,
+    "subsystem": "URaftSimPhysicsBridgeSubsystem",
+    "water_step_seconds": 0.0166666667
+  },
+  "regression_fixture_import": "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json",
+  "render_interpolation": {
+    "clock_subsystem": "URaftSimPhysicsClockSubsystem",
+    "enabled_by_default": true,
+    "manifest": "unreal/Content/RaftSim/Physics/fixed_step_render_interpolation.json",
+    "policy": "interpolate_between_last_two_committed_physics_poses"
   },
   "runtime_policy": {
+    "allowed_water_mode": "telemetry_and_frozen_playback_only",
+    "blocked_lock_prevents_step_water": true,
+    "failure_policy": "fault_if_required_report_manifest_is_missing_or_lock_hash_mismatches",
     "feature_forcing_default": "off_until_manifest_recorded_and_geoclaw_compared",
-    "unreal_water_system_role": "visual_only_consumer",
     "raft_to_water_feedback": "disabled_until_bounded_source_terms_are_validated",
-    "failure_policy": "fault_if_required_report_manifest_is_missing_or_lock_hash_mismatches"
+    "unreal_water_system_role": "visual_only_consumer"
+  },
+  "schema": "raftsim.unreal.live_water_bridge.v1",
+  "status": "live_custom_water_blocked_frozen_playback_only",
+  "water_runtime": {
+    "adapter_class": "URaftSimWaterRuntimeAdapter",
+    "authority": "custom_cxx_shallow_water_solver",
+    "authority_status": "blocked",
+    "config_struct": "FRaftSimWaterRuntimeConfig",
+    "live_stepping_enabled": false,
+    "module": "RaftSimWater",
+    "native_header_root": "../../physics/cpp/include",
+    "native_runtime_name": "raftsim_water_cpp_v1",
+    "primary_headers": [
+      "raftsim_water/solver.hpp",
+      "raftsim_water/scenario.hpp",
+      "raftsim_water/chrono_coupling.hpp"
+    ],
+    "sample_struct": "FRaftSimWaterSample"
   }
 }

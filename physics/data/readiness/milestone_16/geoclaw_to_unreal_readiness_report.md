@@ -2,9 +2,9 @@
 
 Gate version: `raftsim.geoclaw_to_unreal_readiness.v1`
 
-Decision: **APPROVED**
+Decision: **BLOCKED**
 
-The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom water can proceed after target-hardware confirmation.
+The full Milestone 16 gate was regenerated, but live Unreal custom water remains blocked by: Milestone 16 GeoClaw/C++ Solver Parity.
 
 ## Checks
 
@@ -12,7 +12,7 @@ The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom w
 | --- | --- | --- |
 | Milestone 16 GeoClaw Reference Runs | PASS | 20 of 20 scenarios have full GeoClaw frames. |
 | Milestone 16 C++ Solver Runs | PASS | 40 of 40 C++ runs completed with manifests. |
-| Milestone 16 GeoClaw/C++ Thresholds | PASS | 40 of 40 threshold comparisons pass. |
+| Milestone 16 GeoClaw/C++ Solver Parity | FAILED | 6 of 40 rows provide passing solver parity; 34 rows are reference playback and 40 raw threshold checks pass. |
 | Milestone 16 Geometry Validation | PASS | 6 of 6 geometry families pass. |
 | Milestone 16 Raft Coupling | PASS | 50 of 50 raft comparisons pass. |
 | Milestone 16 Runtime Profile | PASS | 80 of 80 promoted C++ profile repetitions pass runtime budgets. |
@@ -28,19 +28,19 @@ The full Milestone 16 GeoClaw/C++/raft/runtime gate passed; live Unreal custom w
 
 ## Required Next Actions
 
-- Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration.
-- Repeat runtime profiling on target desktop, VR, and handheld hardware.
+- Replace reference-playback rows with passing solver-parity evidence under the owner-selected water strategy.
+- Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate.
 
 ## Accepted Model Limitations
 
 - 2.5D shallow-water/height-field flow remains the intended runtime model; full 3D CFD is out of scope.
 - GeoClaw remains offline reference infrastructure and does not ship inside Unreal.
-- The approved Milestone 16/18 gate validates the current C++ water evidence set; new authored rivers, feature-forcing defaults, and gameplay tuning must add matching regression evidence.
-- Flow-dependent pin/release, crew high-side, swimmer, and rescue behavior remain dedicated gameplay fixtures layered over the approved water-field agreement gate.
+- Promoted fixtures are passing subsets, not proof that the full live-water gate has passed.
+- Dedicated pin/release evidence remains a separate Milestone 18 fixture until the full readiness gate is rerun.
 
 ## Risks
 
-- Runtime profile passes on the local validation machine and still needs target desktop, VR, and handheld hardware confirmation.
-- Real-world river source licensing, guide review, field-media validation, and level-editor annotation remain production gates.
-- Chaos/Jolt raft/contact/swimmer authority must still be selected and validated over the approved custom water outputs.
-- Future feature forcing must remain bounded, manifest-recorded, GeoClaw-compared, and separate from conservation fixes.
+- Fixture-scoped reference playback cannot approve live custom water even when its raw threshold checks pass.
+- Raft force and outcome agreement is not yet stable across hydraulics, drops, and boulder gardens.
+- Runtime profile passes only the promoted configurations and still needs target hardware confirmation.
+- Real-world river source licensing, guide review, and field-media validation remain production gates.

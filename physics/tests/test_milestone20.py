@@ -19,6 +19,7 @@ from raftsim.milestone20 import (
     build_report_set_lock,
     write_report_set_lock,
 )
+from raftsim.live_water_bridge_manifest import build_live_water_bridge_manifests
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -107,8 +108,11 @@ def test_build_report_set_lock_covers_milestone16_acceptance_artifacts():
     artifact_paths = {artifact["path"] for artifact in lock["artifacts"]}
 
     assert lock["schema"] == MILESTONE20_REPORT_SET_LOCK_SCHEMA
-    assert lock["decision"] == MILESTONE20_REPORT_SET_LOCK_DECISION
-    assert lock["passed"] is True
+    assert lock["decision"] == "blocked"
+    assert lock["decision"] != MILESTONE20_REPORT_SET_LOCK_DECISION
+    assert lock["passed"] is False
+    assert lock["source_gate"]["passed"] is False
+    assert lock["readiness_gate"]["approved_for_unreal_production_start"] is False
     assert len(lock["lock"]["lock_hash"]) == 64
     assert lock["lock"]["artifact_count"] == (
         len(MILESTONE16_SOURCE_REPORTS)
@@ -154,8 +158,10 @@ def test_write_report_set_lock_creates_json_and_markdown(tmp_path):
 
     assert output_json.exists()
     assert output_md.exists()
-    assert lock.report["passed"] is True
-    assert "Milestone 20 Report Set Lock" in output_md.read_text(encoding="utf-8")
+    assert lock.report["passed"] is False
+    markdown = output_md.read_text(encoding="utf-8")
+    assert "Milestone 20 Report Set Lock" in markdown
+    assert "blocked evidence set" in markdown
 
 
 def test_committed_report_set_lock_matches_generator():
@@ -221,18 +227,27 @@ def test_live_water_bridge_manifest_uses_locked_report_and_water_module():
     candidate = json.loads(WATER_RUNTIME_CANDIDATE_PATH.read_text(encoding="utf-8"))
     fixed_step = json.loads(FIXED_STEP_BRIDGE_PATH.read_text(encoding="utf-8"))
     interpolation = json.loads(RENDER_INTERPOLATION_PATH.read_text(encoding="utf-8"))
+    expected_manifests = build_live_water_bridge_manifests(REPO_ROOT)
 
+    assert live_bridge == expected_manifests.live_bridge
+    assert candidate == expected_manifests.runtime_candidate
     assert live_bridge["schema"] == "raftsim.unreal.live_water_bridge.v1"
     assert live_bridge["accepted_report_set_lock"]["manifest"] == (
         "physics/reports/milestone20/report_set_lock.json"
     )
     assert live_bridge["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
     assert live_bridge["accepted_report_set_lock"]["required"] is True
+    assert live_bridge["accepted_report_set_lock"]["passed"] is False
     assert live_bridge["regression_fixture_import"] == (
         "unreal/Content/RaftSim/Automation/water_regression_fixture_import.json"
     )
     assert live_bridge["water_runtime"]["module"] == "RaftSimWater"
     assert live_bridge["water_runtime"]["authority"] == "custom_cxx_shallow_water_solver"
+    assert live_bridge["water_runtime"]["authority_status"] == "blocked"
+    assert live_bridge["water_runtime"]["live_stepping_enabled"] is False
+    assert live_bridge["runtime_policy"]["allowed_water_mode"] == (
+        "telemetry_and_frozen_playback_only"
+    )
     assert live_bridge["fixed_step_scheduling"]["subsystem"] == "URaftSimPhysicsBridgeSubsystem"
     assert live_bridge["deterministic_capture"]["enabled_by_default"] is True
     assert live_bridge["render_interpolation"]["enabled_by_default"] is True
@@ -289,7 +304,7 @@ def test_unreal_regression_fixture_import_matches_generator():
 
     assert committed == expected
     assert committed["schema"] == MILESTONE20_UNREAL_REGRESSION_IMPORT_SCHEMA
-    assert committed["status"] == "ready_for_unreal_automation_execution"
+    assert committed["status"] == "live_water_blocked_replay_fixtures_available"
 
 
 def test_unreal_regression_fixture_import_covers_milestone16_17_18():
@@ -298,13 +313,13 @@ def test_unreal_regression_fixture_import_covers_milestone16_17_18():
     report_lock = json.loads(REPORT_SET_LOCK_PATH.read_text(encoding="utf-8"))
 
     assert manifest["accepted_report_set_lock"]["lock_hash"] == report_lock["lock"]["lock_hash"]
+    assert manifest["accepted_report_set_lock"]["passed"] is False
     assert manifest["automation_module"] == "RaftSimAutomation"
     assert manifest["live_water_bridge_manifest"] == (
         "unreal/Content/RaftSim/Physics/live_water_bridge.json"
     )
     assert manifest["comparison_modes"] == [
-        "replayed_water_field_vs_accepted_cpp_output",
-        "live_water_field_vs_accepted_cpp_output",
+        "replayed_water_field_vs_calibrated_cpp_output"
     ]
     assert manifest["total_fixture_count"] == 109
     assert source["milestone16"]["fixture_count"] == 98
@@ -462,12 +477,12 @@ def test_live_water_smoke_suite_matches_generator():
     assert LIVE_WATER_SMOKE_REPORT_MD_PATH.exists()
 
 
-def test_live_water_smoke_suite_closes_text_first_gate():
+def test_live_water_smoke_suite_blocks_on_solver_evidence_gate():
     suite = json.loads(LIVE_WATER_SMOKE_SUITE_PATH.read_text(encoding="utf-8"))
     report = json.loads(LIVE_WATER_SMOKE_REPORT_PATH.read_text(encoding="utf-8"))
 
     assert suite["schema"] == MILESTONE20_LIVE_WATER_SMOKE_SUITE_SCHEMA
-    assert suite["status"] == "ready_for_unreal_automation_execution"
+    assert suite["status"] == "blocked"
     assert suite["execution_mode"] == "text_first_contract_pending_unreal_editor_execution"
     assert {check["check_id"] for check in suite["checks"]} == {
         "accepted_report_set_lock",
@@ -478,7 +493,13 @@ def test_live_water_smoke_suite_closes_text_first_gate():
         "target_profile_budgets",
         "deterministic_replay_evidence",
     }
-    assert all(check["passed"] for check in suite["checks"])
+    checks = {check["check_id"]: check for check in suite["checks"]}
+    assert checks["accepted_report_set_lock"]["passed"] is False
+    assert all(
+        check["passed"]
+        for check_id, check in checks.items()
+        if check_id != "accepted_report_set_lock"
+    )
     assert {profile["profile"] for profile in suite["target_profiles"]} == {
         "desktop",
         "handheld",
@@ -486,9 +507,10 @@ def test_live_water_smoke_suite_closes_text_first_gate():
     }
 
     assert report["schema"] == MILESTONE20_LIVE_WATER_SMOKE_REPORT_SCHEMA
-    assert report["decision"] == MILESTONE20_LIVE_WATER_SMOKE_DECISION
-    assert report["passed"] is True
-    assert report["milestone20_closed"] is True
+    assert report["decision"] == "blocked"
+    assert report["decision"] != MILESTONE20_LIVE_WATER_SMOKE_DECISION
+    assert report["passed"] is False
+    assert report["milestone20_closed"] is False
     assert report["regression_fixture_count"] == 109
     assert report["stitched_whole_window_asset_count"] == 6
     assert report["debug_view_count"] == 9

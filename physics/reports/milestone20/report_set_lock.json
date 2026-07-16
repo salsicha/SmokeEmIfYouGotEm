@@ -3,38 +3,38 @@
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/cpp_solver_runs.json",
-      "sha256": "5509de7d3ede2199472ee52ecd465e1cb906f664c23c8f1bc2aa287888657de2",
-      "size_bytes": 53760
+      "sha256": "d6888577c814a71c8342430ef8f79f899823d6a861aa6ffa427a41a5e5f53703",
+      "size_bytes": 55681
     },
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/cpp_solver_runs.md",
-      "sha256": "38ee3e5f6839e637dda03a3c8674725b89a685f5aab37e8b708cfe060f843c36",
+      "sha256": "b8fd2be3962b6e365441a6068cdf116c5df255c135c1b9e5e098800bb6ec52dc",
       "size_bytes": 3254
     },
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/full_cpp_validation_gate.json",
-      "sha256": "485e113704cb8f3f07a9f4cf922377b491f0f21a4cfa6369f606b0aa8a0b2db0",
-      "size_bytes": 3017
+      "sha256": "455a66ff71120dafa323cb980d86445a74c488090da80e788ad25d0ef4e6117e",
+      "size_bytes": 4274
     },
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/full_cpp_validation_gate.md",
-      "sha256": "9b0e4e1c656318f5fbc7b58f94ae7a38b2bb2f21db8a6252e2a31360dfb89ece",
-      "size_bytes": 931
+      "sha256": "1e4cac07d997b4443a576ffc03664fab6d480fb518a5c255872f31bc4822397a",
+      "size_bytes": 2134
     },
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.json",
-      "sha256": "487e569864a0db35c53d34939eff835027c9b66a9f61367c29659ba39fa2c22a",
-      "size_bytes": 129862
+      "sha256": "6d10bdee6266542b539a72897e49aaa9d21e8a60838a32d8c442676970b87e25",
+      "size_bytes": 138709
     },
     {
       "group": "milestone16_source_report",
       "path": "physics/reports/milestone16/geoclaw_cpp_comparisons.md",
-      "sha256": "06d9aedb55192668a242f8ed8b49aae165f0386eb2c04de717f5a30ec6f5081e",
-      "size_bytes": 3815
+      "sha256": "58b2d3a2fc5d45e9bb5a350a47b89d670aa8d232f08889f43b56d2ea119a628a",
+      "size_bytes": 4702
     },
     {
       "group": "milestone16_source_report",
@@ -105,8 +105,8 @@
     {
       "group": "milestone16_readiness_package",
       "path": "physics/data/readiness/milestone_16/geoclaw_cpp_comparison_summary.json",
-      "sha256": "f2d304d0a0bbc23d24334a7934467bd894bb38fe59c131858491ec9ee518ce95",
-      "size_bytes": 245
+      "sha256": "092c079951720a8b7043c2ce657e8254cb9dd96d84ebd2b1f9c7396262f74202",
+      "size_bytes": 488
     },
     {
       "group": "milestone16_readiness_package",
@@ -117,14 +117,14 @@
     {
       "group": "milestone16_readiness_package",
       "path": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json",
-      "sha256": "72347b373839737978654456047bd8f5b3e91c1fe926371a3e3c6424b1f4af8b",
-      "size_bytes": 5467
+      "sha256": "3fe6d7f4afd32610ad9e1d00e52046deff335d8b01e4c0a9c7f1e6817d50ca5e",
+      "size_bytes": 5361
     },
     {
       "group": "milestone16_readiness_package",
       "path": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.md",
-      "sha256": "1d0038372c7bf649405151a2b0dd678a72dcbd57b7be5e765ab952b5be7d9ecc",
-      "size_bytes": 2857
+      "sha256": "fbcd16e02baad25481c74d71e97185697a80f388e730aa4f08e718b16e3c9192",
+      "size_bytes": 2750
     },
     {
       "group": "milestone16_readiness_package",
@@ -163,45 +163,45 @@
       "size_bytes": 1757
     }
   ],
-  "decision": "accepted_milestone16_report_set_locked_target_profiles_pass",
+  "decision": "blocked",
   "lock": {
     "artifact_count": 27,
     "hash_algorithm": "sha256",
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
     "readiness_artifact_count": 9,
     "source_report_count": 16,
     "supporting_artifact_count": 2
   },
   "notes": [
-    "The lock hash covers the accepted Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.",
+    "The lock hash covers the current Milestone 16 source reports, packaged readiness summaries, and runtime budget contract.",
     "Runtime profile evidence is repeated here by evaluating every committed Milestone 16 profile record against desktop, VR, and handheld budget profiles.",
-    "This artifact is the manifest Unreal live-water bridge work should load until a newer accepted report-set lock supersedes it."
+    "A blocked lock must keep live custom water disabled until a newer passing report-set lock supersedes it."
   ],
-  "passed": true,
+  "passed": false,
   "production_use": {
     "authoritative_water_source": "custom_cxx_shallow_water_solver",
-    "live_water_unreal_bridge_foundation_unblocked": true,
+    "live_water_unreal_bridge_foundation_unblocked": false,
     "physical_device_capture_policy": "Replace or extend this lock with measured desktop, VR, and handheld device telemetry before release hardening or platform sign-off. The committed evidence confirms target budget profiles, not lab hardware IDs.",
     "physical_device_capture_status": "not_recorded_in_repo",
     "report_manifest_loading_required": true
   },
   "readiness_gate": {
-    "approved_for_unreal_production_start": true,
-    "passed": true,
+    "approved_for_unreal_production_start": false,
+    "passed": false,
     "report": "physics/data/readiness/milestone_16/geoclaw_to_unreal_readiness_report.json",
     "required_next_actions": [
-      "Lock the accepted Milestone 16 report set and regression fixtures before live-water Unreal integration.",
-      "Repeat runtime profiling on target desktop, VR, and handheld hardware."
+      "Replace reference-playback rows with passing solver-parity evidence under the owner-selected water strategy.",
+      "Keep the distinct Milestone 18 pin/release fixture separate from the raft-coupling water-field agreement gate."
     ],
-    "status": "approved"
+    "status": "blocked"
   },
   "schema": "raftsim.milestone20.report_set_lock.v1",
   "source_gate": {
-    "blocked_component_count": 0,
+    "blocked_component_count": 1,
     "component_count": 7,
-    "decision": "PASS",
-    "passed": true,
-    "passed_component_count": 7,
+    "decision": "BLOCKED",
+    "passed": false,
+    "passed_component_count": 6,
     "report": "physics/reports/milestone16/full_cpp_validation_gate.json"
   },
   "target_profile_confirmation": {

@@ -1,4 +1,4 @@
-"""Generate Unreal-ready visual derivatives from an accepted C++ water frame."""
+"""Generate Unreal-ready visual derivatives from calibrated C++ playback."""
 
 from pathlib import Path
 

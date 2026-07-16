@@ -1,45 +1,5 @@
 {
-  "schema": "raftsim.unreal.raft_contact_authority_integration.v1",
-  "status": "custom_reduced_authority_integrated_over_approved_custom_cxx_water",
-  "approved_custom_water": {
-    "authority": "custom_cxx_shallow_water_solver",
-    "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "source_gate_report": "physics/reports/milestone16/full_cpp_validation_gate.json",
-    "source_gate_passed": true,
-    "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
-    "water_runtime_adapter": "URaftSimWaterRuntimeAdapter"
-  },
-  "selected_raft_contact_authority": {
-    "runtime": "CustomReducedRigidBody",
-    "selection_report": "physics/reports/milestone19/runtime_authority_selection.json",
-    "selection_decision": "custom_reduced_runtime_fallback_selected_for_vertical_slice",
-    "selection_scope": "first_unreal_vertical_slice_raft_contact_swimmer_authority",
-    "chaos_or_jolt_authority_selection_allowed": false,
-    "comparison_report": "physics/reports/milestone19/chaos_vs_jolt_comparison.json",
-    "comparison_measured_evidence_available": false
-  },
-  "unreal_bridge": {
-    "subsystem": "URaftSimPhysicsBridgeSubsystem",
-    "fixed_step_bridge_manifest": "unreal/Content/RaftSim/Physics/fixed_step_bridge.json",
-    "raft_runtime_adapter": "URaftSimChronoRuntimeAdapter",
-    "legacy_adapter_note": "The adapter class name is retained for compatibility, but its default runtime is CustomReducedRigidBody for Milestone 22.",
-    "water_step_seconds": 0.0166666667,
-    "raft_contact_substep_seconds": 0.0083333333,
-    "render_tick_may_advance_authority": false,
-    "tick_order": [
-      "collect_deterministic_inputs",
-      "advance_custom_water_solver",
-      "sample_water_snapshot_for_raft_patches",
-      "apply_forces_to_selected_raft_runtime",
-      "step_selected_runtime_substeps",
-      "collect_contact_and_force_telemetry",
-      "publish_authoritative_raft_state"
-    ]
-  },
   "chaos_policy": {
-    "role": "visual_and_non_authoritative_only",
-    "may_drive_scoring_critical_outcomes": false,
     "allowed": [
       "loose_visual_props",
       "splash_debris",
@@ -54,8 +14,45 @@
       "raft_bed_grounding",
       "water_force_integration",
       "scoring_critical_rescue_outcomes"
-    ]
+    ],
+    "may_drive_scoring_critical_outcomes": false,
+    "role": "visual_and_non_authoritative_only"
   },
+  "custom_water_evidence": {
+    "accepted_report_set_lock": "physics/reports/milestone20/report_set_lock.json",
+    "candidate_authority": "custom_cxx_shallow_water_solver",
+    "live_water_approved": false,
+    "live_water_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "operating_mode": "frozen_validation_snapshot_only",
+    "source_gate_passed": false,
+    "source_gate_report": "physics/reports/milestone16/full_cpp_validation_gate.json",
+    "water_runtime_adapter": "URaftSimWaterRuntimeAdapter"
+  },
+  "pass_policy": {
+    "chaos_must_remain_visual_only_until_measured_fixture_pass": true,
+    "custom_water_report_lock_required": true,
+    "custom_water_source_gate_must_pass": true,
+    "render_interpolation_must_consume_authoritative_state": true,
+    "selected_runtime_must_match_authority_selection_report": true
+  },
+  "replacement_gates": [
+    "Run measured Unreal Chaos automation fixtures over the shared contract.",
+    "Run measured native Jolt SDK/plugin fixtures over the shared contract.",
+    "Regenerate the Chaos-vs-Jolt comparison with non-placeholder telemetry.",
+    "Select Chaos or Jolt only if the comparison report allows scoring-critical authority."
+  ],
+  "schema": "raftsim.unreal.raft_contact_authority_integration.v2",
+  "selected_raft_contact_authority": {
+    "chaos_or_jolt_authority_selection_allowed": false,
+    "comparison_measured_evidence_available": false,
+    "comparison_report": "physics/reports/milestone19/chaos_vs_jolt_comparison.json",
+    "runtime": "CustomReducedRigidBody",
+    "selection_decision": "custom_reduced_runtime_fallback_selected_for_vertical_slice",
+    "selection_report": "physics/reports/milestone19/runtime_authority_selection.json",
+    "selection_scope": "first_unreal_vertical_slice_raft_contact_swimmer_authority"
+  },
+  "status": "raft_contact_integrated_over_frozen_water_live_custom_water_blocked",
   "telemetry_contract": {
     "deterministic_capture": "Saved/Automation/RaftSim/Water/live_water_capture.jsonl",
     "required_fields": [
@@ -71,17 +68,22 @@
       "authority_policy_hash"
     ]
   },
-  "replacement_gates": [
-    "Run measured Unreal Chaos automation fixtures over the shared contract.",
-    "Run measured native Jolt SDK/plugin fixtures over the shared contract.",
-    "Regenerate the Chaos-vs-Jolt comparison with non-placeholder telemetry.",
-    "Select Chaos or Jolt only if the comparison report allows scoring-critical authority."
-  ],
-  "pass_policy": {
-    "custom_water_report_lock_required": true,
-    "custom_water_source_gate_must_pass": true,
-    "selected_runtime_must_match_authority_selection_report": true,
-    "chaos_must_remain_visual_only_until_measured_fixture_pass": true,
-    "render_interpolation_must_consume_authoritative_state": true
+  "unreal_bridge": {
+    "fixed_step_bridge_manifest": "unreal/Content/RaftSim/Physics/fixed_step_bridge.json",
+    "legacy_adapter_note": "The adapter class name is retained for compatibility, but its default runtime is CustomReducedRigidBody for Milestone 22.",
+    "raft_contact_substep_seconds": 0.0083333333,
+    "raft_runtime_adapter": "URaftSimChronoRuntimeAdapter",
+    "render_tick_may_advance_authority": false,
+    "subsystem": "URaftSimPhysicsBridgeSubsystem",
+    "tick_order": [
+      "collect_deterministic_inputs",
+      "advance_custom_water_solver",
+      "sample_water_snapshot_for_raft_patches",
+      "apply_forces_to_selected_raft_runtime",
+      "step_selected_runtime_substeps",
+      "collect_contact_and_force_telemetry",
+      "publish_authoritative_raft_state"
+    ],
+    "water_step_seconds": 0.0166666667
   }
 }

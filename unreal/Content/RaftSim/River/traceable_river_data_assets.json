@@ -1,7 +1,8 @@
 {
   "accepted_report_set_lock": {
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "manifest": "physics/reports/milestone20/report_set_lock.json"
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "passed": false
   },
   "asset_class": "URaftSimTraceableRiverDataAsset",
   "asset_count": 9,
@@ -348,7 +349,7 @@
   },
   "status": "ready_for_unreal_data_asset_loading",
   "traceability_rules": [
-    "Every data asset must point back to repo-relative source paths and the accepted report-set lock.",
+    "Every data asset must point back to repo-relative source paths and the current report-set lock.",
     "Reach-local grid assets must include ghost-zone metadata and stitched whole-window validation outputs.",
     "Geospatial and corridor package assets must preserve CRS/provenance and validation-matrix paths.",
     "Unreal may cache or convert these assets, but converted assets cannot replace the source manifests."

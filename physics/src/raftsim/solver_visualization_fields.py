@@ -1,4 +1,4 @@
-"""Generate provenance-locked visual fields from an accepted C++ water frame."""
+"""Generate provenance-locked visual fields from a calibrated C++ playback frame."""
 
 from __future__ import annotations
 
@@ -38,7 +38,6 @@ GATE_SCENARIO_ID = "south_fork_cascading_median_runnable"
 SOLVER_MODE = "finite_volume"
 OUTPUT_SIZE = (1024, 512)
 GENERATED_ON = "2026-07-10"
-EXPECTED_REPORT_SET_LOCK_HASH = "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627"
 NORMALIZATION_CAPS = {
     "depth_m": 6.0,
     "speed_mps": 10.0,
@@ -145,12 +144,12 @@ def _load_validated_source(repo_root: Path) -> tuple[np.ndarray, dict]:
     return fields, metadata
 
 
-def _validate_acceptance_evidence(repo_root: Path) -> dict:
+def _validate_visualization_source_evidence(repo_root: Path) -> dict:
     run_manifest = _read_json(repo_root / SOURCE_RUN_MANIFEST_RELATIVE_PATH)
     if run_manifest.get("scenario_id") != SCENARIO_ID:
         raise ValueError("source run scenario id does not match the visualization contract")
     if run_manifest.get("solver_mode") != SOLVER_MODE:
-        raise ValueError("source run is not the accepted finite-volume lane")
+        raise ValueError("source run is not the calibrated finite-volume lane")
     if run_manifest.get("boundary_mode") != "scenario" or run_manifest.get("flux_scheme") != "hll":
         raise ValueError("source run boundary/flux semantics do not match the accepted lane")
     if run_manifest.get("feature_strength_scale") != 0:
@@ -168,20 +167,24 @@ def _validate_acceptance_evidence(repo_root: Path) -> dict:
         raise ValueError("expected one finite-volume South Fork cascading median parity record")
     comparison = matching[0]
     if not comparison.get("compared") or not comparison.get("threshold_passed"):
-        raise ValueError("GeoClaw/C++ parity record is not accepted")
+        raise ValueError("GeoClaw/C++ calibrated threshold record is not available")
     if comparison.get("failing_checks"):
-        raise ValueError("GeoClaw/C++ parity record still has failing checks")
+        raise ValueError("GeoClaw/C++ calibrated threshold record still has failing checks")
+    if comparison.get("parity_mode") != "reference_playback":
+        raise ValueError("visualization source must retain its reference-playback classification")
+    if comparison.get("solver_approval_passed") is not False:
+        raise ValueError("reference-playback visualization source cannot pass solver approval")
 
     full_gate = _read_json(repo_root / FULL_GATE_RELATIVE_PATH)
-    if not full_gate.get("passed") or full_gate.get("decision") != "PASS":
-        raise ValueError("full C++ validation gate is not passing")
-    if full_gate.get("blocked_component_count") != 0:
-        raise ValueError("full C++ validation gate still has blocked components")
+    if full_gate.get("passed") or full_gate.get("decision") != "BLOCKED":
+        raise ValueError("full C++ validation gate must preserve the current blocked decision")
+    if "geoclaw_cpp_comparisons" not in full_gate.get("blocked_component_ids", []):
+        raise ValueError("full C++ validation gate does not record the solver-parity blocker")
 
     report_lock = _read_json(repo_root / REPORT_SET_LOCK_RELATIVE_PATH)
     lock_hash = report_lock.get("lock", {}).get("lock_hash")
-    if not report_lock.get("passed") or lock_hash != EXPECTED_REPORT_SET_LOCK_HASH:
-        raise ValueError("Milestone 20 accepted report-set lock does not match")
+    if report_lock.get("passed") or not isinstance(lock_hash, str) or len(lock_hash) != 64:
+        raise ValueError("Milestone 20 report-set lock must preserve the blocked hash-addressed state")
     if report_lock.get("production_use", {}).get("authoritative_water_source") != (
         "custom_cxx_shallow_water_solver"
     ):
@@ -193,6 +196,10 @@ def _validate_acceptance_evidence(repo_root: Path) -> dict:
         "flux_scheme": run_manifest["flux_scheme"],
         "threshold_tier": comparison["threshold_tier"],
         "threshold_report": comparison["threshold_report"],
+        "parity_mode": comparison["parity_mode"],
+        "solver_approval_passed": comparison["solver_approval_passed"],
+        "full_gate_passed": False,
+        "live_water_approved": False,
         "report_set_lock_hash": lock_hash,
     }
 
@@ -206,7 +213,7 @@ def _resize_texture(array: np.ndarray) -> Image.Image:
 def generate_solver_visualization_fields(repo_root: Path) -> dict:
     repo_root = repo_root.resolve()
     fields, grid = _load_validated_source(repo_root)
-    evidence = _validate_acceptance_evidence(repo_root)
+    evidence = _validate_visualization_source_evidence(repo_root)
 
     depth = fields[:, :, 0]
     eta = fields[:, :, 1]
@@ -260,9 +267,9 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
         "normal_z": [float(np.min(normals[:, :, 2])), float(np.max(normals[:, :, 2]))],
     }
     manifest = {
-        "schema": "raftsim.unreal.cpp_solver_visualization_fields.v1",
+        "schema": "raftsim.unreal.cpp_solver_visualization_fields.v2",
         "generated_on": GENERATED_ON,
-        "status": "validated_cpp_solver_visualization_fields_generated_for_south_fork_review",
+        "status": "reference_playback_visualization_fields_generated_for_south_fork_review",
         "river_id": RIVER_ID,
         "scenario_id": SCENARIO_ID,
         "flow_band": "median",
@@ -275,14 +282,14 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
             "run_manifest": _artifact(repo_root, SOURCE_RUN_MANIFEST_RELATIVE_PATH),
             "geoclaw_cpp_parity": _artifact(repo_root, PARITY_REPORT_RELATIVE_PATH),
             "full_cpp_validation_gate": _artifact(repo_root, FULL_GATE_RELATIVE_PATH),
-            "accepted_report_set_lock": _artifact(repo_root, REPORT_SET_LOCK_RELATIVE_PATH),
+            "current_report_set_lock": _artifact(repo_root, REPORT_SET_LOCK_RELATIVE_PATH),
         },
-        "acceptance_evidence": evidence,
+        "visualization_source_evidence": evidence,
         "field_ranges": actual_ranges,
         "normalization": {
             "policy": "fixed_physical_caps_clamp_to_unit_interval",
             "caps": NORMALIZATION_CAPS,
-            "reason": "stable cross-frame authoring scale; accepted frame extrema remain inside every cap",
+            "reason": "stable cross-frame authoring scale; calibrated playback frame extrema remain inside every cap",
         },
         "surface_relief_derivation": {
             "source_field": "eta",
@@ -333,7 +340,7 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
                 "target_world_x_cm": 4740.0,
                 "camera_solver_u": (240.0 + 11600.0) / 37800.0,
                 "target_solver_u": (4740.0 + 11600.0) / 37800.0,
-                "intent": "frame the accepted median field approach spanning the strongest mean-Froude columns",
+                "intent": "frame the calibrated median playback field spanning the strongest mean-Froude columns",
             },
         },
         "render_binding": {
@@ -343,7 +350,7 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
                 "MI_RaftSim_AmericanSouthFork_SingleLayerWaterCandidate"
             ),
             "river_scope": [RIVER_ID],
-            "other_river_status": "not_bound_until_equivalent_river_specific_validated_cpp_exports_exist",
+            "other_river_status": "not_bound_until_equivalent_river_specific_playback_or_solver_exports_exist",
             "feature_weights": {
                 "macro_normal": 0.22,
                 "depth_color": 0.20,
@@ -368,13 +375,16 @@ def generate_solver_visualization_fields(repo_root: Path) -> dict:
             },
         },
         "authority_policy": {
-            "physical_authority": "custom_cxx_shallow_water_solver",
+            "physical_authority": "none_reference_playback_visualization_only",
+            "source_runtime_candidate": "custom_cxx_shallow_water_solver",
+            "parity_mode": "reference_playback",
+            "live_water_approved": False,
             "derivative_scope": "review_only_noncolliding_render_geometry_and_material_response_on_landscape_candidate_ribbon",
             "feature_forcing_enabled": False,
             "changes_collision_or_raft_forces": False,
             "changes_solver_state": False,
             "may_hide_conservation_or_parity_failures": False,
-            "promotion_requires_river_specific_live_bridge_alignment": True,
+            "promotion_requires_future_solver_parity_and_live_bridge_alignment": True,
         },
     }
     manifest_path = repo_root / MANIFEST_RELATIVE_PATH

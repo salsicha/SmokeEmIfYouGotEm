@@ -262,6 +262,32 @@ def test_cpp_reduced_water_solver_builds_and_exports_shared_scenario(tmp_path):
     assert bed_step_profile["max_speed_m_per_s"] == pytest.approx(520.0)
     assert bed_step_profile["requires_feature_forcing"] is False
 
+    bed_step_fv_output_dir = tmp_path / "cpp_bed_step_finite_volume_output"
+    subprocess.run(
+        [
+            str(build_dir / "raftsim_water_solver"),
+            "--scenario",
+            str(bed_step_scenario_dir),
+            "--output",
+            str(bed_step_fv_output_dir),
+            "--steps",
+            "2",
+            "--frame-interval",
+            "1",
+            "--solver-mode",
+            "finite_volume",
+            "--feature-strength-scale",
+            "0",
+        ],
+        check=True,
+    )
+    bed_step_fv_manifest = json.loads(
+        (bed_step_fv_output_dir / bed_step_scenario.metadata.scenario_id / "manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert bed_step_fv_manifest["fixture_scoped_bed_step_finite_volume_hydrostatic_face_source"] is True
+
     finite_volume_output_dir = tmp_path / "cpp_finite_volume_output"
     subprocess.run(
         [

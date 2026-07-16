@@ -1,6 +1,11 @@
 {
-  "schema": "raftsim.unreal.water_runtime_candidate.v1",
-  "runtime_name": "raftsim_water_cpp_v1",
+  "accepted_report_set_lock": {
+    "lock_hash": "4a30cca66065bc504edc6ba300b79b60ca2e57faa506abf48edbf14422dfa486",
+    "manifest": "physics/reports/milestone20/report_set_lock.json",
+    "passed": false,
+    "required_for_live_bridge": true
+  },
+  "live_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
   "native_header_root": "../../physics/cpp/include",
   "native_source_root": "../../physics/cpp/src",
   "primary_headers": [
@@ -8,27 +13,26 @@
     "raftsim_water/scenario.hpp",
     "raftsim_water/chrono_coupling.hpp"
   ],
-  "accepted_report_set_lock": {
-    "manifest": "physics/reports/milestone20/report_set_lock.json",
-    "lock_hash": "267dc418cf29bcf399e5af4cadcf1398510968b419c9466cd6e13afcc64fd627",
-    "required_for_live_bridge": true
+  "runtime_name": "raftsim_water_cpp_v1",
+  "runtime_policy": {
+    "allowed_water_mode": "telemetry_and_frozen_playback_only",
+    "authority": "custom_cxx_shallow_water_solver",
+    "authority_status": "candidate_blocked",
+    "feature_forcing_default": "off",
+    "fixed_step_seconds": 0.0166666667,
+    "live_stepping_enabled": false,
+    "mode": "one_way_water_to_raft_first",
+    "report_manifest_required": true,
+    "unreal_water_system_role": "visual_only"
   },
+  "schema": "raftsim.unreal.water_runtime_candidate.v1",
+  "status": "runtime_candidate_integrated_live_authority_blocked",
   "unreal_adapter": {
-    "module": "RaftSimWater",
     "class": "URaftSimWaterRuntimeAdapter",
     "config_struct": "FRaftSimWaterRuntimeConfig",
-    "sample_struct": "FRaftSimWaterSample",
     "deterministic_capture_struct": "FRaftSimWaterDeterministicCaptureState",
-    "report_manifest_state_struct": "FRaftSimWaterReportManifestState"
-  },
-  "runtime_policy": {
-    "authority": "custom_cxx_shallow_water_solver",
-    "mode": "one_way_water_to_raft_first",
-    "fixed_step_seconds": 0.0166666667,
-    "unreal_water_system_role": "visual_only",
-    "feature_forcing_default": "off",
-    "report_manifest_required": true
-  },
-  "live_bridge_manifest": "unreal/Content/RaftSim/Physics/live_water_bridge.json",
-  "status": "authoritative_live_water_path_integrated_text_first_pending_editor_compile"
+    "module": "RaftSimWater",
+    "report_manifest_state_struct": "FRaftSimWaterReportManifestState",
+    "sample_struct": "FRaftSimWaterSample"
+  }
 }
