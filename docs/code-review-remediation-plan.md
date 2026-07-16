@@ -165,6 +165,12 @@ This plan addresses the four findings from the July 15, 2026 project review. It 
 - Retired the superseded V19 generator, compare driver, and V19-specific snapshot after confirming zero downstream executable imports.
 - Preserved the V19 scale-leaf hierarchy review, source report, captures, and contact-sheet evidence unchanged.
 
+### 2026-07-16 Finding 3 Step 3.2 V21 Retirement
+
+- Retired V21 before V20 under the policy's active-dependency exception: the V21 generator directly imported and invoked V20, so removing V20 first would have broken the retained executable path.
+- Removed the V21 texture generator, compound-branchlet compare driver, and two V21-specific snapshots. Preserved the V21 manifest, source report, review JSON, captures, and contact-sheet evidence unchanged; V22 may continue reading that governed evidence as its historical baseline.
+- Verification: `import raftsim` succeeds, no Python source imports the deleted generator, and the full suite reports **542 passed / 3 skipped**. The pass count changed only by the two intentionally retired V21 snapshots.
+
 ## Phase 0 — Baseline and guardrails (do first, ~30 min)
 
 1. Run `cd physics && uv run pytest -q` and save the output. Your job in later phases is to never make this baseline worse except where a phase explicitly says which tests will change and why.
