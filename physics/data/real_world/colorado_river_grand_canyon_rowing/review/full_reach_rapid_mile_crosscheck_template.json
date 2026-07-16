@@ -1,0 +1,1097 @@
+{
+  "acceptable_default_tolerance_m": 150.0,
+  "display_name": "Colorado River: Lees Ferry to Pearce Ferry",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_restation_major_rapids": false,
+    "complete_when": [
+      "each rapid has NPS/GCMRC, USGS/geospatial, oarsman/guide, and guide/index checks",
+      "each check records source, date, reviewed mile or geometry, evidence, and approval",
+      "reviewed station deltas are within per-record tolerance or disagreement is explicitly resolved",
+      "no record has unresolved source disagreement"
+    ]
+  },
+  "rapid_count": 15,
+  "rapid_records": [
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_01",
+      "class": "5/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "pour_over",
+        "hole",
+        "debris_fan"
+      ],
+      "planning_station_m": 12874.752,
+      "published_river_mile": 8.0,
+      "rapid_name": "Badger Creek",
+      "review_notes": "",
+      "review_priority": "high",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_01",
+      "class": "5/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "lateral",
+        "debris_fan"
+      ],
+      "planning_station_m": 18346.522,
+      "published_river_mile": 11.4,
+      "rapid_name": "Soap Creek",
+      "review_notes": "",
+      "review_priority": "medium",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_02",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "right_run",
+        "lateral",
+        "flow_sensitive"
+      ],
+      "planning_station_m": 27519.782,
+      "published_river_mile": 17.1,
+      "rapid_name": "House Rock",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [
+        "24 Mile"
+      ],
+      "assigned_window_id": "colorado_a2_window_03",
+      "class": "6/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "drop",
+        "wave_train",
+        "hole"
+      ],
+      "planning_station_m": 39267.994,
+      "published_river_mile": 24.4,
+      "rapid_name": "Georgie",
+      "review_notes": "",
+      "review_priority": "high",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_06",
+      "class": "6/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "boulder_garden",
+        "laterals",
+        "debris_fan"
+      ],
+      "planning_station_m": 117321.178,
+      "published_river_mile": 72.9,
+      "rapid_name": "Unkar",
+      "review_notes": "",
+      "review_priority": "high",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "boulder_garden",
+        "multiple_moves",
+        "holes",
+        "low_flow_difficulty"
+      ],
+      "planning_station_m": 124080.422,
+      "published_river_mile": 77.1,
+      "rapid_name": "Hance",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "holes",
+        "canyon_constriction"
+      ],
+      "planning_station_m": 127299.11,
+      "published_river_mile": 79.1,
+      "rapid_name": "Sockdolager",
+      "review_notes": "",
+      "review_priority": "high",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_07",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "wave_train",
+        "laterals",
+        "debris_fan"
+      ],
+      "planning_station_m": 131322.47,
+      "published_river_mile": 81.6,
+      "rapid_name": "Grapevine",
+      "review_notes": "",
+      "review_priority": "high",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "rock_ledge",
+        "right_to_left_move",
+        "low_flow_difficulty"
+      ],
+      "planning_station_m": 146128.435,
+      "published_river_mile": 90.8,
+      "rapid_name": "Horn Creek",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [
+        "Granite Falls"
+      ],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_waves",
+        "laterals",
+        "debris_fan"
+      ],
+      "planning_station_m": 151117.402,
+      "published_river_mile": 93.9,
+      "rapid_name": "Granite",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_08",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_wave_train",
+        "hydraulics",
+        "flow_sensitive"
+      ],
+      "planning_station_m": 153692.352,
+      "published_river_mile": 95.5,
+      "rapid_name": "Hermit",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_09",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_holes",
+        "rock_garden",
+        "debris_fan",
+        "multiple_lines",
+        "flip_hazard"
+      ],
+      "planning_station_m": 158037.581,
+      "published_river_mile": 98.2,
+      "rapid_name": "Crystal",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_11",
+      "class": "7/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "central_island",
+        "channel_choice",
+        "wrap_hazard",
+        "rock_push"
+      ],
+      "planning_station_m": 210984.998,
+      "published_river_mile": 131.1,
+      "rapid_name": "Bedrock",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [],
+      "assigned_window_id": "colorado_a2_window_13",
+      "class": "8/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "large_hole",
+        "wave_train",
+        "flip_hazard"
+      ],
+      "planning_station_m": 241723.469,
+      "published_river_mile": 150.2,
+      "rapid_name": "Upset",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    },
+    {
+      "acceptable_tolerance_m": 150.0,
+      "aliases": [
+        "Vulcan"
+      ],
+      "assigned_window_id": "colorado_a2_window_15",
+      "class": "9/10",
+      "editor_binding_enabled": false,
+      "exact_stationing_promoted": false,
+      "feature_tags": [
+        "ledge_hole",
+        "large_waves",
+        "laterals",
+        "multiple_lines",
+        "flip_hazard",
+        "flow_sensitive"
+      ],
+      "planning_station_m": 289199.117,
+      "published_river_mile": 179.7,
+      "rapid_name": "Lava Falls",
+      "review_notes": "",
+      "review_priority": "critical",
+      "reviewed_river_mile": null,
+      "reviewed_station_m": null,
+      "solver_window_enabled": false,
+      "source_checks": {
+        "grand_canyon_oarsman_or_guide_review": {
+          "approved": false,
+          "check_id": "grand_canyon_oarsman_or_guide_review",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "nps_or_gcmrc_river_mile_reference": {
+          "approved": false,
+          "check_id": "nps_or_gcmrc_river_mile_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "published_guide_or_secondary_index_crosscheck": {
+          "approved": false,
+          "check_id": "published_guide_or_secondary_index_crosscheck",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        },
+        "usgs_hydraulic_map_or_geospatial_reference": {
+          "approved": false,
+          "check_id": "usgs_hydraulic_map_or_geospatial_reference",
+          "checked_on": "",
+          "evidence": [],
+          "notes": "",
+          "reviewed_river_mile": null,
+          "reviewed_station_m": null,
+          "source_title_or_reviewer": "",
+          "source_url_or_report": ""
+        }
+      },
+      "station_delta_m": null,
+      "unresolved_source_disagreement": true
+    }
+  ],
+  "required_source_checks": [
+    "nps_or_gcmrc_river_mile_reference",
+    "usgs_hydraulic_map_or_geospatial_reference",
+    "grand_canyon_oarsman_or_guide_review",
+    "published_guide_or_secondary_index_crosscheck"
+  ],
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.a2_rapid_mile_crosscheck_template.v1",
+  "source_contracts": {
+    "centerline_decision_template": "physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_centerline_decision_template.json",
+    "window_plan": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/full_reach_window_plan.json"
+  },
+  "status": "empty_rapid_mile_crosscheck_template_no_stationing_promotion",
+  "task_id": "A2",
+  "validation_contract": {
+    "all_required_source_checks_must_approve": true,
+    "every_catalog_rapid_must_have_record": true,
+    "every_record_must_include_all_required_source_checks": true,
+    "may_bind_editor_geometry_from_empty_template": false,
+    "may_bind_solver_windows_from_empty_template": false,
+    "may_restation_from_empty_template": false,
+    "reviewed_river_mile_and_station_must_be_recorded": true,
+    "station_delta_m_must_be_within_record_tolerance": true,
+    "template_is_empty": true,
+    "unresolved_source_disagreement_blocks_stationing": true
+  }
+}
