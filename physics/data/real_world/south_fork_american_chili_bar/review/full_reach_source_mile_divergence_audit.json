@@ -1,0 +1,108 @@
+{
+  "divergence_summary": {
+    "excess_source_path_after_21_miles_m": 15281.508,
+    "excess_source_path_after_21_miles_miles": 9.495,
+    "geodesic_21_mile_point_to_official_access_m": 10426.611,
+    "interpretation": "The extracted NHD path reaches the published 21.0-mile convention well upstream of the official Salmon Falls Lower Water Raft Take-out access seed, leaving a 15.282 km source-path excess. This suggests the published miles are not directly compatible with the current NHD source-length station axis without guide/geospatial review.",
+    "official_access_source_station_m": 49077.732,
+    "published_full_run_station_m": 33796.224,
+    "reanchor_diagnostic_status": "official_access_seed_snaps_to_nhd_pool_but_route_length_disagrees_with_published_run"
+  },
+  "generated_on": "2026-07-16",
+  "inputs": {
+    "named_flowline_extract": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_nhd_named_flowline_extract.geojson",
+    "official_access_geometry_discrepancy_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_discrepancy_review.json",
+    "official_access_reanchor_diagnostic": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_official_access_reanchor_diagnostic.json",
+    "official_access_reanchor_route_geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_official_access_reanchor_route.geojson",
+    "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json"
+  },
+  "official_access_endpoint": {
+    "fid": 50927,
+    "gisid": "GIS0005556",
+    "lon_lat": [
+      -121.043513366612,
+      38.7717445614809
+    ],
+    "name": "Salmon Falls  Lower Water Raft Take-out",
+    "nearest_graph_node_distance_m": 117.705,
+    "nearest_graph_node_lon_lat": [
+      -121.043353,
+      38.7727957
+    ],
+    "source_station_m": 49077.732,
+    "source_station_miles": 30.495
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_named_rapid_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_crop_to_final_downstream_anchor": false,
+    "can_import_unreal_full_reach_landscape": false,
+    "can_promote_current_nhd_station_axis": false,
+    "can_restation_named_rapids": false,
+    "next_required_actions": [
+      "Review the 20.5/21.0-mile breakpoint overlay against aerial imagery and guide/local knowledge.",
+      "Decide whether published miles are guide conventions separate from the simulation station axis.",
+      "If the NHD axis is retained, record a distinct simulation station axis before restationing rapids.",
+      "If the NHD axis is rejected, replace it with a reviewed centerline or hydrography source before regenerating windows."
+    ]
+  },
+  "published_breakpoints_on_official_access_path": [
+    {
+      "breakpoint_id": "salmon_falls_20_5_mile_source_convention",
+      "edge_alpha": 0.862573,
+      "edge_station_end_m": 33081.92823,
+      "edge_station_start_m": 32424.29669,
+      "geodesic_distance_to_official_access_m": 10699.374,
+      "lon_lat": [
+        -120.938291,
+        38.8220775
+      ],
+      "path_edge_index": 115,
+      "permanent_identifier": "63414776",
+      "published_miles": 20.5,
+      "remaining_source_path_to_official_access_m": 16086.18,
+      "remaining_source_path_to_official_access_miles": 9.995,
+      "source_record_index": 22469,
+      "source_record_number": 22470,
+      "source_station_m": 32991.552,
+      "source_station_miles": 20.5
+    },
+    {
+      "breakpoint_id": "full_run_21_0_mile_source_convention",
+      "edge_alpha": 0.480381,
+      "edge_station_end_m": 33912.81628,
+      "edge_station_start_m": 33688.43582,
+      "geodesic_distance_to_official_access_m": 10426.611,
+      "lon_lat": [
+        -120.9441395,
+        38.8246066
+      ],
+      "path_edge_index": 119,
+      "permanent_identifier": "{77575978-B9EE-4BC8-9395-3B05958E06E5}",
+      "published_miles": 21.0,
+      "remaining_source_path_to_official_access_m": 15281.508,
+      "remaining_source_path_to_official_access_miles": 9.495,
+      "source_record_index": 19144,
+      "source_record_number": 19145,
+      "source_station_m": 33796.224,
+      "source_station_miles": 21.0
+    }
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_source_mile_divergence_audit.v1",
+  "status": "published_source_mile_points_are_upstream_of_official_access_path",
+  "task_id": "A1",
+  "upstream_anchor": {
+    "lon_lat": [
+      -120.7199431,
+      38.7786168
+    ],
+    "name": "Chili Bar put-in review seed",
+    "nearest_graph_node_distance_m": 0.0,
+    "nearest_graph_node_lon_lat": [
+      -120.7199431,
+      38.7786168
+    ]
+  }
+}
