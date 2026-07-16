@@ -1,0 +1,203 @@
+{
+  "candidate_feature_count_from_prior_geojson": 3,
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          -121.05840946152,
+          38.7522231811928
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50817",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "fid": 50817,
+        "gisid": "GIS0005206",
+        "name": "Old Salmon Falls Assembly Parking",
+        "production_promoted": false,
+        "review_role": "upstream_or_alternate_salmon_falls_context",
+        "share": "Public",
+        "source_id": "ca_state_parks_parking_points_arcgis",
+        "use_type": "Day Use (No Fee)"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.03444619524,
+          38.7738621515691
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50924",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "fid": 50924,
+        "gisid": "GIS0005558",
+        "name": "Skunk Hollow Day Use Parking",
+        "production_promoted": false,
+        "review_role": "nearby_public_access_context",
+        "share": "Public",
+        "source_id": "ca_state_parks_parking_points_arcgis",
+        "use_type": "Day Use (Fee)"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.043513366612,
+          38.7717445614809
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50927",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "fid": 50927,
+        "gisid": "GIS0005556",
+        "name": "Salmon Falls  Lower Water Raft Take-out",
+        "production_promoted": false,
+        "review_role": "primary_official_downstream_access_geometry_lead",
+        "share": "Public",
+        "source_id": "ca_state_parks_parking_points_arcgis",
+        "use_type": "Day Use (Fee)"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.042833677013,
+          38.7717617394222
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50930",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "fid": 50930,
+        "gisid": "GIS0005555",
+        "name": "Salmon Falls Parking",
+        "production_promoted": false,
+        "review_role": "parking_context_for_primary_takeout",
+        "share": "Public",
+        "source_id": "ca_state_parks_parking_points_arcgis",
+        "use_type": "Day Use (Fee)"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          -121.042028800892,
+          38.7719121462091
+        ],
+        "type": "Point"
+      },
+      "id": "official_access_50933",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "fid": 50933,
+        "gisid": "GIS0005554",
+        "name": "Salmon Falls Overflow Parking",
+        "production_promoted": false,
+        "review_role": "parking_context_for_primary_takeout",
+        "share": "Public",
+        "source_id": "ca_state_parks_parking_points_arcgis",
+        "use_type": "Day Use (Fee)"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.938291,
+            38.8220775
+          ],
+          [
+            -121.043513366612,
+            38.7717445614809
+          ]
+        ],
+        "type": "LineString"
+      },
+      "id": "select_20_5_mile_salmon_falls_basis__to_primary_official_takeout",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "candidate_geometry_status": "rejected_for_exact_anchor_review",
+        "option_id": "select_20_5_mile_salmon_falls_basis",
+        "primary_raft_takeout_distance_m": 10699.374,
+        "production_promoted": false,
+        "source_id": "ca_state_parks_parking_points_arcgis"
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -120.9441395,
+            38.8246066
+          ],
+          [
+            -121.043513366612,
+            38.7717445614809
+          ]
+        ],
+        "type": "LineString"
+      },
+      "id": "select_21_0_mile_full_run_folsom_basis__to_primary_official_takeout",
+      "properties": {
+        "can_bind_editor_geometry": false,
+        "can_bind_solver_windows": false,
+        "candidate_geometry_status": "rejected_for_exact_anchor_review",
+        "option_id": "select_21_0_mile_full_run_folsom_basis",
+        "primary_raft_takeout_distance_m": 10426.611,
+        "production_promoted": false,
+        "source_id": "ca_state_parks_parking_points_arcgis"
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "policy": {
+    "allowed_use": [
+      "editor/GIS discrepancy overlay",
+      "official access seed review",
+      "route re-anchoring planning"
+    ],
+    "forbidden_use": [
+      "final riverbank landing geometry",
+      "reservoir-stage access authority",
+      "corridor crop authority",
+      "named-rapid stationing authority",
+      "solver-window binding"
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.a1_official_access_geometry_leads.geojson.v1",
+  "source": {
+    "dataset_note": "Parking Points is a simplified point layer of California State Parks parking-area centroids. It is a strong access-geometry lead, not a surveyed riverbank landing or reservoir-stage authority.",
+    "dataset_url": "https://lab.data.ca.gov/dataset/parking-points",
+    "feature_layer_url": "https://services2.arcgis.com/AhxrK3F6WM8ECvDi/arcgis/rest/services/ParkingPoints/FeatureServer/0",
+    "http_status": 200,
+    "license": "Creative Commons Attribution",
+    "provider": "California Department of Parks and Recreation / California Open Data",
+    "query_url": "https://services2.arcgis.com/AhxrK3F6WM8ECvDi/arcgis/rest/services/ParkingPoints/FeatureServer/0/query?where=UPPER(UNITNAME)%20LIKE%20%27%25FOLSOM%25%27%20OR%20UPPER(NAME)%20LIKE%20%27%25SALMON%25%27%20OR%20UPPER(NAME)%20LIKE%20%27%25SKUNK%25%27&outFields=*&f=geojson",
+    "retrieved_on": "2026-07-16",
+    "source_id": "ca_state_parks_parking_points_arcgis"
+  },
+  "status": "official_access_geometry_disagrees_with_current_nhd_downstream_candidates",
+  "task_id": "A1",
+  "type": "FeatureCollection"
+}

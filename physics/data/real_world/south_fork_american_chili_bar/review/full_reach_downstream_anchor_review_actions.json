@@ -14,18 +14,20 @@
     },
     {
       "action_id": "verify_official_access_context",
-      "expected_output": "Exact geometry source, unresolved source disagreement, and unsupported access claims are recorded separately.",
+      "expected_output": "Current NHD candidate-point mismatch, exact geometry source, unresolved source disagreement, and unsupported access claims are recorded separately.",
       "required_inputs": [
         "ca_state_parks_dbw_salmon_falls_btaf",
         "ca_state_parks_dbw_american_south_fork_facilities",
         "blm_south_fork_american_river",
-        "ca_state_parks_folsom_lake_boat_launch_status"
+        "ca_state_parks_folsom_lake_boat_launch_status",
+        "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_discrepancy_review.json",
+        "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_leads.geojson"
       ],
-      "title": "Check official access/source leads against the candidate points."
+      "title": "Check official access/source leads and geometry against the candidate points."
     },
     {
       "action_id": "resolve_source_mile_convention",
-      "expected_output": "Selected option id plus source-mile convention are recorded; selection remains invalid without exact geometry and reviewers.",
+      "expected_output": "Selected source-mile convention or replacement endpoint basis is recorded; current NHD candidate points remain invalid after the official access-geometry discrepancy unless a corrected route is regenerated and approved.",
       "required_inputs": [
         "select_20_5_mile_salmon_falls_basis",
         "select_21_0_mile_full_run_folsom_basis"
@@ -36,6 +38,7 @@
       "action_id": "record_exact_anchor_geometry",
       "expected_output": "A replacement or selected endpoint is explicit enough for final window crop, rapid restationing, and editor overlay regeneration.",
       "required_inputs": [
+        "official Salmon Falls Lower Water Raft Take-out access seed",
         "accepted official layer, field point, survey, or guide-reviewed GIS point",
         "CRS/datum note",
         "reservoir-stage/access interpretation"
@@ -86,6 +89,28 @@
       },
       "path": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson",
       "production_promoted": false
+    },
+    "official_access_geometry_discrepancy": {
+      "geojson_overlay_path": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_leads.geojson",
+      "minimum_distance_to_any_official_access_m": 9647.972,
+      "minimum_distance_to_primary_raft_takeout_m": 10426.611,
+      "path": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_discrepancy_review.json",
+      "primary_official_access_geometry_lead": {
+        "fid": 50927,
+        "gisid": "GIS0005556",
+        "lon_lat": [
+          -121.043513366612,
+          38.7717445614809
+        ],
+        "name": "Salmon Falls  Lower Water Raft Take-out",
+        "review_role": "primary_official_downstream_access_geometry_lead",
+        "share": "Public",
+        "trailhead": "Yes",
+        "use_type": "Day Use (Fee)"
+      },
+      "rejected_candidate_count": 2,
+      "replacement_or_reanchored_endpoint_required": true,
+      "status": "official_access_geometry_disagrees_with_current_nhd_downstream_candidates"
     },
     "official_source_leads": [
       {
@@ -284,7 +309,9 @@
   "inputs": {
     "candidate_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_candidates.geojson",
     "downstream_access_publication_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_access_publication_review.json",
-    "downstream_anchor_decision_packet": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_packet.json"
+    "downstream_anchor_decision_packet": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_downstream_anchor_decision_packet.json",
+    "official_access_geometry_discrepancy_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_discrepancy_review.json",
+    "official_access_geometry_leads_geojson": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_leads.geojson"
   },
   "production_promoted": false,
   "promotion_gate": {
