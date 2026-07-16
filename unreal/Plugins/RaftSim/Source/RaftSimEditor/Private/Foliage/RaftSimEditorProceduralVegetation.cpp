@@ -155,7 +155,8 @@
 
 #define LOCTEXT_NAMESPACE "FRaftSimEditorModule"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRaftSimEditor, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogRaftSimEditorPveAuthoring, Log, All);
+#define LogRaftSimEditor LogRaftSimEditorPveAuthoring
 
 using RaftSimEditorFoliage::AppendNativeCanopyAtlasCurvedCard;
 using RaftSimEditorFoliage::AppendNativeCanopyLeafCard;
@@ -2151,4 +2152,5 @@ bool ConfigureFutaleufuCypressPveGrower(
 } // namespace RaftSimEditorPve
 
 
+#undef LogRaftSimEditor
 #undef LOCTEXT_NAMESPACE
