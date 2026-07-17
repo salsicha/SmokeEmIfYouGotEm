@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 139
-- Referenced command count: 84
+- Referenced artifact count: 140
+- Referenced command count: 85
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -764,13 +764,14 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the non-authoritative recommendation packet to start C4 review with South Fork Meat Grinder and Troublemaker first, keep Zambezi passive until Batoka source evidence exists, and require trajectory, raft/crew/swimmer/rescue telemetry, conservation overlay, guide-seat video, river-eye video, fixed frames, hashes, and reviewer signoff.
-2. Generate deterministic run preparations from valid C3 water windows.
-3. Run clean and consequence lines at required flows with raft, crew, swimmer, rescue, conservation, video, and frame evidence.
-4. Fill the simulator output sidecar and regenerate C4 readiness after review.
+2. Use the Markdown review form to record prepared run identity, all runtime artifact paths and SHA-256s, outcome decisions, failure notes, and guide/visual/technical/rights/owner signoff before filling the C4 output sidecar.
+3. Generate deterministic run preparations from valid C3 water windows.
+4. Run clean and consequence lines at required flows with raft, crew, swimmer, rescue, conservation, video, and frame evidence.
+5. Fill the simulator output sidecar and regenerate C4 readiness after review.
 
 **Acceptance Requirements**
 
-1. All required trajectory, telemetry, overlay, video, fixed-frame, and review-decision hashes are present.
+1. All required trajectory, telemetry, overlay, video, fixed-frame, and review-decision hashes are present and traceable to the Markdown review form or an equivalent signed review packet.
 2. Guide, visual, technical, rights, and owner reviews pass.
 3. C4 readiness no longer blocks C5 flexible-raft re-review.
 
@@ -782,6 +783,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/named_rapid_simulator_review_recommendation.json`
+- `docs/named-rapid-c4-simulator-review-form.md`
 - `physics/data/real_world/named_rapid_simulator_review_preparation_packet.json`
 - `physics/data/real_world/named_rapid_simulator_review_output_sidecar_template.json`
 - `physics/data/real_world/named_rapid_simulator_review_output_validation_report.json`
@@ -790,6 +792,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_named_rapid_simulator_review_recommendation.py`
+- `physics/src/raftsim/examples/generate_named_rapid_simulator_review_form.py`
 - `physics/src/raftsim/examples/generate_named_rapid_simulator_review_preparation.py`
 - `physics/src/raftsim/examples/generate_named_rapid_simulator_review_output.py`
 - `physics/src/raftsim/examples/generate_named_rapid_simulator_review_readiness.py`
