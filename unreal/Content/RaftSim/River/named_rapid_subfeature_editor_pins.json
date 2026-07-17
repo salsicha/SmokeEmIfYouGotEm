@@ -1,0 +1,40 @@
+{
+  "editor_contract": {
+    "pin_geometry_was_reviewed_before_layer_generation": false,
+    "render_as_overlay_layer": true,
+    "show_c3_binding_badge": true,
+    "show_flow_dependence": true,
+    "show_parent_rapid_marker_link": true,
+    "show_source_and_rights_panel": true
+  },
+  "generated_on": "2026-07-16",
+  "pins": [],
+  "placement_validation": {
+    "placement_record_count": 0,
+    "placements_valid": false,
+    "source_editor_pin_count": 0,
+    "status": "c2_editor_pin_placements_blocked_pending_exact_geometry",
+    "validation_error_count": 2
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "may_bind_c3_water_windows": false,
+    "may_claim_named_rapid_behavior_ready": false,
+    "may_load_as_unreal_review_overlay": false,
+    "may_replace_named_rapid_editor_markers": false,
+    "may_unblock_simulator_review_runs": false
+  },
+  "rivers": [],
+  "schema": "raftsim.unreal.named_rapid_subfeature_editor_pins.v1",
+  "source_editor_markers": "unreal/Content/RaftSim/River/named_rapid_editor_markers.json",
+  "source_placement_merge_report": "physics/data/real_world/named_rapid_editor_pin_placement_merge_report.json",
+  "source_placement_sidecar_template": "physics/data/real_world/named_rapid_editor_pin_placement_sidecar_template.json",
+  "status": "c2_subfeature_editor_pin_layer_blocked_pending_valid_placements",
+  "summary": {
+    "authoritative_editor_pin_count": 0,
+    "c3_bindable_pin_count": 0,
+    "river_count": 0,
+    "simulator_run_unblock_count": 0,
+    "subfeature_pin_count": 0
+  }
+}
