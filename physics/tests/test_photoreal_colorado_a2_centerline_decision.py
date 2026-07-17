@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_colorado_a2_centerline_decision import (
+    main as validate_colorado_a2_centerline_decision_main,
+)
 from raftsim.colorado_a2_centerline_decision import (
     COLORADO_A2_CENTERLINE_DECISION_TEMPLATE_RELATIVE_PATH,
     COLORADO_A2_CENTERLINE_DECISION_TEMPLATE_SCHEMA,
@@ -160,6 +163,85 @@ def test_colorado_a2_centerline_decision_validation_rejects_bad_option_and_buffe
         "field": "source_window_bbox_generation_scope",
         "reason": "buffer_policy_m_must_be_positive",
     } in report["invalid_fields"]
+
+
+def test_colorado_a2_centerline_decision_cli_writes_empty_gate():
+    exit_code = validate_colorado_a2_centerline_decision_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    template_path = REPO_ROOT / COLORADO_A2_CENTERLINE_DECISION_TEMPLATE_RELATIVE_PATH
+    report_path = (
+        REPO_ROOT / COLORADO_A2_CENTERLINE_DECISION_VALIDATION_REPORT_RELATIVE_PATH
+    )
+    assert exit_code == 0
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["decision_valid"] is False
+    assert report["status"] == "centerline_decision_incomplete_a2_promotion_blocked"
+
+
+def test_colorado_a2_centerline_decision_cli_accepts_complete_payload(tmp_path):
+    payload = _complete_decision_payload()
+    decision_path = tmp_path / "filled_colorado_centerline_decision.json"
+    output_path = tmp_path / "accepted_colorado_centerline_decision.json"
+    report_path = tmp_path / "colorado_centerline_decision_validation_report.json"
+    decision_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_colorado_a2_centerline_decision_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--decision",
+            str(decision_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["decision_valid"] is True
+    assert report["regeneration_permissions"]["can_generate_source_window_bboxes"] is True
+    assert report["regeneration_permissions"]["can_bind_solver_windows"] is True
+
+
+def test_colorado_a2_centerline_decision_cli_blocks_invalid_payload(tmp_path):
+    payload = _complete_decision_payload()
+    payload["decision_result"]["chosen_option_id"] = "not_allowed"
+    decision_path = tmp_path / "invalid_colorado_centerline_decision.json"
+    output_path = tmp_path / "accepted_colorado_centerline_decision.json"
+    report_path = tmp_path / "colorado_centerline_decision_validation_report.json"
+    decision_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_colorado_a2_centerline_decision_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--decision",
+            str(decision_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["decision_valid"] is False
+    assert {"field": "chosen_option_id", "reason": "option_id_not_allowed"} in report[
+        "invalid_fields"
+    ]
 
 
 def _complete_decision_payload() -> dict:
