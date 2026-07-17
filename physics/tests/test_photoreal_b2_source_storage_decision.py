@@ -4,6 +4,9 @@ from pathlib import Path
 from raftsim.photoreal_b2_source_acquisition_preflight import (
     build_b2_source_acquisition_preflight,
 )
+from raftsim.examples.validate_photoreal_b2_source_storage_decision_result import (
+    main as validate_b2_source_storage_decision_result_main,
+)
 from raftsim.photoreal_b2_source_storage_decision import (
     B2_SOURCE_STORAGE_DECISION_RELATIVE_PATH,
     B2_SOURCE_STORAGE_DECISION_RESULT_TEMPLATE_RELATIVE_PATH,
@@ -220,6 +223,89 @@ def test_b2_source_storage_decision_validation_rejects_generated_map_policy_chan
     payload["decision_result"]["generated_map_versioning_policy"] = "prune_generated_maps"
     report = build_b2_source_storage_decision_validation_report(payload)
 
+    assert report["storage_decision_valid"] is False
+    assert {
+        "field": "generated_map_versioning_policy",
+        "reason": "generated_maps_must_remain_versioned",
+    } in report["errors"]
+
+
+def test_b2_source_storage_decision_cli_writes_empty_gate():
+    exit_code = validate_b2_source_storage_decision_result_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    packet_path = REPO_ROOT / B2_SOURCE_STORAGE_DECISION_RELATIVE_PATH
+    template_path = REPO_ROOT / B2_SOURCE_STORAGE_DECISION_RESULT_TEMPLATE_RELATIVE_PATH
+    report_path = REPO_ROOT / B2_SOURCE_STORAGE_DECISION_VALIDATION_REPORT_RELATIVE_PATH
+    assert exit_code == 0
+    assert packet_path.exists()
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["storage_decision_valid"] is False
+    assert report["status"] == (
+        "owner_storage_policy_result_incomplete_downloads_remain_disabled"
+    )
+
+
+def test_b2_source_storage_decision_cli_accepts_complete_local_only_payload(tmp_path):
+    payload = _complete_local_only_result()
+    result_path = tmp_path / "filled_b2_source_storage_decision_result.json"
+    output_path = tmp_path / "accepted_b2_source_storage_decision_result.json"
+    report_path = tmp_path / "b2_source_storage_decision_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_b2_source_storage_decision_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["storage_decision_valid"] is True
+    assert report["chosen_option_id"] == "local_only_hash_report_public_repo"
+    assert report["promotion_permissions"]["can_enable_local_cc0_downloads"] is True
+    assert report["promotion_permissions"]["can_commit_cc0_source_binaries"] is False
+
+
+def test_b2_source_storage_decision_cli_blocks_invalid_payload(tmp_path):
+    payload = _complete_local_only_result()
+    payload["decision_result"]["generated_map_versioning_policy"] = "prune_generated_maps"
+    result_path = tmp_path / "invalid_b2_source_storage_decision_result.json"
+    output_path = tmp_path / "accepted_b2_source_storage_decision_result.json"
+    report_path = tmp_path / "b2_source_storage_decision_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_b2_source_storage_decision_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["storage_decision_valid"] is False
     assert {
         "field": "generated_map_versioning_policy",
