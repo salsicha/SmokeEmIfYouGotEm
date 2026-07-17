@@ -1,0 +1,43 @@
+{
+  "allowed_option_ids": [
+    "local_only_hash_report_public_repo",
+    "commit_all_cc0_source_binaries_after_storage_capacity",
+    "hybrid_commit_small_local_only_large"
+  ],
+  "decision_result": {
+    "chosen_option_id": "",
+    "decision_date": "",
+    "decision_owner": "",
+    "evidence": [],
+    "fab_standard_policy": "local_only",
+    "generated_map_versioning_policy": "keep_versioning_generated_maps",
+    "gitlab_storage_resolution": "",
+    "lfs_retention_policy": "",
+    "max_source_bundle_bytes_without_extra_approval": null,
+    "notes": "",
+    "rollback_policy": "",
+    "source_binary_commit_scope": ""
+  },
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_commit_cc0_source_binaries": false,
+    "can_commit_hash_reports": false,
+    "can_commit_import_reports": false,
+    "can_enable_local_cc0_downloads": false,
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_run_local_isolated_imports": false
+  },
+  "schema": "raftsim.photoreal.b2_source_storage_decision_result_template.v1",
+  "source_decision_packet": "physics/data/real_world/photoreal_b2_source_storage_decision_packet.json",
+  "status": "empty_owner_storage_policy_result_downloads_remain_disabled",
+  "validation_contract": {
+    "fab_standard_sources_remain_local_only": true,
+    "generated_map_policy_does_not_authorize_third_party_source_binaries": true,
+    "generated_maps_remain_versioned": true,
+    "gitlab_capacity_required_before_committing_any_cc0_source_binary": true,
+    "owner_must_choose_one_allowed_option": true,
+    "template_is_empty": true,
+    "validated_local_only_decision_allows_local_downloads_hashes_and_import_reports_only": true
+  }
+}
