@@ -395,7 +395,7 @@ def test_flexible_raft_d6_chaos_fixture_contract_maps_every_job():
 def test_flexible_raft_d6_unreal_contract_guard_is_registered():
     source_path = (
         REPO_ROOT
-        / "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/Tests/"
+        / "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/"
         "RaftSimD6ChaosFixtureContractTest.cpp"
     )
     source = source_path.read_text(encoding="utf-8")
