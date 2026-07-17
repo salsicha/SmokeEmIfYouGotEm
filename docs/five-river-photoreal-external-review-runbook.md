@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 132
-- Referenced command count: 77
+- Referenced artifact count: 133
+- Referenced command count: 78
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -266,18 +266,20 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Use the non-authoritative recommendation packet to start A3 review with reviewed-route/aerial digitizing for stationing and source-class flow evidence before numeric tuning.
 2. Use the reviewer briefing to answer the Pacuare route authority, aerial source, rapid geometry, guide confirmation, flow-source, flash-response, publication, and regeneration-scope questions.
-3. Replace provisional rapid order with reviewed GPS/aerial/guide stationing.
-4. Attach reviewed source-class flow-band evidence and acceptance signoffs.
-5. Regenerate stationing, editor markers, water-window inputs, and readiness from the accepted records.
-6. Record post-review acceptance evidence for regenerated stationing, editor markers, flow source classes, water windows, solver validation, Unreal import, and final guide/geospatial/rights/hazard/owner acceptance.
+3. Use the Markdown review form to collect route, aerial/orthomosaic, rapid stationing, guide, flow-source, flash-response, and publication decisions before copying accepted values into JSON review payloads.
+4. Replace provisional rapid order with reviewed GPS/aerial/guide stationing.
+5. Attach reviewed source-class flow-band evidence and acceptance signoffs.
+6. Regenerate stationing, editor markers, water-window inputs, and readiness from the accepted records.
+7. Record post-review acceptance evidence for regenerated stationing, editor markers, flow source classes, water windows, solver validation, Unreal import, and final guide/geospatial/rights/hazard/owner acceptance.
 
 **Acceptance Requirements**
 
 1. Reviewer decisions cite the A3 briefing source artifacts and answer the route, aerial, rapid-geometry, guide, flow, flash-response, publication, and regeneration-scope questions.
-2. Stationing and flow validators are green.
-3. The regeneration action packet authorizes all required downstream Pacuare outputs.
-4. The post-review acceptance validation report is green for regenerated stationing, catalog/editor outputs, source-class flow presets, rapid water windows, C++ solver validation, Unreal import, and final acceptance.
-5. A3 readiness no longer lists provisional-order, flow-source, or post-review blockers.
+2. The filled stationing and flow-source records are traceable to the Markdown review form or equivalent signed review packets.
+3. Stationing and flow validators are green.
+4. The regeneration action packet authorizes all required downstream Pacuare outputs.
+5. The post-review acceptance validation report is green for regenerated stationing, catalog/editor outputs, source-class flow presets, rapid water windows, C++ solver validation, Unreal import, and final acceptance.
+6. A3 readiness no longer lists provisional-order, flow-source, or post-review blockers.
 
 **Promotion Guardrails**
 
@@ -287,6 +289,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/pacuare_river_costa_rica/review/a3_review_briefing.json`
+- `docs/pacuare-a3-stationing-flow-review-form.md`
 - `physics/data/real_world/pacuare_river_costa_rica/review/a3_review_recommendation.json`
 - `physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_result_template.json`
 - `physics/data/real_world/pacuare_river_costa_rica/review/a3_stationing_digitizing_validation_report.json`
@@ -300,6 +303,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_pacuare_a3_review_briefing.py`
+- `physics/src/raftsim/examples/generate_pacuare_a3_review_form.py`
 - `physics/src/raftsim/examples/generate_pacuare_a3_review_recommendation.py`
 - `physics/src/raftsim/examples/validate_pacuare_a3_digitizing_result.py`
 - `physics/src/raftsim/examples/validate_pacuare_a3_flow_source_result.py`
