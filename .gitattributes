@@ -38,3 +38,4 @@ unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/*.png filter=lfs 
 *.zip filter=lfs diff=lfs merge=lfs -text
 *.7z filter=lfs diff=lfs merge=lfs -text
 *.rar filter=lfs diff=lfs merge=lfs -text
+docs/environment-captures/**/*.png filter=lfs diff=lfs merge=lfs -text

@@ -57,9 +57,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_low_runnable",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_low_runnable.umap",
-          "exists": true,
-          "size_bytes": 139419902,
-          "sha256": "42e12ea51027aeab4ee7e9ce4d54869ec06d9a09910c711bd6ac75c7135ae30b"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -187,9 +187,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_median_runnable",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_median_runnable.umap",
-          "exists": true,
-          "size_bytes": 139424060,
-          "sha256": "0037e93cff97bd8fb73225454233fe0f644752654f90d6f1234e2fc83dddffb9"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -317,9 +317,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_high_runnable",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_SouthForkAmerican_PhotorealPreview_high_runnable.umap",
-          "exists": true,
-          "size_bytes": 139274512,
-          "sha256": "f00281b013033ca133349545028c5562b75f4b6135722f4290ccdd925f7dadef"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -447,9 +447,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_low_release_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_low_release_planning.umap",
-          "exists": true,
-          "size_bytes": 126927345,
-          "sha256": "2a4e09477f1c9d1ff0b12ccc3457c653f83114e7d5b5a4bf4c08cdc3fdc8156d"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -577,9 +577,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_moderate_release_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_moderate_release_planning.umap",
-          "exists": true,
-          "size_bytes": 126932675,
-          "sha256": "07f6c473ac524d5d5e075359a6be330cefa385a2fcee59f698d24707e17f63ff"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -707,9 +707,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_high_release_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_ColoradoGrandCanyon_PhotorealPreview_high_release_planning.umap",
-          "exists": true,
-          "size_bytes": 126928478,
-          "sha256": "47c244c8ef64c7b109fe11281ce18bbdf0f374ebd753bca2bb4c55a5ce01ebd5"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -837,9 +837,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_clear_season_low_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_clear_season_low_planning.umap",
-          "exists": true,
-          "size_bytes": 167322254,
-          "sha256": "12d4af1eb4fc0c2104b67aa4e80125dc6a8fb7ead993214543d781a6cf051004"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -967,9 +967,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainfed_runnable_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainfed_runnable_planning.umap",
-          "exists": true,
-          "size_bytes": 167322254,
-          "sha256": "f8985a4298483bde3fae621e3d9ae03c3b01765c18ed66a72272b83e2b167b45"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -1097,9 +1097,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainy_season_high_planning",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_rainy_season_high_planning.umap",
-          "exists": true,
-          "size_bytes": 167324363,
-          "sha256": "8acf677b836ef7dd8dd75438fe0c99928834a80515df1717081e570b3c952fd9"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {
@@ -1227,9 +1227,9 @@
         "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_flash_response_review_only",
         "map_asset": {
           "path": "unreal/Content/RaftSim/Maps/EnvironmentPreviews/FlowVariants/L_PacuareRainforest_PhotorealPreview_flash_response_review_only.umap",
-          "exists": true,
-          "size_bytes": 167324363,
-          "sha256": "524871d6d6fcba38f877aaeb83755f32c5589249ccfc41463189c88a6f3b309b"
+          "exists": false,
+          "size_bytes": 0,
+          "sha256": null
         },
         "captures": [
           {

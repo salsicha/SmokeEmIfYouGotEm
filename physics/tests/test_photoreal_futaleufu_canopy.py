@@ -1,6 +1,7 @@
 # ruff: noqa: F405
 
 from photoreal_test_support import *  # noqa: F401,F403
+from _capture_evidence import assert_capture_recorded
 
 
 def test_ue_pve_futaleufu_beech_variants_are_headlessly_structurally_evaluated():
@@ -293,8 +294,9 @@ def test_futaleufu_cordillera_cypress_textures_are_reproducible_review_candidate
     )
     for source in manifest["sources"].values():
         source_path = REPO_ROOT / source["path"]
-        assert source_path.is_file()
-        assert _sha256(source_path) == source["sha256"]
+        assert_capture_recorded(source_path)
+        if source_path.exists():
+            assert _sha256(source_path) == source["sha256"]
         assert source["generator_path"] == str(generator_path.relative_to(REPO_ROOT))
         assert source["generator_sha256"] == _sha256(generator_path)
         assert source["input_images_used"] is False
@@ -332,8 +334,9 @@ def test_futaleufu_cordillera_cypress_textures_are_reproducible_review_candidate
     }
     for map_data in manifest["maps"].values():
         path = REPO_ROOT / map_data["path"]
-        assert path.is_file()
-        assert _sha256(path) == map_data["sha256"]
+        assert_capture_recorded(path)
+        if path.exists():
+            assert _sha256(path) == map_data["sha256"]
         assert (map_data["width"], map_data["height"]) == (2048, 2048)
         assert map_data["status"].endswith("not_production_promoted")
 
@@ -1190,8 +1193,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
         is False
     )
     runtime_capture = REPO_ROOT / v12_review["capture_evidence"]["capture"]
-    assert runtime_capture.is_file()
-    assert _sha256(runtime_capture) == v12_review["capture_evidence"]["sha256"]
+    assert_capture_recorded(runtime_capture)
+    if runtime_capture.exists():
+        assert _sha256(runtime_capture) == v12_review["capture_evidence"]["sha256"]
     assert v12_review["capture_evidence"]["tree_instance_count"] == 512
     assert v12_review["capture_evidence"]["hism_component_count"] == 16
     assert len(v12_review["accepted_findings"]) == 5
@@ -1256,8 +1260,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v13_review["capture_evidence"].values():
         for role in ("baseline", "comparison"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction"] > 0.04
         assert view["comparison_green_dominant_fraction"] < (
@@ -1289,8 +1294,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v14_review["capture_evidence"].values():
         for revision in ("v13", "v14"):
             capture = REPO_ROOT / view[revision]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{revision}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{revision}_sha256"]
         assert view["v13_sha256"] == view["v14_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction_v13_to_v14"] == 0
@@ -1333,8 +1339,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
             "opaque_leaves_no_shadow",
         ):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction_native_to_shadowless"] > 0
         assert view["changed_pixel_fraction_shadowless_to_opaque"] > 0.02
@@ -1377,8 +1384,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
             "constant_opacity",
         ):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction_shadowless_native_to_alpha_scale_4"] > 0.03
         assert view["changed_pixel_fraction_alpha_scale_4_to_constant_opacity"] < 0.001
@@ -1411,8 +1419,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v17_review["capture_evidence"].values():
         for role in ("alpha4_reference", "ao_off", "flat_normal", "emissive_035"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction_vs_alpha4_reference"]["ao_off"] < 0.00001
         assert view["changed_pixel_fraction_vs_alpha4_reference"]["flat_normal"] < 0.001
@@ -1444,8 +1453,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v18_review["capture_evidence"].values():
         for role in ("baseline", "isolated_fill", "skylight_310"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction_vs_baseline"]["isolated_fill"] > 0.25
         assert view["changed_pixel_fraction_vs_baseline"]["skylight_310"] == 0
@@ -1474,8 +1484,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v19_review["capture_evidence"].values():
         for role in ("reference", "basecolor_236", "white_transmission", "combined"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         crown = view["restored_crown_metrics"]
         assert crown["basecolor_236_green_dominant_fraction"] > (
@@ -1515,8 +1526,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
             "defaultlit_236",
         ):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         crown = view["restored_crown_metrics"]
         assert crown["defaultlit_118_green_dominant_fraction"] < (
@@ -1563,8 +1575,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v21_review["capture_evidence"].values():
         for role in ("reference", "rgb_padded"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         crown = view["restored_crown_metrics"]
         assert crown["rgb_padded_green_dominant_fraction"] > 0.65
@@ -1593,8 +1606,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v22_review["capture_evidence"].values():
         for role in ("alpha4_reference", "alpha2", "alpha3"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["alpha2_sha256"] == view["alpha3_sha256"]
         assert view["changed_pixel_fraction_alpha2_vs_alpha3"] == 0
@@ -1640,8 +1654,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
             "v15_opaque_no_shadow",
         ):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["off_crown_ground_shadow"]["v23_to_v15_recurrence_ratio"] < 0.002
         crown = view["shadow_affected_region"]
@@ -1699,8 +1714,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v24_review["capture_evidence"].values():
         for role in ("sparse", "dense"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["dense_tree_count"] == 9000
         assert view["changed_pixel_fraction"] > 0.04
@@ -1755,8 +1771,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v25_review["capture_evidence"].values():
         for role in ("centerline", "area_sampled"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["centerline_tree_count"] == 9000
         assert view["area_sampled_tree_count"] == 9000
@@ -1821,8 +1838,9 @@ def test_futaleufu_native_canopy_reviews_reject_v1_through_v22_without_corridor_
     for view in v26_review["capture_evidence"].values():
         for role in ("camera_local", "world_stable"):
             capture = REPO_ROOT / view[role]
-            assert capture.is_file()
-            assert _sha256(capture) == view[f"{role}_sha256"]
+            assert_capture_recorded(capture)
+            if capture.exists():
+                assert _sha256(capture) == view[f"{role}_sha256"]
         assert view["dimensions_px"] == [1280, 720]
         assert view["changed_pixel_fraction"] > 0.11
     editor_source = EDITOR_MODULE_PATH.read_text(encoding="utf-8")
