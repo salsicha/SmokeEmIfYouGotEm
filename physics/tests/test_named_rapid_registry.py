@@ -14,7 +14,7 @@ from raftsim.named_rapid_registry import (
     build_simulator_review_runs,
     validate_source_catalog,
 )
-from raftsim.scalability_profiles import SCALABILITY_PROFILE_IDS
+from raftsim.named_rapid_registry import SCALABILITY_PROFILE_IDS
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
