@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 138
-- Referenced command count: 83
+- Referenced artifact count: 139
+- Referenced command count: 84
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -707,13 +707,14 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the non-authoritative recommendation packet to start C3 review with South Fork Meat Grinder and Troublemaker first, keep Zambezi passive until Batoka source evidence exists, and keep feature forcing off unless bounded, manifest-recorded, compared, and not hiding conservation failures.
-2. Bind exact rapid geometry and reviewed C2 subfeatures to reach-local water-window scenarios.
-3. Attach stitched validation, C++/GeoClaw-or-analytic comparisons, conservation, raft-coupling, flow-source, and forcing manifests.
-4. Regenerate the C3 validation and readiness reports after each accepted binding batch.
+2. Use the Markdown review form to record exact geometry, reviewed C2 pins, reach-local and stitched artifacts, all three flow-band reports and forcing manifests, plus reviewer signoff before filling the C3 binding JSON.
+3. Bind exact rapid geometry and reviewed C2 subfeatures to reach-local water-window scenarios.
+4. Attach stitched validation, C++/GeoClaw-or-analytic comparisons, conservation, raft-coupling, flow-source, and forcing manifests.
+5. Regenerate the C3 validation and readiness reports after each accepted binding batch.
 
 **Acceptance Requirements**
 
-1. Every intended binding has exact geometry, reviewed pins, and stitched validation output.
+1. Every intended binding has exact geometry, reviewed pins, and stitched validation output traceable to the Markdown review form or an equivalent signed review packet.
 2. C++ water evidence passes the required parity, conservation, and raft-coupling gates.
 3. C3 readiness no longer blocks C4 review-run preparation.
 
@@ -725,6 +726,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/named_rapid_water_window_recommendation.json`
+- `docs/named-rapid-c3-water-window-review-form.md`
 - `physics/data/real_world/named_rapid_water_window_binding_template.json`
 - `physics/data/real_world/named_rapid_water_window_binding_validation_report.json`
 - `physics/data/real_world/named_rapid_water_window_completion_readiness_report.json`
@@ -733,6 +735,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_named_rapid_water_window_recommendation.py`
+- `physics/src/raftsim/examples/generate_named_rapid_water_window_review_form.py`
 - `physics/src/raftsim/examples/generate_named_rapid_water_window_binding.py`
 - `physics/src/raftsim/examples/generate_named_rapid_water_window_readiness.py`
 
