@@ -36,3 +36,7 @@ unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCy
 graphify-out/
 
 .DS_Store
+
+# Generated diagnostic maps are regenerable and never versioned (release-1.0-plan.md P0.6)
+unreal/Content/RaftSim/Maps/EnvironmentPreviews/
+unreal/Content/RaftSim/Environment/GeneratedLocalReview/

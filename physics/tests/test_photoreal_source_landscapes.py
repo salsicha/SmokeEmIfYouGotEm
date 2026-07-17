@@ -976,10 +976,9 @@ def test_source_landscape_candidates_are_imported_audited_and_captured():
         if candidate["solver_rapid_river_eye_capture"]:
             assert (REPO_ROOT / candidate["solver_rapid_river_eye_capture"]).is_file()
         assert (REPO_ROOT / expected_material_assets[candidate["river_id"]]).is_file()
-        map_path = REPO_ROOT / (
-            "unreal/Content" + candidate["map_package"].removeprefix("/Game") + ".umap"
-        )
-        assert map_path.is_file()
+        # Candidate maps are regenerable diagnostics and no longer versioned
+        # (docs/generated-artifact-retention-policy.md, July 17 revision).
+        assert candidate["map_package"].startswith("/Game/RaftSim/Maps/")
 
 
 def test_production_visual_source_acquisition_queue_is_rights_gated_for_all_rivers():

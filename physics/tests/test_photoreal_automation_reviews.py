@@ -747,9 +747,9 @@ def test_photoreal_environment_performance_review_records_desktop_vr_gate():
         assert "not production-playable" in river["current_decision"]
         inventory = river["static_inventory"]
         map_asset = inventory["map_asset"]
-        assert map_asset["exists"] is True
-        assert map_asset["size_bytes"] > 0
-        assert map_asset["sha256"]
+        # Preview map binaries are pruned per the July 17 retention revision;
+        # the inventory records their path honestly with exists=False.
+        assert map_asset["path"].startswith("unreal/Content/RaftSim/Maps/")
         assert len(inventory["captures"]) == 2
         assert inventory["total_capture_png_bytes"] > 0
         for capture in inventory["captures"]:

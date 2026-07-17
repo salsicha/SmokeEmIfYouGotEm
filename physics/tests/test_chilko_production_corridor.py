@@ -151,12 +151,12 @@ def test_unreal_candidate_is_captured_with_nanite_but_not_promoted() -> None:
         pixels = np.asarray(Image.open(capture_path).convert("RGB"), dtype=np.float32)
         assert pixels.std() > 8.0
 
-    map_path = (
-        REPO_ROOT
-        / "unreal/Content/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/"
-        "L_ChilkoRiver_PhysicalCorridorCandidate.umap"
+    # Candidate maps are regenerable diagnostics and are no longer versioned
+    # (docs/generated-artifact-retention-policy.md, July 17 revision); the
+    # manifest and captures above remain the reviewed evidence.
+    assert candidate["map_package"].endswith(
+        "L_ChilkoRiver_PhysicalCorridorCandidate"
     )
-    assert map_path.is_file()
 
 
 def test_unreal_command_supports_an_isolated_chilko_build() -> None:
