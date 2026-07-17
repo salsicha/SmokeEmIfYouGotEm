@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.merge_photoreal_b2_source_hash_sidecar import (
+    main as merge_b2_source_hash_sidecar_main,
+)
 from raftsim.photoreal_b2_source_hash_report import (
     build_b2_source_hash_validation_report,
 )
@@ -122,6 +125,65 @@ def test_b2_source_hash_sidecar_merge_rejects_source_binary_commit_paths():
         "field": "source_binary_repo_paths",
         "reason": "source_binary_repo_paths_blocked_by_current_storage_policy",
     } in report["sidecar_errors"]
+
+
+def test_b2_source_hash_sidecar_merge_cli_writes_outputs_for_valid_sidecar(tmp_path):
+    payload = _complete_sidecar_payload()
+    sidecar_path = tmp_path / "filled_sidecar.json"
+    output_path = tmp_path / "merged_hash_report.json"
+    report_path = tmp_path / "sidecar_merge_report.json"
+    validation_path = tmp_path / "source_hash_validation_report.json"
+    sidecar_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = merge_b2_source_hash_sidecar_main(
+        [
+            "--sidecar",
+            str(sidecar_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+            "--validation-report",
+            str(validation_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    assert validation_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    validation = json.loads(validation_path.read_text(encoding="utf-8"))
+    assert report["status"] == "source_hash_sidecar_valid_manual_review_required"
+    assert validation["source_hashes_valid"] is True
+    assert validation["source_file_hash_count"] == 44
+
+
+def test_b2_source_hash_sidecar_merge_cli_blocks_invalid_sidecar(tmp_path):
+    payload = _complete_sidecar_payload()
+    payload["records"][0]["source_files"][0]["sha256"] = "bad"
+    sidecar_path = tmp_path / "invalid_sidecar.json"
+    output_path = tmp_path / "merged_hash_report.json"
+    report_path = tmp_path / "sidecar_merge_report.json"
+    sidecar_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = merge_b2_source_hash_sidecar_main(
+        [
+            "--sidecar",
+            str(sidecar_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["status"] == "source_hash_sidecar_incomplete_promotion_blocked"
+    assert report["merged_validation"]["source_hashes_valid"] is False
 
 
 def _complete_sidecar_payload() -> dict:
