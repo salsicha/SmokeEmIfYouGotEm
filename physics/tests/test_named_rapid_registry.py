@@ -14,6 +14,7 @@ from raftsim.named_rapid_registry import (
     build_simulator_review_runs,
     validate_source_catalog,
 )
+from raftsim.scalability_profiles import SCALABILITY_PROFILE_IDS
 
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -175,7 +176,10 @@ def test_named_rapid_review_runs_cover_flow_lines_controls_and_safety_policy():
     }
     assert all(run["crew_weight_distribution_enabled"] for run in committed["runs"])
     assert all(run["swimmer_and_rescue_enabled"] for run in committed["runs"])
-    assert all(len(run["platform_profiles"]) == 5 for run in committed["runs"])
+    assert all(
+        run["platform_profiles"] == list(SCALABILITY_PROFILE_IDS)
+        for run in committed["runs"]
+    )
 
     colorado = [
         run for run in committed["runs"]

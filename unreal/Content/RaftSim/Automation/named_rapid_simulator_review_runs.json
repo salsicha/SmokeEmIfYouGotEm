@@ -47,6 +47,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -102,6 +103,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -157,6 +159,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -212,6 +215,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -267,6 +271,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -322,6 +327,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -377,6 +383,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -432,6 +439,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -487,6 +495,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -542,6 +551,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -597,6 +607,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -652,6 +663,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -707,6 +719,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -762,6 +775,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -817,6 +831,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -872,6 +887,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -927,6 +943,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -982,6 +999,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1037,6 +1055,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1092,6 +1111,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1147,6 +1167,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1202,6 +1223,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1257,6 +1279,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1312,6 +1335,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1367,6 +1391,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1422,6 +1447,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1477,6 +1503,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1532,6 +1559,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1587,6 +1615,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1642,6 +1671,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1697,6 +1727,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1752,6 +1783,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1807,6 +1839,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1862,6 +1895,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1917,6 +1951,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -1972,6 +2007,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2027,6 +2063,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2082,6 +2119,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2137,6 +2175,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2192,6 +2231,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2247,6 +2287,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2302,6 +2343,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2357,6 +2399,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2412,6 +2455,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2467,6 +2511,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2522,6 +2567,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2577,6 +2623,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2632,6 +2679,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2687,6 +2735,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2742,6 +2791,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2797,6 +2847,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2852,6 +2903,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2907,6 +2959,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -2962,6 +3015,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3017,6 +3071,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3072,6 +3127,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3127,6 +3183,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3182,6 +3239,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3237,6 +3295,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3292,6 +3351,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3347,6 +3407,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3402,6 +3463,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3457,6 +3519,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3512,6 +3575,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3567,6 +3631,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3622,6 +3687,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3677,6 +3743,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3732,6 +3799,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3787,6 +3855,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3842,6 +3911,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3897,6 +3967,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -3952,6 +4023,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4007,6 +4079,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4062,6 +4135,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4117,6 +4191,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4172,6 +4247,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4227,6 +4303,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4282,6 +4359,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4337,6 +4415,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4392,6 +4471,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4447,6 +4527,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4502,6 +4583,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4557,6 +4639,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4612,6 +4695,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4667,6 +4751,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4722,6 +4807,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4777,6 +4863,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4832,6 +4919,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4887,6 +4975,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4942,6 +5031,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -4997,6 +5087,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5052,6 +5143,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5107,6 +5199,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5162,6 +5255,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5217,6 +5311,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5272,6 +5367,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5327,6 +5423,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5382,6 +5479,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5437,6 +5535,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5492,6 +5591,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5547,6 +5647,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5602,6 +5703,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5657,6 +5759,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5712,6 +5815,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5767,6 +5871,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5822,6 +5927,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5877,6 +5983,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5932,6 +6039,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -5987,6 +6095,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6042,6 +6151,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6097,6 +6207,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6152,6 +6263,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6207,6 +6319,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6262,6 +6375,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6317,6 +6431,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6372,6 +6487,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6427,6 +6543,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6482,6 +6599,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6537,6 +6655,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6592,6 +6711,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6647,6 +6767,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6702,6 +6823,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6757,6 +6879,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6812,6 +6935,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6867,6 +6991,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6922,6 +7047,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -6977,6 +7103,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7032,6 +7159,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7087,6 +7215,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7142,6 +7271,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7197,6 +7327,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7252,6 +7383,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7307,6 +7439,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7362,6 +7495,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7417,6 +7551,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7472,6 +7607,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7527,6 +7663,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7582,6 +7719,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7637,6 +7775,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7692,6 +7831,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7747,6 +7887,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7802,6 +7943,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7857,6 +7999,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7912,6 +8055,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -7967,6 +8111,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8022,6 +8167,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8077,6 +8223,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8132,6 +8279,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8187,6 +8335,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8242,6 +8391,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8297,6 +8447,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8352,6 +8503,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8407,6 +8559,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8462,6 +8615,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8517,6 +8671,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8572,6 +8727,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8627,6 +8783,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8682,6 +8839,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8737,6 +8895,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8792,6 +8951,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8847,6 +9007,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8902,6 +9063,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -8957,6 +9119,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9012,6 +9175,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9067,6 +9231,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9122,6 +9287,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9177,6 +9343,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9232,6 +9399,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9287,6 +9455,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9342,6 +9511,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9397,6 +9567,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9452,6 +9623,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9507,6 +9679,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9562,6 +9735,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9617,6 +9791,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9672,6 +9847,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9727,6 +9903,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9782,6 +9959,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9837,6 +10015,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9892,6 +10071,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -9947,6 +10127,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10002,6 +10183,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10057,6 +10239,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10112,6 +10295,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10167,6 +10351,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10222,6 +10407,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10277,6 +10463,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10332,6 +10519,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10387,6 +10575,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10442,6 +10631,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10497,6 +10687,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10552,6 +10743,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10607,6 +10799,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10662,6 +10855,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10717,6 +10911,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10772,6 +10967,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10827,6 +11023,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10882,6 +11079,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10937,6 +11135,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -10992,6 +11191,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11047,6 +11247,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11102,6 +11303,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11157,6 +11359,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11212,6 +11415,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11267,6 +11471,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11322,6 +11527,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11377,6 +11583,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11432,6 +11639,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11487,6 +11695,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11542,6 +11751,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11597,6 +11807,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11652,6 +11863,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11707,6 +11919,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11762,6 +11975,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11817,6 +12031,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11872,6 +12087,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11927,6 +12143,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -11982,6 +12199,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12037,6 +12255,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12092,6 +12311,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12147,6 +12367,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12202,6 +12423,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12257,6 +12479,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12312,6 +12535,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12367,6 +12591,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12422,6 +12647,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12477,6 +12703,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12532,6 +12759,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12587,6 +12815,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12642,6 +12871,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12697,6 +12927,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12752,6 +12983,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12807,6 +13039,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12862,6 +13095,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12917,6 +13151,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -12972,6 +13207,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13027,6 +13263,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13082,6 +13319,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13137,6 +13375,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13192,6 +13431,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13247,6 +13487,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13302,6 +13543,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13357,6 +13599,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13412,6 +13655,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13467,6 +13711,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13522,6 +13767,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13577,6 +13823,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13632,6 +13879,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13687,6 +13935,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13742,6 +13991,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13797,6 +14047,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13852,6 +14103,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13907,6 +14159,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -13962,6 +14215,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14017,6 +14271,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14072,6 +14327,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14127,6 +14383,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14182,6 +14439,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14237,6 +14495,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14292,6 +14551,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14347,6 +14607,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14402,6 +14663,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14457,6 +14719,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14512,6 +14775,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14567,6 +14831,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14622,6 +14887,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14677,6 +14943,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14732,6 +14999,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14787,6 +15055,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14842,6 +15111,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14897,6 +15167,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -14952,6 +15223,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15007,6 +15279,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15062,6 +15335,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15117,6 +15391,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15172,6 +15447,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15227,6 +15503,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15282,6 +15559,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15337,6 +15615,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15392,6 +15671,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15447,6 +15727,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15502,6 +15783,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15557,6 +15839,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15612,6 +15895,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15667,6 +15951,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15722,6 +16007,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15777,6 +16063,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15832,6 +16119,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15887,6 +16175,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15942,6 +16231,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -15997,6 +16287,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16052,6 +16343,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16107,6 +16399,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16162,6 +16455,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16217,6 +16511,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16272,6 +16567,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16327,6 +16623,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16382,6 +16679,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16437,6 +16735,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16492,6 +16791,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16547,6 +16847,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16602,6 +16903,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16657,6 +16959,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16712,6 +17015,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16767,6 +17071,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16822,6 +17127,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16877,6 +17183,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16932,6 +17239,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -16987,6 +17295,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17042,6 +17351,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17097,6 +17407,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17152,6 +17463,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17207,6 +17519,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17262,6 +17575,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17317,6 +17631,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17372,6 +17687,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17427,6 +17743,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17482,6 +17799,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17537,6 +17855,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17592,6 +17911,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17647,6 +17967,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17702,6 +18023,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17757,6 +18079,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17812,6 +18135,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17867,6 +18191,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17922,6 +18247,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -17977,6 +18303,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18032,6 +18359,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18087,6 +18415,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18142,6 +18471,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18197,6 +18527,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18252,6 +18583,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18307,6 +18639,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18362,6 +18695,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18417,6 +18751,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18472,6 +18807,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18527,6 +18863,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18582,6 +18919,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18637,6 +18975,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18692,6 +19031,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18747,6 +19087,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18802,6 +19143,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18857,6 +19199,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18912,6 +19255,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -18967,6 +19311,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19022,6 +19367,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19077,6 +19423,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19132,6 +19479,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19187,6 +19535,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19242,6 +19591,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19297,6 +19647,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19352,6 +19703,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19407,6 +19759,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19462,6 +19815,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19517,6 +19871,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19572,6 +19927,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19627,6 +19983,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19682,6 +20039,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19737,6 +20095,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19792,6 +20151,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19847,6 +20207,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19902,6 +20263,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -19957,6 +20319,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20012,6 +20375,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20067,6 +20431,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20122,6 +20487,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20177,6 +20543,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20232,6 +20599,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20287,6 +20655,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20342,6 +20711,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20397,6 +20767,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20452,6 +20823,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20507,6 +20879,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20562,6 +20935,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20617,6 +20991,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20672,6 +21047,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20727,6 +21103,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20782,6 +21159,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20837,6 +21215,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20892,6 +21271,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -20947,6 +21327,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21002,6 +21383,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21057,6 +21439,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21112,6 +21495,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21167,6 +21551,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21222,6 +21607,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21277,6 +21663,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21332,6 +21719,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21387,6 +21775,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21442,6 +21831,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21497,6 +21887,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21552,6 +21943,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21607,6 +21999,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21662,6 +22055,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21717,6 +22111,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21772,6 +22167,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21827,6 +22223,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21882,6 +22279,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21937,6 +22335,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -21992,6 +22391,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22047,6 +22447,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22102,6 +22503,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22157,6 +22559,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22212,6 +22615,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22267,6 +22671,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22322,6 +22727,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22377,6 +22783,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22432,6 +22839,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22487,6 +22895,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22542,6 +22951,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22597,6 +23007,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22652,6 +23063,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22707,6 +23119,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22762,6 +23175,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22817,6 +23231,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22872,6 +23287,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22927,6 +23343,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -22982,6 +23399,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23037,6 +23455,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23092,6 +23511,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23147,6 +23567,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23202,6 +23623,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23257,6 +23679,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23312,6 +23735,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23367,6 +23791,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23422,6 +23847,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23477,6 +23903,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23532,6 +23959,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23587,6 +24015,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23642,6 +24071,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23697,6 +24127,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23752,6 +24183,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23807,6 +24239,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23862,6 +24295,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23917,6 +24351,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -23972,6 +24407,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24027,6 +24463,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24082,6 +24519,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24137,6 +24575,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24192,6 +24631,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24247,6 +24687,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24302,6 +24743,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24357,6 +24799,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24412,6 +24855,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24467,6 +24911,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24522,6 +24967,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24577,6 +25023,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24632,6 +25079,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24687,6 +25135,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24742,6 +25191,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24797,6 +25247,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24852,6 +25303,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
@@ -24907,6 +25359,7 @@
       "platform_profiles": [
         "desktop_high",
         "desktop_scalable",
+        "vr_openxr",
         "console_quality",
         "console_performance",
         "handheld_low"
