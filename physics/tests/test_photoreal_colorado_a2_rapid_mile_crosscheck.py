@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_colorado_a2_rapid_mile_crosscheck import (
+    main as validate_colorado_a2_rapid_mile_crosscheck_main,
+)
 from raftsim.colorado_a2_rapid_mile_crosscheck import (
     COLORADO_A2_RAPID_MILE_CROSSCHECK_TEMPLATE_RELATIVE_PATH,
     COLORADO_A2_RAPID_MILE_CROSSCHECK_TEMPLATE_SCHEMA,
@@ -135,6 +138,88 @@ def test_colorado_a2_rapid_mile_crosscheck_validation_rejects_bad_delta():
     payload["rapid_records"][0]["station_delta_m"] = 200.0
     report = build_colorado_a2_rapid_mile_crosscheck_validation_report(REPO_ROOT, payload)
 
+    assert report["crosscheck_valid"] is False
+    assert {
+        "rapid_name": "Badger Creek",
+        "field": "station_delta_m",
+        "reason": "station_delta_exceeds_tolerance",
+    } in report["errors"]
+
+
+def test_colorado_a2_rapid_mile_crosscheck_cli_writes_empty_gate():
+    exit_code = validate_colorado_a2_rapid_mile_crosscheck_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    template_path = REPO_ROOT / COLORADO_A2_RAPID_MILE_CROSSCHECK_TEMPLATE_RELATIVE_PATH
+    report_path = (
+        REPO_ROOT / COLORADO_A2_RAPID_MILE_CROSSCHECK_VALIDATION_REPORT_RELATIVE_PATH
+    )
+    assert exit_code == 0
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["crosscheck_valid"] is False
+    assert report["status"] == "rapid_mile_crosscheck_incomplete_stationing_promotion_blocked"
+
+
+def test_colorado_a2_rapid_mile_crosscheck_cli_accepts_complete_payload(tmp_path):
+    payload = _complete_crosscheck_payload()
+    crosscheck_path = tmp_path / "filled_colorado_rapid_mile_crosscheck.json"
+    output_path = tmp_path / "accepted_colorado_rapid_mile_crosscheck.json"
+    report_path = tmp_path / "colorado_rapid_mile_crosscheck_validation_report.json"
+    crosscheck_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_colorado_a2_rapid_mile_crosscheck_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--crosscheck",
+            str(crosscheck_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["crosscheck_valid"] is True
+    assert report["passing_rapid_count"] == 15
+    assert report["promotion_permissions"]["can_restation_major_rapids"] is True
+    assert report["promotion_permissions"]["can_bind_solver_windows"] is True
+
+
+def test_colorado_a2_rapid_mile_crosscheck_cli_blocks_invalid_payload(tmp_path):
+    payload = _complete_crosscheck_payload()
+    payload["rapid_records"][0]["station_delta_m"] = 200.0
+    crosscheck_path = tmp_path / "invalid_colorado_rapid_mile_crosscheck.json"
+    output_path = tmp_path / "accepted_colorado_rapid_mile_crosscheck.json"
+    report_path = tmp_path / "colorado_rapid_mile_crosscheck_validation_report.json"
+    crosscheck_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_colorado_a2_rapid_mile_crosscheck_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--crosscheck",
+            str(crosscheck_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["crosscheck_valid"] is False
     assert {
         "rapid_name": "Badger Creek",
