@@ -1,6 +1,10 @@
 # Generated Artifact Retention Policy
 
-Written July 15, 2026. This document records the non-destructive Finding 3.1 audit and the resulting owner decision. On July 16, 2026, the owner chose to keep versioning generated maps and not prune Git LFS. No LFS dry run, prune, server deletion, history rewrite, `git rm --cached`, retention-configuration change, or ignore-rule change is authorized.
+Written July 15, 2026. Revised July 17, 2026.
+
+> **July 17, 2026 owner instruction (given directly in chat) supersedes the July 16 no-prune decision.** Generated preview/candidate maps are no longer versioned; repository trimming, history rewrite, and LFS pruning are authorized and executed per `docs/release-1.0-plan.md` §3 (Phase 0). A full pre-rewrite mirror archive is created before any history surgery, and GitHub-side purge of orphaned LFS storage remains an owner-handoff step. The paragraphs below record the superseded July 16 policy and the original audit for historical reference.
+
+Historical (superseded) decision of July 16, 2026: the owner chose to keep versioning generated maps and not prune Git LFS; no LFS dry run, prune, server deletion, history rewrite, `git rm --cached`, retention-configuration change, or ignore-rule change was authorized at that time.
 
 ## Current audit
 

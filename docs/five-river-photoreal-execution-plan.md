@@ -1,5 +1,7 @@
 # Five-River Photoreal Production Execution Plan
 
+> **FROZEN July 17, 2026 — superseded by `docs/release-1.0-plan.md`.** The A–E workstream content survives only as referenced by that plan; the review-form/runbook/DoD apparatus is retired. Do not execute tasks from this document.
+
 Written July 15, 2026. This is a self-contained execution plan for an agent with no prior context. It consolidates the goals below into ordered, committable tasks, building on infrastructure that already exists in this repo. Read `docs/code-review-remediation-plan.md` first — its Finding 1 (water-solver validation honesty) and Finding 3 (LFS retention) are prerequisites woven into this plan.
 
 **Execution status, July 16, 2026:** active goal started. `docs/code-review-remediation-plan.md` is complete under the owner's Option B water-solver decision and keep-versioning/no-prune retention decision. The current baseline is `504 passed, 3 skipped` for `cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run pytest -q`. This plan now executes from that state: live custom-water rapid approval remains blocked until genuine solver parity gates pass, while generated preview/candidate maps remain versioned in Git LFS unless the owner later reverses that decision.

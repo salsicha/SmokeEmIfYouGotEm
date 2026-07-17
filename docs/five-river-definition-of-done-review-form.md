@@ -1,5 +1,7 @@
 # Five-River Definition of Done Review Form
 
+> **FROZEN July 17, 2026 — superseded by `docs/release-1.0-plan.md`.** The release plan's phase exit gates are the definition of done for 1.0.
+
 Generated: 2026-07-17
 
 Use this form only after the A/B/C/D/E source, asset, water, raft, platform, capture, test, commit, and push gates are green. Record hash-locked evidence and all reviewer signoffs in the JSON sidecar, then run the validator before starting the separate owner completion review.

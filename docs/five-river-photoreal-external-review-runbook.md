@@ -1,5 +1,7 @@
 # Five-River Photoreal External Review Runbook
 
+> **FROZEN July 17, 2026 — superseded by `docs/release-1.0-plan.md`.** The external-review apparatus is retired; human-review items are batched into the release plan's P7 owner packet.
+
 Generated: 2026-07-17
 
 This runbook is a human-readable export of the fail-closed external action queue. It organizes the remaining manual review, source, asset, physics, platform, and final Definition of Done evidence without granting promotion by itself.
