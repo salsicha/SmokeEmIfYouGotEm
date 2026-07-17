@@ -1,168 +1,176 @@
-# RaftSim 1.0 Release Plan
+# RaftSim 1.0 Release Plan (revision 2)
 
-Written July 16, 2026, from a fresh full-repo analysis. This plan is the **master plan** for taking this project from its current state to a released, playable game. It is written for an autonomous agent that **cannot ask the owner anything**: every choice is decided here, and §10 gives decision principles for choices this plan did not foresee. Where a step physically requires the owner (account creation, payments, playing the build), the agent prepares everything, adds the item to the §9 owner-handoff checklist, and keeps moving — such items block the *release date*, never the *work*.
+Written July 17, 2026, from a fresh full-repo analysis. This plan is the **single top-level driver** for taking this project to a released, playable game. It is written for an autonomous agent that **cannot ask the owner anything**: every choice is decided here; §11 gives decision principles for anything unforeseen. Steps that physically require the owner (accounts, payments, playing the release candidate, GitHub support actions) go on the §10 handoff checklist and block only the launch date, never the work.
 
-This plan supersedes `docs/five-river-photoreal-execution-plan.md` as the top-level driver. That plan's content pipeline survives inside Phase 4 (South Fork only) and becomes the post-1.0 roadmap for the other rivers. `docs/code-review-remediation-plan.md` is complete and stays closed.
+**Authority.** This plan supersedes `docs/five-river-photoreal-execution-plan.md`, `docs/named-rapid-realism-validation-plan.md`'s process gates, the five-river review-form/runbook/DoD apparatus, and — by explicit owner instruction of July 17, 2026 — the July 16 no-prune retention decision recorded in `docs/generated-artifact-retention-policy.md`. Where any repo document conflicts with this plan, **this plan wins**; record the conflict in the execution log appended to this file.
 
-## 1. Current state (verified July 16, 2026)
+## 1. Why this revision exists (read this; it is the failure mode to avoid)
 
-**What exists and is good:**
-- A genuine finite-volume shallow-water solver core: Rusanov/HLL/Roe Riemann solvers with entropy fix, hydrostatic reconstruction, bed-slope sources, CFL-limited substepping (`physics/cpp/src/solver_numerics.cpp`), split into maintainable files. Honest parity accounting: **6/40 rows genuine solver parity, 34/40 openly labeled GeoClaw playback** (`physics/reports/solver_truth_baseline/`), toggled by `SolverConfig::disable_fixture_calibrations`. Runtime budget PASSES: South Fork windows at ~0.63 ms/tick vs a 1.6 ms desktop budget (`physics/reports/milestone16/runtime_profile.md`).
-- Flexible-raft reference physics D1–D5 (compliant tube, seat-load coupling, overwash/flip, rock wrap/pin, telemetry) — real, deterministic, tested, but quasi-static, Python-only, and stamped `disabled_reference_only`. D6 comparison harness awaits measured engine results.
-- A ~48K-line procedural environment authoring toolkit in the RaftSimEditor module (landscape import, materials, foliage, captures, 40+ commands), cleanly split.
-- Corridor source data for five rivers; an 85-marker named-rapid catalog with 453 blocked simulator review-run definitions; 677-passing physics test suite; rigorous hash-locked evidence conventions.
+The July 16 revision of this plan was committed and then never executed. In the following ~18 hours, 94 commits added ~225,000 lines — **all of it review forms, recommendation packets, readiness gates, blocker matrices, and runbooks** (plus 511 tests that test those form generators), and **zero lines of gameplay, solver, or content work**. The five-river plan's own definition-of-done form now honestly scores the project **0/30 criteria complete, "playable release ready: False."** Every blocked gate was converted into paperwork awaiting a human instead of into either a decision or alternative progress.
 
-**What does not exist (the actual gap to "playable game"):**
-- No input bindings (zero `UInputMappingContext`/`UInputAction` assets; `DefaultMappingContexts=()`), no UMG widgets, no menus, no HUD, no save/load calls, no sound assets or playback, no Niagara, no crew actors or animation, no raft movement (the Chrono adapter is a `position += velocity*dt` stub that nothing ticks), no live water (the runtime sampler returns constant depth 1.0 m), no water surface rendered in any map, and the configured boot map `/Game/RaftSim/Maps/L_RaftSimBoot` **does not exist**. The 84 maps are environment previews with a PlayerStart and nothing else. Runtime gameplay C++ totals ~1,900 lines vs ~47,900 in the editor module. The project does not package into a runnable game today.
-- No LICENSE file anywhere in the repo — a release blocker for a self-described open-source project.
-- South Fork A1 stationing is blocked: the NHD-derived downstream take-out candidates sit >9 km from official California State Parks access geometry; 20.5 vs 21.0 published-mile conventions conflict.
+**Therefore, standing rule zero:** deliverables are *working code, assets, tests, and builds*. It is forbidden to create new review forms, recommendation packets, readiness/handoff/DoD matrices, runbooks, action queues, or generators/tests for any of those. When you hit a gate this plan hasn't decided, apply §11 and keep building. When a step needs a human, add one line to the §10 checklist and continue. If you find yourself writing a JSON schema about reviewing evidence instead of producing the evidence, stop and re-read this section.
 
-**Conclusion:** the release effort is ~15% content polish and ~85% building the runtime game. The plan below is organized accordingly.
+## 2. Current state (verified July 17, 2026)
 
-## 2. Product definition (all decisions final)
+**Foundation (good, unchanged since July 16):**
+- Genuine finite-volume shallow-water core (Rusanov/HLL/Roe, entropy fix, hydrostatic reconstruction, CFL substepping) in `physics/cpp/src/solver_numerics.cpp`; honest parity accounting (6/40 genuine, 34/40 labeled playback, `physics/reports/solver_truth_baseline/`); South Fork windows run at ~0.63 ms/tick vs a 1.6 ms budget.
+- Flexible-raft reference physics D1–D5 (tube compliance, seat load, overwash flip, rock wrap/pin, telemetry), deterministic and tested; D6 comparison harness awaits measured engine results.
+- ~48K-line procedural environment editor toolkit (landscape/materials/foliage/captures, 40+ commands), cleanly modularized.
+- Five-river corridor source data; 85-marker named-rapid catalog; 453 review-run definitions; hash-locked evidence conventions.
+
+**The game does not exist (all July-16 gaps still open):**
+- Boot map `/Game/RaftSim/Maps/L_RaftSimBoot` missing (packaged build boots to nothing). Zero `UInputAction`/`UInputMappingContext`, zero UMG widgets, zero sound assets or playback calls, zero Niagara, zero `BP_*`/`WBP_*`, no crew actors/animation, no save/load calls.
+- `RaftSimWaterRuntimeAdapter.cpp:121` still returns constant depth 1.0 m; `RaftSimChronoRuntimeAdapter.cpp:27` is still an unticked `position += velocity·dt` stub. Runtime gameplay C++ ≈ 1,900 lines vs ~47,900 editor lines.
+- No LICENSE file anywhere (open-source release blocker).
+- Physics suite: 1,401 passed / 3 skipped in 5:35 — inflated by ~511 paperwork tests (was 677 in 2:31 before the spiral).
+
+**Repo weight (measured July 17):** working tree 30 GB; `.git` 13 GB (pack 3.7 GB + local LFS 9.0 GB). LFS at HEAD: 991 files / 9.21 GB. **LFS across all history: 3,356 objects / 80.86 GB** — ~71.6 GB is superseded re-saves of regenerable preview maps (`L_PacuareRainforest_PhotorealPreview.umap` alone: 150 revisions × 167 MB ≈ 20.8 GB; South Fork and Colorado previews ~149 revisions each). Git pack is dominated by 1,257 raw contact-sheet PNGs (~1.0 GB), 444 MB of `TODO.md` churn, and 313 MB of deleted-at-HEAD retired files (old `solver.cpp`, old test monolith). Only `origin` (GitHub) is configured now; local is in sync. Hosted-LFS totals vastly exceed any free tier.
+
+## 3. Phase 0 — Governance reset, licensing, repo trim, history clean
+
+Do this phase first, in order, committing after each numbered step. It removes the drift machinery, adds the missing legal files, and executes the owner-requested history clean.
+
+### 0.1 Commit or clear the in-flight working tree
+Finish and commit the dirty/untracked five-river files currently in the tree (DoD review form work). Nothing from here on may be built on an dirty tree.
+
+### 0.2 Freeze the superseded plans and process apparatus
+- Add a one-paragraph header to `docs/five-river-photoreal-execution-plan.md`: "FROZEN July 17, 2026 — superseded by docs/release-1.0-plan.md. The A–E workstream content survives only as referenced by that plan; the review-form/runbook/DoD apparatus is retired." Same one-liner on `docs/five-river-photoreal-external-review-runbook.md` and `docs/five-river-definition-of-done-review-form.md`.
+- Rewrite `docs/generated-artifact-retention-policy.md` to record: "July 17, 2026 owner instruction (chat) supersedes the July 16 no-prune decision. Generated preview/candidate maps are no longer versioned; history rewrite and LFS pruning are authorized and executed per docs/release-1.0-plan.md §3."
+
+### 0.3 Retire the paperwork machinery
+Delete (git history preserves them; the §3.5 archive bundle preserves them forever):
+- `physics/src/raftsim/` modules matching `five_river_*`, `*_review_form*`, `*_recommendation*`, `*_readiness*`, `*_evidence_handoff*`, `*_external_action_queue*`, `*_blocker_closure*`, and the `e2_scalability_profile_parity` contract generator, plus their `examples/generate_*` drivers.
+- Their tests (`physics/tests/test_*review_form*.py`, `test_five_river_*.py`, `test_*_recommendation*.py`, `test_*_readiness*.py`, etc.) and generated data (`physics/data/real_world/five_river_*`, `*_review_form*.json`, the 92K-line `e2_scalability_profile_parity_contract.json`).
+- The 17 review-form/runbook markdown files in `docs/` from July 16–17 (keep `docs/futaleufu-canopy-strategy-review.md` and `docs/water-solver-strategy-decision.md` — those record genuine decisions).
+Keep: all corridor source data, source pulls, gauge attachments, stationing diagnostics, and review JSONs that contain *evidence* rather than *forms about evidence*. Re-run the suite; record the new baseline (~890 tests expected) in the execution log. This baseline replaces 1,401.
+
+### 0.4 Licensing and repo front door (trivial, blocking, do now)
+- Root `LICENSE` = MIT (all code). `LICENSE-CONTENT.md` = CC-BY-4.0 for first-party content; per-asset intake manifests stay authoritative for third-party items. `NOTICE.md` + `CREDITS.md` generated from the intake manifests.
+- Replace `README.md` stub content at root: what the game is, status, screenshots (add in P4), build instructions, license pointers, contribution note ("solo project; issues welcome").
+
+### 0.5 Archive before any history surgery (safety gate for everything below)
+```
+git clone --mirror /Users/alexmoran/repos/SmokeEmIfYouGotEm ../SmokeEmIfYouGotEm-archive-2026-07-17.git
+cd ../SmokeEmIfYouGotEm-archive-2026-07-17.git && git lfs fetch --all
+```
+Verify object counts match (`git count-objects -v`; `git lfs ls-files --all | wc -l` ≈ 3,356). Add a §10 handoff line: "Copy the archive mirror to offline/cloud storage." **Do not proceed to 0.6 until the mirror verifies.**
+
+### 0.6 Working-set trim (normal commits, no history rewrite yet)
+Delete from HEAD (all regenerable via documented editor commands; keep every manifest and the regeneration command records):
+- **All** of `unreal/Content/RaftSim/Maps/EnvironmentPreviews/` (~6.0 GB: every `*PhotorealPreview*`, `*FlowVariant*`, and `*PhysicalCorridorCandidate*` map, South Fork included — they are diagnostic artifacts; Phase 4 builds the real gameplay map fresh from the committed physics data via `-RaftSimCreateLandscapeImportCandidateMaps` / `-RaftSimCreatePhotorealEnvironmentPreviewMaps`).
+- `git rm --cached` the 15 `Environment/GeneratedLocalReview/PVE*` LFS assets that are tracked despite the ignore rule (~1.4 GB).
+- `docs/environment-captures/`: keep every review JSON (the evidence chain, with hashes); keep contact-sheet PNGs only for the two most recent versions of each series and any image referenced by an active doc; delete the rest (~0.9 GB of superseded iteration PNGs — all hash-recorded in the retained JSONs and preserved in the archive).
+- Move Milestones 0–25 out of `TODO.md` into `docs/todo-archive.md` (cuts the highest-churn file to its live tail).
+- Add ignore + `.gitattributes` rules: `Maps/EnvironmentPreviews/` ignored entirely; any future capture PNGs ≥ 2 MB routed to LFS; add a CI guard (P1 sets up CI) failing on any commit adding a >50 MB non-LFS file or any tracked file under an ignored generated-map path.
+
+### 0.7 History rewrite
+Solo repo, no forks/contributors, archive verified — proceed:
+1. `pip install git-filter-repo` (or brew). Build the strip list = every path present in history but absent from HEAD after 0.6 under these prefixes: `unreal/Content/RaftSim/Maps/EnvironmentPreviews/`, `unreal/Content/RaftSim/Environment/GeneratedLocalReview/`, `docs/environment-captures/**/*.png` (deleted ones only), `physics/cpp/src/solver.cpp`, `physics/tests/test_photoreal_environment_assets.py`, plus all paths deleted by step 0.3.
+2. `git filter-repo --invert-paths --paths-from-file <striplist>` on a fresh clone of the trimmed repo; verify HEAD tree is byte-identical to pre-rewrite HEAD (`git diff` against a tag made after 0.6 — must be empty) and the physics suite passes in the rewritten clone.
+3. `git reflog expire --expire=now --all && git gc --prune=now --aggressive`; `git lfs prune`. Record before/after sizes in the execution log. Expected result: pack 3.7 GB → ≲1.5 GB; local LFS 9.0 GB → ≈2.5 GB (PolyHaven 1.2 GB + source terrain/imagery + textures); full fresh clone ≈4 GB instead of 30 GB.
+4. Replace `origin` history: `git push --force --mirror origin`. GitHub keeps orphaned LFS objects until purged server-side — add §10 handoff line: "Either open a GitHub support request to purge orphaned LFS storage, or delete and recreate the GitHub repo from the rewritten mirror (loses stars/issues — owner's call); until then hosted LFS storage stays at ~81 GB."
+5. Local working repo: re-clone from the rewritten origin (or `git fetch` + hard reset) so day-to-day work runs on the clean history. The old local repo directory may be deleted after the archive copy is confirmed offsite (handoff).
+
+**Phase 0 exit gate:** suite green at the new baseline; LICENSE files in place; fresh clone ≤ ~4 GB; no paperwork generators remain; retention policy doc matches reality; execution log records sizes and test counts before/after.
+
+## 4. Product definition (all decisions final)
 
 | Decision | Value |
 |---|---|
-| Title | **RaftSim** (subtitle for stores: *RaftSim — Whitewater Guide Simulator*). Repo name stays SmokeEmIfYouGotEm as internal codename. Before first public asset, run a name-collision search (Steam, itch.io, USPTO TESS, Google); if "RaftSim" is taken as a game title, fall back in order: "RaftSim: Big Water" → "River Guide: Whitewater Simulator" → "Chili Bar" (evocative single-name). Record the search evidence and pick in `docs/branding-decision.md`. |
-| Genre / pitch | First-person whitewater river-guide simulator: read the rapid, set the angle, call the strokes, keep the crew in the boat. |
-| 1.0 content scope | **One river, complete and deep: South Fork American, Chili Bar → Salmon Falls (Folsom Reservoir)**, all 20 cataloged named rapids, three flow bands (900 / 1,600 / 3,000 cfs, the attached presets). Plus a Training Eddy tutorial area (reuses the existing Chili Bar pilot window). No other rivers in 1.0 — Futaleufú, Pacuare, Chilko, Colorado, Zambezi are the post-1.0 roadmap in that order. Depth over breadth is the quality strategy. |
-| Game modes | (1) **Guided Descent** — career: run South Fork section-by-section at rising flows, license-tier progression unlocks harder flows/sections. (2) **Free Run** — any unlocked section, any unlocked flow, scored. (3) **Training Eddy** — tutorial drills: strokes, commands, ferrying, eddy catch, flip/swim/rescue. |
-| Player fantasy / camera | Guide seat, stern, first person (the existing `ARaftSimGuidePawn` camera + comfort filter). Optional third-person chase cam in Free Run only. |
-| Crew | Guide (player) + 4 AI paddlers. Command-driven (radial menu + hotkeys): All Forward, All Back, Left Back/Right Forward, Right Back/Left Forward, Stop, Get Down, High Side (timed QTE-style response window). Crew respond with authored barks; crew weight/safety math already exists (`RaftSimCrewStateContracts.cpp`). |
-| Voice input / local AI | **Cut from 1.0.** The bark catalog ships as authored text + TTS-generated audio under the existing AI-audio policy. Local voice recognition is post-1.0. |
-| Multiplayer | **Cut from 1.0** (docs already gate it; nothing is implemented). |
-| VR | **Cut from 1.0; targeted 1.1.** Zero VR code exists today and VR QA would consume the whole schedule. The comfort-camera scaffolding, OpenXR plugins, and seated-posture design docs stay in place; 1.0 ships flat-screen only. Remove `bEnableHMD=True` from shipped config to avoid accidental HMD capture. |
-| Platforms | **Windows x64 (primary) and macOS Apple Silicon (secondary — it is the dev platform and the Metal path is maintained).** Linux via Proton verification only (no native build). No consoles, no handheld. |
-| Distribution | **GitHub Releases (primary), itch.io (secondary), Steam (prepared, owner-gated).** The agent produces packaged builds, store-page kits (copy, capsule art from in-engine captures, trailer), and upload-ready archives; account creation/fees/uploads are owner-handoff items. |
-| Price | **Free** (open source). Donation links (GitHub Sponsors) optional, owner-configured. |
-| Engine features | Nanite ON for terrain/rocks/static meshes (keep the documented masked-foliage exceptions). **Software Lumen** GI+reflections (works on both target platforms; hardware RT off). Virtual Shadow Maps on Windows; on macOS use VSM if the UE 5.8 Metal path passes the P6 verification test, else cascaded maps — decided by that test, criteria in P6. TSR upscaling. World Partition streaming for the corridor (properly converted — external actors, HLOD, the existing 25,600 grid config). |
-| Rendering targets | 1080p / 60 fps on RTX 3060 + M2 Pro at High; 1440p/60 on RTX 4070 at Epic. Game thread ≤ 8 ms, water solver ≤ 1.6 ms/tick (existing budget), no streaming hitch > 33 ms on the full-reach descent. |
-| Audio | **Unreal-native MetaSounds** (decision already recorded in `docs/audio-middleware-evaluation.md` — keep). Sources: first-party procedural + CC0 (freesound et al.) + AI-generated per the existing audio policies, all manifest-tracked. No Wwise/FMOD, no paid libraries for 1.0. |
-| Localization | English only for 1.0; all user-facing strings as `FText` from day one so localization is post-1.0 work, not a rewrite. |
-| Licensing | Add at repo root: **`LICENSE` = MIT for all code** (physics, plugin, game); **`LICENSE-CONTENT.md` = CC-BY-4.0 for first-party content** (maps, textures, audio, manifests), with the per-asset manifests remaining authoritative for third-party items; `NOTICE.md` + generated `CREDITS.md` (every third-party asset, source, license — generated from the intake manifests). Local-only licensed content (Fab Standard) never enters the repo or the *source* release; it may ship inside packaged builds where its license permits (verify per item during P4; where not permitted, the committed procedural fallback ships). |
-| Versioning / branching | Semver. Current `0.11.0` continues on `main`; release branch `release/1.0` cut at Phase 6 start; ship `1.0.0`. Tag every phase exit (`v0.12.0` = P1 exit, etc.). Changelog in `CHANGELOG.md` from now on. |
-| Telemetry | **None.** Local logs and local crash dumps only. Privacy statement in README. |
+| Title | **RaftSim** (store subtitle: *RaftSim — Whitewater Guide Simulator*). Name-collision search before first public asset; fallbacks in order: "RaftSim: Big Water" → "River Guide: Whitewater Simulator" → "Chili Bar". Record in `docs/branding-decision.md`. |
+| 1.0 scope | **South Fork American only, complete and deep**: Chili Bar → Salmon Falls (Folsom Reservoir), all 20 cataloged named rapids, three flow bands (900/1,600/3,000 cfs). Training Eddy tutorial area from the Chili Bar pilot window. Futaleufú, Pacuare, Chilko, Colorado, Zambezi are post-1.0 roadmap, in that order. |
+| Modes | Guided Descent (career, section-by-section, license tiers unlock flows/sections) · Free Run (any unlocked section/flow, scored) · Training Eddy (stroke/command/ferry/eddy/flip/rescue drills). |
+| Camera | First-person guide seat (existing `ARaftSimGuidePawn` camera + comfort filter); optional chase cam in Free Run. |
+| Crew | Player guide + 4 AI paddlers; command wheel + hotkeys (All Forward/Back, turn combos, Stop, Get Down, High Side with timed response). Barks = authored text + policy-compliant TTS audio. |
+| Cut from 1.0 | VR (→1.1; remove `bEnableHMD=True` from shipped config) · multiplayer · voice recognition · all non-South-Fork rivers · Chrono runtime · Jolt · native Linux · consoles/handheld · localization (FText hygiene only) · Wwise/FMOD · paid asset libraries · telemetry (local logs only) · player-facing editor tools. |
+| Platforms | Windows x64 primary; macOS Apple Silicon secondary; Linux = Proton verification report only. |
+| Distribution / price | Free, open source. GitHub Releases primary; itch.io kit; Steam kit prepared (owner uploads). |
+| Engine features | Nanite for terrain/rocks/statics (masked-foliage exceptions stand); Software Lumen GI+reflections; VSM on Windows (macOS: VSM only if the P6 Metal test passes, else cascades); TSR; proper World Partition streaming (external actors + HLOD, existing 25,600 grid). |
+| Perf targets | 1080p60 High on RTX 3060 / M2 Pro; 1440p60 Epic on RTX 4070. Game thread ≤ 8 ms; solver ≤ 1.6 ms/tick; no streaming hitch > 33 ms full-reach. |
+| Audio | UE-native MetaSounds (decision stands). CC0 + first-party + policy-compliant AI-generated, manifest-tracked. |
+| Licensing | MIT code / CC-BY-4.0 first-party content / per-manifest third-party (from §3 Phase 0.4). Fab Standard License items: usable in packaged builds only where item terms allow; never in the repo; committed procedural fallback must exist per slot. |
+| Versioning | Semver; `release/1.0` branch cut at P6; tag phase exits; `CHANGELOG.md` from Phase 0 onward. |
 
-## 3. Architecture decisions (final)
+## 5. Architecture decisions (final)
 
-- **A-1. Water runtime = the in-repo C++ FV solver, embedded, on CPU.** Compile `physics/cpp` sources into the `RaftSimWater` module (static lib target added to the CMake + a Build.cs include path; no subprocess at runtime). The solver runs a **moving window** (~500 m × river width, 2–4 m cells) centered ahead of the raft, seeded from **precomputed steady-state fields** per flow band (generated offline per corridor section by the existing pipeline and cooked as textures/arrays). Outside the live window, sampling reads the precomputed fields. `RaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition` is rewritten to sample live-window state (bilinear over h, u, v, bed, plus surface normal); `StepWater` runs the real solver tick on the physics substep cadence. **Fixture calibrations and GeoClaw playback are compiled OUT of shipping builds** (`disable_fixture_calibrations` forced true + dead-stripped); playback remains a dev/validation tool only.
-- **A-2. Water accuracy gate for 1.0 is behavior, not blanket parity.** Option B numerics work continues with a concrete 1.0 target: genuine solver parity on the **8 canonical fixture families most load-bearing for gameplay** (flat pool, uniform channel, sloping Manning channel, wet/dry shoreline, dam break, bed step, drop/ledge, constriction — 16 rows), achieved via second-order MUSCL reconstruction + proper well-balanced wet/dry front treatment in `solver_numerics.cpp`, plus mass-conservation and stability checks on every South Fork window. The remaining rapid-feature families (boulder garden, wave train, hydraulic hole, lateral, eddy line, shear, shelf) are validated **behaviorally** through the named-rapid review runs (feature present, correctly placed, correctly scaled at each flow band) rather than field-norm parity — that is what a player experiences. Full 40-row parity stays a post-1.0 engineering track. If a canonical family cannot reach parity after 3 focused attempts, log the numeric gap, mark the family `behavioral_validation_only`, and proceed — do not stall the release on a research problem.
-- **A-3. Raft dynamics = first-party rigid 6-DoF + flexible corrections, in-engine.** Port the Python raft coupling (`raft_coupling2_5d.py`) and the D1–D4 flexible-raft quasi-static models to C++ inside `RaftSimPhysics`, driven by `URaftSimPhysicsBridgeSubsystem` at a fixed 120 Hz substep. Buoyancy/drag from multi-point tube sampling of the water fields; D1/D2 tube deformation modifies freeboard and roll stiffness; D3 overwash adds retained-water mass + roll moment (this is the flip mechanic); D4 provides rock contact/wrap/pin/release (this is the wrap mechanic). The UE port's outputs become the **measured results D6 has been waiting for** — run the D6 comparison harness UE-vs-Python as the acceptance test (tolerance bands already defined in `flexible_raft_d6.py`). Project Chrono stays a local-only optional cross-check, **not** a blocker; Jolt is cut. Chaos handles only non-authoritative debris/secondary motion.
-- **A-4. Crew = animated skeletal actors with existing math as the brain.** Crew characters: first-party stylized-realistic meshes rigged to the UE5 Mannequin skeleton (committed, CC-BY), animated by Control Rig procedural paddling (stroke cadence from command state) + physics-driven secondary motion. MetaHumans are NOT used (license prevents committing to an open repo; a local-only path would make crew non-reproducible for contributors). The existing crew weight-shift/safety/rescue/scoring math drives seat-load inputs to D2 and the swimmer/rescue loop.
-- **A-5. Swim/rescue loop.** On flip or ejection: crew become swimmer agents (drift model already in `RaftSimCrewStateContracts.cpp`), player throws a rope (aim + timing) or maneuvers the raft; re-entry at the tube. Player-overboard = swim to raft (simple first-person swim) or respawn at the last eddy checkpoint. Checkpoints = the eddy above each named rapid. |
-- **A-6. Rapid encounters are data-driven from the existing catalog.** Each named-rapid marker becomes an encounter volume (scout point, line hints in Training/assist mode, scoring triggers, checkpoint eddy, hazard volumes at cataloged holes/waves). The 453 review-run definitions become the automated regression harness: headless runs that drive a scripted raft down each rapid at each flow and assert outcome envelopes (clean line survives, hole line flips, etc.).
+- **A-1 Water runtime = the in-repo FV solver, embedded on CPU.** Compile `physics/cpp` into `RaftSimWater` as a static lib. Moving live window (~500 m × river width, 2–4 m cells) ahead of the raft, seeded from precomputed per-flow-band steady fields (cooked textures/arrays); outside the window, sample the precomputed fields. Rewrite `SampleWaterAtWorldPosition` (bilinear h/u/v/bed + normal); `StepWater` runs the real tick on the physics substep. **Playback/calibrations compiled out of shipping builds.**
+- **A-2 Accuracy gate = behavior, not blanket parity.** Numerics work targets genuine parity on the 8 canonical families (16 rows) via MUSCL second order + well-balanced wet/dry fronts; rapid-feature families validate behaviorally through per-rapid review runs (feature present/placed/scaled per flow). 3 failed attempts on a family → label `behavioral_validation_only`, log the gap, move on. Full 40-row parity is post-1.0.
+- **A-3 Raft dynamics = first-party 6-DoF + flexible corrections in C++** (port `raft_coupling2_5d.py` + D1–D4) at 120 Hz substeps inside `RaftSimPhysics`, driven by the bridge subsystem, finally ticked by the GameMode. Buoyancy/drag from multi-point tube sampling; D1/D2 freeboard-roll effects; D3 overwash = the flip mechanic; D4 = wrap/pin/release. The UE port's outputs are the measured results that complete D6 (UE-vs-Python within the harness tolerance bands). Chrono = optional local cross-check only.
+- **A-4 Crew** = first-party stylized-realistic characters on the UE5 Mannequin skeleton (committed, CC-BY), Control Rig procedural paddling + physics secondary. No MetaHumans (open-repo licensing). Existing crew math (`RaftSimCrewStateContracts.cpp`) is the brain.
+- **A-5 Swim/rescue loop**: flip/eject → swimmer agents (existing drift model), rope throw (aim+timing) or raft approach, tube re-entry; player-overboard → swim or eddy-checkpoint respawn.
+- **A-6 Rapids are data-driven** from the named-rapid catalog: encounter volumes (scout eddy, hazard volumes at cataloged holes/waves, scoring, checkpoint). The 453 review-run definitions become the packaged-build regression harness asserting outcome envelopes per rapid per flow.
 
-## 4. Phases
+## 6. Gate dispositions (mechanical — no forms, no waiting)
 
-Execute in order. Each phase lists its tasks and a hard exit gate. Commit and push after each task (both remotes, per standing rules). Tag the repo at each phase exit. Before P1: commit the in-flight B2 preflight work currently sitting untracked in the working tree (finish that task cleanly), and commit `TODO.md`/plan-doc edits.
-
-### Phase 1 — Playable skeleton (boot → menu → floating raft)
-1. Create `L_RaftSimBoot` (menu level: scenic South Fork preview camera + sky) — fixes the broken `GameDefaultMap`.
-2. UMG front-end: MainMenu, ModeSelect, SectionSelect (river/section/flow), Settings (video/audio/input/accessibility tabs), Credits — implementing the screen-kind enums that already exist in `RaftSimVerticalSliceFrontend.h`. C++ widget base classes + minimal styled Blueprints (committed as text-diffable where possible; keep BP logic thin over C++).
-3. Enhanced Input: author `UInputAction`/`UInputMappingContext` assets for the 23 contracted actions in `RaftSimInputActions.h`; bind in `ARaftSimGuidePawn::SetupPlayerInputComponent`; KBM + gamepad. Rebinding UI in Settings.
-4. Save/settings: wire `URaftSimVerticalSliceSaveGame` to `SaveGameToSlot`/load on boot; settings apply/persist (resolution, quality, audio volumes, bindings, comfort options).
-5. Test tank map: flat-pool solver window + raft rigid body floating via the new multi-point buoyancy (first slice of A-3), paddle-force strokes move it. No rapids yet.
-6. CI: GitHub Actions workflow running the physics suite + CMake solver build/tests on push (Unreal builds stay local scripted: add `Scripts/package_win.ps1` / `package_mac.sh` wrapping RunUAT).
-**Exit gate:** packaged Windows build boots to menu, starts Test Tank, player paddles a floating raft with visible water surface, settings persist, quits cleanly. Physics suite green.
-
-### Phase 2 — Water and raft core (the simulation becomes a game)
-1. Embed the solver in `RaftSimWater` (A-1): static-lib build, moving-window runtime, live `SampleWaterAtWorldPosition`, precomputed-field fallback, deterministic replay hashes preserved in dev builds.
-2. Water rendering v1: heightfield surface mesh driven by live/precomputed fields feeding the existing `M_RaftSim_SolverSurfaceWaterCandidate` material line (elevation, velocity → flow-map, Froude → foam mask); single-layer-water shading; Niagara foam/spray/mist emitters keyed to the telemetry cue outputs that `RaftSimAudio`'s math already computes.
-3. Raft dynamics port (A-3) complete: 6-DoF + D1–D4 in C++, 120 Hz, driven by the bridge subsystem from the game loop (subsystem finally gets ticked by the GameMode).
-4. Flip/swim/recover loop (A-5) end-to-end with placeholder capsule crew.
-5. D6 closure: run the comparison harness with UE-measured results; commit the report; fixture failures are physics bugs to fix now, not later.
-6. Solver numerics sprint (A-2): MUSCL + wet/dry front work; re-run truth baseline; record new honest parity counts.
-**Exit gate:** in the Chili Bar pilot window, the raft runs moving water with believable current/eddy response; deliberately dropping into the test hole flips the raft via D3 overwash; crew capsules swim and can be recovered; D6 comparison committed and passing within tolerance bands; solver parity ≥ 12/16 canonical rows (log any `behavioral_validation_only` exceptions per A-2).
-
-### Phase 3 — First rapid vertical slice (Troublemaker)
-1. Resolve South Fork A1 with the following **decided** anchors: downstream anchor = the official California State Parks *Salmon Falls Lower Water Raft Take-out* geometry (official access geometry is ground truth; the conflicting NHD-derived mileage candidates are rejected); mainstem route = re-selected NHD flowline chain validated against the official access points and aerial imagery; published mile figures (20.5 vs 21.0) become metadata aliases with a recorded divergence note, not anchors. Regenerate full-reach windows and stationing on that basis. Items previously gated on "local guide review" are marked `pending_human_review` (batched to the P7 owner review) and do **not** block binding.
-2. Bind the first two rapids (Meat Grinder, Troublemaker) to exact geometry; author their reach-local bed/boulder geometry from DEM + NAIP + cataloged feature descriptions.
-3. Build the Troublemaker encounter (A-6): scout eddy, hazard volumes at the right-side hole, line scoring, checkpoint, three flow bands.
-4. Crew v1 (A-4): rigged paddler characters, Control Rig paddling, command radial menu + responses, High Side timed event, seat-load → D2 coupling.
-5. Audio pass 1: MetaSounds water bed (level-crossfaded by the telemetry cues), paddle/hull/contact one-shots, command VO barks (TTS per policy), menu/UI sounds.
-6. HUD v1: speed/heading ribbon, command state, crew status, scoring toasts, subtitle system.
-7. Run the review-run harness for these two rapids (the first of the 453 definitions unblocked); commit outcome reports.
-**Exit gate:** a stranger can launch the build, pick Training Eddy or Troublemaker, run it with crew and sound, flip in the hole at high flow, swim/recover, get scored, and their progress saves. This is the "it is now a game" gate.
-
-### Phase 4 — Full South Fork (content at scale)
-1. Convert the full-reach corridor to proper World Partition (external actors, HLOD build, streaming verified over a continuous full descent).
-2. Extend rapid binding/encounters to all 20 cataloged rapids across the 33 km reach, using the review-run harness per rapid per flow as the acceptance test (behavioral validation per A-2).
-3. Environment art completion, external-first per the existing intake policy: execute the B2 asset selections already committed for South Fork (CC0 committed; Fab hero items local-only with committed procedural fallbacks — and verify per-item packaged-build redistribution rights, else the fallback ships). Canopy strategy per the recorded review: **the hybrid pilot is hereby authorized** — analog species for distant mass (honestly labeled `visual_analog` in manifests), project-owned assets only where they already pass gates; the ≤6-cycle stop-loss rules in `docs/futaleufu-canopy-strategy-review.md` apply to any new in-repo authoring.
-4. Water rendering v2: bank wetness, shallows tint by depth field, rapid-specific spray/mist densities, wet raft/paddle materials.
-5. Section structure for career mode: Chili Bar Gorge / Coloma Valley / The Gorge / Salmon Falls approach — each a Guided Descent chapter with license-tier thresholds.
-6. Full-reach performance pass against the §2 budgets (Nanite/HLOD/streaming tuning; the 1.6 ms solver budget already passes with margin).
-**Exit gate:** complete Chili Bar → Salmon Falls descent, no loading breaks, all 20 rapids reviewed at 3 flows via harness reports, frame/streaming budgets met on the two target platforms, screenshots of five different rapids read as photoreal per the automated artifact checks (human confirmation batched to P7).
-
-### Phase 5 — Game systems and polish
-1. Guided Descent career: progression, license tiers, unlock flow, per-section medals, stats.
-2. Training Eddy tutorial: guided drills with objective tracking (strokes, ferry, eddy catch, commands, flip recovery, rope throw).
-3. Accessibility: full rebinding (done P1), subtitles + sizes, colorblind-safe HUD palette, camera-shake/vignette sliders, hold/toggle options, UI scale.
-4. Photo mode (free camera, DoF, time-of-day slider in Free Run) — it markets the environment work.
-5. Audio pass 2: full mix, distance/occlusion, canyon reverb zones, dynamic crew chatter density, menu music (first-party or CC0, manifest-tracked).
-6. Difficulty/assist options: line ghost (Training + optional), scout-mode slow pan, forgiving vs realistic swim timers.
-7. Legal/branding tasks: LICENSE/LICENSE-CONTENT/NOTICE/CREDITS files (per §2), README overhaul (what it is, screenshots, how to play, how to build, contribution guide), name-collision search + `docs/branding-decision.md`, in-game credits screen, third-party license screen.
-**Exit gate:** feature-complete 1.0; all §2 scope items implemented or formally cut in the changelog; zero known crash/blocker bugs; licensing files complete and consistent with every intake manifest.
-
-### Phase 6 — Platforms, packaging, release engineering
-1. Cut `release/1.0`. Windows + macOS packaged builds via the P1 scripts; determinism spot-check (same seed → same replay hashes) on both.
-2. macOS verification pass: VSM-vs-cascade decision test (VSM ships on macOS only if the full-reach descent shows no Metal shadow artifacts and stays ≥ 55 fps at High/1440p on M2 Pro; else cascades), Metal foliage-masking checks (the known alpha-as-mask issues), Proton verification of the Windows build on Steam Deck/desktop Linux (playable = 40 fps Medium; report only, not a gate).
-3. QA sweep: scripted full-descent soak runs (all flows, both platforms, overnight loops via the review-run harness in packaged builds), input-device matrix (KBM, XInput, DualSense), save-migration test, fresh-machine first-run test.
-4. Release artifacts: GitHub Release draft (builds + checksums + changelog), itch.io kit, Steam kit (store copy, capsule/screenshot/trailer asset set — trailer cut from in-engine captures of five rapids + a flip sequence), press kit page in `docs/presskit/`.
-5. Version/lock: `1.0.0`, cook manifests, LFS assets verified present, final physics suite + full gate report regeneration.
-**Exit gate:** both platform builds pass the QA sweep from a fresh machine; release artifacts staged; repo tagged `v1.0.0-rc1`.
-
-### Phase 7 — Release candidate review and launch
-1. Assemble the **owner review packet**: every `pending_human_review` item (guide-eye rapid realism judgments, photoreal "lifelike" confirmations, hazard-readability, the branding pick, store metadata) presented as a single checklist with builds, captures, and per-item accept/redo buttons (a simple markdown checklist + capture gallery).
-2. Fix what the owner rejects; re-tag RCs as needed.
-3. On owner sign-off: publish the GitHub Release; hand the owner the itch/Steam upload steps (accounts and fees are theirs); announce post (draft provided).
-4. Open the post-1.0 roadmap: 1.1 = VR mode; 1.2 = Futaleufú; then Pacuare, Chilko, Colorado (windowed), voice commands, multiplayer evaluation — reactivating the five-river plan's remaining workstreams in that order.
-**Exit gate:** v1.0.0 tag public with downloadable, playable builds.
-
-## 5. Explicit cut list for 1.0 (do not implement, do not partially implement)
-
-VR (1.1) · multiplayer · local-AI voice recognition · all rivers except South Fork · Zambezi anything · Chrono runtime integration · Jolt · native Linux · consoles/handheld · localization beyond FText hygiene · paid asset libraries · Wwise/FMOD · online telemetry · level editor for players (the RaftSim editor tools remain dev-only).
-
-## 6. Standing engineering rules
-
-1. Commit + push to both remotes after every task; phase tags; changelog entries per task.
-2. `cd physics && uv run pytest -q` green before every push (current baseline 677 passed / 3 skipped — never lower without a logged reason); UE editor target must compile before every push touching `unreal/`.
-3. Hash-locked manifests regenerate through generators only. The honesty conventions are non-negotiable: playback ≠ solver parity, analogs are labeled `visual_analog`, diagnostic captures are never presented as photoreal.
-4. LFS: owner's no-prune decision stands. New heavy generated binaries: commit only meaningful revisions (no churn); packaged builds go to GitHub Releases, never into the repo.
-5. New user-facing strings are `FText`. New gameplay values live in data assets/config, not hardcoded.
-6. Keep BP logic thin; gameplay logic in C++ so it stays diffable and testable.
-
-## 7. Test/verification strategy
-
-- **Physics**: existing suite + D6 UE-vs-Python comparison + solver truth baseline re-runs after every numerics change.
-- **Gameplay**: the 453 review-run definitions become packaged-build automation — headless scripted descents asserting outcome envelopes per rapid/flow; run nightly and at every phase exit.
-- **Rendering/perf**: automated capture + frame-time harness on 5 fixed descent segments per platform per quality tier; budgets from §2.
-- **Manual**: each phase exit includes one full human-playable descent by the agent driving the build interactively (screenshots + notes committed to `docs/playtest-notes/`).
-
-## 8. Risks and predecided responses
-
-| Risk | Response (decided now) |
+| Blocked gate (as of July 17) | Disposition (decided) |
 |---|---|
-| Solver numerics can't reach parity on a canonical family | After 3 attempts: `behavioral_validation_only` label, behavioral gate via review runs, post-1.0 track. Never re-enable playback in shipping. |
-| Full-reach corridor too heavy for streaming budgets | Reduce foliage density tiers and HLOD distances first; if still failing, split the descent into 4 section maps with eddy-pause transitions (career already sections there). |
-| D3/D4 flexible corrections feel bad (twitchy/unfair) at 120 Hz | Tune clamp constants via the D-fixtures within recorded bounds; if still bad, ship D1/D2+D3 (sag + overwash flip) and defer D4 wrap/pin to 1.0.x with the rocks acting as rigid colliders meanwhile. |
-| Fab hero-asset licenses disallow packaged redistribution | Ship the committed procedural fallback for that slot; note in CREDITS. |
-| macOS falls below perf floor | Lower the macOS default tier to Medium and state it; never delay Windows for macOS parity. |
-| Owner review (P7) rejects a rapid's realism | Rework that rapid's window/geometry only; other rapids ship; a single rapid may ship flagged "under revision" in the changelog rather than slipping the release. |
+| South Fork A1 downstream anchor (>9 km NHD-vs-official conflict; 20.5 vs 21.0 mi) | **Adopt now:** official CA State Parks *Salmon Falls Lower Water Raft Take-out* geometry is ground truth; re-select the mainstem NHD chain against official access points + imagery; published miles become alias metadata with a divergence note. Mark A1 stationing complete with `decision_source: release-1.0-plan-v2`. |
+| All "guide review" / "human lifelike" / "hazard readability" gates | Convert to `pending_human_review` items in the single P7 owner packet; never blocking; never generate new forms for them. |
+| Five-river DoD 0/30 matrix | Retired (§3 0.3). This plan's phase exit gates are the definition of done for 1.0. |
+| C2 editor pins / C3 water windows / C4 runs | Unblocked by the A1 adoption above; execute inside P3–P4 for South Fork only. |
+| D6 "14 missing measured pairs" | Supplied by the A-3 UE port in P2; Chrono pairs optional, non-blocking. |
+| Canopy sourcing decision (V44 frozen) | Hybrid authorized: analog species for distant mass (labeled `visual_analog`), existing stop-loss rules govern any new in-repo authoring. South Fork biome needs no Nothofagus — use the B2 South Fork selection. |
+| E1 platform matrix | Decided in §4 (Win + macOS, Proton report). |
+| Milestone 20/25 locks referencing live-water approval | Regenerate through their generators once P2's honest water lands; until then they correctly stay "blocked" and that blocks nothing in this plan. |
 
-## 9. Owner-handoff checklist (agent prepares; owner executes; these gate the launch date only)
+## 7. Phases 1–7
 
-- Create/verify itch.io and Steam partner accounts; pay Steam fee; upload staged kits.
-- Confirm the branding pick from `docs/branding-decision.md`.
-- Play the RC and complete the review packet (P7.1).
-- Optional: GitHub Sponsors/donation links; announcement posts from the provided drafts.
+Same structure as revision 1, restated with current facts. Commit + push (origin only — the GitLab remote no longer exists) after every task; tag each phase exit; suite green before every push; UE editor target compiles before every push touching `unreal/`.
 
-## 10. Decision principles for anything this plan missed
+**P1 — Playable skeleton.** `L_RaftSimBoot` menu level (fixes broken `GameDefaultMap`); UMG front-end (MainMenu/ModeSelect/SectionSelect/Settings/Credits) in C++-backed widgets; Enhanced Input assets + `SetupPlayerInputComponent` bindings for the 23 contracted actions (KBM + gamepad + rebinding UI); `SaveGameToSlot`/load wiring; flat-water test tank with the raft floating via first-slice buoyancy and paddle strokes; CI (GitHub Actions: physics suite + CMake solver tests + the §3 size guard; UE packaging stays scripted local — `Scripts/package_win.ps1`, `package_mac.sh`).
+*Exit:* packaged Windows build → menu → test tank → paddle a floating raft → settings persist → clean quit.
 
-1. Prefer cutting scope over cutting quality; prefer the smaller, finished thing.
-2. Prefer the choice that keeps evidence honest, even when it looks worse.
-3. Prefer deterministic and testable over impressive and fragile.
-4. Prefer CC0/first-party content; when licensing is ambiguous, treat it as disallowed and use the fallback.
-5. Prefer Windows-path certainty over multi-platform parity.
-6. When a gate requires a human, convert it to a `pending_human_review` item in the P7 packet and continue; never fabricate a human judgment.
-7. When two existing docs conflict, this plan wins for 1.0 scope; record the conflict in this file's execution log.
-8. Log every nontrivial decision, dated, in an execution log section appended to this file — the same convention the previous plans used.
+**P2 — Water & raft core.** Embed solver (A-1) with live window + live sampler (replaces the constant-depth placeholder); water surface v1 (heightfield mesh + solver-field material, foam from Froude field, Niagara spray keyed to telemetry cues); raft dynamics port (A-3) complete and ticked; flip/swim/recover loop with capsule crew; D6 closure via UE-measured results; MUSCL/wet-dry numerics sprint; re-run truth baseline and record new honest counts.
+*Exit:* raft runs moving water in the Chili Bar window; hole flips raft via D3; capsule crew swim/recover; D6 comparison committed within tolerances; ≥12/16 canonical rows genuine (exceptions labeled).
+
+**P3 — Troublemaker vertical slice.** Execute the A1 adoption (§6) and regenerate full-reach stationing; bind Meat Grinder + Troublemaker exact geometry; author their windows and encounters (scout eddy, hole hazard, scoring, checkpoint, 3 flows); crew v1 (characters, Control Rig paddling, command wheel, High Side event, seat-load→D2); audio pass 1 (MetaSounds water bed, one-shots, TTS barks, UI); HUD v1 + subtitles; first review-runs executed as regression harness.
+*Exit:* a stranger can launch, run Training Eddy or Troublemaker with crew and sound, flip at high flow, swim, recover, get scored, and progress saves. **This is the "it is now a game" gate.**
+
+**P4 — Full South Fork.** Build the 1.0 gameplay corridor map fresh from committed physics data (World Partition, external actors, HLOD — replaces the deleted preview maps); bind all 20 rapids with encounters, harness-validated per flow; execute the committed B2 South Fork asset selections (CC0 committed; Fab hero slots local-only + fallback verified); water rendering v2 (wet banks, depth tint, per-rapid spray); career sectioning; full-reach performance pass to §4 budgets; first README screenshots.
+*Exit:* complete Chili Bar→Salmon Falls descent, no loading breaks, 20/20 rapids pass harness at 3 flows, budgets met on both platforms.
+
+**P5 — Game systems & polish.** Career progression/licenses/medals/stats; tutorial drills with objectives; accessibility (rebinding done in P1, subtitles+sizes, colorblind-safe HUD, shake/vignette sliders, hold/toggle, UI scale); photo mode; audio pass 2 (mix, occlusion, canyon reverb zones, chatter density, menu music); assists (line ghost, scout slow-pan, swim-timer options); branding search + `docs/branding-decision.md`; in-game credits + third-party license screen.
+*Exit:* feature-complete; zero known blockers; every §4 scope row implemented or formally logged as cut.
+
+**P6 — Platforms & packaging.** Cut `release/1.0`; Windows + macOS packages via P1 scripts; determinism spot-check (same seed → same replay hashes) both platforms; macOS Metal verification (VSM-vs-cascade decision test: full-reach descent, no shadow artifacts, ≥55 fps High/1440p on M2 Pro; the known alpha-as-mask foliage checks); Proton verification report; QA sweep (scripted full-descent soaks all flows/platforms via the harness in packaged builds, input-device matrix, save migration, fresh-machine first run); release artifacts (GitHub Release draft with checksums, itch kit, Steam kit, trailer cut from in-engine captures, `docs/presskit/`).
+*Exit:* both platform builds pass QA from a fresh machine; artifacts staged; `v1.0.0-rc1` tagged.
+
+**P7 — RC review & launch.** Assemble the single owner review packet (all `pending_human_review` items: rapid realism, lifelike confirmation, hazard readability, branding, store metadata) as one markdown checklist + capture gallery; fix rejections, re-tag; on owner sign-off publish the GitHub Release and hand over the itch/Steam upload steps; open the post-1.0 roadmap (1.1 VR → 1.2 Futaleufú → Pacuare → Chilko → Colorado windowed → voice → multiplayer evaluation).
+*Exit:* `v1.0.0` public with downloadable playable builds.
+
+## 8. Test & verification strategy
+
+Physics suite (new Phase-0 baseline) + D6 UE-vs-Python + truth-baseline reruns after numerics changes. The 453 review-run definitions become nightly packaged-build automation. Frame-time harness on 5 fixed descent segments per platform/tier. Each phase exit includes one interactive full descent by the agent driving the real build, with notes + screenshots committed to `docs/playtest-notes/`. Never test a paperwork generator again.
+
+## 9. Risks and predecided responses
+
+| Risk | Response |
+|---|---|
+| Canonical-family parity stalls | 3 attempts → `behavioral_validation_only`, post-1.0 track; never re-enable playback in shipping. |
+| Full-reach streaming misses budget | Reduce foliage tiers/HLOD distances; if still failing, split into 4 section maps with eddy-pause transitions. |
+| Flexible-raft feel is bad | Tune within D-fixture clamp bounds; if still bad, ship D1–D3 and defer D4 wrap/pin to 1.0.x (rocks = rigid colliders meanwhile). |
+| Fab item disallows packaged redistribution | Ship the committed procedural fallback; note in CREDITS. |
+| macOS under perf floor | Default macOS tier to Medium and say so; never delay Windows. |
+| History rewrite goes wrong | The 0.5 mirror is the recovery point; restore and retry. Never rewrite without the verified mirror. |
+| Owner rejects a rapid in P7 | Rework that rapid only; a single rapid may ship flagged "under revision" rather than slipping the release. |
+
+## 10. Owner-handoff checklist (agent maintains; owner executes)
+
+- Copy `../SmokeEmIfYouGotEm-archive-2026-07-17.git` (full pre-rewrite mirror incl. all LFS) to offline/cloud storage; confirm before the old local repo is deleted.
+- GitHub server-side LFS purge: support request, or delete+recreate the repo from the rewritten mirror (owner's call; loses stars/issues).
+- Steam/itch accounts + fees + uploads of the staged kits.
+- Confirm branding pick from `docs/branding-decision.md`.
+- Play the RC; complete the P7 review packet.
+- Optional: donation links, announcement posts (drafts provided).
+
+## 11. Decision principles for anything unforeseen
+
+1. Product over process: if a task's output is a document about future work, it is the wrong task (§1 rule zero).
+2. Cut scope, not quality; prefer the smaller finished thing.
+3. Keep evidence honest even when it looks worse; never weaken a gate to pass it.
+4. Deterministic and testable beats impressive and fragile.
+5. CC0/first-party by default; ambiguous licensing = disallowed, use the fallback.
+6. Windows-path certainty over platform parity.
+7. Human-required steps → one line in §10, keep building; never fabricate a human judgment.
+8. Doc conflicts → this plan wins; log it.
+9. Log every nontrivial decision, dated, in the execution log appended below. Update the log as the FIRST commit of every phase and after every phase exit.
