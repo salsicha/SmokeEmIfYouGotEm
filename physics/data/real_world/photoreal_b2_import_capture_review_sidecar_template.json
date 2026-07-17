@@ -1,0 +1,4541 @@
+{
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_mark_any_source_reviewed": false,
+    "can_run_corridor_substitution": false,
+    "can_run_imports_from_sidecar_alone": false,
+    "complete_when": [
+      "source hash validation passes for every sidecar record",
+      "Unreal import report path and SHA-256 are recorded",
+      "turntable, 60 m, and 150 m captures exist, are hash-locked, and are approved",
+      "rights, ecology/guide, art, technical-art, hazard, and performance reviews approve with evidence",
+      "desktop and VR performance profiles are recorded and pass",
+      "per-river promotion readiness and owner decision gates are run after the merge"
+    ]
+  },
+  "records": [
+    {
+      "asset_need_id": "granite_metamorphic_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_rock_01",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_rock_01_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_rock_01_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_rock_01_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/PolyhavenRock01"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:polyhaven_rock_01:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:polyhaven_rock_01:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_leafy_grass",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_leafy_grass_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_leafy_grass_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_leafy_grass_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/PolyhavenLeafyGrass"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:polyhaven_leafy_grass:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "dry_grass_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_grass_medium_01",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_01_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_01_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_01_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/PolyhavenGrassMedium01"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_01:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_grass_medium_02",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_02_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_02_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/polyhaven_grass_medium_02_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/PolyhavenGrassMedium02"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:polyhaven_grass_medium_02:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_rock_face",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_face_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_face_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_face_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/PolyhavenRockFace"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_face:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_rock_06",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_06_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_06_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_rock_06_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/PolyhavenRock06"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:polyhaven_rock_06:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_aerial_rocks_02",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_rocks_02_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_rocks_02_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_rocks_02_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/PolyhavenAerialRocks02"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_rocks_02:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_aerial_beach_03",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_beach_03_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_beach_03_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_aerial_beach_03_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/PolyhavenAerialBeach03"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:polyhaven_aerial_beach_03:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "sand_beach_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_sand_01",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_sand_01_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_sand_01_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/polyhaven_sand_01_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/PolyhavenSand01"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:polyhaven_sand_01:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_pachira_aquatica_01",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_pachira_aquatica_01_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_pachira_aquatica_01_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_pachira_aquatica_01_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/PolyhavenPachiraAquatica01"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:polyhaven_pachira_aquatica_01:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_mossy_rock",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_mossy_rock_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_mossy_rock_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_mossy_rock_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/PolyhavenMossyRock"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:polyhaven_mossy_rock:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_rock_moss_set_02",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_rock_moss_set_02_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_rock_moss_set_02_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_rock_moss_set_02_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/PolyhavenRockMossSet02"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:polyhaven_rock_moss_set_02:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_moss_01",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_moss_01_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_moss_01_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/polyhaven_moss_01_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/PolyhavenMoss01"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:polyhaven_moss_01:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:polyhaven_moss_01:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_fern_02",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_fern_02_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_fern_02_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_fern_02_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/PolyhavenFern02"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:polyhaven_fern_02:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:polyhaven_fern_02:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_mountainside",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_mountainside_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_mountainside_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_mountainside_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/PolyhavenMountainside"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:polyhaven_mountainside:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:polyhaven_mountainside:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_dry_riverbed_rock_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_dry_riverbed_rock_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_dry_riverbed_rock_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/PolyhavenDryRiverbedRock"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_river_small_rocks",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_river_small_rocks_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_river_small_rocks_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/polyhaven_river_small_rocks_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/PolyhavenRiverSmallRocks"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_pine_sapling_small",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_pine_sapling_small_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_pine_sapling_small_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_pine_sapling_small_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/PolyhavenPineSaplingSmall"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:polyhaven_pine_sapling_small:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_fir_sapling",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_fir_sapling_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_fir_sapling_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_fir_sapling_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/PolyhavenFirSapling"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:polyhaven_fir_sapling:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_volcanic_rock_tiles",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_volcanic_rock_tiles_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_volcanic_rock_tiles_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_volcanic_rock_tiles_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/PolyhavenVolcanicRockTiles"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:polyhaven_volcanic_rock_tiles:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_dry_riverbed_rock",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_dry_riverbed_rock_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_dry_riverbed_rock_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_dry_riverbed_rock_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/PolyhavenDryRiverbedRock"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:polyhaven_dry_riverbed_rock:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "polyhaven_river_small_rocks",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_river_small_rocks_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_river_small_rocks_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/polyhaven_river_small_rocks_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/PolyhavenRiverSmallRocks"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:polyhaven_river_small_rocks:cc0_source_download_preflight:source_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "cc0_poly_haven",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "sierra_oak_gray_pine_foliage",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_blue_oak_gray_pine_hero_foliage_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_blue_oak_gray_pine_hero_foliage_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_blue_oak_gray_pine_hero_foliage_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_blue_oak_gray_pine_hero_foliage_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/FabBlueOakGrayPineHeroFoliageSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:fab_blue_oak_gray_pine_hero_foliage_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "chaparral_shrub_understory",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_chaparral_shrub_understory_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_chaparral_shrub_understory_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_chaparral_shrub_understory_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/fab_chaparral_shrub_understory_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/FabChaparralShrubUnderstorySlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:fab_chaparral_shrub_understory_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "grand_canyon_layered_cliff_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_grand_canyon_layered_cliff_hero_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_grand_canyon_layered_cliff_hero_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_grand_canyon_layered_cliff_hero_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_grand_canyon_layered_cliff_hero_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/FabGrandCanyonLayeredCliffHeroSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:fab_grand_canyon_layered_cliff_hero_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "desert_scrub_riparian_foliage",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_desert_scrub_tamarisk_willow_cactus_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_desert_scrub_tamarisk_willow_cactus_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_desert_scrub_tamarisk_willow_cactus_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_desert_scrub_tamarisk_willow_cactus_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/FabDesertScrubTamariskWillowCactusSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:fab_desert_scrub_tamarisk_willow_cactus_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "lava_falls_basalt",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_lava_falls_basalt_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_lava_falls_basalt_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_lava_falls_basalt_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/fab_lava_falls_basalt_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/FabLavaFallsBasaltSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:fab_lava_falls_basalt_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "multi_strata_tropical_canopy",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_pacuare_multi_strata_rainforest_canopy_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_multi_strata_rainforest_canopy_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_multi_strata_rainforest_canopy_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_multi_strata_rainforest_canopy_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/FabPacuareMultiStrataRainforestCanopySlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:fab_pacuare_multi_strata_rainforest_canopy_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "mossy_basalt_andesite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_pacuare_mossy_basalt_andesite_boulder_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_mossy_basalt_andesite_boulder_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_mossy_basalt_andesite_boulder_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_mossy_basalt_andesite_boulder_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/FabPacuareMossyBasaltAndesiteBoulderSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:fab_pacuare_mossy_basalt_andesite_boulder_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "waterfall_side_stream_assets",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_pacuare_waterfall_mist_vfx_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_waterfall_mist_vfx_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_waterfall_mist_vfx_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_waterfall_mist_vfx_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/FabPacuareWaterfallMistVfxSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:fab_pacuare_waterfall_mist_vfx_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "rainforest_floor_and_lianas",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_pacuare_lianas_epiphytes_understory_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_lianas_epiphytes_understory_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_lianas_epiphytes_understory_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/fab_pacuare_lianas_epiphytes_understory_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/FabPacuareLianasEpiphytesUnderstorySlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:fab_pacuare_lianas_epiphytes_understory_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "nothofagus_coigue_canopy_or_reviewed_analog",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_futaleufu_nothofagus_coigue_canopy_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_nothofagus_coigue_canopy_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_nothofagus_coigue_canopy_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_nothofagus_coigue_canopy_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/FabFutaleufuNothofagusCoigueCanopySlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:fab_futaleufu_nothofagus_coigue_canopy_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "patagonian_granite_boulders",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_futaleufu_patagonian_granite_boulder_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_patagonian_granite_boulder_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_patagonian_granite_boulder_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_patagonian_granite_boulder_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/FabFutaleufuPatagonianGraniteBoulderSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:fab_futaleufu_patagonian_granite_boulder_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "turquoise_wet_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_futaleufu_turquoise_wet_bank_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_turquoise_wet_bank_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_turquoise_wet_bank_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/fab_futaleufu_turquoise_wet_bank_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/FabFutaleufuTurquoiseWetBankSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:fab_futaleufu_turquoise_wet_bank_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "lodgepole_spruce_aspen_foliage",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_chilko_lodgepole_spruce_aspen_foliage_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lodgepole_spruce_aspen_foliage_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lodgepole_spruce_aspen_foliage_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lodgepole_spruce_aspen_foliage_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/FabChilkoLodgepoleSpruceAspenFoliageSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:fab_chilko_lodgepole_spruce_aspen_foliage_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "glacial_blue_wet_bank_materials",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_chilko_glacial_blue_wet_bank_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_glacial_blue_wet_bank_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_glacial_blue_wet_bank_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_glacial_blue_wet_bank_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/FabChilkoGlacialBlueWetBankSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:fab_chilko_glacial_blue_wet_bank_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "volcanic_canyon_rock",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_chilko_lava_canyon_volcanic_rock_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lava_canyon_volcanic_rock_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lava_canyon_volcanic_rock_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_lava_canyon_volcanic_rock_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/FabChilkoLavaCanyonVolcanicRockSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:fab_chilko_lava_canyon_volcanic_rock_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "cold_water_debris_and_gravel",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "fab_chilko_cold_water_debris_gravel_slot",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_cold_water_debris_gravel_slot_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_cold_water_debris_gravel_slot_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/fab_chilko_cold_water_debris_gravel_slot_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/FabChilkoColdWaterDebrisGravelSlot"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:fab_chilko_cold_water_debris_gravel_slot:fab_local_only:local_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "fab_local_only",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "all_south_fork_asset_needs",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "first_party_south_fork_biome_fallback_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/first_party_south_fork_biome_fallback_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/first_party_south_fork_biome_fallback_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/south_fork_american_chili_bar/first_party_south_fork_biome_fallback_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/SouthForkAmericanChiliBar/FirstPartySouthForkBiomeFallbackV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "south_fork_american_chili_bar",
+      "source_hash_record_id": "south_fork_american_chili_bar:first_party_south_fork_biome_fallback_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "all_colorado_asset_needs",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "first_party_colorado_biome_fallback_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/first_party_colorado_biome_fallback_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/first_party_colorado_biome_fallback_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/colorado_river_grand_canyon_rowing/first_party_colorado_biome_fallback_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ColoradoRiverGrandCanyonRowing/FirstPartyColoradoBiomeFallbackV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "source_hash_record_id": "colorado_river_grand_canyon_rowing:first_party_colorado_biome_fallback_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "all_pacuare_asset_needs",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "first_party_pacuare_biome_fallback_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/first_party_pacuare_biome_fallback_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/first_party_pacuare_biome_fallback_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/pacuare_river_costa_rica/first_party_pacuare_biome_fallback_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/PacuareRiverCostaRica/FirstPartyPacuareBiomeFallbackV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "pacuare_river_costa_rica",
+      "source_hash_record_id": "pacuare_river_costa_rica:first_party_pacuare_biome_fallback_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "near_bank_sapling_fern_strata",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "project_owned_futaleufu_sapling_fern_strata_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/project_owned_futaleufu_sapling_fern_strata_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/project_owned_futaleufu_sapling_fern_strata_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/project_owned_futaleufu_sapling_fern_strata_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/ProjectOwnedFutaleufuSaplingFernStrataV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:project_owned_futaleufu_sapling_fern_strata_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "all_futaleufu_asset_needs",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "first_party_futaleufu_biome_fallback_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/first_party_futaleufu_biome_fallback_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/first_party_futaleufu_biome_fallback_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/futaleufu_river_chile/first_party_futaleufu_biome_fallback_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/FutaleufuRiverChile/FirstPartyFutaleufuBiomeFallbackV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "futaleufu_river_chile",
+      "source_hash_record_id": "futaleufu_river_chile:first_party_futaleufu_biome_fallback_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    },
+    {
+      "asset_need_id": "all_chilko_asset_needs",
+      "can_import_now": false,
+      "can_promote_candidate_now": false,
+      "candidate_id": "first_party_chilko_biome_fallback_v1",
+      "captures": [
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "isolated turntable capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/first_party_chilko_biome_fallback_v1_isolated_turntable.png",
+          "sha256": "",
+          "view_id": "isolated_turntable"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "60 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/first_party_chilko_biome_fallback_v1_river_distance_60m.png",
+          "sha256": "",
+          "view_id": "river_distance_60m"
+        },
+        {
+          "approved": false,
+          "capture_path": "",
+          "description": "150 m river-distance capture",
+          "expected_capture_path": "docs/environment-captures/photoreal_river_previews/asset_intake/b2/chilko_river_lava_canyon/first_party_chilko_biome_fallback_v1_river_distance_150m.png",
+          "sha256": "",
+          "view_id": "river_distance_150m"
+        }
+      ],
+      "import_report": {
+        "import_settings_recorded": false,
+        "map_check_zero_errors": false,
+        "path": "",
+        "sha256": "",
+        "unreal_destination_root": "/Game/RaftSim/Environment/ExternalReview/B2/ChilkoRiverLavaCanyon/FirstPartyChilkoBiomeFallbackV1"
+      },
+      "notes": "",
+      "performance_evidence": {
+        "desktop_passed": false,
+        "desktop_profile": "",
+        "vr_passed": false,
+        "vr_profile": ""
+      },
+      "record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:b2_import_capture_review",
+      "reviews": [
+        {
+          "approved": false,
+          "domain_id": "rights_and_license",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "ecology_or_guide_fit",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "art_direction_lifelike",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "technical_art_import_quality",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "hazard_readability",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        {
+          "approved": false,
+          "domain_id": "desktop_vr_performance",
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      ],
+      "river_id": "chilko_river_lava_canyon",
+      "source_hash_record_id": "chilko_river_lava_canyon:first_party_chilko_biome_fallback_v1:first_party:recipe_hash_report",
+      "source_hash_record_valid": false,
+      "source_kind": "first_party_or_project_owned",
+      "status": "sidecar_not_recorded"
+    }
+  ],
+  "schema": "raftsim.photoreal.b2_import_capture_review_sidecar_template.v1",
+  "sidecar_contract": {
+    "corridor_substitution_allowed_from_sidecar": false,
+    "manual_per_river_asset_set_review_still_required": true,
+    "may_commit_screenshots_and_reports_only_when_hash_locked": true,
+    "may_commit_sidecar_without_source_binaries": true,
+    "record_id_must_match_import_capture_ledger": true,
+    "required_capture_views": [
+      "isolated_turntable",
+      "river_distance_60m",
+      "river_distance_150m"
+    ],
+    "required_review_domains": [
+      "rights_and_license",
+      "ecology_or_guide_fit",
+      "art_direction_lifelike",
+      "technical_art_import_quality",
+      "hazard_readability",
+      "desktop_vr_performance"
+    ],
+    "source_hash_record_must_be_valid_before_import_approval": true
+  },
+  "source_ledger": "physics/data/real_world/photoreal_b2_import_capture_review_ledger.json",
+  "source_validation_report": "physics/data/real_world/photoreal_b2_import_capture_review_validation_report.json",
+  "status": "empty_import_capture_review_sidecar_template_no_promotion",
+  "summary": {
+    "approved_review_record_count": 0,
+    "can_promote_any_b2_asset_set": false,
+    "candidate_capture_count": 0,
+    "candidate_import_report_count": 0,
+    "filled_sidecar_record_count": 0,
+    "sidecar_record_count": 44
+  }
+}

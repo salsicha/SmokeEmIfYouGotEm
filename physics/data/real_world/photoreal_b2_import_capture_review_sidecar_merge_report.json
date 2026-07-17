@@ -1,0 +1,30 @@
+{
+  "generated_on": "2026-07-16",
+  "merged_validation": {
+    "approved_review_record_count": 0,
+    "candidate_capture_count": 0,
+    "candidate_import_report_count": 0,
+    "failing_record_count": 44,
+    "import_reviews_valid": false,
+    "validation_error_count": 1584
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_replace_owner_art_guide_rights_hazard_performance_decision": false,
+    "can_replace_per_river_promotion_readiness": false,
+    "manual_per_river_asset_set_review_required": true
+  },
+  "promotion_permissions": {
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_mark_any_source_reviewed": false,
+    "can_run_corridor_substitution": false
+  },
+  "schema": "raftsim.photoreal.b2_import_capture_review_sidecar_merge_report.v1",
+  "sidecar_error_count": 0,
+  "sidecar_errors": [],
+  "sidecar_record_count": 44,
+  "source_ledger": "physics/data/real_world/photoreal_b2_import_capture_review_ledger.json",
+  "source_sidecar_template": "physics/data/real_world/photoreal_b2_import_capture_review_sidecar_template.json",
+  "source_validation_report": "physics/data/real_world/photoreal_b2_import_capture_review_validation_report.json",
+  "status": "import_capture_review_sidecar_incomplete_promotion_blocked"
+}
