@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 142
-- Referenced command count: 87
+- Referenced artifact count: 143
+- Referenced command count: 88
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -945,14 +945,15 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the Definition of Done matrix only after A/B/C/D/E source, asset, water, raft, platform, capture, test, commit, and push gates are green.
-2. Fill one final evidence row per river criterion with hash-locked artifacts, test commands, commit IDs, push records, and all reviewer signoffs.
-3. Run the Definition of Done evidence validator and keep the manual completion review blocked until it is green.
-4. After a green sidecar, perform the owner completion review and update plan checkboxes as a separate manual step.
+2. Use the Markdown review form to coordinate all 30 river/criterion rows, hash-locked evidence, test commands, commit IDs, push records, all eight reviewer roles, and the separate owner completion review before filling the final JSON sidecar.
+3. Fill one final evidence row per river criterion with hash-locked artifacts, test commands, commit IDs, push records, and all reviewer signoffs.
+4. Run the Definition of Done evidence validator and keep the manual completion review blocked until it is green.
+5. After a green sidecar, perform the owner completion review and update plan checkboxes as a separate manual step.
 
 **Acceptance Requirements**
 
 1. The source Definition of Done matrix reports all 30 criteria complete before the sidecar can validate.
-2. Every sidecar criterion row has evidence paths, SHA-256 hashes, test commands, commit IDs, push records, and required signoffs.
+2. Every sidecar criterion row has evidence paths, SHA-256 hashes, test commands, commit IDs, push records, and required signoffs traceable to the Markdown review form or an equivalent signed packet.
 3. The Definition of Done evidence validation report is green.
 4. The owner manually reviews the green matrix and sidecar before any parent gate or execution-plan completion checkbox is marked complete.
 
@@ -968,10 +969,12 @@ This runbook is a human-readable export of the fail-closed external action queue
 - `physics/data/real_world/five_river_definition_of_done_matrix.json`
 - `physics/data/real_world/five_river_definition_of_done_evidence_sidecar_template.json`
 - `physics/data/real_world/five_river_definition_of_done_evidence_validation_report.json`
+- `docs/five-river-definition-of-done-review-form.md`
 
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_five_river_definition_of_done.py`
+- `physics/src/raftsim/examples/generate_five_river_definition_of_done_review_form.py`
 - `physics/src/raftsim/examples/validate_five_river_definition_of_done_evidence.py`
 
 ## Promotion Guardrail
