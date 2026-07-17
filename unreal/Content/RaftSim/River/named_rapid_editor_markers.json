@@ -2,10 +2,12 @@
   "editor_contract": {
     "block_gameplay_promotion_without_guide_review": true,
     "block_solver_window_export_without_exact_geometry": true,
+    "block_subfeature_pin_promotion_without_exact_geometry": true,
     "show_expected_outcomes": true,
     "show_flow_hypotheses": true,
     "show_provisional_station_badge": true,
-    "show_source_and_rights_panel": true
+    "show_source_and_rights_panel": true,
+    "show_subfeature_inventory_panel": true
   },
   "portfolio": {
     "additional_active_environment_count": 1,
@@ -49,6 +51,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__chili_bar_hole",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hole",
             "surf_wave",
@@ -71,6 +75,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "recovery_pool",
+            "wave"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -83,7 +92,9 @@
             "published_value": 0.0,
             "station_kind": "published_river_mile_converted",
             "station_m": 0.0
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -103,6 +114,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__meat_grinder",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "constriction",
@@ -126,6 +139,12 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -138,7 +157,9 @@
             "published_value": 0.6,
             "station_kind": "published_river_mile_converted",
             "station_m": 965.606
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -157,6 +178,8 @@
             "release"
           ],
           "feature_id": "south_fork_american_chili_bar__racehorse_bend",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "bend",
             "lateral",
@@ -179,6 +202,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "lateral"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -191,7 +218,9 @@
             "published_value": 1.3,
             "station_kind": "published_river_mile_converted",
             "station_m": 2092.147
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -211,6 +240,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__maya",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hole",
             "ledge",
@@ -234,6 +265,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "ledge",
+            "wave"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -246,7 +282,9 @@
             "published_value": 1.5,
             "station_kind": "published_river_mile_converted",
             "station_m": 2414.016
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -264,6 +302,8 @@
             "release"
           ],
           "feature_id": "south_fork_american_chili_bar__rock_garden",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "shallow_shelf",
@@ -286,6 +326,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock",
+            "shelf"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -298,7 +343,9 @@
             "published_value": 1.7,
             "station_kind": "published_river_mile_converted",
             "station_m": 2735.885
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -318,6 +365,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__african_queen",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "boulder"
@@ -339,6 +388,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -351,7 +405,9 @@
             "published_value": 2.0,
             "station_kind": "published_river_mile_converted",
             "station_m": 3218.688
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -369,6 +425,8 @@
             "release"
           ],
           "feature_id": "south_fork_american_chili_bar__triple_threat",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "multiple_channels",
@@ -391,6 +449,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -403,7 +465,9 @@
             "published_value": 3.1,
             "station_kind": "published_river_mile_converted",
             "station_m": 4988.966
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -424,6 +488,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__troublemaker",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "hole",
@@ -449,6 +515,14 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "eddy_line",
+            "hole",
+            "line",
+            "pin_rock",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -461,7 +535,9 @@
             "published_value": 5.2,
             "station_kind": "published_river_mile_converted",
             "station_m": 8368.589
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -479,6 +555,8 @@
             "release"
           ],
           "feature_id": "south_fork_american_chili_bar__fowler_s_rock",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "constriction",
@@ -502,6 +580,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -514,7 +596,9 @@
             "published_value": 15.8,
             "station_kind": "published_river_mile_converted",
             "station_m": 25427.635
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -532,6 +616,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__upper_haystack_canyon",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "canyon_constriction"
@@ -553,6 +639,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -565,7 +655,9 @@
             "published_value": 16.2,
             "station_kind": "published_river_mile_converted",
             "station_m": 26071.373
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -583,6 +675,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__lost_hat",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "continuous_entry"
@@ -604,6 +698,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "continuous_whitewater",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -616,7 +715,9 @@
             "published_value": 16.7,
             "station_kind": "published_river_mile_converted",
             "station_m": 26876.045
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -637,6 +738,8 @@
             "swimmer_recovery"
           ],
           "feature_id": "south_fork_american_chili_bar__satan_s_cesspool",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hole",
             "curling_wave",
@@ -662,6 +765,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "eddy_line",
+            "hole",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -674,7 +782,9 @@
             "published_value": 16.9,
             "station_kind": "published_river_mile_converted",
             "station_m": 27197.914
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -696,6 +806,8 @@
             "swimmer_recovery"
           ],
           "feature_id": "south_fork_american_chili_bar__son_of_satan",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "submerged_rock",
             "wall_push",
@@ -718,6 +830,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -730,7 +845,9 @@
             "published_value": 17.0,
             "station_kind": "published_river_mile_converted",
             "station_m": 27358.848
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -749,6 +866,8 @@
             "release"
           ],
           "feature_id": "south_fork_american_chili_bar__scissors",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "diagonal_ledge",
             "boulder",
@@ -771,6 +890,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "lateral",
+            "ledge"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -783,7 +907,9 @@
             "published_value": 17.4,
             "station_kind": "published_river_mile_converted",
             "station_m": 28002.586
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -801,6 +927,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__lower_haystack_canyon",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "canyon_constriction"
@@ -822,6 +950,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -834,7 +966,9 @@
             "published_value": 17.6,
             "station_kind": "published_river_mile_converted",
             "station_m": 28324.454
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -855,6 +989,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__bouncing_rock",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "rock_push",
             "hole",
@@ -877,6 +1013,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -889,7 +1029,9 @@
             "published_value": 18.2,
             "station_kind": "published_river_mile_converted",
             "station_m": 29290.061
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -910,6 +1052,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__pre_op",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "bank_holes",
@@ -932,6 +1076,12 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -944,7 +1094,9 @@
             "published_value": 18.4,
             "station_kind": "published_river_mile_converted",
             "station_m": 29611.93
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -965,6 +1117,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__hospital_bar",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "chute",
@@ -988,6 +1142,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1000,7 +1158,9 @@
             "published_value": 18.6,
             "station_kind": "published_river_mile_converted",
             "station_m": 29933.798
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1019,6 +1179,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__recovery_room",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hole",
             "reservoir_stage_sensitive",
@@ -1041,6 +1203,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "recovery_pool"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1053,7 +1219,9 @@
             "published_value": 18.8,
             "station_kind": "published_river_mile_converted",
             "station_m": 30255.667
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1073,6 +1241,8 @@
             "surf"
           ],
           "feature_id": "south_fork_american_chili_bar__surprise",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "seasonal_rock",
             "chute",
@@ -1096,6 +1266,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1108,7 +1282,9 @@
             "published_value": 19.3,
             "station_kind": "published_river_mile_converted",
             "station_m": 31060.339
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "runnable_river",
@@ -1155,6 +1331,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__badger_creek",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "pour_over",
             "hole",
@@ -1177,6 +1355,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1190,7 +1371,9 @@
             "published_value": 8.0,
             "station_kind": "published_river_mile_converted",
             "station_m": 12874.752
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1209,6 +1392,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__soap_creek",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "lateral",
@@ -1231,6 +1416,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "lateral",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1244,7 +1434,9 @@
             "published_value": 11.4,
             "station_kind": "published_river_mile_converted",
             "station_m": 18346.522
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1264,6 +1456,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__house_rock",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_hole",
             "right_run",
@@ -1287,6 +1481,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "lateral"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1300,7 +1498,9 @@
             "published_value": 17.1,
             "station_kind": "published_river_mile_converted",
             "station_m": 27519.782
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -1322,6 +1522,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__georgie",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "drop",
             "wave_train",
@@ -1344,6 +1546,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1357,7 +1564,9 @@
             "published_value": 24.4,
             "station_kind": "published_river_mile_converted",
             "station_m": 39267.994
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1376,6 +1585,8 @@
             "release"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__unkar",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "laterals",
@@ -1398,6 +1609,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "lateral"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1411,7 +1626,9 @@
             "published_value": 72.9,
             "station_kind": "published_river_mile_converted",
             "station_m": 117321.178
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1431,6 +1648,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__hance",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "multiple_moves",
@@ -1454,6 +1673,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1467,7 +1690,9 @@
             "published_value": 77.1,
             "station_kind": "published_river_mile_converted",
             "station_m": 124080.422
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1487,6 +1712,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__sockdolager",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "holes",
@@ -1509,6 +1736,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1522,7 +1754,9 @@
             "published_value": 79.1,
             "station_kind": "published_river_mile_converted",
             "station_m": 127299.11
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1541,6 +1775,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__grapevine",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "laterals",
@@ -1563,6 +1799,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "lateral",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1576,7 +1817,9 @@
             "published_value": 81.6,
             "station_kind": "published_river_mile_converted",
             "station_m": 131322.47
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1596,6 +1839,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__horn_creek",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_hole",
             "rock_ledge",
@@ -1619,6 +1864,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole",
+            "ledge"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1632,7 +1882,9 @@
             "published_value": 90.8,
             "station_kind": "published_river_mile_converted",
             "station_m": 146128.435
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -1653,6 +1905,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__granite",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_waves",
             "laterals",
@@ -1675,6 +1929,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "lateral",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1688,7 +1946,9 @@
             "published_value": 93.9,
             "station_kind": "published_river_mile_converted",
             "station_m": 151117.402
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1706,6 +1966,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__hermit",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_wave_train",
             "hydraulics",
@@ -1728,6 +1990,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1741,7 +2007,9 @@
             "published_value": 95.5,
             "station_kind": "published_river_mile_converted",
             "station_m": 153692.352
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1762,6 +2030,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__crystal",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_holes",
             "rock_garden",
@@ -1786,6 +2056,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole",
+            "line"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1799,7 +2074,9 @@
             "published_value": 98.2,
             "station_kind": "published_river_mile_converted",
             "station_m": 158037.581
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1817,6 +2094,8 @@
             "release"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__bedrock",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "central_island",
             "channel_choice",
@@ -1840,6 +2119,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1853,7 +2136,9 @@
             "published_value": 131.1,
             "station_kind": "published_river_mile_converted",
             "station_m": 210984.998
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -1874,6 +2159,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__upset",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_hole",
             "wave_train",
@@ -1896,6 +2183,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1909,7 +2201,9 @@
             "published_value": 150.2,
             "station_kind": "published_river_mile_converted",
             "station_m": 241723.469
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -1932,6 +2226,8 @@
             "surf"
           ],
           "feature_id": "colorado_river_grand_canyon_rowing__lava_falls",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "ledge_hole",
             "large_waves",
@@ -1957,6 +2253,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "lateral",
+            "ledge",
+            "line",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -1970,7 +2273,9 @@
             "published_value": 179.7,
             "station_kind": "published_river_mile_converted",
             "station_m": 289199.117
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "runnable_river",
@@ -2034,6 +2339,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__bienvenidos",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "training_entry"
@@ -2055,6 +2362,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2067,7 +2378,9 @@
             "published_value": 1,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 1640.625
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2095,6 +2408,8 @@
             "release"
           ],
           "feature_id": "pacuare_river_costa_rica__pyramid_rock",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder",
             "channel_choice",
@@ -2117,6 +2432,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2129,7 +2447,9 @@
             "published_value": 2,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 3281.25
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2159,6 +2479,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__pele_el_ojo",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hole",
             "wave_train"
@@ -2180,6 +2502,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2192,7 +2519,9 @@
             "published_value": 3,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 4921.875
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2221,6 +2550,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__upper_huacas",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "gorge",
             "drop",
@@ -2245,6 +2576,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2257,7 +2591,9 @@
             "published_value": 4,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 6562.5
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2285,6 +2621,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__bobo_falls",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "drop",
             "wave_train"
@@ -2306,6 +2644,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2318,7 +2660,9 @@
             "published_value": 5,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 8203.125
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2347,6 +2691,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__lower_huacas",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "gorge",
             "drop",
@@ -2371,6 +2717,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2383,7 +2732,9 @@
             "published_value": 6,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 9843.75
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2412,6 +2763,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__rodeo",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "laterals"
@@ -2433,6 +2786,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "lateral",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2445,7 +2803,9 @@
             "published_value": 7,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 11484.375
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2475,6 +2835,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__guatemala",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "wave_train"
@@ -2496,6 +2858,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2508,7 +2875,9 @@
             "published_value": 8,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 13125.0
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2537,6 +2906,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__double_drop",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "two_stage_drop",
             "holes",
@@ -2559,6 +2930,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2571,7 +2945,9 @@
             "published_value": 9,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 14765.625
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2602,6 +2978,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__cimarrones",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulders",
             "pour_over",
@@ -2625,6 +3003,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2637,7 +3020,9 @@
             "published_value": 10,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 16406.25
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2665,6 +3050,8 @@
             "release"
           ],
           "feature_id": "pacuare_river_costa_rica__upper_pinball",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "multiple_moves",
@@ -2687,6 +3074,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2699,7 +3090,9 @@
             "published_value": 11,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 18046.875
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2727,6 +3120,8 @@
             "release"
           ],
           "feature_id": "pacuare_river_costa_rica__lower_pinball",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boulder_garden",
             "multiple_moves",
@@ -2749,6 +3144,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "pin_rock"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2761,7 +3160,9 @@
             "published_value": 12,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 19687.5
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2788,6 +3189,8 @@
             "flush"
           ],
           "feature_id": "pacuare_river_costa_rica__wall_of_sorrow",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wall_push",
             "lateral",
@@ -2810,6 +3213,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "lateral"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2822,7 +3228,9 @@
             "published_value": 13,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 21328.125
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -2854,6 +3262,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__dos_montanas",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "canyon_constriction",
             "long_rapid",
@@ -2877,6 +3287,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2889,7 +3304,9 @@
             "published_value": 14,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 22968.75
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -2919,6 +3336,8 @@
             "surf"
           ],
           "feature_id": "pacuare_river_costa_rica__las_ranitas",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "boulders"
@@ -2940,6 +3359,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -2952,7 +3376,9 @@
             "published_value": 15,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 24609.375
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "runnable_river",
@@ -3007,6 +3433,8 @@
             "flush"
           ],
           "feature_id": "zambezi_batoka_gorge__against_the_wall",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wall_cushion",
             "eddy_ferry",
@@ -3030,6 +3458,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "1",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "eddy_line"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3042,7 +3474,9 @@
             "published_value": 1,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 1052.263
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3072,6 +3506,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__the_bridge",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "surf_wave",
             "hole"
@@ -3093,6 +3529,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "2",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3105,7 +3545,9 @@
             "published_value": 2,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 2104.527
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3135,6 +3577,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__between_two_worlds",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave",
             "hole"
@@ -3156,6 +3600,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "3",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3168,7 +3616,9 @@
             "published_value": 3,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 3156.79
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3196,6 +3646,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__morning_glory",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "dragons_back",
             "tight_line",
@@ -3219,6 +3671,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "4",
+          "required_subfeature_types_to_review": [
+            "line",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3231,7 +3688,9 @@
             "published_value": 4,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 4209.054
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3261,6 +3720,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__stairway_to_heaven",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "drop",
             "hole",
@@ -3283,6 +3744,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "5",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3295,7 +3761,9 @@
             "published_value": 5,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 5261.317
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3325,6 +3793,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__devil_s_toilet_bowl",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_wave_train",
             "hole"
@@ -3346,6 +3816,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "6",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3358,7 +3833,9 @@
             "published_value": 6,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 6313.58
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3386,6 +3863,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__gulliver_s_travels",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_diagonal",
             "large_waves",
@@ -3408,6 +3887,9 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "7",
+          "required_subfeature_types_to_review": [
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3420,7 +3902,9 @@
             "published_value": 7,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 7365.844
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3449,6 +3933,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__midnight_diner",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_hole",
             "multiple_lines",
@@ -3473,6 +3959,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "8",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "line"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3485,7 +3975,9 @@
             "published_value": 8,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 8418.107
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3515,6 +4007,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__commercial_suicide",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "river_wide_pourover",
             "narrow_slot",
@@ -3538,6 +4032,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "9",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "portage",
+            "pourover"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3550,7 +4049,9 @@
             "published_value": 9,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 9470.37
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3580,6 +4081,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__gnashing_jaws_of_death",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_waves",
             "holes"
@@ -3601,6 +4104,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "10",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3613,7 +4120,9 @@
             "published_value": 10,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 10522.634
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3641,6 +4150,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__overland_truck_eater",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "boils",
             "large_waves",
@@ -3663,6 +4174,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "11",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3675,7 +4190,9 @@
             "published_value": 11,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 11574.897
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3703,6 +4220,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__three_ugly_sisters",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_wave_train",
             "surf_wave"
@@ -3724,6 +4243,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "12",
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3736,7 +4259,9 @@
             "published_value": 12,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 12627.161
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3766,6 +4291,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__the_mother",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_wave_train",
             "holes"
@@ -3787,6 +4314,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "13",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3799,7 +4331,9 @@
             "published_value": 13,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 13679.424
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3827,6 +4361,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__surprise_surprise",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "waves",
             "boils"
@@ -3848,6 +4384,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "14",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "wave"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3860,7 +4400,9 @@
             "published_value": 14,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 14731.687
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -3889,6 +4431,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__the_washing_machine",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "recirculating_pourover",
             "central_hole",
@@ -3912,6 +4456,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "15",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "line",
+            "pourover"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3924,7 +4473,9 @@
             "published_value": 15,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 15783.951
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -3955,6 +4506,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__the_terminators",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "large_wave_train",
             "flip_wave",
@@ -3977,6 +4530,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "16",
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -3989,7 +4546,9 @@
             "published_value": 16,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 16836.214
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4018,6 +4577,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__double_trouble",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "two_large_holes",
             "flow_sensitive",
@@ -4040,6 +4601,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "17",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "line"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4052,7 +4617,9 @@
             "published_value": 17,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 17888.478
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4083,6 +4650,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__oblivion",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "crashing_hole",
             "third_wave",
@@ -4107,6 +4676,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "18",
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4119,7 +4692,9 @@
             "published_value": 18,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 18940.741
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4147,6 +4722,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__the_last_straw",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "boils"
@@ -4168,6 +4745,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "19",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4180,7 +4762,9 @@
             "published_value": 19,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 19993.004
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4208,6 +4792,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__rapid_20",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "waves",
             "eddy_lines"
@@ -4229,6 +4815,11 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "20",
+          "required_subfeature_types_to_review": [
+            "eddy_line",
+            "line",
+            "wave"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4241,7 +4832,9 @@
             "published_value": 20,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 21045.268
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4269,6 +4862,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__rapid_21",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "waves",
             "boils"
@@ -4290,6 +4885,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "21",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "wave"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4302,7 +4901,9 @@
             "published_value": 21,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 22097.531
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4330,6 +4931,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__morning_shave",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "eddy_lines"
@@ -4351,6 +4954,12 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "22",
+          "required_subfeature_types_to_review": [
+            "eddy_line",
+            "line",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4363,7 +4972,9 @@
             "published_value": 22,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 23149.794
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4391,6 +5002,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__morning_shower",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "high_water_takeout_context"
@@ -4412,6 +5025,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "23",
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4424,7 +5041,9 @@
             "published_value": 23,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 24202.058
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4452,6 +5071,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__rapid_24",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "waves",
             "boils"
@@ -4473,6 +5094,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "24",
+          "required_subfeature_types_to_review": [
+            "boil",
+            "wave"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4485,7 +5110,9 @@
             "published_value": 24,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 25254.321
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4513,6 +5140,8 @@
             "surf"
           ],
           "feature_id": "zambezi_batoka_gorge__rapid_25",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "wave_train",
             "takeout_context"
@@ -4534,6 +5163,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": "25",
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "medium",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4546,7 +5179,9 @@
             "published_value": 25,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 26306.585
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "additional_active_environment",
@@ -4602,6 +5237,8 @@
             "surf"
           ],
           "feature_id": "futaleufu_river_chile__asleep_at_the_wheel",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "warmup",
             "wave_train",
@@ -4624,6 +5261,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4636,7 +5277,9 @@
             "published_value": 1,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 1666.667
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4667,6 +5310,8 @@
             "surf"
           ],
           "feature_id": "futaleufu_river_chile__terminator",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "long_rapid",
             "multiple_holes",
@@ -4693,6 +5338,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "line",
+            "portage",
+            "scout",
+            "sneak_line"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4705,7 +5357,9 @@
             "published_value": 2,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 3333.333
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4735,6 +5389,8 @@
             "surf"
           ],
           "feature_id": "futaleufu_river_chile__son_of_terminator",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "holes",
             "wave_train",
@@ -4757,6 +5413,12 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "continuous_whitewater",
+            "hole",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4769,7 +5431,9 @@
             "published_value": 3,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 5000.0
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
@@ -4802,6 +5466,8 @@
             "surf"
           ],
           "feature_id": "futaleufu_river_chile__khyber_pass",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "hydraulic_holes",
             "large_waves",
@@ -4824,6 +5490,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "hole",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4836,7 +5506,9 @@
             "published_value": 4,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 6666.667
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -4865,6 +5537,8 @@
             "surf"
           ],
           "feature_id": "futaleufu_river_chile__himalayas",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "very_large_standing_waves",
             "wave_train",
@@ -4888,6 +5562,10 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -4900,7 +5578,9 @@
             "published_value": 5,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 8333.333
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "runnable_river",
@@ -4963,6 +5643,8 @@
             "swimmer_recovery"
           ],
           "feature_id": "chilko_river_lava_canyon__bidwell_rapids",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "blind_corner",
             "scout",
@@ -4991,6 +5673,12 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "hole",
+            "scout",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -5004,7 +5692,9 @@
             "published_value": 1,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 9307.616
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -5034,6 +5724,8 @@
             "surf"
           ],
           "feature_id": "chilko_river_lava_canyon__lava_canyon",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "continuous_whitewater",
             "basalt_canyon",
@@ -5062,6 +5754,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "continuous_whitewater",
+            "recovery_pool",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -5075,7 +5774,9 @@
             "published_value": 2,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 18615.232
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -5107,6 +5808,8 @@
             "swimmer_recovery"
           ],
           "feature_id": "chilko_river_lava_canyon__white_mile",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "continuous_whitewater",
             "large_waves",
@@ -5135,6 +5838,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "continuous_whitewater",
+            "pin_rock",
+            "recovery_pool",
+            "wave"
+          ],
           "review_priority": "critical",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -5148,7 +5858,9 @@
             "published_value": 3,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 27922.848
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -5178,6 +5890,8 @@
             "surf"
           ],
           "feature_id": "chilko_river_lava_canyon__green_mile",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "continuous_whitewater",
             "wave_train",
@@ -5203,6 +5917,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "continuous_whitewater",
+            "recovery_pool",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -5216,7 +5937,9 @@
             "published_value": 4,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 37230.464
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [],
@@ -5246,6 +5969,8 @@
             "surf"
           ],
           "feature_id": "chilko_river_lava_canyon__miracle_canyon",
+          "feature_inventory": [],
+          "feature_inventory_status": "research_missing",
           "feature_tags": [
             "canyon_constriction",
             "continuous_whitewater",
@@ -5272,6 +5997,13 @@
           "geometry_kind": "station_pin",
           "guide_review_status": "required",
           "rapid_number": null,
+          "required_subfeature_types_to_review": [
+            "boulder",
+            "continuous_whitewater",
+            "recovery_pool",
+            "wave",
+            "wave_train"
+          ],
           "review_priority": "high",
           "solver_window_status": "not_authored",
           "source_ids": [
@@ -5285,7 +6017,9 @@
             "published_value": 5,
             "station_kind": "provisional_downstream_order_interpolation",
             "station_m": 46538.08
-          }
+          },
+          "subfeature_count": 0,
+          "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         }
       ],
       "portfolio_role": "runnable_river",

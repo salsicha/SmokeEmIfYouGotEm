@@ -29,6 +29,25 @@ RUNNABLE_RIVERS = {
 }
 ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS = {"zambezi_batoka_gorge"}
 REQUIRED_RIVERS = RUNNABLE_RIVERS | ADDITIONAL_ACTIVE_ENVIRONMENT_RIVERS
+NAMED_RAPID_SUBFEATURE_TYPES = (
+    "hole",
+    "wave",
+    "wave_train",
+    "ledge",
+    "pourover",
+    "eddy_line",
+    "lateral",
+    "boil",
+    "shelf",
+    "boulder",
+    "pin_rock",
+    "line",
+    "sneak_line",
+    "scout",
+    "portage",
+    "recovery_pool",
+    "continuous_whitewater",
+)
 
 
 def _slug(value: str) -> str:
@@ -36,6 +55,50 @@ def _slug(value: str) -> str:
     if not slug:
         raise ValueError(f"Cannot build an identifier from {value!r}")
     return slug
+
+
+def rapid_feature_id(river_id: str, rapid_name: str) -> str:
+    return f"{river_id}__{_slug(rapid_name)}"
+
+
+def required_subfeature_types_for_tags(tags: list[str]) -> list[str]:
+    tag_set = set(tags)
+    required: set[str] = set()
+    if any("hole" in tag or "pourover" in tag for tag in tag_set):
+        required.add("hole")
+    if any("pourover" in tag for tag in tag_set):
+        required.add("pourover")
+    if any("ledge" in tag for tag in tag_set):
+        required.add("ledge")
+    if any("wave" in tag or "surf" in tag for tag in tag_set):
+        required.add("wave")
+    if any("wave_train" in tag for tag in tag_set):
+        required.add("wave_train")
+    if any("eddy" in tag for tag in tag_set):
+        required.add("eddy_line")
+    if any("lateral" in tag for tag in tag_set):
+        required.add("lateral")
+    if any("boil" in tag for tag in tag_set):
+        required.add("boil")
+    if any("shelf" in tag for tag in tag_set):
+        required.add("shelf")
+    if any("boulder" in tag or "rock" in tag for tag in tag_set):
+        required.add("boulder")
+    if any("pin" in tag or "wrap" in tag or "broach" in tag for tag in tag_set):
+        required.add("pin_rock")
+    if any("line" in tag for tag in tag_set):
+        required.add("line")
+    if any("sneak" in tag for tag in tag_set):
+        required.add("sneak_line")
+    if any("scout" in tag for tag in tag_set):
+        required.add("scout")
+    if any("portage" in tag for tag in tag_set):
+        required.add("portage")
+    if any("recovery" in tag for tag in tag_set):
+        required.add("recovery_pool")
+    if any("continuous" in tag for tag in tag_set):
+        required.add("continuous_whitewater")
+    return sorted(required or {"line"})
 
 
 def load_source_catalog(repo_root: Path) -> dict[str, Any]:
@@ -107,7 +170,7 @@ def validate_source_catalog(catalog: dict[str, Any]) -> None:
         if orders != sorted(orders) or len(set(orders)) != len(orders):
             raise ValueError(f"Rapid order must be unique and downstream: {river['river_id']}")
         for rapid in rapids:
-            feature_id = f"{river['river_id']}__{_slug(rapid['name'])}"
+            feature_id = rapid_feature_id(river["river_id"], rapid["name"])
             if feature_id in feature_ids:
                 raise ValueError(f"Duplicate rapid feature ID: {feature_id}")
             feature_ids.add(feature_id)
@@ -115,6 +178,53 @@ def validate_source_catalog(catalog: dict[str, Any]) -> None:
                 raise ValueError(f"Rapid has no feature tags: {feature_id}")
             if rapid.get("review_priority") not in {"medium", "high", "critical"}:
                 raise ValueError(f"Invalid review priority: {feature_id}")
+            _validate_rapid_feature_inventory(rapid, feature_id)
+
+
+def _validate_rapid_feature_inventory(
+    rapid: dict[str, Any],
+    parent_feature_id: str,
+) -> None:
+    inventory = rapid.get("feature_inventory", [])
+    if not isinstance(inventory, list):
+        raise ValueError(f"Feature inventory must be a list: {parent_feature_id}")
+    subfeature_ids: set[str] = set()
+    for subfeature in inventory:
+        subfeature_id = subfeature.get("subfeature_id")
+        if not subfeature_id or subfeature_id in subfeature_ids:
+            raise ValueError(f"Invalid subfeature ID in {parent_feature_id}")
+        subfeature_ids.add(subfeature_id)
+        if subfeature.get("feature_type") not in NAMED_RAPID_SUBFEATURE_TYPES:
+            raise ValueError(f"Invalid subfeature type in {parent_feature_id}")
+        if not subfeature.get("source_ids"):
+            raise ValueError(f"Subfeature source IDs required in {parent_feature_id}")
+        if subfeature.get("guide_review_status") not in {
+            "required",
+            "pending",
+            "approved",
+            "rejected",
+        }:
+            raise ValueError(f"Invalid subfeature guide review in {parent_feature_id}")
+
+
+def _normalised_feature_inventory(rapid: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        {
+            "subfeature_id": subfeature["subfeature_id"],
+            "display_name": subfeature["display_name"],
+            "feature_type": subfeature["feature_type"],
+            "aliases": subfeature.get("aliases", []),
+            "relative_position": subfeature.get("relative_position", "review_required"),
+            "flow_dependence": subfeature.get("flow_dependence", "review_required"),
+            "consequence_class": subfeature.get("consequence_class", "review_required"),
+            "source_ids": subfeature["source_ids"],
+            "geometry_status": subfeature.get("geometry_status", "exact_geometry_required"),
+            "guide_review_status": subfeature["guide_review_status"],
+            "feature_forcing_allowed": subfeature.get("feature_forcing_allowed", False),
+            "production_authoritative": subfeature.get("production_authoritative", False),
+        }
+        for subfeature in rapid.get("feature_inventory", [])
+    ]
 
 
 def _station_record(river: dict[str, Any], rapid: dict[str, Any]) -> dict[str, Any]:
@@ -271,13 +381,14 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
     for river in catalog["rivers"]:
         markers = []
         for rapid in river["rapids"]:
-            feature_id = f"{river['river_id']}__{_slug(rapid['name'])}"
+            feature_id = rapid_feature_id(river["river_id"], rapid["name"])
             station = _station_record(river, rapid)
             map_geometry = _project_station_to_candidate_geometry(
                 repo_root,
                 river,
                 float(station["station_m"]),
             )
+            feature_inventory = _normalised_feature_inventory(rapid)
             markers.append(
                 {
                     "feature_id": feature_id,
@@ -299,6 +410,21 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                     "exact_geometry_status": "required_before_production",
                     "expected_outcomes": _expected_outcomes(rapid["feature_tags"]),
                     "flow_hypotheses": _flow_hypotheses(rapid["feature_tags"]),
+                    "required_subfeature_types_to_review": (
+                        required_subfeature_types_for_tags(rapid["feature_tags"])
+                    ),
+                    "feature_inventory_status": (
+                        "research_attached_pending_exact_geometry_and_guide_review"
+                        if feature_inventory
+                        else "research_missing"
+                    ),
+                    "feature_inventory": feature_inventory,
+                    "subfeature_count": len(feature_inventory),
+                    "subfeature_editor_pin_status": (
+                        "blocked_until_c1_inventory_and_exact_geometry"
+                        if not feature_inventory or map_geometry is None
+                        else "ready_for_editor_pin_review_not_authoritative"
+                    ),
                     "source_ids": river["source_ids"],
                     "guide_review_status": "required",
                     "solver_window_status": "not_authored",
@@ -331,7 +457,9 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
             "show_source_and_rights_panel": True,
             "show_flow_hypotheses": True,
             "show_expected_outcomes": True,
+            "show_subfeature_inventory_panel": True,
             "block_solver_window_export_without_exact_geometry": True,
+            "block_subfeature_pin_promotion_without_exact_geometry": True,
             "block_gameplay_promotion_without_guide_review": True,
         },
         "rivers": rivers,

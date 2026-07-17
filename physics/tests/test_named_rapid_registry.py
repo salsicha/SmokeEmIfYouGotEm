@@ -92,6 +92,20 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
     south_fork = {marker["display_name"]: marker for marker in rivers["south_fork_american_chili_bar"]["markers"]}
     assert south_fork["Meat Grinder"]["stationing"]["station_m"] == 965.606
     assert south_fork["Meat Grinder"]["stationing"]["production_authoritative"] is True
+    troublemaker = south_fork["Troublemaker"]
+    assert troublemaker["feature_inventory_status"] == "research_missing"
+    assert troublemaker["subfeature_count"] == 0
+    assert {
+        "boulder",
+        "eddy_line",
+        "hole",
+        "line",
+        "pin_rock",
+        "wave",
+    } <= set(troublemaker["required_subfeature_types_to_review"])
+    assert troublemaker["subfeature_editor_pin_status"] == (
+        "blocked_until_c1_inventory_and_exact_geometry"
+    )
 
     colorado = {marker["display_name"]: marker for marker in rivers["colorado_river_grand_canyon_rowing"]["markers"]}
     assert colorado["House Rock"]["stationing"]["station_kind"] == "published_river_mile_converted"
