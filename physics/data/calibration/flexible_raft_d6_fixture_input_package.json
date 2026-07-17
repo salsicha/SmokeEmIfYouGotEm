@@ -655,6 +655,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -735,6 +736,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -948,6 +950,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -1039,6 +1042,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -1126,6 +1130,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -1295,6 +1300,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },
@@ -1377,6 +1383,7 @@
           "adapter_contract": {
             "adapter_id": "unreal_chaos_rigid_d6_fixture_runner",
             "expected_runner": "Unreal Chaos rigid-body fixture pass using the same initial raft state, crew actions, obstacle definitions, and flow probes.",
+            "fixture_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
             "may_substitute_with_synthetic_python_reference": false,
             "required_output": "baseline delta metrics plus telemetry hash"
           },

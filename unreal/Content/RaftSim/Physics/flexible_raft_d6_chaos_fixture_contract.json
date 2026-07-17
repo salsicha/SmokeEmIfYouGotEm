@@ -1,0 +1,600 @@
+{
+  "automation_export": {
+    "measured_results_sidecar": "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json",
+    "replay_dir": "physics/reports/d6/chaos/replays",
+    "summary": "physics/reports/d6/chaos/summary.json"
+  },
+  "d6_complete": false,
+  "fixed_step_seconds": 0.03333333333333333,
+  "generated_on": "2026-07-16",
+  "job_count": 7,
+  "jobs": [
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.StaticSeatLoadSag",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/static_seat_load_sag.json",
+      "fixture_id": "static_seat_load_sag",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "static_seat_load_sag",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__static_seat_load_sag",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 6,
+      "required_metric_paths": [
+        "loaded_crew_mass_kg",
+        "max_seat_freeboard_loss_m",
+        "port_total_freeboard_loss_m",
+        "raft_length_m",
+        "raft_width_m",
+        "starboard_total_freeboard_loss_m"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/static_seat_load_sag_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/static_seat_load_sag",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/static_seat_load_sag.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.TravelingCrewShift",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/traveling_crew_shift.json",
+      "fixture_id": "traveling_crew_shift",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "traveling_crew_shift",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__traveling_crew_shift",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "neutral_roll_load_bias_nm",
+        "port_roll_load_bias_nm",
+        "port_total_freeboard_delta_m",
+        "starboard_roll_load_bias_nm",
+        "starboard_total_freeboard_delta_m"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/traveling_crew_shift_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/traveling_crew_shift",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/traveling_crew_shift.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.RockPinchWrap",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/rock_pinch_wrap.json",
+      "fixture_id": "rock_pinch_wrap",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "rock_pinch_wrap",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__rock_pinch_wrap",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "contact_count",
+        "max_indentation_m",
+        "min_release_margin_n",
+        "pinned_obstacle_count",
+        "wrapping_contact_count"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/rock_pinch_wrap_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/rock_pinch_wrap",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/rock_pinch_wrap.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.UpstreamTubeOverwashFlip",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/upstream_tube_overwash_flip.json",
+      "fixture_id": "upstream_tube_overwash_flip",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "upstream_tube_overwash_flip",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__upstream_tube_overwash_flip",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 4,
+      "required_metric_paths": [
+        "reference_flip_margin_nm",
+        "retained_water_roll_moment_nm",
+        "total_overtopping_flux_m3_s",
+        "total_retained_water_mass_kg"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/upstream_tube_overwash_flip_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/upstream_tube_overwash_flip",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/upstream_tube_overwash_flip.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.TimedHighSideSave",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/timed_high_side_save.json",
+      "fixture_id": "timed_high_side_save",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "timed_high_side_save",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__timed_high_side_save",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 5,
+      "required_metric_paths": [
+        "high_side_flip_margin_nm",
+        "high_side_flip_threshold_nm",
+        "margin_delta_nm",
+        "neutral_flip_margin_nm",
+        "neutral_flip_threshold_nm"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/timed_high_side_save_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/timed_high_side_save",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/timed_high_side_save.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.PostContactRecovery",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/post_contact_recovery.json",
+      "fixture_id": "post_contact_recovery",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "post_contact_recovery",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__post_contact_recovery",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 3,
+      "required_metric_paths": [
+        "max_recovered_indentation_m",
+        "recovering_contact_count",
+        "total_holding_force_n"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/post_contact_recovery_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/post_contact_recovery",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/post_contact_recovery.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    },
+    {
+      "automation_test_name": "RaftSim.D6.Chaos.PressureFlowSweeps",
+      "comparison_mode": "baseline_delta_recording",
+      "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/pressure_flow_sweeps.json",
+      "fixture_id": "pressure_flow_sweeps",
+      "fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+      "fixture_input_selector": {
+        "common_setup": "use source_fixture_input_package.common_setup",
+        "fixture_id": "pressure_flow_sweeps",
+        "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id"
+      },
+      "guardrails": {
+        "may_drive_scoring_critical_physics": false,
+        "may_promote_fixture": false,
+        "may_substitute_python_reference": false,
+        "must_export_64_hex_telemetry_sha256": true,
+        "must_preserve_fixture_input_semantics": true
+      },
+      "job_id": "unreal_chaos_rigid_baseline__pressure_flow_sweeps",
+      "metric_deltas_are_failures": false,
+      "required_d5_replay_channels": [
+        "tube.pressure_pa",
+        "tube.volume_m3",
+        "tube.freeboard_loss_m",
+        "tube.floor_load_n",
+        "tube.lacing_load_n",
+        "overwash.overtopping_flux_m3_s",
+        "overwash.entrained_water_side",
+        "contact.max_indentation_m",
+        "contact.min_release_margin_n",
+        "combined_roll_moment_nm"
+      ],
+      "required_metric_count": 46,
+      "required_metric_paths": [
+        "sweep_case_count",
+        "sweeps[0].contact_min_release_margin_n",
+        "sweeps[0].incoming_velocity_mps",
+        "sweeps[0].nominal_pressure_pa",
+        "sweeps[0].overwash_flux_m3_s",
+        "sweeps[0].retained_water_roll_moment_nm",
+        "sweeps[1].contact_min_release_margin_n",
+        "sweeps[1].incoming_velocity_mps",
+        "sweeps[1].nominal_pressure_pa",
+        "sweeps[1].overwash_flux_m3_s",
+        "sweeps[1].retained_water_roll_moment_nm",
+        "sweeps[2].contact_min_release_margin_n",
+        "sweeps[2].incoming_velocity_mps",
+        "sweeps[2].nominal_pressure_pa",
+        "sweeps[2].overwash_flux_m3_s",
+        "sweeps[2].retained_water_roll_moment_nm",
+        "sweeps[3].contact_min_release_margin_n",
+        "sweeps[3].incoming_velocity_mps",
+        "sweeps[3].nominal_pressure_pa",
+        "sweeps[3].overwash_flux_m3_s",
+        "sweeps[3].retained_water_roll_moment_nm",
+        "sweeps[4].contact_min_release_margin_n",
+        "sweeps[4].incoming_velocity_mps",
+        "sweeps[4].nominal_pressure_pa",
+        "sweeps[4].overwash_flux_m3_s",
+        "sweeps[4].retained_water_roll_moment_nm",
+        "sweeps[5].contact_min_release_margin_n",
+        "sweeps[5].incoming_velocity_mps",
+        "sweeps[5].nominal_pressure_pa",
+        "sweeps[5].overwash_flux_m3_s",
+        "sweeps[5].retained_water_roll_moment_nm",
+        "sweeps[6].contact_min_release_margin_n",
+        "sweeps[6].incoming_velocity_mps",
+        "sweeps[6].nominal_pressure_pa",
+        "sweeps[6].overwash_flux_m3_s",
+        "sweeps[6].retained_water_roll_moment_nm",
+        "sweeps[7].contact_min_release_margin_n",
+        "sweeps[7].incoming_velocity_mps",
+        "sweeps[7].nominal_pressure_pa",
+        "sweeps[7].overwash_flux_m3_s",
+        "sweeps[7].retained_water_roll_moment_nm",
+        "sweeps[8].contact_min_release_margin_n",
+        "sweeps[8].incoming_velocity_mps",
+        "sweeps[8].nominal_pressure_pa",
+        "sweeps[8].overwash_flux_m3_s",
+        "sweeps[8].retained_water_roll_moment_nm"
+      ],
+      "required_output_fields": [
+        "source_report",
+        "telemetry_sha256",
+        "engine_version",
+        "metrics"
+      ],
+      "required_telemetry_fields": [
+        "runtime_id",
+        "fixture_id",
+        "step_index",
+        "raft_pose",
+        "raft_linear_velocity",
+        "raft_angular_velocity",
+        "contact_points",
+        "contact_impulses",
+        "crew_state",
+        "tube_or_rigid_proxy_state",
+        "overwash_state",
+        "pin_state",
+        "release_state",
+        "outcome",
+        "runtime_cpu_ms",
+        "determinism_hash"
+      ],
+      "runtime": "UnrealChaos",
+      "status": "ready_for_unreal_runner_implementation_pending",
+      "unreal_target": {
+        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/pressure_flow_sweeps_overlay.png",
+        "fixture_map": "/RaftSim/Physics/D6/Chaos/pressure_flow_sweeps",
+        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/pressure_flow_sweeps.telemetry.jsonl",
+        "test_type": "EditorContext | EngineFilter"
+      }
+    }
+  ],
+  "production_promoted": false,
+  "promotion_gate": {
+    "manual_review_required_after_run": true,
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "may_substitute_python_reference": false,
+    "reason": "This contract defines the Unreal Chaos baseline runner inputs and expected outputs only. D6 still requires measured Chaos exports, compliant-reference exports, comparison regeneration, and manual review."
+  },
+  "required_fixture_ids": [
+    "static_seat_load_sag",
+    "traveling_crew_shift",
+    "rock_pinch_wrap",
+    "upstream_tube_overwash_flip",
+    "timed_high_side_save",
+    "post_contact_recovery",
+    "pressure_flow_sweeps"
+  ],
+  "required_result_fields": [
+    "source_report",
+    "telemetry_sha256",
+    "engine_version",
+    "metrics"
+  ],
+  "runtime": "UnrealChaos",
+  "schema": "raftsim.flexible_raft.d6_chaos_fixture_contract.v1",
+  "source_fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+  "source_measured_results_template": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
+  "source_measurement_manifest": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+  "source_milestone19_runtime_manifest": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+  "status": "chaos_fixture_contract_ready_runner_implementation_pending"
+}

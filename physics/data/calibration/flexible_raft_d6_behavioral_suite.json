@@ -351,7 +351,7 @@
   "reference_requirements": {
     "chaos_rigid_baseline": {
       "required": true,
-      "source_contract": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+      "source_contract": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
       "status": "missing_measured_unreal_chaos_results"
     },
     "compliant_reference": {

@@ -7,6 +7,8 @@ from raftsim.examples.generate_flexible_raft_d6_comparison_report import (
 from raftsim.flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
     D6_BEHAVIORAL_SUITE_SCHEMA,
+    D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
+    D6_CHAOS_FIXTURE_CONTRACT_SCHEMA,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_COMPARISON_REPORT_SCHEMA,
     D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
@@ -17,6 +19,7 @@ from raftsim.flexible_raft_d6 import (
     D6_MEASUREMENT_MANIFEST_SCHEMA,
     REQUIRED_D6_FIXTURE_IDS,
     build_d6_replay_channel_probe,
+    build_flexible_raft_d6_chaos_fixture_contract,
     build_flexible_raft_d6_behavioral_suite,
     build_flexible_raft_d6_comparison_report,
     build_flexible_raft_d6_fixture_input_package,
@@ -55,6 +58,7 @@ def test_flexible_raft_d6_requires_compliant_reference_and_chaos_baseline():
 
     assert suite["reference_requirements"]["compliant_reference"]["status"] == "missing_measured_reference_results"
     assert suite["reference_requirements"]["chaos_rigid_baseline"]["status"] == "missing_measured_unreal_chaos_results"
+    assert suite["reference_requirements"]["chaos_rigid_baseline"]["source_contract"] == D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH
     for fixture in suite["fixtures"]:
         targets = {target["target_id"]: target for target in fixture["comparison_targets"]}
         assert targets["project_chrono_or_reviewed_compliant_model"]["required"] is True
@@ -197,6 +201,13 @@ def test_flexible_raft_d6_measurement_manifest_covers_every_target_fixture_pair(
         assert "telemetry_sha256" in task["required_provenance_fields"]
         assert "engine_version" in task["required_provenance_fields"]
         assert task["can_promote_fixture"] is False
+    chaos_tasks = [
+        task for task in manifest["tasks"]
+        if task["target_id"] == "unreal_chaos_rigid_baseline"
+    ]
+    assert {
+        task["adapter_contract"]["fixture_contract"] for task in chaos_tasks
+    } == {D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH}
 
 
 def test_flexible_raft_d6_measured_results_template_is_reproducible_and_empty():
@@ -322,6 +333,43 @@ def test_flexible_raft_d6_fixture_input_package_targets_and_metrics_match_manife
             assert "engine_version" in target["required_provenance_fields"]
             assert target["adapter_contract"]["may_substitute_with_synthetic_python_reference"] is False
             assert target["can_promote_fixture"] is False
+
+
+def test_flexible_raft_d6_chaos_fixture_contract_is_reproducible_and_pending():
+    generated = build_flexible_raft_d6_chaos_fixture_contract()
+    committed = json.loads(
+        (REPO_ROOT / D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_CHAOS_FIXTURE_CONTRACT_SCHEMA
+    assert committed["status"] == "chaos_fixture_contract_ready_runner_implementation_pending"
+    assert committed["runtime"] == "UnrealChaos"
+    assert committed["job_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert committed["required_fixture_ids"] == list(REQUIRED_D6_FIXTURE_IDS)
+    assert committed["d6_complete"] is False
+    assert committed["production_promoted"] is False
+    assert committed["promotion_gate"]["may_mark_d6_complete"] is False
+
+
+def test_flexible_raft_d6_chaos_fixture_contract_maps_every_job():
+    contract = build_flexible_raft_d6_chaos_fixture_contract()
+    jobs = {job["fixture_id"]: job for job in contract["jobs"]}
+
+    assert set(jobs) == set(REQUIRED_D6_FIXTURE_IDS)
+    static = jobs["static_seat_load_sag"]
+    assert static["job_id"] == "unreal_chaos_rigid_baseline__static_seat_load_sag"
+    assert static["automation_test_name"] == "RaftSim.D6.Chaos.StaticSeatLoadSag"
+    assert static["fixture_input_package"] == D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH
+    assert static["expected_result_template_path"].endswith(
+        "unreal_chaos_rigid_baseline/static_seat_load_sag.json"
+    )
+    assert "telemetry_sha256" in static["required_output_fields"]
+    assert "determinism_hash" in static["required_telemetry_fields"]
+    assert static["guardrails"]["may_substitute_python_reference"] is False
+    assert static["guardrails"]["must_preserve_fixture_input_semantics"] is True
 
 
 def test_flexible_raft_d6_comparison_cli_accepts_populated_measured_results(tmp_path):
