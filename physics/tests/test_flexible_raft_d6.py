@@ -401,6 +401,16 @@ def test_flexible_raft_d6_unreal_contract_guard_is_registered():
     source = source_path.read_text(encoding="utf-8")
 
     assert "RaftSim.D6.ChaosFixtureContract" in source
+    for automation_test_name in (
+        "RaftSim.D6.Chaos.StaticSeatLoadSag",
+        "RaftSim.D6.Chaos.TravelingCrewShift",
+        "RaftSim.D6.Chaos.RockPinchWrap",
+        "RaftSim.D6.Chaos.UpstreamTubeOverwashFlip",
+        "RaftSim.D6.Chaos.TimedHighSideSave",
+        "RaftSim.D6.Chaos.PostContactRecovery",
+        "RaftSim.D6.Chaos.PressureFlowSweeps",
+    ):
+        assert automation_test_name in source
     assert "flexible_raft_d6_chaos_fixture_contract.json" in source
     assert "telemetry_sha256" in source
     assert "must_preserve_fixture_input_semantics" in source

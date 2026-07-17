@@ -46,6 +46,158 @@ bool JsonStringArrayContains(
     }
     return false;
 }
+
+bool LoadD6ChaosFixtureContract(
+    FAutomationTestBase& Test,
+    TSharedPtr<FJsonObject>& OutRoot
+)
+{
+    const FString ContractPath = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(
+            FPaths::ProjectContentDir(),
+            TEXT("RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json")
+        )
+    );
+
+    FString ContractText;
+    if (!FFileHelper::LoadFileToString(ContractText, *ContractPath))
+    {
+        Test.AddError(FString::Printf(TEXT("Missing D6 Chaos fixture contract: %s"), *ContractPath));
+        return false;
+    }
+
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ContractText);
+    if (!FJsonSerializer::Deserialize(Reader, OutRoot) || !OutRoot.IsValid())
+    {
+        Test.AddError(TEXT("D6 Chaos fixture contract is not valid JSON."));
+        return false;
+    }
+
+    return true;
+}
+
+TSharedPtr<FJsonObject> FindD6ChaosFixtureJob(
+    FAutomationTestBase& Test,
+    const TSharedPtr<FJsonObject>& Root,
+    const FString& FixtureId
+)
+{
+    const TArray<TSharedPtr<FJsonValue>>* Jobs = nullptr;
+    if (!Root->TryGetArrayField(TEXT("jobs"), Jobs) || Jobs == nullptr)
+    {
+        Test.AddError(TEXT("D6 Chaos fixture contract must contain a jobs array."));
+        return nullptr;
+    }
+
+    for (const TSharedPtr<FJsonValue>& JobValue : *Jobs)
+    {
+        const TSharedPtr<FJsonObject> Job = JobValue->AsObject();
+        if (!Job.IsValid())
+        {
+            Test.AddError(TEXT("Every D6 Chaos job entry must be a JSON object."));
+            return nullptr;
+        }
+
+        FString JobFixtureId;
+        if (
+            Job->TryGetStringField(TEXT("fixture_id"), JobFixtureId)
+            && JobFixtureId == FixtureId
+        )
+        {
+            return Job;
+        }
+    }
+
+    Test.AddError(FString::Printf(TEXT("Missing D6 Chaos fixture job: %s"), *FixtureId));
+    return nullptr;
+}
+
+bool ValidateD6ChaosFixtureJob(
+    FAutomationTestBase& Test,
+    const FString& FixtureId,
+    const FString& ExpectedAutomationTestName
+)
+{
+    TSharedPtr<FJsonObject> Root;
+    if (!LoadD6ChaosFixtureContract(Test, Root))
+    {
+        return false;
+    }
+
+    const TSharedPtr<FJsonObject> Job = FindD6ChaosFixtureJob(Test, Root, FixtureId);
+    if (!Job.IsValid())
+    {
+        return false;
+    }
+
+    Test.TestEqual(
+        FString::Printf(TEXT("%s automation_test_name"), *FixtureId),
+        Job->GetStringField(TEXT("automation_test_name")),
+        ExpectedAutomationTestName
+    );
+    Test.TestEqual(
+        FString::Printf(TEXT("%s status"), *FixtureId),
+        Job->GetStringField(TEXT("status")),
+        FString(TEXT("ready_for_unreal_runner_implementation_pending"))
+    );
+    Test.TestEqual(
+        FString::Printf(TEXT("%s runtime"), *FixtureId),
+        Job->GetStringField(TEXT("runtime")),
+        FString(TEXT("UnrealChaos"))
+    );
+    Test.TestTrue(
+        FString::Printf(TEXT("%s requires telemetry_sha256"), *FixtureId),
+        JsonStringArrayContains(Job, TEXT("required_output_fields"), TEXT("telemetry_sha256"))
+    );
+    Test.TestTrue(
+        FString::Printf(TEXT("%s requires metrics"), *FixtureId),
+        JsonStringArrayContains(Job, TEXT("required_output_fields"), TEXT("metrics"))
+    );
+    Test.TestTrue(
+        FString::Printf(TEXT("%s requires determinism hash"), *FixtureId),
+        JsonStringArrayContains(Job, TEXT("required_telemetry_fields"), TEXT("determinism_hash"))
+    );
+
+    const TArray<TSharedPtr<FJsonValue>>* RequiredMetricPaths = nullptr;
+    if (
+        !Job->TryGetArrayField(TEXT("required_metric_paths"), RequiredMetricPaths)
+        || RequiredMetricPaths == nullptr
+        || RequiredMetricPaths->Num() == 0
+    )
+    {
+        Test.AddError(FString::Printf(TEXT("D6 Chaos fixture job %s must declare required metrics."), *FixtureId));
+        return false;
+    }
+
+    const TSharedPtr<FJsonObject>* Guardrails = nullptr;
+    if (!Job->TryGetObjectField(TEXT("guardrails"), Guardrails) || Guardrails == nullptr)
+    {
+        Test.AddError(FString::Printf(TEXT("D6 Chaos fixture job %s must declare guardrails."), *FixtureId));
+        return false;
+    }
+    Test.TestFalse(
+        FString::Printf(TEXT("%s may_promote_fixture"), *FixtureId),
+        (*Guardrails)->GetBoolField(TEXT("may_promote_fixture"))
+    );
+    Test.TestFalse(
+        FString::Printf(TEXT("%s may_drive_scoring_critical_physics"), *FixtureId),
+        (*Guardrails)->GetBoolField(TEXT("may_drive_scoring_critical_physics"))
+    );
+    Test.TestFalse(
+        FString::Printf(TEXT("%s may_substitute_python_reference"), *FixtureId),
+        (*Guardrails)->GetBoolField(TEXT("may_substitute_python_reference"))
+    );
+    Test.TestTrue(
+        FString::Printf(TEXT("%s must_export_64_hex_telemetry_sha256"), *FixtureId),
+        (*Guardrails)->GetBoolField(TEXT("must_export_64_hex_telemetry_sha256"))
+    );
+    Test.TestTrue(
+        FString::Printf(TEXT("%s must_preserve_fixture_input_semantics"), *FixtureId),
+        (*Guardrails)->GetBoolField(TEXT("must_preserve_fixture_input_semantics"))
+    );
+
+    return true;
+}
 }
 
 bool FRaftSimD6ChaosFixtureContractTest::RunTest(const FString& Parameters)
@@ -204,5 +356,60 @@ bool FRaftSimD6ChaosFixtureContractTest::RunTest(const FString& Parameters)
 
     return true;
 }
+
+#define RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(TestClass, TestPath, FixtureId) \
+    IMPLEMENT_SIMPLE_AUTOMATION_TEST( \
+        TestClass, \
+        TestPath, \
+        EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter \
+    ) \
+    bool TestClass::RunTest(const FString& Parameters) \
+    { \
+        return ValidateD6ChaosFixtureJob(*this, FString(TEXT(FixtureId)), FString(TEXT(TestPath))); \
+    }
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosStaticSeatLoadSagTest,
+    "RaftSim.D6.Chaos.StaticSeatLoadSag",
+    "static_seat_load_sag"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosTravelingCrewShiftTest,
+    "RaftSim.D6.Chaos.TravelingCrewShift",
+    "traveling_crew_shift"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosRockPinchWrapTest,
+    "RaftSim.D6.Chaos.RockPinchWrap",
+    "rock_pinch_wrap"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosUpstreamTubeOverwashFlipTest,
+    "RaftSim.D6.Chaos.UpstreamTubeOverwashFlip",
+    "upstream_tube_overwash_flip"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosTimedHighSideSaveTest,
+    "RaftSim.D6.Chaos.TimedHighSideSave",
+    "timed_high_side_save"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosPostContactRecoveryTest,
+    "RaftSim.D6.Chaos.PostContactRecovery",
+    "post_contact_recovery"
+)
+
+RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST(
+    FRaftSimD6ChaosPressureFlowSweepsTest,
+    "RaftSim.D6.Chaos.PressureFlowSweeps",
+    "pressure_flow_sweeps"
+)
+
+#undef RAFTSIM_D6_CHAOS_FIXTURE_JOB_TEST
 
 #endif
