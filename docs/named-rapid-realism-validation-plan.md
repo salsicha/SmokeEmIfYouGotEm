@@ -33,6 +33,8 @@ The hand-reviewed source catalog is `physics/data/real_world/named_rapid_source_
 
 The reviewed Unreal `DA_RapidRiverEditorShell` DataAsset points to both manifests. The live Rapid/River Editor reports the five-runnable/one-additional portfolio split, exposes a portfolio-role filter, badges each row as runnable or additional active environment, and retains the existing source, flow, station, geometry, guide, and execution filters.
 
+The C1 feature-inventory intake is now review-gated but still empty. `physics/data/real_world/named_rapid_feature_inventory_template.json` enumerates all 85 rapid records and required subfeature fields. `physics/data/real_world/named_rapid_feature_inventory_sidecar_template.json` is the fillable reviewer handoff for holes, waves, ledges, eddy lines, laterals, lines, scout/portage notes, and other typed subfeatures. `physics/data/real_world/named_rapid_feature_inventory_sidecar_merge_report.json` currently blocks merge with 85 missing-subfeature errors and keeps C2 editor-pin generation, C3 water-window binding, and behavior-review claims disabled until reviewed source IDs, geometry evidence, flow dependence, guide/oarsman signoff, geospatial signoff, rights/publication signoff, owner, and review date are recorded.
+
 This is authoring and test-definition progress, not proof that any named rapid has been reproduced. Every generated run remains blocked until its exact geometry, validated C++ window, and guide-reviewed line are attached.
 
 ## Source And Rights Rules
