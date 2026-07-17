@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 130
-- Referenced command count: 75
+- Referenced artifact count: 131
+- Referenced command count: 76
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -123,18 +123,20 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Use the non-authoritative recommendation packet to start review with split published-mile conventions, reviewed simulation stationing, and official_access_50927 as the endpoint candidate.
 2. Use the reviewer briefing to compare source-mile/access options, evidence sources, required fields, and downstream regeneration commands.
-3. Fill the source-mile/access decision result with the selected endpoint and station-axis policy.
-4. Run the validator and regenerate the action packet only after all reviewer signoffs are present.
-5. Regenerate downstream route, stationing, corridor windows, and solver-window actions from the accepted result.
-6. Record post-decision acceptance evidence for regenerated outputs before asking A1 readiness to clear.
+3. Use the Markdown review form to collect the owner, guide/oarsman, geospatial, and rights/publication decision before copying accepted values into the JSON result.
+4. Fill the source-mile/access decision result with the selected endpoint and station-axis policy.
+5. Run the validator and regenerate the action packet only after all reviewer signoffs are present.
+6. Regenerate downstream route, stationing, corridor windows, and solver-window actions from the accepted result.
+7. Record post-decision acceptance evidence for regenerated outputs before asking A1 readiness to clear.
 
 **Acceptance Requirements**
 
 1. Reviewer decisions cite the briefing source artifacts and answer the endpoint, station-axis, publication-policy, and regeneration-scope questions.
-2. The decision validation report is green.
-3. Regeneration actions are non-empty for every selected downstream scope.
-4. The post-decision acceptance validation report is green for route/station-axis, corridor windows, rapid stationing, solver windows, flow windows, Unreal import, and final guide/geospatial/rights/owner acceptance.
-5. The A1 readiness report no longer lists source-mile/access or post-decision regeneration blockers.
+2. The filled decision record is traceable to the Markdown review form or an equivalent signed review packet.
+3. The decision validation report is green.
+4. Regeneration actions are non-empty for every selected downstream scope.
+5. The post-decision acceptance validation report is green for route/station-axis, corridor windows, rapid stationing, solver windows, flow windows, Unreal import, and final guide/geospatial/rights/owner acceptance.
+6. The A1 readiness report no longer lists source-mile/access or post-decision regeneration blockers.
 
 **Promotion Guardrails**
 
@@ -144,6 +146,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_review_briefing.json`
+- `docs/south-fork-a1-source-mile-access-review-form.md`
 - `physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_recommendation.json`
 - `physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_decision_result_template.json`
 - `physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_access_decision_validation_report.json`
@@ -155,6 +158,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_south_fork_a1_source_mile_access_review_briefing.py`
+- `physics/src/raftsim/examples/generate_south_fork_a1_source_mile_access_review_form.py`
 - `physics/src/raftsim/examples/generate_south_fork_a1_source_mile_access_recommendation.py`
 - `physics/src/raftsim/examples/validate_south_fork_a1_source_mile_access_decision_result.py`
 - `physics/src/raftsim/examples/generate_south_fork_a1_source_mile_access_regeneration_actions.py`
