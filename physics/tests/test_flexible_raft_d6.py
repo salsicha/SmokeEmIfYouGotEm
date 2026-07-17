@@ -372,6 +372,21 @@ def test_flexible_raft_d6_chaos_fixture_contract_maps_every_job():
     assert static["guardrails"]["must_preserve_fixture_input_semantics"] is True
 
 
+def test_flexible_raft_d6_unreal_contract_guard_is_registered():
+    source_path = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/Tests/"
+        "RaftSimD6ChaosFixtureContractTest.cpp"
+    )
+    source = source_path.read_text(encoding="utf-8")
+
+    assert "RaftSim.D6.ChaosFixtureContract" in source
+    assert "flexible_raft_d6_chaos_fixture_contract.json" in source
+    assert "telemetry_sha256" in source
+    assert "must_preserve_fixture_input_semantics" in source
+    assert "may_substitute_python_reference" in source
+
+
 def test_flexible_raft_d6_comparison_cli_accepts_populated_measured_results(tmp_path):
     measured_payload = build_flexible_raft_d6_measured_results_template()
     measured_payload["measured_results"] = _synthetic_measured_results()
