@@ -7,6 +7,9 @@ from raftsim.examples.generate_flexible_raft_d6_comparison_report import (
 from raftsim.examples.generate_flexible_raft_d6_chaos_runner_export import (
     main as generate_d6_chaos_runner_export_main,
 )
+from raftsim.examples.generate_flexible_raft_d6_compliant_runner_export import (
+    main as generate_d6_compliant_runner_export_main,
+)
 from raftsim.examples.merge_flexible_raft_d6_chaos_measured_results import (
     main as merge_d6_chaos_measured_results_main,
 )
@@ -55,6 +58,13 @@ from raftsim.flexible_raft_d6_chaos_runner_export import (
     D6_CHAOS_RUNNER_SUMMARY_SCHEMA,
     build_flexible_raft_d6_chaos_runner_sidecar,
     build_flexible_raft_d6_chaos_runner_summary,
+)
+from raftsim.flexible_raft_d6_compliant_runner_export import (
+    D6_COMPLIANT_RUNNER_SIDECAR_RELATIVE_PATH,
+    D6_COMPLIANT_RUNNER_SUMMARY_RELATIVE_PATH,
+    D6_COMPLIANT_RUNNER_SUMMARY_SCHEMA,
+    build_flexible_raft_d6_compliant_runner_sidecar,
+    build_flexible_raft_d6_compliant_runner_summary,
 )
 
 
@@ -750,6 +760,49 @@ def test_flexible_raft_d6_chaos_runner_export_is_reproducible_and_blocked():
         assert record["engine_version"] == ""
 
 
+def test_flexible_raft_d6_compliant_runner_export_is_reproducible_and_blocked():
+    generated_sidecar = build_flexible_raft_d6_compliant_runner_sidecar()
+    generated_summary = build_flexible_raft_d6_compliant_runner_summary(
+        generated_sidecar
+    )
+    committed_sidecar = json.loads(
+        (REPO_ROOT / D6_COMPLIANT_RUNNER_SIDECAR_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+    committed_summary = json.loads(
+        (REPO_ROOT / D6_COMPLIANT_RUNNER_SUMMARY_RELATIVE_PATH).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert generated_sidecar == committed_sidecar
+    assert generated_summary == committed_summary
+    assert committed_summary["schema"] == D6_COMPLIANT_RUNNER_SUMMARY_SCHEMA
+    assert committed_summary["status"] == (
+        "compliant_runner_output_pending_no_measurements_recorded"
+    )
+    assert committed_summary["runtime"] == "ProjectChronoOrReviewedCompliantReference"
+    assert committed_summary["can_merge_sidecar"] is False
+    assert committed_summary["filled_fixture_count"] == 0
+    assert committed_summary["invalid_fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert committed_summary["promotion_gate"]["may_mark_d6_complete"] is False
+    assert committed_sidecar["schema"] == D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_SCHEMA
+    assert committed_sidecar["status"] == (
+        "compliant_runner_output_pending_no_measurements_recorded"
+    )
+    assert committed_sidecar["target_id"] == (
+        "project_chrono_or_reviewed_compliant_model"
+    )
+    assert committed_sidecar["filled_result_count"] == 0
+    for fixture_id, record in committed_sidecar["results"].items():
+        assert fixture_id in REQUIRED_D6_FIXTURE_IDS
+        assert record["status"] == "not_measured"
+        assert record["source_report"] == ""
+        assert record["telemetry_sha256"] == ""
+        assert record["engine_version"] == ""
+
+
 def test_flexible_raft_d6_chaos_runner_export_cli_writes_blocked_bundle(tmp_path):
     sidecar_path = tmp_path / "chaos_measured_results.json"
     summary_path = tmp_path / "summary.json"
@@ -768,6 +821,32 @@ def test_flexible_raft_d6_chaos_runner_export_cli_writes_blocked_bundle(tmp_path
 
     assert exit_code == 0
     assert summary["schema"] == D6_CHAOS_RUNNER_SUMMARY_SCHEMA
+    assert summary["can_merge_sidecar"] is False
+    assert summary["filled_fixture_count"] == 0
+    assert merge_report["can_merge"] is False
+    assert merge_report["invalid_fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+
+
+def test_flexible_raft_d6_compliant_runner_export_cli_writes_blocked_bundle(tmp_path):
+    sidecar_path = tmp_path / "compliant_measured_results.json"
+    summary_path = tmp_path / "summary.json"
+
+    exit_code = generate_d6_compliant_runner_export_main(
+        [
+            "--sidecar-output",
+            str(sidecar_path),
+            "--summary-output",
+            str(summary_path),
+        ]
+    )
+    sidecar = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    merge_report = build_flexible_raft_d6_compliant_measured_results_merge_report(
+        sidecar
+    )
+
+    assert exit_code == 0
+    assert summary["schema"] == D6_COMPLIANT_RUNNER_SUMMARY_SCHEMA
     assert summary["can_merge_sidecar"] is False
     assert summary["filled_fixture_count"] == 0
     assert merge_report["can_merge"] is False
