@@ -1382,6 +1382,7 @@ This milestone turns the five runnable river targets into complete, reviewable, 
   - [ ] Run human guide/art/geospatial/rights/hazard/solver-forcing review plus measured desktop/VR profiling for every flow variant before promoting any low/high/release/rain/flash visual state.
 - [ ] Add desktop and VR performance capture evidence for the three photoreal river environments before any river is marked production-playable.
   - [x] Add the E3 release-candidate packaging/performance matrix: `physics/data/real_world/e3_release_candidate_packaging_matrix.json` links E2 profile parity, named-rapid runs, release readiness, static environment performance, and flow-variant performance evidence; maps seven package/evaluation targets across the six profiles; creates 30 five-river packaged runtime evidence rows; and keeps the actual desktop/VR/console/handheld performance capture gate open until measured packaged builds and manual reviews are attached.
+  - [x] Add the E3 packaged-runtime result sidecar and validator: `physics/data/real_world/e3_packaged_runtime_result_sidecar_template.json` provides one fillable runtime evidence record for each five-river/profile row, and `e3_packaged_runtime_validation_report.json` keeps E3 completion, release-candidate readiness, lifelike/playable claims, and platform-specific authoritative physics scaling blocked until package manifests, artifact hashes, runtime captures/traces, E2 parity, hazard/rescue readability review, and manual platform signoff are all present and green.
 
 ### Active Five-River Named Rapid Realism
 
