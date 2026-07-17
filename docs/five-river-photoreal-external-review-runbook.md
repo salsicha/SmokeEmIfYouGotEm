@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 141
-- Referenced command count: 86
+- Referenced artifact count: 142
+- Referenced command count: 87
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -880,14 +880,15 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Record the E1 platform-matrix owner decision before using E2/E3 evidence for release-candidate planning; keep console and handheld as evaluation or explicitly deferred targets until owner hardware/licensing decisions exist.
 2. Use the non-authoritative recommendation packet to start E2/E3 release evidence with same-seed profile parity first, then packaged runtime rows for all five runnable rivers and six profiles, while keeping authoritative physics identical and named-rapid/flexible-raft gates separate.
-3. Populate E2 profile-parity results from measured same-seed runs across all target profiles.
-4. Populate E3 packaged-runtime rows with package manifests, artifact hashes, captures, traces, and reviews.
-5. Use platform evidence only after named-rapid and flexible-raft gates are already valid.
+3. Use the Markdown review form to record the E1 target decision, all six E2 profile batches, all seven package targets, all 30 E3 river/profile rows, paths, SHA-256s, performance and hazard outcomes, deferments, failure notes, and reviewer signoff before filling the E2/E3 sidecars.
+4. Populate E2 profile-parity results from measured same-seed runs across all target profiles.
+5. Populate E3 packaged-runtime rows with package manifests, artifact hashes, captures, traces, and reviews.
+6. Use platform evidence only after named-rapid and flexible-raft gates are already valid.
 
 **Acceptance Requirements**
 
-1. E2 validation is green for every required profile-parity job.
-2. E3 validation is green for every five-river/profile packaged runtime row.
+1. E2 validation is green for every required profile-parity job with evidence traceable to the Markdown review form or an equivalent signed packet.
+2. E3 validation is green for every five-river/profile packaged runtime row with evidence traceable to the Markdown review form or an equivalent signed packet.
 3. Hazard/readability and release reviews approve the packaged runtime evidence.
 
 **Promotion Guardrails**
@@ -901,6 +902,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 - `physics/data/real_world/e1_platform_matrix_decision_result_template.json`
 - `physics/data/real_world/e1_platform_matrix_decision_validation_report.json`
 - `physics/data/real_world/e2_e3_platform_release_recommendation.json`
+- `docs/e2-e3-platform-release-review-form.md`
 - `physics/data/real_world/e2_scalability_profile_parity_contract.json`
 - `physics/data/real_world/e2_scalability_profile_parity_result_sidecar_template.json`
 - `physics/data/real_world/e2_scalability_profile_parity_validation_report.json`
@@ -912,6 +914,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 - `physics/src/raftsim/examples/validate_e1_platform_matrix_decision.py`
 - `physics/src/raftsim/examples/generate_e2_e3_platform_release_recommendation.py`
+- `physics/src/raftsim/examples/generate_e2_e3_platform_release_review_form.py`
 - `physics/src/raftsim/examples/generate_e2_scalability_profile_parity_results.py`
 - `physics/src/raftsim/examples/generate_e3_packaged_runtime_results.py`
 
