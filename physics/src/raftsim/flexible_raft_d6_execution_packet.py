@@ -8,6 +8,10 @@ from typing import Any
 
 from .flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
+    D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+    D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
     D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
@@ -60,6 +64,18 @@ def build_flexible_raft_d6_execution_packet(
             "measurement_manifest": D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
             "fixture_input_package": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
             "measured_results_template": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+            "compliant_measured_results_sidecar_template": (
+                D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+            ),
+            "compliant_measured_results_merge_report": (
+                D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+            ),
+            "chaos_measured_results_sidecar_template": (
+                D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+            ),
+            "chaos_measured_results_merge_report": (
+                D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+            ),
             "comparison_report": D6_COMPARISON_REPORT_RELATIVE_PATH,
         },
         "summary": {
@@ -76,6 +92,8 @@ def build_flexible_raft_d6_execution_packet(
         "local_preparation_checks": {
             "can_generate_fixture_inputs": True,
             "can_generate_empty_measured_results_template": True,
+            "can_generate_empty_target_sidecar_templates": True,
+            "can_validate_target_sidecars_before_merge": True,
             "can_regenerate_pending_report": True,
             "can_run_external_measurement_gate_with_python_only": False,
             "reason": (
@@ -91,6 +109,49 @@ def build_flexible_raft_d6_execution_packet(
                 "step": "run_external_engine_jobs",
                 "required_job_count": len(jobs),
                 "allowed_to_skip_jobs": False,
+            },
+            {
+                "step": "populate_target_sidecars",
+                "sidecar_templates": {
+                    "project_chrono_or_reviewed_compliant_model": (
+                        D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+                    ),
+                    "unreal_chaos_rigid_baseline": (
+                        D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+                    ),
+                },
+                "required_fixture_count_per_sidecar": manifest["fixture_count"],
+                "allowed_to_hand_edit_standard_template_before_sidecar_validation": False,
+            },
+            {
+                "step": "validate_and_merge_target_sidecars",
+                "commands": {
+                    "project_chrono_or_reviewed_compliant_model": (
+                        "uv run --no-sync python "
+                        "physics/src/raftsim/examples/"
+                        "merge_flexible_raft_d6_compliant_measured_results.py "
+                        "--compliant-sidecar <compliant-sidecar.json> "
+                        "--output <merged-measured-results.json> "
+                        "--report <compliant-merge-report.json>"
+                    ),
+                    "unreal_chaos_rigid_baseline": (
+                        "uv run --no-sync python "
+                        "physics/src/raftsim/examples/"
+                        "merge_flexible_raft_d6_chaos_measured_results.py "
+                        "--chaos-sidecar <chaos-sidecar.json> "
+                        "--base-measured-results <merged-measured-results.json> "
+                        "--output <merged-measured-results.json> "
+                        "--report <chaos-merge-report.json>"
+                    ),
+                },
+                "merge_reports": {
+                    "project_chrono_or_reviewed_compliant_model": (
+                        D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+                    ),
+                    "unreal_chaos_rigid_baseline": (
+                        D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+                    ),
+                },
             },
             {
                 "step": "populate_measured_results_template",
@@ -224,11 +285,25 @@ def _adapter_group(target_id: str, jobs: list[dict[str, Any]]) -> dict[str, Any]
             "Every numeric metric must match the Python D1-D5 reference within "
             "the recorded D6 absolute/relative tolerance, with provenance complete."
         )
+        sidecar_template = D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+        merge_report = D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+        merge_command = (
+            "uv run --no-sync python "
+            "physics/src/raftsim/examples/"
+            "merge_flexible_raft_d6_compliant_measured_results.py"
+        )
     elif target_id == "unreal_chaos_rigid_baseline":
         runner_family = "unreal_chaos_rigid_baseline"
         acceptance = (
             "Every fixture must be measured and hash-recorded. Metric deltas are "
             "baseline evidence rather than compliant-reference failures."
+        )
+        sidecar_template = D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+        merge_report = D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+        merge_command = (
+            "uv run --no-sync python "
+            "physics/src/raftsim/examples/"
+            "merge_flexible_raft_d6_chaos_measured_results.py"
         )
     else:
         raise ValueError(f"Unsupported D6 target id: {target_id}")
@@ -246,5 +321,8 @@ def _adapter_group(target_id: str, jobs: list[dict[str, Any]]) -> dict[str, Any]
         "adapter_must_not_substitute_python_reference": True,
         "required_external_runner": True,
         "acceptance_summary": acceptance,
+        "measured_results_sidecar_template": sidecar_template,
+        "measured_results_merge_report": merge_report,
+        "sidecar_merge_command": merge_command,
         "job_ids": [job["job_id"] for job in target_jobs],
     }
