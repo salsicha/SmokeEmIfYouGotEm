@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_chilko_a5_flow_source_result import (
+    main as validate_chilko_a5_flow_source_result_main,
+)
 from raftsim.chilko_a5_flow_source import (
     CHILKO_A5_FLOW_SOURCE_RESULT_TEMPLATE_RELATIVE_PATH,
     CHILKO_A5_FLOW_SOURCE_RESULT_TEMPLATE_SCHEMA,
@@ -200,6 +203,91 @@ def test_chilko_a5_flow_source_validation_rejects_numeric_tuning_or_solver_promo
         "flow_window": "low_technical_review",
         "field": "primary_station_number",
         "reason": "primary_station_must_be_08ma002",
+    } in report["errors"]
+
+
+def test_chilko_a5_flow_source_cli_writes_empty_gate():
+    exit_code = validate_chilko_a5_flow_source_result_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    packet_path = REPO_ROOT / CHILKO_A5_FLOW_SOURCE_REVIEW_PACKET_RELATIVE_PATH
+    template_path = REPO_ROOT / CHILKO_A5_FLOW_SOURCE_RESULT_TEMPLATE_RELATIVE_PATH
+    report_path = REPO_ROOT / CHILKO_A5_FLOW_SOURCE_VALIDATION_REPORT_RELATIVE_PATH
+    assert exit_code == 0
+    assert packet_path.exists()
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["flow_source_valid"] is False
+    assert report["status"] == "flow_source_result_incomplete_flow_promotion_blocked"
+
+
+def test_chilko_a5_flow_source_cli_accepts_complete_payload(tmp_path):
+    payload = _complete_flow_source_payload()
+    result_path = tmp_path / "filled_chilko_flow_source_result.json"
+    output_path = tmp_path / "accepted_chilko_flow_source_result.json"
+    report_path = tmp_path / "chilko_flow_source_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_chilko_a5_flow_source_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["flow_source_valid"] is True
+    assert report["passing_flow_window_count"] == 4
+    assert (
+        report["promotion_permissions"]["can_update_flow_window_source_class_labels"]
+        is True
+    )
+    assert report["promotion_permissions"]["can_enable_numeric_discharge_values"] is False
+
+
+def test_chilko_a5_flow_source_cli_blocks_invalid_payload(tmp_path):
+    payload = _complete_flow_source_payload()
+    payload["flow_window_records"][0]["numeric_values_promoted"] = True
+    result_path = tmp_path / "invalid_chilko_flow_source_result.json"
+    output_path = tmp_path / "accepted_chilko_flow_source_result.json"
+    report_path = tmp_path / "chilko_flow_source_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_chilko_a5_flow_source_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["flow_source_valid"] is False
+    assert {
+        "flow_window": "low_technical_review",
+        "field": "numeric_values_promoted",
+        "reason": "numeric_values_require_later_calibration",
     } in report["errors"]
 
 
