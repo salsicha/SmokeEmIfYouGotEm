@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.generate_photoreal_b2_source_acquisition_execution import (
+    main as generate_b2_source_acquisition_execution_main,
+)
 from raftsim.photoreal_b2_source_acquisition_execution import (
     B2_SOURCE_ACQUISITION_EXECUTION_PLAN_RELATIVE_PATH,
     B2_SOURCE_ACQUISITION_EXECUTION_PLAN_SCHEMA,
@@ -101,6 +104,30 @@ def test_b2_source_acquisition_execution_plan_preserves_invalid_storage_errors()
         "reason": "generated_maps_must_remain_versioned",
     } in plan["storage_decision"]["errors"]
     assert plan["execution_gate"]["requires_valid_storage_decision"] is True
+
+
+def test_b2_source_acquisition_execution_cli_writes_policy_sidecar(tmp_path):
+    storage_result = _complete_local_only_result()
+    storage_result_path = tmp_path / "valid_storage_decision_result.json"
+    output_path = tmp_path / "b2_source_acquisition_execution_plan.json"
+    storage_result_path.write_text(json.dumps(storage_result), encoding="utf-8")
+
+    exit_code = generate_b2_source_acquisition_execution_main(
+        [
+            "--storage-decision-result",
+            str(storage_result_path),
+            "--output",
+            str(output_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    payload = json.loads(output_path.read_text(encoding="utf-8"))
+    assert payload["storage_decision"]["storage_decision_valid"] is True
+    assert payload["summary"]["local_download_policy_allowed_count"] == 22
+    assert payload["summary"]["source_binary_commit_policy_allowed_count"] == 0
+    assert payload["summary"]["executable_task_count"] == 0
 
 
 def _complete_local_only_result() -> dict:
