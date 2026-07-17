@@ -1,0 +1,74 @@
+{
+  "chosen_option_id": "",
+  "download_execution_policy": {
+    "downloads_allowed_now": false,
+    "reason": "storage decision result is incomplete or inconsistent",
+    "source_binary_commits_allowed_now": false
+  },
+  "errors": [
+    {
+      "field": "chosen_option_id",
+      "reason": "chosen_option_not_allowed_or_missing"
+    },
+    {
+      "field": "decision_owner",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "decision_date",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gitlab_storage_resolution",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "lfs_retention_policy",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "rollback_policy",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "source_binary_commit_scope",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "max_source_bundle_bytes_without_extra_approval",
+      "reason": "max_source_bundle_bytes_must_be_nonnegative_integer"
+    },
+    {
+      "field": "evidence",
+      "reason": "decision_evidence_missing"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_skip_import_capture_review": false,
+    "can_skip_per_river_promotion_decision": false,
+    "can_skip_source_hash_report": false,
+    "next_after_valid_result": [
+      "regenerate_b2_source_acquisition_execution_plan",
+      "run allowed local or LFS-backed CC0 downloads one asset at a time",
+      "populate source hash report with exact files and SHA-256 values",
+      "run isolated Unreal import/capture review before per-river promotion"
+    ]
+  },
+  "promotion_permissions": {
+    "can_commit_cc0_source_binaries": false,
+    "can_commit_hash_reports": false,
+    "can_commit_import_reports": false,
+    "can_enable_local_cc0_downloads": false,
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_promote_b2_from_storage_decision_alone": false,
+    "can_run_local_isolated_imports": false
+  },
+  "schema": "raftsim.photoreal.b2_source_storage_decision_validation_report.v1",
+  "source_decision_packet": "physics/data/real_world/photoreal_b2_source_storage_decision_packet.json",
+  "source_result_template": "physics/data/real_world/photoreal_b2_source_storage_decision_result_template.json",
+  "status": "owner_storage_policy_result_incomplete_downloads_remain_disabled",
+  "storage_decision_valid": false,
+  "validation_error_count": 9
+}

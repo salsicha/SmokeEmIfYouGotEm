@@ -7,7 +7,9 @@ from pathlib import Path
 
 from raftsim.photoreal_b2_source_storage_decision import (
     build_b2_source_storage_decision,
+    write_b2_source_storage_decision_result_template,
     write_b2_source_storage_decision,
+    write_b2_source_storage_decision_validation_report,
 )
 
 
@@ -16,9 +18,14 @@ def main() -> None:
     parser.add_argument("--repo-root", type=Path, default=Path.cwd())
     args = parser.parse_args()
 
-    output_path = write_b2_source_storage_decision(args.repo_root)
+    output_paths = [
+        write_b2_source_storage_decision(args.repo_root),
+        write_b2_source_storage_decision_result_template(args.repo_root),
+        write_b2_source_storage_decision_validation_report(args.repo_root),
+    ]
     payload = build_b2_source_storage_decision()
-    print(f"decision_packet={output_path}")
+    for output_path in output_paths:
+        print(f"artifact={output_path}")
     print(f"schema={payload['schema']}")
     print(f"mode={payload['current_operating_mode']['mode']}")
     print(f"downloads_allowed_now={payload['current_operating_mode']['downloads_allowed_now']}")
