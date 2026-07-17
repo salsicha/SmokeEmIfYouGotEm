@@ -14,6 +14,12 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter
 )
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimD6ChaosRunnerExportBundleTest,
+    "RaftSim.D6.ChaosRunnerExportBundle",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter
+)
+
 namespace
 {
 const TArray<FString> RequiredD6FixtureIds = {
@@ -70,6 +76,37 @@ bool LoadD6ChaosFixtureContract(
     if (!FJsonSerializer::Deserialize(Reader, OutRoot) || !OutRoot.IsValid())
     {
         Test.AddError(TEXT("D6 Chaos fixture contract is not valid JSON."));
+        return false;
+    }
+
+    return true;
+}
+
+FString D6RepoRootPath()
+{
+    return FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(FPaths::ProjectDir(), TEXT(".."))
+    );
+}
+
+bool LoadD6JsonFile(
+    FAutomationTestBase& Test,
+    const FString& FullPath,
+    const FString& Label,
+    TSharedPtr<FJsonObject>& OutRoot
+)
+{
+    FString JsonText;
+    if (!FFileHelper::LoadFileToString(JsonText, *FullPath))
+    {
+        Test.AddError(FString::Printf(TEXT("Missing %s JSON: %s"), *Label, *FullPath));
+        return false;
+    }
+
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonText);
+    if (!FJsonSerializer::Deserialize(Reader, OutRoot) || !OutRoot.IsValid())
+    {
+        Test.AddError(FString::Printf(TEXT("%s JSON is invalid: %s"), *Label, *FullPath));
         return false;
     }
 
@@ -351,6 +388,202 @@ bool FRaftSimD6ChaosFixtureContractTest::RunTest(const FString& Parameters)
         TestTrue(
             FString::Printf(TEXT("D6 Chaos jobs contain %s"), *FixtureId),
             SeenFixtureIds.Contains(FixtureId)
+        );
+    }
+
+    return true;
+}
+
+bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
+{
+    TSharedPtr<FJsonObject> ContractRoot;
+    if (!LoadD6ChaosFixtureContract(*this, ContractRoot))
+    {
+        return false;
+    }
+
+    const TSharedPtr<FJsonObject>* AutomationExport = nullptr;
+    if (
+        !ContractRoot->TryGetObjectField(TEXT("automation_export"), AutomationExport)
+        || AutomationExport == nullptr
+    )
+    {
+        AddError(TEXT("D6 Chaos contract must declare automation_export."));
+        return false;
+    }
+
+    const FString RepoRoot = D6RepoRootPath();
+    const FString SummaryPath = FPaths::Combine(
+        RepoRoot,
+        (*AutomationExport)->GetStringField(TEXT("summary"))
+    );
+    const FString SidecarPath = FPaths::Combine(
+        RepoRoot,
+        (*AutomationExport)->GetStringField(TEXT("measured_results_sidecar"))
+    );
+
+    TSharedPtr<FJsonObject> SummaryRoot;
+    if (!LoadD6JsonFile(*this, SummaryPath, TEXT("D6 Chaos runner summary"), SummaryRoot))
+    {
+        return false;
+    }
+    TSharedPtr<FJsonObject> SidecarRoot;
+    if (!LoadD6JsonFile(*this, SidecarPath, TEXT("D6 Chaos runner sidecar"), SidecarRoot))
+    {
+        return false;
+    }
+
+    TestEqual(
+        TEXT("runner summary schema"),
+        SummaryRoot->GetStringField(TEXT("schema")),
+        FString(TEXT("raftsim.flexible_raft.d6_chaos_runner_summary.v1"))
+    );
+    TestEqual(
+        TEXT("runner summary status"),
+        SummaryRoot->GetStringField(TEXT("status")),
+        FString(TEXT("chaos_runner_output_pending_no_measurements_recorded"))
+    );
+    TestFalse(TEXT("runner summary d6_complete"), SummaryRoot->GetBoolField(TEXT("d6_complete")));
+    TestFalse(
+        TEXT("runner summary production_promoted"),
+        SummaryRoot->GetBoolField(TEXT("production_promoted"))
+    );
+    TestEqual(
+        TEXT("runner sidecar path"),
+        SummaryRoot->GetStringField(TEXT("runner_output_sidecar")),
+        (*AutomationExport)->GetStringField(TEXT("measured_results_sidecar"))
+    );
+    TestEqual(
+        TEXT("runner summary fixture_count"),
+        static_cast<int32>(SummaryRoot->GetIntegerField(TEXT("fixture_count"))),
+        RequiredD6FixtureIds.Num()
+    );
+    TestEqual(
+        TEXT("runner summary filled_fixture_count"),
+        static_cast<int32>(SummaryRoot->GetIntegerField(TEXT("filled_fixture_count"))),
+        0
+    );
+    TestEqual(
+        TEXT("runner summary invalid_fixture_count"),
+        static_cast<int32>(SummaryRoot->GetIntegerField(TEXT("invalid_fixture_count"))),
+        RequiredD6FixtureIds.Num()
+    );
+    TestFalse(
+        TEXT("runner can_merge_sidecar"),
+        SummaryRoot->GetBoolField(TEXT("can_merge_sidecar"))
+    );
+
+    const TSharedPtr<FJsonObject>* SummaryPromotionGate = nullptr;
+    if (
+        !SummaryRoot->TryGetObjectField(TEXT("promotion_gate"), SummaryPromotionGate)
+        || SummaryPromotionGate == nullptr
+    )
+    {
+        AddError(TEXT("D6 Chaos runner summary must declare promotion_gate."));
+        return false;
+    }
+    TestFalse(
+        TEXT("runner may_mark_d6_complete"),
+        (*SummaryPromotionGate)->GetBoolField(TEXT("may_mark_d6_complete"))
+    );
+    TestFalse(
+        TEXT("runner may_merge_into_measured_results_template"),
+        (*SummaryPromotionGate)->GetBoolField(TEXT("may_merge_into_measured_results_template"))
+    );
+
+    const TArray<TSharedPtr<FJsonValue>>* Jobs = nullptr;
+    if (!SummaryRoot->TryGetArrayField(TEXT("jobs"), Jobs) || Jobs == nullptr)
+    {
+        AddError(TEXT("D6 Chaos runner summary must contain jobs."));
+        return false;
+    }
+    TestEqual(TEXT("runner job count"), Jobs->Num(), RequiredD6FixtureIds.Num());
+
+    TSet<FString> SeenFixtureIds;
+    for (const TSharedPtr<FJsonValue>& JobValue : *Jobs)
+    {
+        const TSharedPtr<FJsonObject> Job = JobValue->AsObject();
+        if (!Job.IsValid())
+        {
+            AddError(TEXT("Every D6 Chaos runner job entry must be a JSON object."));
+            return false;
+        }
+
+        const FString FixtureId = Job->GetStringField(TEXT("fixture_id"));
+        SeenFixtureIds.Add(FixtureId);
+        TestFalse(
+            FString::Printf(TEXT("%s ready_for_sidecar_merge"), *FixtureId),
+            Job->GetBoolField(TEXT("ready_for_sidecar_merge"))
+        );
+        TestEqual(
+            FString::Printf(TEXT("%s blocking_reason"), *FixtureId),
+            Job->GetStringField(TEXT("blocking_reason")),
+            FString(TEXT("real_unreal_chaos_measurement_not_recorded"))
+        );
+        TestEqual(
+            FString::Printf(TEXT("%s recorded_metric_count"), *FixtureId),
+            static_cast<int32>(Job->GetIntegerField(TEXT("recorded_metric_count"))),
+            0
+        );
+    }
+
+    for (const FString& FixtureId : RequiredD6FixtureIds)
+    {
+        TestTrue(
+            FString::Printf(TEXT("runner jobs contain %s"), *FixtureId),
+            SeenFixtureIds.Contains(FixtureId)
+        );
+    }
+
+    TestEqual(
+        TEXT("sidecar schema"),
+        SidecarRoot->GetStringField(TEXT("schema")),
+        FString(TEXT("raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1"))
+    );
+    TestEqual(
+        TEXT("sidecar status"),
+        SidecarRoot->GetStringField(TEXT("status")),
+        FString(TEXT("chaos_runner_output_pending_no_measurements_recorded"))
+    );
+    TestEqual(
+        TEXT("sidecar filled_result_count"),
+        static_cast<int32>(SidecarRoot->GetIntegerField(TEXT("filled_result_count"))),
+        0
+    );
+
+    const TSharedPtr<FJsonObject>* Results = nullptr;
+    if (!SidecarRoot->TryGetObjectField(TEXT("results"), Results) || Results == nullptr)
+    {
+        AddError(TEXT("D6 Chaos runner sidecar must contain results."));
+        return false;
+    }
+    for (const FString& FixtureId : RequiredD6FixtureIds)
+    {
+        const TSharedPtr<FJsonObject>* Result = nullptr;
+        if (!(*Results)->TryGetObjectField(FixtureId, Result) || Result == nullptr)
+        {
+            AddError(FString::Printf(TEXT("Missing D6 Chaos sidecar result: %s"), *FixtureId));
+            return false;
+        }
+        TestEqual(
+            FString::Printf(TEXT("%s sidecar result status"), *FixtureId),
+            (*Result)->GetStringField(TEXT("status")),
+            FString(TEXT("not_measured"))
+        );
+        TestEqual(
+            FString::Printf(TEXT("%s source_report"), *FixtureId),
+            (*Result)->GetStringField(TEXT("source_report")),
+            FString()
+        );
+        TestEqual(
+            FString::Printf(TEXT("%s telemetry_sha256"), *FixtureId),
+            (*Result)->GetStringField(TEXT("telemetry_sha256")),
+            FString()
+        );
+        TestEqual(
+            FString::Printf(TEXT("%s engine_version"), *FixtureId),
+            (*Result)->GetStringField(TEXT("engine_version")),
+            FString()
         );
     }
 
