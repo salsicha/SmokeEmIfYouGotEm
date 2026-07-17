@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_pacuare_a3_digitizing_result import (
+    main as validate_pacuare_a3_digitizing_result_main,
+)
 from raftsim.pacuare_a3_digitizing import (
     PACUARE_A3_DIGITIZING_ACTION_PACKET_RELATIVE_PATH,
     PACUARE_A3_DIGITIZING_ACTION_PACKET_SCHEMA,
@@ -175,6 +178,88 @@ def test_pacuare_a3_digitizing_validation_rejects_provisional_and_solver_enabled
         "field": "stationing_kind",
         "reason": "stationing_kind_not_exact_or_missing",
     } in report["errors"]
+    assert {
+        "rapid_name": "Bienvenidos",
+        "field": "solver_window_enabled",
+        "reason": "solver_binding_requires_later_water_validation",
+    } in report["errors"]
+
+
+def test_pacuare_a3_digitizing_cli_writes_empty_gate():
+    exit_code = validate_pacuare_a3_digitizing_result_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    packet_path = REPO_ROOT / PACUARE_A3_DIGITIZING_ACTION_PACKET_RELATIVE_PATH
+    template_path = REPO_ROOT / PACUARE_A3_DIGITIZING_RESULT_TEMPLATE_RELATIVE_PATH
+    report_path = REPO_ROOT / PACUARE_A3_DIGITIZING_VALIDATION_REPORT_RELATIVE_PATH
+    assert exit_code == 0
+    assert packet_path.exists()
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["digitizing_valid"] is False
+    assert report["status"] == "digitizing_result_incomplete_stationing_promotion_blocked"
+
+
+def test_pacuare_a3_digitizing_cli_accepts_complete_payload(tmp_path):
+    payload = _complete_digitizing_payload()
+    result_path = tmp_path / "filled_pacuare_digitizing_result.json"
+    output_path = tmp_path / "accepted_pacuare_digitizing_result.json"
+    report_path = tmp_path / "pacuare_digitizing_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_pacuare_a3_digitizing_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["digitizing_valid"] is True
+    assert report["passing_rapid_count"] == 15
+    assert report["promotion_permissions"]["can_regenerate_named_rapid_catalog"] is True
+    assert report["promotion_permissions"]["can_bind_solver_windows"] is False
+
+
+def test_pacuare_a3_digitizing_cli_blocks_invalid_payload(tmp_path):
+    payload = _complete_digitizing_payload()
+    payload["stationing_result_records"][0]["solver_window_enabled"] = True
+    result_path = tmp_path / "invalid_pacuare_digitizing_result.json"
+    output_path = tmp_path / "accepted_pacuare_digitizing_result.json"
+    report_path = tmp_path / "pacuare_digitizing_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_pacuare_a3_digitizing_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["digitizing_valid"] is False
     assert {
         "rapid_name": "Bienvenidos",
         "field": "solver_window_enabled",
