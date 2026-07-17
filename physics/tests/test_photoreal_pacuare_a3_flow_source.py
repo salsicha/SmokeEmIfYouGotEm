@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_pacuare_a3_flow_source_result import (
+    main as validate_pacuare_a3_flow_source_result_main,
+)
 from raftsim.pacuare_a3_flow_source import (
     PACUARE_A3_FLOW_SOURCE_RESULT_TEMPLATE_RELATIVE_PATH,
     PACUARE_A3_FLOW_SOURCE_RESULT_TEMPLATE_SCHEMA,
@@ -169,6 +172,88 @@ def test_pacuare_a3_flow_source_validation_rejects_numeric_or_tuning_promotion()
         "flow_band": "clear_season_low_planning",
         "field": "feature_forcing_tuning_allowed",
         "reason": "feature_forcing_requires_later_review",
+    } in report["errors"]
+
+
+def test_pacuare_a3_flow_source_cli_writes_empty_gate():
+    exit_code = validate_pacuare_a3_flow_source_result_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    packet_path = REPO_ROOT / PACUARE_A3_FLOW_SOURCE_REVIEW_PACKET_RELATIVE_PATH
+    template_path = REPO_ROOT / PACUARE_A3_FLOW_SOURCE_RESULT_TEMPLATE_RELATIVE_PATH
+    report_path = REPO_ROOT / PACUARE_A3_FLOW_SOURCE_VALIDATION_REPORT_RELATIVE_PATH
+    assert exit_code == 0
+    assert packet_path.exists()
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["flow_source_valid"] is False
+    assert report["status"] == "flow_source_result_incomplete_flow_promotion_blocked"
+
+
+def test_pacuare_a3_flow_source_cli_accepts_complete_payload(tmp_path):
+    payload = _complete_flow_source_payload()
+    result_path = tmp_path / "filled_pacuare_flow_source_result.json"
+    output_path = tmp_path / "accepted_pacuare_flow_source_result.json"
+    report_path = tmp_path / "pacuare_flow_source_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_pacuare_a3_flow_source_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["flow_source_valid"] is True
+    assert report["passing_flow_band_count"] == 4
+    assert report["promotion_permissions"]["can_update_flow_presets_source_class_labels"] is True
+    assert report["promotion_permissions"]["can_enable_numeric_discharge_values"] is False
+
+
+def test_pacuare_a3_flow_source_cli_blocks_numeric_or_tuning_promotion(tmp_path):
+    payload = _complete_flow_source_payload()
+    payload["flow_source_records"][0]["numeric_values_promoted"] = True
+    result_path = tmp_path / "invalid_pacuare_flow_source_result.json"
+    output_path = tmp_path / "accepted_pacuare_flow_source_result.json"
+    report_path = tmp_path / "pacuare_flow_source_validation_report.json"
+    result_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_pacuare_a3_flow_source_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--result",
+            str(result_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["flow_source_valid"] is False
+    assert {
+        "flow_band": "clear_season_low_planning",
+        "field": "numeric_values_promoted",
+        "reason": "numeric_values_require_later_calibration",
     } in report["errors"]
 
 
