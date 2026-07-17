@@ -1,0 +1,657 @@
+{
+  "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -124.0910975,
+            51.7564756
+          ],
+          [
+            -124.09049136,
+            51.75654386
+          ],
+          [
+            -124.08970985,
+            51.75663181
+          ],
+          [
+            -124.08896779,
+            51.7567486
+          ],
+          [
+            -124.08846648,
+            51.7569195
+          ],
+          [
+            -124.0879153,
+            51.7572841
+          ],
+          [
+            -124.08723336,
+            51.75760027
+          ],
+          [
+            -124.08692359,
+            51.75785094
+          ],
+          [
+            -124.08674956,
+            51.75808736
+          ],
+          [
+            -124.08661864,
+            51.75823414
+          ],
+          [
+            -124.08238045,
+            51.7608685
+          ],
+          [
+            -124.08216068,
+            51.76097993
+          ],
+          [
+            -124.08143082,
+            51.7612682
+          ],
+          [
+            -124.08120671,
+            51.76154074
+          ],
+          [
+            -124.08081527,
+            51.76201674
+          ],
+          [
+            -124.08076668,
+            51.76207577
+          ],
+          [
+            -124.07978977,
+            51.76252864
+          ],
+          [
+            -124.07841264,
+            51.76261898
+          ],
+          [
+            -124.07738559,
+            51.76260638
+          ],
+          [
+            -124.0755296,
+            51.76258358
+          ],
+          [
+            -124.07481729,
+            51.76250525
+          ],
+          [
+            -124.07400526,
+            51.76243929
+          ],
+          [
+            -124.07290645,
+            51.76235001
+          ],
+          [
+            -124.07268951,
+            51.76234803
+          ],
+          [
+            -124.07226119,
+            51.76234413
+          ],
+          [
+            -124.07191873,
+            51.76245035
+          ],
+          [
+            -124.07131013,
+            51.76263913
+          ],
+          [
+            -124.07003007,
+            51.76288872
+          ],
+          [
+            -124.06962544,
+            51.76295388
+          ],
+          [
+            -124.0693225,
+            51.7630112
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [
+          "Bidwell Rapid"
+        ],
+        "class": "IV (guide-published, all reviewed levels)",
+        "current_station_m_from_order_interpolation": 9307.616,
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "feature_tags": [
+          "blind_corner",
+          "scout",
+          "s_bend",
+          "breaking_waves",
+          "terminal_hole",
+          "midstream_boulder",
+          "flip_hazard",
+          "swimmer_hazard",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 1,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with approved put-in, take-out, route station axis, GPS/aerial rapid point/span geometry, Chilko guide confirmation, rights/land/publication review, and 08MA002/08MA001 flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Bidwell Rapids",
+        "review_priority": "critical",
+        "river_id": "chilko_river_lava_canyon",
+        "route_order_station_m": 9307.616,
+        "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 10207.616,
+        "window_id": "chilko_a5_window_01_bidwell_rapids",
+        "window_start_m": 8407.616
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -124.030392,
+            51.8132687
+          ],
+          [
+            -124.030147,
+            51.81350334
+          ],
+          [
+            -124.02890109,
+            51.81539184
+          ],
+          [
+            -124.02762642,
+            51.81690578
+          ],
+          [
+            -124.02733383,
+            51.81746407
+          ],
+          [
+            -124.02728923,
+            51.81823884
+          ],
+          [
+            -124.02695747,
+            51.81915033
+          ],
+          [
+            -124.02654768,
+            51.81982255
+          ],
+          [
+            -124.02575929,
+            51.82073975
+          ],
+          [
+            -124.02481433,
+            51.82134646
+          ],
+          [
+            -124.02231841,
+            51.82265531
+          ],
+          [
+            -124.02057204,
+            51.82336599
+          ],
+          [
+            -124.01929249,
+            51.82399264
+          ],
+          [
+            -124.01642319,
+            51.82606487
+          ],
+          [
+            -124.0162414,
+            51.8262478
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "class": "III-V (flow-dependent reach, exact feature scope pending)",
+        "current_station_m_from_order_interpolation": 18615.232,
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "feature_tags": [
+          "continuous_whitewater",
+          "basalt_canyon",
+          "constriction",
+          "wave_train",
+          "boulders",
+          "wood_hazard",
+          "cold_water",
+          "limited_recovery",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 2,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with approved put-in, take-out, route station axis, GPS/aerial rapid point/span geometry, Chilko guide confirmation, rights/land/publication review, and 08MA002/08MA001 flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Lava Canyon",
+        "review_priority": "critical",
+        "river_id": "chilko_river_lava_canyon",
+        "route_order_station_m": 18615.232,
+        "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 19515.232,
+        "window_id": "chilko_a5_window_02_lava_canyon",
+        "window_start_m": 17715.232
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -123.9501423,
+            51.8702156
+          ],
+          [
+            -123.94982527,
+            51.87041047
+          ],
+          [
+            -123.94890522,
+            51.87084913
+          ],
+          [
+            -123.9484754,
+            51.87098443
+          ],
+          [
+            -123.94730533,
+            51.8713417
+          ],
+          [
+            -123.94692143,
+            51.87145892
+          ],
+          [
+            -123.94691533,
+            51.87145869
+          ],
+          [
+            -123.94646074,
+            51.87156409
+          ],
+          [
+            -123.94589853,
+            51.87179196
+          ],
+          [
+            -123.9456662,
+            51.87195807
+          ],
+          [
+            -123.94562364,
+            51.8719885
+          ],
+          [
+            -123.94491664,
+            51.87252105
+          ],
+          [
+            -123.94482064,
+            51.87256672
+          ],
+          [
+            -123.94416495,
+            51.87277324
+          ],
+          [
+            -123.94352442,
+            51.87288147
+          ],
+          [
+            -123.94248432,
+            51.87288575
+          ],
+          [
+            -123.94103287,
+            51.87295838
+          ],
+          [
+            -123.93899688,
+            51.87285157
+          ],
+          [
+            -123.93785997,
+            51.87270772
+          ],
+          [
+            -123.93729915,
+            51.87268921
+          ],
+          [
+            -123.93539976,
+            51.87295839
+          ],
+          [
+            -123.9344365,
+            51.87297548
+          ],
+          [
+            -123.93386762,
+            51.87286866
+          ],
+          [
+            -123.93287521,
+            51.87247842
+          ],
+          [
+            -123.93147014,
+            51.87179103
+          ],
+          [
+            -123.92987493,
+            51.87096449
+          ],
+          [
+            -123.92853495,
+            51.87074944
+          ],
+          [
+            -123.92779123,
+            51.8707181
+          ],
+          [
+            -123.9265749,
+            51.8707808
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "class": "IV-V (flow-dependent)",
+        "current_station_m_from_order_interpolation": 27922.848,
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "feature_tags": [
+          "continuous_whitewater",
+          "large_waves",
+          "midstream_rock",
+          "broach_hazard",
+          "flip_hazard",
+          "swimmer_hazard",
+          "cold_water",
+          "limited_recovery",
+          "high_flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 900.0,
+        "lateral_review_buffer_m": 180.0,
+        "order": 3,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with approved put-in, take-out, route station axis, GPS/aerial rapid point/span geometry, Chilko guide confirmation, rights/land/publication review, and 08MA002/08MA001 flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "White Mile",
+        "review_priority": "critical",
+        "river_id": "chilko_river_lava_canyon",
+        "route_order_station_m": 27922.848,
+        "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 28822.848,
+        "window_id": "chilko_a5_window_03_white_mile",
+        "window_start_m": 27022.848
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -123.8394722,
+            51.900335
+          ],
+          [
+            -123.83923157,
+            51.90041144
+          ],
+          [
+            -123.8387484,
+            51.90067493
+          ],
+          [
+            -123.83740711,
+            51.90164196
+          ],
+          [
+            -123.83682565,
+            51.90195102
+          ],
+          [
+            -123.83630409,
+            51.90217462
+          ],
+          [
+            -123.83549703,
+            51.90243952
+          ],
+          [
+            -123.83450669,
+            51.90270158
+          ],
+          [
+            -123.83365876,
+            51.90311744
+          ],
+          [
+            -123.83334321,
+            51.90335165
+          ],
+          [
+            -123.83288353,
+            51.90369282
+          ],
+          [
+            -123.83244089,
+            51.9040916
+          ],
+          [
+            -123.83224343,
+            51.90434654
+          ],
+          [
+            -123.83205752,
+            51.9047681
+          ],
+          [
+            -123.83148137,
+            51.90542324
+          ],
+          [
+            -123.83087961,
+            51.90592172
+          ],
+          [
+            -123.8302103,
+            51.90634042
+          ],
+          [
+            -123.82928073,
+            51.90653412
+          ],
+          [
+            -123.82827125,
+            51.9070212
+          ],
+          [
+            -123.82673628,
+            51.90731601
+          ],
+          [
+            -123.82585864,
+            51.90753107
+          ],
+          [
+            -123.8255683,
+            51.9076491
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "class": "guide review required",
+        "current_station_m_from_order_interpolation": 37230.464,
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "feature_tags": [
+          "continuous_whitewater",
+          "wave_train",
+          "boulders",
+          "cold_water",
+          "limited_recovery",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 140.0,
+        "order": 4,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with approved put-in, take-out, route station axis, GPS/aerial rapid point/span geometry, Chilko guide confirmation, rights/land/publication review, and 08MA002/08MA001 flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Green Mile",
+        "review_priority": "high",
+        "river_id": "chilko_river_lava_canyon",
+        "route_order_station_m": 37230.464,
+        "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 37880.464,
+        "window_id": "chilko_a5_window_04_green_mile",
+        "window_start_m": 36580.464
+      },
+      "type": "Feature"
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            -123.778679,
+            51.9573891
+          ],
+          [
+            -123.77803045,
+            51.95788826
+          ],
+          [
+            -123.77714782,
+            51.9588083
+          ],
+          [
+            -123.7764339,
+            51.95982377
+          ],
+          [
+            -123.77588468,
+            51.96039915
+          ],
+          [
+            -123.77534275,
+            51.96083068
+          ],
+          [
+            -123.7745946,
+            51.96163536
+          ],
+          [
+            -123.77337462,
+            51.96270779
+          ],
+          [
+            -123.77270389,
+            51.96321908
+          ],
+          [
+            -123.77187326,
+            51.96375031
+          ],
+          [
+            -123.77080781,
+            51.96429863
+          ],
+          [
+            -123.768829,
+            51.96600199
+          ],
+          [
+            -123.76811418,
+            51.96685224
+          ],
+          [
+            -123.7680539,
+            51.9669698
+          ]
+        ],
+        "type": "LineString"
+      },
+      "properties": {
+        "aliases": [],
+        "class": "guide review required",
+        "current_station_m_from_order_interpolation": 46538.08,
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "feature_tags": [
+          "canyon_constriction",
+          "continuous_whitewater",
+          "wave_train",
+          "boulders",
+          "cold_water",
+          "limited_recovery",
+          "flow_sensitive"
+        ],
+        "geometry_status": "review_focus_window_not_exact_rapid_geometry",
+        "half_length_m": 650.0,
+        "lateral_review_buffer_m": 140.0,
+        "order": 5,
+        "promotion_gate": "Use only to focus manual digitizing review. Replace with approved put-in, take-out, route station axis, GPS/aerial rapid point/span geometry, Chilko guide confirmation, rights/land/publication review, and 08MA002/08MA001 flow-context review before catalog, editor, water-window, or solver binding.",
+        "rapid_name": "Miracle Canyon",
+        "review_priority": "high",
+        "river_id": "chilko_river_lava_canyon",
+        "route_order_station_m": 46538.08,
+        "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+        "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+        "stationing_status": "order_distributed_route_work_window_not_authoritative",
+        "window_end_m": 47188.08,
+        "window_id": "chilko_a5_window_05_miracle_canyon",
+        "window_start_m": 45888.08
+      },
+      "type": "Feature"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "review_limits": [
+    "Window center stations are provisional downstream-order stations on the current source-scale route scaffold.",
+    "The current FWA route is technical corridor evidence, not guide-approved exact rapid stationing.",
+    "These features only focus manual aerial/guide digitizing review and cannot replace exact GPS, aerial, or guide-reviewed stationing.",
+    "Do not bind editor geometry, water windows, solver windows, public screenshots, or gameplay hazards from these windows."
+  ],
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.a5_stationing_digitizing_work_windows.geojson.v1",
+  "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+  "source_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+  "status": "review_only_digitizing_windows_on_route_scaffold_not_authoritative",
+  "task_id": "A5",
+  "type": "FeatureCollection"
+}
