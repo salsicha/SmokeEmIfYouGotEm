@@ -1,0 +1,500 @@
+{
+  "digitizing_valid": false,
+  "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+  "errors": [
+    {
+      "field": "geometry_type",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "route_station_m",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "route_station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gps_or_aerial_source",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "land_publication_status",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "land_publication_not_approved"
+    },
+    {
+      "field": "flow_context_class",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "flow_context_class_missing_or_not_allowed"
+    },
+    {
+      "field": "flow_context_source",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "flow_context_source_missing"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Bidwell Rapids",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Lava Canyon",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "route_station_m",
+      "rapid_name": "Lava Canyon",
+      "reason": "route_station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Lava Canyon",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gps_or_aerial_source",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Lava Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Lava Canyon",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Lava Canyon",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "land_publication_status",
+      "rapid_name": "Lava Canyon",
+      "reason": "land_publication_not_approved"
+    },
+    {
+      "field": "flow_context_class",
+      "rapid_name": "Lava Canyon",
+      "reason": "flow_context_class_missing_or_not_allowed"
+    },
+    {
+      "field": "flow_context_source",
+      "rapid_name": "Lava Canyon",
+      "reason": "flow_context_source_missing"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Lava Canyon",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Lava Canyon",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "White Mile",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "route_station_m",
+      "rapid_name": "White Mile",
+      "reason": "route_station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "White Mile",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gps_or_aerial_source",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "White Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "White Mile",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "White Mile",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "land_publication_status",
+      "rapid_name": "White Mile",
+      "reason": "land_publication_not_approved"
+    },
+    {
+      "field": "flow_context_class",
+      "rapid_name": "White Mile",
+      "reason": "flow_context_class_missing_or_not_allowed"
+    },
+    {
+      "field": "flow_context_source",
+      "rapid_name": "White Mile",
+      "reason": "flow_context_source_missing"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "White Mile",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "White Mile",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Green Mile",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "route_station_m",
+      "rapid_name": "Green Mile",
+      "reason": "route_station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Green Mile",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gps_or_aerial_source",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Green Mile",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Green Mile",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Green Mile",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "land_publication_status",
+      "rapid_name": "Green Mile",
+      "reason": "land_publication_not_approved"
+    },
+    {
+      "field": "flow_context_class",
+      "rapid_name": "Green Mile",
+      "reason": "flow_context_class_missing_or_not_allowed"
+    },
+    {
+      "field": "flow_context_source",
+      "rapid_name": "Green Mile",
+      "reason": "flow_context_source_missing"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Green Mile",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Green Mile",
+      "reason": "guide_evidence_missing"
+    },
+    {
+      "field": "geometry_type",
+      "rapid_name": "Miracle Canyon",
+      "reason": "geometry_type_not_allowed_or_missing"
+    },
+    {
+      "field": "route_station_m",
+      "rapid_name": "Miracle Canyon",
+      "reason": "route_station_m_missing"
+    },
+    {
+      "field": "stationing_kind",
+      "rapid_name": "Miracle Canyon",
+      "reason": "stationing_kind_not_exact_or_missing"
+    },
+    {
+      "field": "reviewed_route_source",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "gps_or_aerial_source",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_by",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "digitized_on",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewer",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "guide_reviewed_on",
+      "rapid_name": "Miracle Canyon",
+      "reason": "required_field_empty"
+    },
+    {
+      "field": "confidence_m",
+      "rapid_name": "Miracle Canyon",
+      "reason": "confidence_m_missing"
+    },
+    {
+      "field": "rights_publication_status",
+      "rapid_name": "Miracle Canyon",
+      "reason": "rights_publication_not_approved"
+    },
+    {
+      "field": "land_publication_status",
+      "rapid_name": "Miracle Canyon",
+      "reason": "land_publication_not_approved"
+    },
+    {
+      "field": "flow_context_class",
+      "rapid_name": "Miracle Canyon",
+      "reason": "flow_context_class_missing_or_not_allowed"
+    },
+    {
+      "field": "flow_context_source",
+      "rapid_name": "Miracle Canyon",
+      "reason": "flow_context_source_missing"
+    },
+    {
+      "field": "source_evidence",
+      "rapid_name": "Miracle Canyon",
+      "reason": "source_evidence_missing"
+    },
+    {
+      "field": "guide_evidence",
+      "rapid_name": "Miracle Canyon",
+      "reason": "guide_evidence_missing"
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "passing_rapid_count": 0,
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows_from_digitizing_result_alone": false,
+    "can_import_unreal_route_from_empty_or_invalid_result": false,
+    "can_promote_current_fwa_route": false,
+    "next_after_valid_result": [
+      "regenerate_named_rapid_source_catalog",
+      "regenerate_named_rapid_editor_markers",
+      "generate_chilko_rapid_water_window_inputs",
+      "run_guide_geospatial_rights_and_flow_review"
+    ]
+  },
+  "promotion_permissions": {
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a5_from_validation_report_alone": false,
+    "can_regenerate_editor_geometry": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false,
+    "manual_review_still_required_after_valid_result": true
+  },
+  "rapid_count": 5,
+  "reviewer_failures": [
+    {
+      "reason": "review_not_approved",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "owner_or_producer_acceptance"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "chilko_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "chilko_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "chilko_guide_or_outfitter_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "geospatial_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "rights_publication_reviewer"
+    },
+    {
+      "reason": "review_not_approved",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "reviewer_identity_or_date_missing",
+      "role": "hydrology_or_flow_reviewer"
+    },
+    {
+      "reason": "review_evidence_missing",
+      "role": "hydrology_or_flow_reviewer"
+    }
+  ],
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.a5_stationing_digitizing_validation_report.v1",
+  "source_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+  "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+  "source_result_template": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_result_template.json",
+  "status": "digitizing_result_incomplete_stationing_promotion_blocked",
+  "task_id": "A5",
+  "validation_error_count": 95
+}

@@ -1,0 +1,301 @@
+{
+  "critical_rapid_count": 3,
+  "current_blockers": {
+    "all_rapids_are_order_only": true,
+    "catalog_run_length_m": 55845.696,
+    "downstream_context_station": "08MA001",
+    "exact_endpoint_geometry_approved": false,
+    "numeric_flow_bands_promoted": false,
+    "primary_flow_station": "08MA002",
+    "route_is_source_scale_candidate": true,
+    "route_stationing_length_m": 55845.696,
+    "stationing_authority": "published_downstream_names_only_order_interpolation_pending_exact_gps_aerial_and_guide_review"
+  },
+  "digitizing_actions": [
+    {
+      "action_id": "chilko_a5_digitize_01_bidwell_rapids",
+      "aliases": [
+        "Bidwell Rapid"
+      ],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a5_promotion"
+      ],
+      "class": "IV (guide-published, all reviewed levels)",
+      "current_station_m_from_order_interpolation": 9307.616,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "blind_corner",
+        "scout",
+        "s_bend",
+        "breaking_waves",
+        "terminal_hole",
+        "midstream_boulder",
+        "flip_hazard",
+        "swimmer_hazard",
+        "flow_sensitive"
+      ],
+      "order": 1,
+      "rapid_name": "Bidwell Rapids",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_fwa_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "chilko_guide_or_outfitter_confirmation",
+        "rights_land_and_publication_review",
+        "08ma002_flow_window_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 9307.616
+    },
+    {
+      "action_id": "chilko_a5_digitize_02_lava_canyon",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a5_promotion"
+      ],
+      "class": "III-V (flow-dependent reach, exact feature scope pending)",
+      "current_station_m_from_order_interpolation": 18615.232,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "continuous_whitewater",
+        "basalt_canyon",
+        "constriction",
+        "wave_train",
+        "boulders",
+        "wood_hazard",
+        "cold_water",
+        "limited_recovery",
+        "flow_sensitive"
+      ],
+      "order": 2,
+      "rapid_name": "Lava Canyon",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_fwa_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "chilko_guide_or_outfitter_confirmation",
+        "rights_land_and_publication_review",
+        "08ma002_flow_window_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 18615.232
+    },
+    {
+      "action_id": "chilko_a5_digitize_03_white_mile",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a5_promotion"
+      ],
+      "class": "IV-V (flow-dependent)",
+      "current_station_m_from_order_interpolation": 27922.848,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "continuous_whitewater",
+        "large_waves",
+        "midstream_rock",
+        "broach_hazard",
+        "flip_hazard",
+        "swimmer_hazard",
+        "cold_water",
+        "limited_recovery",
+        "high_flow_sensitive"
+      ],
+      "order": 3,
+      "rapid_name": "White Mile",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_fwa_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "chilko_guide_or_outfitter_confirmation",
+        "rights_land_and_publication_review",
+        "08ma002_flow_window_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "critical",
+      "route_order_station_m_for_review_focus": 27922.848
+    },
+    {
+      "action_id": "chilko_a5_digitize_04_green_mile",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a5_promotion"
+      ],
+      "class": "guide review required",
+      "current_station_m_from_order_interpolation": 37230.464,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "continuous_whitewater",
+        "wave_train",
+        "boulders",
+        "cold_water",
+        "limited_recovery",
+        "flow_sensitive"
+      ],
+      "order": 4,
+      "rapid_name": "Green Mile",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_fwa_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "chilko_guide_or_outfitter_confirmation",
+        "rights_land_and_publication_review",
+        "08ma002_flow_window_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high",
+      "route_order_station_m_for_review_focus": 37230.464
+    },
+    {
+      "action_id": "chilko_a5_digitize_05_miracle_canyon",
+      "aliases": [],
+      "blocks_until_complete": [
+        "named_rapid_catalog_restationing",
+        "editor_geometry_binding",
+        "rapid_water_window_generation",
+        "solver_window_binding",
+        "a5_promotion"
+      ],
+      "class": "guide review required",
+      "current_station_m_from_order_interpolation": 46538.08,
+      "current_stationing_kind": "provisional_downstream_order_interpolation",
+      "feature_tags": [
+        "canyon_constriction",
+        "continuous_whitewater",
+        "wave_train",
+        "boulders",
+        "cold_water",
+        "limited_recovery",
+        "flow_sensitive"
+      ],
+      "order": 5,
+      "rapid_name": "Miracle Canyon",
+      "required_output_geometry": [
+        "Point",
+        "LineString"
+      ],
+      "required_source_classes": [
+        "reviewed_fwa_route_centerline",
+        "accepted_aerial_or_orthomosaic",
+        "rapid_feature_digitizer",
+        "chilko_guide_or_outfitter_confirmation",
+        "rights_land_and_publication_review",
+        "08ma002_flow_window_context"
+      ],
+      "required_stationing_kinds": [
+        "exact_gps_point",
+        "aerial_interpreted_point",
+        "aerial_interpreted_span",
+        "guide_reviewed_point",
+        "guide_reviewed_span"
+      ],
+      "review_priority": "high",
+      "route_order_station_m_for_review_focus": 46538.08
+    }
+  ],
+  "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_editor_geometry": false,
+    "can_bind_solver_windows": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a5": false,
+    "can_regenerate_named_rapid_catalog": false,
+    "can_replace_order_interpolation": false
+  },
+  "rapid_count": 5,
+  "required_workflow": [
+    {
+      "complete_when": "Chilko River Lodge put-in, Chilko-Taseko Junction take-out, and the official FWA stitched route are guide/geospatial approved",
+      "required_before": "stationing_digitizing",
+      "step_id": "confirm_put_in_take_out_and_route_station_axis"
+    },
+    {
+      "complete_when": "Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and Miracle Canyon have WGS84 Point or LineString geometry, route station, confidence, source evidence, and guide review",
+      "required_before": "catalog_regeneration",
+      "step_id": "digitize_priority_rapid_points_or_spans"
+    },
+    {
+      "complete_when": "daily or finer flow windows from 08MA002 are translated to the put-in/reach, checked against 08MA001 downstream context, and guide-reviewed for low/reference/high/unsafe bands",
+      "required_before": "rapid_water_window_generation",
+      "step_id": "route_daily_flow_windows_from_08ma002"
+    },
+    {
+      "complete_when": "named rapid catalog, editor geometry, flow-window labels, and rapid water-window inputs are regenerated from the reviewed result",
+      "required_before": "a5_promotion",
+      "step_id": "regenerate_catalog_editor_and_water_window_inputs"
+    }
+  ],
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.a5_stationing_digitizing_action_packet.v1",
+  "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+  "source_inputs": {
+    "corridor_manifest": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/manifest.json",
+    "named_rapid_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "route_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+    "seasonal_flow_context": "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json",
+    "source_manifest": "physics/data/real_world/chilko_river_bc/source_manifest.json"
+  },
+  "source_manifest": "physics/data/real_world/chilko_river_bc/source_manifest.json",
+  "source_route_stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+  "status": "digitizing_actions_ready_no_stationing_or_flow_promotion",
+  "task_id": "A5"
+}

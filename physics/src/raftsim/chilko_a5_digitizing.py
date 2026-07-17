@@ -1,0 +1,509 @@
+"""Build Chilko A5 rapid-stationing digitizing packets and validators."""
+
+from __future__ import annotations
+
+import json
+import re
+from pathlib import Path
+from typing import Any
+
+
+CHILKO_A5_DIGITIZING_ACTION_PACKET_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/review/"
+    "a5_stationing_digitizing_action_packet.json"
+)
+CHILKO_A5_DIGITIZING_RESULT_TEMPLATE_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/review/"
+    "a5_stationing_digitizing_result_template.json"
+)
+CHILKO_A5_DIGITIZING_VALIDATION_REPORT_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/review/"
+    "a5_stationing_digitizing_validation_report.json"
+)
+CHILKO_A5_DIGITIZING_ACTION_PACKET_SCHEMA = (
+    "raftsim.chilko.a5_stationing_digitizing_action_packet.v1"
+)
+CHILKO_A5_DIGITIZING_RESULT_TEMPLATE_SCHEMA = (
+    "raftsim.chilko.a5_stationing_digitizing_result_template.v1"
+)
+CHILKO_A5_DIGITIZING_VALIDATION_REPORT_SCHEMA = (
+    "raftsim.chilko.a5_stationing_digitizing_validation_report.v1"
+)
+
+_CATALOG_RELATIVE_PATH = "physics/data/real_world/named_rapid_source_catalog.json"
+_ROUTE_STATIONING_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/production_corridor/"
+    "chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json"
+)
+_SOURCE_MANIFEST_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/source_manifest.json"
+)
+_SEASONAL_FLOW_CONTEXT_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json"
+)
+_CORRIDOR_MANIFEST_RELATIVE_PATH = (
+    "physics/data/real_world/chilko_river_bc/production_corridor/"
+    "chilko_river_lodge_to_taseko_junction/manifest.json"
+)
+
+_REVIEW_ROLES = (
+    "owner_or_producer_acceptance",
+    "chilko_guide_or_outfitter_reviewer",
+    "geospatial_reviewer",
+    "rights_publication_reviewer",
+    "hydrology_or_flow_reviewer",
+)
+_ALLOWED_GEOMETRY_TYPES = ("Point", "LineString")
+_ALLOWED_STATIONING_KINDS = (
+    "exact_gps_point",
+    "aerial_interpreted_point",
+    "aerial_interpreted_span",
+    "guide_reviewed_point",
+    "guide_reviewed_span",
+)
+_ALLOWED_FLOW_CONTEXT_CLASSES = (
+    "08ma002_daily_window_routing_pending",
+    "08ma002_to_put_in_route_translation_reviewed",
+    "08ma001_downstream_context_reviewed",
+    "guide_reviewed_flow_band",
+    "hypothesis_pending_guide_review",
+)
+
+
+def build_chilko_a5_digitizing_action_packet(repo_root: Path) -> dict[str, Any]:
+    """Build the fail-closed Chilko A5 rapid digitizing action packet."""
+
+    catalog_river = _load_chilko_catalog_river(repo_root)
+    route = _read_json(repo_root / _ROUTE_STATIONING_RELATIVE_PATH)
+    source_manifest = _read_json(repo_root / _SOURCE_MANIFEST_RELATIVE_PATH)
+    flow = _read_json(repo_root / _SEASONAL_FLOW_CONTEXT_RELATIVE_PATH)
+    corridor = _read_json(repo_root / _CORRIDOR_MANIFEST_RELATIVE_PATH)
+    rapids = catalog_river["rapids"]
+    return {
+        "schema": CHILKO_A5_DIGITIZING_ACTION_PACKET_SCHEMA,
+        "generated_on": "2026-07-16",
+        "task_id": "A5",
+        "river_id": catalog_river["river_id"],
+        "display_name": catalog_river["display_name"],
+        "status": "digitizing_actions_ready_no_stationing_or_flow_promotion",
+        "production_promoted": False,
+        "source_catalog": _CATALOG_RELATIVE_PATH,
+        "source_route_stationing": _ROUTE_STATIONING_RELATIVE_PATH,
+        "source_manifest": _SOURCE_MANIFEST_RELATIVE_PATH,
+        "rapid_count": len(rapids),
+        "critical_rapid_count": sum(
+            rapid["review_priority"] == "critical" for rapid in rapids
+        ),
+        "current_blockers": {
+            "all_rapids_are_order_only": True,
+            "stationing_authority": catalog_river["stationing_authority"],
+            "catalog_run_length_m": round(float(catalog_river["run_length_m"]), 3),
+            "route_stationing_length_m": round(float(route["length_m"]), 3),
+            "route_is_source_scale_candidate": (
+                corridor["route"]["all_source_segments_stitched"] is True
+            ),
+            "exact_endpoint_geometry_approved": source_manifest["reach"][
+                "exact_endpoint_geometry_approved"
+            ],
+            "numeric_flow_bands_promoted": bool(
+                flow["gameplay_flow_bands"]["numeric_thresholds"]
+            ),
+            "primary_flow_station": "08MA002",
+            "downstream_context_station": "08MA001",
+        },
+        "source_inputs": {
+            "named_rapid_catalog": _CATALOG_RELATIVE_PATH,
+            "route_stationing": _ROUTE_STATIONING_RELATIVE_PATH,
+            "source_manifest": _SOURCE_MANIFEST_RELATIVE_PATH,
+            "seasonal_flow_context": _SEASONAL_FLOW_CONTEXT_RELATIVE_PATH,
+            "corridor_manifest": _CORRIDOR_MANIFEST_RELATIVE_PATH,
+        },
+        "digitizing_actions": [
+            _digitizing_action(catalog_river, rapid) for rapid in rapids
+        ],
+        "required_workflow": [
+            {
+                "step_id": "confirm_put_in_take_out_and_route_station_axis",
+                "required_before": "stationing_digitizing",
+                "complete_when": (
+                    "Chilko River Lodge put-in, Chilko-Taseko Junction take-out, "
+                    "and the official FWA stitched route are guide/geospatial approved"
+                ),
+            },
+            {
+                "step_id": "digitize_priority_rapid_points_or_spans",
+                "required_before": "catalog_regeneration",
+                "complete_when": (
+                    "Bidwell Rapids, Lava Canyon, White Mile, Green Mile, and "
+                    "Miracle Canyon have WGS84 Point or LineString geometry, "
+                    "route station, confidence, source evidence, and guide review"
+                ),
+            },
+            {
+                "step_id": "route_daily_flow_windows_from_08ma002",
+                "required_before": "rapid_water_window_generation",
+                "complete_when": (
+                    "daily or finer flow windows from 08MA002 are translated to the "
+                    "put-in/reach, checked against 08MA001 downstream context, and "
+                    "guide-reviewed for low/reference/high/unsafe bands"
+                ),
+            },
+            {
+                "step_id": "regenerate_catalog_editor_and_water_window_inputs",
+                "required_before": "a5_promotion",
+                "complete_when": (
+                    "named rapid catalog, editor geometry, flow-window labels, and "
+                    "rapid water-window inputs are regenerated from the reviewed result"
+                ),
+            },
+        ],
+        "promotion_gate": {
+            "can_replace_order_interpolation": False,
+            "can_regenerate_named_rapid_catalog": False,
+            "can_bind_editor_geometry": False,
+            "can_generate_rapid_water_windows": False,
+            "can_bind_solver_windows": False,
+            "can_promote_a5": False,
+        },
+    }
+
+
+def write_chilko_a5_digitizing_action_packet(repo_root: Path) -> Path:
+    payload = build_chilko_a5_digitizing_action_packet(repo_root)
+    path = repo_root / CHILKO_A5_DIGITIZING_ACTION_PACKET_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_chilko_a5_digitizing_result_template(repo_root: Path) -> dict[str, Any]:
+    """Build an empty result template for reviewed Chilko A5 stationing."""
+
+    packet = build_chilko_a5_digitizing_action_packet(repo_root)
+    return {
+        "schema": CHILKO_A5_DIGITIZING_RESULT_TEMPLATE_SCHEMA,
+        "generated_on": "2026-07-16",
+        "task_id": "A5",
+        "river_id": packet["river_id"],
+        "display_name": packet["display_name"],
+        "status": "empty_digitizing_result_template_no_stationing_or_flow_promotion",
+        "production_promoted": False,
+        "source_action_packet": CHILKO_A5_DIGITIZING_ACTION_PACKET_RELATIVE_PATH,
+        "source_catalog": _CATALOG_RELATIVE_PATH,
+        "source_route_stationing": _ROUTE_STATIONING_RELATIVE_PATH,
+        "rapid_count": packet["rapid_count"],
+        "allowed_geometry_types": list(_ALLOWED_GEOMETRY_TYPES),
+        "allowed_stationing_kinds": list(_ALLOWED_STATIONING_KINDS),
+        "allowed_flow_context_classes": list(_ALLOWED_FLOW_CONTEXT_CLASSES),
+        "stationing_result_records": [
+            _empty_result_record(action) for action in packet["digitizing_actions"]
+        ],
+        "reviewer_signoff": {
+            role: {
+                "name_or_role": "",
+                "review_date": "",
+                "approved": False,
+                "evidence": [],
+                "notes": "",
+            }
+            for role in _REVIEW_ROLES
+        },
+        "validation_contract": {
+            "template_is_empty": True,
+            "every_catalog_rapid_must_have_result": True,
+            "geometry_must_be_point_or_span": True,
+            "route_station_m_required": True,
+            "stationing_kind_must_not_be_provisional_order_interpolation": True,
+            "source_guide_rights_and_flow_context_required": True,
+            "all_reviewer_roles_must_approve": True,
+            "may_promote_from_empty_template": False,
+            "may_bind_solver_windows_from_template": False,
+        },
+        "promotion_gate": {
+            "can_replace_order_interpolation": False,
+            "can_regenerate_named_rapid_catalog": False,
+            "can_bind_editor_geometry": False,
+            "can_generate_rapid_water_windows": False,
+            "can_bind_solver_windows": False,
+            "can_promote_a5": False,
+        },
+    }
+
+
+def write_chilko_a5_digitizing_result_template(repo_root: Path) -> Path:
+    payload = build_chilko_a5_digitizing_result_template(repo_root)
+    path = repo_root / CHILKO_A5_DIGITIZING_RESULT_TEMPLATE_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_chilko_a5_digitizing_validation_report(
+    repo_root: Path,
+    result_payload: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Validate a Chilko digitizing result without promoting geometry."""
+
+    packet = build_chilko_a5_digitizing_action_packet(repo_root)
+    payload = (
+        result_payload
+        if result_payload is not None
+        else build_chilko_a5_digitizing_result_template(repo_root)
+    )
+    records = payload["stationing_result_records"]
+    expected_names = [action["rapid_name"] for action in packet["digitizing_actions"]]
+    errors = _rapid_set_errors(records, expected_names)
+    for record in records:
+        errors.extend(_record_errors(record))
+    reviewer_failures = _reviewer_failures(payload["reviewer_signoff"])
+    digitizing_valid = not errors and not reviewer_failures
+    return {
+        "schema": CHILKO_A5_DIGITIZING_VALIDATION_REPORT_SCHEMA,
+        "generated_on": "2026-07-16",
+        "task_id": "A5",
+        "river_id": packet["river_id"],
+        "display_name": packet["display_name"],
+        "status": (
+            "digitizing_result_valid_manual_catalog_regeneration_allowed"
+            if digitizing_valid
+            else "digitizing_result_incomplete_stationing_promotion_blocked"
+        ),
+        "production_promoted": False,
+        "source_action_packet": CHILKO_A5_DIGITIZING_ACTION_PACKET_RELATIVE_PATH,
+        "source_result_template": CHILKO_A5_DIGITIZING_RESULT_TEMPLATE_RELATIVE_PATH,
+        "source_catalog": _CATALOG_RELATIVE_PATH,
+        "digitizing_valid": digitizing_valid,
+        "validation_error_count": len(errors) + len(reviewer_failures),
+        "rapid_count": len(records),
+        "passing_rapid_count": sum(1 for record in records if not _record_errors(record)),
+        "errors": errors,
+        "reviewer_failures": [
+            {"role": role, "reason": reason} for role, reason in reviewer_failures
+        ],
+        "promotion_permissions": {
+            "can_replace_order_interpolation": digitizing_valid,
+            "can_regenerate_named_rapid_catalog": digitizing_valid,
+            "can_regenerate_editor_geometry": digitizing_valid,
+            "can_generate_rapid_water_windows": digitizing_valid,
+            "can_bind_solver_windows": False,
+            "can_promote_a5_from_validation_report_alone": False,
+            "manual_review_still_required_after_valid_result": True,
+        },
+        "promotion_gate": {
+            "can_promote_current_fwa_route": False,
+            "can_import_unreal_route_from_empty_or_invalid_result": False,
+            "can_bind_solver_windows_from_digitizing_result_alone": False,
+            "next_after_valid_result": [
+                "regenerate_named_rapid_source_catalog",
+                "regenerate_named_rapid_editor_markers",
+                "generate_chilko_rapid_water_window_inputs",
+                "run_guide_geospatial_rights_and_flow_review",
+            ],
+        },
+    }
+
+
+def write_chilko_a5_digitizing_validation_report(repo_root: Path) -> Path:
+    payload = build_chilko_a5_digitizing_validation_report(repo_root)
+    path = repo_root / CHILKO_A5_DIGITIZING_VALIDATION_REPORT_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _load_chilko_catalog_river(repo_root: Path) -> dict[str, Any]:
+    catalog = _read_json(repo_root / _CATALOG_RELATIVE_PATH)
+    for river in catalog["rivers"]:
+        if river["river_id"] == "chilko_river_lava_canyon":
+            return river
+    raise ValueError("Chilko river catalog record missing")
+
+
+def _digitizing_action(
+    river: dict[str, Any],
+    rapid: dict[str, Any],
+) -> dict[str, Any]:
+    station = float(river["run_length_m"]) * float(rapid["order"]) / (
+        len(river["rapids"]) + 1
+    )
+    return {
+        "action_id": f"chilko_a5_digitize_{int(rapid['order']):02d}_{_slug(rapid['name'])}",
+        "rapid_name": rapid["name"],
+        "aliases": rapid.get("aliases", []),
+        "order": rapid["order"],
+        "class": rapid["class"],
+        "feature_tags": rapid["feature_tags"],
+        "review_priority": rapid["review_priority"],
+        "current_station_m_from_order_interpolation": round(station, 3),
+        "current_stationing_kind": "provisional_downstream_order_interpolation",
+        "route_order_station_m_for_review_focus": round(station, 3),
+        "required_output_geometry": list(_ALLOWED_GEOMETRY_TYPES),
+        "required_stationing_kinds": list(_ALLOWED_STATIONING_KINDS),
+        "required_source_classes": [
+            "reviewed_fwa_route_centerline",
+            "accepted_aerial_or_orthomosaic",
+            "rapid_feature_digitizer",
+            "chilko_guide_or_outfitter_confirmation",
+            "rights_land_and_publication_review",
+            "08ma002_flow_window_context",
+        ],
+        "blocks_until_complete": [
+            "named_rapid_catalog_restationing",
+            "editor_geometry_binding",
+            "rapid_water_window_generation",
+            "solver_window_binding",
+            "a5_promotion",
+        ],
+    }
+
+
+def _empty_result_record(action: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "rapid_name": action["rapid_name"],
+        "aliases": action["aliases"],
+        "order": action["order"],
+        "geometry_type": "",
+        "geometry_coordinates_wgs84": [],
+        "route_station_m": None,
+        "stationing_kind": "not_recorded",
+        "reviewed_route_source": "",
+        "gps_or_aerial_source": "",
+        "digitized_by": "",
+        "digitized_on": "",
+        "confidence_m": None,
+        "guide_reviewer": "",
+        "guide_reviewed_on": "",
+        "rights_publication_status": "",
+        "land_publication_status": "",
+        "flow_context_class": "",
+        "flow_context_source": "",
+        "source_evidence": [],
+        "guide_evidence": [],
+        "stationing_promoted": False,
+        "editor_binding_enabled": False,
+        "solver_window_enabled": False,
+        "notes": "",
+    }
+
+
+def _rapid_set_errors(
+    records: list[dict[str, Any]],
+    expected_names: list[str],
+) -> list[dict[str, str]]:
+    errors: list[dict[str, str]] = []
+    names = [record["rapid_name"] for record in records]
+    for name in sorted(set(expected_names) - set(names)):
+        errors.append(_error(name, "stationing_result_records", "rapid_result_missing"))
+    for name in sorted(set(names) - set(expected_names)):
+        errors.append(_error(name, "stationing_result_records", "unknown_rapid_result"))
+    if len(names) != len(set(names)):
+        errors.append(_error("", "stationing_result_records", "duplicate_rapid_result"))
+    return errors
+
+
+def _record_errors(record: dict[str, Any]) -> list[dict[str, str]]:
+    errors: list[dict[str, str]] = []
+    rapid_name = record["rapid_name"]
+    if record["geometry_type"] not in _ALLOWED_GEOMETRY_TYPES:
+        errors.append(_error(rapid_name, "geometry_type", "geometry_type_not_allowed_or_missing"))
+    elif not _geometry_coordinates_valid(
+        record["geometry_type"], record["geometry_coordinates_wgs84"]
+    ):
+        errors.append(_error(rapid_name, "geometry_coordinates_wgs84", "geometry_coordinates_invalid_or_missing"))
+    if record["route_station_m"] is None:
+        errors.append(_error(rapid_name, "route_station_m", "route_station_m_missing"))
+    elif float(record["route_station_m"]) < 0.0:
+        errors.append(_error(rapid_name, "route_station_m", "route_station_m_negative"))
+    if record["stationing_kind"] not in _ALLOWED_STATIONING_KINDS:
+        errors.append(_error(rapid_name, "stationing_kind", "stationing_kind_not_exact_or_missing"))
+    for field in (
+        "reviewed_route_source",
+        "gps_or_aerial_source",
+        "digitized_by",
+        "digitized_on",
+        "guide_reviewer",
+        "guide_reviewed_on",
+    ):
+        if not record[field]:
+            errors.append(_error(rapid_name, field, "required_field_empty"))
+    if record["confidence_m"] is None:
+        errors.append(_error(rapid_name, "confidence_m", "confidence_m_missing"))
+    elif float(record["confidence_m"]) <= 0.0 or float(record["confidence_m"]) > 75.0:
+        errors.append(_error(rapid_name, "confidence_m", "confidence_m_outside_allowed_range"))
+    if record["rights_publication_status"] != "approved":
+        errors.append(_error(rapid_name, "rights_publication_status", "rights_publication_not_approved"))
+    if record["land_publication_status"] != "approved":
+        errors.append(_error(rapid_name, "land_publication_status", "land_publication_not_approved"))
+    if record["flow_context_class"] not in _ALLOWED_FLOW_CONTEXT_CLASSES:
+        errors.append(_error(rapid_name, "flow_context_class", "flow_context_class_missing_or_not_allowed"))
+    if not record["flow_context_source"]:
+        errors.append(_error(rapid_name, "flow_context_source", "flow_context_source_missing"))
+    if not record["source_evidence"]:
+        errors.append(_error(rapid_name, "source_evidence", "source_evidence_missing"))
+    if not record["guide_evidence"]:
+        errors.append(_error(rapid_name, "guide_evidence", "guide_evidence_missing"))
+    if record["stationing_promoted"]:
+        errors.append(_error(rapid_name, "stationing_promoted", "promotion_must_wait_for_catalog_regeneration"))
+    if record["solver_window_enabled"]:
+        errors.append(_error(rapid_name, "solver_window_enabled", "solver_binding_requires_later_water_validation"))
+    return errors
+
+
+def _reviewer_failures(
+    reviewers: dict[str, dict[str, Any]],
+) -> list[tuple[str, str]]:
+    failures: list[tuple[str, str]] = []
+    for role in _REVIEW_ROLES:
+        payload = reviewers.get(role)
+        if payload is None:
+            failures.append((role, "required_reviewer_missing"))
+            continue
+        if not payload["approved"]:
+            failures.append((role, "review_not_approved"))
+        if not payload["name_or_role"] or not payload["review_date"]:
+            failures.append((role, "reviewer_identity_or_date_missing"))
+        if not payload["evidence"]:
+            failures.append((role, "review_evidence_missing"))
+    return failures
+
+
+def _geometry_coordinates_valid(geometry_type: str, coordinates: Any) -> bool:
+    if geometry_type == "Point":
+        return _lon_lat_pair_valid(coordinates)
+    if geometry_type == "LineString":
+        return (
+            isinstance(coordinates, list)
+            and len(coordinates) >= 2
+            and all(_lon_lat_pair_valid(pair) for pair in coordinates)
+        )
+    return False
+
+
+def _lon_lat_pair_valid(value: Any) -> bool:
+    if not isinstance(value, list) or len(value) != 2:
+        return False
+    lon, lat = value
+    if not isinstance(lon, (int, float)) or not isinstance(lat, (int, float)):
+        return False
+    return -180.0 <= float(lon) <= 180.0 and -90.0 <= float(lat) <= 90.0
+
+
+def _error(rapid_name: str, field: str, reason: str) -> dict[str, str]:
+    return {"rapid_name": rapid_name, "field": field, "reason": reason}
+
+
+def _slug(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "_", value.lower()).strip("_")
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
