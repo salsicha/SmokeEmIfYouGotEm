@@ -174,3 +174,12 @@ Physics suite (new Phase-0 baseline) + D6 UE-vs-Python + truth-baseline reruns a
 7. Human-required steps → one line in §10, keep building; never fabricate a human judgment.
 8. Doc conflicts → this plan wins; log it.
 9. Log every nontrivial decision, dated, in the execution log appended below. Update the log as the FIRST commit of every phase and after every phase exit.
+
+---
+
+## Execution log
+
+### 2026-07-17 — Phase 0 begun
+- 0.1: working tree was already clean (in-flight work committed as `ec4e5ff9c`).
+- 0.2: froze the five-river plan, external-review runbook, and DoD form; recorded the July 17 owner reversal in `docs/generated-artifact-retention-policy.md` (`cc347462d`).
+- 0.3: retired the paperwork machinery — ~230 generator modules/examples, ~110 tests, ~90 generated JSON templates/reports, and 12 per-gate form docs deleted; kept the two D6 runner-export modules (engine-measurement bridge), `readiness.py` (June 27 product module), and all evidence/source data. Fixed `named_rapid_registry.py` and its test to inline `SCALABILITY_PROFILE_IDS` instead of importing the deleted `scalability_profiles`. Replaced the hard-coded test-census assertions in `test_futaleufu_cypress_retention.py` with structural invariants. **New suite baseline: 876 passed / 3 skipped in ~2:24** (was 1,401 / 5:35).

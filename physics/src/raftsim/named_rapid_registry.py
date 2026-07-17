@@ -8,12 +8,20 @@ import re
 from pathlib import Path
 from typing import Any
 
-from .scalability_profiles import SCALABILITY_PROFILE_IDS
 
 
 SOURCE_CATALOG_RELATIVE_PATH = "physics/data/real_world/named_rapid_source_catalog.json"
 EDITOR_MARKERS_RELATIVE_PATH = "unreal/Content/RaftSim/River/named_rapid_editor_markers.json"
 EDITOR_GEOMETRY_RELATIVE_PATH = "unreal/Content/RaftSim/River/named_rapid_editor_geometry.geojson"
+SCALABILITY_PROFILE_IDS = (
+    "desktop_high",
+    "desktop_scalable",
+    "vr_openxr",
+    "console_quality",
+    "console_performance",
+    "handheld_low",
+)
+
 SIMULATOR_RUNS_RELATIVE_PATH = (
     "unreal/Content/RaftSim/Automation/named_rapid_simulator_review_runs.json"
 )
