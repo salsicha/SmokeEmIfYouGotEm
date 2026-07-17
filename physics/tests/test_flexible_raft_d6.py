@@ -7,6 +7,9 @@ from raftsim.examples.generate_flexible_raft_d6_comparison_report import (
 from raftsim.examples.merge_flexible_raft_d6_chaos_measured_results import (
     main as merge_d6_chaos_measured_results_main,
 )
+from raftsim.examples.merge_flexible_raft_d6_compliant_measured_results import (
+    main as merge_d6_compliant_measured_results_main,
+)
 from raftsim.flexible_raft_d6 import (
     D6_BEHAVIORAL_SUITE_RELATIVE_PATH,
     D6_BEHAVIORAL_SUITE_SCHEMA,
@@ -16,6 +19,10 @@ from raftsim.flexible_raft_d6 import (
     D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_SCHEMA,
     D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA,
     D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_SCHEMA,
+    D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_SCHEMA,
+    D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_COMPARISON_REPORT_SCHEMA,
     D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
@@ -30,11 +37,14 @@ from raftsim.flexible_raft_d6 import (
     build_flexible_raft_d6_chaos_measured_results_merge_report,
     build_flexible_raft_d6_chaos_measured_results_sidecar_template,
     build_flexible_raft_d6_behavioral_suite,
+    build_flexible_raft_d6_compliant_measured_results_merge_report,
+    build_flexible_raft_d6_compliant_measured_results_sidecar_template,
     build_flexible_raft_d6_comparison_report,
     build_flexible_raft_d6_fixture_input_package,
     build_flexible_raft_d6_measured_results_template,
     build_flexible_raft_d6_measurement_manifest,
     merge_flexible_raft_d6_chaos_measured_results_sidecar,
+    merge_flexible_raft_d6_compliant_measured_results_sidecar,
 )
 
 
@@ -397,6 +407,133 @@ def test_flexible_raft_d6_unreal_contract_guard_is_registered():
     assert "may_substitute_python_reference" in source
 
 
+def test_flexible_raft_d6_compliant_sidecar_template_is_reproducible_and_empty():
+    generated = build_flexible_raft_d6_compliant_measured_results_sidecar_template()
+    committed = json.loads(
+        (
+            REPO_ROOT / D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+        ).read_text(encoding="utf-8")
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_SCHEMA
+    assert committed["status"] == "compliant_measured_results_sidecar_template_empty"
+    assert committed["target_id"] == "project_chrono_or_reviewed_compliant_model"
+    assert committed["filled_result_count"] == 0
+    assert set(committed["results"]) == set(REQUIRED_D6_FIXTURE_IDS)
+    assert committed["promotion_gate"]["may_merge_into_measured_results_template"] is False
+    for fixture_id, record in committed["results"].items():
+        assert fixture_id in REQUIRED_D6_FIXTURE_IDS
+        assert record["status"] == "not_measured"
+        assert record["source_report"] == ""
+        assert record["telemetry_sha256"] == ""
+        assert record["engine_version"] == ""
+        assert record["target_id"] == "project_chrono_or_reviewed_compliant_model"
+
+
+def test_flexible_raft_d6_compliant_sidecar_merge_report_blocks_empty_template():
+    sidecar = build_flexible_raft_d6_compliant_measured_results_sidecar_template()
+    generated = build_flexible_raft_d6_compliant_measured_results_merge_report(sidecar)
+    committed = json.loads(
+        (
+            REPO_ROOT / D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+        ).read_text(encoding="utf-8")
+    )
+
+    assert generated == committed
+    assert committed["schema"] == D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_SCHEMA
+    assert committed["status"] == "blocked_pending_complete_compliant_measured_results"
+    assert committed["can_merge"] is False
+    assert committed["filled_fixture_count"] == 0
+    assert committed["invalid_fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    for fixture_report in committed["fixture_reports"]:
+        assert "result_status_not_measured" in fixture_report["errors"]
+        assert "missing_required_provenance" in fixture_report["errors"]
+        assert fixture_report["missing_metric_count"] == fixture_report["required_metric_count"]
+
+
+def test_flexible_raft_d6_compliant_sidecar_merge_populates_only_reference_target():
+    sidecar = _synthetic_compliant_sidecar()
+    report = build_flexible_raft_d6_compliant_measured_results_merge_report(sidecar)
+    merged = merge_flexible_raft_d6_compliant_measured_results_sidecar(sidecar)
+    comparison = build_flexible_raft_d6_comparison_report(merged["measured_results"])
+
+    assert report["can_merge"] is True
+    assert report["filled_fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert merged["filled_result_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert merged["measured_results"]["project_chrono_or_reviewed_compliant_model"][
+        "static_seat_load_sag"
+    ]["status"] == "measured_engine_output"
+    assert merged["measured_results"]["unreal_chaos_rigid_baseline"][
+        "static_seat_load_sag"
+    ]["status"] == "not_measured"
+    assert comparison["failed_target_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert comparison["comparison_passed"] is False
+    assert comparison["status"] == "measured_comparisons_failed"
+    for fixture in comparison["fixtures"]:
+        targets = {target["target_id"]: target for target in fixture["targets"]}
+        assert targets["project_chrono_or_reviewed_compliant_model"]["status"] == (
+            "passed_numeric_equivalence"
+        )
+        assert targets["unreal_chaos_rigid_baseline"]["status"] == (
+            "incomplete_measured_result_provenance"
+        )
+
+
+def test_flexible_raft_d6_compliant_sidecar_merge_rejects_bad_fixture_payloads():
+    sidecar = _synthetic_compliant_sidecar()
+    del sidecar["results"]["pressure_flow_sweeps"]
+    sidecar["results"]["static_seat_load_sag"]["telemetry_sha256"] = "bad-hash"
+    sidecar["results"]["traveling_crew_shift"]["target_id"] = (
+        "unreal_chaos_rigid_baseline"
+    )
+    sidecar["results"]["unexpected_fixture"] = {
+        "source_report": "synthetic/unexpected.json",
+        "telemetry_sha256": "a" * 64,
+        "engine_version": "synthetic-test",
+        "metrics": {"value": 1.0},
+    }
+
+    report = build_flexible_raft_d6_compliant_measured_results_merge_report(sidecar)
+
+    assert report["can_merge"] is False
+    assert report["missing_fixture_ids"] == ["pressure_flow_sweeps"]
+    assert report["unexpected_fixture_ids"] == ["unexpected_fixture"]
+    by_id = {fixture["fixture_id"]: fixture for fixture in report["fixture_reports"]}
+    assert by_id["static_seat_load_sag"]["invalid_provenance_fields"] == [
+        "telemetry_sha256"
+    ]
+    assert "target_id_mismatch" in by_id["traveling_crew_shift"]["errors"]
+
+
+def test_flexible_raft_d6_compliant_sidecar_cli_merges_valid_sidecar(tmp_path):
+    sidecar_path = tmp_path / "compliant_sidecar.json"
+    report_path = tmp_path / "compliant_sidecar.merge_report.json"
+    merged_path = tmp_path / "merged_measured_results.json"
+    sidecar_path.write_text(
+        json.dumps(_synthetic_compliant_sidecar(), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    exit_code = merge_d6_compliant_measured_results_main(
+        [
+            "--compliant-sidecar",
+            str(sidecar_path),
+            "--report",
+            str(report_path),
+            "--output",
+            str(merged_path),
+        ]
+    )
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    merged = json.loads(merged_path.read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert report["can_merge"] is True
+    assert report["filled_fixture_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert merged["filled_result_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+
+
 def test_flexible_raft_d6_chaos_sidecar_template_is_reproducible_and_empty():
     generated = build_flexible_raft_d6_chaos_measured_results_sidecar_template()
     committed = json.loads(
@@ -554,6 +691,23 @@ def test_flexible_raft_d6_comparison_cli_accepts_populated_measured_results(tmp_
     assert report["comparison_passed"] is True
     assert report["d6_complete"] is False
     assert report["promotion_gate"]["may_mark_d6_complete"] is True
+
+
+def _synthetic_compliant_sidecar() -> dict[str, object]:
+    sidecar = build_flexible_raft_d6_compliant_measured_results_sidecar_template()
+    compliant_results = _synthetic_measured_results()[
+        "project_chrono_or_reviewed_compliant_model"
+    ]
+    for fixture_id, payload in compliant_results.items():
+        sidecar["results"][fixture_id].update(payload)
+        sidecar["results"][fixture_id]["status"] = "measured_engine_output"
+        sidecar["results"][fixture_id]["fixture_id"] = fixture_id
+        sidecar["results"][fixture_id]["target_id"] = (
+            "project_chrono_or_reviewed_compliant_model"
+        )
+    sidecar["status"] = "compliant_measured_results_sidecar_populated"
+    sidecar["filled_result_count"] = len(REQUIRED_D6_FIXTURE_IDS)
+    return sidecar
 
 
 def _synthetic_chaos_sidecar() -> dict[str, object]:
