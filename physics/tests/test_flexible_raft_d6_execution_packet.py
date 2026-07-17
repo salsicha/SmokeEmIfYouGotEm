@@ -2,6 +2,10 @@ import json
 from pathlib import Path
 
 from raftsim.flexible_raft_d6 import (
+    D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+    D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+    D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH,
     D6_COMPARISON_REPORT_RELATIVE_PATH,
     D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
     D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
@@ -53,8 +57,22 @@ def test_flexible_raft_d6_execution_packet_links_source_artifacts():
     assert artifacts["measurement_manifest"] == D6_MEASUREMENT_MANIFEST_RELATIVE_PATH
     assert artifacts["fixture_input_package"] == D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH
     assert artifacts["measured_results_template"] == D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH
+    assert artifacts["compliant_measured_results_sidecar_template"] == (
+        D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+    )
+    assert artifacts["compliant_measured_results_merge_report"] == (
+        D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+    )
+    assert artifacts["chaos_measured_results_sidecar_template"] == (
+        D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+    )
+    assert artifacts["chaos_measured_results_merge_report"] == (
+        D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+    )
     assert artifacts["comparison_report"] == D6_COMPARISON_REPORT_RELATIVE_PATH
     assert packet["local_preparation_checks"]["can_generate_fixture_inputs"] is True
+    assert packet["local_preparation_checks"]["can_generate_empty_target_sidecar_templates"] is True
+    assert packet["local_preparation_checks"]["can_validate_target_sidecars_before_merge"] is True
     assert packet["local_preparation_checks"]["can_run_external_measurement_gate_with_python_only"] is False
 
 
@@ -98,6 +116,15 @@ def test_flexible_raft_d6_execution_packet_separates_compliant_and_chaos_policie
     assert compliant["required_external_runner"] is True
     assert compliant["job_count"] == len(REQUIRED_D6_FIXTURE_IDS)
     assert compliant["pending_job_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert compliant["measured_results_sidecar_template"] == (
+        D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+    )
+    assert compliant["measured_results_merge_report"] == (
+        D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+    )
+    assert "merge_flexible_raft_d6_compliant_measured_results.py" in compliant[
+        "sidecar_merge_command"
+    ]
 
     assert chaos["runner_family"] == "unreal_chaos_rigid_baseline"
     assert chaos["comparison_mode"] == "baseline_delta_recording"
@@ -106,6 +133,15 @@ def test_flexible_raft_d6_execution_packet_separates_compliant_and_chaos_policie
     assert chaos["required_external_runner"] is True
     assert chaos["job_count"] == len(REQUIRED_D6_FIXTURE_IDS)
     assert chaos["pending_job_count"] == len(REQUIRED_D6_FIXTURE_IDS)
+    assert chaos["measured_results_sidecar_template"] == (
+        D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+    )
+    assert chaos["measured_results_merge_report"] == (
+        D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
+    )
+    assert "merge_flexible_raft_d6_chaos_measured_results.py" in chaos[
+        "sidecar_merge_command"
+    ]
 
 
 def test_flexible_raft_d6_execution_packet_blocks_runtime_until_reviewed():
@@ -117,4 +153,16 @@ def test_flexible_raft_d6_execution_packet_blocks_runtime_until_reviewed():
     assert "declaring Unreal Chaos rigid-baseline agreement" in blocked_actions
     assert packet["post_measurement_workflow"][0]["required_job_count"] == len(REQUIRED_D6_FIXTURE_IDS) * 2
     assert packet["post_measurement_workflow"][0]["allowed_to_skip_jobs"] is False
+    workflow_steps = [step["step"] for step in packet["post_measurement_workflow"]]
+    assert "populate_target_sidecars" in workflow_steps
+    assert "validate_and_merge_target_sidecars" in workflow_steps
+    merge_step = next(
+        step
+        for step in packet["post_measurement_workflow"]
+        if step["step"] == "validate_and_merge_target_sidecars"
+    )
+    assert set(merge_step["merge_reports"]) == {
+        "project_chrono_or_reviewed_compliant_model",
+        "unreal_chaos_rigid_baseline",
+    }
     assert packet["post_measurement_workflow"][-1]["may_mark_d6_complete_before_review"] is False
