@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.merge_photoreal_b2_import_capture_review_sidecar import (
+    main as merge_b2_import_capture_sidecar_main,
+)
 from raftsim.photoreal_b2_import_capture_review import (
     build_b2_import_capture_review_validation_report,
 )
@@ -129,6 +132,67 @@ def test_b2_import_capture_review_sidecar_rejects_candidate_promotion_flags():
         "field": "can_promote_candidate_now",
         "reason": "candidate_promotion_requires_per_river_decision",
     } in report["sidecar_errors"]
+
+
+def test_b2_import_capture_review_sidecar_merge_cli_writes_outputs_for_valid_sidecar(
+    tmp_path,
+):
+    payload = _complete_sidecar_payload()
+    sidecar_path = tmp_path / "filled_import_capture_sidecar.json"
+    output_path = tmp_path / "merged_import_capture_ledger.json"
+    report_path = tmp_path / "import_capture_sidecar_merge_report.json"
+    validation_path = tmp_path / "import_capture_validation_report.json"
+    sidecar_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = merge_b2_import_capture_sidecar_main(
+        [
+            "--sidecar",
+            str(sidecar_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+            "--validation-report",
+            str(validation_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    assert validation_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    validation = json.loads(validation_path.read_text(encoding="utf-8"))
+    assert report["status"] == "import_capture_review_sidecar_valid_manual_promotion_required"
+    assert validation["import_reviews_valid"] is True
+    assert validation["summary"]["approved_review_record_count"] == 44
+
+
+def test_b2_import_capture_review_sidecar_merge_cli_blocks_invalid_sidecar(tmp_path):
+    payload = _complete_sidecar_payload()
+    payload["records"][0]["captures"][0]["sha256"] = "bad"
+    sidecar_path = tmp_path / "invalid_import_capture_sidecar.json"
+    output_path = tmp_path / "merged_import_capture_ledger.json"
+    report_path = tmp_path / "import_capture_sidecar_merge_report.json"
+    sidecar_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = merge_b2_import_capture_sidecar_main(
+        [
+            "--sidecar",
+            str(sidecar_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["status"] == "import_capture_review_sidecar_incomplete_promotion_blocked"
+    assert report["merged_validation"]["import_reviews_valid"] is False
 
 
 def _complete_sidecar_payload() -> dict:
