@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 136
-- Referenced command count: 81
+- Referenced artifact count: 137
+- Referenced command count: 82
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -566,20 +566,22 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the non-authoritative recommendation packet to run D6 as preflight, seven compliant-reference measurements, seven Chaos measurements, sidecar merges, regenerated comparison, and physics/Unreal/replay/guide-safety review before runtime authority.
-2. Run the D6 measurement preflight before attempting sidecar merges or comparison regeneration.
-3. Run the seven fixture inputs in both the compliant reference and Unreal Chaos.
-4. Use the committed compliant-reference runner sidecar and summary paths as the Project Chrono/reviewed-model output handoff.
-5. Use the committed Chaos runner sidecar and summary paths as the Unreal automation output handoff.
-6. Record source reports, engine versions, 64-hex telemetry hashes, and required metric paths.
-7. Merge both target sidecars and regenerate the D6 comparison and readiness reports.
+2. Use the Markdown review form to collect source reports, engine versions, telemetry hashes, metric values, merge evidence, comparison review, and required signoffs before copying accepted values into D6 sidecars.
+3. Run the D6 measurement preflight before attempting sidecar merges or comparison regeneration.
+4. Run the seven fixture inputs in both the compliant reference and Unreal Chaos.
+5. Use the committed compliant-reference runner sidecar and summary paths as the Project Chrono/reviewed-model output handoff.
+6. Use the committed Chaos runner sidecar and summary paths as the Unreal automation output handoff.
+7. Record source reports, engine versions, 64-hex telemetry hashes, and required metric paths.
+8. Merge both target sidecars and regenerate the D6 comparison and readiness reports.
 
 **Acceptance Requirements**
 
 1. All 14 target/fixture measured-result rows pass provenance validation.
-2. The compliant-reference runner sidecar has real measured rows instead of the committed not_measured placeholders.
-3. The Chaos runner sidecar has real measured rows instead of the committed not_measured placeholders.
-4. The regenerated comparison report has no missing target pairs and passes numeric gates.
-5. Physics, Unreal, replay, and guide/safety reviewers approve the D6 result.
+2. The filled compliant-reference, Chaos, comparison, and manual-review records are traceable to the Markdown review form or equivalent signed review packets.
+3. The compliant-reference runner sidecar has real measured rows instead of the committed not_measured placeholders.
+4. The Chaos runner sidecar has real measured rows instead of the committed not_measured placeholders.
+5. The regenerated comparison report has no missing target pairs and passes numeric gates.
+6. Physics, Unreal, replay, and guide/safety reviewers approve the D6 result.
 
 **Promotion Guardrails**
 
@@ -589,6 +591,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/calibration/flexible_raft_d6_measurement_recommendation.json`
+- `docs/flexible-raft-d6-measurement-review-form.md`
 - `physics/data/calibration/flexible_raft_d6_measurement_work_order.json`
 - `physics/data/calibration/flexible_raft_d6_measurement_preflight.json`
 - `physics/data/calibration/flexible_raft_d6_fixture_input_package.json`
@@ -607,6 +610,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_flexible_raft_d6_measurement_recommendation.py`
+- `physics/src/raftsim/examples/generate_flexible_raft_d6_measurement_review_form.py`
 - `physics/src/raftsim/examples/generate_flexible_raft_d6_measurement_preflight.py`
 - `physics/src/raftsim/examples/generate_flexible_raft_d6_compliant_runner_export.py`
 - `physics/src/raftsim/examples/generate_flexible_raft_d6_chaos_runner_export.py`
