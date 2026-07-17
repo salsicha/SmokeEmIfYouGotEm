@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 137
-- Referenced command count: 82
+- Referenced artifact count: 138
+- Referenced command count: 83
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -644,15 +644,17 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the non-authoritative recommendation packet to start C2 review with South Fork Meat Grinder and Troublemaker first, keep Zambezi passive until Batoka source evidence exists, and preserve the C1/C2/C3/C4 gate boundaries.
-2. Fill the reviewed subfeature inventory for each named rapid.
-3. Generate editor pin packets from accepted C1 inventory only.
-4. Record exact pin placements, captures, and required signoffs before regenerating the Unreal overlay.
+2. Use the Markdown review form to collect reviewed C1 subfeature records, exact C2 pin geometry, editor captures, guide/geospatial/rights/technical-art/owner signoffs, and post-review command evidence before copying accepted values into sidecars.
+3. Fill the reviewed subfeature inventory for each named rapid.
+4. Generate editor pin packets from accepted C1 inventory only.
+5. Record exact pin placements, captures, and required signoffs before regenerating the Unreal overlay.
 
 **Acceptance Requirements**
 
 1. The C1 sidecar merge report is green.
-2. Exact placement sidecar is mergeable with capture and signoff evidence.
-3. The Unreal subfeature overlay is regenerated from accepted placements and C2 readiness is green.
+2. The filled C1 inventory, C2 placement, overlay, and manual marker records are traceable to the Markdown review form or equivalent signed review packets.
+3. Exact placement sidecar is mergeable with capture and signoff evidence.
+4. The Unreal subfeature overlay is regenerated from accepted placements and C2 readiness is green.
 
 **Promotion Guardrails**
 
@@ -662,6 +664,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/named_rapid_editor_pin_recommendation.json`
+- `docs/named-rapid-c2-editor-pin-review-form.md`
 - `physics/data/real_world/named_rapid_feature_inventory_sidecar_template.json`
 - `physics/data/real_world/named_rapid_feature_inventory_sidecar_merge_report.json`
 - `physics/data/real_world/named_rapid_editor_pin_packet.json`
@@ -673,6 +676,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_named_rapid_editor_pin_recommendation.py`
+- `physics/src/raftsim/examples/generate_named_rapid_editor_pin_review_form.py`
 - `physics/src/raftsim/examples/merge_named_rapid_feature_inventory_sidecar.py`
 - `physics/src/raftsim/examples/generate_named_rapid_editor_pin_packet.py`
 - `physics/src/raftsim/examples/generate_named_rapid_editor_pin_placement.py`
