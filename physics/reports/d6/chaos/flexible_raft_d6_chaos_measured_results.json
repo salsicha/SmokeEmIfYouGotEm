@@ -1,0 +1,292 @@
+{
+  "d6_complete": false,
+  "filled_result_count": 0,
+  "fixture_count": 7,
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": false,
+    "may_merge_into_measured_results_template": false,
+    "reason": "This is the committed Unreal Chaos runner output placeholder. Every fixture remains not_measured until editor automation writes real metric values, source reports, engine version, and 64-hex telemetry hashes."
+  },
+  "required_fixture_ids": [
+    "static_seat_load_sag",
+    "traveling_crew_shift",
+    "rock_pinch_wrap",
+    "upstream_tube_overwash_flip",
+    "timed_high_side_save",
+    "post_contact_recovery",
+    "pressure_flow_sweeps"
+  ],
+  "required_provenance_fields": [
+    "source_report",
+    "telemetry_sha256",
+    "engine_version"
+  ],
+  "results": {
+    "post_contact_recovery": {
+      "engine_version": "",
+      "fixture_id": "post_contact_recovery",
+      "metric_paths_required": [
+        "max_recovered_indentation_m",
+        "recovering_contact_count",
+        "total_holding_force_n"
+      ],
+      "metrics": {
+        "max_recovered_indentation_m": null,
+        "recovering_contact_count": null,
+        "total_holding_force_n": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "pressure_flow_sweeps": {
+      "engine_version": "",
+      "fixture_id": "pressure_flow_sweeps",
+      "metric_paths_required": [
+        "sweep_case_count",
+        "sweeps[0].contact_min_release_margin_n",
+        "sweeps[0].incoming_velocity_mps",
+        "sweeps[0].nominal_pressure_pa",
+        "sweeps[0].overwash_flux_m3_s",
+        "sweeps[0].retained_water_roll_moment_nm",
+        "sweeps[1].contact_min_release_margin_n",
+        "sweeps[1].incoming_velocity_mps",
+        "sweeps[1].nominal_pressure_pa",
+        "sweeps[1].overwash_flux_m3_s",
+        "sweeps[1].retained_water_roll_moment_nm",
+        "sweeps[2].contact_min_release_margin_n",
+        "sweeps[2].incoming_velocity_mps",
+        "sweeps[2].nominal_pressure_pa",
+        "sweeps[2].overwash_flux_m3_s",
+        "sweeps[2].retained_water_roll_moment_nm",
+        "sweeps[3].contact_min_release_margin_n",
+        "sweeps[3].incoming_velocity_mps",
+        "sweeps[3].nominal_pressure_pa",
+        "sweeps[3].overwash_flux_m3_s",
+        "sweeps[3].retained_water_roll_moment_nm",
+        "sweeps[4].contact_min_release_margin_n",
+        "sweeps[4].incoming_velocity_mps",
+        "sweeps[4].nominal_pressure_pa",
+        "sweeps[4].overwash_flux_m3_s",
+        "sweeps[4].retained_water_roll_moment_nm",
+        "sweeps[5].contact_min_release_margin_n",
+        "sweeps[5].incoming_velocity_mps",
+        "sweeps[5].nominal_pressure_pa",
+        "sweeps[5].overwash_flux_m3_s",
+        "sweeps[5].retained_water_roll_moment_nm",
+        "sweeps[6].contact_min_release_margin_n",
+        "sweeps[6].incoming_velocity_mps",
+        "sweeps[6].nominal_pressure_pa",
+        "sweeps[6].overwash_flux_m3_s",
+        "sweeps[6].retained_water_roll_moment_nm",
+        "sweeps[7].contact_min_release_margin_n",
+        "sweeps[7].incoming_velocity_mps",
+        "sweeps[7].nominal_pressure_pa",
+        "sweeps[7].overwash_flux_m3_s",
+        "sweeps[7].retained_water_roll_moment_nm",
+        "sweeps[8].contact_min_release_margin_n",
+        "sweeps[8].incoming_velocity_mps",
+        "sweeps[8].nominal_pressure_pa",
+        "sweeps[8].overwash_flux_m3_s",
+        "sweeps[8].retained_water_roll_moment_nm"
+      ],
+      "metrics": {
+        "sweep_case_count": null,
+        "sweeps": [
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          },
+          {
+            "contact_min_release_margin_n": null,
+            "incoming_velocity_mps": null,
+            "nominal_pressure_pa": null,
+            "overwash_flux_m3_s": null,
+            "retained_water_roll_moment_nm": null
+          }
+        ]
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "rock_pinch_wrap": {
+      "engine_version": "",
+      "fixture_id": "rock_pinch_wrap",
+      "metric_paths_required": [
+        "contact_count",
+        "max_indentation_m",
+        "min_release_margin_n",
+        "pinned_obstacle_count",
+        "wrapping_contact_count"
+      ],
+      "metrics": {
+        "contact_count": null,
+        "max_indentation_m": null,
+        "min_release_margin_n": null,
+        "pinned_obstacle_count": null,
+        "wrapping_contact_count": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "static_seat_load_sag": {
+      "engine_version": "",
+      "fixture_id": "static_seat_load_sag",
+      "metric_paths_required": [
+        "loaded_crew_mass_kg",
+        "max_seat_freeboard_loss_m",
+        "port_total_freeboard_loss_m",
+        "raft_length_m",
+        "raft_width_m",
+        "starboard_total_freeboard_loss_m"
+      ],
+      "metrics": {
+        "loaded_crew_mass_kg": null,
+        "max_seat_freeboard_loss_m": null,
+        "port_total_freeboard_loss_m": null,
+        "raft_length_m": null,
+        "raft_width_m": null,
+        "starboard_total_freeboard_loss_m": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "timed_high_side_save": {
+      "engine_version": "",
+      "fixture_id": "timed_high_side_save",
+      "metric_paths_required": [
+        "high_side_flip_margin_nm",
+        "high_side_flip_threshold_nm",
+        "margin_delta_nm",
+        "neutral_flip_margin_nm",
+        "neutral_flip_threshold_nm"
+      ],
+      "metrics": {
+        "high_side_flip_margin_nm": null,
+        "high_side_flip_threshold_nm": null,
+        "margin_delta_nm": null,
+        "neutral_flip_margin_nm": null,
+        "neutral_flip_threshold_nm": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "traveling_crew_shift": {
+      "engine_version": "",
+      "fixture_id": "traveling_crew_shift",
+      "metric_paths_required": [
+        "neutral_roll_load_bias_nm",
+        "port_roll_load_bias_nm",
+        "port_total_freeboard_delta_m",
+        "starboard_roll_load_bias_nm",
+        "starboard_total_freeboard_delta_m"
+      ],
+      "metrics": {
+        "neutral_roll_load_bias_nm": null,
+        "port_roll_load_bias_nm": null,
+        "port_total_freeboard_delta_m": null,
+        "starboard_roll_load_bias_nm": null,
+        "starboard_total_freeboard_delta_m": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    },
+    "upstream_tube_overwash_flip": {
+      "engine_version": "",
+      "fixture_id": "upstream_tube_overwash_flip",
+      "metric_paths_required": [
+        "reference_flip_margin_nm",
+        "retained_water_roll_moment_nm",
+        "total_overtopping_flux_m3_s",
+        "total_retained_water_mass_kg"
+      ],
+      "metrics": {
+        "reference_flip_margin_nm": null,
+        "reference_flip_risk": false,
+        "retained_water_roll_moment_nm": null,
+        "total_overtopping_flux_m3_s": null,
+        "total_retained_water_mass_kg": null
+      },
+      "source_report": "",
+      "status": "not_measured",
+      "target_id": "unreal_chaos_rigid_baseline",
+      "telemetry_sha256": ""
+    }
+  },
+  "runner_output_state": "pending_real_unreal_chaos_measurements",
+  "runtime": "UnrealChaos",
+  "schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+  "source_automation_summary_path": "physics/reports/d6/chaos/summary.json",
+  "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+  "source_comparison_report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
+  "source_measured_results_template_path": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
+  "source_runner_output_path": "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json",
+  "status": "chaos_runner_output_pending_no_measurements_recorded",
+  "target_id": "unreal_chaos_rigid_baseline"
+}
