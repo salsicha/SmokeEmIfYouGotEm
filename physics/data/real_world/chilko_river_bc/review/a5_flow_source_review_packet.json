@@ -1,0 +1,546 @@
+{
+  "current_flow_status": {
+    "downstream_context_station": {
+      "limitation": "station_is_downstream_of_taseko_confluence_and_cannot_define_pre_confluence_route_discharge",
+      "real_time": true,
+      "role": "downstream_context_and_routing_check_only",
+      "station_name": "CHILKO RIVER NEAR REDSTONE",
+      "station_number": "08MA001",
+      "status": "Active"
+    },
+    "gameplay_flow_band_status": "blocked_pending_daily_window_routing_and_local_guide_review",
+    "numeric_flow_bands_promoted": false,
+    "numeric_thresholds_present": false,
+    "primary_station": {
+      "limitation": "lake_outlet_is_upstream_of_put_in_and_does_not_include_reach_tributaries",
+      "real_time": true,
+      "role": "primary_upstream_seasonality_and_timing_candidate",
+      "station_name": "CHILKO RIVER AT OUTLET OF CHILKO LAKE",
+      "station_number": "08MA002",
+      "status": "Active"
+    },
+    "provider": "Environment and Climate Change Canada Water Survey of Canada",
+    "required_before_authoring": [
+      "attach_daily_and_event_windows_for_reviewed_run_dates",
+      "estimate_lag_and_tributary_change_from_08MA002_to_put_in",
+      "separate_pre_confluence_chilko_flow_from_08MA001_taseko_influence",
+      "review_low_reference_high_and_washout_behavior_with_local_guides"
+    ],
+    "units": "m3/s"
+  },
+  "current_stationing_status": "digitizing_actions_ready_no_stationing_or_flow_promotion",
+  "display_name": "Chilko River: Chilko River Lodge to Chilko-Taseko Junction",
+  "flow_window_actions": [
+    {
+      "allowed_source_classes": [
+        "eccc_08ma002_daily_time_series",
+        "eccc_08ma002_to_put_in_route_translation",
+        "eccc_08ma001_downstream_context_check",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_or_washout_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Low technical review window",
+      "downstream_context_month_summary": [
+        {
+          "median_m3_s": 69.15,
+          "month": 10,
+          "p10_m3_s": 51.25,
+          "p90_m3_s": 97.45,
+          "sample_count": 96
+        },
+        {
+          "median_m3_s": 43.4,
+          "month": 11,
+          "p10_m3_s": 31.2,
+          "p90_m3_s": 65.12,
+          "sample_count": 93
+        },
+        {
+          "median_m3_s": 29.8,
+          "month": 12,
+          "p10_m3_s": 19.82,
+          "p90_m3_s": 41.94,
+          "sample_count": 83
+        },
+        {
+          "median_m3_s": 21.7,
+          "month": 1,
+          "p10_m3_s": 15.76,
+          "p90_m3_s": 31.46,
+          "sample_count": 79
+        },
+        {
+          "median_m3_s": 17.9,
+          "month": 2,
+          "p10_m3_s": 13.31,
+          "p90_m3_s": 28.14,
+          "sample_count": 78
+        },
+        {
+          "median_m3_s": 16.7,
+          "month": 3,
+          "p10_m3_s": 12.4,
+          "p90_m3_s": 22.26,
+          "sample_count": 79
+        },
+        {
+          "median_m3_s": 18.0,
+          "month": 4,
+          "p10_m3_s": 13.76,
+          "p90_m3_s": 29.92,
+          "sample_count": 85
+        },
+        {
+          "median_m3_s": 64.4,
+          "month": 5,
+          "p10_m3_s": 39.37,
+          "p90_m3_s": 107.8,
+          "sample_count": 92
+        }
+      ],
+      "downstream_context_station_number": "08MA001",
+      "expected_gameplay_behavior": "shallower shelves, more exposed boulder contact, less sticky holes, and tighter rescue margins",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_window": "low_technical_review",
+      "numeric_values_allowed_now": false,
+      "primary_station_month_summary": [
+        {
+          "median_m3_s": 40.35,
+          "month": 10,
+          "p10_m3_s": 30.9,
+          "p90_m3_s": 55.76,
+          "sample_count": 92
+        },
+        {
+          "median_m3_s": 26.2,
+          "month": 11,
+          "p10_m3_s": 20.29,
+          "p90_m3_s": 38.47,
+          "sample_count": 84
+        },
+        {
+          "median_m3_s": 18.45,
+          "month": 12,
+          "p10_m3_s": 13.6,
+          "p90_m3_s": 26.4,
+          "sample_count": 76
+        },
+        {
+          "median_m3_s": 13.2,
+          "month": 1,
+          "p10_m3_s": 9.127,
+          "p90_m3_s": 19.31,
+          "sample_count": 74
+        },
+        {
+          "median_m3_s": 9.76,
+          "month": 2,
+          "p10_m3_s": 6.986,
+          "p90_m3_s": 15.54,
+          "sample_count": 74
+        },
+        {
+          "median_m3_s": 8.455,
+          "month": 3,
+          "p10_m3_s": 5.813,
+          "p90_m3_s": 12.95,
+          "sample_count": 74
+        },
+        {
+          "median_m3_s": 8.74,
+          "month": 4,
+          "p10_m3_s": 5.574,
+          "p90_m3_s": 14.34,
+          "sample_count": 87
+        },
+        {
+          "median_m3_s": 20.8,
+          "month": 5,
+          "p10_m3_s": 13.2,
+          "p90_m3_s": 33.9,
+          "sample_count": 91
+        }
+      ],
+      "primary_station_number": "08MA002",
+      "rapid_water_windows_allowed_now": false,
+      "reference_months": [
+        10,
+        11,
+        12,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "required_result_fields": [
+        "source_class",
+        "primary_station_number",
+        "downstream_context_station_number",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "daily_window_selection",
+        "route_translation_method",
+        "lag_or_travel_time_assumption",
+        "tributary_adjustment_assumption",
+        "downstream_context_check",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "feature_behavior_notes",
+        "rights_terms_status"
+      ],
+      "review_priority": "high",
+      "solver_windows_allowed_now": false,
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "eccc_08ma002_daily_time_series",
+        "eccc_08ma002_to_put_in_route_translation",
+        "eccc_08ma001_downstream_context_check",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_or_washout_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Reference summer runnable review window",
+      "downstream_context_month_summary": [
+        {
+          "median_m3_s": 180.0,
+          "month": 6,
+          "p10_m3_s": 127.6,
+          "p90_m3_s": 239.2,
+          "sample_count": 97
+        },
+        {
+          "median_m3_s": 231.5,
+          "month": 7,
+          "p10_m3_s": 181.7,
+          "p90_m3_s": 285.5,
+          "sample_count": 98
+        },
+        {
+          "median_m3_s": 204.5,
+          "month": 8,
+          "p10_m3_s": 175.0,
+          "p90_m3_s": 245.6,
+          "sample_count": 98
+        },
+        {
+          "median_m3_s": 125.5,
+          "month": 9,
+          "p10_m3_s": 97.4,
+          "p90_m3_s": 162.3,
+          "sample_count": 98
+        }
+      ],
+      "downstream_context_station_number": "08MA001",
+      "expected_gameplay_behavior": "continuous cold big-water run with wave trains, laterals, strong eddy lines, and limited recovery",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_window": "reference_summer_runnable_review",
+      "numeric_values_allowed_now": false,
+      "primary_station_month_summary": [
+        {
+          "median_m3_s": 74.85,
+          "month": 6,
+          "p10_m3_s": 52.46,
+          "p90_m3_s": 103.4,
+          "sample_count": 94
+        },
+        {
+          "median_m3_s": 114.0,
+          "month": 7,
+          "p10_m3_s": 87.64,
+          "p90_m3_s": 142.6,
+          "sample_count": 95
+        },
+        {
+          "median_m3_s": 105.0,
+          "month": 8,
+          "p10_m3_s": 88.12,
+          "p90_m3_s": 123.0,
+          "sample_count": 95
+        },
+        {
+          "median_m3_s": 67.0,
+          "month": 9,
+          "p10_m3_s": 54.64,
+          "p90_m3_s": 83.34,
+          "sample_count": 97
+        }
+      ],
+      "primary_station_number": "08MA002",
+      "rapid_water_windows_allowed_now": false,
+      "reference_months": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "required_result_fields": [
+        "source_class",
+        "primary_station_number",
+        "downstream_context_station_number",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "daily_window_selection",
+        "route_translation_method",
+        "lag_or_travel_time_assumption",
+        "tributary_adjustment_assumption",
+        "downstream_context_check",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "feature_behavior_notes",
+        "rights_terms_status"
+      ],
+      "review_priority": "critical",
+      "solver_windows_allowed_now": false,
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "eccc_08ma002_daily_time_series",
+        "eccc_08ma002_to_put_in_route_translation",
+        "eccc_08ma001_downstream_context_check",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_or_washout_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "High big-water review window",
+      "downstream_context_month_summary": [
+        {
+          "median_m3_s": 180.0,
+          "month": 6,
+          "p10_m3_s": 127.6,
+          "p90_m3_s": 239.2,
+          "sample_count": 97
+        },
+        {
+          "median_m3_s": 231.5,
+          "month": 7,
+          "p10_m3_s": 181.7,
+          "p90_m3_s": 285.5,
+          "sample_count": 98
+        },
+        {
+          "median_m3_s": 204.5,
+          "month": 8,
+          "p10_m3_s": 175.0,
+          "p90_m3_s": 245.6,
+          "sample_count": 98
+        }
+      ],
+      "downstream_context_station_number": "08MA001",
+      "expected_gameplay_behavior": "larger standing waves, stronger laterals, stickier holes at selected stages, and faster swimmer drift",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_window": "high_big_water_review",
+      "numeric_values_allowed_now": false,
+      "primary_station_month_summary": [
+        {
+          "median_m3_s": 74.85,
+          "month": 6,
+          "p10_m3_s": 52.46,
+          "p90_m3_s": 103.4,
+          "sample_count": 94
+        },
+        {
+          "median_m3_s": 114.0,
+          "month": 7,
+          "p10_m3_s": 87.64,
+          "p90_m3_s": 142.6,
+          "sample_count": 95
+        },
+        {
+          "median_m3_s": 105.0,
+          "month": 8,
+          "p10_m3_s": 88.12,
+          "p90_m3_s": 123.0,
+          "sample_count": 95
+        }
+      ],
+      "primary_station_number": "08MA002",
+      "rapid_water_windows_allowed_now": false,
+      "reference_months": [
+        6,
+        7,
+        8
+      ],
+      "required_result_fields": [
+        "source_class",
+        "primary_station_number",
+        "downstream_context_station_number",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "daily_window_selection",
+        "route_translation_method",
+        "lag_or_travel_time_assumption",
+        "tributary_adjustment_assumption",
+        "downstream_context_check",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "feature_behavior_notes",
+        "rights_terms_status"
+      ],
+      "review_priority": "critical",
+      "solver_windows_allowed_now": false,
+      "water_visual_tuning_allowed_now": false
+    },
+    {
+      "allowed_source_classes": [
+        "eccc_08ma002_daily_time_series",
+        "eccc_08ma002_to_put_in_route_translation",
+        "eccc_08ma001_downstream_context_check",
+        "guide_reviewed_flow_band",
+        "unsafe_high_water_or_washout_review",
+        "hypothesis_pending_guide_review"
+      ],
+      "display_name": "Unsafe or washout review-only window",
+      "downstream_context_month_summary": [
+        {
+          "median_m3_s": 180.0,
+          "month": 6,
+          "p10_m3_s": 127.6,
+          "p90_m3_s": 239.2,
+          "sample_count": 97
+        },
+        {
+          "median_m3_s": 231.5,
+          "month": 7,
+          "p10_m3_s": 181.7,
+          "p90_m3_s": 285.5,
+          "sample_count": 98
+        },
+        {
+          "median_m3_s": 204.5,
+          "month": 8,
+          "p10_m3_s": 175.0,
+          "p90_m3_s": 245.6,
+          "sample_count": 98
+        }
+      ],
+      "downstream_context_station_number": "08MA001",
+      "expected_gameplay_behavior": "some holes may wash out while hydraulics, pins, flips, swimmer separation, and recovery consequences intensify",
+      "feature_forcing_tuning_allowed_now": false,
+      "flow_window": "unsafe_or_washout_review_only",
+      "numeric_values_allowed_now": false,
+      "primary_station_month_summary": [
+        {
+          "median_m3_s": 74.85,
+          "month": 6,
+          "p10_m3_s": 52.46,
+          "p90_m3_s": 103.4,
+          "sample_count": 94
+        },
+        {
+          "median_m3_s": 114.0,
+          "month": 7,
+          "p10_m3_s": 87.64,
+          "p90_m3_s": 142.6,
+          "sample_count": 95
+        },
+        {
+          "median_m3_s": 105.0,
+          "month": 8,
+          "p10_m3_s": 88.12,
+          "p90_m3_s": 123.0,
+          "sample_count": 95
+        }
+      ],
+      "primary_station_number": "08MA002",
+      "rapid_water_windows_allowed_now": false,
+      "reference_months": [
+        6,
+        7,
+        8
+      ],
+      "required_result_fields": [
+        "source_class",
+        "primary_station_number",
+        "downstream_context_station_number",
+        "provider",
+        "variables",
+        "units",
+        "time_zone",
+        "temporal_resolution",
+        "daily_window_selection",
+        "route_translation_method",
+        "lag_or_travel_time_assumption",
+        "tributary_adjustment_assumption",
+        "downstream_context_check",
+        "reach_relation",
+        "guide_reviewed_behavior",
+        "feature_behavior_notes",
+        "rights_terms_status",
+        "safety_status"
+      ],
+      "review_priority": "critical",
+      "solver_windows_allowed_now": false,
+      "water_visual_tuning_allowed_now": false
+    }
+  ],
+  "flow_window_count": 4,
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_bind_solver_windows": false,
+    "can_enable_numeric_discharge_values": false,
+    "can_generate_rapid_water_windows": false,
+    "can_promote_a5": false,
+    "can_record_flow_window_source_classes": false,
+    "can_tune_feature_forcing": false,
+    "can_tune_water_visuals": false
+  },
+  "required_workflow": [
+    "attach daily or event-window 08MA002 discharge records for target run dates",
+    "estimate lag, tributary change, and route translation from 08MA002 to the Chilko River Lodge put-in",
+    "compare against 08MA001 downstream context while separating Taseko confluence influence",
+    "record guide/outfitter hydraulic behavior review for each flow window and priority rapid",
+    "keep unsafe or washout scenarios review-only until safety, rescue, and hazard-readability review passes",
+    "pair reviewed flow windows with exact rapid stationing before authoring water windows or solver scenarios"
+  ],
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.a5_flow_source_review_packet.v1",
+  "source_digitizing_action_packet": "physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_action_packet.json",
+  "source_inputs": [
+    {
+      "discharge_record_count": 1033,
+      "drainage_area_gross_km2": 2138.0,
+      "first_month": "1928-11",
+      "last_month": "2025-12",
+      "limitation": "lake_outlet_is_upstream_of_put_in_and_does_not_include_reach_tributaries",
+      "monthly_record_count": 1068,
+      "real_time": true,
+      "role": "primary_upstream_seasonality_and_timing_candidate",
+      "source_class": "primary_upstream_station",
+      "station_name": "CHILKO RIVER AT OUTLET OF CHILKO LAKE",
+      "station_number": "08MA002",
+      "status": "Active"
+    },
+    {
+      "discharge_record_count": 1076,
+      "drainage_area_gross_km2": 6691.0,
+      "first_month": "1927-05",
+      "last_month": "2024-12",
+      "limitation": "station_is_downstream_of_taseko_confluence_and_cannot_define_pre_confluence_route_discharge",
+      "monthly_record_count": 1107,
+      "real_time": true,
+      "role": "downstream_context_and_routing_check_only",
+      "source_class": "downstream_context_station",
+      "station_name": "CHILKO RIVER NEAR REDSTONE",
+      "station_number": "08MA001",
+      "status": "Active"
+    }
+  ],
+  "source_seasonal_flow_context": "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json",
+  "status": "flow_source_review_packet_ready_08ma002_08ma001_review_only_no_numeric_promotion",
+  "task_id": "A5"
+}
