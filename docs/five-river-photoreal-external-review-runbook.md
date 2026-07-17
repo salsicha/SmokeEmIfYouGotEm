@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 131
-- Referenced command count: 76
+- Referenced artifact count: 132
+- Referenced command count: 77
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -190,18 +190,20 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Use the non-authoritative recommendation packet to start A2 review with official hydrography plus NPS/GCMRC river-mile calibration while keeping Pearce Ferry, CRS, source bboxes, and rapid miles reviewer-owned.
 2. Use the reviewer briefing to answer the full-reach centerline, endpoint, CRS/station-axis, rapid-mile, bbox, publication, and regeneration-scope questions in one packet.
-3. Fill the centerline/CRS decision and rapid-mile cross-check sidecars from reviewed sources.
-4. Fill and validate all 23 source-window bboxes before generating source-pull work orders.
-5. Regenerate A2 readiness only after reviewed source decisions and source-pull status are updated.
-6. Record post-review acceptance evidence for regenerated centerline, windows, stitched validation, rapid stationing, water windows, Unreal import, and final acceptance before asking A2 readiness to clear.
+3. Use the Markdown review form to collect centerline/CRS, rapid-mile cross-check, source-window bbox, and publication decisions before copying accepted values into JSON review payloads.
+4. Fill the centerline/CRS decision and rapid-mile cross-check sidecars from reviewed sources.
+5. Fill and validate all 23 source-window bboxes before generating source-pull work orders.
+6. Regenerate A2 readiness only after reviewed source decisions and source-pull status are updated.
+7. Record post-review acceptance evidence for regenerated centerline, windows, stitched validation, rapid stationing, water windows, Unreal import, and final acceptance before asking A2 readiness to clear.
 
 **Acceptance Requirements**
 
 1. Reviewer decisions cite the A2 briefing source artifacts and answer the centerline, endpoint, station-axis, rapid-mile, bbox, publication, and regeneration-scope questions.
-2. Centerline/CRS, rapid-mile, and source-window bbox validators are green.
-3. All 46 official source-pull rows have hash-locked outputs before source-window promotion.
-4. The post-review acceptance validation report is green for full-reach centerline, window manifests, stitched validation, rapid stationing, rapid water windows, Unreal import, and oarsman/geospatial/rights/owner acceptance.
-5. The A2 readiness report no longer blocks full-run centerline, bbox, rapid stationing, or source-pull promotion.
+2. The filled centerline, rapid-mile, and bbox records are traceable to the Markdown review form or equivalent signed review packets.
+3. Centerline/CRS, rapid-mile, and source-window bbox validators are green.
+4. All 46 official source-pull rows have hash-locked outputs before source-window promotion.
+5. The post-review acceptance validation report is green for full-reach centerline, window manifests, stitched validation, rapid stationing, rapid water windows, Unreal import, and oarsman/geospatial/rights/owner acceptance.
+6. The A2 readiness report no longer blocks full-run centerline, bbox, rapid stationing, or source-pull promotion.
 
 **Promotion Guardrails**
 
@@ -211,6 +213,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_review_briefing.json`
+- `docs/colorado-a2-full-reach-review-form.md`
 - `physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_review_recommendation.json`
 - `physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_centerline_decision_template.json`
 - `physics/data/real_world/colorado_river_grand_canyon_rowing/review/full_reach_centerline_decision_validation_report.json`
@@ -228,6 +231,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_colorado_a2_review_briefing.py`
+- `physics/src/raftsim/examples/generate_colorado_a2_review_form.py`
 - `physics/src/raftsim/examples/generate_colorado_a2_review_recommendation.py`
 - `physics/src/raftsim/examples/validate_colorado_a2_centerline_decision.py`
 - `physics/src/raftsim/examples/validate_colorado_a2_rapid_mile_crosscheck.py`
