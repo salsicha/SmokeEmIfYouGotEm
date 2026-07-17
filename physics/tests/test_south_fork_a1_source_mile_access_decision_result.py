@@ -1,6 +1,9 @@
 import json
 from pathlib import Path
 
+from raftsim.examples.validate_south_fork_a1_source_mile_access_decision_result import (
+    main as validate_south_fork_a1_source_mile_access_decision_result_main,
+)
 from raftsim.south_fork_a1_source_mile_access_decision import (
     FULL_REACH_SOURCE_MILE_ACCESS_DECISION_PACKET_RELATIVE_PATH,
     build_south_fork_a1_source_mile_access_decision_packet,
@@ -201,6 +204,91 @@ def test_south_fork_a1_source_mile_access_decision_validation_rejects_bad_option
         payload,
     )
 
+    assert report["decision_valid"] is False
+    assert {"field": "chosen_option_id", "reason": "option_id_not_allowed"} in report[
+        "invalid_fields"
+    ]
+
+
+def test_south_fork_a1_source_mile_access_decision_cli_writes_empty_gate():
+    exit_code = validate_south_fork_a1_source_mile_access_decision_result_main(
+        ["--repo-root", str(REPO_ROOT)]
+    )
+
+    template_path = (
+        REPO_ROOT / FULL_REACH_SOURCE_MILE_ACCESS_DECISION_RESULT_TEMPLATE_RELATIVE_PATH
+    )
+    report_path = (
+        REPO_ROOT / FULL_REACH_SOURCE_MILE_ACCESS_DECISION_VALIDATION_REPORT_RELATIVE_PATH
+    )
+    assert exit_code == 0
+    assert template_path.exists()
+    assert report_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert report["decision_valid"] is False
+    assert report["status"] == "decision_result_incomplete_route_promotion_blocked"
+
+
+def test_south_fork_a1_source_mile_access_decision_cli_accepts_complete_result(
+    tmp_path,
+):
+    payload = _complete_decision_payload()
+    decision_path = tmp_path / "filled_source_mile_access_decision_result.json"
+    output_path = tmp_path / "accepted_source_mile_access_decision_result.json"
+    report_path = tmp_path / "source_mile_access_decision_validation_report.json"
+    decision_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_south_fork_a1_source_mile_access_decision_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--decision-result",
+            str(decision_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 0
+    assert output_path.exists()
+    assert report_path.exists()
+    accepted = json.loads(output_path.read_text(encoding="utf-8"))
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    assert accepted == payload
+    assert report["decision_valid"] is True
+    assert report["regeneration_permissions"]["can_regenerate_directed_route"] is True
+    assert report["regeneration_permissions"]["can_bind_solver_windows"] is True
+
+
+def test_south_fork_a1_source_mile_access_decision_cli_blocks_invalid_result(
+    tmp_path,
+):
+    payload = _complete_decision_payload()
+    payload["decision_result"]["chosen_option_id"] = "not_allowed"
+    decision_path = tmp_path / "invalid_source_mile_access_decision_result.json"
+    output_path = tmp_path / "accepted_source_mile_access_decision_result.json"
+    report_path = tmp_path / "source_mile_access_decision_validation_report.json"
+    decision_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    exit_code = validate_south_fork_a1_source_mile_access_decision_result_main(
+        [
+            "--repo-root",
+            str(REPO_ROOT),
+            "--decision-result",
+            str(decision_path),
+            "--output",
+            str(output_path),
+            "--report",
+            str(report_path),
+        ]
+    )
+
+    assert exit_code == 1
+    assert report_path.exists()
+    assert not output_path.exists()
+    report = json.loads(report_path.read_text(encoding="utf-8"))
     assert report["decision_valid"] is False
     assert {"field": "chosen_option_id", "reason": "option_id_not_allowed"} in report[
         "invalid_fields"
