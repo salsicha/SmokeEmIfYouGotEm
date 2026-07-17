@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 134
-- Referenced command count: 79
+- Referenced artifact count: 135
+- Referenced command count: 80
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -406,18 +406,20 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Use the non-authoritative recommendation packet to start A5 review with exact endpoint geometry, a reviewed route station axis, GPS/aerial rapid geometry, and 08MA002 daily-window routing with 08MA001 context before numeric tuning.
 2. Use the reviewer briefing to answer the Chilko route/endpoint, rapid geometry, guide, 08MA002 routing, 08MA001 context, unsafe/washout, land/publication, and regeneration-scope questions.
-3. Approve exact put-in/take-out geometry and priority rapid stationing.
-4. Attach reviewed 08MA002 flow-window routing evidence and signoffs.
-5. Regenerate route, source-window, editor, and water-window inputs after validation.
-6. Record post-review acceptance evidence for regenerated stationing, endpoint/land publication, editor markers, 08MA source classes, water windows, unsafe/washout safety, solver validation, Unreal import, and final guide/geospatial/rights/land/hazard/owner acceptance.
+3. Use the Markdown review form to collect endpoint, route-axis, rapid geometry, 08MA002 routing, 08MA001 context, unsafe/washout, land/publication, and regeneration decisions before copying accepted values into JSON review payloads.
+4. Approve exact put-in/take-out geometry and priority rapid stationing.
+5. Attach reviewed 08MA002 flow-window routing evidence and signoffs.
+6. Regenerate route, source-window, editor, and water-window inputs after validation.
+7. Record post-review acceptance evidence for regenerated stationing, endpoint/land publication, editor markers, 08MA source classes, water windows, unsafe/washout safety, solver validation, Unreal import, and final guide/geospatial/rights/land/hazard/owner acceptance.
 
 **Acceptance Requirements**
 
 1. Reviewer decisions cite the A5 briefing source artifacts and answer the route/endpoint, rapid-geometry, guide, 08MA002/08MA001, unsafe/washout, land/publication, and regeneration-scope questions.
-2. Stationing and flow validators are green.
-3. Regeneration actions cover the Chilko corridor and all priority rapid outputs.
-4. The post-review acceptance validation report is green for regenerated stationing, endpoint/land-publication approval, catalog/editor outputs, 08MA flow source classes, rapid water windows, unsafe/washout safety, C++ solver validation, Unreal import, and final acceptance.
-5. A5 readiness no longer lists exact-geometry, flow-source, or regeneration blockers.
+2. The filled stationing and 08MA flow-window records are traceable to the Markdown review form or equivalent signed review packets.
+3. Stationing and flow validators are green.
+4. Regeneration actions cover the Chilko corridor and all priority rapid outputs.
+5. The post-review acceptance validation report is green for regenerated stationing, endpoint/land-publication approval, catalog/editor outputs, 08MA flow source classes, rapid water windows, unsafe/washout safety, C++ solver validation, Unreal import, and final acceptance.
+6. A5 readiness no longer lists exact-geometry, flow-source, or regeneration blockers.
 
 **Promotion Guardrails**
 
@@ -427,6 +429,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/chilko_river_bc/review/a5_review_briefing.json`
+- `docs/chilko-a5-stationing-08ma-flow-review-form.md`
 - `physics/data/real_world/chilko_river_bc/review/a5_review_recommendation.json`
 - `physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_result_template.json`
 - `physics/data/real_world/chilko_river_bc/review/a5_stationing_digitizing_validation_report.json`
@@ -440,6 +443,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_chilko_a5_review_briefing.py`
+- `physics/src/raftsim/examples/generate_chilko_a5_review_form.py`
 - `physics/src/raftsim/examples/generate_chilko_a5_review_recommendation.py`
 - `physics/src/raftsim/examples/validate_chilko_a5_digitizing_result.py`
 - `physics/src/raftsim/examples/validate_chilko_a5_flow_source_result.py`
