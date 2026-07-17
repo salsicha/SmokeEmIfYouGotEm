@@ -8,6 +8,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from .scalability_profiles import SCALABILITY_PROFILE_IDS
+
 
 SOURCE_CATALOG_RELATIVE_PATH = "physics/data/real_world/named_rapid_source_catalog.json"
 EDITOR_MARKERS_RELATIVE_PATH = "unreal/Content/RaftSim/River/named_rapid_editor_markers.json"
@@ -474,13 +476,7 @@ def build_simulator_review_runs(editor_markers: dict[str, Any]) -> dict[str, Any
                                 "rescue_time_s",
                                 "mass_conservation_error",
                             ],
-                            "platform_profiles": [
-                                "desktop_high",
-                                "desktop_scalable",
-                                "console_quality",
-                                "console_performance",
-                                "handheld_low",
-                            ],
+                            "platform_profiles": list(SCALABILITY_PROFILE_IDS),
                             "definition_status": "ready_for_window_binding",
                             "execution_status": "blocked_until_exact_geometry_validated_cpp_window_and_guide_line",
                         }
