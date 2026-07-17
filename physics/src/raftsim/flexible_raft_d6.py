@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
@@ -39,12 +40,24 @@ D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH = (
 D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH = (
     "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json"
 )
+D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json"
+)
+D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH = (
+    "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json"
+)
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
 D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
 D6_MEASUREMENT_MANIFEST_SCHEMA = "raftsim.flexible_raft.d6_measurement_manifest.v1"
 D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = "raftsim.flexible_raft.d6_measured_results_template.v1"
 D6_FIXTURE_INPUT_PACKAGE_SCHEMA = "raftsim.flexible_raft.d6_fixture_input_package.v1"
 D6_CHAOS_FIXTURE_CONTRACT_SCHEMA = "raftsim.flexible_raft.d6_chaos_fixture_contract.v1"
+D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA = (
+    "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1"
+)
+D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_SCHEMA = (
+    "raftsim.flexible_raft.d6_chaos_measured_results_merge_report.v1"
+)
 D6_METRIC_ABSOLUTE_TOLERANCE = 1.0e-6
 D6_METRIC_RELATIVE_TOLERANCE = 0.05
 
@@ -83,6 +96,7 @@ _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS = (
     "telemetry_sha256",
     "engine_version",
 )
+_D6_CHAOS_TARGET_ID = "unreal_chaos_rigid_baseline"
 
 
 def build_flexible_raft_d6_behavioral_suite(
@@ -425,6 +439,242 @@ def write_flexible_raft_d6_measured_results_template(repo_root: Path) -> Path:
     return path
 
 
+def build_flexible_raft_d6_chaos_measured_results_sidecar_template(
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Build the fillable Unreal Chaos-only measured-results sidecar."""
+
+    template = build_flexible_raft_d6_measured_results_template(parameters)
+    return {
+        "schema": D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": "chaos_measured_results_sidecar_template_empty",
+        "d6_complete": False,
+        "production_promoted": False,
+        "runtime": "UnrealChaos",
+        "target_id": _D6_CHAOS_TARGET_ID,
+        "source_chaos_fixture_contract_path": D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
+        "source_measured_results_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+        "source_comparison_report_path": D6_COMPARISON_REPORT_RELATIVE_PATH,
+        "fixture_count": len(REQUIRED_D6_FIXTURE_IDS),
+        "required_fixture_ids": list(REQUIRED_D6_FIXTURE_IDS),
+        "required_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
+        "filled_result_count": 0,
+        "results": deepcopy(template["measured_results"][_D6_CHAOS_TARGET_ID]),
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "may_merge_into_measured_results_template": False,
+            "reason": (
+                "This sidecar is intentionally empty. Unreal Chaos automation must "
+                "fill all seven D6 fixture results with source_report, telemetry "
+                "SHA-256, engine version, and required numeric metrics before the "
+                "standard measured-results template can be merged and compared."
+            ),
+        },
+    }
+
+
+def write_flexible_raft_d6_chaos_measured_results_sidecar_template(
+    repo_root: Path,
+) -> Path:
+    payload = build_flexible_raft_d6_chaos_measured_results_sidecar_template()
+    path = repo_root / D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def build_flexible_raft_d6_chaos_measured_results_merge_report(
+    sidecar_payload: dict[str, Any],
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Validate a Chaos sidecar before it can enter the standard D6 template."""
+
+    suite = build_flexible_raft_d6_behavioral_suite(parameters)
+    fixture_lookup = {fixture["fixture_id"]: fixture for fixture in suite["fixtures"]}
+    expected_fixture_ids = set(REQUIRED_D6_FIXTURE_IDS)
+    errors: list[str] = []
+
+    if not isinstance(sidecar_payload, dict):
+        sidecar_payload = {}
+        errors.append("sidecar_payload_must_be_json_object")
+
+    if sidecar_payload.get("schema") != D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA:
+        errors.append("sidecar_schema_mismatch")
+    if sidecar_payload.get("target_id") != _D6_CHAOS_TARGET_ID:
+        errors.append("target_id_must_be_unreal_chaos_rigid_baseline")
+
+    results = sidecar_payload.get("results")
+    if not isinstance(results, dict):
+        results = {}
+        errors.append("results_must_be_json_object")
+
+    actual_fixture_ids = set(results)
+    missing_fixture_ids = sorted(expected_fixture_ids - actual_fixture_ids)
+    unexpected_fixture_ids = sorted(actual_fixture_ids - expected_fixture_ids)
+    if missing_fixture_ids:
+        errors.append("missing_required_fixture_results")
+    if unexpected_fixture_ids:
+        errors.append("unexpected_fixture_results")
+
+    fixture_reports = []
+    filled_fixture_count = 0
+    invalid_fixture_count = 0
+    for fixture_id in REQUIRED_D6_FIXTURE_IDS:
+        fixture = fixture_lookup[fixture_id]
+        record = results.get(fixture_id)
+        report = _validate_d6_chaos_measured_result_record(fixture, record)
+        if report["valid"]:
+            filled_fixture_count += 1
+        else:
+            invalid_fixture_count += 1
+        fixture_reports.append(report)
+
+    can_merge = (
+        not errors
+        and not missing_fixture_ids
+        and not unexpected_fixture_ids
+        and invalid_fixture_count == 0
+        and filled_fixture_count == len(REQUIRED_D6_FIXTURE_IDS)
+    )
+    status = (
+        "chaos_measured_results_valid_ready_for_standard_template_merge"
+        if can_merge
+        else "blocked_pending_complete_chaos_measured_results"
+    )
+
+    return {
+        "schema": D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": status,
+        "d6_complete": False,
+        "production_promoted": False,
+        "target_id": _D6_CHAOS_TARGET_ID,
+        "runtime": "UnrealChaos",
+        "source_sidecar_schema": sidecar_payload.get("schema"),
+        "source_chaos_fixture_contract_path": D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
+        "source_measured_results_template_path": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+        "source_comparison_report_path": D6_COMPARISON_REPORT_RELATIVE_PATH,
+        "valid": can_merge,
+        "can_merge": can_merge,
+        "fixture_count": len(REQUIRED_D6_FIXTURE_IDS),
+        "filled_fixture_count": filled_fixture_count,
+        "invalid_fixture_count": invalid_fixture_count,
+        "missing_fixture_count": len(missing_fixture_ids),
+        "unexpected_fixture_count": len(unexpected_fixture_ids),
+        "missing_fixture_ids": missing_fixture_ids,
+        "unexpected_fixture_ids": unexpected_fixture_ids,
+        "errors": sorted(set(errors)),
+        "fixture_reports": fixture_reports,
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "may_merge_into_measured_results_template": can_merge,
+            "may_regenerate_comparison_report_after_merge": can_merge,
+            "reason": (
+                "Chaos sidecar merge is allowed only after all seven Unreal Chaos "
+                "D6 fixtures have complete provenance, valid telemetry hashes, "
+                "and every required numeric metric. D6 still also requires the "
+                "compliant-reference target and manual review before promotion."
+            ),
+        },
+    }
+
+
+def merge_flexible_raft_d6_chaos_measured_results_sidecar(
+    sidecar_payload: dict[str, Any],
+    *,
+    base_measured_results_payload: dict[str, Any] | None = None,
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Merge a validated Chaos sidecar into the standard measured-results payload."""
+
+    report = build_flexible_raft_d6_chaos_measured_results_merge_report(
+        sidecar_payload,
+        parameters,
+    )
+    if not report["can_merge"]:
+        details = ", ".join(report["errors"] or ["invalid Chaos sidecar"])
+        raise ValueError(f"Cannot merge D6 Chaos measured-results sidecar: {details}")
+
+    merged = deepcopy(
+        base_measured_results_payload
+        if base_measured_results_payload is not None
+        else build_flexible_raft_d6_measured_results_template(parameters)
+    )
+    measured_results = merged.get("measured_results")
+    if not isinstance(measured_results, dict):
+        raise ValueError("Base measured-results payload must contain measured_results.")
+    if _D6_CHAOS_TARGET_ID not in measured_results:
+        raise ValueError("Base measured-results payload is missing the Chaos target.")
+
+    template = build_flexible_raft_d6_measured_results_template(parameters)
+    chaos_template = template["measured_results"][_D6_CHAOS_TARGET_ID]
+    chaos_results = sidecar_payload["results"]
+    for fixture_id in REQUIRED_D6_FIXTURE_IDS:
+        source_record = chaos_results[fixture_id]
+        target_record = deepcopy(chaos_template[fixture_id])
+        target_record.update(
+            {
+                "status": source_record.get("status", "measured_engine_output"),
+                "source_report": source_record["source_report"],
+                "telemetry_sha256": source_record["telemetry_sha256"],
+                "engine_version": source_record["engine_version"],
+                "metrics": deepcopy(source_record["metrics"]),
+                "source_sidecar_schema": sidecar_payload["schema"],
+                "source_chaos_fixture_contract_path": D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
+            }
+        )
+        measured_results[_D6_CHAOS_TARGET_ID][fixture_id] = target_record
+
+    merged["status"] = "measured_results_template_partially_populated_pending_remaining_targets"
+    merged["filled_result_count"] = _count_filled_d6_measured_result_records(
+        measured_results
+    )
+    merged["source_chaos_measured_results_sidecar_schema"] = sidecar_payload["schema"]
+    merged["source_chaos_fixture_contract_path"] = D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH
+    merged["promotion_gate"] = {
+        "may_mark_d6_complete": False,
+        "may_drive_runtime_gameplay": False,
+        "reason": (
+            "This payload contains validated Unreal Chaos D6 baseline results, "
+            "but D6 remains incomplete until the compliant reference target is "
+            "also populated, the comparison report passes, and manual review "
+            "approves promotion."
+        ),
+    }
+    return merged
+
+
+def write_flexible_raft_d6_chaos_measured_results_merge_report(
+    repo_root: Path,
+    sidecar_payload: dict[str, Any] | None = None,
+) -> Path:
+    payload = build_flexible_raft_d6_chaos_measured_results_merge_report(
+        sidecar_payload or build_flexible_raft_d6_chaos_measured_results_sidecar_template()
+    )
+    return write_flexible_raft_d6_chaos_measured_results_merge_payload(
+        repo_root / D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
+        payload,
+    )
+
+
+def write_flexible_raft_d6_chaos_measured_results_merge_payload(
+    output_path: Path,
+    payload: dict[str, Any],
+) -> Path:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return output_path
+
+
 def build_flexible_raft_d6_fixture_input_package(
     parameters: RaftParameters2_5D | None = None,
 ) -> dict[str, Any]:
@@ -520,6 +770,13 @@ def build_flexible_raft_d6_chaos_fixture_contract(
             "replay_dir": "physics/reports/d6/chaos/replays",
             "measured_results_sidecar": (
                 "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json"
+            ),
+            "measured_results_sidecar_schema": D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA,
+            "measured_results_sidecar_template": (
+                D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH
+            ),
+            "measured_results_merge_report": (
+                D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
             ),
         },
         "required_result_fields": [
@@ -1326,6 +1583,93 @@ def _invalid_measurement_provenance_fields(
     if telemetry_sha256 and not _is_sha256_hex(str(telemetry_sha256)):
         invalid.append("telemetry_sha256")
     return invalid
+
+
+def _validate_d6_chaos_measured_result_record(
+    fixture: dict[str, Any],
+    record: Any,
+) -> dict[str, Any]:
+    fixture_id = fixture["fixture_id"]
+    required_metric_paths = set(_flatten_numeric_metrics(fixture["python_reference_metrics"]))
+    errors = []
+    missing_provenance: list[str] = []
+    invalid_provenance: list[str] = []
+    missing_metric_paths = sorted(required_metric_paths)
+    extra_metric_paths: list[str] = []
+    measured_metric_count = 0
+
+    if not isinstance(record, dict):
+        errors.append("missing_result_record")
+    else:
+        if record.get("fixture_id") not in (None, fixture_id):
+            errors.append("fixture_id_mismatch")
+        if record.get("target_id") not in (None, _D6_CHAOS_TARGET_ID):
+            errors.append("target_id_mismatch")
+        if record.get("status") == "not_measured":
+            errors.append("result_status_not_measured")
+
+        missing_provenance = [
+            field for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS if not record.get(field)
+        ]
+        invalid_provenance = _invalid_measurement_provenance_fields(record)
+        if missing_provenance:
+            errors.append("missing_required_provenance")
+        if invalid_provenance:
+            errors.append("invalid_required_provenance")
+
+        metrics = record.get("metrics")
+        if not isinstance(metrics, dict):
+            errors.append("metrics_must_be_json_object")
+            measured_metrics = {}
+        else:
+            measured_metrics = _flatten_numeric_metrics(metrics)
+        measured_metric_paths = set(measured_metrics)
+        measured_metric_count = len(measured_metric_paths)
+        missing_metric_paths = sorted(required_metric_paths - measured_metric_paths)
+        extra_metric_paths = sorted(measured_metric_paths - required_metric_paths)
+        if missing_metric_paths:
+            errors.append("missing_required_numeric_metrics")
+
+    return {
+        "fixture_id": fixture_id,
+        "valid": not errors,
+        "status": "valid" if not errors else "invalid",
+        "required_metric_count": len(required_metric_paths),
+        "measured_metric_count": measured_metric_count,
+        "missing_metric_count": len(missing_metric_paths),
+        "extra_metric_count": len(extra_metric_paths),
+        "missing_metric_paths": missing_metric_paths,
+        "extra_metric_paths": extra_metric_paths,
+        "missing_provenance_fields": missing_provenance,
+        "invalid_provenance_fields": invalid_provenance,
+        "errors": errors,
+    }
+
+
+def _count_filled_d6_measured_result_records(
+    measured_results: dict[str, Any],
+) -> int:
+    count = 0
+    for fixture_map in measured_results.values():
+        if not isinstance(fixture_map, dict):
+            continue
+        for record in fixture_map.values():
+            if not isinstance(record, dict):
+                continue
+            missing_provenance = [
+                field
+                for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS
+                if not record.get(field)
+            ]
+            metrics = record.get("metrics")
+            if (
+                not missing_provenance
+                and not _invalid_measurement_provenance_fields(record)
+                and isinstance(metrics, dict)
+                and _flatten_numeric_metrics(metrics)
+            ):
+                count += 1
+    return count
 
 
 def _is_sha256_hex(value: str) -> bool:

@@ -1,6 +1,9 @@
 {
   "automation_export": {
+    "measured_results_merge_report": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json",
     "measured_results_sidecar": "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json",
+    "measured_results_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+    "measured_results_sidecar_template": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json",
     "replay_dir": "physics/reports/d6/chaos/replays",
     "summary": "physics/reports/d6/chaos/summary.json"
   },
