@@ -6,7 +6,9 @@ import argparse
 from pathlib import Path
 
 from raftsim.flexible_raft_d6 import (
+    build_flexible_raft_d6_chaos_fixture_contract,
     build_flexible_raft_d6_fixture_input_package,
+    write_flexible_raft_d6_chaos_fixture_contract,
     write_flexible_raft_d6_fixture_input_package,
 )
 
@@ -17,11 +19,15 @@ def main() -> None:
     args = parser.parse_args()
 
     output_path = write_flexible_raft_d6_fixture_input_package(args.repo_root)
+    chaos_contract_path = write_flexible_raft_d6_chaos_fixture_contract(args.repo_root)
     payload = build_flexible_raft_d6_fixture_input_package()
+    chaos_contract = build_flexible_raft_d6_chaos_fixture_contract()
     print(f"fixture_inputs={output_path}")
+    print(f"chaos_contract={chaos_contract_path}")
     print(f"schema={payload['schema']}")
     print(f"fixture_count={payload['fixture_count']}")
     print(f"measurement_task_count={payload['measurement_task_count']}")
+    print(f"chaos_job_count={chaos_contract['job_count']}")
     print(f"d6_complete={payload['d6_complete']}")
 
 

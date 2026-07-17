@@ -36,11 +36,15 @@ D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH = (
 D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_fixture_input_package.json"
 )
+D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH = (
+    "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json"
+)
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
 D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
 D6_MEASUREMENT_MANIFEST_SCHEMA = "raftsim.flexible_raft.d6_measurement_manifest.v1"
 D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = "raftsim.flexible_raft.d6_measured_results_template.v1"
 D6_FIXTURE_INPUT_PACKAGE_SCHEMA = "raftsim.flexible_raft.d6_fixture_input_package.v1"
+D6_CHAOS_FIXTURE_CONTRACT_SCHEMA = "raftsim.flexible_raft.d6_chaos_fixture_contract.v1"
 D6_METRIC_ABSOLUTE_TOLERANCE = 1.0e-6
 D6_METRIC_RELATIVE_TOLERANCE = 0.05
 
@@ -117,7 +121,7 @@ def build_flexible_raft_d6_behavioral_suite(
             },
             "chaos_rigid_baseline": {
                 "required": True,
-                "source_contract": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
+                "source_contract": D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
                 "status": "missing_measured_unreal_chaos_results",
             },
         },
@@ -488,6 +492,69 @@ def write_flexible_raft_d6_fixture_input_package(repo_root: Path) -> Path:
     return path
 
 
+def build_flexible_raft_d6_chaos_fixture_contract(
+    parameters: RaftParameters2_5D | None = None,
+) -> dict[str, Any]:
+    """Build the Unreal Chaos runner contract for D6 measured baseline jobs."""
+
+    package = build_flexible_raft_d6_fixture_input_package(parameters)
+    chaos_jobs = [_d6_chaos_job_payload(fixture) for fixture in package["fixtures"]]
+    return {
+        "schema": D6_CHAOS_FIXTURE_CONTRACT_SCHEMA,
+        "generated_on": "2026-07-16",
+        "status": "chaos_fixture_contract_ready_runner_implementation_pending",
+        "d6_complete": False,
+        "production_promoted": False,
+        "runtime": "UnrealChaos",
+        "source_fixture_input_package": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
+        "source_measurement_manifest": D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
+        "source_measured_results_template": D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
+        "source_milestone19_runtime_manifest": (
+            "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json"
+        ),
+        "job_count": len(chaos_jobs),
+        "required_fixture_ids": list(REQUIRED_D6_FIXTURE_IDS),
+        "fixed_step_seconds": package["common_setup"]["fixed_step_s"],
+        "automation_export": {
+            "summary": "physics/reports/d6/chaos/summary.json",
+            "replay_dir": "physics/reports/d6/chaos/replays",
+            "measured_results_sidecar": (
+                "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json"
+            ),
+        },
+        "required_result_fields": [
+            "source_report",
+            "telemetry_sha256",
+            "engine_version",
+            "metrics",
+        ],
+        "jobs": chaos_jobs,
+        "promotion_gate": {
+            "may_mark_d6_complete": False,
+            "may_drive_runtime_gameplay": False,
+            "may_substitute_python_reference": False,
+            "manual_review_required_after_run": True,
+            "reason": (
+                "This contract defines the Unreal Chaos baseline runner inputs "
+                "and expected outputs only. D6 still requires measured Chaos "
+                "exports, compliant-reference exports, comparison regeneration, "
+                "and manual review."
+            ),
+        },
+    }
+
+
+def write_flexible_raft_d6_chaos_fixture_contract(repo_root: Path) -> Path:
+    payload = build_flexible_raft_d6_chaos_fixture_contract()
+    path = repo_root / D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def _d6_target_adapter_contract(target_id: str) -> dict[str, Any]:
     if target_id == "project_chrono_or_reviewed_compliant_model":
         return {
@@ -506,6 +573,7 @@ def _d6_target_adapter_contract(target_id: str) -> dict[str, Any]:
                 "Unreal Chaos rigid-body fixture pass using the same initial "
                 "raft state, crew actions, obstacle definitions, and flow probes."
             ),
+            "fixture_contract": D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH,
             "required_output": "baseline delta metrics plus telemetry hash",
             "may_substitute_with_synthetic_python_reference": False,
         }
@@ -715,6 +783,80 @@ def _d6_target_fixture_input_payload(target_id: str, fixture_id: str) -> dict[st
         "required_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
         "can_promote_fixture": False,
     }
+
+
+def _d6_chaos_job_payload(fixture: dict[str, Any]) -> dict[str, Any]:
+    fixture_id = fixture["fixture_id"]
+    return {
+        "job_id": f"unreal_chaos_rigid_baseline__{fixture_id}",
+        "fixture_id": fixture_id,
+        "status": "ready_for_unreal_runner_implementation_pending",
+        "runtime": "UnrealChaos",
+        "comparison_mode": D6_TARGET_POLICIES["unreal_chaos_rigid_baseline"][
+            "comparison_mode"
+        ],
+        "metric_deltas_are_failures": False,
+        "automation_test_name": f"RaftSim.D6.Chaos.{_pascal_case(fixture_id)}",
+        "fixture_input_package": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
+        "fixture_input_selector": {
+            "fixture_id": fixture_id,
+            "common_setup": "use source_fixture_input_package.common_setup",
+            "input_contract": "use source_fixture_input_package.fixtures entry by fixture_id",
+        },
+        "expected_result_template_path": (
+            "physics/data/calibration/d6_measurements/"
+            f"unreal_chaos_rigid_baseline/{fixture_id}.json"
+        ),
+        "required_metric_paths": fixture["required_metric_paths"],
+        "required_metric_count": fixture["required_metric_count"],
+        "required_d5_replay_channels": fixture["required_d5_replay_channels"],
+        "required_telemetry_fields": [
+            "runtime_id",
+            "fixture_id",
+            "step_index",
+            "raft_pose",
+            "raft_linear_velocity",
+            "raft_angular_velocity",
+            "contact_points",
+            "contact_impulses",
+            "crew_state",
+            "tube_or_rigid_proxy_state",
+            "overwash_state",
+            "pin_state",
+            "release_state",
+            "outcome",
+            "runtime_cpu_ms",
+            "determinism_hash",
+        ],
+        "required_output_fields": [
+            "source_report",
+            "telemetry_sha256",
+            "engine_version",
+            "metrics",
+        ],
+        "unreal_target": {
+            "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
+            "fixture_map": f"/RaftSim/Physics/D6/Chaos/{fixture_id}",
+            "test_type": "EditorContext | EngineFilter",
+            "debug_overlay_capture": (
+                f"Saved/Automation/RaftSim/D6/Chaos/{fixture_id}_overlay.png"
+            ),
+            "telemetry_stream": (
+                f"Saved/Automation/RaftSim/D6/Chaos/{fixture_id}.telemetry.jsonl"
+            ),
+        },
+        "guardrails": {
+            "may_promote_fixture": False,
+            "may_drive_scoring_critical_physics": False,
+            "may_substitute_python_reference": False,
+            "must_export_64_hex_telemetry_sha256": True,
+            "must_preserve_fixture_input_semantics": True,
+        },
+    }
+
+
+def _pascal_case(value: str) -> str:
+    return "".join(part[:1].upper() + part[1:] for part in value.split("_"))
 
 
 def _crew_phase_payload(
