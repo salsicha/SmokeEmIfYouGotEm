@@ -1,0 +1,397 @@
+{
+  "generated_on": "2026-07-16",
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_mark_any_b2_complete_from_empty_sidecar": false,
+    "can_run_corridor_substitution_from_empty_sidecar": false,
+    "complete_when": [
+      "the readiness report marks each river promotion_ready",
+      "the sidecar records a reviewed owner decision for each river",
+      "selected candidate, source-hash, and import-review ids cover readiness counts",
+      "every required review role approves with evidence",
+      "the sidecar merge report and canonical decision validation report are green",
+      "the plan checkbox update is performed as a separate manual step"
+    ]
+  },
+  "required_review_roles": [
+    "owner_or_producer_acceptance",
+    "environment_art_direction",
+    "river_guide_or_ecology_reviewer",
+    "rights_or_license_reviewer",
+    "hazard_readability_reviewer",
+    "technical_art_import_reviewer",
+    "desktop_vr_performance_reviewer"
+  ],
+  "river_decision_count": 5,
+  "river_decisions": [
+    {
+      "approved_for_corridor_substitution": false,
+      "corridor_substitution_executed": false,
+      "decision_date": "",
+      "decision_id": "south_fork_american_chili_bar:b2_asset_promotion_decision",
+      "decision_owner": "",
+      "decision_status": "not_recorded",
+      "display_name": "South Fork American",
+      "import_review_record_ids": [],
+      "notes": "",
+      "plan_checkbox_marked_complete": false,
+      "promotion_ready": false,
+      "readiness_record_counts": {
+        "import_review_record_count": 7,
+        "source_hash_record_count": 7
+      },
+      "reviewer_signoff": {
+        "desktop_vr_performance_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "environment_art_direction": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "hazard_readability_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "owner_or_producer_acceptance": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "rights_or_license_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "river_guide_or_ecology_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "technical_art_import_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      },
+      "river_id": "south_fork_american_chili_bar",
+      "selected_candidate_ids": [],
+      "source_hash_record_ids": []
+    },
+    {
+      "approved_for_corridor_substitution": false,
+      "corridor_substitution_executed": false,
+      "decision_date": "",
+      "decision_id": "colorado_river_grand_canyon_rowing:b2_asset_promotion_decision",
+      "decision_owner": "",
+      "decision_status": "not_recorded",
+      "display_name": "Colorado River Grand Canyon",
+      "import_review_record_ids": [],
+      "notes": "",
+      "plan_checkbox_marked_complete": false,
+      "promotion_ready": false,
+      "readiness_record_counts": {
+        "import_review_record_count": 9,
+        "source_hash_record_count": 9
+      },
+      "reviewer_signoff": {
+        "desktop_vr_performance_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "environment_art_direction": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "hazard_readability_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "owner_or_producer_acceptance": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "rights_or_license_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "river_guide_or_ecology_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "technical_art_import_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      },
+      "river_id": "colorado_river_grand_canyon_rowing",
+      "selected_candidate_ids": [],
+      "source_hash_record_ids": []
+    },
+    {
+      "approved_for_corridor_substitution": false,
+      "corridor_substitution_executed": false,
+      "decision_date": "",
+      "decision_id": "pacuare_river_costa_rica:b2_asset_promotion_decision",
+      "decision_owner": "",
+      "decision_status": "not_recorded",
+      "display_name": "Pacuare River",
+      "import_review_record_ids": [],
+      "notes": "",
+      "plan_checkbox_marked_complete": false,
+      "promotion_ready": false,
+      "readiness_record_counts": {
+        "import_review_record_count": 9,
+        "source_hash_record_count": 9
+      },
+      "reviewer_signoff": {
+        "desktop_vr_performance_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "environment_art_direction": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "hazard_readability_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "owner_or_producer_acceptance": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "rights_or_license_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "river_guide_or_ecology_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "technical_art_import_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      },
+      "river_id": "pacuare_river_costa_rica",
+      "selected_candidate_ids": [],
+      "source_hash_record_ids": []
+    },
+    {
+      "approved_for_corridor_substitution": false,
+      "corridor_substitution_executed": false,
+      "decision_date": "",
+      "decision_id": "futaleufu_river_chile:b2_asset_promotion_decision",
+      "decision_owner": "",
+      "decision_status": "not_recorded",
+      "display_name": "Futaleufu River",
+      "import_review_record_ids": [],
+      "notes": "",
+      "plan_checkbox_marked_complete": false,
+      "promotion_ready": false,
+      "readiness_record_counts": {
+        "import_review_record_count": 9,
+        "source_hash_record_count": 9
+      },
+      "reviewer_signoff": {
+        "desktop_vr_performance_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "environment_art_direction": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "hazard_readability_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "owner_or_producer_acceptance": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "rights_or_license_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "river_guide_or_ecology_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "technical_art_import_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      },
+      "river_id": "futaleufu_river_chile",
+      "selected_candidate_ids": [],
+      "source_hash_record_ids": []
+    },
+    {
+      "approved_for_corridor_substitution": false,
+      "corridor_substitution_executed": false,
+      "decision_date": "",
+      "decision_id": "chilko_river_lava_canyon:b2_asset_promotion_decision",
+      "decision_owner": "",
+      "decision_status": "not_recorded",
+      "display_name": "Chilko River",
+      "import_review_record_ids": [],
+      "notes": "",
+      "plan_checkbox_marked_complete": false,
+      "promotion_ready": false,
+      "readiness_record_counts": {
+        "import_review_record_count": 10,
+        "source_hash_record_count": 10
+      },
+      "reviewer_signoff": {
+        "desktop_vr_performance_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "environment_art_direction": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "hazard_readability_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "owner_or_producer_acceptance": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "rights_or_license_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "river_guide_or_ecology_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        },
+        "technical_art_import_reviewer": {
+          "approved": false,
+          "evidence": [],
+          "notes": "",
+          "review_date": "",
+          "reviewer": ""
+        }
+      },
+      "river_id": "chilko_river_lava_canyon",
+      "selected_candidate_ids": [],
+      "source_hash_record_ids": []
+    }
+  ],
+  "schema": "raftsim.photoreal.b2_asset_promotion_decision_sidecar_template.v1",
+  "sidecar_contract": {
+    "manual_plan_checkbox_update_required_after_valid_decisions": true,
+    "readiness_report_must_mark_river_promotion_ready": true,
+    "review_roles_must_match_decision_template": true,
+    "river_ids_must_match_decision_template": true,
+    "sidecar_may_not_execute_corridor_substitution": true,
+    "sidecar_may_not_mark_plan_checkboxes_complete": true,
+    "source_hash_and_import_record_ids_must_cover_readiness_counts": true
+  },
+  "source_decision_template": "physics/data/real_world/photoreal_b2_asset_promotion_decision_template.json",
+  "source_decision_validation_report": "physics/data/real_world/photoreal_b2_asset_promotion_decision_validation_report.json",
+  "source_readiness_report": "physics/data/real_world/photoreal_b2_asset_promotion_readiness_report.json",
+  "status": "empty_b2_asset_promotion_decision_sidecar_no_river_promoted"
+}

@@ -1,0 +1,34 @@
+{
+  "generated_on": "2026-07-16",
+  "merged_validation": {
+    "decisions_valid": false,
+    "failing_river_count": 5,
+    "readiness_blocked_river_count": 5,
+    "readiness_ready_river_count": 0,
+    "valid_decision_count": 0,
+    "validation_error_count": 145
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_replace_manual_owner_review": false,
+    "can_update_plan_checkboxes_from_sidecar_alone": false,
+    "manual_plan_checkbox_update_required_after_valid_decisions": true
+  },
+  "promotion_permissions": {
+    "can_mark_chilko_b2_complete": false,
+    "can_mark_colorado_b2_complete": false,
+    "can_mark_futaleufu_b2_complete": false,
+    "can_mark_pacuare_b2_complete": false,
+    "can_mark_south_fork_b2_complete": false,
+    "can_run_corridor_substitution": false
+  },
+  "schema": "raftsim.photoreal.b2_asset_promotion_decision_sidecar_merge_report.v1",
+  "sidecar_decision_count": 5,
+  "sidecar_error_count": 0,
+  "sidecar_errors": [],
+  "source_decision_template": "physics/data/real_world/photoreal_b2_asset_promotion_decision_template.json",
+  "source_decision_validation_report": "physics/data/real_world/photoreal_b2_asset_promotion_decision_validation_report.json",
+  "source_readiness_report": "physics/data/real_world/photoreal_b2_asset_promotion_readiness_report.json",
+  "source_sidecar_template": "physics/data/real_world/photoreal_b2_asset_promotion_decision_sidecar_template.json",
+  "status": "b2_asset_promotion_decision_sidecar_incomplete_promotion_blocked"
+}
