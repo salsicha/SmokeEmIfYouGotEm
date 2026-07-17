@@ -1,0 +1,32 @@
+{
+  "generated_on": "2026-07-16",
+  "merged_validation": {
+    "failing_record_count": 44,
+    "source_file_hash_count": 0,
+    "source_hashes_valid": false,
+    "validation_error_count": 182
+  },
+  "production_promoted": false,
+  "promotion_gate": {
+    "can_commit_source_binaries": false,
+    "can_download_from_merge_report_alone": false,
+    "can_replace_import_capture_review": false,
+    "can_replace_rights_or_ecology_review": false,
+    "manual_rights_import_capture_and_performance_review_required": true
+  },
+  "promotion_permissions": {
+    "can_commit_source_binaries": false,
+    "can_mark_any_asset_source_reviewed": false,
+    "can_mark_any_b2_asset_set_promotion_ready": false,
+    "can_run_corridor_substitution": false,
+    "can_run_imports": false
+  },
+  "schema": "raftsim.photoreal.b2_source_hash_sidecar_merge_report.v1",
+  "sidecar_error_count": 0,
+  "sidecar_errors": [],
+  "sidecar_record_count": 44,
+  "source_hash_report_template": "physics/data/real_world/photoreal_b2_source_hash_report_template.json",
+  "source_hash_sidecar_template": "physics/data/real_world/photoreal_b2_source_hash_sidecar_template.json",
+  "source_hash_validation_report": "physics/data/real_world/photoreal_b2_source_hash_validation_report.json",
+  "status": "source_hash_sidecar_incomplete_promotion_blocked"
+}
