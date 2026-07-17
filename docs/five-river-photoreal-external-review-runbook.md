@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 135
-- Referenced command count: 80
+- Referenced artifact count: 136
+- Referenced command count: 81
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -477,16 +477,18 @@ This runbook is a human-readable export of the fail-closed external action queue
 
 1. Use the non-authoritative recommendation packet to start B2 review with a local-only hash-report workflow, first-party iteration assets, and per-river promotion blocked until source hashes, Unreal captures, domain reviews, and performance evidence pass.
 2. Use the B2 reviewer briefing to answer storage policy, exact source selection, acquisition evidence, hashes, import/capture evidence, per-river promotion, corridor-substitution, post-review, and release-limit questions.
-3. Approve storage/download policy before acquiring local-only or large binary sources.
-4. Record source acquisition selections, source hashes, Unreal import reports, isolated captures, and reviews.
-5. Merge only validated source-hash, import/capture, and promotion-decision sidecars.
+3. Use the Markdown review form to collect storage/source/acquisition/hash/import/promotion/substitution/post-review decisions before copying accepted values into JSON sidecars.
+4. Approve storage/download policy before acquiring local-only or large binary sources.
+5. Record source acquisition selections, source hashes, Unreal import reports, isolated captures, and reviews.
+6. Merge only validated source-hash, import/capture, and promotion-decision sidecars.
 
 **Acceptance Requirements**
 
 1. Reviewer decisions cite the B2 briefing source artifacts and answer the storage/source/acquisition/hash/import/promotion/substitution/post-review questions.
-2. All selected source assets have reviewed provenance and hash records.
-3. Every imported asset has an Unreal import report and hash-locked capture evidence.
-4. Per-river B2 completion readiness reports allow promotion for the intended river.
+2. The filled storage, source, hash, import, promotion, substitution, and post-review records are traceable to the Markdown review form or equivalent signed review packets.
+3. All selected source assets have reviewed provenance and hash records.
+4. Every imported asset has an Unreal import report and hash-locked capture evidence.
+5. Per-river B2 completion readiness reports allow promotion for the intended river.
 
 **Promotion Guardrails**
 
@@ -497,6 +499,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/photoreal_b2_review_briefing.json`
+- `docs/photoreal-b2-asset-review-form.md`
 - `physics/data/real_world/photoreal_b2_review_recommendation.json`
 - `physics/data/real_world/photoreal_b2_source_storage_decision_result_template.json`
 - `physics/data/real_world/photoreal_b2_source_storage_decision_validation_report.json`
@@ -528,6 +531,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_photoreal_b2_review_briefing.py`
+- `physics/src/raftsim/examples/generate_photoreal_b2_review_form.py`
 - `physics/src/raftsim/examples/generate_photoreal_b2_review_recommendation.py`
 - `physics/src/raftsim/examples/validate_photoreal_b2_source_storage_decision_result.py`
 - `physics/src/raftsim/examples/validate_photoreal_b2_source_acquisition_selection.py`
