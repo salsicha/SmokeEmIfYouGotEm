@@ -20,8 +20,8 @@ This runbook is a human-readable export of the fail-closed external action queue
 - Blocked parent gate count: 15
 - Readiness blocker count: 141
 - Follow-up acceptance blocker count: 34
-- Referenced artifact count: 140
-- Referenced command count: 85
+- Referenced artifact count: 141
+- Referenced command count: 86
 - Missing referenced path count: 0
 - First action id: `01-A1-source-mile-access-decision`
 - May mark execution plan complete: False
@@ -822,15 +822,16 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Next Actions**
 
 1. Use the non-authoritative recommendation packet to start C5 review with South Fork Meat Grinder and Troublemaker first, keep Zambezi passive until Batoka source evidence exists, and require C4 decision hashes, D6 comparison hashes, flexible-raft replay, crew weight distribution, wrap/pin/flip/release, swimmer/rescue readability, captures, hashes, and reviewer signoff.
-2. Rerun accepted C4 rapids with the D6-approved flexible raft.
-3. Record crew weight distribution, wrap/pin/flip/release, swimmer/rescue readability, replay hashes, and captures.
-4. Regenerate C5 readiness only after C4 and D6 gates are green.
+2. Use the Markdown review form to record accepted C4 and green D6 hashes, C5 rerun identity, flexible-raft evidence, crew-weight and consequence outcomes, swimmer/rescue readability, failure notes, and guide/safety/physics/technical/rights/owner signoff before filling the C5 sidecar.
+3. Rerun accepted C4 rapids with the D6-approved flexible raft.
+4. Record crew weight distribution, wrap/pin/flip/release, swimmer/rescue readability, replay hashes, and captures.
+5. Regenerate C5 readiness only after C4 and D6 gates are green.
 
 **Acceptance Requirements**
 
 1. C4 behavior review is accepted for the rapid and flow.
 2. D6 external validation is complete.
-3. C5 sidecar validation passes with guide/safety/physics/technical/rights/owner signoff.
+3. C5 sidecar validation passes with evidence traceable to the Markdown review form or an equivalent signed packet and guide/safety/physics/technical/rights/owner signoff.
 
 **Promotion Guardrails**
 
@@ -840,6 +841,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Required Artifacts**
 
 - `physics/data/real_world/named_rapid_flexible_raft_rerun_recommendation.json`
+- `docs/named-rapid-c5-flexible-raft-rerun-review-form.md`
 - `physics/data/real_world/named_rapid_flexible_raft_rerun_sidecar_template.json`
 - `physics/data/real_world/named_rapid_flexible_raft_rerun_validation_report.json`
 - `physics/data/real_world/named_rapid_flexible_raft_rerun_completion_readiness_report.json`
@@ -849,6 +851,7 @@ This runbook is a human-readable export of the fail-closed external action queue
 **Command Paths**
 
 - `physics/src/raftsim/examples/generate_named_rapid_flexible_raft_rerun_recommendation.py`
+- `physics/src/raftsim/examples/generate_named_rapid_flexible_raft_rerun_review_form.py`
 - `physics/src/raftsim/examples/generate_named_rapid_flexible_raft_rerun.py`
 - `physics/src/raftsim/examples/generate_named_rapid_flexible_raft_rerun_readiness.py`
 
