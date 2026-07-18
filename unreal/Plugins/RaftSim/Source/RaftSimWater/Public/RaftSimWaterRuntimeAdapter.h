@@ -4,6 +4,9 @@
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
+#include "RaftSimLiveWaterWindow.h"
+#include "Templates/UniquePtr.h"
+
 #include "RaftSimWaterRuntimeAdapter.generated.h"
 
 UENUM(BlueprintType)
@@ -129,8 +132,23 @@ class RAFTSIMWATER_API URaftSimWaterRuntimeAdapter : public UObject
     GENERATED_BODY()
 
 public:
+    virtual ~URaftSimWaterRuntimeAdapter() override;
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     void Configure(const FRaftSimWaterRuntimeConfig& InConfig);
+
+    /**
+     * Configure a live flat-tank solver window (genuine FV solver, order 2,
+     * calibrations disabled). Dev water for the P1/P2 test tank; river
+     * windows replace this in P2 slice three. No-op without the solver lib.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool ConfigureDevTankWindow(
+        FVector2D WorldOriginM, float SizeXM, float SizeYM, float CellSizeM,
+        float SurfaceHeightM, float DepthM);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
+    bool HasLiveWindow() const;
 
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool LoadAcceptedReportManifest(const FString& ManifestPath);
@@ -178,4 +196,6 @@ private:
     FString BuildDeterministicFrameHash() const;
     void AppendDeterministicCaptureFrame();
     FString ResolveRepoRelativePath(const FString& Path) const;
+
+    TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
 };
