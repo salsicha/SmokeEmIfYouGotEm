@@ -239,6 +239,45 @@ FluxState finite_volume_flux_x(const ConservedState& left, const ConservedState&
 
 FluxState finite_volume_flux_y(const ConservedState& south, const ConservedState& north, const SolverConfig& config);
 
+// Primitive water state (depth, free surface, velocity) reconstructed at a cell face
+// for the second-order MUSCL finite-volume path.
+struct MusclFaceState {
+    double h = 0.0;
+    double eta = 0.0;
+    double u = 0.0;
+    double v = 0.0;
+};
+
+// Limited half-slopes (already scaled by 0.5) for each reconstructed primitive field.
+// Depth at faces is not reconstructed independently; it derives from the reconstructed
+// free surface minus the continuous (face-averaged) bed.
+struct MusclHalfSlopes {
+    double x_eta = 0.0;
+    double x_u = 0.0;
+    double x_v = 0.0;
+    double y_eta = 0.0;
+    double y_u = 0.0;
+    double y_v = 0.0;
+};
+
+double minmod(double a, double b);
+
+double mc_limited(double back, double forward);
+
+InterfaceFluxPair muscl_hydrostatic_flux_x(
+    const MusclFaceState& left,
+    const MusclFaceState& right,
+    bool bed_coupling,
+    const SolverConfig& config
+);
+
+InterfaceFluxPair muscl_hydrostatic_flux_y(
+    const MusclFaceState& south,
+    const MusclFaceState& north,
+    bool bed_coupling,
+    const SolverConfig& config
+);
+
 bool is_abrupt_bed_jump(double left_bed, double right_bed);
 
 ConservedState hydrostatic_reconstructed_state(

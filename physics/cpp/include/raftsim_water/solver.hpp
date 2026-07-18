@@ -18,6 +18,10 @@ struct SolverConfig {
     std::string solver_mode = "reduced";
     std::string boundary_mode = "scenario";
     std::string flux_scheme = "rusanov";
+    // Spatial accuracy of the finite-volume path: 2 selects MUSCL (piecewise-linear,
+    // minmod-limited) reconstruction with well-balanced hydrostatic face states;
+    // 1 selects the legacy first-order scheme. Reduced mode ignores this switch.
+    int spatial_order = 2;
     double gravity = 9.81;
     double dry_tolerance = 1.0e-6;
     double max_velocity = 60.0;
@@ -68,6 +72,9 @@ private:
     void step_reduced(double dt);
     void step_finite_volume(double dt);
     void step_finite_volume_once(double dt);
+    bool finite_volume_second_order_enabled() const;
+    void step_finite_volume_once_second_order(double dt);
+    void finite_volume_second_order_flux_update(const WaterState& from, double dt, WaterState& to) const;
     double finite_volume_stable_dt() const;
     void apply_feature_forcing(double dt, WaterState& next) const;
     void recompute_state(WaterState& next) const;

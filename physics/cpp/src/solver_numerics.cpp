@@ -351,6 +351,185 @@ FluxState finite_volume_flux_y(const ConservedState& south, const ConservedState
     return rusanov_flux_y(south, north, config);
 }
 
+double minmod(double a, double b) {
+    if (a > 0.0 && b > 0.0) {
+        return std::min(a, b);
+    }
+    if (a < 0.0 && b < 0.0) {
+        return std::max(a, b);
+    }
+    return 0.0;
+}
+
+// Monotonized-central (van Leer) limited slope from backward/forward differences.
+// Sharper than minmod while still TVD; matches the limiter family the GeoClaw
+// reference solver uses by default.
+double mc_limited(double back, double forward) {
+    if (back * forward <= 0.0) {
+        return 0.0;
+    }
+    double central = 0.5 * (back + forward);
+    double bound = 2.0 * std::min(std::abs(back), std::abs(forward));
+    double magnitude = std::min(std::abs(central), bound);
+    return central >= 0.0 ? magnitude : -magnitude;
+}
+
+namespace {
+
+ConservedState conserved_from_face_depth(double h_star, const MusclFaceState& face, const SolverConfig& config) {
+    if (h_star <= config.dry_tolerance) {
+        return {};
+    }
+    return ConservedState{h_star, h_star * face.u, h_star * face.v};
+}
+
+// F-wave interface flux for a wet/wet face across an abrupt bed jump: the bed jump
+// enters the interface Riemann problem as a stationary source wave (as in GeoClaw's
+// augmented solver), so the flux imbalance minus the topography source is decomposed
+// into HLL-speed waves and distributed upwind. Exactly well-balanced for lake-at-rest
+// states because the decomposed jump vanishes there. `normal` selects the momentum
+// component aligned with the face normal; `transverse` is passively upwinded.
+struct FwaveComponents {
+    double normal_left = 0.0;
+    double normal_momentum_left = 0.0;
+    double transverse_left = 0.0;
+    double normal_right = 0.0;
+    double normal_momentum_right = 0.0;
+    double transverse_right = 0.0;
+};
+
+FwaveComponents fwave_interface_components(
+    double h_left,
+    double u_left,
+    double v_left,
+    double h_right,
+    double u_right,
+    double v_right,
+    double bed_jump,
+    const SolverConfig& config
+) {
+    double c_left = std::sqrt(config.gravity * h_left);
+    double c_right = std::sqrt(config.gravity * h_right);
+    double s_min = std::min(u_left - c_left, u_right - c_right);
+    double s_max = std::max(u_left + c_left, u_right + c_right);
+    double flux_h_left = h_left * u_left;
+    double flux_h_right = h_right * u_right;
+    double flux_hu_left = h_left * u_left * u_left + 0.5 * config.gravity * h_left * h_left;
+    double flux_hu_right = h_right * u_right * u_right + 0.5 * config.gravity * h_right * h_right;
+    double flux_hv_left = h_left * u_left * v_left;
+    double flux_hv_right = h_right * u_right * v_right;
+
+    double h_bar = 0.5 * (h_left + h_right);
+    double delta_h = flux_h_right - flux_h_left;
+    double delta_hu = flux_hu_right - flux_hu_left + config.gravity * h_bar * bed_jump;
+    double denom = std::max(s_max - s_min, 1.0e-12);
+    double beta_1 = (s_max * delta_h - delta_hu) / denom;
+    double beta_2 = (delta_hu - s_min * delta_h) / denom;
+
+    double minus_h = (s_min < 0.0 ? beta_1 : 0.0) + (s_max < 0.0 ? beta_2 : 0.0);
+    double minus_hu = (s_min < 0.0 ? beta_1 * s_min : 0.0) + (s_max < 0.0 ? beta_2 * s_max : 0.0);
+    double plus_h = (s_min > 0.0 ? beta_1 : 0.0) + (s_max > 0.0 ? beta_2 : 0.0);
+    double plus_hu = (s_min > 0.0 ? beta_1 * s_min : 0.0) + (s_max > 0.0 ? beta_2 * s_max : 0.0);
+
+    double delta_hv = flux_hv_right - flux_hv_left;
+    double u_mean = 0.5 * (u_left + u_right);
+    double minus_hv = u_mean < 0.0 ? delta_hv : (u_mean > 0.0 ? 0.0 : 0.5 * delta_hv);
+    double plus_hv = u_mean > 0.0 ? delta_hv : (u_mean < 0.0 ? 0.0 : 0.5 * delta_hv);
+
+    FwaveComponents parts;
+    parts.normal_left = flux_h_left + minus_h;
+    parts.normal_momentum_left = flux_hu_left + minus_hu;
+    parts.transverse_left = flux_hv_left + minus_hv;
+    parts.normal_right = flux_h_right - plus_h;
+    parts.normal_momentum_right = flux_hu_right - plus_hu;
+    parts.transverse_right = flux_hv_right - plus_hv;
+    return parts;
+}
+
+}  // namespace
+
+// Second-order well-balanced interface flux (Audusse et al. hydrostatic reconstruction).
+// Both sides carry MUSCL-reconstructed primitive states; the reconstructed bed at each
+// side is implied by eta - h. The returned pair holds the flux seen by the left/south
+// cell and the flux seen by the right/north cell; the difference between them is the
+// interface part of the topography source term. With `bed_coupling` disabled the bed is
+// ignored entirely and both sides observe the same conservative flux.
+InterfaceFluxPair muscl_hydrostatic_flux_x(
+    const MusclFaceState& left,
+    const MusclFaceState& right,
+    bool bed_coupling,
+    const SolverConfig& config
+) {
+    double h_left = std::max(0.0, left.h);
+    double h_right = std::max(0.0, right.h);
+    double h_left_star = h_left;
+    double h_right_star = h_right;
+    if (bed_coupling) {
+        double left_bed = left.eta - h_left;
+        double right_bed = right.eta - h_right;
+        if (h_left > config.dry_tolerance && h_right > config.dry_tolerance &&
+            is_abrupt_bed_jump(left_bed, right_bed)) {
+            FwaveComponents parts = fwave_interface_components(
+                h_left, left.u, left.v, h_right, right.u, right.v, right_bed - left_bed, config);
+            return InterfaceFluxPair{
+                FluxState{parts.normal_left, parts.normal_momentum_left, parts.transverse_left},
+                FluxState{parts.normal_right, parts.normal_momentum_right, parts.transverse_right},
+            };
+        }
+        double interface_bed = std::max(left_bed, right_bed);
+        h_left_star = std::max(0.0, left.eta - interface_bed);
+        h_right_star = std::max(0.0, right.eta - interface_bed);
+    }
+    ConservedState q_left = conserved_from_face_depth(h_left_star, left, config);
+    ConservedState q_right = conserved_from_face_depth(h_right_star, right, config);
+    FluxState base = finite_volume_flux_x(q_left, q_right, config);
+    FluxState left_flux = base;
+    FluxState right_flux = base;
+    if (bed_coupling) {
+        left_flux.hu += 0.5 * config.gravity * (h_left * h_left - h_left_star * h_left_star);
+        right_flux.hu += 0.5 * config.gravity * (h_right * h_right - h_right_star * h_right_star);
+    }
+    return InterfaceFluxPair{left_flux, right_flux};
+}
+
+InterfaceFluxPair muscl_hydrostatic_flux_y(
+    const MusclFaceState& south,
+    const MusclFaceState& north,
+    bool bed_coupling,
+    const SolverConfig& config
+) {
+    double h_south = std::max(0.0, south.h);
+    double h_north = std::max(0.0, north.h);
+    double h_south_star = h_south;
+    double h_north_star = h_north;
+    if (bed_coupling) {
+        double south_bed = south.eta - h_south;
+        double north_bed = north.eta - h_north;
+        if (h_south > config.dry_tolerance && h_north > config.dry_tolerance &&
+            is_abrupt_bed_jump(south_bed, north_bed)) {
+            FwaveComponents parts = fwave_interface_components(
+                h_south, south.v, south.u, h_north, north.v, north.u, north_bed - south_bed, config);
+            return InterfaceFluxPair{
+                FluxState{parts.normal_left, parts.transverse_left, parts.normal_momentum_left},
+                FluxState{parts.normal_right, parts.transverse_right, parts.normal_momentum_right},
+            };
+        }
+        double interface_bed = std::max(south_bed, north_bed);
+        h_south_star = std::max(0.0, south.eta - interface_bed);
+        h_north_star = std::max(0.0, north.eta - interface_bed);
+    }
+    ConservedState q_south = conserved_from_face_depth(h_south_star, south, config);
+    ConservedState q_north = conserved_from_face_depth(h_north_star, north, config);
+    FluxState base = finite_volume_flux_y(q_south, q_north, config);
+    FluxState south_flux = base;
+    FluxState north_flux = base;
+    if (bed_coupling) {
+        south_flux.hv += 0.5 * config.gravity * (h_south * h_south - h_south_star * h_south_star);
+        north_flux.hv += 0.5 * config.gravity * (h_north * h_north - h_north_star * h_north_star);
+    }
+    return InterfaceFluxPair{south_flux, north_flux};
+}
+
 bool is_abrupt_bed_jump(double left_bed, double right_bed) {
     return std::abs(right_bed - left_bed) > 0.1;
 }

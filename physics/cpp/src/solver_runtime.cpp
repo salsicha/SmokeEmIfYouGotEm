@@ -103,7 +103,289 @@ void ReducedShallowWaterSolver::step_finite_volume(double dt) {
     time_ += dt;
 }
 
+bool ReducedShallowWaterSolver::finite_volume_second_order_enabled() const {
+    if (config_.spatial_order < 2) {
+        return false;
+    }
+    if (!config_.disable_fixture_calibrations) {
+        // Fixture-scoped calibrated treatments were tuned against the legacy
+        // first-order core; keep those paths byte-for-byte unchanged.
+        if (scenario_.fixture_kind == "bed_step" || scenario_.fixture_kind == "wet_dry_shoreline" ||
+            scenario_.fixture_kind == "constriction" || scenario_.fixture_kind == "drop_ledge") {
+            return false;
+        }
+        if (dam_break_geoclaw_profile_enabled(scenario_, config_) ||
+            cascading_geoclaw_profile_enabled(scenario_, config_) ||
+            finite_volume_fixture_geoclaw_profile_enabled(scenario_, config_)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// One forward-Euler stage of the second-order MUSCL scheme: `to` receives
+// `from` advanced by dt using minmod-limited piecewise-linear reconstruction of
+// (h, eta, u, v) with well-balanced hydrostatic interface states. Friction and
+// feature forcing are intentionally excluded; the caller applies them once per
+// substep after combining the Heun stages.
+void ReducedShallowWaterSolver::finite_volume_second_order_flux_update(
+    const WaterState& from,
+    double dt,
+    WaterState& to
+) const {
+    const std::size_t ny = scenario_.grid.ny;
+    const std::size_t nx = scenario_.grid.nx;
+    const bool bed_coupling = config_.bed_slope_source_scale != 0.0;
+
+    // With bed coupling disabled (bed_slope_source_scale == 0) the legacy contract is
+    // that topography does not influence the finite-volume dynamics, so the bed is
+    // treated as flat throughout the reconstruction.
+    auto cell_bed = [&](std::size_t row, std::size_t col) -> double {
+        return bed_coupling ? scenario_.bed(row, col) : 0.0;
+    };
+    auto cell_primitive = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
+        double h = std::max(0.0, from.h(row, col));
+        if (h <= config_.dry_tolerance) {
+            return solver_detail::MusclFaceState{0.0, cell_bed(row, col), 0.0, 0.0};
+        }
+        return solver_detail::MusclFaceState{h, cell_bed(row, col) + h, from.u(row, col), from.v(row, col)};
+    };
+    auto ghost_primitive = [&](std::size_t row, std::size_t col, const char* edge) -> solver_detail::MusclFaceState {
+        ConservedState q = boundary_conserved(scenario_, from, config_, row, col, edge);
+        if (q.h <= config_.dry_tolerance) {
+            return solver_detail::MusclFaceState{0.0, cell_bed(row, col), 0.0, 0.0};
+        }
+        double depth = safe_depth(q.h, config_.dry_tolerance);
+        return solver_detail::MusclFaceState{q.h, cell_bed(row, col) + q.h, q.hu / depth, q.hv / depth};
+    };
+
+    std::vector<solver_detail::MusclHalfSlopes> slopes(ny * nx);
+    for (std::size_t row = 0; row < ny; ++row) {
+        for (std::size_t col = 0; col < nx; ++col) {
+            solver_detail::MusclFaceState center = cell_primitive(row, col);
+            if (center.h <= config_.dry_tolerance) {
+                continue;
+            }
+            solver_detail::MusclHalfSlopes& slope = slopes[idx(scenario_, row, col)];
+            solver_detail::MusclFaceState west =
+                col > 0 ? cell_primitive(row, col - 1) : ghost_primitive(row, col, "west");
+            solver_detail::MusclFaceState east =
+                col + 1 < nx ? cell_primitive(row, col + 1) : ghost_primitive(row, col, "east");
+            if (west.h > config_.dry_tolerance && east.h > config_.dry_tolerance) {
+                slope.x_eta = 0.5 * mc_limited(center.eta - west.eta, east.eta - center.eta);
+                slope.x_u = 0.5 * mc_limited(center.u - west.u, east.u - center.u);
+                slope.x_v = 0.5 * mc_limited(center.v - west.v, east.v - center.v);
+            }
+            solver_detail::MusclFaceState south =
+                row > 0 ? cell_primitive(row - 1, col) : ghost_primitive(row, col, "south");
+            solver_detail::MusclFaceState north =
+                row + 1 < ny ? cell_primitive(row + 1, col) : ghost_primitive(row, col, "north");
+            if (south.h > config_.dry_tolerance && north.h > config_.dry_tolerance) {
+                slope.y_eta = 0.5 * mc_limited(center.eta - south.eta, north.eta - center.eta);
+                slope.y_u = 0.5 * mc_limited(center.u - south.u, north.u - center.u);
+                slope.y_v = 0.5 * mc_limited(center.v - south.v, north.v - center.v);
+            }
+        }
+    }
+
+    // The bed at each face shared by two wet cells across a smooth bed variation is
+    // the arithmetic mean of the adjacent cell-center beds (a continuous piecewise-
+    // linear bed); the face depth derives from the reconstructed free surface minus
+    // that face bed, which keeps lake-at-rest states exact. Faces toward dry cells or
+    // domain boundaries keep the cell-center bed (preserving the exact wall/shoreline
+    // behavior), and abrupt bed jumps also keep the cell-center bed so the full jump
+    // is handled by the interface f-wave flux instead.
+    auto neighbor_wet = [&](std::size_t row, std::size_t col) -> bool {
+        return from.h(row, col) > config_.dry_tolerance;
+    };
+    auto build_face = [&](std::size_t row, std::size_t col, bool has_wet_neighbor, double neighbor_bed,
+                          double eta_face, double u_face, double v_face) -> solver_detail::MusclFaceState {
+        double center_bed = cell_bed(row, col);
+        bool average_bed = has_wet_neighbor && !is_abrupt_bed_jump(center_bed, neighbor_bed);
+        double face_bed = average_bed ? 0.5 * (center_bed + neighbor_bed) : center_bed;
+        double h_face = std::max(0.0, eta_face - face_bed);
+        return solver_detail::MusclFaceState{h_face, h_face > 0.0 ? face_bed + h_face : eta_face, u_face, v_face};
+    };
+    auto west_face = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
+        solver_detail::MusclFaceState center = cell_primitive(row, col);
+        if (center.h <= config_.dry_tolerance) {
+            return center;
+        }
+        const solver_detail::MusclHalfSlopes& slope = slopes[idx(scenario_, row, col)];
+        bool has_wet_neighbor = col > 0 && neighbor_wet(row, col - 1);
+        double neighbor_bed = col > 0 ? cell_bed(row, col - 1) : 0.0;
+        return build_face(row, col, has_wet_neighbor, neighbor_bed,
+                          center.eta - slope.x_eta, center.u - slope.x_u, center.v - slope.x_v);
+    };
+    auto east_face = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
+        solver_detail::MusclFaceState center = cell_primitive(row, col);
+        if (center.h <= config_.dry_tolerance) {
+            return center;
+        }
+        const solver_detail::MusclHalfSlopes& slope = slopes[idx(scenario_, row, col)];
+        bool has_wet_neighbor = col + 1 < nx && neighbor_wet(row, col + 1);
+        double neighbor_bed = col + 1 < nx ? cell_bed(row, col + 1) : 0.0;
+        return build_face(row, col, has_wet_neighbor, neighbor_bed,
+                          center.eta + slope.x_eta, center.u + slope.x_u, center.v + slope.x_v);
+    };
+    auto south_face = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
+        solver_detail::MusclFaceState center = cell_primitive(row, col);
+        if (center.h <= config_.dry_tolerance) {
+            return center;
+        }
+        const solver_detail::MusclHalfSlopes& slope = slopes[idx(scenario_, row, col)];
+        bool has_wet_neighbor = row > 0 && neighbor_wet(row - 1, col);
+        double neighbor_bed = row > 0 ? cell_bed(row - 1, col) : 0.0;
+        return build_face(row, col, has_wet_neighbor, neighbor_bed,
+                          center.eta - slope.y_eta, center.u - slope.y_u, center.v - slope.y_v);
+    };
+    auto north_face = [&](std::size_t row, std::size_t col) -> solver_detail::MusclFaceState {
+        solver_detail::MusclFaceState center = cell_primitive(row, col);
+        if (center.h <= config_.dry_tolerance) {
+            return center;
+        }
+        const solver_detail::MusclHalfSlopes& slope = slopes[idx(scenario_, row, col)];
+        bool has_wet_neighbor = row + 1 < ny && neighbor_wet(row + 1, col);
+        double neighbor_bed = row + 1 < ny ? cell_bed(row + 1, col) : 0.0;
+        return build_face(row, col, has_wet_neighbor, neighbor_bed,
+                          center.eta + slope.y_eta, center.u + slope.y_u, center.v + slope.y_v);
+    };
+
+    // Reflective (wall/bank) boundaries mirror the cell's own reconstructed face
+    // state, which keeps the reflection second-order accurate; other boundary kinds
+    // fall back to the first-order ghost state.
+    auto edge_is_wall = [&](const char* edge) -> bool {
+        const BoundaryCondition* boundary = boundary_for_edge(scenario_, edge);
+        return boundary != nullptr && (boundary->kind == "wall" || boundary->kind == "bank");
+    };
+    const bool west_wall = edge_is_wall("west");
+    const bool east_wall = edge_is_wall("east");
+    const bool south_wall = edge_is_wall("south");
+    const bool north_wall = edge_is_wall("north");
+    auto mirror_x = [](const solver_detail::MusclFaceState& state) -> solver_detail::MusclFaceState {
+        return solver_detail::MusclFaceState{state.h, state.eta, -state.u, state.v};
+    };
+    auto mirror_y = [](const solver_detail::MusclFaceState& state) -> solver_detail::MusclFaceState {
+        return solver_detail::MusclFaceState{state.h, state.eta, state.u, -state.v};
+    };
+
+    for (std::size_t row = 0; row < ny; ++row) {
+        for (std::size_t col = 0; col < nx; ++col) {
+            solver_detail::MusclFaceState center = cell_primitive(row, col);
+            solver_detail::MusclFaceState center_west = west_face(row, col);
+            solver_detail::MusclFaceState center_east = east_face(row, col);
+            solver_detail::MusclFaceState center_south = south_face(row, col);
+            solver_detail::MusclFaceState center_north = north_face(row, col);
+
+            InterfaceFluxPair west_pair = muscl_hydrostatic_flux_x(
+                col > 0 ? east_face(row, col - 1)
+                        : (west_wall ? mirror_x(center_west) : ghost_primitive(row, col, "west")),
+                center_west,
+                bed_coupling,
+                config_);
+            InterfaceFluxPair east_pair = muscl_hydrostatic_flux_x(
+                center_east,
+                col + 1 < nx ? west_face(row, col + 1)
+                             : (east_wall ? mirror_x(center_east) : ghost_primitive(row, col, "east")),
+                bed_coupling,
+                config_);
+            InterfaceFluxPair south_pair = muscl_hydrostatic_flux_y(
+                row > 0 ? north_face(row - 1, col)
+                        : (south_wall ? mirror_y(center_south) : ghost_primitive(row, col, "south")),
+                center_south,
+                bed_coupling,
+                config_);
+            InterfaceFluxPair north_pair = muscl_hydrostatic_flux_y(
+                center_north,
+                row + 1 < ny ? south_face(row + 1, col)
+                             : (north_wall ? mirror_y(center_north) : ghost_primitive(row, col, "north")),
+                bed_coupling,
+                config_);
+            const FluxState& flux_w = west_pair.right;
+            const FluxState& flux_e = east_pair.left;
+            const FluxState& flux_s = south_pair.right;
+            const FluxState& flux_n = north_pair.left;
+
+            double h_next = center.h -
+                dt * ((flux_e.h - flux_w.h) / scenario_.grid.dx + (flux_n.h - flux_s.h) / scenario_.grid.dy);
+            double hu_next = center.h * center.u -
+                dt * ((flux_e.hu - flux_w.hu) / scenario_.grid.dx + (flux_n.hu - flux_s.hu) / scenario_.grid.dy);
+            double hv_next = center.h * center.v -
+                dt * ((flux_e.hv - flux_w.hv) / scenario_.grid.dx + (flux_n.hv - flux_s.hv) / scenario_.grid.dy);
+
+            if (bed_coupling && center.h > config_.dry_tolerance) {
+                // Centered part of the topography source from the within-cell bed
+                // reconstruction; together with the interface corrections this keeps
+                // lake-at-rest states exact (well-balanced).
+                double bed_w = center_west.eta - center_west.h;
+                double bed_e = center_east.eta - center_east.h;
+                double bed_s = center_south.eta - center_south.h;
+                double bed_n = center_north.eta - center_north.h;
+                hu_next += dt * 0.5 * config_.gravity * (center_west.h + center_east.h) * (bed_w - bed_e) /
+                           scenario_.grid.dx;
+                hv_next += dt * 0.5 * config_.gravity * (center_south.h + center_north.h) * (bed_s - bed_n) /
+                           scenario_.grid.dy;
+            }
+
+            h_next = std::max(0.0, h_next);
+            if (h_next <= config_.dry_tolerance) {
+                to.h(row, col) = 0.0;
+                to.u(row, col) = 0.0;
+                to.v(row, col) = 0.0;
+                continue;
+            }
+            to.h(row, col) = h_next;
+            to.u(row, col) = hu_next / safe_depth(h_next, config_.dry_tolerance);
+            to.v(row, col) = hv_next / safe_depth(h_next, config_.dry_tolerance);
+        }
+    }
+}
+
+void ReducedShallowWaterSolver::step_finite_volume_once_second_order(double dt) {
+    // Heun (SSP RK2) time integration over the MUSCL spatial operator, followed by
+    // the same friction damping and feature forcing treatment as the legacy path.
+    WaterState predictor = state_;
+    finite_volume_second_order_flux_update(state_, dt, predictor);
+    WaterState corrector = predictor;
+    finite_volume_second_order_flux_update(predictor, dt, corrector);
+
+    WaterState next = state_;
+    for (std::size_t row = 0; row < scenario_.grid.ny; ++row) {
+        for (std::size_t col = 0; col < scenario_.grid.nx; ++col) {
+            double h_start = std::max(0.0, state_.h(row, col));
+            double h_end = std::max(0.0, corrector.h(row, col));
+            double h_next = 0.5 * (h_start + h_end);
+            double hu_next = 0.5 * (h_start * state_.u(row, col) + h_end * corrector.u(row, col));
+            double hv_next = 0.5 * (h_start * state_.v(row, col) + h_end * corrector.v(row, col));
+            if (h_next <= config_.dry_tolerance) {
+                next.h(row, col) = 0.0;
+                next.u(row, col) = 0.0;
+                next.v(row, col) = 0.0;
+                continue;
+            }
+            double u_next = hu_next / safe_depth(h_next, config_.dry_tolerance);
+            double v_next = hv_next / safe_depth(h_next, config_.dry_tolerance);
+            double speed = std::hypot(u_next, v_next);
+            double friction = scenario_.roughness * config_.roughness_scale * speed /
+                              std::max(std::pow(safe_depth(h_next, config_.dry_tolerance), 4.0 / 3.0), 1.0e-6);
+            double damping = clamp(1.0 - dt * friction, 0.0, 1.0);
+            next.h(row, col) = h_next;
+            next.u(row, col) = clamp(u_next * damping, -config_.max_velocity, config_.max_velocity);
+            next.v(row, col) = clamp(v_next * damping, -config_.max_velocity, config_.max_velocity);
+        }
+    }
+    if (config_.feature_strength_scale > 0.0) {
+        apply_feature_forcing(dt, next);
+    }
+    recompute_state(next);
+    state_ = std::move(next);
+}
+
 void ReducedShallowWaterSolver::step_finite_volume_once(double dt) {
+    if (finite_volume_second_order_enabled()) {
+        step_finite_volume_once_second_order(dt);
+        return;
+    }
     WaterState next = state_;
     bool use_fixture_calibrations = !config_.disable_fixture_calibrations;
     bool use_bed_step_face_source = use_fixture_calibrations && scenario_.fixture_kind == "bed_step";
