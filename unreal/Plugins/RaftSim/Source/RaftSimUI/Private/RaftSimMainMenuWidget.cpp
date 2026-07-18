@@ -38,7 +38,10 @@ void URaftSimMainMenuWidget::NativeConstruct()
     Column->AddChildToVerticalBox(Subtitle);
 
     MakeMenuButton(
-        Column, NSLOCTEXT("RaftSim", "EnterTestTank", "Enter Test Tank"),
+        Column, NSLOCTEXT("RaftSim", "RunTroublemaker", "Run Troublemaker (South Fork)"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunTroublemaker));
+    MakeMenuButton(
+        Column, NSLOCTEXT("RaftSim", "EnterTestTank", "Training Eddy (Test Tank)"),
         GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleEnterTestTank));
     MakeMenuButton(
         Column, NSLOCTEXT("RaftSim", "Settings", "Settings"),
@@ -77,6 +80,16 @@ void URaftSimMainMenuWidget::HandleEnterTestTank()
         SaveSubsystem->SaveCurrent();
     }
     UGameplayStatics::OpenLevel(this, TestTankLevelName);
+}
+
+void URaftSimMainMenuWidget::HandleRunTroublemaker()
+{
+    if (URaftSimSaveSubsystem* SaveSubsystem =
+            GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>())
+    {
+        SaveSubsystem->SaveCurrent();
+    }
+    UGameplayStatics::OpenLevel(this, TroublemakerLevelName);
 }
 
 void URaftSimMainMenuWidget::HandleToggleSettings()

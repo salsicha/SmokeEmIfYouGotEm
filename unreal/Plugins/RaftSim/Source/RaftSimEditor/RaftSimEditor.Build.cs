@@ -42,6 +42,7 @@ public class RaftSimEditor : ModuleRules
             "MeshUtilities",
             "EnhancedInput",
             "RaftSimRaft",
+            "RaftSimWater",
             "Projects",
             "ProceduralMeshComponent",
             "ProceduralVegetation",
