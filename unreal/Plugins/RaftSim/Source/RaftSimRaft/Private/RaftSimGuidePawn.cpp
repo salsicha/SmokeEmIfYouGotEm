@@ -361,8 +361,21 @@ void ARaftSimGuidePawn::HandleLook(const FInputActionValue& Value)
 
 void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)
 {
-    // P3 wires this into the crew high-side response window; P1 gives feedback only.
     ApplyRaftImpactCue(FVector(0.0f, 0.0f, -4.0f), FRotator::ZeroRotator, 0.4f);
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        // Context-sensitive: re-right a capsized raft, otherwise high-side to
+        // the raft's current lean direction to fight the incoming roll.
+        if (Raft->GetRaftMode() == ERaftSimRaftMode::Capsized)
+        {
+            Raft->RequestReflip();
+        }
+        else
+        {
+            const float Roll = Raft->GetActorRotation().Roll;
+            Raft->HandleHighSideResponse(Roll >= 0.0f ? -1 : 1);
+        }
+    }
 }
 
 void ARaftSimGuidePawn::HandleGuideCommand(FName CommandActionName)

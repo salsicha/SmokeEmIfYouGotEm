@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "RaftSimCrewStateContracts.h"
 
 #include "RaftSimRaftActor.generated.h"
 
@@ -17,6 +18,18 @@ enum class ERaftSimPaddleSide : uint8
     Port,
     Starboard,
     Both
+};
+
+/** Capsize lifecycle of the raft. */
+UENUM(BlueprintType)
+enum class ERaftSimRaftMode : uint8
+{
+    /** Right-side up and under control. */
+    Upright,
+    /** Flipped by overwash/roll; crew are swimmers. */
+    Capsized,
+    /** Re-righted; draining retained water and reseating recovered swimmers. */
+    Recovering
 };
 
 /**
@@ -51,6 +64,39 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     FVector GetRaftVelocity() const;
+
+    // --- Flip / swim / recover loop (P2) ---------------------------------
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
+    ERaftSimRaftMode GetRaftMode() const { return RaftMode; }
+
+    /** Number of crew currently in the water as swimmers. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
+    int32 GetSwimmerCount() const { return Swimmers.Num(); }
+
+    /** Guide's request to re-right a capsized raft (bound to a recovery input). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void RequestReflip();
+
+    /**
+     * Timed high-side response: shift crew weight to the given side (+1 = starboard,
+     * -1 = port) to counter an incoming roll. Feeds the D2 crew action into the
+     * flexible-raft model, reducing the D3 flip moment when timed into a hit.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void HandleHighSideResponse(int32 Direction);
+
+    /**
+     * Test/authoring hook: impose a strong uniform overwash surface (meters) on
+     * the flexible-raft model so a flip can be provoked deterministically. Pass
+     * a negative value to clear it.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void ForceOverwashForTesting(float SurfaceHeightM, FVector FlowVelocityMps);
+
+    /** Crew size seeded as swimmers on capsize (guide + paddlers). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void SetCrewSize(int32 InCrewSize) { CrewSize = FMath::Clamp(InCrewSize, 0, 8); }
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
@@ -106,10 +152,52 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float FixedSubstepSeconds = 1.0f / 120.0f;
 
+    /** Roll angle (degrees) past which the raft is considered capsized. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CapsizeRollDegrees = 100.0f;
+
+    /** Seconds a negative flip margin must persist before the raft capsizes. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CapsizeLatchSeconds = 0.35f;
+
+    /** Reach radius (meters) within which a swimmer can be reseated. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float SwimmerReseatReachM = 3.0f;
+
+    /** Crew seeded as swimmers on capsize (guide + 4 paddlers by default). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    int32 CrewSize = 5;
+
 private:
+    void UpdateCapsizeLoop(float DeltaSeconds);
+    void EnterCapsize();
+    void DriftSwimmers(float DeltaSeconds);
+    void TryReseatSwimmers();
+    FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
+
     UPROPERTY()
     TObjectPtr<URaftSimPhysicsBridgeSubsystem> Bridge;
 
     UPROPERTY()
     TObjectPtr<URaftSimChronoRuntimeAdapter> RaftAdapter;
+
+    UPROPERTY()
+    ERaftSimRaftMode RaftMode = ERaftSimRaftMode::Upright;
+
+    /** Crew currently in the water (crew library rescue frames). */
+    UPROPERTY()
+    TArray<FRaftSimSwimmerRescueFrame> Swimmers;
+
+    /** Visual spheres for in-water swimmers, parallel to Swimmers. */
+    UPROPERTY()
+    TArray<TObjectPtr<UStaticMeshComponent>> SwimmerMeshes;
+
+    /** Transform to respawn the raft at when recovery completes / is requested. */
+    FTransform CheckpointTransform = FTransform::Identity;
+
+    /** Raft location at the moment of capsize; re-flip rights the boat here. */
+    FVector CapsizeLocation = FVector::ZeroVector;
+
+    float FlipRiskLatchSeconds = 0.0f;
+    bool bReflipRequested = false;
 };
