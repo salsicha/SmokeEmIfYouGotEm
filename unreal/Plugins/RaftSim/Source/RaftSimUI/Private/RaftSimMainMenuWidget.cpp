@@ -38,8 +38,20 @@ void URaftSimMainMenuWidget::NativeConstruct()
     Column->AddChildToVerticalBox(Subtitle);
 
     MakeMenuButton(
-        Column, NSLOCTEXT("RaftSim", "RunTroublemaker", "Run Troublemaker (South Fork)"),
-        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunTroublemaker));
+        Column, NSLOCTEXT("RaftSim", "RunSouthFork", "South Fork American — Troublemaker"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunSouthFork));
+    MakeMenuButton(
+        Column, NSLOCTEXT("RaftSim", "RunColorado", "Colorado (Grand Canyon) — Hance"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunColorado));
+    MakeMenuButton(
+        Column, NSLOCTEXT("RaftSim", "RunPacuare", "Pacuare — Upper Huacas"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunPacuare));
+    MakeMenuButton(
+        Column, NSLOCTEXT("RaftSim", "RunFutaleufu", "Futaleufú — Terminator"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunFutaleufu));
+    MakeMenuButton(
+        Column, NSLOCTEXT("RaftSim", "RunChilko", "Chilko — Lava Canyon"),
+        GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleRunChilko));
     MakeMenuButton(
         Column, NSLOCTEXT("RaftSim", "EnterTestTank", "Training Eddy (Test Tank)"),
         GET_FUNCTION_NAME_CHECKED(URaftSimMainMenuWidget, HandleEnterTestTank));
@@ -82,15 +94,21 @@ void URaftSimMainMenuWidget::HandleEnterTestTank()
     UGameplayStatics::OpenLevel(this, TestTankLevelName);
 }
 
-void URaftSimMainMenuWidget::HandleRunTroublemaker()
+void URaftSimMainMenuWidget::OpenRiverLevel(FName LevelName)
 {
     if (URaftSimSaveSubsystem* SaveSubsystem =
             GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>())
     {
         SaveSubsystem->SaveCurrent();
     }
-    UGameplayStatics::OpenLevel(this, TroublemakerLevelName);
+    UGameplayStatics::OpenLevel(this, LevelName);
 }
+
+void URaftSimMainMenuWidget::HandleRunSouthFork() { OpenRiverLevel(SouthForkLevelName); }
+void URaftSimMainMenuWidget::HandleRunColorado() { OpenRiverLevel(ColoradoLevelName); }
+void URaftSimMainMenuWidget::HandleRunPacuare() { OpenRiverLevel(PacuareLevelName); }
+void URaftSimMainMenuWidget::HandleRunFutaleufu() { OpenRiverLevel(FutaleufuLevelName); }
+void URaftSimMainMenuWidget::HandleRunChilko() { OpenRiverLevel(ChilkoLevelName); }
 
 void URaftSimMainMenuWidget::HandleToggleSettings()
 {

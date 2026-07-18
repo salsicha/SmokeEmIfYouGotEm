@@ -265,25 +265,65 @@ static void HandleCreateVerticalSliceCoreMaps(const TArray<FString>&)
     }
 }
 
-static void HandleCreateTroublemakerMap(const TArray<FString>&)
+// One playable river map: signature rapid, live cooked-field water, raft.
+struct FRiverMapSpec
+{
+    const TCHAR* MapName;
+    const TCHAR* CookedFieldsDir;
+    const TCHAR* FlowBand;
+};
+
+// The five runnable rivers (docs/five-river-simulation-plan.md). Each points at
+// its signature rapid's cooked flow fields; a river map that has no cooked
+// package yet falls back to the dev tank at runtime until its fields land.
+static const FRiverMapSpec GRiverMaps[] = {
+    {TEXT("L_Troublemaker"),
+     TEXT("physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/cooked_flow_fields"),
+     TEXT("median_runnable")},
+    {TEXT("L_Hance"),
+     TEXT("physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/cooked_flow_fields"),
+     TEXT("median_runnable")},
+    {TEXT("L_UpperHuacas"),
+     TEXT("physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/cooked_flow_fields"),
+     TEXT("median_runnable")},
+    {TEXT("L_Terminator"),
+     TEXT("physics/data/real_world/futaleufu_river_chile/scenario_terminator/cooked_flow_fields"),
+     TEXT("median_runnable")},
+    {TEXT("L_LavaCanyon"),
+     TEXT("physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/cooked_flow_fields"),
+     TEXT("median_runnable")},
+};
+
+static bool BuildRiverMap(const FRiverMapSpec& Spec)
 {
     UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
     AddCommonLighting(World);
 
-    // Visual ground and a river water surface at Z=0. The live solver window
-    // (loaded from the river config) drives the actual surface.
     AddScaledPlane(
         World, FVector(0.0f, 0.0f, -300.0f), FVector(700.0f, 700.0f, 1.0f),
         TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
 
-    // River water config: median-flow Troublemaker cooked window centred at
-    // origin, 600 m. The raft resolves this at BeginPlay.
-    AActor* RiverConfig = AddActorToWorld(
-        World, ARaftSimRiverWaterConfig::StaticClass(), FTransform(FVector::ZeroVector));
-    (void)RiverConfig;
+    // River water config pointing at this river's cooked window — placed only
+    // when the cooked package actually exists, so a river whose fields are not
+    // cooked yet loads clean dev-tank water (still playable) and is regenerated
+    // with live river water once its fields land.
+    const FString ManifestPath = FPaths::Combine(
+        FPaths::ProjectDir(), TEXT("../"), Spec.CookedFieldsDir, TEXT("manifest.json"));
+    const bool bCookedFieldsExist = FPaths::FileExists(ManifestPath);
+    if (bCookedFieldsExist)
+    {
+        if (ARaftSimRiverWaterConfig* RiverConfig = Cast<ARaftSimRiverWaterConfig>(
+                AddActorToWorld(World, ARaftSimRiverWaterConfig::StaticClass(),
+                                FTransform(FVector::ZeroVector))))
+        {
+            RiverConfig->CookedFieldsDir = Spec.CookedFieldsDir;
+            RiverConfig->FlowBand = FName(Spec.FlowBand);
+        }
+    }
+    UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: %s cooked_fields=%d"),
+           Spec.MapName, bCookedFieldsExist ? 1 : 0);
 
-    // Raft at the upstream scout eddy; run flows downstream (+X). Kept within
-    // the rendered surface grid and the loaded window for v1 registration.
+    // Raft at the upstream scout eddy; run flows downstream (+X).
     AddActorToWorld(
         World, ARaftSimRaftActor::StaticClass(),
         FTransform(FVector(-6000.0f, 0.0f, 60.0f)));
@@ -292,15 +332,36 @@ static void HandleCreateTroublemakerMap(const TArray<FString>&)
         FTransform(FVector(-6600.0f, 0.0f, 200.0f)));
 
     SetWorldGameMode(World, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
-    const bool bSaved = SaveWorldAsMap(World, TEXT("/Game/RaftSim/Maps/L_Troublemaker"));
-    UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: L_Troublemaker saved=%d"), bSaved ? 1 : 0);
+    const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Maps/%s"), Spec.MapName);
+    const bool bSaved = SaveWorldAsMap(World, *PackagePath);
+    UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: %s saved=%d"), Spec.MapName, bSaved ? 1 : 0);
+    return bSaved;
 }
 
-static FAutoConsoleCommand GCreateTroublemakerMapCommand(
-    TEXT("RaftSim.CreateTroublemakerMap"),
-    TEXT("Generate L_Troublemaker: the South Fork Troublemaker rapid with live "
-         "cooked-field river water, raft, and player start."),
-    FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateTroublemakerMap));
+static void HandleCreateRiverMaps(const TArray<FString>& Args)
+{
+    for (const FRiverMapSpec& Spec : GRiverMaps)
+    {
+        // Optional filter: build only maps whose name contains an arg token.
+        if (Args.Num() > 0)
+        {
+            bool bMatch = false;
+            for (const FString& Arg : Args)
+            {
+                if (FString(Spec.MapName).Contains(Arg)) { bMatch = true; }
+            }
+            if (!bMatch) { continue; }
+        }
+        BuildRiverMap(Spec);
+    }
+}
+
+static FAutoConsoleCommand GCreateRiverMapsCommand(
+    TEXT("RaftSim.CreateRiverMaps"),
+    TEXT("Generate the five runnable river maps (L_Troublemaker, L_Hance, "
+         "L_UpperHuacas, L_Terminator, L_LavaCanyon) with live cooked-field "
+         "river water. Optional args filter by map-name substring."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateRiverMaps));
 
 static FAutoConsoleCommand GCreateVerticalSliceInputAssetsCommand(
     TEXT("RaftSim.CreateVerticalSliceInputAssets"),
