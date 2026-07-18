@@ -2,148 +2,221 @@
   "a1_acceptance": [
     {
       "evidence": [
-        "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
-        "physics/data/real_world/south_fork_american_chili_bar/hydrography/nhd_hu8_18020129_bbox_extract_manifest.json"
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+        "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_official_access_geometry_discrepancy_review.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_official_access_reanchor_diagnostic.json",
+        "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_source_mile_divergence_audit.json"
       ],
-      "next_action": "Acquire or derive a full-reach official hydrography route, select the correct South Fork mainstem path, and record exact reviewed put-in/take-out anchors.",
+      "next_action": "None for stationing. The Salmon Falls bank-landing refinement rides the P7 owner packet as a non-blocking pending_human_review item.",
       "requirement": "Fix NHD flowline conflict and re-anchor Chili Bar plus Folsom take-out.",
-      "status": "blocked"
+      "status": "adopted"
     },
     {
       "evidence": [
-        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json"
+        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
       ],
-      "next_action": "Replace the current 0-2.5 km physical corridor slice with windowed full-run corridor packages after official route selection.",
+      "next_action": "Regenerate and extend the windowed corridor source pulls against the adopted 49078 m axis during P3/P4; the anchor blocker is resolved.",
       "requirement": "Extend corridor to the full Chili Bar-to-Folsom reach.",
-      "status": "blocked"
+      "status": "unblocked_source_pull_extension_pending_p3_p4"
     },
     {
       "evidence": [
         "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
         "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json"
       ],
-      "next_action": "Expand CBR/A25 seasonal windows, resolve A25 flag/routing/legal review, and obtain guide/outfitter validation before promotion.",
+      "next_action": "Expand CBR/A25 seasonal windows and resolve the A25 flag/routing/legal questions; guide/outfitter validation is batched to the P7 owner packet and no longer blocks stationing.",
       "requirement": "Attach official low/reference/high flow bands.",
-      "status": "attached_but_review_gated"
+      "status": "attached_pending_human_review_non_blocking"
     },
     {
       "evidence": [
-        "physics/data/real_world/named_rapid_source_catalog.json"
+        "physics/data/real_world/named_rapid_source_catalog.json",
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
       ],
-      "next_action": "Project the published miles only after the corrected centerline and anchors are reviewed; then regenerate editor markers through the catalog generator.",
+      "next_action": "Author exact per-rapid geometry in P3/P4 and regenerate editor markers through the catalog generator alongside that work; stations along the adopted axis are recorded now.",
       "requirement": "Re-station all 20 catalog markers with no order interpolation.",
-      "status": "published_mile_scaffold_ready_exact_geometry_blocked"
+      "status": "stationed_on_adopted_axis_no_order_interpolation"
     },
     {
       "evidence": [
-        "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json"
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
       ],
-      "next_action": "Do not enable South Fork editor-map geometry or Meat Grinder/Troublemaker solver windows until the alignment review status changes to resolved.",
+      "next_action": "Proceed to P3/P4 corridor window regeneration, exact rapid geometry authoring, and solver-window binding against the adopted axis.",
       "requirement": "Exit gate: conflict resolved and zero South Fork markers use order interpolation.",
-      "status": "not_met"
+      "status": "met_for_stationing"
     }
   ],
+  "adopted_route_stationing": {
+    "adopted_route_length_m": 49077.732,
+    "adopted_route_length_miles": 30.495,
+    "artifact": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+    "artifact_status": "adopted_official_access_anchor_route_stationing_active",
+    "decision_source": "release-1.0-plan-v2 \u00a76, July 17 2026",
+    "downstream_anchor_authority": "california_state_parks_parking_points",
+    "downstream_anchor_fid": 50927,
+    "downstream_anchor_name": "Salmon Falls  Lower Water Raft Take-out",
+    "downstream_anchor_snap_distance_m": 117.705,
+    "downstream_anchor_station_m": 49077.732,
+    "order_interpolation_used": false,
+    "published_mile_alias_policy": "published_river_miles_are_alias_metadata_not_anchors",
+    "published_mile_divergence_note": "Published guide miles reach 21.0 miles well upstream of the official Salmon Falls Lower Water Raft Take-out; the adopted NHD source-length axis measures 30.495 miles from Chili Bar to that anchor. Published miles are recorded as aliases with this divergence and are not used as anchors.",
+    "rapid_station_count": 20,
+    "route_geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
+    "station_axis_id": "adopted_nhd_directed_mainstem_chain_v1"
+  },
   "catalog_stationing_scaffold": {
+    "adopted_route_length_m": 49077.732,
     "all_rapids_have_published_miles": true,
     "downstreammost_catalog_rapid": "Surprise",
+    "published_mile_role": "alias_metadata_with_recorded_divergence",
     "rapid_count": 20,
     "rapid_mile_max": 19.3,
     "rapid_mile_min": 0.0,
     "rapid_stations": [
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "hole",
           "surf_wave",
           "recovery_pool"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7199431,
+          38.7786168
+        ],
         "name": "Chili Bar Hole",
         "order": 1,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 0.0,
-        "station_m_from_published_mile": 0.0
+        "station_m_from_published_mile": 0.0,
+        "station_m_on_adopted_axis": 0.0
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "constriction",
           "wave_train",
           "pin_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7290462,
+          38.7772729
+        ],
         "name": "Meat Grinder",
         "order": 2,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "critical",
         "river_mile": 0.6,
-        "station_m_from_published_mile": 965.606
+        "station_m_from_published_mile": 965.606,
+        "station_m_on_adopted_axis": 965.6064
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "bend",
           "lateral",
           "boulder"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7383971,
+          38.7722948
+        ],
         "name": "Racehorse Bend",
         "order": 3,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 1.3,
-        "station_m_from_published_mile": 2092.147
+        "station_m_from_published_mile": 2092.147,
+        "station_m_on_adopted_axis": 2092.1472
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "hole",
           "ledge",
           "surf_wave",
           "flow_sensitive"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7398037,
+          38.7747887
+        ],
         "name": "Maya",
         "order": 4,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 1.5,
-        "station_m_from_published_mile": 2414.016
+        "station_m_from_published_mile": 2414.016,
+        "station_m_on_adopted_axis": 2414.016
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "shallow_shelf",
           "pin_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7418644,
+          38.7770399
+        ],
         "name": "Rock Garden",
         "order": 5,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 1.7,
-        "station_m_from_published_mile": 2735.885
+        "station_m_from_published_mile": 2735.885,
+        "station_m_on_adopted_axis": 2735.8848
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "wave_train",
           "boulder"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7471694,
+          38.7765129
+        ],
         "name": "African Queen",
         "order": 6,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 2.0,
-        "station_m_from_published_mile": 3218.688
+        "station_m_from_published_mile": 3218.688,
+        "station_m_on_adopted_axis": 3218.688
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "multiple_channels",
           "pin_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7618089,
+          38.7799137
+        ],
         "name": "Triple Threat",
         "order": 7,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 3.1,
-        "station_m_from_published_mile": 4988.966
+        "station_m_from_published_mile": 4988.966,
+        "station_m_on_adopted_axis": 4988.9664
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "hole",
@@ -152,52 +225,80 @@
           "wrap_hazard",
           "multiple_lines"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.7767335,
+          38.7763812
+        ],
         "name": "Troublemaker",
         "order": 8,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "critical",
         "river_mile": 5.2,
-        "station_m_from_published_mile": 8368.589
+        "station_m_from_published_mile": 8368.589,
+        "station_m_on_adopted_axis": 8368.5888
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "constriction",
           "pin_hazard",
           "slalom"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.8964121,
+          38.8093193
+        ],
         "name": "Fowler's Rock",
         "order": 9,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 15.8,
-        "station_m_from_published_mile": 25427.635
+        "station_m_from_published_mile": 25427.635,
+        "station_m_on_adopted_axis": 25427.6352
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "wave_train",
           "canyon_constriction"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9001328,
+          38.8137704
+        ],
         "name": "Upper Haystack Canyon",
         "order": 10,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 16.2,
-        "station_m_from_published_mile": 26071.373
+        "station_m_from_published_mile": 26071.373,
+        "station_m_on_adopted_axis": 26071.3728
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "wave_train",
           "continuous_entry"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9053397,
+          38.8113154
+        ],
         "name": "Lost Hat",
         "order": 11,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 16.7,
-        "station_m_from_published_mile": 26876.045
+        "station_m_from_published_mile": 26876.045,
+        "station_m_on_adopted_axis": 26876.0448
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "hole",
           "curling_wave",
@@ -206,139 +307,207 @@
           "swimmer_hazard",
           "flow_sensitive"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9021894,
+          38.8099593
+        ],
         "name": "Satan's Cesspool",
         "order": 12,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "critical",
         "river_mile": 16.9,
-        "station_m_from_published_mile": 27197.914
+        "station_m_from_published_mile": 27197.914,
+        "station_m_on_adopted_axis": 27197.9136
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "submerged_rock",
           "wall_push",
           "swimmer_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9013332,
+          38.8086827
+        ],
         "name": "Son of Satan",
         "order": 13,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 17.0,
-        "station_m_from_published_mile": 27358.848
+        "station_m_from_published_mile": 27358.848,
+        "station_m_on_adopted_axis": 27358.848
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "diagonal_ledge",
           "boulder",
           "lateral"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9051419,
+          38.8048158
+        ],
         "name": "Scissors",
         "order": 14,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 17.4,
-        "station_m_from_published_mile": 28002.586
+        "station_m_from_published_mile": 28002.586,
+        "station_m_on_adopted_axis": 28002.5856
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "wave_train",
           "canyon_constriction"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9087679,
+          38.8043388
+        ],
         "name": "Lower Haystack Canyon",
         "order": 15,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 17.6,
-        "station_m_from_published_mile": 28324.454
+        "station_m_from_published_mile": 28324.454,
+        "station_m_on_adopted_axis": 28324.4544
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "rock_push",
           "hole",
           "flip_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9168841,
+          38.801105
+        ],
         "name": "Bouncing Rock",
         "order": 16,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "critical",
         "river_mile": 18.2,
-        "station_m_from_published_mile": 29290.061
+        "station_m_from_published_mile": 29290.061,
+        "station_m_on_adopted_axis": 29290.0608
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "wave_train",
           "bank_holes",
           "boulders"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9176316,
+          38.8039112
+        ],
         "name": "Pre-Op",
         "order": 17,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "medium",
         "river_mile": 18.4,
-        "station_m_from_published_mile": 29611.93
+        "station_m_from_published_mile": 29611.93,
+        "station_m_on_adopted_axis": 29611.9296
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "boulder_garden",
           "chute",
           "diagonal_hole",
           "flip_hazard"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9173471,
+          38.8064519
+        ],
         "name": "Hospital Bar",
         "order": 18,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "critical",
         "river_mile": 18.6,
-        "station_m_from_published_mile": 29933.798
+        "station_m_from_published_mile": 29933.798,
+        "station_m_on_adopted_axis": 29933.7984
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "hole",
           "reservoir_stage_sensitive",
           "recovery"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9204227,
+          38.8078396
+        ],
         "name": "Recovery Room",
         "order": 19,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 18.8,
-        "station_m_from_published_mile": 30255.667
+        "station_m_from_published_mile": 30255.667,
+        "station_m_on_adopted_axis": 30255.6672
       },
       {
-        "exact_geometry_status": "blocked_pending_full_reach_centerline_and_guide_review",
+        "exact_geometry_status": "stationed_on_adopted_axis_exact_geometry_pending_p3_p4",
         "feature_tags": [
           "seasonal_rock",
           "chute",
           "hole",
           "low_flow_sensitive"
         ],
+        "lon_lat_on_adopted_axis": [
+          -120.9267035,
+          38.8126016
+        ],
         "name": "Surprise",
         "order": 20,
+        "pending_human_review": true,
+        "review_batch": "p7_owner_review_packet",
         "review_priority": "high",
         "river_mile": 19.3,
-        "station_m_from_published_mile": 31060.339
+        "station_m_from_published_mile": 31060.339,
+        "station_m_on_adopted_axis": 31060.3392
       }
     ],
     "run_length_m": 33796.224,
     "run_length_miles": 21.0,
     "source_catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "station_axis": "adopted_nhd_directed_mainstem_chain_v1",
     "stationing_authority": "published_river_miles"
   },
   "current_geometry_evidence": {
     "access_seed_to_published_coloma_delta_m": 3812.3264,
+    "adopted_axis_artifact": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+    "adopted_axis_stationing_enabled": true,
     "alignment_review": "physics/data/real_world/south_fork_american_chili_bar/review/named_rapid_station_alignment_review.json",
     "alignment_status": "failed_alignment_binding_disabled",
     "candidate_centerline_path": "physics/data/real_world/south_fork_american_chili_bar/hydrography/production_import_pilot/centerline.geojson",
     "candidate_covers_catalog_full_run_length": false,
     "candidate_declared_length_m": 26204.692,
     "candidate_declared_section_id": "chili_bar_to_coloma",
+    "candidate_disposition": "The chili_bar_to_coloma pilot candidate centerline remains rejected exactly as reviewed; it is superseded for stationing by the adopted NHD directed mainstem axis and retained as evidence.",
     "candidate_to_published_coloma_length_ratio": 2.90765,
     "existing_full_run_catalog_length_m": 33796.224,
     "geometry_binding_enabled": false,
-    "published_chili_bar_to_coloma_length_m": 9012.3264,
-    "why_blocked": "Do not project published named-rapid miles onto this candidate centerline until the route is clipped and anchored to reviewed Chili Bar and Coloma locations."
+    "published_chili_bar_to_coloma_length_m": 9012.3264
   },
   "current_source_coverage": {
-    "coverage_blocker": "The committed NHD extract is a pilot bbox and the physical corridor is a 0-2.5 km Chili Bar slice; neither covers the full Chili Bar-to-Folsom run or proves exact Coloma/Folsom anchors.",
+    "coverage_gap": "Committed DEM/NAIP window pulls cover the planned 0-33796 m spans and the 0-2.5 km physical pilot slice; extending source coverage to the 49078 m adopted axis is P3/P4 source-pull work. This is a source-coverage gap, not an anchor blocker.",
+    "full_reach_extract_supports_adopted_axis": true,
+    "full_reach_named_flowline_extract": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_nhd_named_flowline_extract.geojson",
     "nhd_bbox_bounds_wgs84": {
       "max_lat": 38.83,
       "max_lon": -120.72,
@@ -359,12 +528,13 @@
     ],
     "production_corridor_status": "official_source_attached_physical_landscape_inputs_generated_review_gated"
   },
+  "decision_source": "release-1.0-plan-v2 \u00a76, July 17 2026",
   "display_name": "South Fork American: Chili Bar to Folsom Reservoir",
   "do_not_use_for": [
     "exact rapid geometry",
-    "solver water-window binding",
     "public access or rescue geometry",
-    "production-playable South Fork completion"
+    "photoreal or gameplay realism claims",
+    "production-playable South Fork completion claims"
   ],
   "flow_evidence": {
     "flow_band_review": "physics/data/real_world/south_fork_american_chili_bar/hydrology/production_import_pilot/flow_band_review.json",
@@ -376,6 +546,7 @@
       "Legal/redistribution signoff, guide/outfitter validation, and hydrologic station-to-rapid relation remain open.",
       "High-flow planning at 3000 cfs was not observed in the attached window and needs separate runoff/release evidence."
     ],
+    "review_routing": "Guide/outfitter validation items are batched to the P7 owner packet as pending_human_review and do not block stationing or corridor binding; flow-band promotion remains its own gate.",
     "reviewed_band_count": 3,
     "reviewed_bands": [
       {
@@ -404,11 +575,42 @@
     "source_selection": "physics/data/real_world/south_fork_american_chili_bar/hydrology/south_fork_modern_flow_source_selection.json",
     "source_selection_status": "cdec_cbr_primary_candidate_first_window_terms_flag_review_and_30d_context_attached_promotion_blocked"
   },
-  "generated_on": "2026-07-16",
-  "plan": "docs/five-river-photoreal-execution-plan.md#workstream-a--source-data-stationing-and-seasonal-flows-per-river",
+  "generated_on": "2026-07-17",
+  "pending_human_review": [
+    {
+      "blocking": false,
+      "description": "Confirm the exact riverbank landing at the Salmon Falls Lower Water Raft Take-out relative to the State Parks parking-centroid anchor (117.7 m snap) and its reservoir-stage usability.",
+      "formerly": "local guide review blocker",
+      "review_batch": "p7_owner_review_packet",
+      "review_id": "salmon_falls_takeout_bank_landing_confirmation"
+    },
+    {
+      "blocking": false,
+      "description": "Guide/oarsman confirmation that the 20 named-rapid stations projected from published guide miles onto the adopted NHD axis land at the real rapids.",
+      "formerly": "local guide review blocker",
+      "review_batch": "p7_owner_review_packet",
+      "review_id": "rapid_station_realism_guide_confirmation"
+    },
+    {
+      "blocking": false,
+      "description": "Owner review of the recorded divergence between published guide miles (21.0-mile full run) and the adopted NHD source-length axis (30.495 miles to the official take-out).",
+      "formerly": "source-mile convention review blocker",
+      "review_batch": "p7_owner_review_packet",
+      "review_id": "published_mile_alias_divergence_note_review"
+    },
+    {
+      "blocking": false,
+      "description": "Guide/outfitter validation of the CBR/A25 flow bands, seasonal windows, and station-to-rapid flow routing.",
+      "formerly": "local guide review blocker",
+      "review_batch": "p7_owner_review_packet",
+      "review_id": "flow_band_guide_outfitter_validation"
+    }
+  ],
+  "plan": "docs/release-1.0-plan.md#6-gate-dispositions-mechanical--no-forms-no-waiting",
   "production_promoted": false,
   "river_id": "south_fork_american_chili_bar",
   "schema": "raftsim.south_fork.a1_stationing_repair_status.v1",
-  "status": "blocked_pending_full_reach_hydrography_exact_anchors_and_guide_review",
+  "status": "adopted_official_access_anchor_full_reach_stationing_active",
+  "superseded_plan": "docs/five-river-photoreal-execution-plan.md#workstream-a--source-data-stationing-and-seasonal-flows-per-river",
   "task_id": "A1"
 }
