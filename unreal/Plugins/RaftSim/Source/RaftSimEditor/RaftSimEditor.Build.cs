@@ -40,6 +40,8 @@ public class RaftSimEditor : ModuleRules
             "ImageWrapper",
             "InputCore",
             "MeshUtilities",
+            "EnhancedInput",
+            "RaftSimRaft",
             "Projects",
             "ProceduralMeshComponent",
             "ProceduralVegetation",

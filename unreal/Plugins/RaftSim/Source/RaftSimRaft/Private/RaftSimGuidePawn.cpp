@@ -2,11 +2,55 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/SceneComponent.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Engine/LocalPlayer.h"
+#include "EngineUtils.h"
+#include "InputAction.h"
+#include "InputActionValue.h"
+#include "InputMappingContext.h"
+#include "Kismet/GameplayStatics.h"
+#include "RaftSimInputActions.h"
+#include "RaftSimRaftActor.h"
+#include "UObject/ConstructorHelpers.h"
+
+namespace
+{
+template <typename T>
+T* LoadGeneratedInputAsset(const TCHAR* Path)
+{
+    ConstructorHelpers::FObjectFinderOptional<T> Finder(Path);
+    return Finder.Succeeded() ? Finder.Get() : nullptr;
+}
+}
 
 ARaftSimGuidePawn::ARaftSimGuidePawn()
 {
     PrimaryActorTick.bCanEverTick = true;
     AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+    DefaultMappingContext = LoadGeneratedInputAsset<UInputMappingContext>(
+        TEXT("/Game/RaftSim/Input/IMC_RaftSimDefault.IMC_RaftSimDefault"));
+    PaddleStrokeAction = LoadGeneratedInputAsset<UInputAction>(
+        TEXT("/Game/RaftSim/Input/IA_PaddleStroke.IA_PaddleStroke"));
+    PaddleDrawAction = LoadGeneratedInputAsset<UInputAction>(
+        TEXT("/Game/RaftSim/Input/IA_PaddleDraw.IA_PaddleDraw"));
+    LookAction = LoadGeneratedInputAsset<UInputAction>(
+        TEXT("/Game/RaftSim/Input/IA_Look.IA_Look"));
+    HighSideAction = LoadGeneratedInputAsset<UInputAction>(
+        TEXT("/Game/RaftSim/Input/IA_HighSide.IA_HighSide"));
+    for (const TCHAR* CommandPath : {
+             TEXT("/Game/RaftSim/Input/IA_GuideCommandForwardPaddle.IA_GuideCommandForwardPaddle"),
+             TEXT("/Game/RaftSim/Input/IA_GuideCommandBackPaddle.IA_GuideCommandBackPaddle"),
+             TEXT("/Game/RaftSim/Input/IA_GuideCommandLeftPaddle.IA_GuideCommandLeftPaddle"),
+             TEXT("/Game/RaftSim/Input/IA_GuideCommandRightPaddle.IA_GuideCommandRightPaddle"),
+             TEXT("/Game/RaftSim/Input/IA_GuideCommandStop.IA_GuideCommandStop") })
+    {
+        if (UInputAction* CommandAction = LoadGeneratedInputAsset<UInputAction>(CommandPath))
+        {
+            GuideCommandActions.Add(CommandAction);
+        }
+    }
 
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     SetRootComponent(Root);
@@ -184,4 +228,145 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
     CameraRuntimeState.CurrentVignetteStrength = CameraSettings.bEnableVRComfortVignette
         ? CameraSettings.ComfortVignetteStrength * ImpactMagnitude
         : 0.0f;
+}
+
+void ARaftSimGuidePawn::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if (const APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+    {
+        if (UEnhancedInputLocalPlayerSubsystem* InputSubsystem =
+                ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+                    PlayerController->GetLocalPlayer()))
+        {
+            if (DefaultMappingContext != nullptr)
+            {
+                InputSubsystem->AddMappingContext(DefaultMappingContext, 0);
+            }
+        }
+    }
+
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        AttachToComponent(
+            Raft->GetSternSeatAttachPoint(),
+            FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+    }
+}
+
+ARaftSimRaftActor* ARaftSimGuidePawn::ResolveRaft()
+{
+    if (AttachedRaft != nullptr)
+    {
+        return AttachedRaft;
+    }
+    if (TActorIterator<ARaftSimRaftActor> It(GetWorld()); It)
+    {
+        AttachedRaft = *It;
+    }
+    return AttachedRaft;
+}
+
+void ARaftSimGuidePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+    Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+    UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+    if (EnhancedInput == nullptr)
+    {
+        return;
+    }
+
+    if (PaddleStrokeAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            PaddleStrokeAction, ETriggerEvent::Triggered, this,
+            &ARaftSimGuidePawn::HandlePaddleStroke);
+    }
+    if (PaddleDrawAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            PaddleDrawAction, ETriggerEvent::Triggered, this,
+            &ARaftSimGuidePawn::HandleTurnStroke);
+    }
+    if (LookAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            LookAction, ETriggerEvent::Triggered, this, &ARaftSimGuidePawn::HandleLook);
+    }
+    if (HighSideAction != nullptr)
+    {
+        EnhancedInput->BindAction(
+            HighSideAction, ETriggerEvent::Started, this, &ARaftSimGuidePawn::HandleHighSide);
+    }
+    for (const TObjectPtr<UInputAction>& CommandAction : GuideCommandActions)
+    {
+        if (CommandAction != nullptr)
+        {
+            EnhancedInput->BindActionValueLambda(
+                CommandAction, ETriggerEvent::Started,
+                [this, ActionName = CommandAction.GetFName()](const FInputActionValue&)
+                { HandleGuideCommand(ActionName); });
+        }
+    }
+}
+
+void ARaftSimGuidePawn::HandlePaddleStroke(const FInputActionValue& Value)
+{
+    const float Now = GetWorld()->GetTimeSeconds();
+    if (Now - LastStrokeTimeSeconds < StrokeCooldownSeconds)
+    {
+        return;
+    }
+    const FVector Axis = Value.Get<FVector>();
+    if (FMath::Abs(Axis.X) < 0.2f)
+    {
+        return;
+    }
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        LastStrokeTimeSeconds = Now;
+        Raft->ApplyPaddleStroke(ERaftSimPaddleSide::Both, Axis.X);
+        ApplyRaftImpactCue(
+            FVector(0.0f, 0.0f, -2.0f), FRotator(-0.6f * Axis.X, 0.0f, 0.0f), 0.18f);
+    }
+}
+
+void ARaftSimGuidePawn::HandleTurnStroke(const FInputActionValue& Value)
+{
+    const FVector2D Axis = Value.Get<FVector2D>();
+    if (FMath::Abs(Axis.X) < 0.2f)
+    {
+        return;
+    }
+    const float Now = GetWorld()->GetTimeSeconds();
+    if (Now - LastStrokeTimeSeconds < StrokeCooldownSeconds)
+    {
+        return;
+    }
+    if (ARaftSimRaftActor* Raft = ResolveRaft())
+    {
+        LastStrokeTimeSeconds = Now;
+        Raft->ApplyTurnStroke(Axis.X);
+    }
+}
+
+void ARaftSimGuidePawn::HandleLook(const FInputActionValue& Value)
+{
+    const FVector2D Axis = Value.Get<FVector2D>();
+    AddControllerYawInput(Axis.X);
+    AddControllerPitchInput(Axis.Y);
+}
+
+void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)
+{
+    // P3 wires this into the crew high-side response window; P1 gives feedback only.
+    ApplyRaftImpactCue(FVector(0.0f, 0.0f, -4.0f), FRotator::ZeroRotator, 0.4f);
+}
+
+void ARaftSimGuidePawn::HandleGuideCommand(FName CommandActionName)
+{
+    // P3 routes commands to the crew AI; P1 logs so the binding is verifiable.
+    UE_LOG(LogTemp, Display, TEXT("RaftSim guide command: %s"), *CommandActionName.ToString());
 }
