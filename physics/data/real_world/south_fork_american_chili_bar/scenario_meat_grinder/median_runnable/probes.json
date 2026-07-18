@@ -1,0 +1,173 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 6.0,
+        "y": 0.0
+      },
+      "probe_id": "window_entry_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "entry_slot_between_submerged_rocks"
+      },
+      "normal": null,
+      "position": {
+        "x": 273.0,
+        "y": 1.5
+      },
+      "probe_id": "entry_slot"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "hole": "a_left",
+        "subfeature_id": "offset_midriver_holes"
+      },
+      "normal": null,
+      "position": {
+        "x": 308.0,
+        "y": 5.0
+      },
+      "probe_id": "hole_a"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "hole": "b_right",
+        "subfeature_id": "offset_midriver_holes"
+      },
+      "normal": null,
+      "position": {
+        "x": 323.0,
+        "y": -5.0
+      },
+      "probe_id": "hole_b"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "shallow_boulder_garden_bed"
+      },
+      "normal": null,
+      "position": {
+        "x": 342.0,
+        "y": 0.0
+      },
+      "probe_id": "boulder_garden_mid"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "death_star_rock"
+      },
+      "normal": null,
+      "position": {
+        "x": 333.0,
+        "y": 1.0
+      },
+      "probe_id": "death_star"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "rhino_funnel_wave_train"
+      },
+      "normal": null,
+      "position": {
+        "x": 366.5,
+        "y": -8.0
+      },
+      "probe_id": "rhino_funnel"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "rhino_rock"
+      },
+      "normal": null,
+      "position": {
+        "x": 399.0,
+        "y": -12.0
+      },
+      "probe_id": "rhino_rock"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "left_exit_recovery_eddy"
+      },
+      "normal": null,
+      "position": {
+        "x": 423.0,
+        "y": 18.5
+      },
+      "probe_id": "left_exit_eddy"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "exit_wave_train"
+      },
+      "normal": null,
+      "position": {
+        "x": 458.0,
+        "y": 0.0
+      },
+      "probe_id": "exit_wave"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 594.0,
+        "y": 0.0
+      },
+      "probe_id": "window_exit_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 309.5,
+        "y": 0.0
+      },
+      "probe_id": "holes_cross_section"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 342.0,
+        "y": 0.0
+      },
+      "probe_id": "garden_cross_section"
+    }
+  ]
+}

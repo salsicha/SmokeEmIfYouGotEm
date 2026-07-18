@@ -9,7 +9,7 @@
 
 namespace
 {
-constexpr float kCmPerM = 100.0f;
+constexpr float kSurfCmPerM = 100.0f;
 constexpr float kGravity = 9.80665f;
 }
 
@@ -67,8 +67,8 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
         for (int32 X = 0; X < GridN; ++X)
         {
             const int32 Index = Y * GridN + X;
-            const float WorldX = GridOriginCm.X + X * VertexSpacingMeters * kCmPerM;
-            const float WorldY = GridOriginCm.Y + Y * VertexSpacingMeters * kCmPerM;
+            const float WorldX = GridOriginCm.X + X * VertexSpacingMeters * kSurfCmPerM;
+            const float WorldY = GridOriginCm.Y + Y * VertexSpacingMeters * kSurfCmPerM;
             Vertices[Index] = FVector(WorldX, WorldY, 0.0f);
             Normals[Index] = FVector::UpVector;
             UVs[Index] = FVector2D(
@@ -119,7 +119,7 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         FVector(V.X, V.Y, 0.0f), Sample) &&
                     Sample.bWet)
                 {
-                    SurfaceZCm = Sample.SurfaceHeightMeters * kCmPerM;
+                    SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM;
                     NormalOut = Sample.SurfaceNormal.GetSafeNormal();
                     // Froude number = speed / sqrt(g * depth); >~1 breaks white.
                     const float Speed = Sample.VelocityMetersPerSecond.Size2D();

@@ -1,0 +1,246 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 229.0,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 66.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "entry_lead_in_line"
+      },
+      "radius": 5.0,
+      "strength": 0.55,
+      "width": 12.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 250.0,
+        "y": 12.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "boulder",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "diversion_canal_rock"
+      },
+      "radius": 3.2,
+      "strength": 0.3,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 273.0,
+        "y": 1.5
+      },
+      "kind": "constriction",
+      "length": 23.430749027719962,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "entry_slot_between_submerged_rocks"
+      },
+      "radius": 3.0,
+      "strength": 0.55,
+      "width": 5.2
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 342.0,
+        "y": 0.0
+      },
+      "kind": "shallow",
+      "length": 140.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "boulder",
+        "consequence_class": "entrapment_life_threat",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "shallow_boulder_garden_bed"
+      },
+      "radius": 8.0,
+      "strength": 1.0,
+      "width": 36.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 309.5,
+        "y": 0.0
+      },
+      "kind": "hole",
+      "length": 27.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "offset_midriver_holes"
+      },
+      "radius": 4.0,
+      "strength": 0.7,
+      "width": 19.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 333.0,
+        "y": 1.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "pin_rock",
+        "consequence_class": "wrap_or_pin",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "death_star_rock"
+      },
+      "radius": 2.8,
+      "strength": 0.95,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 366.5,
+        "y": -7.5
+      },
+      "kind": "wave_train",
+      "length": 33.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "wave_train",
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "rhino_funnel_wave_train"
+      },
+      "radius": 5.0,
+      "strength": 0.85,
+      "width": 13.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 399.0,
+        "y": -12.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "rhino_rock"
+      },
+      "radius": 4.4,
+      "strength": 0.95,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 423.0,
+        "y": 18.5
+      },
+      "kind": "eddy_line",
+      "length": 38.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "eddy_line",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "left_exit_recovery_eddy"
+      },
+      "radius": 5.0,
+      "strength": 0.3,
+      "width": 11.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 438.0,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 40.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "wave",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "exit_wave_train"
+      },
+      "radius": 5.0,
+      "strength": 0.3,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 250.0,
+        "y": -31.0
+      },
+      "kind": "eddy_line",
+      "length": 100.0,
+      "metadata": {
+        "authored_bed_change": false,
+        "c1_feature_type": "scout",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Meat Grinder",
+        "subfeature_id": "railroad_grade_scout_portage"
+      },
+      "radius": 4.0,
+      "strength": 0.3,
+      "width": 0.0
+    }
+  ]
+}
