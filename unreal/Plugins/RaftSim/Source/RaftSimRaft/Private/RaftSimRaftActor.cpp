@@ -3,11 +3,18 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "Materials/MaterialInterface.h"
 #include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
+
+namespace
+{
+constexpr float kCmPerM = 100.0f;
+}
 
 ARaftSimRaftActor::ARaftSimRaftActor()
 {
@@ -120,6 +127,11 @@ void ARaftSimRaftActor::BeginPlay()
 
     Bridge = BridgeSubsystem;
     RaftAdapter = Adapter;
+
+    // Checkpoint = spawn pose; recovery/reset returns the raft here.
+    CheckpointTransform = GetActorTransform();
+    RaftMode = ERaftSimRaftMode::Upright;
+    FlipRiskLatchSeconds = 0.0f;
 }
 
 FVector ARaftSimRaftActor::GetRaftVelocity() const
@@ -177,4 +189,224 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         SetActorLocationAndRotation(
             RaftTransform.GetTranslation(), RaftTransform.GetRotation().GetNormalized());
     }
+
+    UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
+}
+
+void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
+{
+    const FRaftSimFlexStepTelemetry& Telemetry = RaftAdapter->GetLastFlexibleStepTelemetry();
+    const float RollDegrees = FMath::Abs(GetActorRotation().Roll);
+
+    if (RaftMode == ERaftSimRaftMode::Upright)
+    {
+        // Latch on a sustained negative flip margin (overwash roll moment beats
+        // the tube's righting moment) or a hard roll-over.
+        const bool bFlipRisk = Telemetry.bReferenceFlipRisk && Telemetry.ReferenceFlipMarginNm < 0.0;
+        FlipRiskLatchSeconds = bFlipRisk
+            ? FlipRiskLatchSeconds + DeltaSeconds
+            : FMath::Max(0.0f, FlipRiskLatchSeconds - DeltaSeconds);
+
+        if (FlipRiskLatchSeconds >= CapsizeLatchSeconds || RollDegrees >= CapsizeRollDegrees)
+        {
+            EnterCapsize();
+        }
+        return;
+    }
+
+    // Capsized or Recovering: swimmers drift and can be reseated.
+    DriftSwimmers(DeltaSeconds);
+
+    if (RaftMode == ERaftSimRaftMode::Recovering)
+    {
+        TryReseatSwimmers();
+        if (Swimmers.Num() == 0)
+        {
+            RaftMode = ERaftSimRaftMode::Upright;
+            FlipRiskLatchSeconds = 0.0f;
+        }
+    }
+}
+
+void ARaftSimRaftActor::EnterCapsize()
+{
+    RaftMode = ERaftSimRaftMode::Capsized;
+    FlipRiskLatchSeconds = 0.0f;
+    // Right the boat here on re-flip. Guard against a diverged sink so the
+    // recovery point stays near where the crew went overboard.
+    CapsizeLocation = GetActorLocation();
+    CapsizeLocation.Z = FMath::Clamp(CapsizeLocation.Z, -200.0f, 200.0f);
+
+    // Roll the hull over so the flip is visible, and drain nothing yet — the
+    // retained water keeps it inverted until the guide re-flips.
+    AddActorLocalRotation(FRotator(0.0f, 0.0f, 160.0f));
+
+    // Eject the crew as swimmers at the raft, drifting downstream.
+    Swimmers.Reset();
+    const FVector RaftM = CapsizeLocation / kCmPerM;
+    const FVector FlowMps = SampleWaterVelocityMps(CapsizeLocation);
+    for (int32 Index = 0; Index < CrewSize; ++Index)
+    {
+        FRaftSimSwimmerRescueFrame Swimmer;
+        Swimmer.PassengerId = (Index == 0) ? FName(TEXT("guide")) : FName(*FString::Printf(TEXT("paddler_%d"), Index));
+        // Scatter swimmers slightly around the flip point.
+        const float Angle = (2.0f * PI * Index) / FMath::Max(1, CrewSize);
+        Swimmer.SwimmerWorldPositionMeters =
+            RaftM + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * 1.5f;
+        Swimmer.SwimmerDriftVelocityMetersPerSecond = FlowMps;
+        Swimmer.RescueWindowSeconds = 12.0f;
+        Swimmer.bThrowLineAvailable = true;
+        Swimmers.Add(Swimmer);
+    }
+
+    // Visual spheres for each swimmer.
+    for (UStaticMeshComponent* Mesh : SwimmerMeshes)
+    {
+        if (Mesh != nullptr)
+        {
+            Mesh->DestroyComponent();
+        }
+    }
+    SwimmerMeshes.Reset();
+    UStaticMesh* SphereMesh =
+        LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
+    {
+        UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
+        Mesh->SetupAttachment(nullptr);
+        Mesh->RegisterComponent();
+        Mesh->SetStaticMesh(SphereMesh);
+        Mesh->SetWorldScale3D(FVector(0.5f));
+        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        Mesh->SetWorldLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+        SwimmerMeshes.Add(Mesh);
+    }
+}
+
+void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
+{
+    for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
+    {
+        const FVector SwimmerCm = Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM;
+        const FVector FlowMps = SampleWaterVelocityMps(SwimmerCm);
+        Swimmers[Index] = URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
+            Swimmers[Index], FlowMps, DeltaSeconds);
+        if (SwimmerMeshes.IsValidIndex(Index) && SwimmerMeshes[Index] != nullptr)
+        {
+            SwimmerMeshes[Index]->SetWorldLocation(
+                Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+        }
+    }
+}
+
+void ARaftSimRaftActor::TryReseatSwimmers()
+{
+    const FVector RaftM = GetActorLocation() / kCmPerM;
+    FRaftSimSwimmingSkillProfile Skill;
+    for (int32 Index = Swimmers.Num() - 1; Index >= 0; --Index)
+    {
+        const float DistanceM =
+            FVector::Dist(Swimmers[Index].SwimmerWorldPositionMeters, RaftM);
+        FRaftSimRescueAttempt Attempt;
+        // Reach-grab a swimmer at the tube; throw a line to one further out.
+        Attempt.Method = (DistanceM <= 1.2f)
+            ? ERaftSimRescueMethod::ReachGrab
+            : ERaftSimRescueMethod::ThrowLine;
+        Attempt.bThrowLineAvailable = Swimmers[Index].bThrowLineAvailable;
+        Attempt.DistanceMeters = DistanceM;
+        Attempt.TimeInWaterSeconds = Swimmers[Index].TimeInWaterSeconds;
+
+        const FRaftSimSwimmerRescueFrame Result =
+            URaftSimSwimmerRescueLibrary::EvaluateRescueAttempt(
+                Swimmers[Index], Attempt, Skill);
+        Swimmers[Index] = Result;
+
+        // Reseated once the guide finishes pulling the swimmer in.
+        if (Result.PullInProgress >= 1.0f)
+        {
+            if (SwimmerMeshes.IsValidIndex(Index) && SwimmerMeshes[Index] != nullptr)
+            {
+                SwimmerMeshes[Index]->DestroyComponent();
+            }
+            SwimmerMeshes.RemoveAt(Index);
+            Swimmers.RemoveAt(Index);
+        }
+    }
+}
+
+FVector ARaftSimRaftActor::SampleWaterVelocityMps(const FVector& WorldLocationCm) const
+{
+    if (Bridge != nullptr)
+    {
+        if (const URaftSimWaterRuntimeAdapter* WaterAdapter = Bridge->GetWaterRuntime())
+        {
+            FRaftSimWaterSample Sample;
+            if (WaterAdapter->SampleWaterAtWorldPosition(WorldLocationCm, Sample) && Sample.bWet)
+            {
+                // Cap to a physical big-water speed so a solver spike or a
+                // non-finite sample can never teleport a swimmer.
+                FVector Velocity = Sample.VelocityMetersPerSecond;
+                if (!Velocity.ContainsNaN())
+                {
+                    return Velocity.GetClampedToMaxSize(12.0f);
+                }
+            }
+        }
+    }
+    return FVector::ZeroVector;
+}
+
+void ARaftSimRaftActor::RequestReflip()
+{
+    if (RaftMode != ERaftSimRaftMode::Capsized)
+    {
+        return;
+    }
+    // Re-right the hull at the capsize location (the guide flips the boat
+    // among the crew), drain retained water, and begin reseating swimmers.
+    RaftMode = ERaftSimRaftMode::Recovering;
+    SetActorLocationAndRotation(
+        CapsizeLocation, FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
+    if (RaftAdapter != nullptr)
+    {
+        RaftAdapter->ResetFlexiblePersistentState();
+        FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+        State.WorldTransform = GetActorTransform();
+        // Guide has re-established the eddy: shed the residual drift the flip
+        // imparted so the raft holds station over the swimmers to reseat them.
+        State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
+        State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+        RaftAdapter->SetKinematicState(State);
+    }
+}
+
+void ARaftSimRaftActor::HandleHighSideResponse(int32 Direction)
+{
+    if (RaftAdapter == nullptr || Direction == 0)
+    {
+        return;
+    }
+    FRaftSimFlexCrewAction Action;
+    Action.SeatId = TEXT("guide");
+    Action.HighSideDirection = FMath::Clamp(Direction, -1, 1);
+    Action.bBrace = true;
+    RaftAdapter->SetFlexibleCrewActions({Action});
+}
+
+void ARaftSimRaftActor::ForceOverwashForTesting(float SurfaceHeightM, FVector FlowVelocityMps)
+{
+    if (RaftAdapter == nullptr)
+    {
+        return;
+    }
+    if (SurfaceHeightM < 0.0f)
+    {
+        RaftAdapter->SetFlexibleUniformWater(FRaftSimFlexUniformWater{}, false);
+        return;
+    }
+    FRaftSimFlexUniformWater Water;
+    Water.SurfaceHeightM = SurfaceHeightM;
+    Water.VelocityMps = FlowVelocityMps;
+    Water.bWet = true;
+    RaftAdapter->SetFlexibleUniformWater(Water, true);
 }
