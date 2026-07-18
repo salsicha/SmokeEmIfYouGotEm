@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "RaftSimFlexibleRaftModel.h"
 #include "UObject/Object.h"
 #include "UObject/ObjectMacros.h"
 
@@ -84,6 +85,32 @@ struct FRaftSimRaftKinematicState
     FVector AngularVelocityRadiansPerSecond = FVector::ZeroVector;
 };
 
+// Per-substep telemetry from the quasi-static flexible-raft evaluation
+// (D1-D4 port). Reference-only until the D6 promotion gate clears; the
+// force/moment modifiers are applied to the adapter's kinematic state.
+struct FRaftSimFlexStepTelemetry
+{
+    bool bEvaluated = false;
+    double MaxFreeboardLossM = 0.0;
+    double PortTotalFreeboardLossM = 0.0;
+    double StarboardTotalFreeboardLossM = 0.0;
+    double TubeRollLoadBiasNm = 0.0;
+    double TubePitchLoadBiasNm = 0.0;
+    double TotalRetainedWaterMassKg = 0.0;
+    double RetainedWaterRollMomentNm = 0.0;
+    double ReferenceFlipThresholdNm = 0.0;
+    double ReferenceFlipMarginNm = 0.0;
+    bool bReferenceFlipRisk = false;
+    int32 ContactCount = 0;
+    int32 WrappingContactCount = 0;
+    int32 PinnedObstacleCount = 0;
+    int32 RecoveringContactCount = 0;
+    double MaxIndentationM = 0.0;
+    double MinReleaseMarginN = 0.0;
+    FVector AppliedForceN = FVector::ZeroVector;
+    FVector AppliedTorqueNm = FVector::ZeroVector;
+};
+
 UCLASS(BlueprintType)
 class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
 {
@@ -114,6 +141,43 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
     bool StepRaftDynamics(float SubstepSeconds);
 
+    // --- Flexible-raft model (D1-D4 port; CustomReducedRigidBody path) ------
+
+    // Stand up the quasi-static flexible model behind the adapter. Seats may be
+    // empty (no crew loads). The tube layout is rebuilt from the parameters.
+    void ConfigureFlexibleRaftModel(
+        const FRaftSimFlexParameters& InParameters,
+        const TArray<FRaftSimFlexCrewSeat>& InSeats,
+        double NominalPressurePa = 18000.0);
+
+    void SetFlexibleCrewActions(const TArray<FRaftSimFlexCrewAction>& InActions);
+
+    // Uniform water descriptor for D3 overwash sampling. Disabled by default;
+    // when disabled, retained deck water still drains deterministically.
+    void SetFlexibleUniformWater(const FRaftSimFlexUniformWater& InWater, bool bInEnabled);
+
+    void SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles);
+
+    // Clear retained-water and indentation memory (deterministic restart).
+    void ResetFlexiblePersistentState();
+
+    bool IsFlexibleModelConfigured() const { return FlexLayout.Num() > 0; }
+
+    const FRaftSimFlexStepTelemetry& GetLastFlexibleStepTelemetry() const
+    {
+        return LastFlexStepTelemetry;
+    }
+
+    const TMap<FString, double>& GetFlexibleRetainedVolumeBySegment() const
+    {
+        return RetainedVolumeBySegment;
+    }
+
+    const TMap<FString, double>& GetFlexibleIndentationBySegment() const
+    {
+        return IndentationBySegment;
+    }
+
 private:
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
@@ -123,4 +187,18 @@ private:
 
     UPROPERTY()
     FRaftSimRaftKinematicState KinematicState;
+
+    // Flexible-raft model state (plain C++ members; deterministic).
+    FRaftSimFlexParameters FlexParameters;
+    TArray<FRaftSimFlexTubeSegment> FlexLayout;
+    TArray<FRaftSimFlexCrewSeat> FlexSeats;
+    TArray<FRaftSimFlexCrewAction> FlexActions;
+    TArray<FRaftSimFlexRockObstacle> FlexObstacles;
+    FRaftSimFlexUniformWater FlexWater;
+    bool bFlexWaterEnabled = false;
+    TMap<FString, double> RetainedVolumeBySegment;
+    TMap<FString, double> IndentationBySegment;
+    FRaftSimFlexStepTelemetry LastFlexStepTelemetry;
+
+    bool StepFlexibleRaftDynamics(double SubstepSeconds);
 };
