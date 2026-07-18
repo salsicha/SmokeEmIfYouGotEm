@@ -83,6 +83,14 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float AngularDampingPerSecond = 1.4f;
 
+    /**
+     * Vertical (heave) damping in N·s/m applied per submerged fraction.
+     * ~0.5 of critical damping for the tube-buoyancy spring, so the raft
+     * settles onto the waterline in a couple of oscillations.
+     */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float HeaveDampingNsPerM = 1500.0f;
+
     /** Impulse in Newton-seconds delivered by one full paddle stroke. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float PaddleStrokeImpulseNs = 260.0f;

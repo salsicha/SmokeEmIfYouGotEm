@@ -140,6 +140,13 @@ void ARaftSimRaftActor::StepRaft(float SubstepSeconds)
                        (LinearDragCoefficient * SubmergedFraction * Speed * Speed);
     }
 
+    // Linear heave damping: quadratic drag alone is negligible at bobbing
+    // speeds, leaving the buoyancy spring underdamped.
+    if (SubmergedFraction > 0.0f)
+    {
+        TotalForceN.Z += -HeaveDampingNsPerM * SubmergedFraction * LinearVelocity.Z;
+    }
+
     // Integrate impulses accumulated from paddle input.
     LinearVelocity += PendingImpulseNs / MassKg;
     // Approximate yaw inertia of a flat raft: (1/12) m (L^2 + W^2).
