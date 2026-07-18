@@ -14,11 +14,13 @@
     {
       "evidence": [
         "physics/data/real_world/south_fork_american_chili_bar/production_corridor/chili_bar_reach_0_2500m/manifest.json",
-        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
+        "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json",
+        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_status.json"
       ],
-      "next_action": "Regenerate and extend the windowed corridor source pulls against the adopted 49078 m axis during P3/P4; the anchor blocker is resolved.",
+      "next_action": "None for source coverage: eight hash-locked DEM/NAIP windows cover the adopted 49078 m axis. Stitched-derivative review and Unreal import readiness continue inside P3/P4 against these sources.",
       "requirement": "Extend corridor to the full Chili Bar-to-Folsom reach.",
-      "status": "unblocked_source_pull_extension_pending_p3_p4"
+      "status": "extended_full_axis_window_sources_attached"
     },
     {
       "evidence": [
@@ -505,9 +507,17 @@
     "published_chili_bar_to_coloma_length_m": 9012.3264
   },
   "current_source_coverage": {
-    "coverage_gap": "Committed DEM/NAIP window pulls cover the planned 0-33796 m spans and the 0-2.5 km physical pilot slice; extending source coverage to the 49078 m adopted axis is P3/P4 source-pull work. This is a source-coverage gap, not an anchor blocker.",
+    "coverage_gap": "Resolved July 17 2026: committed DEM/NAIP window pulls now cover the full 0-49078 m adopted axis in eight hash-locked windows. Only the 0-2.5 km physical pilot slice is promoted corridor terrain; that is derivative/review work inside P3/P4, not an anchor blocker.",
     "full_reach_extract_supports_adopted_axis": true,
     "full_reach_named_flowline_extract": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_nhd_named_flowline_extract.geojson",
+    "full_reach_window_coverage": {
+      "all_source_files_present": true,
+      "corridor_window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json",
+      "covered_station_end_m": 49077.732,
+      "covers_adopted_axis": true,
+      "source_pull_status": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_status.json",
+      "window_count": 8
+    },
     "nhd_bbox_bounds_wgs84": {
       "max_lat": 38.83,
       "max_lon": -120.72,

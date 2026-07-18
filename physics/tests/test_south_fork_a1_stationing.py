@@ -115,6 +115,12 @@ def test_south_fork_a1_preserves_rejected_candidate_evidence_and_coverage_gap():
     assert coverage["production_corridor_point_count"] == 799
     assert coverage["production_corridor_station_range_m"] == [0.0, 2531.325]
     assert "not an anchor blocker" in coverage["coverage_gap"]
+    assert "Resolved July 17 2026" in coverage["coverage_gap"]
+    window_coverage = coverage["full_reach_window_coverage"]
+    assert window_coverage["window_count"] == 8
+    assert window_coverage["covered_station_end_m"] == 49077.732
+    assert window_coverage["covers_adopted_axis"] is True
+    assert window_coverage["all_source_files_present"] is True
 
 
 def test_south_fork_a1_acceptance_is_unblocked_with_p7_batched_reviews():
@@ -138,7 +144,7 @@ def test_south_fork_a1_acceptance_is_unblocked_with_p7_batched_reviews():
     ] == "adopted"
     assert acceptance[
         "Extend corridor to the full Chili Bar-to-Folsom reach."
-    ] == "unblocked_source_pull_extension_pending_p3_p4"
+    ] == "extended_full_axis_window_sources_attached"
     assert acceptance["Attach official low/reference/high flow bands."] == (
         "attached_pending_human_review_non_blocking"
     )
