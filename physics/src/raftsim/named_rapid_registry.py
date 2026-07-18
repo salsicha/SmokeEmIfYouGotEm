@@ -48,6 +48,9 @@ NAMED_RAPID_SUBFEATURE_TYPES = (
     "boil",
     "shelf",
     "boulder",
+    "island",
+    "sieve",
+    "wall",
     "pin_rock",
     "line",
     "sneak_line",
@@ -55,6 +58,16 @@ NAMED_RAPID_SUBFEATURE_TYPES = (
     "portage",
     "recovery_pool",
     "continuous_whitewater",
+)
+NAMED_RAPID_SUBFEATURE_ALONG_POSITIONS = ("entry", "middle", "exit")
+NAMED_RAPID_SUBFEATURE_ACROSS_POSITIONS = ("left", "center", "right")
+NAMED_RAPID_CONSEQUENCE_CLASSES = (
+    "low_nuisance",
+    "swim_risk",
+    "surf_or_retention",
+    "flip_risk",
+    "wrap_or_pin",
+    "entrapment_life_threat",
 )
 
 
@@ -186,12 +199,23 @@ def validate_source_catalog(catalog: dict[str, Any]) -> None:
                 raise ValueError(f"Rapid has no feature tags: {feature_id}")
             if rapid.get("review_priority") not in {"medium", "high", "critical"}:
                 raise ValueError(f"Invalid review priority: {feature_id}")
-            _validate_rapid_feature_inventory(rapid, feature_id)
+            flow_reference = rapid.get("flow_band_reference")
+            if rapid.get("feature_inventory") and flow_reference is None:
+                raise ValueError(f"Feature inventory requires a flow band reference: {feature_id}")
+            if flow_reference is not None:
+                for cfs_key in ("low_review_cfs", "reference_review_cfs", "high_review_cfs"):
+                    cfs_value = flow_reference.get(cfs_key)
+                    if not isinstance(cfs_value, (int, float)) or cfs_value <= 0:
+                        raise ValueError(f"Invalid flow band reference {cfs_key}: {feature_id}")
+                if not flow_reference.get("source"):
+                    raise ValueError(f"Flow band reference requires a source: {feature_id}")
+            _validate_rapid_feature_inventory(rapid, feature_id, source_ids)
 
 
 def _validate_rapid_feature_inventory(
     rapid: dict[str, Any],
     parent_feature_id: str,
+    catalog_source_ids: set[str],
 ) -> None:
     inventory = rapid.get("feature_inventory", [])
     if not isinstance(inventory, list):
@@ -201,11 +225,51 @@ def _validate_rapid_feature_inventory(
         subfeature_id = subfeature.get("subfeature_id")
         if not subfeature_id or subfeature_id in subfeature_ids:
             raise ValueError(f"Invalid subfeature ID in {parent_feature_id}")
+        if subfeature_id != _slug(subfeature_id):
+            raise ValueError(f"Subfeature ID must be a slug in {parent_feature_id}")
         subfeature_ids.add(subfeature_id)
+        if not subfeature.get("display_name"):
+            raise ValueError(f"Subfeature display name required in {parent_feature_id}")
         if subfeature.get("feature_type") not in NAMED_RAPID_SUBFEATURE_TYPES:
             raise ValueError(f"Invalid subfeature type in {parent_feature_id}")
-        if not subfeature.get("source_ids"):
+        aliases = subfeature.get("aliases", [])
+        if not isinstance(aliases, list) or any(
+            not isinstance(alias, str) or not alias for alias in aliases
+        ):
+            raise ValueError(f"Subfeature aliases must be non-empty strings in {parent_feature_id}")
+        position = subfeature.get("relative_position")
+        if not isinstance(position, dict):
+            raise ValueError(f"Subfeature relative position required in {parent_feature_id}")
+        if position.get("along") not in NAMED_RAPID_SUBFEATURE_ALONG_POSITIONS:
+            raise ValueError(f"Invalid subfeature along-position in {parent_feature_id}")
+        if position.get("across") not in NAMED_RAPID_SUBFEATURE_ACROSS_POSITIONS:
+            raise ValueError(f"Invalid subfeature across-position in {parent_feature_id}")
+        if "notes" in position and not (
+            isinstance(position["notes"], str) and position["notes"]
+        ):
+            raise ValueError(f"Subfeature position notes must be non-empty in {parent_feature_id}")
+        flow_dependence = subfeature.get("flow_dependence")
+        if not isinstance(flow_dependence, dict):
+            raise ValueError(f"Subfeature flow dependence required in {parent_feature_id}")
+        for flow_band in FLOW_BANDS:
+            note = flow_dependence.get(flow_band)
+            if not isinstance(note, str) or not note:
+                raise ValueError(
+                    f"Subfeature flow dependence must cover {flow_band} in {parent_feature_id}"
+                )
+        if subfeature.get("consequence_class") not in NAMED_RAPID_CONSEQUENCE_CLASSES:
+            raise ValueError(f"Invalid subfeature consequence class in {parent_feature_id}")
+        if "consequence_notes" in subfeature and not (
+            isinstance(subfeature["consequence_notes"], str) and subfeature["consequence_notes"]
+        ):
+            raise ValueError(
+                f"Subfeature consequence notes must be non-empty in {parent_feature_id}"
+            )
+        subfeature_source_ids = subfeature.get("source_ids")
+        if not subfeature_source_ids:
             raise ValueError(f"Subfeature source IDs required in {parent_feature_id}")
+        if not set(subfeature_source_ids).issubset(catalog_source_ids):
+            raise ValueError(f"Unknown subfeature source in {parent_feature_id}")
         if subfeature.get("guide_review_status") not in {
             "required",
             "pending",
@@ -215,17 +279,37 @@ def _validate_rapid_feature_inventory(
             raise ValueError(f"Invalid subfeature guide review in {parent_feature_id}")
 
 
-def _normalised_feature_inventory(rapid: dict[str, Any]) -> list[dict[str, Any]]:
+def _normalised_feature_inventory(
+    rapid: dict[str, Any],
+    source_lookup: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
     return [
         {
             "subfeature_id": subfeature["subfeature_id"],
             "display_name": subfeature["display_name"],
             "feature_type": subfeature["feature_type"],
             "aliases": subfeature.get("aliases", []),
-            "relative_position": subfeature.get("relative_position", "review_required"),
-            "flow_dependence": subfeature.get("flow_dependence", "review_required"),
-            "consequence_class": subfeature.get("consequence_class", "review_required"),
+            "relative_position": {
+                "along": subfeature["relative_position"]["along"],
+                "across": subfeature["relative_position"]["across"],
+                "notes": subfeature["relative_position"].get("notes"),
+            },
+            "flow_dependence": {
+                flow_band: subfeature["flow_dependence"][flow_band]
+                for flow_band in FLOW_BANDS
+            },
+            "consequence_class": subfeature["consequence_class"],
+            "consequence_notes": subfeature.get("consequence_notes"),
             "source_ids": subfeature["source_ids"],
+            "source_refs": [
+                {
+                    "source_id": source_id,
+                    "title": source_lookup[source_id]["title"],
+                    "url": source_lookup[source_id]["url"],
+                    "rights_status": source_lookup[source_id]["rights_status"],
+                }
+                for source_id in subfeature["source_ids"]
+            ],
             "geometry_status": subfeature.get("geometry_status", "exact_geometry_required"),
             "guide_review_status": subfeature["guide_review_status"],
             "feature_forcing_allowed": subfeature.get("feature_forcing_allowed", False),
@@ -396,7 +480,7 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                 river,
                 float(station["station_m"]),
             )
-            feature_inventory = _normalised_feature_inventory(rapid)
+            feature_inventory = _normalised_feature_inventory(rapid, source_lookup)
             markers.append(
                 {
                     "feature_id": feature_id,
@@ -405,6 +489,8 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                     "rapid_number": rapid.get("rapid_number"),
                     "downstream_order": rapid["order"],
                     "difficulty_label": rapid["class"],
+                    "class_reported_range": rapid.get("class_reported_range"),
+                    "flow_band_reference": rapid.get("flow_band_reference"),
                     "feature_tags": rapid["feature_tags"],
                     "review_priority": rapid["review_priority"],
                     "stationing": station,
@@ -429,9 +515,11 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                     "feature_inventory": feature_inventory,
                     "subfeature_count": len(feature_inventory),
                     "subfeature_editor_pin_status": (
-                        "blocked_until_c1_inventory_and_exact_geometry"
-                        if not feature_inventory or map_geometry is None
-                        else "ready_for_editor_pin_review_not_authoritative"
+                        "ready_for_editor_pin_review_not_authoritative"
+                        if feature_inventory and map_geometry is not None
+                        else "inventory_attached_blocked_until_exact_geometry"
+                        if feature_inventory
+                        else "blocked_until_c1_inventory_and_exact_geometry"
                     ),
                     "source_ids": river["source_ids"],
                     "guide_review_status": "required",
