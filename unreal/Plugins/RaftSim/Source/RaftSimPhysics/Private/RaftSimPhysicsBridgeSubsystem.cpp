@@ -44,6 +44,31 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
     {
         RaftRuntime->ConfigureRaftBody(RaftConfig);
         RaftRuntime->ConfigureAuthorityIntegrationPolicy(AuthorityIntegrationPolicy);
+
+        // Bind the raft adapter's buoyancy probe to the live water runtime.
+        // Without a live solver window the probe reports a flat surface at
+        // world Z=0, matching the P1 dev-tank waterline.
+        TWeakObjectPtr<URaftSimWaterRuntimeAdapter> WeakWater = WaterRuntime;
+        RaftRuntime->SetWaterSurfaceSampler(
+            [WeakWater](const FVector& WorldPositionCm, float& OutWaterSurfaceZCm) -> bool
+            {
+                if (URaftSimWaterRuntimeAdapter* Water = WeakWater.Get())
+                {
+                    if (Water->HasLiveWindow())
+                    {
+                        FRaftSimWaterSample Sample;
+                        if (Water->SampleWaterAtWorldPosition(WorldPositionCm, Sample)
+                            && Sample.bWet)
+                        {
+                            OutWaterSurfaceZCm = Sample.SurfaceHeightMeters * 100.0f;
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+                OutWaterSurfaceZCm = 0.0f;
+                return true;
+            });
     }
 }
 

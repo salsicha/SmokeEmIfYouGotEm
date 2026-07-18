@@ -120,6 +120,11 @@ private:
     UPROPERTY()
     TObjectPtr<URaftSimChronoRuntimeAdapter> RaftRuntime;
 
+public:
+    URaftSimChronoRuntimeAdapter* GetRaftRuntime() const { return RaftRuntime; }
+
+private:
+
     UPROPERTY()
     FRaftSimPhysicsTickOutput LastOutput;
 

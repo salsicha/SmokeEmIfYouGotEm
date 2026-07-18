@@ -68,6 +68,26 @@ struct FRaftSimRaftBodyConfig
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
     bool bEnableCompliantContacts = true;
+
+    /** Total buoyancy at full tube submersion as a multiple of weight. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float BuoyancyWeightMultiple = 2.6f;
+
+    /** Quadratic water drag coefficient applied per submerged fraction. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float LinearDragCoefficient = 45.0f;
+
+    /**
+     * Vertical (heave) damping in N·s/m applied per submerged fraction:
+     * roughly half of critical for the tube-buoyancy spring, so the raft
+     * settles onto the waterline in a couple of oscillations.
+     */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float HeaveDampingNsPerM = 1500.0f;
+
+    /** Angular damping factor per second. */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Chrono")
+    float AngularDampingPerSecond = 1.4f;
 };
 
 USTRUCT(BlueprintType)
@@ -141,6 +161,24 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
     bool StepRaftDynamics(float SubstepSeconds);
 
+    /**
+     * Queue an external (paddle) impulse for the next substep: linear in
+     * Newton-seconds (world space), angular in Newton-meter-seconds.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Chrono")
+    void AddExternalImpulse(FVector LinearImpulseNs, FVector AngularImpulseNms);
+
+    /**
+     * Bind the water-surface probe the buoyancy support stage samples:
+     * given a world position in centimeters, writes the wet surface height in
+     * centimeters and returns true, or returns false where the water is dry.
+     * With a sampler bound, the CustomReducedRigidBody quasi-static step
+     * integrates gravity, multi-point tube buoyancy, drag, and heave damping
+     * in addition to the D1-D4 modifiers.
+     */
+    void SetWaterSurfaceSampler(
+        TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler);
+
     // --- Flexible-raft model (D1-D4 port; CustomReducedRigidBody path) ------
 
     // Stand up the quasi-static flexible model behind the adapter. Seats may be
@@ -187,6 +225,12 @@ private:
 
     UPROPERTY()
     FRaftSimRaftKinematicState KinematicState;
+
+    // Buoyancy support stage (plain C++ members; deterministic).
+    TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
+    TArray<FVector> TubeSamplePointsM;
+    FVector PendingLinearImpulseNs = FVector::ZeroVector;
+    FVector PendingAngularImpulseNms = FVector::ZeroVector;
 
     // Flexible-raft model state (plain C++ members; deterministic).
     FRaftSimFlexParameters FlexParameters;

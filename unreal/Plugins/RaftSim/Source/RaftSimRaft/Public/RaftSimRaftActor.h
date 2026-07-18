@@ -7,7 +7,8 @@
 
 class UStaticMeshComponent;
 class USceneComponent;
-class URaftSimWaterRuntimeAdapter;
+class URaftSimChronoRuntimeAdapter;
+class URaftSimPhysicsBridgeSubsystem;
 
 /** Which side of the raft a paddle stroke acts on. */
 UENUM(BlueprintType)
@@ -19,11 +20,12 @@ enum class ERaftSimPaddleSide : uint8
 };
 
 /**
- * First-slice floating raft: a self-integrated rigid body with multi-point
- * tube buoyancy sampled from the water runtime adapter, quadratic drag, and
- * paddle impulses. This is the P1 test-tank raft; the P2 dynamics port
- * replaces the internal integrator with the authoritative reduced rigid-body
- * + flexible-tube model while keeping this actor's interface.
+ * The floating raft, driven by the authoritative physics bridge (A-3): the
+ * actor configures the bridge subsystem from its properties, routes paddle
+ * impulses into the raft dynamics adapter, and mirrors the adapter's
+ * kinematic state onto its transform. All integration happens inside
+ * URaftSimChronoRuntimeAdapter::StepRaftDynamics (buoyancy support stage +
+ * flexible-raft D1-D4) on the bridge's fixed 120 Hz substep.
  */
 UCLASS()
 class RAFTSIMRAFT_API ARaftSimRaftActor : public AActor
@@ -48,12 +50,9 @@ public:
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
-    FVector GetRaftVelocity() const { return LinearVelocity; }
+    FVector GetRaftVelocity() const;
 
 protected:
-    void StepRaft(float SubstepSeconds);
-    float SampleWaterSurfaceZ(const FVector& WorldPosition) const;
-
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
     TObjectPtr<USceneComponent> Root;
 
@@ -70,6 +69,14 @@ protected:
     /** Tube radius in meters; controls buoyancy saturation depth. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float TubeRadiusM = 0.28f;
+
+    /** Hull footprint length in meters (14 ft paddle raft). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float FootprintLengthM = 4.3f;
+
+    /** Hull footprint width in meters. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float FootprintWidthM = 2.0f;
 
     /** Total buoyancy at full submersion as a multiple of weight. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
@@ -95,20 +102,14 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float PaddleStrokeImpulseNs = 260.0f;
 
-    /** Fixed integration substep in seconds (120 Hz). */
+    /** Fixed physics substep in seconds (120 Hz), forwarded to the bridge. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float FixedSubstepSeconds = 1.0f / 120.0f;
 
 private:
-    /** Local-space buoyancy sample points on the tube ring (meters). */
-    TArray<FVector> TubeSamplePointsM;
-
-    FVector LinearVelocity = FVector::ZeroVector;   // m/s, world space
-    FVector AngularVelocityRad = FVector::ZeroVector; // rad/s, world space
-    FVector PendingImpulseNs = FVector::ZeroVector; // world space
-    FVector PendingAngularImpulse = FVector::ZeroVector;
-    float TimeAccumulator = 0.0f;
+    UPROPERTY()
+    TObjectPtr<URaftSimPhysicsBridgeSubsystem> Bridge;
 
     UPROPERTY()
-    TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
+    TObjectPtr<URaftSimChronoRuntimeAdapter> RaftAdapter;
 };

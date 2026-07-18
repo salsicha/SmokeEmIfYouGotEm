@@ -1,9 +1,43 @@
 #include "RaftSimChronoRuntimeAdapter.h"
 
+namespace
+{
+// Matches the P1 actor-integrator constant so the swap is behavior-preserving.
+constexpr double kSupportGravityMps2 = 9.80665;
+}
+
 void URaftSimChronoRuntimeAdapter::ConfigureRaftBody(const FRaftSimRaftBodyConfig& InConfig)
 {
     RaftConfig = InConfig;
     AuthorityIntegrationPolicy.SelectedRuntime = InConfig.Runtime;
+
+    // Six tube buoyancy sample points from the footprint: bow pair, midship
+    // pair, stern pair (meters, local). For the 4.3 m x 2.0 m paddle raft
+    // this reproduces the P1 test-tank layout exactly.
+    const double HalfLength = 0.5 * RaftConfig.LengthMeters;
+    const double HalfWidth = 0.5 * RaftConfig.WidthMeters;
+    const double EndX = FMath::Max(HalfLength - 0.3, 0.1);
+    const double EndY = FMath::Max(HalfWidth - 0.15, 0.1);
+    TubeSamplePointsM = {
+        FVector(EndX, -EndY, 0.0), FVector(EndX, EndY, 0.0),
+        FVector(0.0, -HalfWidth, 0.0), FVector(0.0, HalfWidth, 0.0),
+        FVector(-EndX, -EndY, 0.0), FVector(-EndX, EndY, 0.0),
+    };
+    PendingLinearImpulseNs = FVector::ZeroVector;
+    PendingAngularImpulseNms = FVector::ZeroVector;
+}
+
+void URaftSimChronoRuntimeAdapter::AddExternalImpulse(
+    FVector LinearImpulseNs, FVector AngularImpulseNms)
+{
+    PendingLinearImpulseNs += LinearImpulseNs;
+    PendingAngularImpulseNms += AngularImpulseNms;
+}
+
+void URaftSimChronoRuntimeAdapter::SetWaterSurfaceSampler(
+    TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler)
+{
+    WaterSurfaceSampler = MoveTemp(InSampler);
 }
 
 void URaftSimChronoRuntimeAdapter::ConfigureAuthorityIntegrationPolicy(const FRaftSimRaftAuthorityIntegrationPolicy& InPolicy)
@@ -188,11 +222,77 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     }
 
     const double MassKg = FMath::Max(static_cast<double>(RaftConfig.MassKg), 1.0e-3);
-    const FVector LinearAcceleration = ForceN / MassKg;
     const FVector Inertia(
         FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.X), 1.0e-3),
         FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Y), 1.0e-3),
         FMath::Max(static_cast<double>(RaftConfig.InertiaTensorKgM2.Z), 1.0e-3));
+
+    // Buoyancy support stage (ported from the P1 actor integrator): gravity,
+    // multi-point tube buoyancy against the live water surface, quadratic
+    // drag, and heave damping. Engaged when the bridge has bound a water
+    // sampler; forces are evaluated from the pre-impulse state, exactly as
+    // the actor's integrator did.
+    double SubmergedFraction = 0.0;
+    const bool bSupportStage = static_cast<bool>(WaterSurfaceSampler) && TubeSamplePointsM.Num() > 0;
+    if (bSupportStage)
+    {
+        const double WeightN = MassKg * kSupportGravityMps2;
+        ForceN.Z += -WeightN;
+        const double PerPointBuoyancyN =
+            WeightN * static_cast<double>(RaftConfig.BuoyancyWeightMultiple) /
+            static_cast<double>(TubeSamplePointsM.Num());
+        const double SaturationDepthM =
+            FMath::Max(2.0 * static_cast<double>(RaftConfig.TubeRadiusMeters), 1.0e-3);
+        for (const FVector& LocalM : TubeSamplePointsM)
+        {
+            const FVector WorldOffset = State.Orientation.RotateVector(LocalM);
+            const FVector WorldPointM = State.Position + WorldOffset;
+            float SurfaceZCm = 0.0f;
+            if (!WaterSurfaceSampler(WorldPointM * 100.0, SurfaceZCm))
+            {
+                // Dry water cell: no support from this tube point.
+                continue;
+            }
+            const double SubmersionM = static_cast<double>(SurfaceZCm) / 100.0 - WorldPointM.Z;
+            const double Saturation = FMath::Clamp(SubmersionM / SaturationDepthM, 0.0, 1.0);
+            if (Saturation <= 0.0)
+            {
+                continue;
+            }
+            SubmergedFraction += Saturation / static_cast<double>(TubeSamplePointsM.Num());
+            const FVector PointForceN(0.0, 0.0, PerPointBuoyancyN * Saturation);
+            ForceN += PointForceN;
+            TorqueNm += FVector::CrossProduct(WorldOffset, PointForceN);
+        }
+
+        // Quadratic water drag opposing velocity, scaled by submersion.
+        const double Speed = State.LinearVelocity.Length();
+        if (Speed > KINDA_SMALL_NUMBER && SubmergedFraction > 0.0)
+        {
+            ForceN += State.LinearVelocity *
+                      (-static_cast<double>(RaftConfig.LinearDragCoefficient) *
+                       SubmergedFraction * Speed);
+        }
+
+        // Linear heave damping: quadratic drag alone is negligible at bobbing
+        // speeds, leaving the buoyancy spring underdamped.
+        if (SubmergedFraction > 0.0)
+        {
+            ForceN.Z += -static_cast<double>(RaftConfig.HeaveDampingNsPerM) *
+                        SubmergedFraction * State.LinearVelocity.Z;
+        }
+    }
+
+    // External (paddle) impulses queued since the last substep.
+    State.LinearVelocity += PendingLinearImpulseNs / MassKg;
+    State.AngularVelocity += FVector(
+        PendingAngularImpulseNms.X / Inertia.X,
+        PendingAngularImpulseNms.Y / Inertia.Y,
+        PendingAngularImpulseNms.Z / Inertia.Z);
+    PendingLinearImpulseNs = FVector::ZeroVector;
+    PendingAngularImpulseNms = FVector::ZeroVector;
+
+    const FVector LinearAcceleration = ForceN / MassKg;
     const FVector AngularAcceleration(
         TorqueNm.X / Inertia.X,
         TorqueNm.Y / Inertia.Y,
@@ -201,6 +301,11 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     // Semi-implicit fixed-step update (RaftState6DoF.advance semantics).
     State.LinearVelocity += LinearAcceleration * Dt;
     State.AngularVelocity += AngularAcceleration * Dt;
+    if (bSupportStage)
+    {
+        State.AngularVelocity *= FMath::Clamp(
+            1.0 - static_cast<double>(RaftConfig.AngularDampingPerSecond) * Dt, 0.0, 1.0);
+    }
     State.Position += State.LinearVelocity * Dt;
     const double AngularSpeed = State.AngularVelocity.Length();
     if (AngularSpeed > 1.0e-12)
