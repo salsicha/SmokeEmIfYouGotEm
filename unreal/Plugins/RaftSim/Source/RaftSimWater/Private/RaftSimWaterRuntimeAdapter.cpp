@@ -199,7 +199,8 @@ FString URaftSimWaterRuntimeAdapter::ResolveRepoRelativePath(const FString& Path
         const FString RepoRelative = FPaths::ConvertRelativePathToFull(
             FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), Path)
         );
-        if (FPaths::FileExists(RepoRelative) || Path.StartsWith(TEXT("physics/")))
+        if (FPaths::FileExists(RepoRelative) || FPaths::DirectoryExists(RepoRelative)
+            || Path.StartsWith(TEXT("physics/")))
         {
             return RepoRelative;
         }
@@ -223,6 +224,52 @@ bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
 #else
     return false;
 #endif
+}
+
+bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
+    const FString& CookedFieldsManifestDir, const FString& BandId,
+    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning)
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    FString Error;
+    LiveWindow = FRaftSimLiveWaterWindow::CreateFromCookedFields(
+        ResolveRepoRelativePath(CookedFieldsManifestDir), BandId,
+        WindowCenterM, WindowExtentM, RoughnessManning, Error);
+    if (!LiveWindow.IsValid())
+    {
+        UE_LOG(
+            LogTemp, Error,
+            TEXT("RaftSim river window '%s' failed to load from %s: %s"),
+            *BandId, *CookedFieldsManifestDir, *Error);
+        Status = ERaftSimWaterRuntimeStatus::Faulted;
+        return false;
+    }
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized
+        || Status == ERaftSimWaterRuntimeStatus::Faulted)
+    {
+        Status = ERaftSimWaterRuntimeStatus::ScenarioBound;
+    }
+    return true;
+#else
+    return false;
+#endif
+}
+
+bool URaftSimWaterRuntimeAdapter::GetLiveWindowStats(FRaftSimWaterLiveWindowStats& OutStats) const
+{
+    OutStats = FRaftSimWaterLiveWindowStats();
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (LiveWindow.IsValid())
+    {
+        OutStats.TotalWaterVolumeM3 = static_cast<float>(LiveWindow->TotalWaterVolumeM3());
+        OutStats.WetFraction = static_cast<float>(LiveWindow->WetCellFraction());
+        OutStats.SeedWetFraction = static_cast<float>(LiveWindow->SeedWetFraction());
+        OutStats.bHasNonFinite = LiveWindow->HasNonFiniteState();
+        OutStats.SimTimeSeconds = static_cast<float>(LiveWindow->SimTimeSeconds());
+        return true;
+    }
+#endif
+    return false;
 }
 
 bool URaftSimWaterRuntimeAdapter::HasLiveWindow() const
