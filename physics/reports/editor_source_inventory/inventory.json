@@ -18,6 +18,10 @@
       "line_count": 889
     },
     {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
+      "line_count": 279
+    },
+    {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorAtmosphereAndFoliage.cpp",
       "line_count": 1602
     },
@@ -146,8 +150,8 @@
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 36,
-  "implementation_line_count": 50491,
+  "implementation_file_count": 37,
+  "implementation_line_count": 50770,
   "registered_console_command_count": 34,
   "registered_console_commands": [
     {
