@@ -14,6 +14,7 @@ from raftsim.meat_grinder_c3_window import (
     SCENARIO_ROOT_RELATIVE,
     MeatGrinderBedParameters,
     _load_final_frame_fields,
+    build_meat_grinder_window_geometry,
     evaluate_meat_grinder_behavior,
     generate_meat_grinder_scenario2_5d,
     load_flow_bands,
@@ -86,26 +87,39 @@ def test_bed_geometry_expresses_headline_features(committed_packages):
         rows = (ys >= y_range[0]) & (ys <= y_range[1])
         return bed[np.ix_(rows, cols)]
 
-    # The boulder garden runs shallower (bed raised) than the deep channel invert
-    # of the smoother approach reach.
-    garden = region((p.garden_x[0] + 20.0, p.garden_x[1] - 20.0), (-8.0, 8.0))
-    approach = region((120.0, 180.0), (-6.0, 6.0))
-    assert float(np.median(garden)) > float(np.median(approach))
+    # The boulder garden runs shallow: its bed sits close under the conditioned
+    # water surface (a raised shelf), unlike the deep parabolic channel carve of
+    # the smoother approach reach.  Compare depth-below-surface so the ~17 m
+    # longitudinal drop through the window does not confound the test.
+    geo = build_meat_grinder_window_geometry(REPO_ROOT)
+    surf = geo.surface_profile[np.newaxis, :]
+    depth_below_surface = surf - geo.bed
 
-    # Each offset hole notch drops into a deeper plunge pool.
+    def surface_gap(x_range, y_range):
+        cols = (xs >= x_range[0]) & (xs <= x_range[1])
+        rows = (ys >= y_range[0]) & (ys <= y_range[1])
+        return depth_below_surface[np.ix_(rows, cols)]
+
+    garden_gap = surface_gap((p.garden_x[0] + 20.0, p.garden_x[1] - 20.0), (-8.0, 8.0))
+    approach_gap = surface_gap((120.0, 180.0), (-6.0, 6.0))
+    assert float(np.median(garden_gap)) < float(np.median(approach_gap))
+
+    # Each offset hole is a pourover: the near-surface sill crest stands well above
+    # the plunge-pool floor just below it (the drop that trips the hydraulic).
     for hx, hy in (p.hole_a_center, p.hole_b_center):
-        notch = region((hx - 3.0, hx + 3.0), (hy - 2.0, hy + 2.0))
-        pool = region((hx + 3.0, hx + 11.0), (hy - 3.0, hy + 3.0))
-        assert float(notch.min()) - float(pool.min()) > 0.4
+        sill = region((hx - 1.0, hx + 1.0), (hy - 2.0, hy + 2.0))
+        pool = region((hx + 4.0, hx + 10.0), (hy - 3.0, hy + 3.0))
+        assert float(sill.max()) - float(pool.min()) > 1.0
 
     # Rhino Rock is a local high standing above the funnel channel to its left.
     rock = region((p.rhino_rock_x - 2.0, p.rhino_rock_x + 2.0), (p.rhino_rock_y - 2.0, p.rhino_rock_y + 2.0))
     funnel = region((p.funnel_wave_x[-1] - 4.0, p.funnel_wave_x[-1] + 4.0), (p.rhino_rock_y - 2.0, p.rhino_rock_y + 4.0))
     assert float(rock.max()) > float(funnel.min()) + 1.0
 
-    # A scattered boulder field: the garden bed is rougher (higher std) than the
-    # smooth approach reach.
-    assert float(np.std(garden)) > float(np.std(approach))
+    # A scattered boulder field: the garden bed (depth-below-surface, detrended of
+    # the longitudinal drop) is rougher -- higher std -- than the smooth parabolic
+    # approach carve.
+    assert float(np.std(garden_gap)) > float(np.std(approach_gap))
 
 
 def test_generation_is_deterministic(committed_packages):
@@ -189,7 +203,7 @@ def test_genuine_solver_run_reproduces_headline_behavior(tmp_path, committed_pac
         subprocess.run([cmake, "--build", str(build_dir)], check=True)
 
     scenario = committed_packages["median_runnable"]
-    config = meat_grinder_solver_config(executable, steps=900, frame_interval=300)
+    config = meat_grinder_solver_config(executable, steps=2000, frame_interval=500)
     from raftsim.dual_solver import run_cpp_solver_scenario
 
     result = run_cpp_solver_scenario(
@@ -210,8 +224,9 @@ def test_genuine_solver_run_reproduces_headline_behavior(tmp_path, committed_pac
     evaluation = evaluate_meat_grinder_behavior(scenario, fields, "median_runnable")
     checks = evaluation["checks"]
     assert checks["mass_positivity"]["passed"] is True
-    # 45 s of settling is enough for the offset-hole hydraulics and the boulder-
-    # garden roughness signature to be present; the committed report holds the
-    # full-length runs at all three bands.
+    # 100 s of settling is enough for both offset-hole pourover hydraulics (the
+    # supercritical sill face plus the plunge-pool surface recovery) and the
+    # boulder-garden roughness signature to be present; the committed report holds
+    # the 4000-step (200 s) runs at all three bands.
     assert checks["offset_holes_form"]["passed"] is True
     assert checks["boulder_garden_roughness_elevated"]["passed"] is True

@@ -1,0 +1,283 @@
+{
+  "bands": {
+    "high_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 70.08862044128912,
+        "garden_x340": 76.23005149695727,
+        "upstream_x100": 79.33252204789392
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.5816728095777075,
+            "garden_mean_depth_m": 1.468795353451939,
+            "garden_p90_grad": 0.0454667721202988,
+            "ratio": 3.542655539626281,
+            "reach_mean_depth_m": 1.4110811173477045,
+            "reach_median_grad": 0.012834093411490733,
+            "shallower_than_reach": false
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness/turbulence signature, honestly harder to validate than a single hole.",
+          "passed": true,
+          "subfeature_id": "shallow_boulder_garden_bed",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.3
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "hole_a_left": {
+              "max_face_froude": 2.5104563056351528,
+              "passed": true,
+              "surface_recovery_m": 0.7161220542955675
+            },
+            "hole_b_right": {
+              "max_face_froude": 0.836126593997017,
+              "passed": true,
+              "surface_recovery_m": 0.2237223029428037
+            }
+          },
+          "note": "Both offset holes: supercritical notch face plus adverse pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "offset_midriver_holes",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.12
+          }
+        },
+        "rhino_funnel_wave_train_forms": {
+          "measured": {
+            "funnel_p90_grad": 0.02773947487498189,
+            "ratio": 2.16138951039159,
+            "reach_median_grad": 0.012834093411490733,
+            "rightward_flow_fraction": 0.46616541353383456
+          },
+          "note": "High flow (>~2,000 cfs): the funnel wave train must form (elevated standing-wave gradient).",
+          "passed": true,
+          "required_at_this_band": true,
+          "subfeature_id": "rhino_funnel_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/high_runnable_final_fields.npz",
+      "scenario_id": "south_fork_meat_grinder_c3_window_high_runnable",
+      "stage_east_m": 443.9076381017253,
+      "stage_west_m": 451.70763810172525,
+      "target_discharge_m3s": 84.950539776
+    },
+    "low_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 1.2033758580422385,
+        "garden_x340": 21.414626438470187,
+        "upstream_x100": 23.439203966557407
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.5777759806494153,
+            "garden_mean_depth_m": 0.7711041154219598,
+            "garden_p90_grad": 0.028521070393398917,
+            "ratio": 2.290144577194003,
+            "reach_mean_depth_m": 0.7445762298835058,
+            "reach_median_grad": 0.012453829630417624,
+            "shallower_than_reach": false
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness/turbulence signature, honestly harder to validate than a single hole.",
+          "passed": true,
+          "subfeature_id": "shallow_boulder_garden_bed",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.25
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "hole_a_left": {
+              "max_face_froude": 2.115965637653908,
+              "passed": true,
+              "surface_recovery_m": 0.13023312286281907
+            },
+            "hole_b_right": {
+              "max_face_froude": 0.9567713860484545,
+              "passed": true,
+              "surface_recovery_m": 0.0631957105444485
+            }
+          },
+          "note": "Both offset holes: supercritical notch face plus adverse pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "offset_midriver_holes",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.04
+          }
+        },
+        "rhino_funnel_wave_train_forms": {
+          "measured": {
+            "funnel_p90_grad": 0.02651174862084173,
+            "ratio": 2.1288028989965144,
+            "reach_median_grad": 0.012453829630417624,
+            "rightward_flow_fraction": 0.48120300751879697
+          },
+          "note": "Low/median flow (<~2,000 cfs): informational only; per C1 the wave train reads as a rocky right-side channel and the large flip-risk waves build above ~2,000 cfs.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "rhino_funnel_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/low_runnable_final_fields.npz",
+      "scenario_id": "south_fork_meat_grinder_c3_window_low_runnable",
+      "stage_east_m": 443.10870071660327,
+      "stage_west_m": 450.90870071660333,
+      "target_discharge_m3s": 25.4851619328
+    },
+    "median_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 34.504291657737674,
+        "garden_x340": 40.304586412794734,
+        "upstream_x100": 42.131497582156854
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.5786876435143896,
+            "garden_mean_depth_m": 1.070000868980675,
+            "garden_p90_grad": 0.03218909477184957,
+            "ratio": 2.5100459436835165,
+            "reach_mean_depth_m": 1.0402151422863537,
+            "reach_median_grad": 0.012824105810832995,
+            "shallower_than_reach": false
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness/turbulence signature, honestly harder to validate than a single hole.",
+          "passed": true,
+          "subfeature_id": "shallow_boulder_garden_bed",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.35
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "hole_a_left": {
+              "max_face_froude": 2.2575637894421483,
+              "passed": true,
+              "surface_recovery_m": 0.3518299889539662
+            },
+            "hole_b_right": {
+              "max_face_froude": 0.9151384470554084,
+              "passed": true,
+              "surface_recovery_m": 0.13679867192217898
+            }
+          },
+          "note": "Both offset holes: supercritical notch face plus adverse pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "offset_midriver_holes",
+          "thresholds": {
+            "min_face_froude": 0.85,
+            "min_surface_recovery_m": 0.08
+          }
+        },
+        "rhino_funnel_wave_train_forms": {
+          "measured": {
+            "funnel_p90_grad": 0.0277109767332801,
+            "ratio": 2.16085059980335,
+            "reach_median_grad": 0.012824105810832995,
+            "rightward_flow_fraction": 0.46616541353383456
+          },
+          "note": "Low/median flow (<~2,000 cfs): informational only; per C1 the wave train reads as a rocky right-side channel and the large flip-risk waves build above ~2,000 cfs.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "rhino_funnel_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/median_runnable_final_fields.npz",
+      "scenario_id": "south_fork_meat_grinder_c3_window_median_runnable",
+      "stage_east_m": 443.44245124338,
+      "stage_west_m": 451.24245124338006,
+      "target_discharge_m3s": 45.3069545472
+    }
+  },
+  "generated_on": "2026-07-18",
+  "headline_gate": {
+    "boulder_garden_roughness_at_reference": true,
+    "offset_holes_form_at_reference": true,
+    "parameterization_iterations": [
+      {
+        "change": "initial authored bed on the raw ~2.8% DEM-trace gradient: shallow garden shelf with an exposed/barely-covered scattered boulder field, two gut-style offset holes, Death Star pin rock, right-side funnel wave bumps; uniform Manning n=0.042",
+        "iteration": 1,
+        "outcome": "the FV solver destabilized within ~2,500 steps -- the steep reach ran supercritical and the wet/dry churn over the exposed boulder field drained mass (rc=2)"
+      },
+      {
+        "change": "submerged the boulder field and the barely-covered rocks (crests just below the conditioned surface) to remove the wet/dry churn, and raised Manning n toward a boulder-garden value",
+        "iteration": 2,
+        "outcome": "runs survived longer but the window still would not convey at the ~2.8% gradient: the discharge decayed from ~Q upstream to <Q/10 at the exit features, starving the right hole, the Rhino funnel and Rhino Rock, and longer runs over-drained and crashed"
+      },
+      {
+        "change": "slope-bounded the conditioned longitudinal profile to a Class III+ gradient (~1.3%, comparable to the committed Troublemaker window) -- the raw ~2.8% trace snaps ~90 m to the DEM channel here and almost certainly captures valley-wall/side terrain rather than the true thalweg.  With the gentler profile the window conveys the full band discharge (flux constant end-to-end), but the now-subcritical ~1 m-deep reach drowned the gentle submerged holes (Fr ~0.4).  Re-cut both offset holes as pourover weirs -- an apron, a near-surface transverse sill the flow tumbles over (critical over the crest regardless of reach Froude), and a plunge pool -- and settled on n=0.060 (a lower, Troublemaker-like n runs the blockier bed faster and destabilizes it)",
+        "iteration": 3,
+        "outcome": "both offset holes trip supercritical over their sills and recover in the pools (hydraulic forms), the boulder garden shows an elevated roughness signature, and the Rhino funnel wave train forms at the high band; all three bands are stable at the reported 4000-step (200 s) settle (the thin low band destabilizes past ~5000 steps, so the settle is bounded there -- features are present well before)"
+      }
+    ],
+    "passed": true,
+    "rhino_funnel_wave_train_at_high": true
+  },
+  "honesty": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "boulder_garden_validation": "The boulder garden is a distributed feature and is genuinely harder to validate than a single hole; it is scored as an elevated surface-gradient roughness ratio over the garden vs the wetted-reach median, and the solver result is recorded per band whether or not it clears the gate.  Here it clears comfortably at all bands and grows with flow (ratio ~2.3 low -> ~3.5 high), matching the C1 note that the garden's hazard sharpens with discharge.",
+    "evidence_kind": "genuine_solver_behavioral_validation_not_parity",
+    "note": "Feature presence is validated behaviorally against the C1 inventory (A-2); no claim of numeric parity with a reference solution is made for this window.",
+    "rhino_funnel_flow_dependence_gap": "C1 says the Rhino funnel wave train builds above ~2,000 cfs.  The solver shows an elevated funnel surface-gradient signature that clears the gate at the high band (the headline requirement), but the signature is roughly flat across the three bands (funnel p90 |grad eta| ~0.027 at all bands) and the rightward-lateral bias is weak (~0.47 of funnel cells), so the sharp ~2,000 cfs onset and the right-side lateral push are NOT cleanly resolved by this window.  Recorded honestly as a gap: the high-band formation is genuine, the flow-dependent onset is not.",
+    "settle_and_stability": "The report captures the developed 4000-step (200 s) state, at which all three bands are stable and the features are fully formed.  The thin low-flow band destabilizes past ~5000 steps (a thin-film wet/dry front over the rocky bed on this modestly steep reach), so the settle is deliberately bounded; feature presence is established well before that limit.  The low band's runout also does not fully convey to the window exit -- per C1 the runout is thin and rocky at low water -- but the holes, boulder garden and funnel all sit in the conveying zone."
+  },
+  "rapid_name": "Meat Grinder",
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.meat_grinder_c3_behavioral_validation.v1",
+  "solver": {
+    "boundary_mode": "scenario",
+    "disable_fixture_calibrations": true,
+    "feature_strength_scale": 0.0,
+    "fixed_dt": 0.05,
+    "flux_scheme": "hll",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 4000
+  },
+  "task_id": "P3-step2-prep-A2-behavioral-gate",
+  "window_id": "meat_grinder_station_966m_c3_window"
+}

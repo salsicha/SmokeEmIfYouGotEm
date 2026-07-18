@@ -74,15 +74,14 @@
       302.0,
       5.0
     ],
-    "hole_apron_offset_m": -0.9,
+    "hole_apron_offset_m": -0.7,
     "hole_b_center": [
       317.0,
       -5.0
     ],
     "hole_half_width_m": 4.5,
-    "hole_notch_offset_m": -1.15,
-    "hole_pool_offset_m": -1.95,
-    "hole_wing_offset_m": -0.55,
+    "hole_pool_offset_m": -2.1,
+    "hole_sill_offset_m": -0.1,
     "lead_in_invert_offset_m": -0.9,
     "lead_in_x": [
       196.0,
@@ -137,37 +136,40 @@
     "boulder_garden_bed": "authored_deterministic_scattered_boulder_field_not_survey",
     "centerline_smoothing_passes": 12,
     "channel_half_width_m": 15.0,
-    "conditioned_profile_drop_m": 16.92863069885317,
+    "conditioned_max_mean_slope": 0.013,
+    "conditioned_profile_drop_m": 7.800000000000011,
     "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
     "floor_percentile": 10.0,
     "floor_sample_half_width_m": 8.0,
     "max_profile_drop_per_cell_m": 0.3,
+    "mean_slope_bound_applied": true,
     "min_centerline_radius_m": 106.94443449853615,
     "monotone_downstream": true,
     "nominal_channel_depth_m": 1.7,
     "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
-    "raw_dem_floor_drop_m": 17.395344183270026
+    "raw_dem_floor_drop_m": 17.395344183270026,
+    "unclamped_conditioned_drop_m": 16.92863069885317
   },
   "flow_band_packages": {
     "high_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/high_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_high_runnable",
-      "stage_east_m": 434.6642792418626,
-      "stage_west_m": 451.5929099407158,
+      "stage_east_m": 443.9076381017253,
+      "stage_west_m": 451.70763810172525,
       "target_discharge_m3s": 84.950539776
     },
     "low_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/low_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_low_runnable",
-      "stage_east_m": 433.9138626949127,
-      "stage_west_m": 450.84249339376595,
+      "stage_east_m": 443.10870071660327,
+      "stage_west_m": 450.90870071660333,
       "target_discharge_m3s": 25.4851619328
     },
     "median_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/median_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_median_runnable",
-      "stage_east_m": 434.1773459283528,
-      "stage_west_m": 451.1059766272059,
+      "stage_east_m": 443.44245124338,
+      "stage_west_m": 451.24245124338006,
       "target_discharge_m3s": 45.3069545472
     }
   },
@@ -204,7 +206,8 @@
     "dem_cannot_resolve_in_channel_rocks": "The 3DEP source DEM (~2 m export) resolves valley walls and channel planform but cannot resolve in-channel rocks, ledges, holes, or bathymetry; every in-channel feature in these packages is an authored interpretation of the committed C1 guide-source inventory placed at its relative positions.",
     "longitudinal_profile": "The raw DEM floor drop through the traced window is recorded in the conditioning report; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it.",
     "pending_human_review": true,
-    "production_promoted": false
+    "production_promoted": false,
+    "slope_bound": "The raw DEM-trace floor drops ~17 m over the 600 m window (~2.8%), and the catalog station snaps ~90 m to the DEM channel here, so that steep trace almost certainly captures valley-wall/side terrain rather than the true thalweg. At the raw gradient the FV solver runs supercritical and does not convey (the window ponds upstream and drains downstream). The conditioned profile is therefore slope-bounded to a Class III+ gradient (~1.3%, comparable to the committed Troublemaker window); both the raw and conditioned drops are recorded in the conditioning report. This is a conditioning choice for solver tractability, not a survey; the window remains pending_human_review."
   },
   "published_river_mile": 0.6,
   "rapid_name": "Meat Grinder",
@@ -230,12 +233,13 @@
     "centerline_smoothing_passes": 12,
     "channel_depth_m": 1.7,
     "channel_half_width_m": 15.0,
+    "conditioned_max_mean_slope": 0.013,
     "cross_half_width_m": 39.0,
     "floor_percentile": 10.0,
     "floor_sample_half_width_m": 8.0,
-    "initial_depth_cap_m": 1.4,
+    "initial_depth_cap_m": 1.6,
     "max_profile_drop_per_cell_m": 0.3,
-    "roughness_manning_n": 0.075,
+    "roughness_manning_n": 0.06,
     "trace_cross_search_m": 14.0,
     "trace_fan_half_deg": 50,
     "trace_fan_step_deg": 5,
