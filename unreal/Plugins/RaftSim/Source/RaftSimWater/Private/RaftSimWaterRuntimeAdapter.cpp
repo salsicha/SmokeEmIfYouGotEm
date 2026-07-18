@@ -216,7 +216,9 @@ bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
 #if RAFTSIM_HAS_LIVE_SOLVER
     LiveWindow = FRaftSimLiveWaterWindow::CreateFlatTank(
         WorldOriginM, SizeXM, SizeYM, CellSizeM, SurfaceHeightM, DepthM);
-    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    // Recover from Uninitialized or a prior failed river attempt (Faulted).
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized
+        || Status == ERaftSimWaterRuntimeStatus::Faulted)
     {
         Status = ERaftSimWaterRuntimeStatus::ScenarioBound;
     }

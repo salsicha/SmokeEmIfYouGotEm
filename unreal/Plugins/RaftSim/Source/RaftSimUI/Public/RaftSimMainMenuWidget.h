@@ -27,7 +27,15 @@ protected:
     void HandleEnterTestTank();
 
     UFUNCTION()
-    void HandleRunTroublemaker();
+    void HandleRunSouthFork();
+    UFUNCTION()
+    void HandleRunColorado();
+    UFUNCTION()
+    void HandleRunPacuare();
+    UFUNCTION()
+    void HandleRunFutaleufu();
+    UFUNCTION()
+    void HandleRunChilko();
 
     UFUNCTION()
     void HandleToggleSettings();
@@ -35,16 +43,24 @@ protected:
     UFUNCTION()
     void HandleQuit();
 
+    void OpenRiverLevel(FName LevelName);
     UButton* MakeMenuButton(UVerticalBox* Parent, const FText& Label, FName ClickHandlerName);
 
     UPROPERTY()
     TObjectPtr<UTextBlock> SettingsSummaryText;
 
-    /** Map opened by Enter Test Tank. */
+    /** Map opened by Training Eddy. */
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
     FName TestTankLevelName = TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank");
 
-    /** Map opened by Run Troublemaker. */
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName TroublemakerLevelName = TEXT("/Game/RaftSim/Maps/L_Troublemaker");
+    FName SouthForkLevelName = TEXT("/Game/RaftSim/Maps/L_Troublemaker");
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
+    FName ColoradoLevelName = TEXT("/Game/RaftSim/Maps/L_Hance");
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
+    FName PacuareLevelName = TEXT("/Game/RaftSim/Maps/L_UpperHuacas");
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
+    FName FutaleufuLevelName = TEXT("/Game/RaftSim/Maps/L_Terminator");
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
+    FName ChilkoLevelName = TEXT("/Game/RaftSim/Maps/L_LavaCanyon");
 };
