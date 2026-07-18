@@ -22,6 +22,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Misc/PackageName.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRiverWaterConfig.h"
 #include "UObject/Package.h"
 #include "UObject/SavePackage.h"
 
@@ -263,6 +264,43 @@ static void HandleCreateVerticalSliceCoreMaps(const TArray<FString>&)
             bSaved ? 1 : 0);
     }
 }
+
+static void HandleCreateTroublemakerMap(const TArray<FString>&)
+{
+    UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
+    AddCommonLighting(World);
+
+    // Visual ground and a river water surface at Z=0. The live solver window
+    // (loaded from the river config) drives the actual surface.
+    AddScaledPlane(
+        World, FVector(0.0f, 0.0f, -300.0f), FVector(700.0f, 700.0f, 1.0f),
+        TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
+
+    // River water config: median-flow Troublemaker cooked window centred at
+    // origin, 600 m. The raft resolves this at BeginPlay.
+    AActor* RiverConfig = AddActorToWorld(
+        World, ARaftSimRiverWaterConfig::StaticClass(), FTransform(FVector::ZeroVector));
+    (void)RiverConfig;
+
+    // Raft at the upstream scout eddy; run flows downstream (+X). Kept within
+    // the rendered surface grid and the loaded window for v1 registration.
+    AddActorToWorld(
+        World, ARaftSimRaftActor::StaticClass(),
+        FTransform(FVector(-6000.0f, 0.0f, 60.0f)));
+    AddActorToWorld(
+        World, APlayerStart::StaticClass(),
+        FTransform(FVector(-6600.0f, 0.0f, 200.0f)));
+
+    SetWorldGameMode(World, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
+    const bool bSaved = SaveWorldAsMap(World, TEXT("/Game/RaftSim/Maps/L_Troublemaker"));
+    UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: L_Troublemaker saved=%d"), bSaved ? 1 : 0);
+}
+
+static FAutoConsoleCommand GCreateTroublemakerMapCommand(
+    TEXT("RaftSim.CreateTroublemakerMap"),
+    TEXT("Generate L_Troublemaker: the South Fork Troublemaker rapid with live "
+         "cooked-field river water, raft, and player start."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreateTroublemakerMap));
 
 static FAutoConsoleCommand GCreateVerticalSliceInputAssetsCommand(
     TEXT("RaftSim.CreateVerticalSliceInputAssets"),

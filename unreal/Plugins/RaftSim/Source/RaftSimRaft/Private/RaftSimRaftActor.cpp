@@ -9,6 +9,7 @@
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
@@ -98,9 +99,28 @@ void ARaftSimRaftActor::BeginPlay()
     // flat Z=0 waterline.
     if (URaftSimWaterRuntimeAdapter* WaterAdapter = BridgeSubsystem->GetWaterRuntime())
     {
-        WaterAdapter->ConfigureDevTankWindow(
-            FVector2D(-80.0, -80.0), 160.0f, 160.0f, 2.0f,
-            /*SurfaceHeightM=*/0.0f, /*DepthM=*/3.0f);
+        // River map: load a cooked steady-state flow window if the level places
+        // a config actor. Otherwise the dev flat tank.
+        ARaftSimRiverWaterConfig* RiverConfig = nullptr;
+        if (TActorIterator<ARaftSimRiverWaterConfig> It(GetWorld()); It)
+        {
+            RiverConfig = *It;
+        }
+        bool bRiverConfigured = false;
+        if (RiverConfig != nullptr)
+        {
+            bRiverConfigured = WaterAdapter->ConfigureRiverWindow(
+                RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
+                RiverConfig->WindowCenterM,
+                FVector2D(RiverConfig->WindowExtentM, RiverConfig->WindowExtentM),
+                /*RoughnessManning=*/0.041f);
+        }
+        if (!bRiverConfigured)
+        {
+            WaterAdapter->ConfigureDevTankWindow(
+                FVector2D(-80.0, -80.0), 160.0f, 160.0f, 2.0f,
+                /*SurfaceHeightM=*/0.0f, /*DepthM=*/3.0f);
+        }
     }
 
     // Water-rendering v1: spawn a surface actor that displays the live solver

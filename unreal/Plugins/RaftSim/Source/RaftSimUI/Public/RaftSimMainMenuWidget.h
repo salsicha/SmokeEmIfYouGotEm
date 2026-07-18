@@ -27,6 +27,9 @@ protected:
     void HandleEnterTestTank();
 
     UFUNCTION()
+    void HandleRunTroublemaker();
+
+    UFUNCTION()
     void HandleToggleSettings();
 
     UFUNCTION()
@@ -40,4 +43,8 @@ protected:
     /** Map opened by Enter Test Tank. */
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
     FName TestTankLevelName = TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank");
+
+    /** Map opened by Run Troublemaker. */
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
+    FName TroublemakerLevelName = TEXT("/Game/RaftSim/Maps/L_Troublemaker");
 };
