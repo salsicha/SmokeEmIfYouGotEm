@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimGuidePlayerController.h"
+#include "RaftSimRunAudioDirector.h"
 #include "RaftSimRunManager.h"
 
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
@@ -30,6 +31,18 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
         {
             Manager->ScenarioId = ActiveScenarioId;
         }
+    }
+
+    // River audio director (P3 audio pass 1).
+    bool bHasAudio = false;
+    if (TActorIterator<ARaftSimRunAudioDirector> It(GetWorld()); It)
+    {
+        bHasAudio = true;
+    }
+    if (!bHasAudio)
+    {
+        GetWorld()->SpawnActor<ARaftSimRunAudioDirector>(
+            ARaftSimRunAudioDirector::StaticClass(), FTransform::Identity);
     }
 }
 
