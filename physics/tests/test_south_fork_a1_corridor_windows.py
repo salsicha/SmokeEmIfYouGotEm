@@ -35,17 +35,28 @@ def test_south_fork_a1_corridor_window_manifest_covers_full_review_route():
     summary = manifest["coverage_summary"]
     windows = manifest["windows"]
 
-    assert summary["window_count"] == 6
+    assert summary["window_count"] == 8
     assert summary["planned_station_start_m"] == 0.0
-    assert summary["planned_station_end_m"] == 33796.224
-    assert summary["planned_length_m"] == 33796.224
+    assert summary["planned_station_end_m"] == 49077.732
+    assert summary["planned_length_m"] == 49077.732
+    assert summary["adopted_axis_end_station_m"] == 49077.732
+    assert summary["covers_adopted_axis"] is True
     assert summary["existing_source_attached_length_m"] == 2500.0
-    assert summary["remaining_source_pull_length_m"] == 31296.224
+    assert summary["remaining_source_pull_length_m"] == 46577.732
     assert manifest["windowing_policy"]["requires_stitched_validation_outputs"] is True
     assert windows[0]["window_id"] == "chili_bar_existing_pilot_0_2500m"
-    assert windows[-1]["window_id"] == "salmon_falls_folsom_review_32991_33796m"
+    assert windows[-2]["window_id"] == "below_full_run_alias_33796_41500m"
+    assert windows[-1]["window_id"] == "salmon_falls_takeout_approach_41500_49077m"
+    assert windows[-1]["station_end_m"] == 49077.732
     assert windows[0]["existing_reach_id"] == "chili_bar_0_2500m"
     assert all(window["production_promoted"] is False for window in windows)
+    station_edges = [
+        (window["station_start_m"], window["station_end_m"]) for window in windows
+    ]
+    assert all(
+        left[1] == right[0]
+        for left, right in zip(station_edges, station_edges[1:], strict=False)
+    )
 
 
 def test_south_fork_a1_corridor_window_manifest_assigns_all_rapids():

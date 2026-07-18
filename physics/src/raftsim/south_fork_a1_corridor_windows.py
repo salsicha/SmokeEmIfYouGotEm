@@ -13,7 +13,10 @@ from .south_fork_a1_directed_station_candidates import (
 )
 from .south_fork_a1_flow_window_review import FULL_REACH_FLOW_WINDOW_REVIEW_RELATIVE_PATH
 from .south_fork_a1_full_reach_acquisition import FULL_REACH_ACQUISITION_RELATIVE_PATH
-from .south_fork_a1_stationing import PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH
+from .south_fork_a1_stationing import (
+    FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+    PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH,
+)
 
 
 FULL_REACH_CORRIDOR_WINDOW_MANIFEST_RELATIVE_PATH = (
@@ -64,6 +67,35 @@ WINDOW_SPECS = [
         "station_start_m": 32991.552,
         "station_end_m": 33796.224,
         "status": "planned_anchor_resolution_window",
+        "downstream_anchor_note": (
+            "Window exists to resolve the 20.5-21.0 mile Salmon Falls/Folsom "
+            "take-out source basis."
+        ),
+    },
+    {
+        "window_id": "below_full_run_alias_33796_41500m",
+        "display_name": "Below Published Full-Run Alias Transit",
+        "station_start_m": 33796.224,
+        "station_end_m": 41500.0,
+        "status": "planned_source_pull_required",
+        "downstream_anchor_note": (
+            "Adopted-axis extension window: the official Salmon Falls take-out "
+            "anchor sits at 49077.732 m, beyond the published 21.0-mile "
+            "full-run alias; this span follows the adopted NHD directed "
+            "mainstem axis."
+        ),
+    },
+    {
+        "window_id": "salmon_falls_takeout_approach_41500_49077m",
+        "display_name": "Salmon Falls Take-out Approach",
+        "station_start_m": 41500.0,
+        "station_end_m": 49077.732,
+        "status": "planned_source_pull_required",
+        "downstream_anchor_note": (
+            "Ends at the adopted official Salmon Falls take-out anchor "
+            "(station 49077.732 m); the bank-landing refinement rides the P7 "
+            "owner packet and does not block source acquisition."
+        ),
     },
 ]
 
@@ -138,12 +170,6 @@ def _window_records(
             )
         else:
             record["source_pull_status"] = "not_started"
-        return_m = record["station_end_m"]
-        if return_m > 32991.552:
-            record["downstream_anchor_note"] = (
-                "Window exists to resolve the 20.5-21.0 mile Salmon Falls/Folsom "
-                "take-out source basis."
-            )
         records.append(record)
     return records
 
@@ -157,12 +183,18 @@ def build_south_fork_a1_full_reach_corridor_window_manifest(
     candidates = _load_json(repo_root, FULL_REACH_DIRECTED_STATION_CANDIDATES_RELATIVE_PATH)
     route_clips = _load_json(repo_root, FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH)
     existing_corridor = _load_json(repo_root, PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH)
+    adopted_stationing = _load_json(
+        repo_root, FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH
+    )
+    adopted_axis_end_m = float(
+        adopted_stationing["station_axis"]["adopted_route_length_m"]
+    )
     rapids = _rapid_assignments(candidates)
     windows = _window_records(candidates, existing_corridor)
 
     return {
         "schema": "raftsim.south_fork.a1_full_reach_corridor_window_manifest.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": candidates["river_id"],
         "status": "planned_full_reach_windows_review_gated_not_source_complete",
@@ -176,16 +208,20 @@ def build_south_fork_a1_full_reach_corridor_window_manifest(
             "directed_route_clips": FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
             "full_reach_flow_window_review": FULL_REACH_FLOW_WINDOW_REVIEW_RELATIVE_PATH,
             "existing_pilot_corridor": PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH,
+            "adopted_route_stationing": (
+                FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH
+            ),
         },
         "route_clip_status": route_clips["status"],
         "route_clip_candidate_count": route_clips["feature_count"],
         "windowing_policy": {
             "authority": "planning_manifest_only_not_terrain_or_gameplay_geometry",
             "reason": (
-                "A1 needs full Chili Bar-to-Folsom corridor coverage, but exact "
-                "downstream anchor and production terrain/imagery pulls are still "
-                "review-gated. Windows make the missing work explicit without "
-                "promoting candidate linework."
+                "A1 needs full Chili Bar-to-Salmon Falls corridor coverage along "
+                "the adopted official-access axis. Windows through the published "
+                "21.0-mile alias keep their reviewed directed-clip spans; the "
+                "adopted-axis extension windows make the remaining source-pull "
+                "work explicit without promoting candidate linework."
             ),
             "max_planned_window_length_m": max(window["length_m"] for window in windows),
             "requires_stitched_validation_outputs": True,
@@ -200,6 +236,11 @@ def build_south_fork_a1_full_reach_corridor_window_manifest(
                 windows[-1]["station_end_m"] - windows[0]["station_start_m"],
                 6,
             ),
+            "adopted_axis_end_station_m": adopted_axis_end_m,
+            "covers_adopted_axis": abs(
+                windows[-1]["station_end_m"] - adopted_axis_end_m
+            )
+            <= 1e-6,
             "existing_source_attached_length_m": 2500.0,
             "remaining_source_pull_length_m": round(windows[-1]["station_end_m"] - 2500.0, 6),
             "named_rapid_count": len(rapids),
@@ -213,7 +254,7 @@ def build_south_fork_a1_full_reach_corridor_window_manifest(
             "can_bind_south_fork_named_rapid_geometry": False,
             "can_bind_meat_grinder_troublemaker_solver_windows": False,
             "exit_criteria": [
-                "Resolve exact Chili Bar and Salmon Falls/Folsom anchors.",
+                "Anchors adopted per release-1.0-plan section 6; the Salmon Falls bank-landing refinement rides the P7 owner packet.",
                 "Pull and hash-lock terrain and imagery for every planned window.",
                 "Generate stitched whole-window validation outputs across seams.",
                 "Review bank/cross-section interpretation with guide/geospatial evidence.",

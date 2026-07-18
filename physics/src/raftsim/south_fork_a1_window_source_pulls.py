@@ -15,12 +15,20 @@ from .south_fork_a1_directed_station_candidates import (
     FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
 )
 from .south_fork_a1_full_reach_acquisition import FULL_REACH_ACQUISITION_RELATIVE_PATH
+from .south_fork_a1_stationing import FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH
 
 
 FULL_REACH_WINDOW_SOURCE_PULL_PLAN_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
     "full_reach_window_source_pull_plan.json"
 )
+
+DIRECTED_CLIP_ROUTE_FEATURE_ID = "chili_bar_to_full_run_21_0_mile_candidate"
+ADOPTED_ROUTE_FEATURE_ID = "adopted_route_chili_bar_to_salmon_falls_takeout"
+DIRECTED_CLIP_STATION_END_M = 33796.224
+DIRECTED_CLIP_ROUTE_BASIS = "directed_route_clip_21_0_mile_candidate"
+ADOPTED_AXIS_ROUTE_BASIS = "adopted_route_axis"
+_STATION_TOLERANCE_M = 1e-6
 
 EARTH_RADIUS_M = 6_371_008.8
 WEB_MERCATOR_RADIUS_M = 6_378_137.0
@@ -91,11 +99,14 @@ def _export_url(service_url: str, params: dict[str, Any]) -> str:
     return f"{service_url}?{encoded}"
 
 
-def _route_coordinates_with_station(route_clip_geojson: dict[str, Any]) -> list[dict[str, Any]]:
+def _route_coordinates_with_station(
+    route_geojson: dict[str, Any],
+    feature_id: str = DIRECTED_CLIP_ROUTE_FEATURE_ID,
+) -> list[dict[str, Any]]:
     route_feature = next(
         feature
-        for feature in route_clip_geojson["features"]
-        if feature["id"] == "chili_bar_to_full_run_21_0_mile_candidate"
+        for feature in route_geojson["features"]
+        if feature["id"] == feature_id
     )
     coordinates = [
         (float(point[0]), float(point[1]))
@@ -181,12 +192,22 @@ def build_south_fork_a1_window_source_pull_plan(repo_root: Path) -> dict[str, An
     repo_root = repo_root.resolve()
     window_manifest = _load_json(repo_root, FULL_REACH_CORRIDOR_WINDOW_MANIFEST_RELATIVE_PATH)
     route_clips = _load_json(repo_root, FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH)
-    route_points = _route_coordinates_with_station(route_clips)
+    adopted_route = _load_json(repo_root, FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH)
+    clip_route_points = _route_coordinates_with_station(route_clips)
+    adopted_route_points = _route_coordinates_with_station(
+        adopted_route, ADOPTED_ROUTE_FEATURE_ID
+    )
 
     windows: list[dict[str, Any]] = []
     for window in window_manifest["windows"]:
         station_start_m = float(window["station_start_m"])
         station_end_m = float(window["station_end_m"])
+        if station_end_m <= DIRECTED_CLIP_STATION_END_M + _STATION_TOLERANCE_M:
+            route_basis = DIRECTED_CLIP_ROUTE_BASIS
+            route_points = clip_route_points
+        else:
+            route_basis = ADOPTED_AXIS_ROUTE_BASIS
+            route_points = adopted_route_points
         points = _points_for_window(route_points, station_start_m, station_end_m)
         bbox3857 = _bbox_epsg3857(points, SOURCE_PULL_BUFFER_M)
         window_id = window["window_id"]
@@ -198,6 +219,7 @@ def build_south_fork_a1_window_source_pull_plan(repo_root: Path) -> dict[str, An
                 "station_end_m": station_end_m,
                 "source_pull_status": "planned_not_downloaded",
                 "existing_artifact": window.get("existing_artifact"),
+                "route_basis": route_basis,
                 "route_point_count": len(points),
                 "bounds_wgs84": _bbox_wgs84(points),
                 "bounds_epsg3857_buffered": bbox3857,
@@ -224,7 +246,7 @@ def build_south_fork_a1_window_source_pull_plan(repo_root: Path) -> dict[str, An
 
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_plan.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": window_manifest["river_id"],
         "status": "bounded_window_source_requests_planned_not_downloaded",
@@ -235,6 +257,7 @@ def build_south_fork_a1_window_source_pull_plan(repo_root: Path) -> dict[str, An
                 FULL_REACH_CORRIDOR_WINDOW_MANIFEST_RELATIVE_PATH
             ),
             "directed_route_clips": FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
+            "adopted_route_geojson": FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH,
         },
         "policy": {
             "downloads_performed": False,
