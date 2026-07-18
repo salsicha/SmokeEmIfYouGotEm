@@ -23,26 +23,32 @@ def test_south_fork_a1_window_source_preflight_is_reproducible():
     committed = _load_preflight()
 
     assert generated == committed
-    assert committed["schema"] == "raftsim.south_fork.a1_window_source_pull_preflight_review.v1"
+    assert committed["schema"] == "raftsim.south_fork.a1_window_source_pull_preflight_review.v2"
     assert (
         committed["status"]
-        == "nonpromotional_source_manifests_ready_for_stitched_validation_exact_anchor_pending"
+        == "adopted_axis_source_manifests_ready_for_stitched_validation"
     )
     assert committed["production_promoted"] is False
 
 
-def test_south_fork_a1_window_source_preflight_matches_downstream_ambiguity_window():
+def test_south_fork_a1_window_source_preflight_covers_adopted_anchor():
     preflight = _load_preflight()
     downstream = preflight["downstream_anchor_review"]
 
-    assert downstream["current_seed_status"] == "missing_exact_anchor"
-    assert downstream["exact_anchor_available"] is False
-    assert downstream["source_mile_window"]["minimum_mile"] == 20.5
-    assert downstream["source_mile_window"]["maximum_mile"] == 21.0
-    assert downstream["final_window_id"] == "salmon_falls_folsom_review_32991_33796m"
-    assert downstream["final_window_start_m"] == downstream["source_window_min_station_m"]
-    assert downstream["final_window_end_m"] == downstream["source_window_max_station_m"]
-    assert downstream["final_window_matches_source_mile_ambiguity"] is True
+    assert downstream["anchor_status"] == "adopted_ground_truth_official_access_geometry"
+    assert downstream["anchor_name"] == "Salmon Falls  Lower Water Raft Take-out"
+    assert downstream["adopted_station_m"] == 49077.732
+    assert downstream["planned_station_end_m"] == 49077.732
+    assert downstream["final_window_id"] == "salmon_falls_takeout_approach_41500_49077m"
+    assert downstream["final_window_end_m"] == downstream["adopted_station_m"]
+    assert downstream["final_window_ends_at_adopted_anchor"] is True
+    assert downstream["pending_human_review"]["blocking"] is False
+    superseded = downstream["superseded_source_mile_window"]
+    assert superseded["source_mile_window"]["minimum_mile"] == 20.5
+    assert superseded["source_mile_window"]["maximum_mile"] == 21.0
+    assert superseded["historical_review_window_id"] == (
+        "salmon_falls_folsom_review_32991_33796m"
+    )
 
 
 def test_south_fork_a1_window_source_preflight_allows_only_nonpromotional_source_pull():
@@ -52,15 +58,16 @@ def test_south_fork_a1_window_source_preflight_allows_only_nonpromotional_source
 
     assert preflight["window_continuity"]["contiguous"] is True
     assert preflight["window_continuity"]["gap_count"] == 0
-    assert readiness["can_execute_overcover_source_pull"] is True
+    assert preflight["window_continuity"]["window_count"] == 8
+    assert readiness["can_execute_full_axis_source_pull"] is True
     assert readiness["source_pull_needed"] is False
     assert readiness["source_files_present"] is True
     assert readiness["window_manifests_present"] is True
     assert readiness["can_enter_stitched_validation_review"] is True
-    assert readiness["source_pull_task_count"] == 12
-    assert readiness["expected_source_file_count"] == 12
-    assert readiness["present_source_file_count"] == 12
-    assert readiness["present_window_manifest_count"] == 6
+    assert readiness["source_pull_task_count"] == 16
+    assert readiness["expected_source_file_count"] == 16
+    assert readiness["present_source_file_count"] == 16
+    assert readiness["present_window_manifest_count"] == 8
     assert readiness["destination_missing_count"] == 0
     assert gate["can_download_source_files"] is True
     assert gate["can_promote_full_reach_corridor"] is False

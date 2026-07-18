@@ -118,7 +118,7 @@ def build_south_fork_a1_window_source_pull_execution_plan(repo_root: Path) -> di
     tasks = build_south_fork_a1_window_source_pull_tasks(repo_root)
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_execution_plan.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "status": "ready_to_execute_review_gated_source_downloads",
         "production_promoted": False,
@@ -235,7 +235,7 @@ def execute_south_fork_a1_window_source_pulls(
     skipped_count = sum(1 for result in results if result["status"] == "skipped_existing")
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_execution_report.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "status": "failed" if failed_count else "completed",
         "production_promoted": False,

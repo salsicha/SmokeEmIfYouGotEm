@@ -1,22 +1,36 @@
 {
   "downstream_anchor_review": {
-    "anchor_id": "salmon_falls_folsom_reservoir_takeout",
-    "current_seed_status": "missing_exact_anchor",
-    "exact_anchor_available": false,
-    "final_window_end_m": 33796.224,
-    "final_window_id": "salmon_falls_folsom_review_32991_33796m",
-    "final_window_matches_source_mile_ambiguity": true,
-    "final_window_start_m": 32991.552,
-    "interpretation": "The final planned source-pull window intentionally over-covers the 20.5-21.0 mile Salmon Falls/Folsom ambiguity. This is acceptable for source acquisition, but not for corridor cropping, editor binding, or solver-window promotion.",
-    "planned_station_end_m": 33796.224,
-    "source_mile_window": {
-      "delta_m": 804.672,
-      "delta_miles": 0.5,
-      "maximum_mile": 21.0,
-      "minimum_mile": 20.5
+    "adopted_station_m": 49077.732,
+    "anchor_authority": "california_state_parks_parking_points",
+    "anchor_lon_lat": [
+      -121.043513366612,
+      38.7717445614809
+    ],
+    "anchor_name": "Salmon Falls  Lower Water Raft Take-out",
+    "anchor_status": "adopted_ground_truth_official_access_geometry",
+    "final_window_end_m": 49077.732,
+    "final_window_ends_at_adopted_anchor": true,
+    "final_window_id": "salmon_falls_takeout_approach_41500_49077m",
+    "final_window_start_m": 41500.0,
+    "interpretation": "The corridor windows now extend along the adopted NHD directed mainstem axis to the official Salmon Falls take-out anchor at 49077.732 m. Source acquisition covers the full adopted axis; corridor cropping, editor binding, and solver-window promotion remain P3/P4 work with the bank-landing refinement batched to the P7 owner packet.",
+    "pending_human_review": {
+      "blocking": false,
+      "note": "The parking-centroid anchor is adopted for stationing; the exact riverbank landing refinement rides the P7 owner packet and does not block stationing or corridor binding.",
+      "review_batch": "p7_owner_review_packet",
+      "review_id": "salmon_falls_takeout_bank_landing_confirmation"
     },
-    "source_window_max_station_m": 33796.224,
-    "source_window_min_station_m": 32991.552
+    "planned_station_end_m": 49077.732,
+    "snap_distance_m": 117.705,
+    "superseded_source_mile_window": {
+      "disposition": "The 20.5-21.0 mile published-mile ambiguity window remains committed as discrepancy evidence; the release-1.0-plan section 6 adoption resolved the downstream anchor to the official Salmon Falls take-out access geometry.",
+      "historical_review_window_id": "salmon_falls_folsom_review_32991_33796m",
+      "source_mile_window": {
+        "delta_m": 804.672,
+        "delta_miles": 0.5,
+        "maximum_mile": 21.0,
+        "minimum_mile": 20.5
+      }
+    }
   },
   "execution_readiness": {
     "allowed_use": [
@@ -26,26 +40,27 @@
       "stitched validation preview preparation"
     ],
     "can_enter_stitched_validation_review": true,
-    "can_execute_overcover_source_pull": true,
+    "can_execute_full_axis_source_pull": true,
     "destination_missing_count": 0,
     "download_command": "cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run python -m raftsim.examples.generate_south_fork_a1_window_source_execution --repo-root .. --execute",
-    "expected_source_file_count": 12,
+    "expected_source_file_count": 16,
     "forbidden_use": [
-      "final take-out coordinate",
+      "bank-landing confirmation authority",
       "cropped production centerline",
       "Unreal full-reach landscape import",
       "named-rapid editor geometry binding",
       "Meat Grinder or Troublemaker solver-window promotion"
     ],
-    "present_source_file_count": 12,
-    "present_window_manifest_count": 6,
+    "present_source_file_count": 16,
+    "present_window_manifest_count": 8,
     "source_files_present": true,
     "source_pull_needed": false,
-    "source_pull_task_count": 12,
+    "source_pull_task_count": 16,
     "window_manifests_present": true
   },
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
+    "adopted_route_stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
     "anchor_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_anchor_review.json",
     "corridor_window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json",
     "source_pull_execution_plan": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_execution_plan.json",
@@ -53,6 +68,7 @@
   },
   "production_promoted": false,
   "promotion_gate": {
+    "authority_note": "This preflight authorizes bounded source downloads only. Crop and solver-window binding authority is governed by the adopted route stationing artifact and executes inside P3/P4.",
     "can_bind_named_rapid_geometry": false,
     "can_bind_solver_windows": false,
     "can_crop_to_final_downstream_anchor": false,
@@ -62,17 +78,17 @@
     "next_required_actions": [
       "Produce stitched seam-validation previews before Unreal import.",
       "Attach bank/cross-section interpretation and guide/geospatial review.",
-      "Resolve the exact Salmon Falls/Folsom downstream anchor before any cropping, Unreal import, or rapid binding."
+      "Confirm the adopted Salmon Falls take-out bank landing via the P7 owner packet before any cropping, Unreal import, or rapid binding."
     ]
   },
   "river_id": "south_fork_american_chili_bar",
-  "schema": "raftsim.south_fork.a1_window_source_pull_preflight_review.v1",
-  "status": "nonpromotional_source_manifests_ready_for_stitched_validation_exact_anchor_pending",
+  "schema": "raftsim.south_fork.a1_window_source_pull_preflight_review.v2",
+  "status": "adopted_axis_source_manifests_ready_for_stitched_validation",
   "task_id": "A1",
   "window_continuity": {
     "contiguous": true,
     "gap_count": 0,
     "gap_report": [],
-    "window_count": 6
+    "window_count": 8
   }
 }

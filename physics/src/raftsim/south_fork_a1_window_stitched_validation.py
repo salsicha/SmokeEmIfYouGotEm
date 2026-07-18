@@ -167,7 +167,7 @@ def build_south_fork_a1_window_stitched_validation_report(
     all_hashes_recorded = all(window["source_hashes_recorded"] for window in windows)
     return {
         "schema": "raftsim.south_fork.a1_full_reach_window_stitched_validation.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": index["river_id"],
         "status": "stitched_source_window_validation_ready_derivatives_pending",
@@ -203,14 +203,14 @@ def build_south_fork_a1_window_stitched_validation_report(
         "review_scope": {
             "validates": [
                 "Per-window manifests are present and hash locked.",
-                "Station ranges are contiguous across the six source windows.",
+                "Station ranges are contiguous across the corridor source windows.",
                 "Every source-window seam is visible as an explicit review object.",
                 "Source bbox overlap/gap metadata is recorded before preview generation.",
             ],
             "does_not_validate": [
                 "Photoreal material quality.",
                 "Hydrologically conditioned terrain correctness.",
-                "Exact Salmon Falls/Folsom downstream anchor.",
+                "Salmon Falls take-out bank-landing refinement (P7 owner packet).",
                 "Named rapid bank/cross-section geometry.",
                 "Unreal landscape import readiness.",
             ],
@@ -231,7 +231,7 @@ def build_south_fork_a1_window_stitched_validation_report(
             "next_required_actions": [
                 "Generate hillshade, heightfield, NAIP-centerline, and seam-preview derivatives.",
                 "Review source bbox gaps/overlaps visually against the whole route before stitching.",
-                "Resolve the exact Salmon Falls/Folsom downstream anchor before final crop.",
+                "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final crop.",
                 "Attach bank, cross-section, guide, and geospatial review before Unreal import.",
             ],
         },

@@ -37,8 +37,8 @@ def test_south_fork_a1_window_stitched_validation_covers_windows_and_seams():
     report = _load_report()
     summary = report["summary"]
 
-    assert summary["window_count"] == 6
-    assert summary["seam_count"] == 5
+    assert summary["window_count"] == 8
+    assert summary["seam_count"] == 7
     assert summary["all_window_manifests_present"] is True
     assert summary["all_source_files_present"] is True
     assert summary["all_hashes_recorded"] is True
@@ -46,8 +46,10 @@ def test_south_fork_a1_window_stitched_validation_covers_windows_and_seams():
     assert summary["station_overlap_count"] == 0
     assert summary["can_generate_stitched_validation_derivatives"] is True
     assert summary["can_import_unreal_full_reach_landscape"] is False
-    assert len(report["windows"]) == 6
-    assert len(report["seams"]) == 5
+    assert len(report["windows"]) == 8
+    assert len(report["seams"]) == 7
+    assert report["windows"][-1]["window_id"] == "salmon_falls_takeout_approach_41500_49077m"
+    assert report["windows"][-1]["station_range_m"]["end"] == 49077.732
 
 
 def test_south_fork_a1_window_stitched_validation_keeps_every_seam_visible():

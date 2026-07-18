@@ -36,12 +36,15 @@ def test_south_fork_a1_window_manifest_index_is_reproducible():
 def test_south_fork_a1_window_manifests_cover_all_windows_and_sources():
     index = _load_index()
 
-    assert index["summary"]["window_count"] == 6
-    assert index["summary"]["source_manifest_count"] == 6
+    assert index["summary"]["window_count"] == 8
+    assert index["summary"]["source_manifest_count"] == 8
     assert index["summary"]["all_sources_present"] is True
     assert index["summary"]["can_enter_stitched_validation_review"] is True
     assert index["summary"]["can_promote_full_reach_corridor"] is False
-    assert len(index["window_manifests"]) == 6
+    assert len(index["window_manifests"]) == 8
+    window_ids = {entry["window_id"] for entry in index["window_manifests"]}
+    assert "below_full_run_alias_33796_41500m" in window_ids
+    assert "salmon_falls_takeout_approach_41500_49077m" in window_ids
     for entry in index["window_manifests"]:
         assert len(entry["terrain_sha256"]) == 64
         assert len(entry["aerial_sha256"]) == 64

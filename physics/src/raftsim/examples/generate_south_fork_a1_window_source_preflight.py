@@ -22,8 +22,8 @@ def main() -> None:
     print(f"schema={payload['schema']}")
     print(f"status={payload['status']}")
     print(
-        "can_execute_overcover_source_pull="
-        f"{payload['execution_readiness']['can_execute_overcover_source_pull']}"
+        "can_execute_full_axis_source_pull="
+        f"{payload['execution_readiness']['can_execute_full_axis_source_pull']}"
     )
 
 

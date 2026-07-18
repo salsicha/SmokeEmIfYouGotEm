@@ -34,7 +34,36 @@
   },
   "display_name": "Salmon Falls/Folsom Downstream Anchor Review",
   "edge_seams": {
-    "downstream": null,
+    "downstream": {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "below_full_run_alias_33796_41500m",
+      "review_required": true,
+      "seam_id": "salmon_falls_folsom_review_32991_33796m__to__below_full_run_alias_33796_41500m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 686.486,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 1025.907
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 3.557901,
+          "y_ratio": 6.026911
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 3.557895,
+          "y_ratio": 6.02692
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
     "upstream": {
       "can_hide_physics_errors": false,
       "downstream_window_id": "salmon_falls_folsom_review_32991_33796m",
@@ -66,8 +95,9 @@
       "upstream_window_id": "lower_gorge_to_salmon_falls_28500_32991m"
     }
   },
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
+    "adopted_route_geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
     "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
     "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
     "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/manifest.json"
@@ -82,13 +112,14 @@
   },
   "review_notes": [
     "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
-    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "NAIP centerline overlay shows the recorded review route basis against the source imagery window.",
     "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
-    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+    "Banks, cross sections, and Unreal import remain blocked; the Salmon Falls bank-landing refinement rides the P7 owner packet."
   ],
   "river_id": "south_fork_american_chili_bar",
   "route_overlay": {
     "line_drawn": true,
+    "route_basis": "directed_route_clip_21_0_mile_candidate",
     "route_sample_count": 14,
     "visible_pixel_count": 14
   },

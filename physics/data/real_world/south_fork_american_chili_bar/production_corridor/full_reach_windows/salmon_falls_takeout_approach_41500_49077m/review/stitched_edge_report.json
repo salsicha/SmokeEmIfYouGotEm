@@ -5,73 +5,73 @@
         2017,
         2017
       ],
-      "elevation_max_m": 792.427551,
-      "elevation_min_m": 405.089996,
-      "elevation_span_m": 387.337555,
+      "elevation_max_m": 495.469727,
+      "elevation_min_m": 125.510765,
+      "elevation_span_m": 369.958961,
       "normalization": "source DEM min/max mapped linearly to 0..65535",
-      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/heightfield_2017.png",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/heightfield_2017.png",
       "pixel_format": "16_bit_grayscale_png",
-      "sha256": "1d08083174ce3a3a148e2e5befb024556ff39299aeab6977950cd844b704d5bd"
+      "sha256": "db12e1ad0dbd9c74566578a261283b23d2cab018dc3237a592d0d6649273aa83"
     },
     "hillshade": {
       "dimensions": [
         2048,
         2048
       ],
-      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/hillshade_2048.png",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/hillshade_2048.png",
       "pixel_format": "8_bit_grayscale_png",
-      "sha256": "6fbca4505baa5d7dc337af7d9d4621ecdbe4ed3a1b56132c6fc828db21664ba4"
+      "sha256": "d00f365bb54822ea1b9633d0d0699425f5163790d7aa7bae6ebd3a8439b5b24b"
     },
     "naip_centerline_preview": {
       "dimensions": [
         2048,
         2048
       ],
-      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/derived/naip_centerline_preview_2048.png",
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/naip_centerline_preview_2048.png",
       "pixel_format": "8_bit_rgb_png",
-      "sha256": "d59f9a2122e266f0ef97ce09cd3d57d8aa083178e1e97c3d8643f64a30e6a7a7"
+      "sha256": "32b8fb4e84c58e7e37d863f01d53c4f417365d966c4124e1f27e7f6bf910fcf0"
     }
   },
-  "display_name": "Chili Bar Existing Pilot",
+  "display_name": "Salmon Falls Take-out Approach",
   "edge_seams": {
-    "downstream": {
+    "downstream": null,
+    "upstream": {
       "can_hide_physics_errors": false,
-      "downstream_window_id": "upper_chili_bar_to_coloma_2500_10000m",
+      "downstream_window_id": "salmon_falls_takeout_approach_41500_49077m",
       "review_required": true,
-      "seam_id": "chili_bar_existing_pilot_0_2500m__to__upper_chili_bar_to_coloma_2500_10000m",
+      "seam_id": "below_full_run_alias_33796_41500m__to__salmon_falls_takeout_approach_41500_49077m",
       "source_bbox_relationship": {
         "overlaps_or_touches_in_epsg3857": true,
         "x_gap_m": 0.0,
-        "x_overlap_m": 689.402,
+        "x_overlap_m": 763.53,
         "y_gap_m": 0.0,
-        "y_overlap_m": 1678.703
+        "y_overlap_m": 628.227
       },
       "source_grid_relationship": {
         "aerial_dimension_match": true,
         "aerial_resolution_ratio": {
-          "x_ratio": 1.883036,
-          "y_ratio": 2.080646
+          "x_ratio": 1.471113,
+          "y_ratio": 1.871397
         },
         "dem_dimension_match": true,
         "dem_resolution_ratio": {
-          "x_ratio": 1.883036,
-          "y_ratio": 2.080647
+          "x_ratio": 1.471114,
+          "y_ratio": 1.871398
         },
         "same_crs": true
       },
       "station_contiguous": true,
       "station_gap_m": 0.0,
       "station_overlap_m": 0.0,
-      "upstream_window_id": "chili_bar_existing_pilot_0_2500m"
-    },
-    "upstream": null
+      "upstream_window_id": "below_full_run_alias_33796_41500m"
+    }
   },
   "generated_on": "2026-07-17",
   "inputs": {
     "adopted_route_geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
     "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
     "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
-    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/manifest.json"
+    "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/manifest.json"
   },
   "production_promoted": false,
   "promotion_gate": {
@@ -90,17 +90,17 @@
   "river_id": "south_fork_american_chili_bar",
   "route_overlay": {
     "line_drawn": true,
-    "route_basis": "directed_route_clip_21_0_mile_candidate",
-    "route_sample_count": 41,
-    "visible_pixel_count": 41
+    "route_basis": "adopted_route_axis",
+    "route_sample_count": 155,
+    "visible_pixel_count": 155
   },
   "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
   "station_range_m": {
-    "end": 2500.0,
-    "length": 2500.0,
-    "start": 0.0
+    "end": 49077.732,
+    "length": 7577.732,
+    "start": 41500.0
   },
   "status": "review_derivatives_generated_not_promoted",
   "task_id": "A1",
-  "window_id": "chili_bar_existing_pilot_0_2500m"
+  "window_id": "salmon_falls_takeout_approach_41500_49077m"
 }

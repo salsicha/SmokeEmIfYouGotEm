@@ -1,5 +1,5 @@
 {
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
     "source_manifest_index": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_manifest_index.json",
     "source_pull_status": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_status.json"
@@ -14,7 +14,7 @@
     "next_required_actions": [
       "Generate hillshade, heightfield, NAIP-centerline, and seam-preview derivatives.",
       "Review source bbox gaps/overlaps visually against the whole route before stitching.",
-      "Resolve the exact Salmon Falls/Folsom downstream anchor before final crop.",
+      "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final crop.",
       "Attach bank, cross-section, guide, and geospatial review before Unreal import."
     ]
   },
@@ -22,13 +22,13 @@
     "does_not_validate": [
       "Photoreal material quality.",
       "Hydrologically conditioned terrain correctness.",
-      "Exact Salmon Falls/Folsom downstream anchor.",
+      "Salmon Falls take-out bank-landing refinement (P7 owner packet).",
       "Named rapid bank/cross-section geometry.",
       "Unreal landscape import readiness."
     ],
     "validates": [
       "Per-window manifests are present and hash locked.",
-      "Station ranges are contiguous across the six source windows.",
+      "Station ranges are contiguous across the corridor source windows.",
       "Every source-window seam is visible as an explicit review object.",
       "Source bbox overlap/gap metadata is recorded before preview generation."
     ]
@@ -185,6 +185,66 @@
       "station_gap_m": 0.0,
       "station_overlap_m": 0.0,
       "upstream_window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+    },
+    {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "below_full_run_alias_33796_41500m",
+      "review_required": true,
+      "seam_id": "salmon_falls_folsom_review_32991_33796m__to__below_full_run_alias_33796_41500m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 686.486,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 1025.907
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 3.557901,
+          "y_ratio": 6.026911
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 3.557895,
+          "y_ratio": 6.02692
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    {
+      "can_hide_physics_errors": false,
+      "downstream_window_id": "salmon_falls_takeout_approach_41500_49077m",
+      "review_required": true,
+      "seam_id": "below_full_run_alias_33796_41500m__to__salmon_falls_takeout_approach_41500_49077m",
+      "source_bbox_relationship": {
+        "overlaps_or_touches_in_epsg3857": true,
+        "x_gap_m": 0.0,
+        "x_overlap_m": 763.53,
+        "y_gap_m": 0.0,
+        "y_overlap_m": 628.227
+      },
+      "source_grid_relationship": {
+        "aerial_dimension_match": true,
+        "aerial_resolution_ratio": {
+          "x_ratio": 1.471113,
+          "y_ratio": 1.871397
+        },
+        "dem_dimension_match": true,
+        "dem_resolution_ratio": {
+          "x_ratio": 1.471114,
+          "y_ratio": 1.871398
+        },
+        "same_crs": true
+      },
+      "station_contiguous": true,
+      "station_gap_m": 0.0,
+      "station_overlap_m": 0.0,
+      "upstream_window_id": "below_full_run_alias_33796_41500m"
     }
   ],
   "status": "stitched_source_window_validation_ready_derivatives_pending",
@@ -197,12 +257,12 @@
     "can_generate_stitched_validation_derivatives": true,
     "can_import_unreal_full_reach_landscape": false,
     "can_promote_full_reach_corridor": false,
-    "seam_count": 5,
+    "seam_count": 7,
     "source_bbox_gap_count": 0,
-    "source_bbox_overlaps_or_touches_count": 5,
+    "source_bbox_overlaps_or_touches_count": 7,
     "station_gap_count": 0,
     "station_overlap_count": 0,
-    "window_count": 6
+    "window_count": 8
   },
   "task_id": "A1",
   "windows": [
@@ -457,6 +517,90 @@
         "start": 32991.552
       },
       "window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    {
+      "can_enter_stitched_validation_review": true,
+      "can_generate_window_derivatives": true,
+      "can_import_unreal_landscape": false,
+      "display_name": "Below Published Full-Run Alias Transit",
+      "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/manifest.json",
+      "manifest_present": true,
+      "pixel_resolution_m_approx": {
+        "aerial": [
+          1.234421,
+          1.622565
+        ],
+        "dem": [
+          2.468841,
+          3.245129
+        ]
+      },
+      "production_promoted": false,
+      "source_bounds_epsg3857": [
+        -13468159.725,
+        4690278.11,
+        -13463103.538,
+        4696924.135
+      ],
+      "source_dimensions": {
+        "aerial": [
+          4096,
+          4096
+        ],
+        "dem": [
+          2048,
+          2048
+        ]
+      },
+      "source_hashes_recorded": true,
+      "station_range_m": {
+        "end": 41500.0,
+        "length": 7703.776,
+        "start": 33796.224
+      },
+      "window_id": "below_full_run_alias_33796_41500m"
+    },
+    {
+      "can_enter_stitched_validation_review": true,
+      "can_generate_window_derivatives": true,
+      "can_import_unreal_landscape": false,
+      "display_name": "Salmon Falls Take-out Approach",
+      "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/manifest.json",
+      "manifest_present": true,
+      "pixel_resolution_m_approx": {
+        "aerial": [
+          1.815973,
+          0.867034
+        ],
+        "dem": [
+          3.631946,
+          1.734067
+        ]
+      },
+      "production_promoted": false,
+      "source_bounds_epsg3857": [
+        -13474834.42,
+        4687354.967,
+        -13467396.195,
+        4690906.337
+      ],
+      "source_dimensions": {
+        "aerial": [
+          4096,
+          4096
+        ],
+        "dem": [
+          2048,
+          2048
+        ]
+      },
+      "source_hashes_recorded": true,
+      "station_range_m": {
+        "end": 49077.732,
+        "length": 7577.732,
+        "start": 41500.0
+      },
+      "window_id": "salmon_falls_takeout_approach_41500_49077m"
     }
   ]
 }

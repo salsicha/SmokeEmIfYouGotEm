@@ -17,7 +17,12 @@ from .south_fork_a1_directed_station_candidates import (
 from .south_fork_a1_window_manifests import (
     FULL_REACH_WINDOW_MANIFEST_INDEX_RELATIVE_PATH,
 )
+from .south_fork_a1_stationing import FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH
 from .south_fork_a1_window_source_pulls import (
+    ADOPTED_AXIS_ROUTE_BASIS,
+    ADOPTED_ROUTE_FEATURE_ID,
+    DIRECTED_CLIP_ROUTE_BASIS,
+    DIRECTED_CLIP_STATION_END_M,
     _lon_lat_to_web_mercator,
     _route_coordinates_with_station,
 )
@@ -105,9 +110,21 @@ def _write_hillshade(
     Image.fromarray(np.round(shade * 255.0).astype(np.uint8), mode="L").save(path)
 
 
-def _route_points(repo_root: Path) -> list[dict[str, Any]]:
+def _route_points(repo_root: Path) -> dict[str, list[dict[str, Any]]]:
     route_clips = _load_json(repo_root, FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH)
-    return _route_coordinates_with_station(route_clips)
+    adopted_route = _load_json(repo_root, FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH)
+    return {
+        DIRECTED_CLIP_ROUTE_BASIS: _route_coordinates_with_station(route_clips),
+        ADOPTED_AXIS_ROUTE_BASIS: _route_coordinates_with_station(
+            adopted_route, ADOPTED_ROUTE_FEATURE_ID
+        ),
+    }
+
+
+def _route_basis_for_window(station_end_m: float) -> str:
+    if station_end_m <= DIRECTED_CLIP_STATION_END_M + 1e-6:
+        return DIRECTED_CLIP_ROUTE_BASIS
+    return ADOPTED_AXIS_ROUTE_BASIS
 
 
 def _window_route_points(
@@ -202,7 +219,7 @@ def _generate_window_derivatives(
     repo_root: Path,
     window_manifest: dict[str, Any],
     stitched_report: dict[str, Any],
-    route_points: list[dict[str, Any]],
+    route_points_by_basis: dict[str, list[dict[str, Any]]],
 ) -> dict[str, Any]:
     targets = window_manifest["derivative_targets"]
     dem_artifact = window_manifest["source_artifacts"]["dem"]
@@ -219,8 +236,9 @@ def _generate_window_derivatives(
     _write_hillshade(dem, hillshade_path, dem_artifact["pixel_resolution_m_approx"])
 
     station = window_manifest["station_range_m"]
+    route_basis = _route_basis_for_window(float(station["end"]))
     window_points = _window_route_points(
-        route_points,
+        route_points_by_basis[route_basis],
         float(station["start"]),
         float(station["end"]),
     )
@@ -233,7 +251,7 @@ def _generate_window_derivatives(
 
     edge_report = {
         "schema": "raftsim.south_fork.a1_window_stitched_edge_report.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": window_manifest["river_id"],
         "window_id": window_manifest["window_id"],
@@ -246,9 +264,11 @@ def _generate_window_derivatives(
             ),
             "stitched_validation_report": FULL_REACH_WINDOW_STITCHED_VALIDATION_RELATIVE_PATH,
             "directed_route_clips": FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
+            "adopted_route_geojson": FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH,
         },
         "station_range_m": station,
         "route_overlay": {
+            "route_basis": route_basis,
             "route_sample_count": len(window_points),
             "visible_pixel_count": len(pixels),
             "line_drawn": len(pixels) >= 2,
@@ -284,9 +304,9 @@ def _generate_window_derivatives(
         },
         "review_notes": [
             "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
-            "NAIP centerline overlay shows the directed review route against the source imagery window.",
+            "NAIP centerline overlay shows the recorded review route basis against the source imagery window.",
             "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
-            "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked.",
+            "Banks, cross sections, and Unreal import remain blocked; the Salmon Falls bank-landing refinement rides the P7 owner packet.",
         ],
     }
     _write_json(edge_report_path, edge_report)
@@ -329,7 +349,7 @@ def build_south_fork_a1_window_derivative_manifest(repo_root: Path) -> dict[str,
     derivative_count = sum(len(window["derived_artifacts"]) for window in windows)
     return {
         "schema": "raftsim.south_fork.a1_full_reach_window_derivatives.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": manifest_index["river_id"],
         "status": "review_derivatives_generated_anchor_and_bank_review_pending",
@@ -338,6 +358,7 @@ def build_south_fork_a1_window_derivative_manifest(repo_root: Path) -> dict[str,
             "source_manifest_index": FULL_REACH_WINDOW_MANIFEST_INDEX_RELATIVE_PATH,
             "stitched_validation_report": FULL_REACH_WINDOW_STITCHED_VALIDATION_RELATIVE_PATH,
             "directed_route_clips": FULL_REACH_DIRECTED_ROUTE_CLIPS_GEOJSON_RELATIVE_PATH,
+            "adopted_route_geojson": FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH,
         },
         "summary": {
             "window_count": len(windows),
@@ -372,7 +393,7 @@ def build_south_fork_a1_window_derivative_manifest(repo_root: Path) -> dict[str,
             "can_promote_full_reach_corridor": False,
             "next_required_actions": [
                 "Visually review every heightfield, hillshade, NAIP overlay, and edge report.",
-                "Resolve the exact Salmon Falls/Folsom downstream anchor before final crop.",
+                "Confirm the adopted Salmon Falls take-out bank landing via the P7 owner packet before final crop.",
                 "Add bank/cross-section interpretation and named rapid geometry review.",
                 "Only after review, generate hydrologically conditioned terrain for Unreal import tests.",
             ],
