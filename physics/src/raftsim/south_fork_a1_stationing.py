@@ -17,6 +17,20 @@ A1_STATUS_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/review/"
     "a1_stationing_repair_status.json"
 )
+FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/hydrography/"
+    "full_reach_adopted_route_stationing.json"
+)
+FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/hydrography/"
+    "full_reach_adopted_route.geojson"
+)
+A1_ADOPTION_DECISION_SOURCE = "release-1.0-plan-v2 §6, July 17 2026"
+A1_ADOPTION_DECISION_AUTHORITY = (
+    "docs/release-1.0-plan.md#6-gate-dispositions-mechanical--no-forms-no-waiting"
+)
+A1_ADOPTED_STATION_AXIS_ID = "adopted_nhd_directed_mainstem_chain_v1"
+P7_REVIEW_BATCH_ID = "p7_owner_review_packet"
 ALIGNMENT_REVIEW_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/review/"
     "named_rapid_station_alignment_review.json"
