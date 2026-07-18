@@ -1,11 +1,36 @@
 #include "RaftSimVerticalSliceGameMode.h"
 
+#include "EngineUtils.h"
 #include "RaftSimGuidePawn.h"
+#include "RaftSimGuidePlayerController.h"
+#include "RaftSimRunManager.h"
 
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 {
     DefaultPawnClass = ARaftSimGuidePawn::StaticClass();
+    PlayerControllerClass = ARaftSimGuidePlayerController::StaticClass();
     InitializeScenarioDefinitions();
+}
+
+void ARaftSimVerticalSliceGameMode::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // Ensure a run manager exists so any rapid/tank map is scored.
+    bool bHasRunManager = false;
+    if (TActorIterator<ARaftSimRunManager> It(GetWorld()); It)
+    {
+        bHasRunManager = true;
+    }
+    if (!bHasRunManager)
+    {
+        ARaftSimRunManager* Manager = GetWorld()->SpawnActor<ARaftSimRunManager>(
+            ARaftSimRunManager::StaticClass(), FTransform::Identity);
+        if (Manager != nullptr)
+        {
+            Manager->ScenarioId = ActiveScenarioId;
+        }
+    }
 }
 
 void ARaftSimVerticalSliceGameMode::RestartRapid()

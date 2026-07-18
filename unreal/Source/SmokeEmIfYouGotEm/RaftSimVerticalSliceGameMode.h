@@ -100,6 +100,8 @@ class SMOKEEMIFYOUGOTEM_API ARaftSimVerticalSliceGameMode : public AGameModeBase
 public:
     ARaftSimVerticalSliceGameMode();
 
+    virtual void BeginPlay() override;
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|VerticalSlice")
     void RestartRapid();
 

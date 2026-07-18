@@ -20,7 +20,11 @@ public class SmokeEmIfYouGotEm : ModuleRules
             "RaftSimInput",
             "RaftSimWater",
             "UMG",
-            "EnhancedInput"
+            "EnhancedInput",
+            "RaftSimCrew",
+            "RaftSimRiver",
+            "Slate",
+            "SlateCore"
         });
     }
 }

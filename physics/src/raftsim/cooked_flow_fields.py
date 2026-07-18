@@ -420,51 +420,57 @@ def _band_manifest_entry(
     return entry
 
 
-def generate_south_fork_cooked_flow_fields(
-    *,
-    executable: str | Path,
-    output_dir: str | Path,
-    work_dir: str | Path,
-    config: CookedFlowFieldsRunConfig | None = None,
-    band_ids: tuple[str, ...] = SOUTH_FORK_COOKED_BAND_IDS,
-    source_commit: str | None = None,
-) -> Path:
-    """Cook all South Fork flow bands and write the v1 package. Returns the manifest path."""
+def _resolve_source_commit(source_commit: str | None) -> str:
+    if source_commit is not None:
+        return source_commit
+    probe = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        check=False,
+        capture_output=True,
+        text=True,
+        cwd=Path(__file__).resolve().parent,
+    )
+    return probe.stdout.strip() if probe.returncode == 0 else "unknown"
 
-    config = config or CookedFlowFieldsRunConfig()
+
+def _require_executable(executable: str | Path) -> Path:
     executable = Path(executable)
     if not executable.exists():
         raise FileNotFoundError(
             f"C++ solver binary not found at {executable}. Build it with: "
             "cmake -S physics/cpp -B physics/cpp/build && cmake --build physics/cpp/build"
         )
-    output_dir = Path(output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
+    return executable
 
-    if source_commit is None:
-        probe = subprocess.run(
-            ["git", "rev-parse", "HEAD"],
-            check=False,
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).resolve().parent,
-        )
-        source_commit = probe.stdout.strip() if probe.returncode == 0 else "unknown"
 
-    results = [
-        cook_flow_field_band(band_id, executable=executable, work_dir=Path(work_dir), config=config)
-        for band_id in band_ids
-    ]
+def _write_cooked_flow_fields_manifest(
+    results: list[CookedBandResult],
+    *,
+    output_dir: Path,
+    executable: Path,
+    config: CookedFlowFieldsRunConfig,
+    river_id: str,
+    section_id: str,
+    source_package: str,
+    source_commit: str,
+    notes: list[str],
+    extra_top_level: dict[str, object] | None = None,
+) -> Path:
+    """Write the ``raftsim.cooked_flow_fields.v1`` package manifest.
+
+    Shared by every window (the Chili Bar pilot and authored scenario windows)
+    so the on-disk schema the UE loader reads is byte-for-byte the same shape.
+    """
+
     reference = results[0].scenario
-
-    manifest = {
+    manifest: dict[str, object] = {
         "schema": COOKED_FLOW_FIELDS_SCHEMA,
         "generator": COOKED_FLOW_FIELDS_GENERATOR,
         "generated_on": date.today().isoformat(),
         "source_commit": source_commit,
-        "river_id": reference.metadata.river_id,
-        "section_id": reference.metadata.section_id,
-        "source_package": "physics/data/real_world/south_fork_american_chili_bar",
+        "river_id": river_id,
+        "section_id": section_id,
+        "source_package": source_package,
         "solver": {
             "solver": "raftsim_water_cpp_v1",
             "binary_sha256": sha256_of_file(executable),
@@ -500,7 +506,48 @@ def generate_south_fork_cooked_flow_fields(
             _band_manifest_entry(result, output_dir=output_dir, config=config)
             for result in results
         ],
-        "notes": [
+        "notes": notes,
+    }
+    if extra_top_level:
+        manifest.update(extra_top_level)
+    manifest_path = output_dir / "manifest.json"
+    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return manifest_path
+
+
+def generate_south_fork_cooked_flow_fields(
+    *,
+    executable: str | Path,
+    output_dir: str | Path,
+    work_dir: str | Path,
+    config: CookedFlowFieldsRunConfig | None = None,
+    band_ids: tuple[str, ...] = SOUTH_FORK_COOKED_BAND_IDS,
+    source_commit: str | None = None,
+) -> Path:
+    """Cook all South Fork flow bands and write the v1 package. Returns the manifest path."""
+
+    config = config or CookedFlowFieldsRunConfig()
+    executable = _require_executable(executable)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    source_commit = _resolve_source_commit(source_commit)
+
+    results = [
+        cook_flow_field_band(band_id, executable=executable, work_dir=Path(work_dir), config=config)
+        for band_id in band_ids
+    ]
+    reference = results[0].scenario
+
+    return _write_cooked_flow_fields_manifest(
+        results,
+        output_dir=output_dir,
+        executable=executable,
+        config=config,
+        river_id=reference.metadata.river_id,
+        section_id=reference.metadata.section_id,
+        source_package="physics/data/real_world/south_fork_american_chili_bar",
+        source_commit=source_commit,
+        notes=[
             "Fields are the genuine finite-volume solver's approximate steady state; no fixture "
             "calibrations, playback, or feature forcing contributed.",
             "The UE river-window loader must run the embedded live solver with this manifest's "
@@ -516,10 +563,59 @@ def generate_south_fork_cooked_flow_fields(
             "boundary preset (fixed inflow depth/velocity, fixed outflow stage) over-drives the "
             "gauge-derived target. Recorded honestly; scenario authoring owns any recalibration.",
         ],
-    }
-    manifest_path = output_dir / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return manifest_path
+    )
+
+
+def generate_authored_window_cooked_flow_fields(
+    bands: tuple[AuthoredWindowBand, ...],
+    *,
+    executable: str | Path,
+    output_dir: str | Path,
+    work_dir: str | Path,
+    config: CookedFlowFieldsRunConfig,
+    source_package: str,
+    notes: list[str],
+    river_id: str | None = None,
+    section_id: str | None = None,
+    source_commit: str | None = None,
+    extra_top_level: dict[str, object] | None = None,
+) -> Path:
+    """Cook an authored multi-band scenario window into a v1 cooked-fields package.
+
+    Each band's committed scenario package (``scenario.json`` + arrays) is run
+    through the genuine C++ FV solver with ``config`` and its steady state is
+    exported under ``output_dir`` with the identical ``raftsim.cooked_flow_fields.v1``
+    schema the UE loader already reads. ``config`` MUST reproduce the settings the
+    window was authored/validated with (e.g. roughness_scale/bed_slope_source_scale)
+    or the seeded live-water window would immediately drift; ``manning_n`` is
+    recorded per band from each scenario's roughness.
+    """
+
+    if not bands:
+        raise ValueError("At least one authored window band is required.")
+    executable = _require_executable(executable)
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    source_commit = _resolve_source_commit(source_commit)
+
+    results = [
+        cook_flow_field_band_from_package(band, executable=executable, work_dir=Path(work_dir), config=config)
+        for band in bands
+    ]
+    reference = results[0].scenario
+
+    return _write_cooked_flow_fields_manifest(
+        results,
+        output_dir=output_dir,
+        executable=executable,
+        config=config,
+        river_id=river_id if river_id is not None else reference.metadata.river_id,
+        section_id=section_id if section_id is not None else reference.metadata.section_id,
+        source_package=source_package,
+        source_commit=source_commit,
+        notes=notes,
+        extra_top_level=extra_top_level,
+    )
 
 
 def read_cooked_flow_fields_manifest(package_dir: str | Path) -> dict[str, object]:

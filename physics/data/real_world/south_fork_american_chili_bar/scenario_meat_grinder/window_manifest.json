@@ -1,0 +1,246 @@
+{
+  "adopted_axis_station_m": 965.6064,
+  "bed_parameters": {
+    "boulder_count": 46,
+    "boulder_crest_offset_max_m": -0.2,
+    "boulder_crest_offset_min_m": -0.75,
+    "boulder_radius_max_m": 3.4,
+    "boulder_radius_min_m": 1.4,
+    "boulder_seed": 20260718,
+    "death_star_crest_offset_m": -0.1,
+    "death_star_radius_m": 2.8,
+    "death_star_x": 333.0,
+    "death_star_y": 1.0,
+    "diversion_canal_invert_offset_m": -0.35,
+    "diversion_canal_x": [
+      236.0,
+      276.0
+    ],
+    "diversion_canal_y": [
+      20.0,
+      30.0
+    ],
+    "diversion_rock_crest_offset_m": -0.1,
+    "diversion_rock_radius_m": 3.2,
+    "diversion_rock_x": 250.0,
+    "diversion_rock_y": 12.0,
+    "entry_slot_invert_offset_m": -0.8,
+    "entry_slot_line_end": [
+      282.0,
+      -6.0
+    ],
+    "entry_slot_line_start": [
+      264.0,
+      9.0
+    ],
+    "entry_slot_rock_a": [
+      268.0,
+      7.0
+    ],
+    "entry_slot_rock_b": [
+      277.0,
+      -3.0
+    ],
+    "entry_slot_rock_crest_offset_m": -0.1,
+    "entry_slot_rock_radius_m": 2.6,
+    "funnel_deflector_crest_offset_m": -0.15,
+    "funnel_deflector_x": [
+      342.0,
+      392.0
+    ],
+    "funnel_deflector_y": [
+      3.0,
+      15.0
+    ],
+    "funnel_wave_crest_offset_m": -0.3,
+    "funnel_wave_half_width_m": 4.0,
+    "funnel_wave_x": [
+      350.0,
+      361.0,
+      372.0,
+      383.0
+    ],
+    "funnel_wave_y": [
+      -14.0,
+      -1.0
+    ],
+    "garden_half_width_m": 18.0,
+    "garden_shelf_offset_m": -0.8,
+    "garden_x": [
+      272.0,
+      412.0
+    ],
+    "hole_a_center": [
+      302.0,
+      5.0
+    ],
+    "hole_apron_offset_m": -0.9,
+    "hole_b_center": [
+      317.0,
+      -5.0
+    ],
+    "hole_half_width_m": 4.5,
+    "hole_notch_offset_m": -1.15,
+    "hole_pool_offset_m": -1.95,
+    "hole_wing_offset_m": -0.55,
+    "lead_in_invert_offset_m": -0.9,
+    "lead_in_x": [
+      196.0,
+      262.0
+    ],
+    "lead_in_y": [
+      -6.0,
+      6.0
+    ],
+    "left_eddy_bar_crest_offset_m": 0.1,
+    "left_eddy_bar_x": [
+      400.0,
+      406.0
+    ],
+    "left_eddy_floor_offset_m": -1.0,
+    "left_eddy_x": [
+      404.0,
+      442.0
+    ],
+    "left_eddy_y": [
+      13.0,
+      24.0
+    ],
+    "rhino_rock_crest_offset_m": 1.25,
+    "rhino_rock_radius_m": 4.4,
+    "rhino_rock_x": 399.0,
+    "rhino_rock_y": -12.0,
+    "runout_wave_big_crest_offset_m": -0.1,
+    "runout_wave_big_x": 458.0,
+    "runout_wave_crest_offset_m": -0.25,
+    "runout_wave_half_width_m": 5.0,
+    "runout_wave_x": [
+      418.0,
+      432.0,
+      446.0
+    ],
+    "runout_wave_y": [
+      -8.0,
+      8.0
+    ],
+    "scout_trail_x": [
+      200.0,
+      300.0
+    ],
+    "scout_trail_y": -31.0
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 8.0,
+    "bank_relief_cap_m": 20.0,
+    "boulder_garden_bed": "authored_deterministic_scattered_boulder_field_not_survey",
+    "centerline_smoothing_passes": 12,
+    "channel_half_width_m": 15.0,
+    "conditioned_profile_drop_m": 16.92863069885317,
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "min_centerline_radius_m": 106.94443449853615,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 1.7,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
+    "raw_dem_floor_drop_m": 17.395344183270026
+  },
+  "flow_band_packages": {
+    "high_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/high_runnable",
+      "scenario_id": "south_fork_meat_grinder_c3_window_high_runnable",
+      "stage_east_m": 434.25301948010724,
+      "stage_west_m": 451.18165017896047,
+      "target_discharge_m3s": 84.950539776
+    },
+    "low_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/low_runnable",
+      "scenario_id": "south_fork_meat_grinder_c3_window_low_runnable",
+      "stage_east_m": 433.6674459369293,
+      "stage_west_m": 450.59607663578254,
+      "target_discharge_m3s": 25.4851619328
+    },
+    "median_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/median_runnable",
+      "scenario_id": "south_fork_meat_grinder_c3_window_median_runnable",
+      "stage_east_m": 433.9121570183587,
+      "stage_west_m": 450.8407877172118,
+      "target_discharge_m3s": 45.3069545472
+    }
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "anchor_lonlat": [
+      -120.72930802650734,
+      38.776494713805
+    ],
+    "catalog_point_to_channel_snap_distance_m": 89.8443097808648,
+    "centerline_lonlat_first": [
+      -120.72606398392668,
+      38.77555900869004
+    ],
+    "centerline_lonlat_last": [
+      -120.73233044957115,
+      38.77547705137907
+    ],
+    "min_centerline_radius_m": 106.94443449853615
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "honesty": {
+    "axis_alignment": "The window channel centerline was snapped to the DEM valley floor (89.8 m from the catalog point). Axis-vs-DEM alignment remains pending_human_review per A1.",
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "boulder_garden_bed": "The boulder-garden bed is a deterministic fixed-seed scattered field of authored boulders over a shallow shelf, not a survey; it expresses the C1 'large boulders and hidden holes over a shallow bed' note as interpreted geometry.",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The 3DEP source DEM (~2 m export) resolves valley walls and channel planform but cannot resolve in-channel rocks, ledges, holes, or bathymetry; every in-channel feature in these packages is an authored interpretation of the committed C1 guide-source inventory placed at its relative positions.",
+    "longitudinal_profile": "The raw DEM floor drop through the traced window is recorded in the conditioning report; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it.",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "published_river_mile": 0.6,
+  "rapid_name": "Meat Grinder",
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.meat_grinder_c3_water_window.v1",
+  "sources": {
+    "adopted_route": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
+    "dem_sha256": "15a08aa3a5857c36f69c34e3aaaf64fb3a618f552a8ca1b10026982ea05ef5b9",
+    "dem_window": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m",
+    "feature_inventory": "physics/data/real_world/named_rapid_source_catalog.json",
+    "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+    "stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
+  },
+  "task_id": "P3-step2-prep-A2",
+  "window_id": "meat_grinder_station_966m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "anchor_search_half_m": 100.0,
+    "bank_feather_m": 8.0,
+    "bank_min_height_m": 0.4,
+    "bank_relief_cap_m": 20.0,
+    "cell_size_m": 2.0,
+    "centerline_smoothing_passes": 12,
+    "channel_depth_m": 1.7,
+    "channel_half_width_m": 15.0,
+    "cross_half_width_m": 39.0,
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "roughness_manning_n": 0.042,
+    "trace_cross_search_m": 14.0,
+    "trace_fan_half_deg": 50,
+    "trace_fan_step_deg": 5,
+    "trace_reach_m": 380.0,
+    "trace_step_m": 8.0,
+    "trace_turn_cost_per_deg": 0.06,
+    "window_length_m": 600.0
+  }
+}
