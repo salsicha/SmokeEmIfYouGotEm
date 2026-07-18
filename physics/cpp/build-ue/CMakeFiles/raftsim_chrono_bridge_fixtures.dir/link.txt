@@ -1,0 +1,1 @@
+/usr/bin/c++ -O3 -DNDEBUG -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/raftsim_chrono_bridge_fixtures.dir/tools/chrono_bridge_fixture_catalog.cpp.o -o raftsim_chrono_bridge_fixtures  libraftsim_water.a /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib/libz.tbd

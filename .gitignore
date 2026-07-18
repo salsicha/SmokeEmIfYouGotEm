@@ -40,3 +40,6 @@ graphify-out/
 # Generated diagnostic maps are regenerable and never versioned (release-1.0-plan.md P0.6)
 unreal/Content/RaftSim/Maps/EnvironmentPreviews/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/
+
+# Packaged builds are release artifacts, never repo content (GitHub Releases instead)
+unreal/Packaged/
