@@ -152,22 +152,22 @@
     "high_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/high_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_high_runnable",
-      "stage_east_m": 434.25301948010724,
-      "stage_west_m": 451.18165017896047,
+      "stage_east_m": 434.6642792418626,
+      "stage_west_m": 451.5929099407158,
       "target_discharge_m3s": 84.950539776
     },
     "low_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/low_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_low_runnable",
-      "stage_east_m": 433.6674459369293,
-      "stage_west_m": 450.59607663578254,
+      "stage_east_m": 433.9138626949127,
+      "stage_west_m": 450.84249339376595,
       "target_discharge_m3s": 25.4851619328
     },
     "median_runnable": {
       "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_meat_grinder/median_runnable",
       "scenario_id": "south_fork_meat_grinder_c3_window_median_runnable",
-      "stage_east_m": 433.9121570183587,
-      "stage_west_m": 450.8407877172118,
+      "stage_east_m": 434.1773459283528,
+      "stage_west_m": 451.1059766272059,
       "target_discharge_m3s": 45.3069545472
     }
   },
@@ -233,8 +233,9 @@
     "cross_half_width_m": 39.0,
     "floor_percentile": 10.0,
     "floor_sample_half_width_m": 8.0,
+    "initial_depth_cap_m": 1.4,
     "max_profile_drop_per_cell_m": 0.3,
-    "roughness_manning_n": 0.042,
+    "roughness_manning_n": 0.075,
     "trace_cross_search_m": 14.0,
     "trace_fan_half_deg": 50,
     "trace_fan_step_deg": 5,

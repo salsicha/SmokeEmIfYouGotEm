@@ -109,7 +109,15 @@ class MeatGrinderWindowParameters:
     bank_min_height_m: float = 0.4
     bank_relief_cap_m: float = 20.0
     max_profile_drop_per_cell_m: float = 0.30
-    roughness_manning_n: float = 0.042
+    # Meat Grinder is a Class III+ boulder garden on a steep (~2.8%) put-in reach;
+    # a boulder-garden Manning n keeps the reach subcritical and the FV solver
+    # stable (n=0.042 runs supercritical here and destabilizes -- see the
+    # parameterization iterations in the behavioral report).
+    roughness_manning_n: float = 0.075
+    # Startup transient control: cap the initial fill depth in the deep channel
+    # carve so the window begins near normal depth instead of draining a deep
+    # reservoir through the steep reach.
+    initial_depth_cap_m: float = 1.4
 
 
 @dataclass(frozen=True, slots=True)
@@ -773,7 +781,7 @@ def generate_meat_grinder_scenario2_5d(
     # solved west and east stage anomalies, relaxed to steady state by the solver.
     delta = np.linspace(stage_west - surface[0], stage_east - surface[-1], surface.size)
     eta0 = (surface + delta)[np.newaxis, :]
-    depth = np.maximum(eta0 - bed, 0.0)
+    depth = np.minimum(np.maximum(eta0 - bed, 0.0), params.initial_depth_cap_m)
     area = np.sum(depth, axis=0) * dy
     u_profile = np.clip(discharge / np.maximum(area, 1.0e-6), 0.2, 3.5)
     u = np.where(depth > 0.02, u_profile[np.newaxis, :], 0.0)

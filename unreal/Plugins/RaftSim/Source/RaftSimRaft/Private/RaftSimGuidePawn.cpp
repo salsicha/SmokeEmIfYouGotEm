@@ -380,6 +380,17 @@ void ARaftSimGuidePawn::HandleHighSide(const FInputActionValue&)
 
 void ARaftSimGuidePawn::HandleGuideCommand(FName CommandActionName)
 {
-    // P3 routes commands to the crew AI; P1 logs so the binding is verifiable.
-    UE_LOG(LogTemp, Display, TEXT("RaftSim guide command: %s"), *CommandActionName.ToString());
+    ARaftSimRaftActor* Raft = ResolveRaft();
+    if (Raft == nullptr)
+    {
+        return;
+    }
+    ERaftSimCrewCommand Command = ERaftSimCrewCommand::Rest;
+    const FString Name = CommandActionName.ToString();
+    if (Name.Contains(TEXT("ForwardPaddle"))) { Command = ERaftSimCrewCommand::AllForward; }
+    else if (Name.Contains(TEXT("BackPaddle"))) { Command = ERaftSimCrewCommand::AllBackward; }
+    else if (Name.Contains(TEXT("LeftPaddle"))) { Command = ERaftSimCrewCommand::TurnLeft; }
+    else if (Name.Contains(TEXT("RightPaddle"))) { Command = ERaftSimCrewCommand::TurnRight; }
+    else if (Name.Contains(TEXT("Stop"))) { Command = ERaftSimCrewCommand::Stop; }
+    Raft->IssueCrewCommand(Command);
 }

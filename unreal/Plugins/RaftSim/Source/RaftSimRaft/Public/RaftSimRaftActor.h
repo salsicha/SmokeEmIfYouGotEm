@@ -32,6 +32,20 @@ enum class ERaftSimRaftMode : uint8
     Recovering
 };
 
+/** Guide paddle commands issued to the AI crew. */
+UENUM(BlueprintType)
+enum class ERaftSimCrewCommand : uint8
+{
+    Rest,
+    AllForward,
+    AllBackward,
+    TurnLeft,
+    TurnRight,
+    Stop,
+    GetDown,
+    HighSide
+};
+
 /**
  * The floating raft, driven by the authoritative physics bridge (A-3): the
  * actor configures the bridge subsystem from its properties, routes paddle
@@ -97,6 +111,13 @@ public:
     /** Crew size seeded as swimmers on capsize (guide + paddlers). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void SetCrewSize(int32 InCrewSize) { CrewSize = FMath::Clamp(InCrewSize, 0, 8); }
+
+    /** Issue a paddle command to the crew (routed from the guide's input). */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Crew")
+    void IssueCrewCommand(ERaftSimCrewCommand Command);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    ERaftSimCrewCommand GetActiveCrewCommand() const { return ActiveCrewCommand; }
 
 protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
@@ -168,11 +189,25 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     int32 CrewSize = 5;
 
+    /** Number of AI paddlers (guide excluded). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
+    int32 PaddlerCount = 4;
+
+    /** Crew stroke cadence in seconds. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
+    float CrewStrokeIntervalSeconds = 0.8f;
+
+    /** Crew reaction latency to a new command (seconds). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Crew")
+    float CrewReactionSeconds = 0.4f;
+
 private:
     void UpdateCapsizeLoop(float DeltaSeconds);
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
     void TryReseatSwimmers();
+    void UpdateCrew(float DeltaSeconds);
+    void SpawnCrewVisuals();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
 
     UPROPERTY()
@@ -200,4 +235,17 @@ private:
 
     float FlipRiskLatchSeconds = 0.0f;
     bool bReflipRequested = false;
+
+    // Crew state.
+    UPROPERTY()
+    ERaftSimCrewCommand ActiveCrewCommand = ERaftSimCrewCommand::Rest;
+
+    UPROPERTY()
+    ERaftSimCrewCommand PendingCrewCommand = ERaftSimCrewCommand::Rest;
+
+    UPROPERTY()
+    TArray<TObjectPtr<UStaticMeshComponent>> CrewMeshes;
+
+    float CrewReactionRemaining = 0.0f;
+    float CrewStrokeTimer = 0.0f;
 };
