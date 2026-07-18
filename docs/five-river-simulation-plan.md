@@ -60,3 +60,9 @@ Commit + push per river as it lands. Physics suite green before every push. Hone
 
 ## Definition of done
 All five `L_<River>` maps: load a live wet finite cooked-field river window; spawn the raft on it with crew, scoring, HUD, and audio; are reachable from the main menu; pass their automation load test; and drive end-to-end in an interactive playable check (raft runs the rapid, can flip and be recovered, scores, saves). Physics suite green.
+
+## Execution log
+
+### 2026-07-18 — All five rivers playable (W2 done)
+- Data-driven `RaftSim.CreateRiverMaps` generates `L_Troublemaker`, `L_Hance`, `L_UpperHuacas`, `L_Terminator`, `L_LavaCanyon`; the main menu lists all five; `RaftSim.P4.RiverMapLoads` (parameterized) passes for every map. River-water config is placed only when a river's cooked fields exist, so a river cooks into real solver water automatically once its package lands (Troublemaker already on cooked water; the other four on clean dev-tank water meanwhile — both playable). Fixed the dev-tank fallback to recover from a faulted river-load. Pushed `71f51a63`.
+- W1 physics agents (Colorado Hance, Pacuare Upper Huacas, Futaleufú Terminator, Chilko Lava Canyon) cooking in parallel; each river's map is regenerated onto its cooked fields as the package lands.
