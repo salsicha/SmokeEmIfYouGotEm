@@ -33,6 +33,10 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFlatTank(
     Scenario.duration = 1.0e9;
     Scenario.bed = raftsim::Array2D(Ny, Nx, SurfaceHeightM - DepthM);
     Scenario.initial.h = raftsim::Array2D(Ny, Nx, DepthM);
+    Scenario.initial.eta = raftsim::Array2D(Ny, Nx, SurfaceHeightM);
+    Scenario.initial.wet.ny = Ny;
+    Scenario.initial.wet.nx = Nx;
+    Scenario.initial.wet.values.assign(Ny * Nx, 1);
     Scenario.initial.u = raftsim::Array2D(Ny, Nx, 0.0);
     Scenario.initial.v = raftsim::Array2D(Ny, Nx, 0.0);
     Scenario.initial.hu = raftsim::Array2D(Ny, Nx, 0.0);

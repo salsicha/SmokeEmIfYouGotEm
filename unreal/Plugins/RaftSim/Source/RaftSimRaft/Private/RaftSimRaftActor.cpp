@@ -3,6 +3,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -48,11 +49,30 @@ ARaftSimRaftActor::ARaftSimRaftActor()
 void ARaftSimRaftActor::BeginPlay()
 {
     Super::BeginPlay();
-    // Seam for P2: resolve the live water adapter from the physics bridge
-    // subsystem once the real solver sampler lands. The P1 test tank uses the
-    // actor's flat-water fallback because the placeholder adapter reports the
-    // surface at the query height and cannot drive buoyancy.
+    // P2: live solver water. Resolve the bridge subsystem's adapter and stand
+    // up a flat-tank FV window (surface Z=0, 3 m deep, 2 m cells, 160x160 m).
+    // Dev water: the report gate governs river-water approval claims, not the
+    // genuine-solver tank, so the gate requirement is disabled here.
     WaterAdapter = nullptr;
+    if (const UGameInstance* GameInstance = GetGameInstance())
+    {
+        if (URaftSimPhysicsBridgeSubsystem* Bridge =
+                GameInstance->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
+        {
+            if (URaftSimWaterRuntimeAdapter* Adapter = Bridge->GetWaterRuntime())
+            {
+                FRaftSimWaterRuntimeConfig DevConfig;
+                DevConfig.bRequireAcceptedReportManifest = false;
+                Adapter->Configure(DevConfig);
+                if (Adapter->ConfigureDevTankWindow(
+                        FVector2D(-80.0, -80.0), 160.0f, 160.0f, 2.0f,
+                        /*SurfaceHeightM=*/0.0f, /*DepthM=*/3.0f))
+                {
+                    WaterAdapter = Adapter;
+                }
+            }
+        }
+    }
 }
 
 float ARaftSimRaftActor::SampleWaterSurfaceZ(const FVector& WorldPosition) const
@@ -95,6 +115,10 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     TimeAccumulator += FMath::Min(DeltaSeconds, 0.25f);
+    if (WaterAdapter != nullptr)
+    {
+        WaterAdapter->StepWater(FMath::Min(DeltaSeconds, 0.25f));
+    }
     while (TimeAccumulator >= FixedSubstepSeconds)
     {
         StepRaft(FixedSubstepSeconds);

@@ -112,6 +112,11 @@ private:
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterRuntime;
 
+public:
+    URaftSimWaterRuntimeAdapter* GetWaterRuntime() const { return WaterRuntime; }
+
+private:
+
     UPROPERTY()
     TObjectPtr<URaftSimChronoRuntimeAdapter> RaftRuntime;
 

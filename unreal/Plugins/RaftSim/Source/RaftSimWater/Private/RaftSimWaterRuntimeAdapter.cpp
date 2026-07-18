@@ -1,5 +1,9 @@
 #include "RaftSimWaterRuntimeAdapter.h"
 
+#include "RaftSimLiveWaterWindow.h"
+
+URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
+
 #include "Dom/JsonObject.h"
 #include "HAL/FileManager.h"
 #include "Misc/Crc.h"
@@ -99,6 +103,12 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
     }
 
     Status = ERaftSimWaterRuntimeStatus::Running;
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (LiveWindow.IsValid())
+    {
+        LiveWindow->Step(DeltaSeconds);
+    }
+#endif
     SimTimeSeconds += DeltaSeconds;
     ++CommittedWaterFrame;
     AppendDeterministicCaptureFrame();
@@ -116,6 +126,25 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     }
 
     OutSample.WorldPosition = WorldPosition;
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (LiveWindow.IsValid())
+    {
+        // World position arrives in centimeters; the solver window is meters.
+        const FRaftSimLiveWaterSampleResult Live =
+            LiveWindow->Sample(FVector2D(WorldPosition.X / 100.0, WorldPosition.Y / 100.0));
+        if (Live.bValid)
+        {
+            OutSample.SurfaceHeightMeters = Live.SurfaceHeightM;
+            OutSample.BedHeightMeters = Live.BedHeightM;
+            OutSample.DepthMeters = Live.DepthM;
+            OutSample.VelocityMetersPerSecond =
+                FVector(Live.VelocityMps.X, Live.VelocityMps.Y, 0.0f);
+            OutSample.SurfaceNormal = Live.SurfaceNormal;
+            OutSample.bWet = Live.bWet;
+            return true;
+        }
+    }
+#endif
     OutSample.SurfaceHeightMeters = WorldPosition.Z;
     OutSample.BedHeightMeters = WorldPosition.Z - 1.0f;
     OutSample.DepthMeters = 1.0f;
@@ -177,4 +206,30 @@ FString URaftSimWaterRuntimeAdapter::ResolveRepoRelativePath(const FString& Path
         return FPaths::ConvertRelativePathToFull(FPaths::Combine(FPaths::ProjectDir(), Path));
     }
     return Path;
+}
+
+bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
+    FVector2D WorldOriginM, float SizeXM, float SizeYM, float CellSizeM,
+    float SurfaceHeightM, float DepthM)
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    LiveWindow = FRaftSimLiveWaterWindow::CreateFlatTank(
+        WorldOriginM, SizeXM, SizeYM, CellSizeM, SurfaceHeightM, DepthM);
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    {
+        Status = ERaftSimWaterRuntimeStatus::ScenarioBound;
+    }
+    return LiveWindow.IsValid();
+#else
+    return false;
+#endif
+}
+
+bool URaftSimWaterRuntimeAdapter::HasLiveWindow() const
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    return LiveWindow.IsValid();
+#else
+    return false;
+#endif
 }
