@@ -100,6 +100,28 @@ struct FRaftSimWaterRuntimeConfig
 };
 
 USTRUCT(BlueprintType)
+struct FRaftSimWaterLiveWindowStats
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float TotalWaterVolumeM3 = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float WetFraction = 0.0f;
+
+    /** Wet fraction of the state the window was seeded with (cooked wet_mask). */
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float SeedWetFraction = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    bool bHasNonFinite = false;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float SimTimeSeconds = 0.0f;
+};
+
+USTRUCT(BlueprintType)
 struct FRaftSimWaterSample
 {
     GENERATED_BODY()
@@ -146,6 +168,24 @@ public:
     bool ConfigureDevTankWindow(
         FVector2D WorldOriginM, float SizeXM, float SizeYM, float CellSizeM,
         float SurfaceHeightM, float DepthM);
+
+    /**
+     * Configure a live river window seeded from cooked steady-state flow
+     * fields (raftsim.cooked_flow_fields.v1). CookedFieldsManifestDir may be
+     * repo-relative (e.g. "physics/data/.../cooked_flow_fields"). The window
+     * covers WindowCenterM +/- WindowExtentM/2 in scenario-local meters,
+     * clamped to the cooked grid. RoughnessManning is the band seed
+     * scenario's Manning n (not recorded by manifest v1; the South Fork
+     * median band authored 0.041). No-op without the solver lib.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool ConfigureRiverWindow(
+        const FString& CookedFieldsManifestDir, const FString& BandId,
+        FVector2D WindowCenterM, FVector2D WindowExtentM,
+        float RoughnessManning = 0.041f);
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool GetLiveWindowStats(FRaftSimWaterLiveWindowStats& OutStats) const;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
     bool HasLiveWindow() const;
