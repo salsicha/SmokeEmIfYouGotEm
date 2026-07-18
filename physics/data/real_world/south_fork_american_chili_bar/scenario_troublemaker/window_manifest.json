@@ -1,0 +1,305 @@
+{
+  "adopted_axis_station_m": 8368.5888,
+  "bed_parameters": {
+    "diagonal_crest_offset_m": -0.35,
+    "diagonal_end": [
+      297.0,
+      -3.0
+    ],
+    "diagonal_half_width_m": 3.2,
+    "diagonal_start": [
+      280.0,
+      -15.0
+    ],
+    "double_trouble_invert_offset_m": -0.18,
+    "double_trouble_x": [
+      282.0,
+      342.0
+    ],
+    "double_trouble_y": [
+      -20.0,
+      -15.0
+    ],
+    "ferry_eddy_bar_crest_offset_m": 0.15,
+    "ferry_eddy_bar_x": [
+      306.0,
+      312.0
+    ],
+    "ferry_eddy_floor_offset_m": -1.1,
+    "ferry_eddy_x": [
+      310.0,
+      338.0
+    ],
+    "ferry_eddy_y": [
+      11.0,
+      22.0
+    ],
+    "gunsight_crest_offset_m": 1.4,
+    "gunsight_left_chute_invert_offset_m": -1.75,
+    "gunsight_left_chute_y": [
+      5.0,
+      11.0
+    ],
+    "gunsight_left_drop_m": 1.15,
+    "gunsight_radius_m": 4.6,
+    "gunsight_right_chute_invert_offset_m": -1.7,
+    "gunsight_right_chute_y": [
+      -11.0,
+      -5.0
+    ],
+    "gunsight_right_drop_m": 0.9,
+    "gunsight_shoulder_offset_m": 0.5,
+    "gunsight_shoulder_x": [
+      346.0,
+      362.0
+    ],
+    "gunsight_shoulder_y_min_m": 12.0,
+    "gunsight_x": 354.0,
+    "gunsight_y": 0.5,
+    "gut_apron_invert_offset_m": -1.25,
+    "gut_notch_crest_offset_m": -1.4,
+    "gut_notch_y": [
+      -3.5,
+      3.5
+    ],
+    "gut_pool_invert_offset_m": -2.6,
+    "gut_pool_x": [
+      302.0,
+      320.0
+    ],
+    "gut_wing_crest_offset_m": -0.9,
+    "gut_wing_y_extent_m": 11.0,
+    "gut_x": 300.0,
+    "island_crest_offset_m": 0.9,
+    "island_left_channel_invert_offset_m": -0.45,
+    "island_left_channel_y": [
+      9.0,
+      14.0
+    ],
+    "island_radius_m": 9.0,
+    "island_right_channel_invert_offset_m": -1.9,
+    "island_right_channel_y": [
+      -13.0,
+      -4.0
+    ],
+    "island_x_center": 241.0,
+    "island_y_center": 4.0,
+    "lead_sieve_crest_offset_m": -0.12,
+    "lead_sieve_radius_m": 2.4,
+    "lead_sieve_rocks": [
+      [
+        263.0,
+        1.0
+      ],
+      [
+        268.0,
+        -2.5
+      ],
+      [
+        272.0,
+        3.0
+      ]
+    ],
+    "peanut_wall_raise_m": 4.0,
+    "peanut_wall_x": [
+      298.0,
+      342.0
+    ],
+    "peanut_wall_y_min": 23.0,
+    "pourover_crest_offset_m": -0.28,
+    "pourover_radius_m": 3.2,
+    "pourover_x": 470.0,
+    "pourover_y": 0.0,
+    "right_turn_hole_crest_offset_m": -0.85,
+    "right_turn_hole_x": [
+      326.0,
+      333.0
+    ],
+    "right_turn_hole_y": [
+      -12.0,
+      -2.0
+    ],
+    "right_turn_pool_invert_offset_m": -1.9,
+    "right_turn_pool_x": [
+      333.0,
+      344.0
+    ],
+    "runout_sieve_crest_offset_m": -0.1,
+    "runout_sieve_radius_m": 2.6,
+    "runout_sieve_rocks": [
+      [
+        398.0,
+        1.0
+      ],
+      [
+        403.0,
+        -3.0
+      ],
+      [
+        407.0,
+        4.0
+      ]
+    ],
+    "safety_eddy_floor_offset_m": -0.95,
+    "safety_eddy_x": [
+      382.0,
+      420.0
+    ],
+    "safety_eddy_y": [
+      -24.0,
+      -13.0
+    ],
+    "scout_eddy_floor_offset_m": -0.7,
+    "scout_eddy_x": [
+      182.0,
+      212.0
+    ],
+    "scout_eddy_y": [
+      15.0,
+      26.0
+    ],
+    "sneak_berm_crest_offset_m": 0.35,
+    "sneak_berm_y": [
+      14.5,
+      16.5
+    ],
+    "sneak_exit_end": [
+      328.0,
+      10.0
+    ],
+    "sneak_exit_invert_offset_m": -0.8,
+    "sneak_exit_start": [
+      312.0,
+      19.0
+    ],
+    "sneak_feeder_end": [
+      234.0,
+      19.0
+    ],
+    "sneak_feeder_invert_offset_m": -0.5,
+    "sneak_feeder_start": [
+      214.0,
+      8.0
+    ],
+    "sneak_invert_offset_m": -0.6,
+    "sneak_x": [
+      232.0,
+      316.0
+    ],
+    "sneak_y": [
+      17.0,
+      22.0
+    ]
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 8.0,
+    "bank_relief_cap_m": 20.0,
+    "centerline_smoothing_passes": 36,
+    "channel_half_width_m": 14.0,
+    "conditioned_profile_drop_m": 7.575812790750831,
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "min_centerline_radius_m": 45.683002868689485,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 1.6,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
+    "raw_dem_floor_drop_m": 7.5699928062390995
+  },
+  "flow_band_packages": {
+    "high_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/high_runnable",
+      "scenario_id": "south_fork_troublemaker_c3_window_high_runnable",
+      "stage_east_m": 315.43360282265587,
+      "stage_west_m": 323.00941561340676,
+      "target_discharge_m3s": 84.950539776
+    },
+    "low_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/low_runnable",
+      "scenario_id": "south_fork_troublemaker_c3_window_low_runnable",
+      "stage_east_m": 314.74107874621063,
+      "stage_west_m": 322.3168915369615,
+      "target_discharge_m3s": 25.4851619328
+    },
+    "median_runnable": {
+      "package": "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker/median_runnable",
+      "scenario_id": "south_fork_troublemaker_c3_window_median_runnable",
+      "stage_east_m": 315.02878254125153,
+      "stage_west_m": 322.6045953320024,
+      "target_discharge_m3s": 45.3069545472
+    }
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "anchor_lonlat": [
+      -120.77693661298623,
+      38.7760522211445
+    ],
+    "catalog_point_to_channel_snap_distance_m": 47.41307836451879,
+    "centerline_lonlat_first": [
+      -120.78034610520403,
+      38.776597309193406
+    ],
+    "centerline_lonlat_last": [
+      -120.77880516470202,
+      38.774229306551135
+    ],
+    "min_centerline_radius_m": 45.683002868689485
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "honesty": {
+    "axis_alignment": "The adopted axis cuts the meander neck near the catalog station in this DEM window; the window channel centerline was snapped to the DEM valley floor (47.4 m from the catalog point). Axis-vs-DEM alignment remains pending_human_review per A1.",
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The 3DEP source DEM (~2 m export) resolves valley walls and channel planform but cannot resolve in-channel rocks, ledges, holes, or bathymetry; every in-channel feature in these packages is an authored interpretation of the committed C1 guide-source inventory placed at its relative positions.",
+    "longitudinal_profile": "The raw DEM floor drop through the traced window is recorded in the conditioning report; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it.",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "rapid_name": "Troublemaker",
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.troublemaker_c3_water_window.v1",
+  "sources": {
+    "adopted_route": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
+    "dem_sha256": "ebb6682d52a6a011854b4679d43ba56f1a1d62642852cce9e045b805820e59f0",
+    "dem_window": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m",
+    "feature_inventory": "physics/data/real_world/named_rapid_source_catalog.json",
+    "flow_presets": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json",
+    "stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json"
+  },
+  "task_id": "P3-step2-prep-A6",
+  "window_id": "troublemaker_station_8368m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "anchor_search_half_m": 100.0,
+    "bank_feather_m": 8.0,
+    "bank_min_height_m": 0.4,
+    "bank_relief_cap_m": 20.0,
+    "cell_size_m": 2.0,
+    "centerline_smoothing_passes": 12,
+    "channel_depth_m": 1.6,
+    "channel_half_width_m": 14.0,
+    "cross_half_width_m": 39.0,
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "roughness_manning_n": 0.041,
+    "trace_cross_search_m": 14.0,
+    "trace_fan_half_deg": 50,
+    "trace_fan_step_deg": 5,
+    "trace_reach_m": 380.0,
+    "trace_step_m": 8.0,
+    "trace_turn_cost_per_deg": 0.06,
+    "window_length_m": 600.0
+  }
+}

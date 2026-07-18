@@ -1,0 +1,158 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 6.0,
+        "y": 0.0
+      },
+      "probe_id": "window_entry_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "main_hole"
+      },
+      "normal": null,
+      "position": {
+        "x": 306.0,
+        "y": 0.0
+      },
+      "probe_id": "gut_hole"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "right_diagonal_wave"
+      },
+      "normal": null,
+      "position": {
+        "x": 290.0,
+        "y": -9.0
+      },
+      "probe_id": "right_diagonal"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "far_left_s_channel_sneak"
+      },
+      "normal": null,
+      "position": {
+        "x": 272.0,
+        "y": 19.0
+      },
+      "probe_id": "sneak_channel_mid"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "gunsight_rock"
+      },
+      "normal": null,
+      "position": {
+        "x": 356.0,
+        "y": 8.0
+      },
+      "probe_id": "gunsight_left_chute"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "gunsight_rock"
+      },
+      "normal": null,
+      "position": {
+        "x": 356.0,
+        "y": -8.0
+      },
+      "probe_id": "gunsight_right_chute"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "left_ferry_eddy"
+      },
+      "normal": null,
+      "position": {
+        "x": 322.0,
+        "y": 16.0
+      },
+      "probe_id": "ferry_eddy"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "right_safety_eddy"
+      },
+      "normal": null,
+      "position": {
+        "x": 400.0,
+        "y": -18.0
+      },
+      "probe_id": "safety_eddy"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "hazard_rock_pourover_below"
+      },
+      "normal": null,
+      "position": {
+        "x": 470.0,
+        "y": 0.0
+      },
+      "probe_id": "runout_pourover"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 594.0,
+        "y": 0.0
+      },
+      "probe_id": "window_exit_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 306.0,
+        "y": 0.0
+      },
+      "probe_id": "gut_cross_section"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 354.0,
+        "y": 0.0
+      },
+      "probe_id": "gunsight_cross_section"
+    }
+  ]
+}

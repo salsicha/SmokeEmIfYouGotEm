@@ -1,0 +1,378 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 197.0,
+        "y": 20.5
+      },
+      "kind": "eddy_line",
+      "length": 30.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "scout",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "left_bank_scout_eddy"
+      },
+      "radius": 6.0,
+      "strength": 0.3,
+      "width": 11.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 241.0,
+        "y": 4.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "island",
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "entry_rock_island"
+      },
+      "radius": 9.0,
+      "strength": 0.55,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 268.0,
+        "y": -2.5
+      },
+      "kind": "strainer",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "sieve",
+        "consequence_class": "entrapment_life_threat",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "lead_in_center_sieve"
+      },
+      "radius": 4.8,
+      "strength": 1.0,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 270.5,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 59.0,
+      "metadata": {
+        "authored_bed_change": false,
+        "c1_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "s_bend_entry_line"
+      },
+      "radius": 8.0,
+      "strength": 0.55,
+      "width": 28.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 274.0,
+        "y": 19.5
+      },
+      "kind": "shallow",
+      "length": 84.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "sneak_line",
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "far_left_s_channel_sneak"
+      },
+      "radius": 3.0,
+      "strength": 0.55,
+      "width": 5.0
+    },
+    {
+      "angle": 0.6146629519221655,
+      "center": {
+        "x": 288.5,
+        "y": -9.0
+      },
+      "kind": "lateral",
+      "length": 20.808652046684813,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "lateral",
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "right_diagonal_wave"
+      },
+      "radius": 3.2,
+      "strength": 0.85,
+      "width": 6.4
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 306.0,
+        "y": 0.0
+      },
+      "kind": "hole",
+      "length": 20.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "main_hole"
+      },
+      "radius": 6.0,
+      "strength": 0.7,
+      "width": 22.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 333.5,
+        "y": -7.0
+      },
+      "kind": "hole",
+      "length": 18.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "right_turn_hole"
+      },
+      "radius": 4.0,
+      "strength": 0.7,
+      "width": 10.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 324.0,
+        "y": 16.5
+      },
+      "kind": "eddy_line",
+      "length": 28.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "eddy_line",
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "left_ferry_eddy"
+      },
+      "radius": 5.0,
+      "strength": 0.7,
+      "width": 11.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 320.0,
+        "y": 27.0
+      },
+      "kind": "rock",
+      "length": 44.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "wall",
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "peanut_gallery_left_wall"
+      },
+      "radius": 4.0,
+      "strength": 0.85,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 354.0,
+        "y": 0.5
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "pin_rock",
+        "consequence_class": "wrap_or_pin",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "gunsight_rock"
+      },
+      "radius": 4.6,
+      "strength": 0.95,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 354.0,
+        "y": 0.0
+      },
+      "kind": "ledge",
+      "length": 4.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "ledge",
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "gunsight_final_drop"
+      },
+      "radius": 0.0,
+      "strength": 0.85,
+      "width": 28.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 312.0,
+        "y": -17.5
+      },
+      "kind": "lateral",
+      "length": 60.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "line",
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "double_trouble_right_line"
+      },
+      "radius": 3.0,
+      "strength": 0.85,
+      "width": 5.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 241.0,
+        "y": 11.5
+      },
+      "kind": "shallow",
+      "length": 24.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "line",
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "high_water_left_island_entry"
+      },
+      "radius": 3.0,
+      "strength": 0.7,
+      "width": 5.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 403.0,
+        "y": -3.0
+      },
+      "kind": "strainer",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "sieve",
+        "consequence_class": "entrapment_life_threat",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "runout_center_sieve"
+      },
+      "radius": 5.2,
+      "strength": 1.0,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 401.0,
+        "y": -18.5
+      },
+      "kind": "eddy_line",
+      "length": 38.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "recovery_pool",
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "right_safety_eddy"
+      },
+      "radius": 6.0,
+      "strength": 0.3,
+      "width": 11.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 470.0,
+        "y": 0.0
+      },
+      "kind": "hole",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "c1_feature_type": "pourover",
+        "consequence_class": "entrapment_life_threat",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Troublemaker",
+        "subfeature_id": "hazard_rock_pourover_below"
+      },
+      "radius": 3.2,
+      "strength": 1.0,
+      "width": 0.0
+    }
+  ]
+}
