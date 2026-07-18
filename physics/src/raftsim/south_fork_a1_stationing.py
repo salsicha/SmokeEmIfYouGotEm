@@ -1,7 +1,11 @@
-"""Track the South Fork A1 stationing repair gate.
+"""Track the South Fork A1 stationing gate.
 
 This module intentionally records what is and is not solved by the current
-source package. It is not an alternate geometry generator.
+source package. It is not an alternate geometry generator. As of the
+release-1.0 plan §6 gate disposition (July 17 2026) it records the adopted
+official-access downstream anchor and the active full-reach stationing on the
+validated NHD mainstem chain, with remaining review items batched as
+non-blocking ``pending_human_review`` entries for the P7 owner packet.
 """
 
 from __future__ import annotations
@@ -64,22 +68,32 @@ def _south_fork_catalog_record(catalog: dict[str, Any]) -> dict[str, Any]:
     raise ValueError("South Fork catalog record is missing")
 
 
-def _rapid_station_records(river: dict[str, Any]) -> list[dict[str, Any]]:
+def _rapid_station_records(
+    river: dict[str, Any],
+    adopted: dict[str, Any],
+) -> list[dict[str, Any]]:
+    adopted_by_name = {
+        rapid["name"]: rapid for rapid in adopted["rapid_stations"]
+    }
     records: list[dict[str, Any]] = []
     for rapid in river["rapids"]:
         river_mile = float(rapid["river_mile"])
-        exact_geometry_status = (
-            "blocked_pending_full_reach_centerline_and_guide_review"
-        )
+        adopted_station = adopted_by_name[rapid["name"]]
         records.append(
             {
                 "name": rapid["name"],
                 "order": rapid["order"],
                 "river_mile": river_mile,
                 "station_m_from_published_mile": round(river_mile * MILES_TO_METERS, 3),
+                "station_m_on_adopted_axis": adopted_station["station_m"],
+                "lon_lat_on_adopted_axis": adopted_station["lon_lat"],
                 "review_priority": rapid["review_priority"],
                 "feature_tags": rapid["feature_tags"],
-                "exact_geometry_status": exact_geometry_status,
+                "exact_geometry_status": (
+                    "stationed_on_adopted_axis_exact_geometry_pending_p3_p4"
+                ),
+                "pending_human_review": True,
+                "review_batch": P7_REVIEW_BATCH_ID,
             }
         )
     return records
@@ -96,10 +110,14 @@ def _load_corridor_local_centerline(
 def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, Any]:
     """Build the machine-readable current state for A1.
 
-    The five-river execution plan requires full Chili Bar-to-Folsom stationing
-    and exact rapid geometry. Current committed evidence does not yet prove that,
-    so this artifact keeps the blocker explicit while preserving the usable
-    published rapid-mile scaffold and official flow-source attachments.
+    The release-1.0 plan §6 gate disposition adopted the official California
+    State Parks Salmon Falls Lower Water Raft Take-out geometry as the
+    downstream anchor ground truth and the validated NHD directed mainstem
+    chain as the station axis, so stationing is no longer blocked on anchor
+    selection. Published mile figures remain alias metadata with a recorded
+    divergence, guide-review items ride the P7 owner packet as non-blocking
+    ``pending_human_review`` entries, and nothing here promotes exact rapid
+    geometry, photoreal, or gameplay claims.
     """
 
     repo_root = repo_root.resolve()
@@ -111,8 +129,12 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
     nhd_manifest = _load_json(repo_root, NHD_BBOX_MANIFEST_RELATIVE_PATH)
     corridor = _load_json(repo_root, PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH)
     corridor_centerline = _load_corridor_local_centerline(repo_root, corridor)
+    adopted = _load_json(
+        repo_root,
+        FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+    )
 
-    rapid_records = _rapid_station_records(river)
+    rapid_records = _rapid_station_records(river, adopted)
     max_rapid = max(rapid_records, key=lambda rapid: rapid["river_mile"])
     coloma_station_m = float(
         alignment["published_reference"]["coloma_bridge_station_m"]
@@ -121,30 +143,67 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
         alignment["candidate_centerline"]["declared_length_m"]
     )
     full_run_length_m = float(river["run_length_m"])
+    adopted_route_length_m = float(
+        adopted["station_axis"]["adopted_route_length_m"]
+    )
+    downstream_anchor = adopted["downstream_anchor"]
 
     return {
         "schema": "raftsim.south_fork.a1_stationing_repair_status.v1",
-        "generated_on": "2026-07-16",
-        "plan": (
+        "generated_on": "2026-07-17",
+        "plan": A1_ADOPTION_DECISION_AUTHORITY,
+        "superseded_plan": (
             "docs/five-river-photoreal-execution-plan.md"
             "#workstream-a--source-data-stationing-and-seasonal-flows-per-river"
         ),
         "task_id": "A1",
         "river_id": river["river_id"],
         "display_name": river["display_name"],
-        "status": "blocked_pending_full_reach_hydrography_exact_anchors_and_guide_review",
+        "status": "adopted_official_access_anchor_full_reach_stationing_active",
+        "decision_source": A1_ADOPTION_DECISION_SOURCE,
         "production_promoted": False,
         "do_not_use_for": [
             "exact rapid geometry",
-            "solver water-window binding",
             "public access or rescue geometry",
-            "production-playable South Fork completion",
+            "photoreal or gameplay realism claims",
+            "production-playable South Fork completion claims",
         ],
+        "adopted_route_stationing": {
+            "artifact": FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+            "route_geojson": FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH,
+            "artifact_status": adopted["status"],
+            "decision_source": adopted["decision"]["decision_source"],
+            "station_axis_id": adopted["station_axis"]["axis_id"],
+            "adopted_route_length_m": adopted_route_length_m,
+            "adopted_route_length_miles": adopted["station_axis"][
+                "adopted_route_length_miles"
+            ],
+            "downstream_anchor_name": downstream_anchor["name"],
+            "downstream_anchor_fid": downstream_anchor["fid"],
+            "downstream_anchor_authority": downstream_anchor["authority"],
+            "downstream_anchor_station_m": downstream_anchor["station_m"],
+            "downstream_anchor_snap_distance_m": downstream_anchor[
+                "snap_distance_m"
+            ],
+            "published_mile_alias_policy": adopted["published_mile_aliases"][
+                "alias_policy"
+            ],
+            "published_mile_divergence_note": adopted["published_mile_aliases"][
+                "divergence_note"
+            ],
+            "rapid_station_count": adopted["rapid_station_summary"]["rapid_count"],
+            "order_interpolation_used": adopted["rapid_station_summary"][
+                "order_interpolation_used"
+            ],
+        },
         "catalog_stationing_scaffold": {
             "source_catalog": SOURCE_CATALOG_RELATIVE_PATH,
             "stationing_authority": river["stationing_authority"],
+            "station_axis": A1_ADOPTED_STATION_AXIS_ID,
+            "published_mile_role": "alias_metadata_with_recorded_divergence",
             "run_length_m": full_run_length_m,
             "run_length_miles": round(full_run_length_m / MILES_TO_METERS, 3),
+            "adopted_route_length_m": adopted_route_length_m,
             "rapid_count": len(rapid_records),
             "rapid_mile_min": rapid_records[0]["river_mile"],
             "rapid_mile_max": max_rapid["river_mile"],
@@ -174,13 +233,26 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
             "candidate_covers_catalog_full_run_length": candidate_length_m
             >= full_run_length_m,
             "geometry_binding_enabled": False,
-            "why_blocked": alignment["decision"],
+            "candidate_disposition": (
+                "The chili_bar_to_coloma pilot candidate centerline remains "
+                "rejected exactly as reviewed; it is superseded for stationing "
+                "by the adopted NHD directed mainstem axis and retained as "
+                "evidence."
+            ),
+            "adopted_axis_artifact": (
+                FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH
+            ),
+            "adopted_axis_stationing_enabled": True,
         },
         "current_source_coverage": {
             "nhd_bbox_extract": NHD_BBOX_MANIFEST_RELATIVE_PATH,
             "nhd_bbox_bounds_wgs84": nhd_manifest["bounds_wgs84"],
             "nhd_extract_method": nhd_manifest["extract_method"]["type"],
             "nhd_extract_is_full_reach": False,
+            "full_reach_named_flowline_extract": (
+                adopted["inputs"]["named_flowline_extract"]
+            ),
+            "full_reach_extract_supports_adopted_axis": True,
             "production_corridor_manifest": PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH,
             "production_corridor_reach_id": corridor["reach_id"],
             "production_corridor_status": corridor["status"],
@@ -194,10 +266,11 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
             "production_corridor_station_range_m": corridor_centerline[
                 "station_range_m"
             ],
-            "coverage_blocker": (
-                "The committed NHD extract is a pilot bbox and the physical corridor is "
-                "a 0-2.5 km Chili Bar slice; neither covers the full Chili Bar-to-Folsom "
-                "run or proves exact Coloma/Folsom anchors."
+            "coverage_gap": (
+                "Committed DEM/NAIP window pulls cover the planned 0-33796 m "
+                "spans and the 0-2.5 km physical pilot slice; extending source "
+                "coverage to the 49078 m adopted axis is P3/P4 source-pull "
+                "work. This is a source-coverage gap, not an anchor blocker."
             ),
         },
         "flow_evidence": {
@@ -219,51 +292,69 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
                 for band in flow_review["reviewed_bands"]
             ],
             "promotion_blockers": flow_review["promotion_blockers"],
+            "review_routing": (
+                "Guide/outfitter validation items are batched to the P7 owner "
+                "packet as pending_human_review and do not block stationing or "
+                "corridor binding; flow-band promotion remains its own gate."
+            ),
         },
+        "pending_human_review": adopted["pending_human_review"],
         "a1_acceptance": [
             {
                 "requirement": (
                     "Fix NHD flowline conflict and re-anchor Chili Bar plus "
                     "Folsom take-out."
                 ),
-                "status": "blocked",
+                "status": "adopted",
                 "evidence": [
-                    ALIGNMENT_REVIEW_RELATIVE_PATH,
-                    NHD_BBOX_MANIFEST_RELATIVE_PATH,
+                    FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+                    adopted["inputs"][
+                        "official_access_geometry_discrepancy_review"
+                    ],
+                    adopted["inputs"]["official_access_reanchor_diagnostic"],
+                    adopted["inputs"]["source_mile_divergence_audit"],
                 ],
                 "next_action": (
-                    "Acquire or derive a full-reach official hydrography route, select the correct "
-                    "South Fork mainstem path, and record exact reviewed put-in/take-out anchors."
+                    "None for stationing. The Salmon Falls bank-landing refinement rides the "
+                    "P7 owner packet as a non-blocking pending_human_review item."
                 ),
             },
             {
                 "requirement": "Extend corridor to the full Chili Bar-to-Folsom reach.",
-                "status": "blocked",
-                "evidence": [PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH],
+                "status": "unblocked_source_pull_extension_pending_p3_p4",
+                "evidence": [
+                    PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH,
+                    FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+                ],
                 "next_action": (
-                    "Replace the current 0-2.5 km physical corridor slice with windowed full-run "
-                    "corridor packages after official route selection."
+                    "Regenerate and extend the windowed corridor source pulls against the "
+                    "adopted 49078 m axis during P3/P4; the anchor blocker is resolved."
                 ),
             },
             {
                 "requirement": "Attach official low/reference/high flow bands.",
-                "status": "attached_but_review_gated",
+                "status": "attached_pending_human_review_non_blocking",
                 "evidence": [
                     FLOW_SOURCE_SELECTION_RELATIVE_PATH,
                     FLOW_BAND_REVIEW_RELATIVE_PATH,
                 ],
                 "next_action": (
-                    "Expand CBR/A25 seasonal windows, resolve A25 flag/routing/legal review, and "
-                    "obtain guide/outfitter validation before promotion."
+                    "Expand CBR/A25 seasonal windows and resolve the A25 flag/routing/legal "
+                    "questions; guide/outfitter validation is batched to the P7 owner packet "
+                    "and no longer blocks stationing."
                 ),
             },
             {
                 "requirement": "Re-station all 20 catalog markers with no order interpolation.",
-                "status": "published_mile_scaffold_ready_exact_geometry_blocked",
-                "evidence": [SOURCE_CATALOG_RELATIVE_PATH],
+                "status": "stationed_on_adopted_axis_no_order_interpolation",
+                "evidence": [
+                    SOURCE_CATALOG_RELATIVE_PATH,
+                    FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+                ],
                 "next_action": (
-                    "Project the published miles only after the corrected centerline and anchors "
-                    "are reviewed; then regenerate editor markers through the catalog generator."
+                    "Author exact per-rapid geometry in P3/P4 and regenerate editor markers "
+                    "through the catalog generator alongside that work; stations along the "
+                    "adopted axis are recorded now."
                 ),
             },
             {
@@ -271,11 +362,11 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
                     "Exit gate: conflict resolved and zero South Fork markers "
                     "use order interpolation."
                 ),
-                "status": "not_met",
-                "evidence": [ALIGNMENT_REVIEW_RELATIVE_PATH],
+                "status": "met_for_stationing",
+                "evidence": [FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH],
                 "next_action": (
-                    "Do not enable South Fork editor-map geometry or Meat Grinder/Troublemaker "
-                    "solver windows until the alignment review status changes to resolved."
+                    "Proceed to P3/P4 corridor window regeneration, exact rapid geometry "
+                    "authoring, and solver-window binding against the adopted axis."
                 ),
             },
         ],
