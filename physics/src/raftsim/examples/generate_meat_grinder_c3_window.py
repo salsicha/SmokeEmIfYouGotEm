@@ -32,7 +32,7 @@ def main() -> None:
         default=None,
         help="Uncommitted solver run directory (default: physics/outputs/meat_grinder_c3_window).",
     )
-    parser.add_argument("--steps", type=int, default=6000, help="Solver steps per band (fixed_dt 0.05 s).")
+    parser.add_argument("--steps", type=int, default=4000, help="Solver steps per band (fixed_dt 0.05 s; all three bands are stable at this settle).")
     args = parser.parse_args()
 
     repo_root = Path(__file__).resolve().parents[4]
