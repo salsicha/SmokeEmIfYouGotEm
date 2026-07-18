@@ -1,17 +1,20 @@
 {
   "coverage_summary": {
+    "adopted_axis_end_station_m": 49077.732,
     "all_named_rapids_assigned": true,
+    "covers_adopted_axis": true,
     "existing_source_attached_length_m": 2500.0,
     "named_rapid_count": 20,
     "named_rapids_assigned_to_windows": 20,
-    "planned_length_m": 33796.224,
-    "planned_station_end_m": 33796.224,
+    "planned_length_m": 49077.732,
+    "planned_station_end_m": 49077.732,
     "planned_station_start_m": 0.0,
-    "remaining_source_pull_length_m": 31296.224,
-    "window_count": 6
+    "remaining_source_pull_length_m": 46577.732,
+    "window_count": 8
   },
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
+    "adopted_route_stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
     "anchor_review": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_anchor_review.json",
     "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
     "directed_station_candidates": "physics/data/real_world/south_fork_american_chili_bar/review/full_reach_directed_station_candidates.json",
@@ -26,7 +29,7 @@
     "can_import_unreal_full_reach_landscape": false,
     "can_promote_full_reach_corridor": false,
     "exit_criteria": [
-      "Resolve exact Chili Bar and Salmon Falls/Folsom anchors.",
+      "Anchors adopted per release-1.0-plan section 6; the Salmon Falls bank-landing refinement rides the P7 owner packet.",
       "Pull and hash-lock terrain and imagery for every planned window.",
       "Generate stitched whole-window validation outputs across seams.",
       "Review bank/cross-section interpretation with guide/geospatial evidence.",
@@ -324,7 +327,7 @@
   "windowing_policy": {
     "authority": "planning_manifest_only_not_terrain_or_gameplay_geometry",
     "max_planned_window_length_m": 14000.0,
-    "reason": "A1 needs full Chili Bar-to-Folsom corridor coverage, but exact downstream anchor and production terrain/imagery pulls are still review-gated. Windows make the missing work explicit without promoting candidate linework.",
+    "reason": "A1 needs full Chili Bar-to-Salmon Falls corridor coverage along the adopted official-access axis. Windows through the published 21.0-mile alias keep their reviewed directed-clip spans; the adopted-axis extension windows make the remaining source-pull work explicit without promoting candidate linework.",
     "requires_stitched_validation_outputs": true
   },
   "windows": [
@@ -487,6 +490,52 @@
       "station_start_m": 32991.552,
       "status": "planned_anchor_resolution_window",
       "window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    {
+      "can_bind_named_rapid_geometry": false,
+      "can_bind_solver_windows": false,
+      "can_build_unreal_landscape": false,
+      "display_name": "Below Published Full-Run Alias Transit",
+      "downstream_anchor_note": "Adopted-axis extension window: the official Salmon Falls take-out anchor sits at 49077.732 m, beyond the published 21.0-mile full-run alias; this span follows the adopted NHD directed mainstem axis.",
+      "length_m": 7703.776,
+      "production_promoted": false,
+      "rapid_count": 0,
+      "rapid_names": [],
+      "required_source_classes": [
+        "3DEP terrain",
+        "NAIP/aerial imagery",
+        "directed centerline clip",
+        "bank/cross-section interpretation",
+        "guide/geospatial review notes"
+      ],
+      "source_pull_status": "not_started",
+      "station_end_m": 41500.0,
+      "station_start_m": 33796.224,
+      "status": "planned_source_pull_required",
+      "window_id": "below_full_run_alias_33796_41500m"
+    },
+    {
+      "can_bind_named_rapid_geometry": false,
+      "can_bind_solver_windows": false,
+      "can_build_unreal_landscape": false,
+      "display_name": "Salmon Falls Take-out Approach",
+      "downstream_anchor_note": "Ends at the adopted official Salmon Falls take-out anchor (station 49077.732 m); the bank-landing refinement rides the P7 owner packet and does not block source acquisition.",
+      "length_m": 7577.732,
+      "production_promoted": false,
+      "rapid_count": 0,
+      "rapid_names": [],
+      "required_source_classes": [
+        "3DEP terrain",
+        "NAIP/aerial imagery",
+        "directed centerline clip",
+        "bank/cross-section interpretation",
+        "guide/geospatial review notes"
+      ],
+      "source_pull_status": "not_started",
+      "station_end_m": 49077.732,
+      "station_start_m": 41500.0,
+      "status": "planned_source_pull_required",
+      "window_id": "salmon_falls_takeout_approach_41500_49077m"
     }
   ]
 }
