@@ -36,7 +36,7 @@ from .real_world import (
     generate_real_world_scenario2_5d,
     south_fork_american_flow_bands,
 )
-from .scenario2_5d import Scenario2_5D
+from .scenario2_5d import Scenario2_5D, read_scenario2_5d_package
 
 COOKED_FLOW_FIELDS_SCHEMA = "raftsim.cooked_flow_fields.v1"
 COOKED_FLOW_FIELDS_GENERATOR = "raftsim.cooked_flow_fields"
@@ -151,6 +151,24 @@ class CookedFlowFieldsRunConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class AuthoredWindowBand:
+    """One authored scenario-window flow band cooked from an on-disk package.
+
+    Unlike the Chili Bar pilot bands (synthesized deterministically from a
+    ``PlayerSelection``), an authored window's per-band scenario package already
+    lives on disk (``scenario.json`` + ``bed.npy`` + ``initial_state.npz`` + ...).
+    The solver runs directly against that committed package so the cooked field
+    is the genuine steady state of exactly the geometry that was authored and
+    behaviorally validated.
+    """
+
+    band_id: str
+    scenario_dir: Path
+    discharge_target_m3s: float
+    discharge_target_cfs: float | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class CookedBandResult:
     band_id: str
     scenario: Scenario2_5D
@@ -159,6 +177,8 @@ class CookedBandResult:
     windows: tuple[ConvergenceWindow, ...]
     converged: bool
     scenario_input_hashes: dict[str, str]
+    discharge_target_m3s: float
+    discharge_target_cfs: float | None = None
 
 
 def sha256_of_file(path: Path) -> str:
@@ -215,21 +235,23 @@ def _selection_for_band(band_id: str) -> PlayerSelection:
     raise ValueError(f"No default player selection maps to flow band '{band_id}'.")
 
 
-def cook_flow_field_band(
-    band_id: str,
+def _band_result_from_run(
     *,
-    executable: Path,
-    work_dir: Path,
+    band_id: str,
+    scenario: Scenario2_5D,
+    run: CppSolverRunResult,
+    scenario_input_dir: Path,
     config: CookedFlowFieldsRunConfig,
+    discharge_target_m3s: float,
+    discharge_target_cfs: float | None,
 ) -> CookedBandResult:
-    """Run the genuine solver for one flow band and extract its final field grids."""
+    """Extract steady-state grids and convergence evidence from a finished run.
 
-    selection = _selection_for_band(band_id)
-    scenario = generate_real_world_scenario2_5d(selection)
-    band_work_dir = Path(work_dir) / band_id
-    run = run_cpp_solver_scenario(scenario, output_dir=band_work_dir, config=config.cpp_config(Path(executable)))
+    Shared by the Chili Bar pilot path and the authored-window path so both
+    produce byte-identical band records from the same solver frames.
+    """
+
     manifest = json.loads(run.manifest_path.read_text(encoding="utf-8"))
-
     ny = scenario.grid.ny
     nx = scenario.grid.nx
     frame_fields = [_load_frame_fields(run.output_dir / frame, ny, nx) for frame in manifest["frames"]]
@@ -247,9 +269,8 @@ def cook_flow_field_band(
         "bed": np.ascontiguousarray(scenario.bed, dtype=np.float32),
         "wet_mask": np.ascontiguousarray(final["wet"], dtype=np.uint8),
     }
-    scenario_dir = band_work_dir / "scenario" / scenario.metadata.scenario_id
     scenario_input_hashes = {
-        name: sha256_of_file(scenario_dir / name)
+        name: sha256_of_file(scenario_input_dir / name)
         for name in ("scenario.json", "bed.npy", "initial_state.npz")
     }
     return CookedBandResult(
@@ -260,6 +281,63 @@ def cook_flow_field_band(
         windows=windows,
         converged=converged,
         scenario_input_hashes=scenario_input_hashes,
+        discharge_target_m3s=discharge_target_m3s,
+        discharge_target_cfs=discharge_target_cfs,
+    )
+
+
+def cook_flow_field_band(
+    band_id: str,
+    *,
+    executable: Path,
+    work_dir: Path,
+    config: CookedFlowFieldsRunConfig,
+) -> CookedBandResult:
+    """Run the genuine solver for one Chili Bar pilot flow band (synthesized scenario)."""
+
+    selection = _selection_for_band(band_id)
+    scenario = generate_real_world_scenario2_5d(selection)
+    band_work_dir = Path(work_dir) / band_id
+    run = run_cpp_solver_scenario(scenario, output_dir=band_work_dir, config=config.cpp_config(Path(executable)))
+    flow_band = next(band for band in south_fork_american_flow_bands() if band.flow_band == band_id)
+    scenario_input_dir = band_work_dir / "scenario" / scenario.metadata.scenario_id
+    return _band_result_from_run(
+        band_id=band_id,
+        scenario=scenario,
+        run=run,
+        scenario_input_dir=scenario_input_dir,
+        config=config,
+        discharge_target_m3s=flow_band.discharge_m3s,
+        discharge_target_cfs=flow_band.discharge_cfs,
+    )
+
+
+def cook_flow_field_band_from_package(
+    band: AuthoredWindowBand,
+    *,
+    executable: Path,
+    work_dir: Path,
+    config: CookedFlowFieldsRunConfig,
+) -> CookedBandResult:
+    """Run the genuine solver on one authored scenario-window package on disk.
+
+    The solver is pointed at the committed band package directly (no copy), so
+    the cooked steady state is the genuine finite-volume evolution of exactly
+    the authored, behaviorally-validated geometry and boundaries.
+    """
+
+    scenario_dir = Path(band.scenario_dir)
+    scenario = read_scenario2_5d_package(scenario_dir)
+    band_work_dir = Path(work_dir) / band.band_id
+    run = run_cpp_solver_scenario(scenario_dir, output_dir=band_work_dir, config=config.cpp_config(Path(executable)))
+    return _band_result_from_run(
+        band_id=band.band_id,
+        scenario=scenario,
+        run=run,
+        scenario_input_dir=scenario_dir,
+        config=config,
+        discharge_target_m3s=band.discharge_target_m3s,
+        discharge_target_cfs=band.discharge_target_cfs,
     )
 
 
@@ -295,7 +373,6 @@ def _band_manifest_entry(
     scenario = result.scenario
     band_dir = output_dir / result.band_id
     band_dir.mkdir(parents=True, exist_ok=True)
-    flow_band = next(band for band in south_fork_american_flow_bands() if band.flow_band == result.band_id)
 
     array_entries: dict[str, object] = {}
     for name, contract in COOKED_ARRAY_CONTRACT.items():
@@ -313,15 +390,20 @@ def _band_manifest_entry(
             "sha256": sha256_of_file(array_path),
         }
 
-    return {
+    entry: dict[str, object] = {
         "band_id": result.band_id,
         "scenario_id": scenario.metadata.scenario_id,
         "difficulty": scenario.metadata.difficulty_preset,
         "season": scenario.metadata.season_preset,
-        "discharge_target_cfs": flow_band.discharge_cfs,
-        "discharge_target_m3s": flow_band.discharge_m3s,
+        "discharge_target_m3s": result.discharge_target_m3s,
         "discharge_steady_m3s": _discharge_profile_m3s(result.arrays, scenario.grid.dy),
         "directory": result.band_id,
+        # Roughness the window was solved with. The earlier Chili Bar manifest
+        # omitted this, forcing the UE loader to pass Manning n as a parameter;
+        # record it per band so the loader can configure friction from the file.
+        # The solver applies ``manning_n`` scaled by the run's ``roughness_scale``.
+        "manning_n": scenario.roughness,
+        "effective_manning_n": scenario.roughness * config.roughness_scale,
         "arrays": array_entries,
         "field_stats": _field_stats(result.arrays),
         "scenario_input_sha256": result.scenario_input_hashes,
@@ -333,6 +415,9 @@ def _band_manifest_entry(
             "final_window": result.windows[-1].to_json_dict(),
         },
     }
+    if result.discharge_target_cfs is not None:
+        entry["discharge_target_cfs"] = result.discharge_target_cfs
+    return entry
 
 
 def generate_south_fork_cooked_flow_fields(

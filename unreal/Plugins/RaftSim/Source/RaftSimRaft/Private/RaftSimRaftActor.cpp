@@ -3,12 +3,14 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
+#include "EngineUtils.h"
 #include "Materials/MaterialInterface.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -99,6 +101,22 @@ void ARaftSimRaftActor::BeginPlay()
         WaterAdapter->ConfigureDevTankWindow(
             FVector2D(-80.0, -80.0), 160.0f, 160.0f, 2.0f,
             /*SurfaceHeightM=*/0.0f, /*DepthM=*/3.0f);
+    }
+
+    // Water-rendering v1: spawn a surface actor that displays the live solver
+    // field. Skipped if one is already present (e.g. placed in a river map).
+    if (UWorld* World = GetWorld())
+    {
+        bool bHasSurface = false;
+        if (TActorIterator<ARaftSimWaterSurfaceActor> It(World); It)
+        {
+            bHasSurface = true;
+        }
+        if (!bHasSurface)
+        {
+            World->SpawnActor<ARaftSimWaterSurfaceActor>(
+                ARaftSimWaterSurfaceActor::StaticClass(), FTransform::Identity);
+        }
     }
 
     URaftSimChronoRuntimeAdapter* Adapter = BridgeSubsystem->GetRaftRuntime();

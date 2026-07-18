@@ -1,0 +1,70 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "ProceduralMeshComponent.h"
+
+#include "RaftSimWaterSurfaceActor.generated.h"
+
+class UProceduralMeshComponent;
+class UMaterialInterface;
+class URaftSimWaterRuntimeAdapter;
+
+/**
+ * Renders the live solver's free surface (water-rendering v1, P2): a procedural
+ * grid mesh whose vertices track the water-runtime adapter's surface height and
+ * normal each tick, with vertex-colour foam driven by the local Froude number.
+ * Resolves the bridge subsystem's adapter at BeginPlay; falls back to a flat
+ * plane when no live window is configured.
+ */
+UCLASS()
+class RAFTSIMRAFT_API ARaftSimWaterSurfaceActor : public AActor
+{
+    GENERATED_BODY()
+
+public:
+    ARaftSimWaterSurfaceActor();
+
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaSeconds) override;
+
+protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
+    TObjectPtr<UProceduralMeshComponent> SurfaceMesh;
+
+    /** Water material applied to the surface (single-layer water). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
+    TObjectPtr<UMaterialInterface> WaterMaterial;
+
+    /** Grid origin (world cm, lower corner) — defaults to the dev tank window. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
+    FVector2D GridOriginCm = FVector2D(-8000.0, -8000.0);
+
+    /** Grid extent in meters (square). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
+    float GridSizeMeters = 160.0f;
+
+    /** World-space spacing between surface vertices in meters. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
+    float VertexSpacingMeters = 2.5f;
+
+    /** Surface refresh interval (s); the FV field evolves slowly at gameplay scale. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
+    float RefreshIntervalSeconds = 1.0f / 30.0f;
+
+private:
+    void BuildGrid();
+    void RefreshSurface();
+
+    UPROPERTY()
+    TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
+
+    int32 GridN = 0;
+    TArray<FVector> Vertices;
+    TArray<int32> Triangles;
+    TArray<FVector> Normals;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> VertexColors;
+    TArray<FProcMeshTangent> Tangents;
+    float TimeSinceRefresh = 0.0f;
+};

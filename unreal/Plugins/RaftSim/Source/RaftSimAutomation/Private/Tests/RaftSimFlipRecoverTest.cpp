@@ -19,7 +19,7 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(
 namespace
 {
 
-UWorld* GetActiveGameWorld()
+UWorld* GetFlipTestWorld()
 {
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
     {
@@ -34,7 +34,7 @@ UWorld* GetActiveGameWorld()
 
 ARaftSimRaftActor* FindRaft()
 {
-    UWorld* World = GetActiveGameWorld();
+    UWorld* World = GetFlipTestWorld();
     if (World == nullptr)
     {
         return nullptr;
