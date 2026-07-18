@@ -1,0 +1,117 @@
+{
+  "array_files": {
+    "bed": "bed.npy",
+    "features": "features.json",
+    "initial_state": "initial_state.npz",
+    "probes": "probes.json"
+  },
+  "boundaries": [
+    {
+      "depth": null,
+      "edge": "west",
+      "hydrograph": [],
+      "kind": "inflow",
+      "metadata": {
+        "flow_band": "low_runnable",
+        "manning_n": 0.041,
+        "manning_slope": 0.012626354651251386,
+        "target_discharge_m3s": 25.4851619328
+      },
+      "stage": 322.3168915369615,
+      "velocity": [
+        2.017511606244544,
+        0.0
+      ]
+    },
+    {
+      "depth": null,
+      "edge": "east",
+      "hydrograph": [],
+      "kind": "outflow",
+      "metadata": {
+        "flow_band": "low_runnable",
+        "target_discharge_m3s": 25.4851619328
+      },
+      "stage": 314.74107874621063,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "south",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "north",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    }
+  ],
+  "duration": 240.0,
+  "feature_count": 17,
+  "fixed_dt": 0.05,
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "metadata": {
+    "confidence_score": 0.3,
+    "coordinate_reference_system": "channel-following meters; x downstream along the traced DEM channel centered on adopted-axis station 8368.5888 m, y positive river-left",
+    "description": "Reach-local Troublemaker C3 water window: DEM-derived valley frame with a conditioned channel and authored (interpreted) C1 sub-feature bed geometry.",
+    "difficulty_preset": "class_III_plus_troublemaker",
+    "fixture_kind": null,
+    "flow_band": "low_runnable",
+    "flow_percentile": 0.22499999999999998,
+    "gauge_source": "USGS 11445500 South Fork American River near Lotus, CA",
+    "generator": "raftsim.troublemaker_c3_window",
+    "generator_version": "p3_c3_window.v1",
+    "provenance": {
+      "adopted_axis_station_m": 8368.5888,
+      "anchor_snap_distance_m": 47.41307836451879,
+      "bed_geometry_authority": "interpreted_bed_geometry",
+      "dem_cannot_resolve_in_channel_rocks": true,
+      "dem_source_sha256": "ebb6682d52a6a011854b4679d43ba56f1a1d62642852cce9e045b805820e59f0",
+      "feature_inventory_source": "physics/data/real_world/named_rapid_source_catalog.json",
+      "pending_human_review": true,
+      "production_promoted": false,
+      "rapid_name": "Troublemaker",
+      "stage_east_m": 314.74107874621063,
+      "stage_west_m": 322.3168915369615,
+      "stationing_source": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+      "target_discharge_m3s": 25.4851619328,
+      "task": "release-1.0-plan P3 step 2 prep / A-6 / A-2 behavioral gate"
+    },
+    "river_id": "south_fork_american_chili_bar",
+    "scenario_id": "south_fork_troublemaker_c3_window_low_runnable",
+    "scenario_type": "real_world",
+    "season_preset": "late_summer_low_water",
+    "section_id": "troublemaker_station_8368m_c3_window",
+    "seed": 1,
+    "source_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json"
+  },
+  "probe_count": 12,
+  "raft": {
+    "drag_coefficient": 1.25,
+    "grounding_friction": 0.65,
+    "guide_mass_kg": 85.0,
+    "length_m": 4.3,
+    "mass_kg": 420.0,
+    "passenger_count": 6,
+    "passenger_mass_kg": 75.0,
+    "tube_radius_m": 0.28,
+    "width_m": 1.9
+  },
+  "roughness": 0.041,
+  "schema_version": "raftsim.scenario2_5d.v0"
+}
