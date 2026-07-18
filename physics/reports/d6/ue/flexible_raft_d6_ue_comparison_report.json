@@ -1,0 +1,1608 @@
+{
+  "all_measurements_present": true,
+  "comparison_passed": true,
+  "d6_complete": false,
+  "failed_target_count": 0,
+  "fixtures": [
+    {
+      "fixture_id": "static_seat_load_sag",
+      "objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 385.0,
+              "path": "loaded_crew_mass_kg",
+              "reference_value": 385.0,
+              "tolerance": 19.250001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.0169868811768041,
+              "path": "max_seat_freeboard_loss_m",
+              "reference_value": 0.0169868811768041,
+              "tolerance": 0.0008503440588402051,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.033652344409774194,
+              "path": "port_total_freeboard_loss_m",
+              "reference_value": 0.033652344409774194,
+              "tolerance": 0.0016836172204887096,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 4.3,
+              "path": "raft_length_m",
+              "reference_value": 4.3,
+              "tolerance": 0.215001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.9,
+              "path": "raft_width_m",
+              "reference_value": 1.9,
+              "tolerance": 0.095001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.03486070129658373,
+              "path": "starboard_total_freeboard_loss_m",
+              "reference_value": 0.03486070129658373,
+              "tolerance": 0.0017440350648291866,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 6,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "221d4e7a7333c8f6d47f670ca6a563c7cc296dc74df2b5b96947423a7899f796"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 385.0,
+              "path": "loaded_crew_mass_kg",
+              "reference_value": 385.0,
+              "tolerance": 19.250001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0169868811768041,
+              "measured_value": 0.0,
+              "path": "max_seat_freeboard_loss_m",
+              "reference_value": 0.0169868811768041,
+              "tolerance": 0.0008503440588402051,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.033652344409774194,
+              "measured_value": 0.0,
+              "path": "port_total_freeboard_loss_m",
+              "reference_value": 0.033652344409774194,
+              "tolerance": 0.0016836172204887096,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 4.3,
+              "path": "raft_length_m",
+              "reference_value": 4.3,
+              "tolerance": 0.215001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.9,
+              "path": "raft_width_m",
+              "reference_value": 1.9,
+              "tolerance": 0.095001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.03486070129658373,
+              "measured_value": 0.0,
+              "path": "starboard_total_freeboard_loss_m",
+              "reference_value": 0.03486070129658373,
+              "tolerance": 0.0017440350648291866,
+              "within_tolerance": false
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 6,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 3,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "06627d260cc4891c0e8301e417e635fe9f9fad7df9dc0c72fc08f248a7e1d793"
+        }
+      ]
+    },
+    {
+      "fixture_id": "traveling_crew_shift",
+      "objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 2.2737367544323206e-13,
+              "measured_value": 281.21591249999966,
+              "path": "neutral_roll_load_bias_nm",
+              "reference_value": 281.2159124999999,
+              "tolerance": 14.060796624999995,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1368683772161603e-13,
+              "measured_value": -550.3164750000002,
+              "path": "port_roll_load_bias_nm",
+              "reference_value": -550.3164750000001,
+              "tolerance": 27.51582475000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 6.938893903907228e-18,
+              "measured_value": 0.0005864084891869861,
+              "path": "port_total_freeboard_delta_m",
+              "reference_value": 0.0005864084891869792,
+              "tolerance": 3.032042445934931e-05,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.2737367544323206e-13,
+              "measured_value": 550.3164750000001,
+              "path": "starboard_roll_load_bias_nm",
+              "reference_value": 550.3164749999999,
+              "tolerance": 27.515824750000007,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -0.000621948397622557,
+              "path": "starboard_total_freeboard_delta_m",
+              "reference_value": -0.000621948397622557,
+              "tolerance": 3.2097419881127854e-05,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "aa09eefb0722334485b5a03d36fa81c48aea5f2bcf97b15ceb96aa9335ebb910"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 2.2737367544323206e-13,
+              "measured_value": 281.21591249999966,
+              "path": "neutral_roll_load_bias_nm",
+              "reference_value": 281.2159124999999,
+              "tolerance": 14.060796624999995,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1368683772161603e-13,
+              "measured_value": -550.3164750000002,
+              "path": "port_roll_load_bias_nm",
+              "reference_value": -550.3164750000001,
+              "tolerance": 27.51582475000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0005864084891869792,
+              "measured_value": 0.0,
+              "path": "port_total_freeboard_delta_m",
+              "reference_value": 0.0005864084891869792,
+              "tolerance": 3.032042445934896e-05,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 2.2737367544323206e-13,
+              "measured_value": 550.3164750000001,
+              "path": "starboard_roll_load_bias_nm",
+              "reference_value": 550.3164749999999,
+              "tolerance": 27.515824750000007,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.000621948397622557,
+              "measured_value": 0.0,
+              "path": "starboard_total_freeboard_delta_m",
+              "reference_value": -0.000621948397622557,
+              "tolerance": 3.2097419881127854e-05,
+              "within_tolerance": false
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 2,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "75b5562f03a8b4a59b39529f05de283dad02d76cce43bcf693cd96433bb7fcf7"
+        }
+      ]
+    },
+    {
+      "fixture_id": "rock_pinch_wrap",
+      "objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 4.0,
+              "path": "contact_count",
+              "reference_value": 4.0,
+              "tolerance": 0.200001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.22,
+              "path": "max_indentation_m",
+              "reference_value": 0.22,
+              "tolerance": 0.011001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8904.222529332537,
+              "path": "min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.0,
+              "path": "pinned_obstacle_count",
+              "reference_value": 1.0,
+              "tolerance": 0.050001000000000004,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 4.0,
+              "path": "wrapping_contact_count",
+              "reference_value": 4.0,
+              "tolerance": 0.200001,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "bf53e6a60cfa8f04177211c9d089d10faccb19121c2e84b9c5e6cfa261be7b3a"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 4.0,
+              "path": "contact_count",
+              "reference_value": 4.0,
+              "tolerance": 0.200001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.22,
+              "path": "max_indentation_m",
+              "reference_value": 0.22,
+              "tolerance": 0.011001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 6047.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.0,
+              "path": "pinned_obstacle_count",
+              "reference_value": 1.0,
+              "tolerance": 0.050001000000000004,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 4.0,
+              "measured_value": 0.0,
+              "path": "wrapping_contact_count",
+              "reference_value": 4.0,
+              "tolerance": 0.200001,
+              "within_tolerance": false
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 2,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "f8ae540ee0588ebf1126e8f6555050c5e1a1e871dfd0d4a286596dd42f7a824b"
+        }
+      ]
+    },
+    {
+      "fixture_id": "upstream_tube_overwash_flip",
+      "objective": "Verify depressed upstream tube segments retain water and create roll moment.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1514.9947832688074,
+              "path": "reference_flip_margin_nm",
+              "reference_value": 1514.9947832688074,
+              "tolerance": 75.74974016344036,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 285.0052167311926,
+              "path": "retained_water_roll_moment_nm",
+              "reference_value": 285.0052167311926,
+              "tolerance": 14.25026183655963,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.917447985614655,
+              "path": "total_overtopping_flux_m3_s",
+              "reference_value": 0.917447985614655,
+              "tolerance": 0.04587339928073275,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 30.5815995204885,
+              "path": "total_retained_water_mass_kg",
+              "reference_value": 30.5815995204885,
+              "tolerance": 1.529080976024425,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 4,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "13929ae2a03c88b78852e8c87dfe4b5bdfce98480c4f185d2e4a29456580bbc7"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 27.998258731192664,
+              "measured_value": 1542.993042,
+              "path": "reference_flip_margin_nm",
+              "reference_value": 1514.9947832688074,
+              "tolerance": 77.14965310000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 27.998258731192607,
+              "measured_value": 257.006958,
+              "path": "retained_water_roll_moment_nm",
+              "reference_value": 285.0052167311926,
+              "tolerance": 14.25026183655963,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.09012798561465507,
+              "measured_value": 0.8273199999999999,
+              "path": "total_overtopping_flux_m3_s",
+              "reference_value": 0.917447985614655,
+              "tolerance": 0.04587339928073275,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 3.0042661871551672,
+              "measured_value": 27.577333333333332,
+              "path": "total_retained_water_mass_kg",
+              "reference_value": 30.5815995204885,
+              "tolerance": 1.529080976024425,
+              "within_tolerance": false
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 4,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 3,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "20fb960b1b9b113eead62ca7eadd79edf499fda277b5a6224c012bf451bf2105"
+        }
+      ]
+    },
+    {
+      "fixture_id": "timed_high_side_save",
+      "objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1738.4372901361644,
+              "path": "high_side_flip_margin_nm",
+              "reference_value": 1738.4372901361644,
+              "tolerance": 86.92186550680822,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2302.7231121281466,
+              "path": "high_side_flip_threshold_nm",
+              "reference_value": 2302.7231121281466,
+              "tolerance": 115.13615660640733,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 223.442506867357,
+              "path": "margin_delta_nm",
+              "reference_value": 223.442506867357,
+              "tolerance": 11.17212634336785,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1514.9947832688074,
+              "path": "neutral_flip_margin_nm",
+              "reference_value": 1514.9947832688074,
+              "tolerance": 75.74974016344036,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1800.0,
+              "path": "neutral_flip_threshold_nm",
+              "reference_value": 1800.0,
+              "tolerance": 90.000001,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "d5385ba78b8b0222e2a4d3d458602f3a5c45b107c3b788b80822117d78f3ee57"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 27.498742900861544,
+              "measured_value": 1765.936033037026,
+              "path": "high_side_flip_margin_nm",
+              "reference_value": 1738.4372901361644,
+              "tolerance": 88.2968026518513,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2302.7231121281466,
+              "path": "high_side_flip_threshold_nm",
+              "reference_value": 2302.7231121281466,
+              "tolerance": 115.13615660640733,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.49951583033112,
+              "measured_value": 222.94299103702588,
+              "path": "margin_delta_nm",
+              "reference_value": 223.442506867357,
+              "tolerance": 11.17212634336785,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 27.998258731192664,
+              "measured_value": 1542.993042,
+              "path": "neutral_flip_margin_nm",
+              "reference_value": 1514.9947832688074,
+              "tolerance": 77.14965310000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1800.0,
+              "path": "neutral_flip_threshold_nm",
+              "reference_value": 1800.0,
+              "tolerance": 90.000001,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 5,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "d296fd7b52a01aeba971c423322f4050296e87b20867f5e65849dabc3bd4f243"
+        }
+      ]
+    },
+    {
+      "fixture_id": "post_contact_recovery",
+      "objective": "Verify prior tube indentation decays after contact clears.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.1104,
+              "path": "max_recovered_indentation_m",
+              "reference_value": 0.1104,
+              "tolerance": 0.005521000000000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.0,
+              "path": "recovering_contact_count",
+              "reference_value": 2.0,
+              "tolerance": 0.100001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.0,
+              "path": "total_holding_force_n",
+              "reference_value": 0.0,
+              "tolerance": 1e-06,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 3,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "12fde4c07786fc6c19378ccadd9b84e81ef93b8bb90bd384bcbd3a77a679ea0f"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.1104,
+              "measured_value": 0.0,
+              "path": "max_recovered_indentation_m",
+              "reference_value": 0.1104,
+              "tolerance": 0.005521000000000001,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 2.0,
+              "measured_value": 0.0,
+              "path": "recovering_contact_count",
+              "reference_value": 2.0,
+              "tolerance": 0.100001,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 0.0,
+              "path": "total_holding_force_n",
+              "reference_value": 0.0,
+              "tolerance": 1e-06,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 3,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 2,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "253623bb272c8aef8efdc56fb2ae33b2e72ba9a26fdb02ba211500a7fcc7c5dd"
+        }
+      ]
+    },
+    {
+      "fixture_id": "pressure_flow_sweeps",
+      "objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
+      "passed": true,
+      "target_count": 2,
+      "targets": [
+        {
+          "comparison_mode": "bounded_numeric_equivalence",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 9.0,
+              "path": "sweep_case_count",
+              "reference_value": 9.0,
+              "tolerance": 0.450001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8976.222529332537,
+              "path": "sweeps[0].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[0].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[0].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 5.551115123125783e-17,
+              "measured_value": 0.3649119385588769,
+              "path": "sweeps[0].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943847,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 113.35989371331512,
+              "path": "sweeps[0].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.6679956856657565,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8976.222529332537,
+              "path": "sweeps[1].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[1].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[1].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.5953826365960623,
+              "path": "sweeps[1].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.029770131829803117,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 184.95561605856673,
+              "path": "sweeps[1].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928337,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8976.222529332537,
+              "path": "sweeps[2].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[2].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[2].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.8258533346332477,
+              "path": "sweeps[2].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166239,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 256.55133840381836,
+              "path": "sweeps[2].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8904.222529332537,
+              "path": "sweeps[3].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[3].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[3].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 5.551115123125783e-17,
+              "measured_value": 0.3649119385588769,
+              "path": "sweeps[3].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943847,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 113.35989371331512,
+              "path": "sweeps[3].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.6679956856657565,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8904.222529332537,
+              "path": "sweeps[4].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[4].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[4].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.5953826365960623,
+              "path": "sweeps[4].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.029770131829803117,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 184.95561605856673,
+              "path": "sweeps[4].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928337,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8904.222529332537,
+              "path": "sweeps[5].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[5].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[5].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.8258533346332477,
+              "path": "sweeps[5].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166239,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 256.55133840381836,
+              "path": "sweeps[5].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8832.222529332537,
+              "path": "sweeps[6].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[6].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[6].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 5.551115123125783e-17,
+              "measured_value": 0.3649119385588769,
+              "path": "sweeps[6].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943847,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 113.35989371331512,
+              "path": "sweeps[6].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.6679956856657565,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8832.222529332537,
+              "path": "sweeps[7].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[7].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[7].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.5953826365960623,
+              "path": "sweeps[7].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.029770131829803117,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 2.842170943040401e-14,
+              "measured_value": 184.95561605856673,
+              "path": "sweeps[7].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928337,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": -8832.222529332537,
+              "path": "sweeps[8].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[8].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[8].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 1.1102230246251565e-16,
+              "measured_value": 0.8258533346332477,
+              "path": "sweeps[8].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166239,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 256.55133840381836,
+              "path": "sweeps[8].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": true
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 46,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 0,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "passed_numeric_equivalence",
+          "target_id": "project_chrono_or_reviewed_compliant_model",
+          "telemetry_sha256": "ab047b01e6d7a0e70b32e35892f036ae8d73d191497c8cb8cd2572090477bc2d"
+        },
+        {
+          "comparison_mode": "baseline_delta_recording",
+          "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+          "extra_measured_metrics": [],
+          "invalid_provenance_fields": [],
+          "metric_comparisons": [
+            {
+              "abs_delta": 0.0,
+              "measured_value": 9.0,
+              "path": "sweep_case_count",
+              "reference_value": 9.0,
+              "tolerance": 0.450001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 6119.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[0].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[0].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[0].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.046281938558876856,
+              "measured_value": 0.31862999999999997,
+              "path": "sweeps[0].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943844,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 14.3774842133151,
+              "measured_value": 98.98240949999999,
+              "path": "sweeps[0].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.667995685665755,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 6119.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[1].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[1].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[1].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.07551263659606222,
+              "measured_value": 0.5198699999999999,
+              "path": "sweeps[1].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.02977013182980311,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 23.458000558566738,
+              "measured_value": 161.49761549999997,
+              "path": "sweeps[1].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928335,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 6119.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[2].contact_min_release_margin_n",
+              "reference_value": -8976.222529332537,
+              "tolerance": 448.8111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[2].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 14000.0,
+              "path": "sweeps[2].nominal_pressure_pa",
+              "reference_value": 14000.0,
+              "tolerance": 700.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.1047433346332477,
+              "measured_value": 0.7211099999999999,
+              "path": "sweeps[2].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166238,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 32.53851690381842,
+              "measured_value": 224.01282149999994,
+              "path": "sweeps[2].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 6047.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[3].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[3].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[3].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.046281938558876856,
+              "measured_value": 0.31862999999999997,
+              "path": "sweeps[3].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943844,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 14.3774842133151,
+              "measured_value": 98.98240949999999,
+              "path": "sweeps[3].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.667995685665755,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 6047.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[4].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[4].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[4].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.07551263659606222,
+              "measured_value": 0.5198699999999999,
+              "path": "sweeps[4].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.02977013182980311,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 23.458000558566738,
+              "measured_value": 161.49761549999997,
+              "path": "sweeps[4].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928335,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 6047.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[5].contact_min_release_margin_n",
+              "reference_value": -8904.222529332537,
+              "tolerance": 445.21112746662686,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[5].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 18000.0,
+              "path": "sweeps[5].nominal_pressure_pa",
+              "reference_value": 18000.0,
+              "tolerance": 900.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.1047433346332477,
+              "measured_value": 0.7211099999999999,
+              "path": "sweeps[5].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166238,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 32.53851690381842,
+              "measured_value": 224.01282149999994,
+              "path": "sweeps[5].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 5975.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[6].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 1.2,
+              "path": "sweeps[6].incoming_velocity_mps",
+              "reference_value": 1.2,
+              "tolerance": 0.060001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[6].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.046281938558876856,
+              "measured_value": 0.31862999999999997,
+              "path": "sweeps[6].overwash_flux_m3_s",
+              "reference_value": 0.3649119385588768,
+              "tolerance": 0.018246596927943844,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 14.3774842133151,
+              "measured_value": 98.98240949999999,
+              "path": "sweeps[6].retained_water_roll_moment_nm",
+              "reference_value": 113.35989371331509,
+              "tolerance": 5.667995685665755,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 5975.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[7].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 2.4,
+              "path": "sweeps[7].incoming_velocity_mps",
+              "reference_value": 2.4,
+              "tolerance": 0.120001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[7].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.07551263659606222,
+              "measured_value": 0.5198699999999999,
+              "path": "sweeps[7].overwash_flux_m3_s",
+              "reference_value": 0.5953826365960622,
+              "tolerance": 0.02977013182980311,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 23.458000558566738,
+              "measured_value": 161.49761549999997,
+              "path": "sweeps[7].retained_water_roll_moment_nm",
+              "reference_value": 184.9556160585667,
+              "tolerance": 9.247781802928335,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 5975.0315876318355,
+              "measured_value": -2857.190941700702,
+              "path": "sweeps[8].contact_min_release_margin_n",
+              "reference_value": -8832.222529332537,
+              "tolerance": 441.6111274666269,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 3.6,
+              "path": "sweeps[8].incoming_velocity_mps",
+              "reference_value": 3.6,
+              "tolerance": 0.18000100000000002,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.0,
+              "measured_value": 22000.0,
+              "path": "sweeps[8].nominal_pressure_pa",
+              "reference_value": 22000.0,
+              "tolerance": 1100.000001,
+              "within_tolerance": true
+            },
+            {
+              "abs_delta": 0.1047433346332477,
+              "measured_value": 0.7211099999999999,
+              "path": "sweeps[8].overwash_flux_m3_s",
+              "reference_value": 0.8258533346332476,
+              "tolerance": 0.04129366673166238,
+              "within_tolerance": false
+            },
+            {
+              "abs_delta": 32.53851690381842,
+              "measured_value": 224.01282149999994,
+              "path": "sweeps[8].retained_water_roll_moment_nm",
+              "reference_value": 256.55133840381836,
+              "tolerance": 12.827567920190917,
+              "within_tolerance": false
+            }
+          ],
+          "metric_summary": {
+            "compared_metric_count": 46,
+            "extra_measured_metric_count": 0,
+            "failed_metric_count": 27,
+            "missing_reference_metric_count": 0
+          },
+          "missing_provenance_fields": [],
+          "missing_reference_metrics": [],
+          "passed": true,
+          "required": true,
+          "source_report": "physics/reports/d6/ue/summary.json",
+          "status": "recorded_baseline_delta",
+          "target_id": "unreal_chaos_rigid_baseline",
+          "telemetry_sha256": "d257cc6fde7b5f1105091fab1380a885d5ced77bfa26c32807025bd7ebf34ab4"
+        }
+      ]
+    }
+  ],
+  "generated_on": "2026-07-16",
+  "measured_result_contract": {
+    "required_provenance_fields": [
+      "source_report",
+      "telemetry_sha256",
+      "engine_version"
+    ],
+    "required_targets": [
+      "project_chrono_or_reviewed_compliant_model",
+      "unreal_chaos_rigid_baseline"
+    ],
+    "shape": {
+      "<target_id>": {
+        "<fixture_id>": {
+          "engine_version": "engine build or package version",
+          "metrics": {
+            "<metric_name>": "numeric metric tree"
+          },
+          "source_report": "path or URI for the reviewed run output",
+          "telemetry_sha256": "sha256 of the replay/telemetry payload"
+        }
+      }
+    }
+  },
+  "metric_tolerance": {
+    "absolute": 1e-06,
+    "relative": 0.05
+  },
+  "missing_target_count": 0,
+  "production_promoted": false,
+  "promotion_gate": {
+    "manual_review_required": true,
+    "may_drive_runtime_gameplay": false,
+    "may_mark_d6_complete": true,
+    "reason": "D6 remains incomplete in the committed artifact until measured engine outputs are attached, source-reviewed, and this report is regenerated with every required fixture passing or recorded."
+  },
+  "schema": "raftsim.flexible_raft.d6_reference_comparison_report.v1",
+  "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
+  "source_suite_schema": "raftsim.flexible_raft.d6_behavioral_validation_suite.v1",
+  "status": "measured_comparisons_passed_manual_promotion_required",
+  "target_policies": {
+    "project_chrono_or_reviewed_compliant_model": {
+      "comparison_mode": "bounded_numeric_equivalence",
+      "description": "Project Chrono or another reviewed compliant model must match the Python D1-D5 reference metrics within the recorded tolerance band.",
+      "metric_deltas_are_failures": true
+    },
+    "unreal_chaos_rigid_baseline": {
+      "comparison_mode": "baseline_delta_recording",
+      "description": "Unreal Chaos rigid-body output is a same-fixture baseline. It must be measured and provenance-recorded, but local tube-compliance deltas are expected and are not treated as equivalence failures.",
+      "metric_deltas_are_failures": false
+    }
+  }
+}

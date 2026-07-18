@@ -1,0 +1,205 @@
+{
+	"schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+	"generated_on": "2026-07-17",
+	"status": "chaos_baseline_measured_results_recorded_from_ue_rigid_pass",
+	"d6_complete": false,
+	"production_promoted": false,
+	"runtime": "UnrealEngine5RigidBaseline",
+	"target_id": "unreal_chaos_rigid_baseline",
+	"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+	"source_fixture_input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+	"source_runner_summary_path": "physics/reports/d6/ue/summary.json",
+	"fixture_count": 7,
+	"required_fixture_ids": [
+		"static_seat_load_sag",
+		"traveling_crew_shift",
+		"rock_pinch_wrap",
+		"upstream_tube_overwash_flip",
+		"timed_high_side_save",
+		"post_contact_recovery",
+		"pressure_flow_sweeps"
+	],
+	"filled_result_count": 7,
+	"results":
+	{
+		"static_seat_load_sag":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "06627d260cc4891c0e8301e417e635fe9f9fad7df9dc0c72fc08f248a7e1d793",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "static_seat_load_sag",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"loaded_crew_mass_kg": 385,
+				"max_seat_freeboard_loss_m": 0,
+				"port_total_freeboard_loss_m": 0,
+				"raft_length_m": 4.2999999999999998,
+				"raft_width_m": 1.8999999999999999,
+				"starboard_total_freeboard_loss_m": 0
+			}
+		},
+		"traveling_crew_shift":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "75b5562f03a8b4a59b39529f05de283dad02d76cce43bcf693cd96433bb7fcf7",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "traveling_crew_shift",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"neutral_roll_load_bias_nm": 281.21591249999966,
+				"port_roll_load_bias_nm": -550.3164750000002,
+				"port_total_freeboard_delta_m": 0,
+				"starboard_roll_load_bias_nm": 550.31647500000008,
+				"starboard_total_freeboard_delta_m": 0
+			}
+		},
+		"rock_pinch_wrap":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "f8ae540ee0588ebf1126e8f6555050c5e1a1e871dfd0d4a286596dd42f7a824b",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "rock_pinch_wrap",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"contact_count": 4,
+				"max_indentation_m": 0.22,
+				"min_release_margin_n": -2857.1909417007018,
+				"pinned_obstacle_count": 1,
+				"wrapping_contact_count": 0
+			}
+		},
+		"upstream_tube_overwash_flip":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "20fb960b1b9b113eead62ca7eadd79edf499fda277b5a6224c012bf451bf2105",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "upstream_tube_overwash_flip",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"reference_flip_margin_nm": 1542.9930420000001,
+				"reference_flip_risk": false,
+				"retained_water_roll_moment_nm": 257.006958,
+				"total_overtopping_flux_m3_s": 0.82731999999999994,
+				"total_retained_water_mass_kg": 27.577333333333332
+			}
+		},
+		"timed_high_side_save":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "d296fd7b52a01aeba971c423322f4050296e87b20867f5e65849dabc3bd4f243",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "timed_high_side_save",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"high_side_flip_margin_nm": 1765.9360330370259,
+				"high_side_flip_threshold_nm": 2302.7231121281466,
+				"margin_delta_nm": 222.94299103702588,
+				"neutral_flip_margin_nm": 1542.9930420000001,
+				"neutral_flip_threshold_nm": 1800
+			}
+		},
+		"post_contact_recovery":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "253623bb272c8aef8efdc56fb2ae33b2e72ba9a26fdb02ba211500a7fcc7c5dd",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "post_contact_recovery",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"max_recovered_indentation_m": 0,
+				"recovering_contact_count": 0,
+				"total_holding_force_n": 0
+			}
+		},
+		"pressure_flow_sweeps":
+		{
+			"status": "measured_engine_output",
+			"source_report": "physics/reports/d6/ue/summary.json",
+			"telemetry_sha256": "d257cc6fde7b5f1105091fab1380a885d5ced77bfa26c32807025bd7ebf34ab4",
+			"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+			"fixture_id": "pressure_flow_sweeps",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"metrics":
+			{
+				"sweep_case_count": 9,
+				"sweeps": [
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 1.2,
+						"nominal_pressure_pa": 14000,
+						"overwash_flux_m3_s": 0.31862999999999997,
+						"retained_water_roll_moment_nm": 98.982409499999989
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 2.3999999999999999,
+						"nominal_pressure_pa": 14000,
+						"overwash_flux_m3_s": 0.51986999999999994,
+						"retained_water_roll_moment_nm": 161.49761549999997
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 3.6000000000000001,
+						"nominal_pressure_pa": 14000,
+						"overwash_flux_m3_s": 0.72110999999999992,
+						"retained_water_roll_moment_nm": 224.01282149999994
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 1.2,
+						"nominal_pressure_pa": 18000,
+						"overwash_flux_m3_s": 0.31862999999999997,
+						"retained_water_roll_moment_nm": 98.982409499999989
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 2.3999999999999999,
+						"nominal_pressure_pa": 18000,
+						"overwash_flux_m3_s": 0.51986999999999994,
+						"retained_water_roll_moment_nm": 161.49761549999997
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 3.6000000000000001,
+						"nominal_pressure_pa": 18000,
+						"overwash_flux_m3_s": 0.72110999999999992,
+						"retained_water_roll_moment_nm": 224.01282149999994
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 1.2,
+						"nominal_pressure_pa": 22000,
+						"overwash_flux_m3_s": 0.31862999999999997,
+						"retained_water_roll_moment_nm": 98.982409499999989
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 2.3999999999999999,
+						"nominal_pressure_pa": 22000,
+						"overwash_flux_m3_s": 0.51986999999999994,
+						"retained_water_roll_moment_nm": 161.49761549999997
+					},
+					{
+						"contact_min_release_margin_n": -2857.1909417007018,
+						"incoming_velocity_mps": 3.6000000000000001,
+						"nominal_pressure_pa": 22000,
+						"overwash_flux_m3_s": 0.72110999999999992,
+						"retained_water_roll_moment_nm": 224.01282149999994
+					}
+				]
+			}
+		}
+	}
+}

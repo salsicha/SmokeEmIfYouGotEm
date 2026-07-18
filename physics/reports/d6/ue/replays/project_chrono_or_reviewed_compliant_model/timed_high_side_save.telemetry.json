@@ -1,0 +1,119 @@
+{
+	"schema": "raftsim.flexible_raft.d6_ue_fixture_telemetry.v1",
+	"runtime_id": "ue_custom_reduced_rigid_body_flexible_port",
+	"target_id": "project_chrono_or_reviewed_compliant_model",
+	"fixture_id": "timed_high_side_save",
+	"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+	"fixed_step_s": 0.033333333333333333,
+	"channels":
+	{
+		"tube.pressure_pa":
+		{
+			"port_0": 18726.392328601632,
+			"port_1": 21348.515554213227,
+			"port_2": 18726.392328601632,
+			"port_3": 18570.842645726367,
+			"bow_0": 21988.595352016404,
+			"bow_1": 18947.696514012303,
+			"starboard_3": 21348.515554213227,
+			"starboard_2": 18993.04892781637,
+			"starboard_1": 21348.515554213227,
+			"starboard_0": 18873.053458169736,
+			"stern_1": 22424.446343130556,
+			"stern_0": 18686.185919343814
+		},
+		"tube.volume_m3":
+		{
+			"port_0": 0.26429260537572224,
+			"port_1": 0.26255693398247693,
+			"port_2": 0.26429260537572224,
+			"port_3": 0.26439556893294863,
+			"bow_0": 0.23165263394577373,
+			"bow_1": 0.23343145197252341,
+			"starboard_3": 0.26255693398247693,
+			"starboard_2": 0.26411609642047695,
+			"starboard_1": 0.26255693398247693,
+			"starboard_0": 0.26419552545033731,
+			"stern_1": 0.23139767656597499,
+			"stern_0": 0.23358442640040264
+		},
+		"tube.freeboard_loss_m":
+		{
+			"port_0": 0.0029044002949294673,
+			"port_1": 0.013388673283424008,
+			"port_2": 0.0029044002949294673,
+			"port_3": 0.0022824518973069098,
+			"bow_0": 0.015947962362229076,
+			"bow_1": 0.0037892608806865398,
+			"starboard_3": 0.013388673283424008,
+			"starboard_2": 0.003970597547996709,
+			"starboard_1": 0.013388673283424008,
+			"starboard_0": 0.0034908087841164503,
+			"stern_1": 0.017690664889903316,
+			"stern_0": 0.0027436393640819993
+		},
+		"tube.floor_load_n":
+		{
+			"port_0": 50.358000000000004,
+			"port_1": 50.358000000000004,
+			"port_2": 50.358000000000004,
+			"port_3": 50.358000000000004,
+			"bow_0": 50.358000000000004,
+			"bow_1": 50.358000000000004,
+			"starboard_3": 50.358000000000004,
+			"starboard_2": 50.358000000000004,
+			"starboard_1": 50.358000000000004,
+			"starboard_0": 50.358000000000004,
+			"stern_1": 50.358000000000004,
+			"stern_0": 50.358000000000004
+		},
+		"tube.lacing_load_n":
+		{
+			"port_0": 44.144999999999996,
+			"port_1": 0,
+			"port_2": 44.144999999999996,
+			"port_3": 44.144999999999996,
+			"bow_0": 0,
+			"bow_1": 88.289999999999992,
+			"starboard_3": 0,
+			"starboard_2": 88.289999999999992,
+			"starboard_1": 0,
+			"starboard_0": 94.175999999999988,
+			"stern_1": 0,
+			"stern_0": 50.030999999999999
+		},
+		"overwash.overtopping_flux_m3_s":
+		{
+			"port_0": 0,
+			"port_1": 0,
+			"port_2": 0,
+			"port_3": 0,
+			"bow_0": 0,
+			"bow_1": 0,
+			"starboard_3": 0.24144474119013229,
+			"starboard_2": 0.21709548363565195,
+			"starboard_1": 0.24144474119013229,
+			"starboard_0": 0.21585504976023503,
+			"stern_1": 0,
+			"stern_0": 0
+		},
+		"overwash.entrained_water_side":
+		{
+			"port": 0,
+			"starboard": 0.060548937388484603,
+			"bow": 0,
+			"stern": 0
+		},
+		"contact.max_indentation_m": 0,
+		"contact.min_release_margin_n": 0,
+		"combined_roll_moment_nm": 1114.6022969919823
+	},
+	"metrics":
+	{
+		"high_side_flip_margin_nm": 1738.4372901361644,
+		"high_side_flip_threshold_nm": 2302.7231121281466,
+		"margin_delta_nm": 223.442506867357,
+		"neutral_flip_margin_nm": 1514.9947832688074,
+		"neutral_flip_threshold_nm": 1800
+	}
+}
