@@ -149,7 +149,7 @@
       "url": "https://www.americanwhitewater.org/content/River/view/river-detail/148/main",
       "source_kind": "guide_feature_description",
       "rights_status": "link_only_factual_index",
-      "evidence_scope": "Meat Grinder right-side standard line, hidden holes, railroad-grade scout/portage trail, and foot-entrapment/flush-drowning history; Troublemaker rocky-island split, Gunsight final drop, Double Trouble alternate right line, and downstream Hazard Rock pourover with foot-entrapment crack."
+      "evidence_scope": "Meat Grinder right-side standard line, hidden holes, railroad-grade scout/portage trail, and foot-entrapment/flush-drowning history; Troublemaker rocky-island split, Gunsight final drop, Double Trouble alternate right line, and downstream Hazard Rock pourover with foot-entrapment crack. Also: Chili Bar Hole play hole with river-left eddy service, Racehorse Bend's sharp left turn toward a right-side rock wall, Maya's surf wave with large eddies on both sides, Rock Garden's small boulders, African Queen's center-right line through vegetated outcrops, First/Second/Third Threat holes and eddies, and the 3,500-7,000 cfs high-flow difficulty rise."
     },
     {
       "source_id": "south_fork_gorafting_meat_grinder",
@@ -185,7 +185,7 @@
       "url": "https://www.oars.com/blog/10-best-rapids-american-river/",
       "source_kind": "outfitter_feature_description",
       "rights_status": "link_only_factual_index",
-      "evidence_scope": "Troublemaker zig-zags boater's left to right; the main drop is split in two by Gunsight Rock; rafts bounce off either side of Gunsight or occasionally run directly over the top."
+      "evidence_scope": "Troublemaker zig-zags boater's left to right; the main drop is split in two by Gunsight Rock; rafts bounce off either side of Gunsight or occasionally run directly over the top. Also: Triple Threat as a three-part rapid with big holes on the first and third sections and a flip on the first hit that can keep swimmers in until after the third; Satan's Cesspool's final big drop and standing wave; Bouncing Rock rafts bouncing off the boulder and slinging into the big hole; Hospital Bar's single big wave and Gold Rush hospital-tent name."
     },
     {
       "source_id": "south_fork_whitewater_guidebook_reach",
@@ -194,7 +194,7 @@
       "url": "https://www.whitewaterguidebook.com/california/south-fork-american-river/",
       "source_kind": "guide_feature_description",
       "rights_status": "link_only_factual_index",
-      "evidence_scope": "Meatgrinder as a long, tricky rapid with big hydraulics; Troublemaker as the most difficult rapid on the South Fork, scouted from river left."
+      "evidence_scope": "Meatgrinder as a long, tricky rapid with big hydraulics; Troublemaker as the most difficult rapid on the South Fork, scouted from river left. Also: Maya's kayak surf wave at most flows, First Threat's nearly river-wide surf hole, Fowler's Rock as the first class III below Troublemaker, Satan's Cesspool as the biggest rapid of the Gorge run, Weber Creek entering on river left during Bouncing Rock, and Hospital Bar as the last big ride."
     },
     {
       "source_id": "south_fork_riverbrain_meat_grinder",
@@ -222,6 +222,96 @@
       "source_kind": "trip_report",
       "rights_status": "link_only_factual_index",
       "evidence_scope": "First-person run at 1,600 cfs: powerful diagonal wave, swift-moving hole, big drop next to Gunsight Rock, kayak eddy-left ferry line past Gunsight, and the head-on drop line between two boulders."
+    },
+    {
+      "source_id": "south_fork_gorafting_reach_guide",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "GoRafting South Fork American River Rafting Guide + Map",
+      "url": "https://gorafting.com/united-states/california/south-fork-american/",
+      "source_kind": "outfitter_feature_description",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Inline rapid-by-rapid notes: Chili Bar Surf Wave left eddy and ~1,700 cfs crash threshold; Racehorse Bend right-wall lateral at the bend apex; Maya middle line, right sneak, and ~3,000 cfs holes; Rock Garden weave; African Queen right-entry cut-left line and bottom wave; Frog Rock wrap hazard and the First/Second/Third Threat lines; Fowler's runout toward Son of Fowler's two holes above ~3,000 cfs; Upper Haystack head-on waves into a pool; Lost Hat lead-in to Satan's Cesspool; Son of Satan's right-of-rock then work-left move; Scissors left-of-boulder finish; Lower Haystack mid-river rock and 4,500+ cfs crashing wave; Bouncing Rock apex hole; Pre-Op right-of-center line and high-flow hole; Hospital Bar lateral, Catchers Mitt, and photo spot; Recovery Room Little Big Hole and reservoir-stage behavior; Surprise pourover rock with left avoidance."
+    },
+    {
+      "source_id": "south_fork_gorafting_fowlers_rock",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "GoRafting South Fork American Rapid Guide: Fowler's Rock",
+      "url": "https://gorafting.com/united-states/california/south-fork-american/fowlers-rock/",
+      "source_kind": "outfitter_feature_description",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "House Rock thread-the-needle left entry, the start-left-then-ferry-right alternate, middle-channel and left-side holes, the right-of-Fowler's-Rock runout, and the left-of-Fowler's-Rock line that opens above ~2,500 cfs and becomes the line of choice as flows rise."
+    },
+    {
+      "source_id": "south_fork_gorafting_satans_cesspool",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "GoRafting South Fork American Rapid Guide: Satan's Cesspool",
+      "url": "https://gorafting.com/united-states/california/south-fork-american/satans-cesspool/",
+      "source_kind": "outfitter_feature_description",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Right-shelf constriction with a substantial lateral to T up, a second straightforward wave and swirly runout, ~4,000 cfs left-wall push turning flippy, 6,000+ cfs island submergence with a tumultuous right eddy line below, the photo-rapid role, and the backboard tied to the left shore below."
+    },
+    {
+      "source_id": "south_fork_aw_org_gorge_reach",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "American Whitewater Reach 4068: South Fork American, The Gorge (Greenwood Creek to Folsom)",
+      "url": "https://www.americanwhitewater.org/content/River/view/river-detail/4068/main",
+      "source_kind": "guide_feature_description",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Satan's Cesspool island and left-cliff dogleg with twin ledges and a swimmer catch pool, the ~70-yard spacing to Son of Satan's and their high-flow merge, Son of Satan's right-wall push with an easy move left, Bouncing Rock's far-right drop-and-hole with a swept-in warning, Hospital Bar's chute carrying the river's largest wave, Fowler's Rock giant-rock slalom hydraulics, Surprise's reservoir-dependent wave/hole avoidable on either side, photographer positions at Satan's Cesspool, and 1,200-1,500 cfs typical summer flows."
+    },
+    {
+      "source_id": "south_fork_riverbrain_chili_bar_run",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: American River, South Fork - Chili Bar run",
+      "url": "https://riverbrain.com/run/show/264",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Per-rapid class ranges for the Chili Bar run, Rock Garden's rock outcrops lining the river, First Threat's sharp right turn into a sizable hole, Second Threat's wave train toward river right, and Third Threat as a wave-train drop."
+    },
+    {
+      "source_id": "south_fork_riverbrain_gorge_run",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: American River, South Fork - The Gorge run",
+      "url": "https://riverbrain.com/run/show/274",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Gorge per-rapid class ranges and aliases (Son of Satan's as Dead Man's Drop; Pre-Op as Triage), Fowler's zig-zag past very large rocks, Lost Hat leading into Satan's Cesspool, Satan's Cesspool as the gorge crux with a large hole where the river cuts through bedrock, Son of Satan's current piling on the right bank, Bouncing Rock's right hole with left sneak options, Hospital Bar's left-facing diagonal hole growing bigger and more retentive to the right, Recovery Room's punch-through hole, and Surprise's low-reservoir funnel constriction."
+    },
+    {
+      "source_id": "south_fork_riverbrain_chili_bar_hole",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: Chili Bar Hole Rapid, South Fork American Chili Bar",
+      "url": "https://riverbrain.com/rapids/821",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Class III- to III range, a fairly retentive but playable hole just below the put-in, left-eddy access, commercial rafts surfing it for splash, and an 800-4,000 cfs recommended flow range."
+    },
+    {
+      "source_id": "south_fork_riverbrain_racehorse_bend",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: Racehorse Bend (Sluice Box) Rapid, South Fork American Chili Bar",
+      "url": "https://riverbrain.com/rapids/823",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Sluice Box alias, class III- to III+ range, follow-the-main-wave-train-left guidance, exit current pushing toward the right bank, numerous lateral waves that flip inflatable and rigid kayaks, and an 800-4,000 cfs recommended flow range."
+    },
+    {
+      "source_id": "south_fork_riverbrain_maya",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: Maya (Traffic Light) Rapid, South Fork American Chili Bar",
+      "url": "https://riverbrain.com/rapids/824",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Traffic Light alias, class II+ to III range, class II waves leading into a river-right drop at the bottom, a left drop opening as flows rise, a surfable main hole at the bottom, eddy access on both sides, and an 800-4,000 cfs recommended flow range."
+    },
+    {
+      "source_id": "south_fork_riverbrain_african_queen",
+      "river_id": "south_fork_american_chili_bar",
+      "title": "River Brain: African Queen Rapid, South Fork American Chili Bar",
+      "url": "https://riverbrain.com/rapids/826",
+      "source_kind": "community_rapid_index",
+      "rights_status": "link_only_factual_index",
+      "evidence_scope": "Class III to IV range (an outlier against the class II published elsewhere), several small islands separating the river, most water down the right channel as the raft line, kayaks exploring the other channels, and an 800-4,000 cfs recommended flow range."
     }
   ],
   "rivers": [
@@ -240,7 +330,62 @@
       },
       "source_ids": ["south_fork_american_rivers_mile_guide", "south_fork_americanwhitewater_map"],
       "rapids": [
-        {"name": "Chili Bar Hole", "order": 1, "river_mile": 0.0, "class": "surf feature", "feature_tags": ["hole", "surf_wave", "recovery_pool"], "review_priority": "high"},
+        {
+          "name": "Chili Bar Hole",
+          "order": 1,
+          "river_mile": 0.0,
+          "class": "surf feature",
+          "aliases": ["Chili Bar Surf Wave"],
+          "class_reported_range": {"low": "II", "high": "III", "note": "AW reach 148 lists class II; the AW map II+; GoRafting rates the surf wave III; River Brain reports III- to III."},
+          "feature_tags": ["hole", "surf_wave", "recovery_pool"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "chili_bar_surf_hole",
+              "display_name": "Chili Bar surf hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Small rapid under the Chili Bar bridge just below the put-in; a fairly retentive but playable hole (River Brain) that commercial rafts deliberately surf for splash."},
+              "flow_dependence": {
+                "low_review": "900 cfs: excellent play at release flows (AW reach 148); the hole is well formed and friendly at release levels.",
+                "reference_review": "1,600 cfs: prime raft-surf window - the AW map calls the surfing fun around ~1,500 cfs, just below GoRafting's ~1,700 cfs threshold where the wave begins to crash.",
+                "high_review": "3,000 cfs: above ~1,700 cfs the wave begins to crash a bit (GoRafting); the feature is pushier and less of a controlled surf."
+              },
+              "consequence_class": "surf_or_retention",
+              "consequence_notes": "Fairly retentive but playable (River Brain); the standard warm-up surf for commercial trips.",
+              "source_ids": ["south_fork_aw_org_chili_bar_reach", "south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_chili_bar_hole"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_service_eddy",
+              "display_name": "Left service eddy",
+              "feature_type": "eddy_line",
+              "relative_position": {"along": "entry", "across": "left", "notes": "Eddy service on river left (AW reach 148); a large eddy on river left gives repeat access to the surf wave (GoRafting; River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: easy, well-defined eddy; the standard staging point for play sessions.",
+                "reference_review": "1,600 cfs: still an easy catch supporting lap after lap on the wave (River Brain left-eddy access).",
+                "high_review": "3,000 cfs: faster eddy line, but the left side remains the access route."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_aw_org_chili_bar_reach", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_chili_bar_hole"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "recovery_pools_below",
+              "display_name": "Recovery pools below",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "exit", "across": "center", "notes": "Large pools directly downstream catch swimmers who come out surfing (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: slow, deep pools; easy self-rescue.",
+                "reference_review": "1,600 cfs: the AW map notes large pools below for recovery if paddlers exit the raft.",
+                "high_review": "3,000 cfs: the pools keep moving; recover swimmers before the rapids downstream."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
         {
           "name": "Meat Grinder",
           "order": 2,
@@ -414,11 +559,423 @@
             }
           ]
         },
-        {"name": "Racehorse Bend", "order": 3, "river_mile": 1.3, "class": "III", "feature_tags": ["bend", "lateral", "boulder"], "review_priority": "medium"},
-        {"name": "Maya", "order": 4, "river_mile": 1.5, "class": "II-III", "feature_tags": ["hole", "ledge", "surf_wave", "flow_sensitive"], "review_priority": "high"},
-        {"name": "Rock Garden", "order": 5, "river_mile": 1.7, "class": "II", "feature_tags": ["boulder_garden", "shallow_shelf", "pin_hazard"], "review_priority": "high"},
-        {"name": "African Queen", "order": 6, "river_mile": 2.0, "class": "II", "feature_tags": ["wave_train", "boulder"], "review_priority": "medium"},
-        {"name": "Triple Threat", "order": 7, "river_mile": 3.1, "class": "III", "feature_tags": ["boulder_garden", "multiple_channels", "pin_hazard"], "review_priority": "high"},
+        {
+          "name": "Racehorse Bend",
+          "order": 3,
+          "river_mile": 1.3,
+          "class": "III",
+          "aliases": ["Sluice Box"],
+          "class_reported_range": {"low": "III-", "high": "III+", "note": "The AW map and AW reach 148 list III-; the mile guide and GoRafting rate III; River Brain reports III- to III+."},
+          "feature_tags": ["bend", "lateral", "boulder"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "entry_wave_train",
+              "display_name": "Entry wave train",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "entry", "across": "center", "notes": "An entertaining wave train leads into the left-hand bend (GoRafting); follow the main wave train around to the left (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small waves over a rocky bed; River Brain flags the rapid as rocky at certain levels.",
+                "reference_review": "1,600 cfs: the standard read-and-run entry; ride the main wave train around to the left (River Brain).",
+                "high_review": "3,000 cfs: bigger waves with more push toward the right wall at the apex."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_riverbrain_racehorse_bend"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_wall_lateral",
+              "display_name": "Right-wall lateral",
+              "feature_type": "lateral",
+              "relative_position": {"along": "middle", "across": "right", "notes": "A large lateral comes off the right wall at the apex of the bend (GoRafting); numerous lateral waves through the rapid can flip inflatable and rigid kayaks (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the lateral is weak, but exposed rock along the right makes the apex tighter.",
+                "reference_review": "1,600 cfs: a fully formed lateral off the right wall (GoRafting); the primary flip hazard for small craft (River Brain).",
+                "high_review": "3,000 cfs: a stronger lateral with more current driving into the wall at the apex."
+              },
+              "consequence_class": "flip_risk",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_riverbrain_racehorse_bend"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "slate_cliff_wall",
+              "display_name": "Up-tilted slate cliff",
+              "feature_type": "wall",
+              "relative_position": {"along": "middle", "across": "right", "notes": "The river curves left among boulders and runs into an up-tilted slate cliff on the right with submerged rocks along its base (AW map); the current flows sharply left toward the wall (AW reach 148)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the submerged rocks along the cliff are shallowest; contact and pin exposure is highest.",
+                "reference_review": "1,600 cfs: the current pushes toward the cliff; paddle hard and precisely (AW map).",
+                "high_review": "3,000 cfs: strongest push into the wall, and the exit current also piles toward the right bank (River Brain)."
+              },
+              "consequence_class": "wrap_or_pin",
+              "consequence_notes": "Submerged rocks lie along the cliff base (AW map); a raft pushed onto the wall at speed risks a wrap.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_chili_bar_reach", "south_fork_riverbrain_racehorse_bend"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "center_exit_line",
+              "display_name": "Center exit line",
+              "feature_type": "line",
+              "relative_position": {"along": "exit", "across": "center", "notes": "The safest exit is toward the center (AW map); a closing wave train finishes the rapid (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: thread between exposed boulders to reach the center.",
+                "reference_review": "1,600 cfs: the standard exit; work off the wall to the center as the bend opens (AW map).",
+                "high_review": "3,000 cfs: the exit current pushes toward the right bank (River Brain); start the move to center early."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_racehorse_bend"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "big_left_eddy_below",
+              "display_name": "Big left eddy below",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "exit", "across": "left", "notes": "A large eddy below on the left permits swimming and play (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: an easy, calm catch.",
+                "reference_review": "1,600 cfs: the standard regroup and swim spot below the bend (AW map).",
+                "high_review": "3,000 cfs: a faster eddy line, but still the regroup."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Maya",
+          "order": 4,
+          "river_mile": 1.5,
+          "class": "II-III",
+          "aliases": ["Traffic Light"],
+          "class_reported_range": {"low": "II", "high": "III", "note": "GoRafting rates II; AW reach 148 II+; River Brain II+ to III; the AW map calls it class III above ~3,500 cfs."},
+          "feature_tags": ["hole", "ledge", "surf_wave", "flow_sensitive"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "right_bottom_drop_hole",
+              "display_name": "Right-side bottom drop",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "right", "notes": "Class II waves lead into a drop on river right at the bottom (River Brain); the AW map describes a small hole on the right."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a small rocky drop with a modest hit.",
+                "reference_review": "1,600 cfs: the formed right-side drop is the standard fun line - III-ish at certain levels (River Brain).",
+                "high_review": "3,000 cfs: at GoRafting's ~3,000 cfs threshold large holes and waves develop; the AW map calls Maya class III above ~3,500 cfs with big but easily avoidable holes."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_riverbrain_maya", "south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_ledge_drop",
+              "display_name": "Left ledge drop",
+              "feature_type": "ledge",
+              "relative_position": {"along": "middle", "across": "left", "notes": "A ledge-drop option on the left (AW map); River Brain notes the left drop opens up as flows rise."},
+              "flow_dependence": {
+                "low_review": "900 cfs: barely runs; the left side is too shallow to be attractive.",
+                "reference_review": "1,600 cfs: an available alternate to the right-side drop (AW map).",
+                "high_review": "3,000 cfs: the left drop is fully open (River Brain) and the holes grow toward the class III high-water character (AW map)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_maya"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "maya_surf_wave",
+              "display_name": "Maya surf wave",
+              "feature_type": "wave",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A wonderful surfing wave at many flows (AW reach 148); a great kayak surf wave at most river flows (Whitewater Guidebook); River Brain surfs the main hole at the bottom."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small but well formed; the wave works at many flows (AW reach 148).",
+                "reference_review": "1,600 cfs: prime playspot, often with long lines of kayakers and a fun wet hit in a raft (AW map).",
+                "high_review": "3,000 cfs: bigger and crashier; a wet raft hit rather than a controlled surf."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_aw_org_chili_bar_reach", "south_fork_whitewater_guidebook_reach", "south_fork_americanwhitewater_map", "south_fork_riverbrain_maya", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "flanking_eddies",
+              "display_name": "Flanking eddies",
+              "feature_type": "eddy_line",
+              "relative_position": {"along": "middle", "across": "left", "notes": "Large eddies on both sides serve the play wave; the river-left eddy is particularly huge (AW reach 148); River Brain confirms eddy access on both sides."},
+              "flow_dependence": {
+                "low_review": "900 cfs: easy catches on either side.",
+                "reference_review": "1,600 cfs: the standard service eddies for the surf wave (AW reach 148).",
+                "high_review": "3,000 cfs: sharper eddy lines, but both sides still stage the playspot."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_aw_org_chili_bar_reach", "south_fork_riverbrain_maya"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_sneak_line",
+              "display_name": "Right sneak line",
+              "feature_type": "sneak_line",
+              "relative_position": {"along": "entry", "across": "right", "notes": "Run down the middle at most water levels and sneak on the right side if needed when high flows build the holes (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: unnecessary; the middle is the line.",
+                "reference_review": "1,600 cfs: the middle line remains standard (GoRafting).",
+                "high_review": "3,000 cfs: the documented sneak once large holes and waves appear around ~3,000 cfs (GoRafting); the AW map calls the high-water holes easily avoidable."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Rock Garden",
+          "order": 5,
+          "river_mile": 1.7,
+          "class": "II",
+          "class_reported_range": {"low": "II", "high": "II+", "note": "The AW map, AW reach 148, and GoRafting rate II; River Brain reports II to II+."},
+          "feature_tags": ["boulder_garden", "shallow_shelf", "pin_hazard"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "boulder_maze_bed",
+              "display_name": "Boulder maze bed",
+              "feature_type": "boulder",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A maze of small boulders that needs good paddling and boat control (AW map); large rock outcrops line the river for a good stretch (River Brain); weave your way through this minefield (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: at the AW map's documented ~900 cfs threshold; the maze is shallowest and grounding on the small boulders is the main hazard.",
+                "reference_review": "1,600 cfs: navigable almost anywhere for an enjoyable ride (AW map); an easy rapid with several small boulders (AW reach 148).",
+                "high_review": "3,000 cfs: mostly washed; the boulders cover and small boils replace the maze."
+              },
+              "consequence_class": "swim_risk",
+              "consequence_notes": "Documented coverage for this rapid is thin: an easy class II boulder maze with no named sub-features in any consulted source.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_chili_bar_run", "south_fork_gorafting_reach_guide", "south_fork_aw_org_chili_bar_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "low_water_far_left_line",
+              "display_name": "Low-water far-left line",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "left", "notes": "At flows under ~900 cfs the rapid is best run far left (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: at the bottom of the review band this is the documented line - under ~900 cfs run far left (AW map).",
+                "reference_review": "1,600 cfs: optional; most routes through the maze work (AW map).",
+                "high_review": "3,000 cfs: unnecessary; the maze is covered."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "African Queen",
+          "order": 6,
+          "river_mile": 2.0,
+          "class": "II",
+          "class_reported_range": {"low": "II", "high": "IV", "note": "GoRafting rates II; AW reach 148 and the AW map II+; River Brain publishes an outlier III to IV range - preserved as a source disagreement."},
+          "feature_tags": ["wave_train", "boulder"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "willow_island_complex",
+              "display_name": "Willow island complex",
+              "feature_type": "island",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Several willow-covered islands split the river into multiple routes (AW map); vegetation-covered rock outcrops (AW reach 148); most flow goes down the right channel (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: only the right channel carries reliable water; the side channels go bony.",
+                "reference_review": "1,600 cfs: multiple routes are open through the islands (AW map).",
+                "high_review": "3,000 cfs: the islands begin to wash and the channels push harder."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_chili_bar_reach", "south_fork_riverbrain_african_queen"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_channel_main_line",
+              "display_name": "Right-channel main line",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "right", "notes": "The common route runs right almost the entire way, then cuts left at the end (AW map); stay right and cut back left toward the end (GoRafting); the raft line follows most of the water down the right channel (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the only reliable raft route; the cut-left timing matters most at low water.",
+                "reference_review": "1,600 cfs: the standard center-right line (AW reach 148) with large waves near the second island (AW map).",
+                "high_review": "3,000 cfs: pushier; the cut-left move comes up faster."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_african_queen"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_channel_end_shallow_trap",
+              "display_name": "Right-channel shallow trap",
+              "feature_type": "shelf",
+              "relative_position": {"along": "exit", "across": "right", "notes": "A shallow trap at the end of the right channel; cut left to avoid it (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: shallowest; grounding is near-certain if the cut-left move is missed.",
+                "reference_review": "1,600 cfs: still shallow enough to park a raft; make the documented cut left (AW map).",
+                "high_review": "3,000 cfs: mostly covered; the cut left remains the clean line."
+              },
+              "consequence_class": "wrap_or_pin",
+              "consequence_notes": "A grounding trap rather than a hydraulic; a stuck raft in the current can spin or wrap on the shallows.",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_one_foot_falls",
+              "display_name": "Left one-foot falls route",
+              "feature_type": "ledge",
+              "relative_position": {"along": "entry", "across": "left", "notes": "The most fun route drops over a one-foot falls on the left, then threads a very narrow slot between the islands back to center (AW map); the far-left channel is less interesting."},
+              "flow_dependence": {
+                "low_review": "900 cfs: below the AW map's ~1,700 cfs raft recommendation; kayak-only at best.",
+                "reference_review": "1,600 cfs: marginal for rafts - just under the documented ~1,700 cfs threshold (AW map).",
+                "high_review": "3,000 cfs: open, with the narrow between-island slot pushier."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "second_island_waves",
+              "display_name": "Second-island waves",
+              "feature_type": "wave",
+              "relative_position": {"along": "exit", "across": "center", "notes": "Nice large waves near the second island on the common right route (AW map); a fun wave at the bottom of the rapid (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small splash over shallows.",
+                "reference_review": "1,600 cfs: the fun bottom wave (GoRafting) and large waves near the second island (AW map).",
+                "high_review": "3,000 cfs: larger waves as the channels merge."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Triple Threat",
+          "order": 7,
+          "river_mile": 3.1,
+          "class": "III",
+          "class_reported_range": {"low": "II", "high": "III+", "note": "Published collectively as Triple Threat (III); AW reach 148, the AW map, GoRafting, and River Brain index the three parts separately as First Threat (III, River Brain III to III+), Second Threat (II to II+), and Third Threat (II to III)."},
+          "feature_tags": ["boulder_garden", "multiple_channels", "pin_hazard"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "first_threat_frog_rock",
+              "display_name": "Frog Rock (First Threat)",
+              "feature_type": "pin_rock",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Frog Rock sits in the center of the flow at First Threat and can be passed on either side (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: most exposed; the pass on either side is narrowest and wrap risk is highest.",
+                "reference_review": "1,600 cfs: covered enough to hide but still the documented wrap hazard (GoRafting).",
+                "high_review": "3,000 cfs: washing over, with strong current still driving onto it."
+              },
+              "consequence_class": "wrap_or_pin",
+              "consequence_notes": "Known to wrap rafts (GoRafting).",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "first_threat_hole",
+              "display_name": "First Threat hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "entry", "across": "left", "notes": "After a class II lead-in the river turns sharply right and drops into a deep hole along a rock outcropping on the left (AW map; River Brain); nearly river-wide and a favorite kayak surf hole (Whitewater Guidebook)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: smaller but sticky against the outcropping; the boulder-garden lead-in is rockiest.",
+                "reference_review": "1,600 cfs: full size - it buries kayaks and gives raft riders a thrill (AW reach 148); flippiest on the left and mostly avoidable by skirting right (AW map).",
+                "high_review": "3,000 cfs: the biggest hit of the sequence; a flip here means a long swim (OARS)."
+              },
+              "consequence_class": "flip_risk",
+              "consequence_notes": "OARS: if you flip on the first hit, you might be in the water until after the third - the three Threats run close together.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_chili_bar_run", "south_fork_whitewater_guidebook_reach", "south_fork_aw_org_chili_bar_reach", "south_fork_oars_ten_best_rapids"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "first_threat_surf_wave_eddy",
+              "display_name": "First Threat surf wave and right eddy",
+              "feature_type": "eddy_line",
+              "relative_position": {"along": "entry", "across": "right", "notes": "A punchy standing wave just after the tight right-hand bend is a popular kayak surf spot with eddy access along the right bank (GoRafting); AW reach 148 notes the river-right eddy usually holds a line of waiting kayakers."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small wave, easy eddy; a mellow play session.",
+                "reference_review": "1,600 cfs: prime surf traffic - expect a queue of kayakers in the right eddy (AW reach 148).",
+                "high_review": "3,000 cfs: punchier wave and faster eddy line; play traffic thins."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_aw_org_chili_bar_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "second_threat_right_slot",
+              "display_name": "Second Threat right slot",
+              "feature_type": "line",
+              "relative_position": {"along": "middle", "across": "right", "notes": "Second Threat drops through a slot along a rock outcropping on the right (AW map); right of center and you're good to go (GoRafting); a wave train toward river right (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the slot is narrow but straightforward to read.",
+                "reference_review": "1,600 cfs: a relatively straightforward rapid to read and run (AW reach 148).",
+                "high_review": "3,000 cfs: the slot washes into a right-side wave train; AW reach 148 notes the section gets rougher at 3,500-7,000 cfs."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_chili_bar_run", "south_fork_aw_org_chili_bar_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "second_threat_swim_eddy",
+              "display_name": "Second Threat swimmers' eddy",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "middle", "across": "right", "notes": "A good swimmer's rapid with a large eddy below giving easy access back to the rock outcropping for repeated swims (AW map); BLM toilets sit on river right just below (AW reach 148)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: calm and easy; the standard swim spot.",
+                "reference_review": "1,600 cfs: the documented swimmer's-rapid eddy (AW map).",
+                "high_review": "3,000 cfs: still catchable, but repeat swims get pushy."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_chili_bar_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "third_threat_left_hole",
+              "display_name": "Third Threat left hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "exit", "across": "left", "notes": "A large hole on the far left halfway down Third Threat (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: reads as a rocky pourover on the far left.",
+                "reference_review": "1,600 cfs: a formed hole; avoid it on the center line or run it as the advanced move (AW map).",
+                "high_review": "3,000 cfs: bigger; OARS counts the third section's hole among the rapid's big hits."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_oars_ten_best_rapids"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "third_threat_right_hole",
+              "display_name": "Third Threat right hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "exit", "across": "right", "notes": "A large hole on the far right near the bottom of Third Threat (AW map); running both holes is an advanced maneuver."},
+              "flow_dependence": {
+                "low_review": "900 cfs: shallow and rocky on the far right.",
+                "reference_review": "1,600 cfs: formed; the center line avoids it (AW map).",
+                "high_review": "3,000 cfs: bigger, with more current feeding the far right."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "third_threat_center_line",
+              "display_name": "Third Threat center line",
+              "feature_type": "line",
+              "relative_position": {"along": "exit", "across": "center", "notes": "The center route through Third Threat is easy and unobstructed (AW map); run right down the middle avoiding the large holes to either side (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: substantial paddling needed to hold the optimal line (AW map).",
+                "reference_review": "1,600 cfs: the standard line between the flanking holes (GoRafting).",
+                "high_review": "3,000 cfs: faster; a swimmer from First Threat can still be in the water through here (OARS)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_chili_bar_run"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
         {
           "name": "Troublemaker",
           "order": 8,
@@ -678,18 +1235,849 @@
             }
           ]
         },
-        {"name": "Fowler's Rock", "order": 9, "river_mile": 15.8, "class": "III", "feature_tags": ["boulder_garden", "constriction", "pin_hazard", "slalom"], "review_priority": "high"},
-        {"name": "Upper Haystack Canyon", "order": 10, "river_mile": 16.2, "class": "III", "feature_tags": ["wave_train", "canyon_constriction"], "review_priority": "medium"},
-        {"name": "Lost Hat", "order": 11, "river_mile": 16.7, "class": "III-", "feature_tags": ["wave_train", "continuous_entry"], "review_priority": "medium"},
-        {"name": "Satan's Cesspool", "order": 12, "river_mile": 16.9, "class": "III+", "feature_tags": ["hole", "curling_wave", "central_island", "eddy", "swimmer_hazard", "flow_sensitive"], "review_priority": "critical"},
-        {"name": "Son of Satan", "aliases": ["Deadman's Drop"], "order": 13, "river_mile": 17.0, "class": "II+-III", "feature_tags": ["submerged_rock", "wall_push", "swimmer_hazard"], "review_priority": "high"},
-        {"name": "Scissors", "order": 14, "river_mile": 17.4, "class": "III", "feature_tags": ["diagonal_ledge", "boulder", "lateral"], "review_priority": "high"},
-        {"name": "Lower Haystack Canyon", "order": 15, "river_mile": 17.6, "class": "II+", "feature_tags": ["wave_train", "canyon_constriction"], "review_priority": "medium"},
-        {"name": "Bouncing Rock", "order": 16, "river_mile": 18.2, "class": "III", "feature_tags": ["rock_push", "hole", "flip_hazard"], "review_priority": "critical"},
-        {"name": "Pre-Op", "order": 17, "river_mile": 18.4, "class": "III-", "feature_tags": ["wave_train", "bank_holes", "boulders"], "review_priority": "medium"},
-        {"name": "Hospital Bar", "order": 18, "river_mile": 18.6, "class": "III", "feature_tags": ["boulder_garden", "chute", "diagonal_hole", "flip_hazard"], "review_priority": "critical"},
-        {"name": "Recovery Room", "order": 19, "river_mile": 18.8, "class": "II-III", "feature_tags": ["hole", "reservoir_stage_sensitive", "recovery"], "review_priority": "high"},
-        {"name": "Surprise", "order": 20, "river_mile": 19.3, "class": "II-III", "feature_tags": ["seasonal_rock", "chute", "hole", "low_flow_sensitive"], "review_priority": "high"}
+        {
+          "name": "Fowler's Rock",
+          "order": 9,
+          "river_mile": 15.8,
+          "class": "III",
+          "class_reported_range": {"low": "III-", "high": "III+", "note": "The mile guide lists III- at the Gorge entrance; the AW map, AW Gorge reach, GoRafting, and Whitewater Guidebook rate III; River Brain reports III to III+."},
+          "feature_tags": ["boulder_garden", "constriction", "pin_hazard", "slalom"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "entry_line_choices",
+              "display_name": "Entry line choices",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Two line choices at the entrance at normal summer release flows (GoRafting): hug tight to the left side of House Rock, threading the needle between the center hole and the rock, or start left, avoid the left hole, and ferry right; the river bends left around a gravel bar and runs along the left cliff (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: thread-the-needle tolerances are tightest; the boulder garden is most exposed.",
+                "reference_review": "1,600 cfs: both documented entry options work (GoRafting normal summer release flows).",
+                "high_review": "3,000 cfs: above ~2,500 cfs the left-of-Fowler's-Rock line opens and becomes the line of choice (GoRafting)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_fowlers_rock", "south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "house_rock_submerged_boulder",
+              "display_name": "House Rock submerged boulder",
+              "feature_type": "pin_rock",
+              "relative_position": {"along": "entry", "across": "right", "notes": "A submerged boulder lies along the house-sized rock on the right; avoid it with a quick left slalom (AW map); GoRafting names House Rock as the entry landmark."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the submerged boulder is barely covered; parking is easiest and hardest to free.",
+                "reference_review": "1,600 cfs: rafts are often accidentally parked on the submerged boulder (AW map).",
+                "high_review": "3,000 cfs: deeper cover, but the current onto the boulder is stronger."
+              },
+              "consequence_class": "wrap_or_pin",
+              "consequence_notes": "Rafts are often accidentally parked here (AW map); a loaded raft parked broadside risks a wrap.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_fowlers_rock"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "center_channel_hole",
+              "display_name": "Center-channel hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A hole in the middle channel between the two entry lines (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a rocky pourover; the needle between it and House Rock is narrowest.",
+                "reference_review": "1,600 cfs: the formed hole that the House Rock line threads past (GoRafting).",
+                "high_review": "3,000 cfs: bigger, but the opening left line bypasses it entirely (GoRafting)."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_gorafting_fowlers_rock"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_channel_hole",
+              "display_name": "Left-side hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "left", "notes": "A hole on the left side, avoided by the start-left-then-ferry-right line (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: shallow and rocky.",
+                "reference_review": "1,600 cfs: formed; the ferry-right line steers around it (GoRafting).",
+                "high_review": "3,000 cfs: stronger, sitting beside the newly opened high-flow left line."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_gorafting_fowlers_rock"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "fowlers_rock_boulder",
+              "display_name": "Fowler's Rock",
+              "feature_type": "boulder",
+              "relative_position": {"along": "middle", "across": "center", "notes": "The tall cabin-sized boulder itself; the standard route passes to its right (AW map); the river zig-zags left then right past several very large rocks (River Brain), with smaller boulders creating plenty of hydraulics (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the slalom past the giant rocks is tightest; contact risk is highest.",
+                "reference_review": "1,600 cfs: the standard right-of-rock line (AW map); the first class III below Troublemaker (Whitewater Guidebook).",
+                "high_review": "3,000 cfs: above ~2,500 cfs the preferred line moves left of the rock (GoRafting)."
+              },
+              "consequence_class": "wrap_or_pin",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_gorge_run", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_fowlers_rock", "south_fork_whitewater_guidebook_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "diagonal_boulder_fence_slot",
+              "display_name": "Diagonal boulder-fence slot",
+              "feature_type": "line",
+              "relative_position": {"along": "exit", "across": "center", "notes": "Below Fowler's Rock pick a good slot near center through the diagonal boulder fence (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the fence is most exposed and the slot narrow.",
+                "reference_review": "1,600 cfs: the near-center slot is the standard runout (AW map).",
+                "high_review": "3,000 cfs: the fence washes; just below, Son of Fowler builds two holes (top right and mid-river) above ~3,000 cfs - run left to right to bypass them (GoRafting)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "high_flow_left_line",
+              "display_name": "High-flow left line",
+              "feature_type": "line",
+              "relative_position": {"along": "middle", "across": "left", "notes": "Above ~2,500 cfs a line to the left of Fowler's Rock opens up and becomes the line of choice as flows rise (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: not available; insufficient water left of the rock.",
+                "reference_review": "1,600 cfs: marginal; the two standard entry lines remain preferred (GoRafting).",
+                "high_review": "3,000 cfs: open and documented as the line of choice above ~2,500 cfs (GoRafting)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_fowlers_rock"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Upper Haystack Canyon",
+          "order": 10,
+          "river_mile": 16.2,
+          "class": "III",
+          "class_reported_range": {"low": "II", "high": "III", "note": "GoRafting rates II; the AW map and AW Gorge reach II+; River Brain (as Haystack Rapids) II+ to III-; the mile guide lists III."},
+          "feature_tags": ["wave_train", "canyon_constriction"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "haystack_wave_train",
+              "display_name": "Haystack wave train",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "middle", "across": "center", "notes": "Big standing waves run a long distance through a narrow section of gorge (AW map; AW Gorge reach); a long straight read-and-run section (River Brain); hit the tall waves head-on (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small haystacks; a low-consequence canyon that is still fun (GoRafting).",
+                "reference_review": "1,600 cfs: classic standing waves - not particularly difficult and a lot of fun (AW map).",
+                "high_review": "3,000 cfs: bigger waves and more splash; still a low-consequence corridor."
+              },
+              "consequence_class": "low_nuisance",
+              "consequence_notes": "Documented coverage is thin: every consulted source describes only the wave train and the narrow canyon, with no named sub-features.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_riverbrain_gorge_run", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "exit_pool_before_lost_hat",
+              "display_name": "Exit pool before Lost Hat",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "exit", "across": "center", "notes": "The canyon ends at a calm pool before Lost Hat (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a long, calm regroup pool.",
+                "reference_review": "1,600 cfs: the standard regroup before the Lost Hat / Satan's Cesspool sequence (GoRafting).",
+                "high_review": "3,000 cfs: shorter and faster, but still the last easy recovery before Lost Hat."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Lost Hat",
+          "order": 11,
+          "river_mile": 16.7,
+          "class": "III-",
+          "class_reported_range": {"low": "III-", "high": "III", "note": "The AW map lists III-; GoRafting rates III; River Brain reports III- to III."},
+          "feature_tags": ["wave_train", "continuous_entry"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "steep_entry_waves",
+              "display_name": "Steep entry wave train",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "entry", "across": "center", "notes": "After a flat section the river drops steeply into big standing waves (AW map); the drop builds nice waves (River Brain); a fun wave train (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a defined drop with modest waves.",
+                "reference_review": "1,600 cfs: the standard big-standing-wave entry (AW map).",
+                "high_review": "3,000 cfs: steeper, faster waves feeding directly downstream."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_gorge_run", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "continuous_runin_to_satans",
+              "display_name": "Continuous run-in to Satan's Cesspool",
+              "feature_type": "continuous_whitewater",
+              "relative_position": {"along": "exit", "across": "center", "notes": "The rapid continues unabated into the one below (AW map); it leads directly into Satan's Cesspool - pay attention here (GoRafting; River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: slightly more definition between the two rapids, but recovery room is still minimal.",
+                "reference_review": "1,600 cfs: continuous; a swimmer at the bottom of Lost Hat reaches Satan's Cesspool without a break (GoRafting).",
+                "high_review": "3,000 cfs: the sequence effectively merges; at high flows even Satan's and Son of Satan's run together (AW Gorge reach)."
+              },
+              "consequence_class": "swim_risk",
+              "consequence_notes": "A swimmer or out-of-position raft at the bottom of Lost Hat enters Satan's Cesspool without a break (GoRafting).",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_gorge_run", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "satans_setup_line",
+              "display_name": "Satan's Cesspool setup line",
+              "feature_type": "line",
+              "relative_position": {"along": "exit", "across": "right", "notes": "Stay right at the bottom if planning to sneak Satan's Cesspool down its right-side slot; otherwise work left for the standard line (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the sneak setup matters most; the right slot below is at its rockiest.",
+                "reference_review": "1,600 cfs: choose the side here before committing (AW map, which questions whether the sneak is necessary).",
+                "high_review": "3,000 cfs: harder to move late; commit to a side early in the wave train."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Satan's Cesspool",
+          "order": 12,
+          "river_mile": 16.9,
+          "class": "III+",
+          "class_reported_range": {"low": "III", "high": "III+", "note": "GoRafting rates III; the mile guide, AW map, AW Gorge reach, Whitewater Guidebook, OARS, and River Brain III+."},
+          "feature_tags": ["hole", "curling_wave", "central_island", "eddy", "swimmer_hazard", "flow_sensitive"],
+          "review_priority": "critical",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "entry_bend_rocky_island",
+              "display_name": "Entry bend and rocky island",
+              "feature_type": "island",
+              "relative_position": {"along": "entry", "across": "center", "notes": "A long moderate rapid bends left toward a low rocky island (AW Gorge reach); the island splits the right-side sneak from the standard left line."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the island is well exposed and the split is obvious.",
+                "reference_review": "1,600 cfs: the standard split - sneak right of the island or run the main line left of it (AW Gorge reach).",
+                "high_review": "3,000 cfs: still defined; GoRafting documents the island submerging entirely only above ~6,000 cfs."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_aw_org_gorge_reach", "south_fork_gorafting_satans_cesspool", "south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_slot_sneak",
+              "display_name": "Right-slot sneak",
+              "feature_type": "sneak_line",
+              "relative_position": {"along": "entry", "across": "right", "notes": "A narrow rocky slot is available to the right of the central island (AW map); the AW Gorge reach lists the sneak route down the right; set it up by staying right through Lost Hat."},
+              "flow_dependence": {
+                "low_review": "900 cfs: bony but the documented sneak; the AW map questions whether sneaking is necessary.",
+                "reference_review": "1,600 cfs: available for crews avoiding the main hit (AW Gorge reach).",
+                "high_review": "3,000 cfs: less distinct as water spreads over the island shoulder."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_cliff_wall_dogleg",
+              "display_name": "Left cliff-wall dogleg",
+              "feature_type": "wall",
+              "relative_position": {"along": "middle", "across": "left", "notes": "The main current sweeps quickly left at the top of the island, then is forced sharply back right by a cliff wall on the left (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a modest push; the dogleg reads clearly.",
+                "reference_review": "1,600 cfs: the defined dogleg move of the standard line; drive off the wall (AW Gorge reach).",
+                "high_review": "3,000 cfs: strengthening toward GoRafting's ~4,000 cfs mark, where the water pushes hard toward the left wall and the rapid gets a bit flippy."
+              },
+              "consequence_class": "flip_risk",
+              "source_ids": ["south_fork_aw_org_gorge_reach", "south_fork_gorafting_satans_cesspool"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_shelf_lateral",
+              "display_name": "Right-shelf lateral",
+              "feature_type": "lateral",
+              "relative_position": {"along": "middle", "across": "right", "notes": "A rock shelf approaches from river right and constricts the channel, throwing a substantial lateral; T it up and be ready for it to turn the boat slightly right (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the shelf shows; the lateral is small but the constriction is narrow.",
+                "reference_review": "1,600 cfs: the fully formed lateral to square up (GoRafting).",
+                "high_review": "3,000 cfs: a bigger lateral with more deflection toward the left wall."
+              },
+              "consequence_class": "flip_risk",
+              "source_ids": ["south_fork_gorafting_satans_cesspool"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "twin_ledges_twisting_drop",
+              "display_name": "Twin-ledge twisting drop",
+              "feature_type": "ledge",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A ledge at top right and immediately another on the left create a crazy, twisting, turbulent drop (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the ledges are most distinct and the twisting drop most technical.",
+                "reference_review": "1,600 cfs: the crux move of the standard line (AW Gorge reach).",
+                "high_review": "3,000 cfs: the two ledges smooth into one large hydraulic."
+              },
+              "consequence_class": "flip_risk",
+              "source_ids": ["south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "main_hole_curling_wave",
+              "display_name": "Main hole and curling wave",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "center", "notes": "An underwater rock cluster forms a hole and a large curling wave at low and moderate flows (AW map); the best candidate for the crux of the Gorge - a large hole as the river cuts right through bedrock (River Brain); the final big drop and standing wave (OARS)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the hole and curling wave are defined at low flows (AW map).",
+                "reference_review": "1,600 cfs: one of the bigger hits in a raft (AW map); the biggest rapid of the Gorge run (Whitewater Guidebook).",
+                "high_review": "3,000 cfs: waves keep building; GoRafting documents them diminishing again only above ~6,000 cfs as the island submerges."
+              },
+              "consequence_class": "surf_or_retention",
+              "consequence_notes": "The signature photo hit of the Gorge; a swimmer released here must reach the left eddy before Son of Satan's (AW map).",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_gorge_run", "south_fork_oars_ten_best_rapids", "south_fork_whitewater_guidebook_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "second_wave_swirly_runout",
+              "display_name": "Second wave and swirly runout",
+              "feature_type": "wave",
+              "relative_position": {"along": "exit", "across": "center", "notes": "A second straightforward wave follows the lateral, with swirly water below the waves in the constriction (GoRafting); below the ledges the rapid is clean and deep (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a small follow-up wave over deep water.",
+                "reference_review": "1,600 cfs: the standard second hit and boily runout (GoRafting).",
+                "high_review": "3,000 cfs: stronger boils and swirls in the constriction."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_satans_cesspool", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_swimmer_catch_pool",
+              "display_name": "Left swimmer catch pool",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "exit", "across": "left", "notes": "Swimmers should enter the left eddy below to avoid getting bruised in Son of Satan just ahead (AW map); a large catch pool below the ledges (AW Gorge reach); a backboard is tied to the left shore below the rapid (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a well-defined pool with easy recovery.",
+                "reference_review": "1,600 cfs: the standard recovery target - make it before Son of Satan's, only ~70 yards downstream (AW Gorge reach).",
+                "high_review": "3,000 cfs: the recovery window shrinks; at high flows Satan's and Son of Satan's run together (AW Gorge reach)."
+              },
+              "consequence_class": "swim_risk",
+              "consequence_notes": "The swimmer-recovery deadline for the rapid; AW Gorge reach notes the two rapids merge at high flows and rescue gear (backboard) is staged on the left shore (GoRafting).",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_satans_cesspool"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "high_flow_right_eddy_line",
+              "display_name": "High-flow right eddy line",
+              "feature_type": "eddy_line",
+              "relative_position": {"along": "exit", "across": "right", "notes": "Above ~6,000 cfs the waves diminish but a tumultuous eddy line forms along river right below the rapid (GoRafting); photographers commonly shoot from the left cliff top and downstream right (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: absent; the right side below is calm.",
+                "reference_review": "1,600 cfs: benign; ordinary eddy lines only.",
+                "high_review": "3,000 cfs: strengthening seam on the right; the documented tumultuous eddy line fully forms only above ~6,000 cfs (GoRafting)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_satans_cesspool", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Son of Satan",
+          "aliases": ["Deadman's Drop", "Dead Man's Drop", "Son of Satan's"],
+          "order": 13,
+          "river_mile": 17.0,
+          "class": "II+-III",
+          "class_reported_range": {"low": "II", "high": "III", "note": "GoRafting rates II; the mile guide and AW Gorge reach II+; River Brain II+ to III- (as Dead Man's Drop); the AW map III."},
+          "feature_tags": ["submerged_rock", "wall_push", "swimmer_hazard"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "submerged_center_rock",
+              "display_name": "Submerged center rock",
+              "feature_type": "boulder",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A submerged rock sits mid-channel at the top (AW map; GoRafting's covered mid-river rock); the best route in a raft or as a swimmer is just to its right (AW map)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: shallowest cover and the sharpest hit for anything left of the line.",
+                "reference_review": "1,600 cfs: covered; read the line off the pillow and pass just right (AW map).",
+                "high_review": "3,000 cfs: washing out, but the left side of the rock remains the bad swim."
+              },
+              "consequence_class": "swim_risk",
+              "consequence_notes": "AW map: a swim to the left of the submerged rock will probably kick your butt good.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_wall_push",
+              "display_name": "Right-wall push",
+              "feature_type": "wall",
+              "relative_position": {"along": "exit", "across": "right", "notes": "The current heads toward the right wall and piles up on the right bank (AW Gorge reach; River Brain); pass right of the rock without smashing into the right-hand wall (AW map); work left at the bottom (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a mild push with rock showing at the wall base.",
+                "reference_review": "1,600 cfs: the standard move - there is plenty of room to move left, an easy move even at the last second (AW Gorge reach).",
+                "high_review": "3,000 cfs: a stronger pile on the right bank; start the work-left earlier."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_aw_org_gorge_reach", "south_fork_riverbrain_gorge_run", "south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_of_rock_line",
+              "display_name": "Right-of-rock line",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Enter right of the covered mid-river rock, then work left to finish (GoRafting); a short pool separates the rapid from Satan's Cesspool above (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a precise slot between the rock and the wall.",
+                "reference_review": "1,600 cfs: the standard right-of-rock, work-left line (GoRafting).",
+                "high_review": "3,000 cfs: at high flows Satan's Cesspool and Son of Satan's run together (AW Gorge reach); arrive already set right-of-rock."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_aw_org_gorge_reach", "south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Scissors",
+          "order": 14,
+          "river_mile": 17.4,
+          "class": "III",
+          "feature_tags": ["diagonal_ledge", "boulder", "lateral"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "diagonal_bedrock_ledges",
+              "display_name": "Diagonal bedrock ledges",
+              "feature_type": "ledge",
+              "relative_position": {"along": "entry", "across": "left", "notes": "After a brief calm stretch the river charges over diagonal bedrock ledges along the left wall (AW map); the river bends left above the drop and narrows over the rapid's length (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the ledges are most exposed and read as distinct diagonal drops.",
+                "reference_review": "1,600 cfs: read and run at the top (GoRafting); the diagonal laterals define the line.",
+                "high_review": "3,000 cfs: the ledge laterals strengthen as the channel narrows."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "cabin_rock_right",
+              "display_name": "Cabin-sized rock on the right",
+              "feature_type": "boulder",
+              "relative_position": {"along": "exit", "across": "right", "notes": "The rapid finishes around a cabin-sized rock on the right (AW map); pass left of the massive boulder at the bottom (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: maximum exposure; the pass-left channel is narrowest.",
+                "reference_review": "1,600 cfs: the standard pass-left move (GoRafting).",
+                "high_review": "3,000 cfs: more water piles onto the rock; the move left needs to come earlier."
+              },
+              "consequence_class": "wrap_or_pin",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "squirrelly_water_line",
+              "display_name": "Squirrelly-water line",
+              "feature_type": "line",
+              "relative_position": {"along": "middle", "across": "center", "notes": "Keep the raft pointed straight through unpredictable water in the narrowing channel (GoRafting); a read-and-run class III as the river turns left toward Lower Haystack Canyon (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: rocky but readable; the squirrelly water is mild.",
+                "reference_review": "1,600 cfs: keep it straight through the boils between the ledges and the boulder (GoRafting).",
+                "high_review": "3,000 cfs: stronger boils and surging water in the constriction."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_riverbrain_gorge_run"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Lower Haystack Canyon",
+          "order": 15,
+          "river_mile": 17.6,
+          "class": "II+",
+          "class_reported_range": {"low": "II+", "high": "III", "note": "The AW map, AW Gorge reach, GoRafting, and the mile guide list II+; River Brain reports II+ to III."},
+          "feature_tags": ["wave_train", "canyon_constriction"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "long_wave_train",
+              "display_name": "Long wave train",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "entry", "across": "center", "notes": "An extended wave train opens the rapid (GoRafting); big standing waves in a narrow gorge section, a bit more difficult than the upper canyon and a lot of wetness (AW map); mostly continuous waves (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: modest haystacks; a straightforward splashy corridor.",
+                "reference_review": "1,600 cfs: the classic wet ride - a bit more difficult than Upper Haystack (AW map).",
+                "high_review": "3,000 cfs: bigger continuous waves through the narrow section."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_reach_guide", "south_fork_riverbrain_gorge_run"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "midriver_shallow_rock_hole",
+              "display_name": "Mid-river shallow rock hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A shallow mid-river rock creates a left-side hole and a right-side wave train at normal flows (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the rock is near the surface and the left hole reads as a pourover.",
+                "reference_review": "1,600 cfs: hole on the left of the rock, wave train on its right (GoRafting).",
+                "high_review": "3,000 cfs: building toward GoRafting's 4,500+ cfs threshold where it becomes a substantial crashing wave."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_avoidance_line",
+              "display_name": "Right avoidance line",
+              "feature_type": "line",
+              "relative_position": {"along": "middle", "across": "right", "notes": "Take the right-side wave train past the mid-river rock; even the 4,500+ cfs crashing wave can still be avoided on the right (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: an easy dodge; plenty of definition around the rock.",
+                "reference_review": "1,600 cfs: the standard line past the rock (GoRafting).",
+                "high_review": "3,000 cfs: still open; documented as the avoidance even above 4,500 cfs (GoRafting)."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "exit_pool",
+              "display_name": "Exit pool",
+              "feature_type": "recovery_pool",
+              "relative_position": {"along": "exit", "across": "center", "notes": "A pool follows downstream (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a calm regroup pool.",
+                "reference_review": "1,600 cfs: the standard recovery before the Bouncing Rock sequence (GoRafting).",
+                "high_review": "3,000 cfs: shorter but still a usable regroup."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Bouncing Rock",
+          "order": 16,
+          "river_mile": 18.2,
+          "class": "III",
+          "class_reported_range": {"low": "II+", "high": "III", "note": "The mile guide and OARS list II+; the AW map, AW Gorge reach, GoRafting, and Whitewater Guidebook III; River Brain II+ to III."},
+          "feature_tags": ["rock_push", "hole", "flip_hazard"],
+          "review_priority": "critical",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "bouncing_rock_boulder",
+              "display_name": "Bouncing Rock",
+              "feature_type": "boulder",
+              "relative_position": {"along": "middle", "across": "right", "notes": "Most of the current smashes into a rock on the right at the apex of an outside bend (AW map; GoRafting); guides often deliberately bounce the raft off it for giggles (AW map), using the current to sling into the big hole (OARS)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the rock is prominent and the bounce is a firm hit.",
+                "reference_review": "1,600 cfs: the standard bounce move - the current does the work (OARS).",
+                "high_review": "3,000 cfs: a strong sweep onto the rock; AW Gorge reach warns crews may not have the paddling skill to avoid being swept in."
+              },
+              "consequence_class": "wrap_or_pin",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_oars_ten_best_rapids", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "main_flippy_hole",
+              "display_name": "Main flippy hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "middle", "across": "center", "notes": "Below the rock the current pours into a large flippy hole (AW map); the river drops into a fun hole with a slight lateral shape at the bend apex - hit it head-on (GoRafting); a steep drop over the bouncing rock and into the hole (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: smaller and rockier; still a defined drop.",
+                "reference_review": "1,600 cfs: fully formed and flippy if taken sideways off the rock (AW map).",
+                "high_review": "3,000 cfs: the biggest hit; the lateral shape strengthens and punishes angled entries."
+              },
+              "consequence_class": "flip_risk",
+              "consequence_notes": "The AW map calls the hole large and flippy; the deliberate bounce line feeds it at an angle.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_aw_org_gorge_reach", "south_fork_riverbrain_gorge_run"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_sneak_lines",
+              "display_name": "Left sneak options",
+              "feature_type": "sneak_line",
+              "relative_position": {"along": "middle", "across": "left", "notes": "Sneak options run down the left (River Brain); there is plenty of room to avoid the rock and hole, but crews may lack the paddling skill to avoid being swept in (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: easy to reach; the inside of the bend is shallow but open.",
+                "reference_review": "1,600 cfs: the documented avoidance for crews skipping the bounce (River Brain).",
+                "high_review": "3,000 cfs: the outside-bend sweep makes the move harder to hold (AW Gorge reach)."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_riverbrain_gorge_run", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "exit_wave_train_weber_creek",
+              "display_name": "Exit wave train at Weber Creek",
+              "feature_type": "wave",
+              "relative_position": {"along": "exit", "across": "center", "notes": "The rapid finishes with a pleasant wave train (GoRafting); Weber Creek enters from river left during the rapid (Whitewater Guidebook)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a mellow runout.",
+                "reference_review": "1,600 cfs: the standard closing wave train (GoRafting).",
+                "high_review": "3,000 cfs: larger waves; Weber Creek inflow adds volume in wet seasons."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide", "south_fork_whitewater_guidebook_reach"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Pre-Op",
+          "order": 17,
+          "river_mile": 18.4,
+          "class": "III-",
+          "aliases": ["Triage"],
+          "class_reported_range": {"low": "II", "high": "III", "note": "GoRafting rates II; the AW map III-; River Brain (as Triage) III- to III; the AW Gorge reach III."},
+          "feature_tags": ["wave_train", "bank_holes", "boulders"],
+          "review_priority": "medium",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "standing_waves_bend",
+              "display_name": "Standing waves on the right bend",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "middle", "across": "center", "notes": "Big standing waves as the river bends steadily right toward Hospital Bar, running mostly north (AW map; AW Gorge reach); more waves and possible holes as the river continues to turn (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: modest waves with more exposed rock along the banks.",
+                "reference_review": "1,600 cfs: the standard read-and-run wave train (AW map).",
+                "high_review": "3,000 cfs: bigger waves; GoRafting documents an enormous hole forming at elevated flows."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_riverbrain_gorge_run"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "bank_rocks_and_holes",
+              "display_name": "Bank rocks and holes",
+              "feature_type": "boulder",
+              "relative_position": {"along": "middle", "across": "left", "notes": "Rocks and holes line the banks on both sides with the clean water in the middle (AW map); recorded on the left with the hazard mirrored on the right bank."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the bank rocks are most exposed; stay off the edges.",
+                "reference_review": "1,600 cfs: holes pocket both banks (AW map); the center stays clean.",
+                "high_review": "3,000 cfs: bank holes strengthen and edge eddies get grabby."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_of_center_line",
+              "display_name": "Right-of-center line",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "center", "notes": "Right of center, read and run (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: simple read-and-run.",
+                "reference_review": "1,600 cfs: the standard right-of-center line (GoRafting).",
+                "high_review": "3,000 cfs: watch for the enormous hole GoRafting documents at elevated flows as the wave train grows."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Hospital Bar",
+          "order": 18,
+          "river_mile": 18.6,
+          "class": "III",
+          "class_reported_range": {"low": "III", "high": "III+", "note": "The mile guide, AW map, GoRafting, Whitewater Guidebook, and OARS rate III; the AW Gorge reach and River Brain report up to III+."},
+          "feature_tags": ["boulder_garden", "chute", "diagonal_hole", "flip_hazard"],
+          "review_priority": "critical",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "entry_boulder_bar",
+              "display_name": "Entry boulder bar",
+              "feature_type": "boulder",
+              "relative_position": {"along": "entry", "across": "center", "notes": "A small boulder garden leads in; most of the current then drops right over a boulder bar (AW map); the river bends right past boulders (AW Gorge reach); a rocky section leads into the main hole (River Brain)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the boulder bar is most exposed; the drop right is a defined move.",
+                "reference_review": "1,600 cfs: the standard rocky lead-in over the bar (AW map).",
+                "high_review": "3,000 cfs: the bar covers and the entry becomes a fast tongue into the chute."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_riverbrain_gorge_run"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "right_fast_channel",
+              "display_name": "Right fast channel",
+              "feature_type": "line",
+              "relative_position": {"along": "middle", "across": "right", "notes": "The current funnels into a fast channel along the right bank (AW map); the river sweeps left with the right side funneling into the lateral wave (GoRafting); then left through a chute (AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a narrow but readable channel along the right.",
+                "reference_review": "1,600 cfs: the standard approach that delivers the raft onto the diagonal hole (GoRafting).",
+                "high_review": "3,000 cfs: faster and pushier; commit to an angle before the chute."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "diagonal_hole",
+              "display_name": "Diagonal hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "exit", "across": "right", "notes": "A left-facing diagonal hole/lateral wave at the bottom; the farther right you are on the hole the bigger and more retentive it gets (River Brain); T up square to the lateral for the biggest hit (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: a smaller, rockier hit; still the wettest moment of the Gorge run.",
+                "reference_review": "1,600 cfs: the last big ride (Whitewater Guidebook); a big fun wet hit (AW map).",
+                "high_review": "3,000 cfs: the largest wave on the river (AW Gorge reach); the right side grows increasingly retentive (River Brain)."
+              },
+              "consequence_class": "flip_risk",
+              "consequence_notes": "Named for a hospital tent set up during the Gold Rush (AW map; OARS); running right offers photographer opportunities with flip potential (AW map).",
+              "source_ids": ["south_fork_riverbrain_gorge_run", "south_fork_aw_org_gorge_reach", "south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_whitewater_guidebook_reach", "south_fork_oars_ten_best_rapids"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "catchers_mitt_rocks",
+              "display_name": "Catchers Mitt rocks",
+              "feature_type": "boulder",
+              "aliases": ["Catchers Mitt"],
+              "relative_position": {"along": "exit", "across": "left", "notes": "Shallow rocks along the left bank known as the Catchers Mitt can snag rafts; the photographer sits just above them - smile if you hang up (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: most exposed; the snag zone is widest.",
+                "reference_review": "1,600 cfs: the documented snag hazard bordering the drier left line (GoRafting).",
+                "high_review": "3,000 cfs: partially covered but still shallow enough to catch a raft drifting left."
+              },
+              "consequence_class": "wrap_or_pin",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "left_dry_line",
+              "display_name": "Left dry line",
+              "feature_type": "sneak_line",
+              "relative_position": {"along": "exit", "across": "left", "notes": "The diagonal hole runs best on the left (AW map); left routing provides drier passage (GoRafting), threading between the hole and the Catchers Mitt rocks."},
+              "flow_dependence": {
+                "low_review": "900 cfs: narrow between the exposed Catchers Mitt and the hole.",
+                "reference_review": "1,600 cfs: the standard drier line for crews avoiding the big hit (GoRafting).",
+                "high_review": "3,000 cfs: more usable as the Mitt covers, but the hole's left shoulder also grows."
+              },
+              "consequence_class": "swim_risk",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Recovery Room",
+          "order": 19,
+          "river_mile": 18.8,
+          "class": "II-III",
+          "class_reported_range": {"low": "II", "high": "III", "note": "The AW map lists III- falling to class II at most when Folsom Reservoir is full; GoRafting II; the mile guide II+; River Brain III- to III."},
+          "feature_tags": ["hole", "reservoir_stage_sensitive", "recovery"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "little_big_hole",
+              "display_name": "Little Big Hole",
+              "feature_type": "hole",
+              "aliases": ["Little Big Hole"],
+              "relative_position": {"along": "entry", "across": "center", "notes": "A sneaker hole sits top-center; GoRafting names it the Little Big Hole."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small but distinct and grabby for its size.",
+                "reference_review": "1,600 cfs: the documented sneaker hole - easy to clip unaware (GoRafting).",
+                "high_review": "3,000 cfs: washes toward a wave, but the surge remains."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "center_left_wave_train",
+              "display_name": "Center-left wave train",
+              "feature_type": "wave_train",
+              "relative_position": {"along": "middle", "across": "left", "notes": "A pleasant wave train forms center-left (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: small waves; the rapid reads as a riffle when the reservoir is high.",
+                "reference_review": "1,600 cfs: the standard center-left ride (GoRafting).",
+                "high_review": "3,000 cfs: larger waves feeding the bottom hole when it is exposed."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "reservoir_stage_bottom_hole",
+              "display_name": "Reservoir-stage bottom hole",
+              "feature_type": "hole",
+              "relative_position": {"along": "exit", "across": "center", "notes": "When Folsom Reservoir is down, the hole at the bottom is a miniature version of Hospital Bar; when the reservoir is full the rapid is class II at most (AW map); paddle and punch through it (River Brain); at high reservoir the hole washes out (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: reservoir stage matters more than release level here; with the lake down the mini-Hospital-Bar hole is at its rockiest.",
+                "reference_review": "1,600 cfs: with the reservoir down, punch the bottom hole (River Brain); with the lake full the rapid fades to class II at most (AW map).",
+                "high_review": "3,000 cfs: more push through the hole when exposed; reservoir stage still decides whether it exists at all (GoRafting)."
+              },
+              "consequence_class": "surf_or_retention",
+              "consequence_notes": "Reservoir stage is an independent variable from release cfs for this rapid and must be authored separately in review scenarios.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_gorge_run", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            }
+          ]
+        },
+        {
+          "name": "Surprise",
+          "order": 20,
+          "river_mile": 19.3,
+          "class": "II-III",
+          "class_reported_range": {"low": "II", "high": "III", "note": "GoRafting rates II; the mile guide III; the AW map II-III depending on season; River Brain III- to III, present only in low-reservoir years."},
+          "feature_tags": ["seasonal_rock", "chute", "hole", "low_flow_sensitive"],
+          "review_priority": "high",
+          "flow_band_reference": {"low_review_cfs": 900.0, "reference_review_cfs": 1600.0, "high_review_cfs": 3000.0, "source": "physics/data/real_world/south_fork_american_chili_bar/flow_presets.json"},
+          "feature_inventory": [
+            {
+              "subfeature_id": "fast_left_chute",
+              "display_name": "Fast left-bending chute",
+              "feature_type": "line",
+              "relative_position": {"along": "entry", "across": "center", "notes": "At a wide gravel bar the river bends left into a fast chute (AW map); a funnel constriction as the river bends left (River Brain); the rapid uncovers late in summer as Folsom Reservoir drops and can be submerged entirely when the lake is high (AW map; GoRafting; AW Gorge reach)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: with the lake low the chute is fast and defined; late-season boaters get surprised as it uncovers (AW map).",
+                "reference_review": "1,600 cfs: the standard funnel when exposed; the rapid only exists in low-reservoir conditions (River Brain).",
+                "high_review": "3,000 cfs: a pushier chute when exposed; reservoir stage remains the controlling variable."
+              },
+              "consequence_class": "swim_risk",
+              "consequence_notes": "Reservoir stage is an independent variable from release cfs for this rapid and must be authored separately in review scenarios.",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_riverbrain_gorge_run", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "center_pourover_rock",
+              "display_name": "Center pourover rock",
+              "feature_type": "pourover",
+              "relative_position": {"along": "middle", "across": "center", "notes": "A big center rock forms a pourover and hole in the chute - run over it into the hole if you're brave (AW map); a large, surprising wave/hole (AW Gorge reach); a mid-river pourover rock in the wave train (GoRafting)."},
+              "flow_dependence": {
+                "low_review": "900 cfs: the rock is shallowest and the pourover most abrupt; the late-summer surprise at its sharpest (AW map).",
+                "reference_review": "1,600 cfs: a formed pourover/hole in the wave train when exposed (GoRafting).",
+                "high_review": "3,000 cfs: more water over the rock; the hole becomes a large crashing wave/hole (AW Gorge reach)."
+              },
+              "consequence_class": "surf_or_retention",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_aw_org_gorge_reach", "south_fork_gorafting_reach_guide"],
+              "guide_review_status": "required"
+            },
+            {
+              "subfeature_id": "side_sneak_lines",
+              "display_name": "Side sneak lines",
+              "feature_type": "sneak_line",
+              "relative_position": {"along": "middle", "across": "right", "notes": "The AW map sneaks the rock on the right; GoRafting routes left to avoid it; the AW Gorge reach says the wave/hole can be avoided on either side - side-preference disagreement preserved."},
+              "flow_dependence": {
+                "low_review": "900 cfs: both edges are shallow; pick the side with visible water.",
+                "reference_review": "1,600 cfs: either side works (AW Gorge reach); the sources split on right (AW map) versus left (GoRafting).",
+                "high_review": "3,000 cfs: wider margins on both sides as the chute fills."
+              },
+              "consequence_class": "low_nuisance",
+              "source_ids": ["south_fork_americanwhitewater_map", "south_fork_gorafting_reach_guide", "south_fork_aw_org_gorge_reach"],
+              "guide_review_status": "required"
+            }
+          ]
+        }
       ]
     },
     {

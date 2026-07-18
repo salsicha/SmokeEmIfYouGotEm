@@ -116,13 +116,21 @@ def test_editor_markers_preserve_published_stationing_and_flag_interpolation():
         "inventory_attached_blocked_until_exact_geometry"
     )
     racehorse = south_fork["Racehorse Bend"]
-    assert racehorse["feature_inventory_status"] == "research_missing"
-    assert racehorse["subfeature_count"] == 0
+    assert racehorse["feature_inventory_status"] == (
+        "research_attached_pending_exact_geometry_and_guide_review"
+    )
+    assert racehorse["subfeature_count"] == 5
     assert racehorse["subfeature_editor_pin_status"] == (
-        "blocked_until_c1_inventory_and_exact_geometry"
+        "inventory_attached_blocked_until_exact_geometry"
     )
 
     colorado = {marker["display_name"]: marker for marker in rivers["colorado_river_grand_canyon_rowing"]["markers"]}
+    badger = colorado["Badger Creek"]
+    assert badger["feature_inventory_status"] == "research_missing"
+    assert badger["subfeature_count"] == 0
+    assert badger["subfeature_editor_pin_status"] == (
+        "blocked_until_c1_inventory_and_exact_geometry"
+    )
     assert colorado["House Rock"]["stationing"]["station_kind"] == "published_river_mile_converted"
     assert colorado["House Rock"]["stationing"]["production_authoritative"] is False
 
@@ -242,6 +250,147 @@ def test_c1_feature_inventories_for_meat_grinder_and_troublemaker():
                 subfeature["source_ids"]
             )
             assert all(ref["url"].startswith("https://") for ref in subfeature["source_refs"])
+
+
+SOUTH_FORK_EXPECTED_SUBFEATURE_COUNTS = {
+    "Chili Bar Hole": 3,
+    "Meat Grinder": 11,
+    "Racehorse Bend": 5,
+    "Maya": 5,
+    "Rock Garden": 2,
+    "African Queen": 5,
+    "Triple Threat": 8,
+    "Troublemaker": 17,
+    "Fowler's Rock": 7,
+    "Upper Haystack Canyon": 2,
+    "Lost Hat": 3,
+    "Satan's Cesspool": 9,
+    "Son of Satan": 3,
+    "Scissors": 3,
+    "Lower Haystack Canyon": 4,
+    "Bouncing Rock": 4,
+    "Pre-Op": 3,
+    "Hospital Bar": 5,
+    "Recovery Room": 3,
+    "Surprise": 3,
+}
+
+
+def test_c1_feature_inventories_cover_all_south_fork_rapids():
+    catalog = _load(SOURCE_CATALOG_RELATIVE_PATH)
+    validate_source_catalog(catalog)
+    source_lookup = {source["source_id"]: source for source in catalog["sources"]}
+    river = next(
+        river for river in catalog["rivers"]
+        if river["river_id"] == "south_fork_american_chili_bar"
+    )
+
+    assert {
+        rapid["name"]: len(rapid["feature_inventory"]) for rapid in river["rapids"]
+    } == SOUTH_FORK_EXPECTED_SUBFEATURE_COUNTS
+
+    for rapid in river["rapids"]:
+        flow_reference = rapid["flow_band_reference"]
+        assert flow_reference["low_review_cfs"] == 900.0
+        assert flow_reference["reference_review_cfs"] == 1600.0
+        assert flow_reference["high_review_cfs"] == 3000.0
+        for subfeature in rapid["feature_inventory"]:
+            assert subfeature["feature_type"] in NAMED_RAPID_SUBFEATURE_TYPES
+            position = subfeature["relative_position"]
+            assert position["along"] in NAMED_RAPID_SUBFEATURE_ALONG_POSITIONS
+            assert position["across"] in NAMED_RAPID_SUBFEATURE_ACROSS_POSITIONS
+            assert all(subfeature["flow_dependence"][band] for band in FLOW_BANDS)
+            assert subfeature["consequence_class"] in NAMED_RAPID_CONSEQUENCE_CLASSES
+            assert subfeature["guide_review_status"] == "required"
+            for source_id in subfeature["source_ids"]:
+                assert source_lookup[source_id]["url"].startswith("https://")
+                assert source_lookup[source_id]["rights_status"].startswith("link_only")
+
+    rapids = {rapid["name"]: rapid for rapid in river["rapids"]}
+
+    # Aliases discovered during C1 research are preserved as source disagreements.
+    assert rapids["Chili Bar Hole"]["aliases"] == ["Chili Bar Surf Wave"]
+    assert rapids["Racehorse Bend"]["aliases"] == ["Sluice Box"]
+    assert rapids["Maya"]["aliases"] == ["Traffic Light"]
+    assert "Dead Man's Drop" in rapids["Son of Satan"]["aliases"]
+    assert rapids["Pre-Op"]["aliases"] == ["Triage"]
+
+    # Class disagreements are recorded for every rapid where sources disagree;
+    # Scissors is the only South Fork rapid with a unanimous class III.
+    for name, rapid in rapids.items():
+        if name == "Scissors":
+            assert "class_reported_range" not in rapid
+        else:
+            reported = rapid["class_reported_range"]
+            assert reported["low"] and reported["high"] and reported["note"]
+
+    def subfeature(name: str, subfeature_id: str) -> dict:
+        return next(
+            sub for sub in rapids[name]["feature_inventory"]
+            if sub["subfeature_id"] == subfeature_id
+        )
+
+    assert {
+        "first_threat_frog_rock",
+        "first_threat_hole",
+        "second_threat_right_slot",
+        "third_threat_left_hole",
+        "third_threat_right_hole",
+    } <= {sub["subfeature_id"] for sub in rapids["Triple Threat"]["feature_inventory"]}
+    assert subfeature("Triple Threat", "first_threat_frog_rock")["consequence_class"] == (
+        "wrap_or_pin"
+    )
+
+    assert {
+        "entry_bend_rocky_island",
+        "right_slot_sneak",
+        "left_cliff_wall_dogleg",
+        "twin_ledges_twisting_drop",
+        "main_hole_curling_wave",
+        "left_swimmer_catch_pool",
+    } <= {sub["subfeature_id"] for sub in rapids["Satan's Cesspool"]["feature_inventory"]}
+
+    assert {
+        "house_rock_submerged_boulder",
+        "fowlers_rock_boulder",
+        "high_flow_left_line",
+    } <= {sub["subfeature_id"] for sub in rapids["Fowler's Rock"]["feature_inventory"]}
+    assert subfeature("Fowler's Rock", "house_rock_submerged_boulder")[
+        "consequence_class"
+    ] == "wrap_or_pin"
+
+    assert subfeature("Bouncing Rock", "main_flippy_hole")["consequence_class"] == (
+        "flip_risk"
+    )
+    assert subfeature("Hospital Bar", "diagonal_hole")["consequence_class"] == "flip_risk"
+    assert subfeature("Hospital Bar", "catchers_mitt_rocks")["aliases"] == [
+        "Catchers Mitt"
+    ]
+    assert subfeature("Recovery Room", "little_big_hole")["aliases"] == ["Little Big Hole"]
+
+    markers = _load(EDITOR_MARKERS_RELATIVE_PATH)
+    south_fork = next(
+        river for river in markers["rivers"]
+        if river["river_id"] == "south_fork_american_chili_bar"
+    )
+    marker_lookup = {marker["display_name"]: marker for marker in south_fork["markers"]}
+    for name, expected_count in SOUTH_FORK_EXPECTED_SUBFEATURE_COUNTS.items():
+        marker = marker_lookup[name]
+        assert marker["subfeature_count"] == expected_count
+        assert marker["feature_inventory_status"] == (
+            "research_attached_pending_exact_geometry_and_guide_review"
+        )
+        assert marker["subfeature_editor_pin_status"] == (
+            "inventory_attached_blocked_until_exact_geometry"
+        )
+        assert marker["flow_band_reference"]["reference_review_cfs"] == 1600.0
+        for subfeature_record in marker["feature_inventory"]:
+            assert subfeature_record["production_authoritative"] is False
+            assert subfeature_record["feature_forcing_allowed"] is False
+            assert subfeature_record["geometry_status"] == "exact_geometry_required"
+            assert [ref["source_id"] for ref in subfeature_record["source_refs"]] == (
+                subfeature_record["source_ids"]
+            )
 
 
 def test_c1_feature_inventory_schema_rejects_invalid_records():
