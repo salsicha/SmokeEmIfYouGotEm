@@ -57,6 +57,63 @@ void assert_solver_is_deterministic(const raftsim::Scenario& scenario) {
     expect(max_abs_diff(first_frames.back().state.v, second_frames.back().state.v) < 1.0e-12, "v run is not deterministic");
 }
 
+raftsim::SolverConfig finite_volume_second_order_config() {
+    raftsim::SolverConfig config;
+    config.solver_mode = "finite_volume";
+    config.flux_scheme = "hll";
+    config.spatial_order = 2;
+    config.bed_slope_source_scale = 1.0;
+    config.feature_strength_scale = 0.0;
+    config.preserve_initial_mass = false;
+    config.disable_fixture_calibrations = true;
+    return config;
+}
+
+void assert_finite_volume_second_order_is_deterministic(const raftsim::Scenario& scenario) {
+    raftsim::SolverConfig config = finite_volume_second_order_config();
+    raftsim::ReducedShallowWaterSolver first(scenario, config);
+    raftsim::ReducedShallowWaterSolver second(scenario, config);
+    std::vector<raftsim::Frame> first_frames = first.run(12, 4);
+    std::vector<raftsim::Frame> second_frames = second.run(12, 4);
+    expect(first_frames.size() == second_frames.size(), "second-order deterministic frame count mismatch");
+    expect(max_abs_diff(first_frames.back().state.h, second_frames.back().state.h) < 1.0e-12, "second-order depth run is not deterministic");
+    expect(max_abs_diff(first_frames.back().state.u, second_frames.back().state.u) < 1.0e-12, "second-order u run is not deterministic");
+    expect(max_abs_diff(first_frames.back().state.v, second_frames.back().state.v) < 1.0e-12, "second-order v run is not deterministic");
+}
+
+void assert_finite_volume_second_order_is_well_balanced(const raftsim::Scenario& scenario) {
+    // A lake-at-rest state over the scenario bathymetry (with reflective walls) must
+    // stay exactly at rest under the second-order MUSCL path, including partially
+    // submerged topography with wet/dry margins.
+    raftsim::Scenario rest = scenario;
+    for (raftsim::BoundaryCondition& boundary : rest.boundaries) {
+        boundary.kind = "wall";
+        boundary.has_stage = false;
+        boundary.has_depth = false;
+        boundary.has_velocity = false;
+    }
+    double bed_min = rest.bed.min();
+    double bed_max = rest.bed.max();
+    double stage = bed_max > bed_min + 1.0e-9 ? bed_min + 0.75 * (bed_max - bed_min) : bed_min + 1.0;
+    for (std::size_t row = 0; row < rest.grid.ny; ++row) {
+        for (std::size_t col = 0; col < rest.grid.nx; ++col) {
+            double depth = std::max(0.0, stage - rest.bed(row, col));
+            rest.initial.h(row, col) = depth;
+            rest.initial.eta(row, col) = rest.bed(row, col) + depth;
+            rest.initial.u(row, col) = 0.0;
+            rest.initial.v(row, col) = 0.0;
+            rest.initial.hu(row, col) = 0.0;
+            rest.initial.hv(row, col) = 0.0;
+            rest.initial.wet.values[row * rest.grid.nx + col] = depth > 1.0e-6 ? 1 : 0;
+        }
+    }
+    raftsim::ReducedShallowWaterSolver solver(rest, finite_volume_second_order_config());
+    std::vector<raftsim::Frame> frames = solver.run(24, 8);
+    expect(max_abs_diff(frames.back().state.h, frames.front().state.h) < 1.0e-12, "lake at rest depth drifted under second-order path");
+    expect(max_abs_diff(frames.back().state.u, frames.front().state.u) < 1.0e-12, "lake at rest u drifted under second-order path");
+    expect(max_abs_diff(frames.back().state.v, frames.front().state.v) < 1.0e-12, "lake at rest v drifted under second-order path");
+}
+
 void assert_output_can_be_written(const raftsim::Scenario& scenario, const std::string& output_dir) {
     raftsim::SolverConfig config;
     raftsim::ReducedShallowWaterSolver solver(scenario, config);
@@ -109,6 +166,8 @@ int main(int argc, char** argv) {
         raftsim::Scenario scenario = raftsim::load_scenario_package(argv[1]);
         assert_scenario_loads(scenario);
         assert_solver_is_deterministic(scenario);
+        assert_finite_volume_second_order_is_deterministic(scenario);
+        assert_finite_volume_second_order_is_well_balanced(scenario);
         assert_chrono_coupling_samples_water_and_contact(scenario);
         if (argc == 3) {
             assert_output_can_be_written(scenario, argv[2]);

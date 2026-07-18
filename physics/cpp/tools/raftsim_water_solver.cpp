@@ -20,6 +20,7 @@ struct CliArgs {
     std::string solver_mode = "reduced";
     std::string boundary_mode = "scenario";
     std::string flux_scheme = "rusanov";
+    int spatial_order = 2;
     int steps = -1;
     int frame_interval = 60;
     double cfl = 0.45;
@@ -40,6 +41,7 @@ void print_usage(const char* program) {
         << "  --solver-mode <mode>           reduced or finite_volume (default: reduced)\n"
         << "  --boundary-mode <mode>         scenario or pyclaw (default: scenario)\n"
         << "  --flux-scheme <scheme>         rusanov, hll, or roe (default: rusanov)\n"
+        << "  --spatial-order <n>            Finite-volume spatial order: 2 = MUSCL, 1 = legacy (default: 2)\n"
         << "  --steps <n>                    Fixed steps to run (default: scenario duration / fixed_dt)\n"
         << "  --frame-interval <n>           Save every n solver steps (default: 60)\n"
         << "  --cfl <x>                      Finite-volume CFL target (default: 0.45)\n"
@@ -92,6 +94,8 @@ CliArgs parse_args(int argc, char** argv) {
             args.boundary_mode = require_value(flag);
         } else if (flag == "--flux-scheme") {
             args.flux_scheme = require_value(flag);
+        } else if (flag == "--spatial-order") {
+            args.spatial_order = parse_int(require_value(flag), flag);
         } else if (flag == "--steps") {
             args.steps = parse_int(require_value(flag), flag);
         } else if (flag == "--frame-interval") {
@@ -132,6 +136,9 @@ CliArgs parse_args(int argc, char** argv) {
     if (args.flux_scheme != "rusanov" && args.flux_scheme != "hll" && args.flux_scheme != "roe") {
         throw std::runtime_error("--flux-scheme must be rusanov, hll, or roe.");
     }
+    if (args.spatial_order != 1 && args.spatial_order != 2) {
+        throw std::runtime_error("--spatial-order must be 1 or 2.");
+    }
     if (args.cfl <= 0.0) {
         throw std::runtime_error("--cfl must be positive.");
     }
@@ -156,6 +163,7 @@ int main(int argc, char** argv) {
         config.solver_mode = args.solver_mode;
         config.boundary_mode = args.boundary_mode;
         config.flux_scheme = args.flux_scheme;
+        config.spatial_order = args.spatial_order;
         config.cfl = args.cfl;
         config.dry_tolerance = args.dry_tolerance;
         config.feature_strength_scale = args.feature_strength_scale;
@@ -176,6 +184,7 @@ int main(int argc, char** argv) {
         std::cout << "solver_mode=" << config.solver_mode << "\n";
         std::cout << "boundary_mode=" << config.boundary_mode << "\n";
         std::cout << "flux_scheme=" << config.flux_scheme << "\n";
+        std::cout << "spatial_order=" << config.spatial_order << "\n";
         std::cout << "disable_fixture_calibrations="
                   << (config.disable_fixture_calibrations ? "true" : "false") << "\n";
         std::cout << "steps=" << steps << "\n";
