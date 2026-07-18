@@ -13,13 +13,13 @@
       "kind": "inflow",
       "metadata": {
         "flow_band": "median_runnable",
-        "manning_n": 0.042,
+        "manning_n": 0.075,
         "manning_slope": 0.028214384498088614,
         "target_discharge_m3s": 45.3069545472
       },
-      "stage": 450.8407877172118,
+      "stage": 451.1059766272059,
       "velocity": [
-        2.9619181396583625,
+        2.091634842440677,
         0.0
       ]
     },
@@ -32,7 +32,7 @@
         "flow_band": "median_runnable",
         "target_discharge_m3s": 45.3069545472
       },
-      "stage": 433.9121570183587,
+      "stage": 434.1773459283528,
       "velocity": null
     },
     {
@@ -87,8 +87,8 @@
       "production_promoted": false,
       "published_river_mile": 0.6,
       "rapid_name": "Meat Grinder",
-      "stage_east_m": 433.9121570183587,
-      "stage_west_m": 450.8407877172118,
+      "stage_east_m": 434.1773459283528,
+      "stage_west_m": 451.1059766272059,
       "stationing_source": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
       "target_discharge_m3s": 45.3069545472,
       "task": "release-1.0-plan P3 step 2 prep / A-2 behavioral gate"
@@ -113,6 +113,6 @@
     "tube_radius_m": 0.28,
     "width_m": 1.9
   },
-  "roughness": 0.042,
+  "roughness": 0.075,
   "schema_version": "raftsim.scenario2_5d.v0"
 }

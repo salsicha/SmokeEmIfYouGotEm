@@ -1,0 +1,1807 @@
+{
+  "bands": [
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "low_runnable/bed.npy",
+          "sha256": "357c813148313da5ad952705da23db773745f6c9197c404c51d13ecb24b71f70",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "low_runnable/h.npy",
+          "sha256": "2e425228821bfd785929eebb2687ba36b75c52bbf1ba5c9591bc2581c182f389",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "low_runnable/u.npy",
+          "sha256": "1c69fe2f7eb6ec47d8b48cacad87ac9657b50c5aba2b6acec220a8a075c070ff",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "low_runnable/v.npy",
+          "sha256": "8b63651a4ea1b036bf28d1bb87fa46d81438f5fb0f2712cfe99bf28bf9eeb53a",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "low_runnable/wet_mask.npy",
+          "sha256": "30dffa992672a4dfbc8957f77d3f7353bb749ae8dafc7438f9ab4b7ea491524e",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "low_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 800.0,
+          "max_abs_dh_m": 0.20359129910997742,
+          "max_abs_du_m_per_s": 1.7819132659110908,
+          "max_abs_dv_m_per_s": 1.4623996528712857
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 0.7148866273868771,
+            "max_abs_du_m_per_s": 3.5,
+            "max_abs_dv_m_per_s": 2.2207369563382584
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 0.4076170206280274,
+            "max_abs_du_m_per_s": 1.2533791838771378,
+            "max_abs_dv_m_per_s": 1.31839575941497
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 0.1874440266259554,
+            "max_abs_du_m_per_s": 1.261953739538191,
+            "max_abs_dv_m_per_s": 1.307585840424745
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 0.34825800657944483,
+            "max_abs_du_m_per_s": 1.5176033211566549,
+            "max_abs_dv_m_per_s": 0.8710693573580647
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 0.09099254929986045,
+            "max_abs_du_m_per_s": 0.6331206293404219,
+            "max_abs_dv_m_per_s": 0.6199734574106748
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.21849212329622575,
+            "max_abs_du_m_per_s": 2.231775877398387,
+            "max_abs_dv_m_per_s": 1.6485262202256041
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 0.44443413766867645,
+            "max_abs_du_m_per_s": 1.4935473020877992,
+            "max_abs_dv_m_per_s": 1.3934546478434966
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.10462120506603735,
+            "max_abs_du_m_per_s": 1.2752647910198194,
+            "max_abs_dv_m_per_s": 0.6477593231032006
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.10843661518989157,
+            "max_abs_du_m_per_s": 0.5829031247875469,
+            "max_abs_dv_m_per_s": 0.4886426945153015
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 0.1060877938702244,
+            "max_abs_du_m_per_s": 0.952329954025406,
+            "max_abs_dv_m_per_s": 0.36975601383516216
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.10244975547631359,
+            "max_abs_du_m_per_s": 0.5947317506814398,
+            "max_abs_dv_m_per_s": 0.4228476619763817
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.10933739612259381,
+            "max_abs_du_m_per_s": 0.5108772889987647,
+            "max_abs_dv_m_per_s": 0.5824963358665263
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.10746809007802874,
+            "max_abs_du_m_per_s": 0.4839979902571487,
+            "max_abs_dv_m_per_s": 0.28620826881749717
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.11118426032709475,
+            "max_abs_du_m_per_s": 0.5664743169415655,
+            "max_abs_dv_m_per_s": 0.7780155891149294
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.11367436136335246,
+            "max_abs_du_m_per_s": 0.9064837546107305,
+            "max_abs_dv_m_per_s": 0.4237729881547025
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.14412816848452376,
+            "max_abs_du_m_per_s": 0.6186750181131764,
+            "max_abs_dv_m_per_s": 0.47586834886922524
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.22852565679427517,
+            "max_abs_du_m_per_s": 0.35654881474889544,
+            "max_abs_dv_m_per_s": 0.35922075691519356
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.1824043334631459,
+            "max_abs_du_m_per_s": 0.5610735207692836,
+            "max_abs_dv_m_per_s": 0.3132621374382323
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.10424726992234146,
+            "max_abs_du_m_per_s": 0.35556998424469954,
+            "max_abs_dv_m_per_s": 0.39921074901713344
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.07175372678453062,
+            "max_abs_du_m_per_s": 0.3883533257367824,
+            "max_abs_dv_m_per_s": 0.2735899364737924
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.0730960456885428,
+            "max_abs_du_m_per_s": 0.30611537451728577,
+            "max_abs_dv_m_per_s": 0.32406912296251034
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.08080444034588508,
+            "max_abs_du_m_per_s": 1.1759356729771588,
+            "max_abs_dv_m_per_s": 0.9995305553485277
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.06238474873501754,
+            "max_abs_du_m_per_s": 2.7882309547391677,
+            "max_abs_dv_m_per_s": 0.9195607678790824
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.1671481314895934,
+            "max_abs_du_m_per_s": 4.799527985338797,
+            "max_abs_dv_m_per_s": 2.381452975878563
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 0.11920321938697498,
+            "max_abs_du_m_per_s": 4.84429473072172,
+            "max_abs_dv_m_per_s": 1.4543917804915263
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.12237258856858074,
+            "max_abs_du_m_per_s": 1.2512314393787036,
+            "max_abs_dv_m_per_s": 1.273261770569037
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.11513796483463085,
+            "max_abs_du_m_per_s": 1.8240817637804994,
+            "max_abs_dv_m_per_s": 1.4905407932024106
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.2403521364615213,
+            "max_abs_du_m_per_s": 1.8885224000610565,
+            "max_abs_dv_m_per_s": 1.806936992993365
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.10173071890256252,
+            "max_abs_du_m_per_s": 1.7949694730441328,
+            "max_abs_dv_m_per_s": 0.8161115991962122
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.17250260843388948,
+            "max_abs_du_m_per_s": 0.6932382464707938,
+            "max_abs_dv_m_per_s": 0.2909566460256366
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.12148546219997652,
+            "max_abs_du_m_per_s": 0.7958047906209857,
+            "max_abs_dv_m_per_s": 0.4061790141711947
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.1244650169614116,
+            "max_abs_du_m_per_s": 0.30856286570354063,
+            "max_abs_dv_m_per_s": 1.4088316558413239
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.1610404369476251,
+            "max_abs_du_m_per_s": 0.5792978926845586,
+            "max_abs_dv_m_per_s": 0.7295787352033182
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.1622442908099243,
+            "max_abs_du_m_per_s": 0.8032399808334241,
+            "max_abs_dv_m_per_s": 0.9598971234965368
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.11771407309857329,
+            "max_abs_du_m_per_s": 0.3872462823606382,
+            "max_abs_dv_m_per_s": 0.5446915068962165
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.09812991452847775,
+            "max_abs_du_m_per_s": 0.514892092597253,
+            "max_abs_dv_m_per_s": 0.881238973470942
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.08683642773496814,
+            "max_abs_du_m_per_s": 0.584416606226499,
+            "max_abs_dv_m_per_s": 0.881238973470942
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.05663870271356508,
+            "max_abs_du_m_per_s": 0.4440981441085622,
+            "max_abs_dv_m_per_s": 0.6426262000730869
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.07796813760566479,
+            "max_abs_du_m_per_s": 0.7105210297894681,
+            "max_abs_dv_m_per_s": 0.6114833087449475
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.09284162014803976,
+            "max_abs_du_m_per_s": 0.3958209063987669,
+            "max_abs_dv_m_per_s": 0.370993378054842
+          },
+          {
+            "end_time_s": 410.0,
+            "max_abs_dh_m": 0.023978313609403834,
+            "max_abs_du_m_per_s": 0.4431320882039812,
+            "max_abs_dv_m_per_s": 0.30611937786880106
+          },
+          {
+            "end_time_s": 420.0,
+            "max_abs_dh_m": 0.09388662279068938,
+            "max_abs_du_m_per_s": 0.573492328711009,
+            "max_abs_dv_m_per_s": 0.7191330561238825
+          },
+          {
+            "end_time_s": 430.0,
+            "max_abs_dh_m": 0.3452802796582543,
+            "max_abs_du_m_per_s": 4.3271211289938165,
+            "max_abs_dv_m_per_s": 1.2648632194264344
+          },
+          {
+            "end_time_s": 440.0,
+            "max_abs_dh_m": 0.09991162396329356,
+            "max_abs_du_m_per_s": 1.4015669784670601,
+            "max_abs_dv_m_per_s": 0.8040065469685025
+          },
+          {
+            "end_time_s": 450.0,
+            "max_abs_dh_m": 0.11861143446068478,
+            "max_abs_du_m_per_s": 0.522076669216695,
+            "max_abs_dv_m_per_s": 0.7867148508687902
+          },
+          {
+            "end_time_s": 460.0,
+            "max_abs_dh_m": 0.11357890776223356,
+            "max_abs_du_m_per_s": 0.522076669216695,
+            "max_abs_dv_m_per_s": 0.7867148508687902
+          },
+          {
+            "end_time_s": 470.0,
+            "max_abs_dh_m": 0.03609059748809573,
+            "max_abs_du_m_per_s": 0.4908410425744438,
+            "max_abs_dv_m_per_s": 0.2754259170742068
+          },
+          {
+            "end_time_s": 480.0,
+            "max_abs_dh_m": 0.040301142848313695,
+            "max_abs_du_m_per_s": 0.5805218044571862,
+            "max_abs_dv_m_per_s": 0.4904010308429502
+          },
+          {
+            "end_time_s": 490.0,
+            "max_abs_dh_m": 0.04607959504288603,
+            "max_abs_du_m_per_s": 0.5730292597835388,
+            "max_abs_dv_m_per_s": 0.715152848231119
+          },
+          {
+            "end_time_s": 500.0,
+            "max_abs_dh_m": 0.07281662274940559,
+            "max_abs_du_m_per_s": 0.3865949808031621,
+            "max_abs_dv_m_per_s": 0.4653718302440776
+          },
+          {
+            "end_time_s": 510.0,
+            "max_abs_dh_m": 0.09320433445662601,
+            "max_abs_du_m_per_s": 0.3995283529335705,
+            "max_abs_dv_m_per_s": 0.370401828525615
+          },
+          {
+            "end_time_s": 520.0,
+            "max_abs_dh_m": 0.11717767462162776,
+            "max_abs_du_m_per_s": 0.36045362876128934,
+            "max_abs_dv_m_per_s": 0.6110218413815238
+          },
+          {
+            "end_time_s": 530.0,
+            "max_abs_dh_m": 0.07390519949107727,
+            "max_abs_du_m_per_s": 0.6268881577818959,
+            "max_abs_dv_m_per_s": 1.0777911092668546
+          },
+          {
+            "end_time_s": 540.0,
+            "max_abs_dh_m": 0.08731061538660195,
+            "max_abs_du_m_per_s": 0.5285259741608208,
+            "max_abs_dv_m_per_s": 0.8580088636190761
+          },
+          {
+            "end_time_s": 550.0,
+            "max_abs_dh_m": 0.2831062284452699,
+            "max_abs_du_m_per_s": 1.1600590254651053,
+            "max_abs_dv_m_per_s": 2.170203921289139
+          },
+          {
+            "end_time_s": 560.0,
+            "max_abs_dh_m": 0.29416072942120675,
+            "max_abs_du_m_per_s": 1.1600590254651053,
+            "max_abs_dv_m_per_s": 2.170203921289139
+          },
+          {
+            "end_time_s": 570.0,
+            "max_abs_dh_m": 0.10139289272367447,
+            "max_abs_du_m_per_s": 0.5256143873543108,
+            "max_abs_dv_m_per_s": 1.066237130492121
+          },
+          {
+            "end_time_s": 580.0,
+            "max_abs_dh_m": 0.12265275055412017,
+            "max_abs_du_m_per_s": 0.6587312724785604,
+            "max_abs_dv_m_per_s": 0.7944917748259228
+          },
+          {
+            "end_time_s": 590.0,
+            "max_abs_dh_m": 0.15627996895594354,
+            "max_abs_du_m_per_s": 0.4178088175568051,
+            "max_abs_dv_m_per_s": 1.2197564219208654
+          },
+          {
+            "end_time_s": 600.0,
+            "max_abs_dh_m": 0.11067366762872419,
+            "max_abs_du_m_per_s": 0.5208015287862944,
+            "max_abs_dv_m_per_s": 0.36477035077053227
+          },
+          {
+            "end_time_s": 610.0,
+            "max_abs_dh_m": 0.1172842953302626,
+            "max_abs_du_m_per_s": 0.5423738354917345,
+            "max_abs_dv_m_per_s": 0.48406812318378223
+          },
+          {
+            "end_time_s": 620.0,
+            "max_abs_dh_m": 0.026256509575910025,
+            "max_abs_du_m_per_s": 0.3772982522941749,
+            "max_abs_dv_m_per_s": 0.5560380848818423
+          },
+          {
+            "end_time_s": 630.0,
+            "max_abs_dh_m": 0.05301342695452416,
+            "max_abs_du_m_per_s": 0.1648099887608243,
+            "max_abs_dv_m_per_s": 0.34627021203464337
+          },
+          {
+            "end_time_s": 640.0,
+            "max_abs_dh_m": 0.055079212356441865,
+            "max_abs_du_m_per_s": 0.17656015006898523,
+            "max_abs_dv_m_per_s": 0.46284067316903854
+          },
+          {
+            "end_time_s": 650.0,
+            "max_abs_dh_m": 0.054368740046954356,
+            "max_abs_du_m_per_s": 0.4836590326942732,
+            "max_abs_dv_m_per_s": 0.46107591903261097
+          },
+          {
+            "end_time_s": 660.0,
+            "max_abs_dh_m": 0.25513200176920126,
+            "max_abs_du_m_per_s": 1.2834740298989815,
+            "max_abs_dv_m_per_s": 3.3226268771650913
+          },
+          {
+            "end_time_s": 670.0,
+            "max_abs_dh_m": 0.3900889970295169,
+            "max_abs_du_m_per_s": 1.4495290048617178,
+            "max_abs_dv_m_per_s": 1.508970932353951
+          },
+          {
+            "end_time_s": 680.0,
+            "max_abs_dh_m": 0.40772577194237386,
+            "max_abs_du_m_per_s": 1.6810127312258525,
+            "max_abs_dv_m_per_s": 1.1135216623018906
+          },
+          {
+            "end_time_s": 690.0,
+            "max_abs_dh_m": 0.24835467377307113,
+            "max_abs_du_m_per_s": 1.3620639820806322,
+            "max_abs_dv_m_per_s": 1.1794044318406978
+          },
+          {
+            "end_time_s": 700.0,
+            "max_abs_dh_m": 0.22317338005406123,
+            "max_abs_du_m_per_s": 1.1943490644305115,
+            "max_abs_dv_m_per_s": 1.251310404176203
+          },
+          {
+            "end_time_s": 710.0,
+            "max_abs_dh_m": 0.23059549520110273,
+            "max_abs_du_m_per_s": 3.7445654057055835,
+            "max_abs_dv_m_per_s": 1.3017963668563437
+          },
+          {
+            "end_time_s": 720.0,
+            "max_abs_dh_m": 0.16796711190022723,
+            "max_abs_du_m_per_s": 3.1494966087505087,
+            "max_abs_dv_m_per_s": 0.8156171468041264
+          },
+          {
+            "end_time_s": 730.0,
+            "max_abs_dh_m": 0.1761204364044361,
+            "max_abs_du_m_per_s": 2.6643493933534392,
+            "max_abs_dv_m_per_s": 0.8005618232187146
+          },
+          {
+            "end_time_s": 740.0,
+            "max_abs_dh_m": 0.1789240157099995,
+            "max_abs_du_m_per_s": 1.8282987983570367,
+            "max_abs_dv_m_per_s": 1.0079687778951256
+          },
+          {
+            "end_time_s": 750.0,
+            "max_abs_dh_m": 0.18011217365865367,
+            "max_abs_du_m_per_s": 1.880697939258384,
+            "max_abs_dv_m_per_s": 0.8258867678670843
+          },
+          {
+            "end_time_s": 760.0,
+            "max_abs_dh_m": 0.08793364090385725,
+            "max_abs_du_m_per_s": 1.792352243559253,
+            "max_abs_dv_m_per_s": 0.6139204469411046
+          },
+          {
+            "end_time_s": 770.0,
+            "max_abs_dh_m": 0.15872848314918678,
+            "max_abs_du_m_per_s": 2.5912180072239126,
+            "max_abs_dv_m_per_s": 0.9032072722475595
+          },
+          {
+            "end_time_s": 780.0,
+            "max_abs_dh_m": 0.12778199756609543,
+            "max_abs_du_m_per_s": 1.7586975927314943,
+            "max_abs_dv_m_per_s": 0.9661664836445353
+          },
+          {
+            "end_time_s": 790.0,
+            "max_abs_dh_m": 0.1862344571100426,
+            "max_abs_du_m_per_s": 2.4575119961688516,
+            "max_abs_dv_m_per_s": 1.028320440018929
+          },
+          {
+            "end_time_s": 800.0,
+            "max_abs_dh_m": 0.20359129910997742,
+            "max_abs_du_m_per_s": 1.7819132659110908,
+            "max_abs_dv_m_per_s": 1.4623996528712857
+          }
+        ]
+      },
+      "difficulty": "class_III_plus_troublemaker",
+      "directory": "low_runnable",
+      "discharge_steady_m3s": {
+        "east": 19.039462708847715,
+        "mid": 16.034710938546915,
+        "west": 17.640800235198
+      },
+      "discharge_target_cfs": 900.0,
+      "discharge_target_m3s": 25.4851619328,
+      "effective_manning_n": 0.041,
+      "field_stats": {
+        "h_max_m": 2.4216363430023193,
+        "h_mean_m": 0.2321566300673184,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 3.9956824314863226,
+        "wet_fraction": 0.3248338870431894
+      },
+      "manning_n": 0.041,
+      "scenario_id": "south_fork_troublemaker_c3_window_low_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "997b9f260f861117be52720b41d67a7ad3adba068788e27b20b266e20c9c7997",
+        "initial_state.npz": "d4f6b834da2246014cfe570a57c57005208e3f67dfd5f2ee38596cb25435d999",
+        "scenario.json": "4a6e16eb90a20cfd6e544b4bb4f3aac46a5a2940765d924161d99328e9af1c56"
+      },
+      "season": "late_summer_low_water"
+    },
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "median_runnable/bed.npy",
+          "sha256": "357c813148313da5ad952705da23db773745f6c9197c404c51d13ecb24b71f70",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "median_runnable/h.npy",
+          "sha256": "5315fea27495dea77e86d5932e5cd68753b215f96c9d016e871d0dc4d6d33ab9",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "median_runnable/u.npy",
+          "sha256": "27b92b710dabdc6c6df06d714585e80dcc4860f6ef99bd439032e8aa3508d0c0",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "median_runnable/v.npy",
+          "sha256": "bc088c15bf7cc31ac7444ae867113527f630c80fdeeeeb3e84675b6417f892bf",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "median_runnable/wet_mask.npy",
+          "sha256": "4f50b8bec3792bf930ef123c24abb93ae4092fe0269ca62fd462c6dc7f23a101",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "median_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 800.0,
+          "max_abs_dh_m": 0.08781686403749492,
+          "max_abs_du_m_per_s": 0.7918866131074834,
+          "max_abs_dv_m_per_s": 1.4446697012997602
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 0.9252220821890322,
+            "max_abs_du_m_per_s": 3.6638623528999954,
+            "max_abs_dv_m_per_s": 3.259848201862147
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 0.4923881720258571,
+            "max_abs_du_m_per_s": 1.789432982036182,
+            "max_abs_dv_m_per_s": 2.0448578486049285
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 0.281676652516124,
+            "max_abs_du_m_per_s": 1.444392629230685,
+            "max_abs_dv_m_per_s": 1.3278033878205269
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 0.3560015889974534,
+            "max_abs_du_m_per_s": 1.602549828518789,
+            "max_abs_dv_m_per_s": 1.5308182240847983
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 0.3498310590954469,
+            "max_abs_du_m_per_s": 1.2220361441459333,
+            "max_abs_dv_m_per_s": 1.3189132399943786
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.18213943647986108,
+            "max_abs_du_m_per_s": 1.4121824334435438,
+            "max_abs_dv_m_per_s": 0.4295720527443454
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 0.23823249683677603,
+            "max_abs_du_m_per_s": 1.3099537883623902,
+            "max_abs_dv_m_per_s": 2.8977134947629684
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.1641278686459474,
+            "max_abs_du_m_per_s": 0.5875934179918737,
+            "max_abs_dv_m_per_s": 1.722914060441041
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.08776336975356706,
+            "max_abs_du_m_per_s": 0.5739946387399403,
+            "max_abs_dv_m_per_s": 1.3996386515019723
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 0.09551995472194441,
+            "max_abs_du_m_per_s": 0.446252510150444,
+            "max_abs_dv_m_per_s": 1.3407057981729726
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.12602796543011202,
+            "max_abs_du_m_per_s": 0.36704821307639646,
+            "max_abs_dv_m_per_s": 1.1591298863167976
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.0730652544267042,
+            "max_abs_du_m_per_s": 0.35199743411086204,
+            "max_abs_dv_m_per_s": 0.4585552677857774
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.0674315111323307,
+            "max_abs_du_m_per_s": 0.8426961848427891,
+            "max_abs_dv_m_per_s": 0.5867248236582423
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.09624615896032473,
+            "max_abs_du_m_per_s": 0.9058368663672756,
+            "max_abs_dv_m_per_s": 1.4231058296735617
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.23491556326502103,
+            "max_abs_du_m_per_s": 1.3207939399879969,
+            "max_abs_dv_m_per_s": 4.0021144238697035
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.07286145281447265,
+            "max_abs_du_m_per_s": 1.4138135062261106,
+            "max_abs_dv_m_per_s": 3.172224186186197
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.07309903262712886,
+            "max_abs_du_m_per_s": 0.6453532760238205,
+            "max_abs_dv_m_per_s": 0.6326073341840325
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.1036205966161241,
+            "max_abs_du_m_per_s": 0.5791794378566392,
+            "max_abs_dv_m_per_s": 1.4536260796144544
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.12209692886725998,
+            "max_abs_du_m_per_s": 0.7328145388891987,
+            "max_abs_dv_m_per_s": 1.4208041795826705
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.07540804076300267,
+            "max_abs_du_m_per_s": 0.7347328340766681,
+            "max_abs_dv_m_per_s": 0.8951086243149533
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.39308170026111366,
+            "max_abs_du_m_per_s": 2.5739117267524914,
+            "max_abs_dv_m_per_s": 1.706739068434087
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.23794471148312646,
+            "max_abs_du_m_per_s": 1.9698746470146364,
+            "max_abs_dv_m_per_s": 1.9190187261826843
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.3620771949952903,
+            "max_abs_du_m_per_s": 1.4580846291525587,
+            "max_abs_dv_m_per_s": 1.0602683770514456
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.20113007749736989,
+            "max_abs_du_m_per_s": 1.7573516879878197,
+            "max_abs_dv_m_per_s": 0.8661415223024063
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 0.1568212870990635,
+            "max_abs_du_m_per_s": 1.5792323964301753,
+            "max_abs_dv_m_per_s": 1.082747899745879
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.2345916342798361,
+            "max_abs_du_m_per_s": 1.310393847526119,
+            "max_abs_dv_m_per_s": 1.4142590332580964
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.5506103071120412,
+            "max_abs_du_m_per_s": 2.711543652634487,
+            "max_abs_dv_m_per_s": 1.6685440289826068
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.5350910395739581,
+            "max_abs_du_m_per_s": 2.6282846268777593,
+            "max_abs_dv_m_per_s": 1.5994949632365343
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.23199783076835442,
+            "max_abs_du_m_per_s": 1.9000023905268084,
+            "max_abs_dv_m_per_s": 1.6065947906656177
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.39433238783476365,
+            "max_abs_du_m_per_s": 1.407931385014331,
+            "max_abs_dv_m_per_s": 1.8215780478065102
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.480446747231444,
+            "max_abs_du_m_per_s": 1.7141683528041671,
+            "max_abs_dv_m_per_s": 1.9262994513468599
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.46469267582628604,
+            "max_abs_du_m_per_s": 1.627231376780725,
+            "max_abs_dv_m_per_s": 2.1372668282794827
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.6072214986096465,
+            "max_abs_du_m_per_s": 3.858387281952182,
+            "max_abs_dv_m_per_s": 2.1150212369533894
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.619372661229803,
+            "max_abs_du_m_per_s": 3.7334763997578246,
+            "max_abs_dv_m_per_s": 1.5311236655902491
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.20511357068591862,
+            "max_abs_du_m_per_s": 1.5282421335322585,
+            "max_abs_dv_m_per_s": 1.716645672784746
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.49501737046593286,
+            "max_abs_du_m_per_s": 2.9806735707732424,
+            "max_abs_dv_m_per_s": 0.9476434291330776
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.49650986289918975,
+            "max_abs_du_m_per_s": 2.8053566444798337,
+            "max_abs_dv_m_per_s": 1.6176025341347087
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.15936664996162497,
+            "max_abs_du_m_per_s": 1.4297857261679492,
+            "max_abs_dv_m_per_s": 1.9376996402485327
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.45404060266710056,
+            "max_abs_du_m_per_s": 3.0295051480873143,
+            "max_abs_dv_m_per_s": 1.644964007445194
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.46226834237067294,
+            "max_abs_du_m_per_s": 2.8198880147183596,
+            "max_abs_dv_m_per_s": 1.5386133586848427
+          },
+          {
+            "end_time_s": 410.0,
+            "max_abs_dh_m": 0.17790457951206928,
+            "max_abs_du_m_per_s": 1.166543769937472,
+            "max_abs_dv_m_per_s": 1.872603817384325
+          },
+          {
+            "end_time_s": 420.0,
+            "max_abs_dh_m": 0.17646482721595924,
+            "max_abs_du_m_per_s": 1.316125346784605,
+            "max_abs_dv_m_per_s": 1.8486908812989393
+          },
+          {
+            "end_time_s": 430.0,
+            "max_abs_dh_m": 0.34168977485835783,
+            "max_abs_du_m_per_s": 1.8734155434651374,
+            "max_abs_dv_m_per_s": 1.619203642676955
+          },
+          {
+            "end_time_s": 440.0,
+            "max_abs_dh_m": 0.3439116653719205,
+            "max_abs_du_m_per_s": 2.010304121329648,
+            "max_abs_dv_m_per_s": 1.96784545239528
+          },
+          {
+            "end_time_s": 450.0,
+            "max_abs_dh_m": 0.1265367144983219,
+            "max_abs_du_m_per_s": 1.269050855539057,
+            "max_abs_dv_m_per_s": 1.5388651399697952
+          },
+          {
+            "end_time_s": 460.0,
+            "max_abs_dh_m": 0.369066590929795,
+            "max_abs_du_m_per_s": 2.1515422585216433,
+            "max_abs_dv_m_per_s": 1.4162008969891653
+          },
+          {
+            "end_time_s": 470.0,
+            "max_abs_dh_m": 0.4198879285614643,
+            "max_abs_du_m_per_s": 2.4833850202938432,
+            "max_abs_dv_m_per_s": 2.0423337203732412
+          },
+          {
+            "end_time_s": 480.0,
+            "max_abs_dh_m": 0.2572866677500776,
+            "max_abs_du_m_per_s": 1.1240753210979426,
+            "max_abs_dv_m_per_s": 0.780437497663891
+          },
+          {
+            "end_time_s": 490.0,
+            "max_abs_dh_m": 0.18458287065367118,
+            "max_abs_du_m_per_s": 0.9797452092059387,
+            "max_abs_dv_m_per_s": 1.4849104819765233
+          },
+          {
+            "end_time_s": 500.0,
+            "max_abs_dh_m": 0.15635362044311552,
+            "max_abs_du_m_per_s": 1.125172978024601,
+            "max_abs_dv_m_per_s": 1.4475273776823632
+          },
+          {
+            "end_time_s": 510.0,
+            "max_abs_dh_m": 0.17811292295405567,
+            "max_abs_du_m_per_s": 1.107220518739906,
+            "max_abs_dv_m_per_s": 1.042906171133922
+          },
+          {
+            "end_time_s": 520.0,
+            "max_abs_dh_m": 0.2037715679300467,
+            "max_abs_du_m_per_s": 1.1701668667183085,
+            "max_abs_dv_m_per_s": 0.8311453097558831
+          },
+          {
+            "end_time_s": 530.0,
+            "max_abs_dh_m": 0.28684896271420723,
+            "max_abs_du_m_per_s": 1.3755382204056303,
+            "max_abs_dv_m_per_s": 2.0121226516442166
+          },
+          {
+            "end_time_s": 540.0,
+            "max_abs_dh_m": 0.38899092061943596,
+            "max_abs_du_m_per_s": 1.8405070823019605,
+            "max_abs_dv_m_per_s": 1.478697648906644
+          },
+          {
+            "end_time_s": 550.0,
+            "max_abs_dh_m": 0.25917319082966983,
+            "max_abs_du_m_per_s": 1.6124624937989296,
+            "max_abs_dv_m_per_s": 0.9709879375311458
+          },
+          {
+            "end_time_s": 560.0,
+            "max_abs_dh_m": 0.14785172038318023,
+            "max_abs_du_m_per_s": 1.1773683911439459,
+            "max_abs_dv_m_per_s": 0.9175009567375692
+          },
+          {
+            "end_time_s": 570.0,
+            "max_abs_dh_m": 0.1930308506769678,
+            "max_abs_du_m_per_s": 1.1393821033902412,
+            "max_abs_dv_m_per_s": 1.4717023491057035
+          },
+          {
+            "end_time_s": 580.0,
+            "max_abs_dh_m": 0.12784997111681218,
+            "max_abs_du_m_per_s": 0.7127828746844268,
+            "max_abs_dv_m_per_s": 1.9354768203761905
+          },
+          {
+            "end_time_s": 590.0,
+            "max_abs_dh_m": 0.13007636514406706,
+            "max_abs_du_m_per_s": 0.8781882702173547,
+            "max_abs_dv_m_per_s": 2.024120847698907
+          },
+          {
+            "end_time_s": 600.0,
+            "max_abs_dh_m": 0.2606148676276929,
+            "max_abs_du_m_per_s": 1.132961052472595,
+            "max_abs_dv_m_per_s": 2.059325201895927
+          },
+          {
+            "end_time_s": 610.0,
+            "max_abs_dh_m": 0.12046098030787733,
+            "max_abs_du_m_per_s": 0.6192140924544757,
+            "max_abs_dv_m_per_s": 2.0053715413834183
+          },
+          {
+            "end_time_s": 620.0,
+            "max_abs_dh_m": 0.13823594790352134,
+            "max_abs_du_m_per_s": 1.0501615659465218,
+            "max_abs_dv_m_per_s": 0.8683876753903998
+          },
+          {
+            "end_time_s": 630.0,
+            "max_abs_dh_m": 0.1632048658436478,
+            "max_abs_du_m_per_s": 1.2722493780741433,
+            "max_abs_dv_m_per_s": 0.9976574462095948
+          },
+          {
+            "end_time_s": 640.0,
+            "max_abs_dh_m": 0.09522744970956665,
+            "max_abs_du_m_per_s": 1.0657092671811215,
+            "max_abs_dv_m_per_s": 1.830907418656272
+          },
+          {
+            "end_time_s": 650.0,
+            "max_abs_dh_m": 0.23510662907667634,
+            "max_abs_du_m_per_s": 1.2373047902489123,
+            "max_abs_dv_m_per_s": 1.7447403422538388
+          },
+          {
+            "end_time_s": 660.0,
+            "max_abs_dh_m": 0.19802633216064947,
+            "max_abs_du_m_per_s": 1.0620503533574,
+            "max_abs_dv_m_per_s": 1.1997805469732912
+          },
+          {
+            "end_time_s": 670.0,
+            "max_abs_dh_m": 0.09665964127079321,
+            "max_abs_du_m_per_s": 1.2661024542225452,
+            "max_abs_dv_m_per_s": 0.7083155102072132
+          },
+          {
+            "end_time_s": 680.0,
+            "max_abs_dh_m": 0.09511448228089095,
+            "max_abs_du_m_per_s": 1.2729340005347058,
+            "max_abs_dv_m_per_s": 0.9995113815447777
+          },
+          {
+            "end_time_s": 690.0,
+            "max_abs_dh_m": 0.07149699061784065,
+            "max_abs_du_m_per_s": 0.8341566670875575,
+            "max_abs_dv_m_per_s": 1.3602780029105406
+          },
+          {
+            "end_time_s": 700.0,
+            "max_abs_dh_m": 0.09896257762199964,
+            "max_abs_du_m_per_s": 0.7949247955060296,
+            "max_abs_dv_m_per_s": 2.5508418455466106
+          },
+          {
+            "end_time_s": 710.0,
+            "max_abs_dh_m": 0.14071131003529014,
+            "max_abs_du_m_per_s": 0.6395894411302501,
+            "max_abs_dv_m_per_s": 2.0250888850727953
+          },
+          {
+            "end_time_s": 720.0,
+            "max_abs_dh_m": 0.14402201657596492,
+            "max_abs_du_m_per_s": 0.7236336081483675,
+            "max_abs_dv_m_per_s": 1.790087668527084
+          },
+          {
+            "end_time_s": 730.0,
+            "max_abs_dh_m": 0.07374253972414074,
+            "max_abs_du_m_per_s": 0.9240682525073378,
+            "max_abs_dv_m_per_s": 1.4120382306149473
+          },
+          {
+            "end_time_s": 740.0,
+            "max_abs_dh_m": 0.10440427027715238,
+            "max_abs_du_m_per_s": 0.6637001929925148,
+            "max_abs_dv_m_per_s": 1.493835927964807
+          },
+          {
+            "end_time_s": 750.0,
+            "max_abs_dh_m": 0.1289630888367812,
+            "max_abs_du_m_per_s": 1.1219938634996753,
+            "max_abs_dv_m_per_s": 1.169077809529345
+          },
+          {
+            "end_time_s": 760.0,
+            "max_abs_dh_m": 0.10268543462892255,
+            "max_abs_du_m_per_s": 1.301499622998123,
+            "max_abs_dv_m_per_s": 1.218269026284191
+          },
+          {
+            "end_time_s": 770.0,
+            "max_abs_dh_m": 0.16108840298606197,
+            "max_abs_du_m_per_s": 0.999199721766515,
+            "max_abs_dv_m_per_s": 0.989424924183379
+          },
+          {
+            "end_time_s": 780.0,
+            "max_abs_dh_m": 0.169249472347052,
+            "max_abs_du_m_per_s": 1.294616292239759,
+            "max_abs_dv_m_per_s": 0.8449328523392983
+          },
+          {
+            "end_time_s": 790.0,
+            "max_abs_dh_m": 0.11947771373643779,
+            "max_abs_du_m_per_s": 1.2664108362676456,
+            "max_abs_dv_m_per_s": 1.9626746435294644
+          },
+          {
+            "end_time_s": 800.0,
+            "max_abs_dh_m": 0.08781686403749492,
+            "max_abs_du_m_per_s": 0.7918866131074834,
+            "max_abs_dv_m_per_s": 1.4446697012997602
+          }
+        ]
+      },
+      "difficulty": "class_III_plus_troublemaker",
+      "directory": "median_runnable",
+      "discharge_steady_m3s": {
+        "east": 31.38483123193785,
+        "mid": 35.47728704576273,
+        "west": 33.325391835235195
+      },
+      "discharge_target_cfs": 1600.0,
+      "discharge_target_m3s": 45.3069545472,
+      "effective_manning_n": 0.041,
+      "field_stats": {
+        "h_max_m": 2.666562795639038,
+        "h_mean_m": 0.3258272343390531,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 5.743643440814857,
+        "wet_fraction": 0.3573089700996678
+      },
+      "manning_n": 0.041,
+      "scenario_id": "south_fork_troublemaker_c3_window_median_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "997b9f260f861117be52720b41d67a7ad3adba068788e27b20b266e20c9c7997",
+        "initial_state.npz": "8313d4a8a811030d22a62dc201c477d466370fe5369bc3d07b4eaffb9567b1f0",
+        "scenario.json": "40e644cf3c9b4e43bbb06ebd3aca3bfca8c840662a5d63059abe403852e3abfe"
+      },
+      "season": "summer_commercial"
+    },
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "high_runnable/bed.npy",
+          "sha256": "357c813148313da5ad952705da23db773745f6c9197c404c51d13ecb24b71f70",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "high_runnable/h.npy",
+          "sha256": "a666443d58cd5e6ae6092292d33ff6501424f9d7592b4723fb100440d1c3898a",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "high_runnable/u.npy",
+          "sha256": "0e948bf685c6d7ce4f322269fa3927bbf32b99d43f66269bf5de87069a326959",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "high_runnable/v.npy",
+          "sha256": "3caf18b6462156f0cb55b53c740502bd36f7227d574f5ef1475cef9b1f3c88e0",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "high_runnable/wet_mask.npy",
+          "sha256": "86c76fe952b1a5c584339da21740b10abe0a5d63f73e4d1acc4a7e878c943b0a",
+          "shape": [
+            40,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "high_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 800.0,
+          "max_abs_dh_m": 0.07241531204675627,
+          "max_abs_du_m_per_s": 0.293906065926544,
+          "max_abs_dv_m_per_s": 1.8203661292492905
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 1.060321415845661,
+            "max_abs_du_m_per_s": 4.4935759752792945,
+            "max_abs_dv_m_per_s": 5.707536717832569
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 0.6536556788371672,
+            "max_abs_du_m_per_s": 3.145433791196776,
+            "max_abs_dv_m_per_s": 3.2703135744497183
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 0.2959367174590905,
+            "max_abs_du_m_per_s": 3.2949321193288594,
+            "max_abs_dv_m_per_s": 1.9604071300921022
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 0.4400280176466551,
+            "max_abs_du_m_per_s": 1.6238157790892185,
+            "max_abs_dv_m_per_s": 2.314912431563133
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 0.26644899356619045,
+            "max_abs_du_m_per_s": 1.4735321920523314,
+            "max_abs_dv_m_per_s": 1.470593660915714
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.22294912524820132,
+            "max_abs_du_m_per_s": 1.1058770687346255,
+            "max_abs_dv_m_per_s": 1.7872483379487933
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 0.26167164263947873,
+            "max_abs_du_m_per_s": 1.3773923216522337,
+            "max_abs_dv_m_per_s": 1.6610471143847048
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.18372700270994752,
+            "max_abs_du_m_per_s": 1.4348054683447709,
+            "max_abs_dv_m_per_s": 1.2625105544702087
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.12554085911249868,
+            "max_abs_du_m_per_s": 1.3618226247112435,
+            "max_abs_dv_m_per_s": 1.5729608176354026
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 0.14311007835604944,
+            "max_abs_du_m_per_s": 2.293353368558498,
+            "max_abs_dv_m_per_s": 1.413618904108679
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.11041124486681614,
+            "max_abs_du_m_per_s": 1.4293113493490137,
+            "max_abs_dv_m_per_s": 1.6421906520996497
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.1589028310014635,
+            "max_abs_du_m_per_s": 2.0969523948518707,
+            "max_abs_dv_m_per_s": 2.761758539148383
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.21636067294248806,
+            "max_abs_du_m_per_s": 2.0911576757405284,
+            "max_abs_dv_m_per_s": 1.700301389272221
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.22325050514150913,
+            "max_abs_du_m_per_s": 1.3830274281614614,
+            "max_abs_dv_m_per_s": 2.497827529762226
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.09725950338659614,
+            "max_abs_du_m_per_s": 0.5213490085098336,
+            "max_abs_dv_m_per_s": 0.7459806324871117
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.09295063889874561,
+            "max_abs_du_m_per_s": 0.8074033247664878,
+            "max_abs_dv_m_per_s": 0.9268018630776873
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.13143643770801947,
+            "max_abs_du_m_per_s": 1.2592752291018563,
+            "max_abs_dv_m_per_s": 1.1157042441792464
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.13208474950457494,
+            "max_abs_du_m_per_s": 1.2383483968691247,
+            "max_abs_dv_m_per_s": 2.3832268781128496
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.13107596482251083,
+            "max_abs_du_m_per_s": 1.6676377012920875,
+            "max_abs_dv_m_per_s": 1.9943368174914016
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.28165008068523895,
+            "max_abs_du_m_per_s": 1.1375572021406413,
+            "max_abs_dv_m_per_s": 1.0107746696973923
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.15971437901954277,
+            "max_abs_du_m_per_s": 0.9350230730030764,
+            "max_abs_dv_m_per_s": 1.2016654169494012
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.14994209858543195,
+            "max_abs_du_m_per_s": 1.8448588002288007,
+            "max_abs_dv_m_per_s": 1.7030195836906694
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.12427515505596232,
+            "max_abs_du_m_per_s": 0.901698413384232,
+            "max_abs_dv_m_per_s": 1.4071753551199313
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.1523058915795722,
+            "max_abs_du_m_per_s": 1.5771882280353824,
+            "max_abs_dv_m_per_s": 0.9284797657315247
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 0.12173254235501085,
+            "max_abs_du_m_per_s": 2.281494365816431,
+            "max_abs_dv_m_per_s": 1.1670753396410536
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.17295073253060722,
+            "max_abs_du_m_per_s": 2.2184050077701647,
+            "max_abs_dv_m_per_s": 1.0567646726501922
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.16391817544503706,
+            "max_abs_du_m_per_s": 1.1566500521056107,
+            "max_abs_dv_m_per_s": 0.5657170521162589
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.7434948936966136,
+            "max_abs_du_m_per_s": 3.151387674492523,
+            "max_abs_dv_m_per_s": 2.077119790450918
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.5456137380539798,
+            "max_abs_du_m_per_s": 2.204104029133106,
+            "max_abs_dv_m_per_s": 2.1428802643104135
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.1259546300963597,
+            "max_abs_du_m_per_s": 0.7552574262164901,
+            "max_abs_dv_m_per_s": 0.6597661045291767
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.13097684897665318,
+            "max_abs_du_m_per_s": 0.8932038644759999,
+            "max_abs_dv_m_per_s": 0.7923927504418562
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.05085794184082514,
+            "max_abs_du_m_per_s": 0.3758746139689252,
+            "max_abs_dv_m_per_s": 0.677831904615027
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.10660770152529986,
+            "max_abs_du_m_per_s": 1.8834205338463215,
+            "max_abs_dv_m_per_s": 1.2732912327565034
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.09744701305736692,
+            "max_abs_du_m_per_s": 0.4732486433621377,
+            "max_abs_dv_m_per_s": 1.6939648212666247
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.0972771057133412,
+            "max_abs_du_m_per_s": 1.5462285761549943,
+            "max_abs_dv_m_per_s": 1.3446527376934065
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.06162324821297541,
+            "max_abs_du_m_per_s": 0.6685994197289289,
+            "max_abs_dv_m_per_s": 0.4678127381455033
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.04719226688231348,
+            "max_abs_du_m_per_s": 0.7141080017967436,
+            "max_abs_dv_m_per_s": 1.2740094538324287
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.04453316344299307,
+            "max_abs_du_m_per_s": 0.29681945400162446,
+            "max_abs_dv_m_per_s": 0.8112788589396336
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.18377162623216425,
+            "max_abs_du_m_per_s": 2.3985477087421465,
+            "max_abs_dv_m_per_s": 1.1508404624074344
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.05225375965602819,
+            "max_abs_du_m_per_s": 0.5583509052056577,
+            "max_abs_dv_m_per_s": 0.7980074929660368
+          },
+          {
+            "end_time_s": 410.0,
+            "max_abs_dh_m": 0.04831537997224589,
+            "max_abs_du_m_per_s": 0.805713783167342,
+            "max_abs_dv_m_per_s": 0.7325616987474278
+          },
+          {
+            "end_time_s": 420.0,
+            "max_abs_dh_m": 0.04084204930402674,
+            "max_abs_du_m_per_s": 1.0780000675265955,
+            "max_abs_dv_m_per_s": 1.0202001332255972
+          },
+          {
+            "end_time_s": 430.0,
+            "max_abs_dh_m": 0.04030734610991438,
+            "max_abs_du_m_per_s": 0.9796413000803319,
+            "max_abs_dv_m_per_s": 0.6945312048015371
+          },
+          {
+            "end_time_s": 440.0,
+            "max_abs_dh_m": 0.11950529835879942,
+            "max_abs_du_m_per_s": 1.1294310579110278,
+            "max_abs_dv_m_per_s": 1.2758038952584578
+          },
+          {
+            "end_time_s": 450.0,
+            "max_abs_dh_m": 0.11442863867540792,
+            "max_abs_du_m_per_s": 1.8968083978801664,
+            "max_abs_dv_m_per_s": 0.9019444850731947
+          },
+          {
+            "end_time_s": 460.0,
+            "max_abs_dh_m": 0.1310148844942588,
+            "max_abs_du_m_per_s": 0.4772758841425846,
+            "max_abs_dv_m_per_s": 1.1942982440717267
+          },
+          {
+            "end_time_s": 470.0,
+            "max_abs_dh_m": 0.13898376452397387,
+            "max_abs_du_m_per_s": 1.0386544557150261,
+            "max_abs_dv_m_per_s": 1.1942982440717267
+          },
+          {
+            "end_time_s": 480.0,
+            "max_abs_dh_m": 0.14094315868059654,
+            "max_abs_du_m_per_s": 1.5729761729331542,
+            "max_abs_dv_m_per_s": 1.7373387496603059
+          },
+          {
+            "end_time_s": 490.0,
+            "max_abs_dh_m": 0.12255029085439356,
+            "max_abs_du_m_per_s": 0.936072356911763,
+            "max_abs_dv_m_per_s": 0.5488104838181715
+          },
+          {
+            "end_time_s": 500.0,
+            "max_abs_dh_m": 0.10480020675891172,
+            "max_abs_du_m_per_s": 0.8504748099249735,
+            "max_abs_dv_m_per_s": 0.49501299041209057
+          },
+          {
+            "end_time_s": 510.0,
+            "max_abs_dh_m": 0.09878504454845922,
+            "max_abs_du_m_per_s": 0.6129591814354334,
+            "max_abs_dv_m_per_s": 1.5066558503786975
+          },
+          {
+            "end_time_s": 520.0,
+            "max_abs_dh_m": 0.07211178528094264,
+            "max_abs_du_m_per_s": 0.9345971550079168,
+            "max_abs_dv_m_per_s": 0.487623052511448
+          },
+          {
+            "end_time_s": 530.0,
+            "max_abs_dh_m": 0.0942896263364269,
+            "max_abs_du_m_per_s": 1.1447999983979993,
+            "max_abs_dv_m_per_s": 1.0525070007339814
+          },
+          {
+            "end_time_s": 540.0,
+            "max_abs_dh_m": 0.1015919282771891,
+            "max_abs_du_m_per_s": 1.2253264202278684,
+            "max_abs_dv_m_per_s": 1.6901878614464694
+          },
+          {
+            "end_time_s": 550.0,
+            "max_abs_dh_m": 0.10618009346752078,
+            "max_abs_du_m_per_s": 1.2995598561747814,
+            "max_abs_dv_m_per_s": 1.6901878614464694
+          },
+          {
+            "end_time_s": 560.0,
+            "max_abs_dh_m": 0.10181939450918615,
+            "max_abs_du_m_per_s": 1.1269236016436357,
+            "max_abs_dv_m_per_s": 0.6581002540192158
+          },
+          {
+            "end_time_s": 570.0,
+            "max_abs_dh_m": 0.0409327456138216,
+            "max_abs_du_m_per_s": 0.300638980213483,
+            "max_abs_dv_m_per_s": 1.0393246524492106
+          },
+          {
+            "end_time_s": 580.0,
+            "max_abs_dh_m": 0.11151240726699296,
+            "max_abs_du_m_per_s": 0.34774277530244,
+            "max_abs_dv_m_per_s": 0.5539981661866552
+          },
+          {
+            "end_time_s": 590.0,
+            "max_abs_dh_m": 0.07848750650814229,
+            "max_abs_du_m_per_s": 0.2466883324413044,
+            "max_abs_dv_m_per_s": 0.48801985181509444
+          },
+          {
+            "end_time_s": 600.0,
+            "max_abs_dh_m": 0.0504084745657154,
+            "max_abs_du_m_per_s": 0.30459785285596297,
+            "max_abs_dv_m_per_s": 0.6598242278474267
+          },
+          {
+            "end_time_s": 610.0,
+            "max_abs_dh_m": 0.06560571559917756,
+            "max_abs_du_m_per_s": 0.3728660431861446,
+            "max_abs_dv_m_per_s": 1.8694131979346862
+          },
+          {
+            "end_time_s": 620.0,
+            "max_abs_dh_m": 0.03337954812404642,
+            "max_abs_du_m_per_s": 0.33557352379512917,
+            "max_abs_dv_m_per_s": 0.6363154306703867
+          },
+          {
+            "end_time_s": 630.0,
+            "max_abs_dh_m": 0.04971787569268542,
+            "max_abs_du_m_per_s": 0.45200256141724243,
+            "max_abs_dv_m_per_s": 2.219205178462914
+          },
+          {
+            "end_time_s": 640.0,
+            "max_abs_dh_m": 0.04841853148874675,
+            "max_abs_du_m_per_s": 0.23294713422795166,
+            "max_abs_dv_m_per_s": 2.006506350003936
+          },
+          {
+            "end_time_s": 650.0,
+            "max_abs_dh_m": 0.04691285873277673,
+            "max_abs_du_m_per_s": 0.25336588692442863,
+            "max_abs_dv_m_per_s": 0.6475418907408598
+          },
+          {
+            "end_time_s": 660.0,
+            "max_abs_dh_m": 0.030472472863106392,
+            "max_abs_du_m_per_s": 0.31203630693289597,
+            "max_abs_dv_m_per_s": 0.5103748915080529
+          },
+          {
+            "end_time_s": 670.0,
+            "max_abs_dh_m": 0.04092589537955782,
+            "max_abs_du_m_per_s": 0.21262188751400982,
+            "max_abs_dv_m_per_s": 0.9654891789432505
+          },
+          {
+            "end_time_s": 680.0,
+            "max_abs_dh_m": 0.06804688273516374,
+            "max_abs_du_m_per_s": 0.264625345866528,
+            "max_abs_dv_m_per_s": 0.5782976605676544
+          },
+          {
+            "end_time_s": 690.0,
+            "max_abs_dh_m": 0.0513362445808585,
+            "max_abs_du_m_per_s": 0.24468659658275005,
+            "max_abs_dv_m_per_s": 1.0603126601388144
+          },
+          {
+            "end_time_s": 700.0,
+            "max_abs_dh_m": 0.04310413478594197,
+            "max_abs_du_m_per_s": 0.20594636637248329,
+            "max_abs_dv_m_per_s": 1.5636857785755778
+          },
+          {
+            "end_time_s": 710.0,
+            "max_abs_dh_m": 0.07628763183128412,
+            "max_abs_du_m_per_s": 0.23091491421382582,
+            "max_abs_dv_m_per_s": 1.1406041407703382
+          },
+          {
+            "end_time_s": 720.0,
+            "max_abs_dh_m": 0.1181353300857928,
+            "max_abs_du_m_per_s": 0.2835733931320365,
+            "max_abs_dv_m_per_s": 1.1756678840552626
+          },
+          {
+            "end_time_s": 730.0,
+            "max_abs_dh_m": 0.11161474657028997,
+            "max_abs_du_m_per_s": 0.30063662042280015,
+            "max_abs_dv_m_per_s": 2.2057443650933335
+          },
+          {
+            "end_time_s": 740.0,
+            "max_abs_dh_m": 0.059772024905213175,
+            "max_abs_du_m_per_s": 0.2625138581176225,
+            "max_abs_dv_m_per_s": 1.3610741645738602
+          },
+          {
+            "end_time_s": 750.0,
+            "max_abs_dh_m": 0.11433283341234302,
+            "max_abs_du_m_per_s": 0.35245827670427965,
+            "max_abs_dv_m_per_s": 1.2836908563694083
+          },
+          {
+            "end_time_s": 760.0,
+            "max_abs_dh_m": 0.11227813282336363,
+            "max_abs_du_m_per_s": 0.3284680195845403,
+            "max_abs_dv_m_per_s": 1.4071649189083013
+          },
+          {
+            "end_time_s": 770.0,
+            "max_abs_dh_m": 0.05196101473627901,
+            "max_abs_du_m_per_s": 0.2454103821656859,
+            "max_abs_dv_m_per_s": 0.414452135287843
+          },
+          {
+            "end_time_s": 780.0,
+            "max_abs_dh_m": 0.047237333222972085,
+            "max_abs_du_m_per_s": 0.2206003033808943,
+            "max_abs_dv_m_per_s": 0.6789839567560386
+          },
+          {
+            "end_time_s": 790.0,
+            "max_abs_dh_m": 0.055981740816497594,
+            "max_abs_du_m_per_s": 0.2647206778975728,
+            "max_abs_dv_m_per_s": 0.7514429150991768
+          },
+          {
+            "end_time_s": 800.0,
+            "max_abs_dh_m": 0.07241531204675627,
+            "max_abs_du_m_per_s": 0.293906065926544,
+            "max_abs_dv_m_per_s": 1.8203661292492905
+          }
+        ]
+      },
+      "difficulty": "class_III_plus_troublemaker",
+      "directory": "high_runnable",
+      "discharge_steady_m3s": {
+        "east": 60.42622074083485,
+        "mid": 66.59429653132364,
+        "west": 65.71886783124695
+      },
+      "discharge_target_cfs": 3000.0,
+      "discharge_target_m3s": 84.950539776,
+      "effective_manning_n": 0.041,
+      "field_stats": {
+        "h_max_m": 3.177603244781494,
+        "h_mean_m": 0.49631135028934836,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 7.709164335064074,
+        "wet_fraction": 0.442109634551495
+      },
+      "manning_n": 0.041,
+      "scenario_id": "south_fork_troublemaker_c3_window_high_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "997b9f260f861117be52720b41d67a7ad3adba068788e27b20b266e20c9c7997",
+        "initial_state.npz": "b0b2042de37f870e17400d24002eb1d91a9afa9e7fe84879944143445d135a3c",
+        "scenario.json": "b5856cf5c5661cf28a71ff51dfd5ade877109c1b2eecff18fd4b4413d57ef096"
+      },
+      "season": "spring_runoff_or_release"
+    }
+  ],
+  "generated_on": "2026-07-18",
+  "generator": "raftsim.cooked_flow_fields",
+  "grid": {
+    "crs": "channel-following meters; x downstream along the traced DEM channel centered on adopted-axis station 8368.5888 m, y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 40,
+    "origin_x_m": 0.0,
+    "origin_y_m": -39.0
+  },
+  "notes": [
+    "Fields are the genuine finite-volume solver's approximate steady state for the authored Troublemaker C3 window: order 2, HLL, calibrations disabled, feature_strength_scale=0 (the C1 sub-features are authored bed geometry, not dynamic feature forcing), matching the settings the window was behaviorally validated with.",
+    "The UE river-window loader (FRaftSimLiveWaterWindow::CreateFromCookedFields) must run the embedded live solver with this manifest's solver settings (notably roughness_scale and bed_slope_source_scale) and each band's manning_n, or the seeded window drifts off the cooked state.",
+    "manning_n / effective_manning_n are recorded per band from each scenario's roughness (the Chili Bar cooked manifest omitted this and the UE side passed roughness as a parameter); effective_manning_n = manning_n * roughness_scale is what the solver applied.",
+    "Bed geometry is interpreted (DEM valley frame + authored in-channel C1 features), the window is pending_human_review and not production_promoted; these cooked fields inherit that provenance and make no claim of numeric parity with a reference solution.",
+    "Convergence is recorded honestly per band against the pilot thresholds; the strong authored hydraulics (gut ledge/jump, right diagonal, holes) can keep the near-feature cross-stream velocity unsteady, so a band that does not meet the thresholds is recorded as converged=false rather than hidden."
+  ],
+  "rapid_name": "Troublemaker",
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.cooked_flow_fields.v1",
+  "section_id": "troublemaker_station_8368m_c3_window",
+  "solver": {
+    "bed_slope_source_scale": 1.0,
+    "binary_sha256": "f2b9a8dcedf3c4cd54f59ff2410d22847396a4840add3f5173ee58887fd1b738",
+    "boundary_mode": "scenario",
+    "cfl": 0.45,
+    "disable_fixture_calibrations": true,
+    "dry_tolerance": 1e-06,
+    "feature_strength_scale": 0.0,
+    "fixed_dt_s": 0.05,
+    "flux_scheme": "hll",
+    "frame_interval_steps": 200,
+    "preserve_initial_mass": false,
+    "roughness_scale": 1.0,
+    "simulated_seconds": 800.0,
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 16000
+  },
+  "source_commit": "492f67ba45dea902ea3dd8f0f620b1d9f1fb6397",
+  "source_package": "physics/data/real_world/south_fork_american_chili_bar/scenario_troublemaker",
+  "window_id": "troublemaker_station_8368m_c3_window",
+  "window_provenance": {
+    "adopted_axis_station_m": 8368.5888,
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "pending_human_review": true,
+    "production_promoted": false,
+    "roughness_manning_n": 0.041
+  }
+}

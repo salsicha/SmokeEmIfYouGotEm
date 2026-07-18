@@ -150,6 +150,112 @@ void ARaftSimRaftActor::BeginPlay()
     CheckpointTransform = GetActorTransform();
     RaftMode = ERaftSimRaftMode::Upright;
     FlipRiskLatchSeconds = 0.0f;
+
+    SpawnCrewVisuals();
+}
+
+void ARaftSimRaftActor::SpawnCrewVisuals()
+{
+    UStaticMesh* SphereMesh =
+        LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    // Two rows of paddlers along the tubes, bow to stern.
+    for (int32 Index = 0; Index < PaddlerCount; ++Index)
+    {
+        UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
+        Mesh->SetupAttachment(Root);
+        Mesh->RegisterComponent();
+        Mesh->SetStaticMesh(SphereMesh);
+        Mesh->SetWorldScale3D(FVector(0.45f));
+        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        const float Row = (Index % 2 == 0) ? -0.75f : 0.75f; // port / starboard
+        const float Bow = 1.2f - (Index / 2) * 1.2f;          // fore to aft (m)
+        Mesh->SetRelativeLocation(FVector(Bow * kCmPerM, Row * kCmPerM, 40.0f));
+        CrewMeshes.Add(Mesh);
+    }
+}
+
+void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
+{
+    if (Command != ActiveCrewCommand)
+    {
+        PendingCrewCommand = Command;
+        CrewReactionRemaining = CrewReactionSeconds;
+    }
+}
+
+void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
+{
+    if (RaftAdapter == nullptr || RaftMode != ERaftSimRaftMode::Upright)
+    {
+        return;
+    }
+
+    // Crew react to a new command after a short latency.
+    if (CrewReactionRemaining > 0.0f)
+    {
+        CrewReactionRemaining -= DeltaSeconds;
+        if (CrewReactionRemaining <= 0.0f)
+        {
+            ActiveCrewCommand = PendingCrewCommand;
+        }
+    }
+
+    // High-side / get-down couple to the D2 flexible crew actions (weight shift).
+    TArray<FRaftSimFlexCrewAction> Actions;
+    if (ActiveCrewCommand == ERaftSimCrewCommand::HighSide)
+    {
+        FRaftSimFlexCrewAction Action;
+        Action.SeatId = TEXT("guide");
+        Action.HighSideDirection = (GetActorRotation().Roll >= 0.0f) ? -1 : 1;
+        Action.bBrace = true;
+        Actions.Add(Action);
+    }
+    else if (ActiveCrewCommand == ERaftSimCrewCommand::GetDown)
+    {
+        FRaftSimFlexCrewAction Action;
+        Action.SeatId = TEXT("guide");
+        Action.LeanOffset = FVector(0.0f, 0.0f, -0.15f);
+        Actions.Add(Action);
+    }
+    RaftAdapter->SetFlexibleCrewActions(Actions);
+
+    // Paddle strokes on cadence for propulsion/turn commands.
+    CrewStrokeTimer -= DeltaSeconds;
+    if (CrewStrokeTimer > 0.0f)
+    {
+        return;
+    }
+    CrewStrokeTimer = CrewStrokeIntervalSeconds;
+
+    const float PerPaddler = PaddleStrokeImpulseNs * 0.5f;
+    const float Crew = static_cast<float>(FMath::Max(1, PaddlerCount));
+    const FVector Forward = GetActorForwardVector();
+    switch (ActiveCrewCommand)
+    {
+        case ERaftSimCrewCommand::AllForward:
+            RaftAdapter->AddExternalImpulse(Forward * PerPaddler * Crew, FVector::ZeroVector);
+            break;
+        case ERaftSimCrewCommand::AllBackward:
+            RaftAdapter->AddExternalImpulse(-Forward * PerPaddler * Crew, FVector::ZeroVector);
+            break;
+        case ERaftSimCrewCommand::TurnLeft:
+            RaftAdapter->AddExternalImpulse(
+                FVector::ZeroVector, FVector(0.0f, 0.0f, -PerPaddler * Crew * 1.1f));
+            break;
+        case ERaftSimCrewCommand::TurnRight:
+            RaftAdapter->AddExternalImpulse(
+                FVector::ZeroVector, FVector(0.0f, 0.0f, PerPaddler * Crew * 1.1f));
+            break;
+        case ERaftSimCrewCommand::Stop:
+        {
+            // Brace/back-paddle to shed speed.
+            const FVector Vel = RaftAdapter->GetKinematicState().LinearVelocityMetersPerSecond;
+            RaftAdapter->AddExternalImpulse(-Vel.GetSafeNormal() * PerPaddler * Crew, FVector::ZeroVector);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 FVector ARaftSimRaftActor::GetRaftVelocity() const
@@ -226,6 +332,7 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
     }
 
     UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
+    UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
 }
 
 void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
