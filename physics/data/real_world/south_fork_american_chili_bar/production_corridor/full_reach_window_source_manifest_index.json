@@ -1,5 +1,5 @@
 {
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
     "corridor_window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_manifest.json",
     "source_pull_plan": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_plan.json",
@@ -13,8 +13,8 @@
     "can_promote_full_reach_corridor": false,
     "next_required_actions": [
       "Generate per-window derivatives and seam reports from these source manifests.",
-      "Build stitched whole-window validation previews across all six windows.",
-      "Resolve exact downstream anchor before final crop, Unreal import, or rapid binding."
+      "Build stitched whole-window validation previews across all corridor windows.",
+      "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final crop, Unreal import, or rapid binding."
     ]
   },
   "river_id": "south_fork_american_chili_bar",
@@ -24,8 +24,8 @@
     "all_sources_present": true,
     "can_enter_stitched_validation_review": true,
     "can_promote_full_reach_corridor": false,
-    "source_manifest_count": 6,
-    "window_count": 6
+    "source_manifest_count": 8,
+    "window_count": 8
   },
   "task_id": "A1",
   "window_manifests": [
@@ -82,6 +82,24 @@
       "production_promoted": false,
       "terrain_sha256": "52ba01a222b7d5c8c659112e52bbb6e73a730caff82488d1138dbfe2cecf5d8a",
       "window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    {
+      "aerial_sha256": "5be2dd678cd2b0ddb3a7043f1d43c7c20922f69887b5aab6a3d8b5615162725d",
+      "can_enter_stitched_validation_review": true,
+      "display_name": "Below Published Full-Run Alias Transit",
+      "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/manifest.json",
+      "production_promoted": false,
+      "terrain_sha256": "9b3f2ea630fa2e07fee454fc16af89a9d1aeea1d0cd0d0b4d9df733644067366",
+      "window_id": "below_full_run_alias_33796_41500m"
+    },
+    {
+      "aerial_sha256": "42410c13d093914392b5eb936c9cebf4e03a8926cfc20677068f065aba17cbd4",
+      "can_enter_stitched_validation_review": true,
+      "display_name": "Salmon Falls Take-out Approach",
+      "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/manifest.json",
+      "production_promoted": false,
+      "terrain_sha256": "fea29b1d75d31e4b47e74dc9d9136a6cbd4822c32121fa4008d347c9d27a6a38",
+      "window_id": "salmon_falls_takeout_approach_41500_49077m"
     }
   ]
 }

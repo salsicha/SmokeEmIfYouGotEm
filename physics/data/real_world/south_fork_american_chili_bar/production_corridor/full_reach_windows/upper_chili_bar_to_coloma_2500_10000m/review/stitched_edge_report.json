@@ -95,8 +95,9 @@
       "upstream_window_id": "chili_bar_existing_pilot_0_2500m"
     }
   },
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
+    "adopted_route_geojson": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
     "directed_route_clips": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_directed_route_clips.geojson",
     "stitched_validation_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_stitched_validation_report.json",
     "window_manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json"
@@ -111,13 +112,14 @@
   },
   "review_notes": [
     "Heightfield and hillshade are DEM-only review derivatives, not hydrologically conditioned terrain.",
-    "NAIP centerline overlay shows the directed review route against the source imagery window.",
+    "NAIP centerline overlay shows the recorded review route basis against the source imagery window.",
     "Seams remain explicit so derivative review cannot hide source-window discontinuities.",
-    "Exact downstream anchor, banks, cross sections, guide review, and Unreal import are still blocked."
+    "Banks, cross sections, and Unreal import remain blocked; the Salmon Falls bank-landing refinement rides the P7 owner packet."
   ],
   "river_id": "south_fork_american_chili_bar",
   "route_overlay": {
     "line_drawn": true,
+    "route_basis": "directed_route_clip_21_0_mile_candidate",
     "route_sample_count": 118,
     "visible_pixel_count": 118
   },

@@ -176,7 +176,7 @@ def build_south_fork_a1_window_source_pull_status(repo_root: Path) -> dict[str, 
 
     return {
         "schema": "raftsim.south_fork.a1_window_source_pull_status.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": plan["river_id"],
         "status": status,

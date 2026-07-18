@@ -1,6 +1,6 @@
 {
   "download_command": "cd physics && UV_CACHE_DIR=/private/tmp/raftsim-uv-cache uv run python -m raftsim.examples.generate_south_fork_a1_window_source_execution --repo-root .. --execute",
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
     "source_pull_plan": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_plan.json",
     "source_pull_status": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_status.json"
@@ -37,11 +37,11 @@
   "schema": "raftsim.south_fork.a1_window_source_pull_execution_plan.v1",
   "status": "ready_to_execute_review_gated_source_downloads",
   "summary": {
-    "aerial_task_count": 6,
+    "aerial_task_count": 8,
     "destination_missing_count": 0,
-    "destination_present_count": 12,
-    "task_count": 12,
-    "terrain_task_count": 6
+    "destination_present_count": 16,
+    "task_count": 16,
+    "terrain_task_count": 8
   },
   "task_id": "A1",
   "tasks": [
@@ -296,6 +296,90 @@
       "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
       "task_id": "salmon_falls_folsom_review_32991_33796m:aerial_imagery",
       "window_id": "salmon_falls_folsom_review_32991_33796m"
+    },
+    {
+      "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/source/3dep_dem.tif",
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "9b3f2ea630fa2e07fee454fc16af89a9d1aeea1d0cd0d0b4d9df733644067366",
+      "display_name": "Below Published Full-Run Alias Transit",
+      "expected_format": "tiff",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "label": "USGS 3DEP DEM",
+      "lfs_extension": "tif",
+      "lfs_tracking_required": true,
+      "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13468159.725%2C4690278.11%2C-13463103.538%2C4696924.135&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "production_promoted": false,
+      "role": "terrain_dem",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "task_id": "below_full_run_alias_33796_41500m:terrain_dem",
+      "window_id": "below_full_run_alias_33796_41500m"
+    },
+    {
+      "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/source/naip.png",
+      "destination_byte_count": 31969561,
+      "destination_present": true,
+      "destination_sha256": "5be2dd678cd2b0ddb3a7043f1d43c7c20922f69887b5aab6a3d8b5615162725d",
+      "display_name": "Below Published Full-Run Alias Transit",
+      "expected_format": "png",
+      "expected_size_px": [
+        4096,
+        4096
+      ],
+      "label": "USDA NAIP aerial imagery",
+      "lfs_extension": "png",
+      "lfs_tracking_required": true,
+      "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13468159.725%2C4690278.11%2C-13463103.538%2C4696924.135&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+      "production_promoted": false,
+      "role": "aerial_imagery",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+      "task_id": "below_full_run_alias_33796_41500m:aerial_imagery",
+      "window_id": "below_full_run_alias_33796_41500m"
+    },
+    {
+      "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/source/3dep_dem.tif",
+      "destination_byte_count": 16780410,
+      "destination_present": true,
+      "destination_sha256": "fea29b1d75d31e4b47e74dc9d9136a6cbd4822c32121fa4008d347c9d27a6a38",
+      "display_name": "Salmon Falls Take-out Approach",
+      "expected_format": "tiff",
+      "expected_size_px": [
+        2048,
+        2048
+      ],
+      "label": "USGS 3DEP DEM",
+      "lfs_extension": "tif",
+      "lfs_tracking_required": true,
+      "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13474834.42%2C4687354.967%2C-13467396.195%2C4690906.337&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+      "production_promoted": false,
+      "role": "terrain_dem",
+      "service_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage",
+      "task_id": "salmon_falls_takeout_approach_41500_49077m:terrain_dem",
+      "window_id": "salmon_falls_takeout_approach_41500_49077m"
+    },
+    {
+      "destination": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/source/naip.png",
+      "destination_byte_count": 31300905,
+      "destination_present": true,
+      "destination_sha256": "42410c13d093914392b5eb936c9cebf4e03a8926cfc20677068f065aba17cbd4",
+      "display_name": "Salmon Falls Take-out Approach",
+      "expected_format": "png",
+      "expected_size_px": [
+        4096,
+        4096
+      ],
+      "label": "USDA NAIP aerial imagery",
+      "lfs_extension": "png",
+      "lfs_tracking_required": true,
+      "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13474834.42%2C4687354.967%2C-13467396.195%2C4690906.337&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+      "production_promoted": false,
+      "role": "aerial_imagery",
+      "service_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage",
+      "task_id": "salmon_falls_takeout_approach_41500_49077m:aerial_imagery",
+      "window_id": "salmon_falls_takeout_approach_41500_49077m"
     }
   ]
 }

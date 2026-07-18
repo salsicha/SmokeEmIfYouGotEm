@@ -1,11 +1,19 @@
+"""The committed decision packet is frozen pre-adoption evidence.
+
+The release-1.0-plan section 6 adoption (recorded in
+full_reach_adopted_route_stationing.json) selected the official Salmon Falls
+take-out access geometry and rejected both published-mile candidates in this
+packet. Per the adoption's evidence policy the packet stays committed exactly
+as decided; it is no longer regenerated against live window inputs, so these
+tests assert the committed record instead of builder reproducibility.
+"""
+
 import json
 from pathlib import Path
 
 from raftsim.south_fork_a1_downstream_anchor_decision import (
     FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_CANDIDATES_GEOJSON_RELATIVE_PATH,
     FULL_REACH_DOWNSTREAM_ANCHOR_DECISION_PACKET_RELATIVE_PATH,
-    build_south_fork_a1_downstream_anchor_decision_geojson,
-    build_south_fork_a1_downstream_anchor_decision_packet,
 )
 
 
@@ -28,13 +36,12 @@ def _load_geojson() -> dict:
     )
 
 
-def test_south_fork_a1_downstream_anchor_decision_packet_is_reproducible():
-    generated = build_south_fork_a1_downstream_anchor_decision_packet(REPO_ROOT)
+def test_south_fork_a1_downstream_anchor_decision_packet_is_recorded_evidence():
     committed = _load_packet()
 
-    assert generated == committed
     assert committed["schema"] == "raftsim.south_fork.a1_downstream_anchor_decision_packet.v1"
     assert committed["status"] == "decision_packet_ready_exact_anchor_not_selected"
+    assert committed["generated_on"] == "2026-07-16"
     assert committed["production_promoted"] is False
 
 
@@ -66,11 +73,9 @@ def test_south_fork_a1_downstream_anchor_decision_visual_inputs_are_hash_locked(
             assert (REPO_ROOT / artifact["path"]).exists()
 
 
-def test_south_fork_a1_downstream_anchor_decision_geojson_is_reproducible_and_review_gated():
-    generated = build_south_fork_a1_downstream_anchor_decision_geojson(REPO_ROOT)
+def test_south_fork_a1_downstream_anchor_decision_geojson_is_recorded_and_review_gated():
     committed = _load_geojson()
 
-    assert generated == committed
     assert committed["type"] == "FeatureCollection"
     assert committed["status"] == "decision_packet_ready_exact_anchor_not_selected"
     assert len(committed["features"]) == 3

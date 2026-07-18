@@ -1,5 +1,5 @@
 {
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "inputs": {
     "source_pull_plan": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_pull_plan.json"
   },
@@ -26,18 +26,18 @@
     "all_source_files_present": true,
     "all_window_manifests_present": true,
     "existing_pilot_artifact_count": 1,
-    "expected_review_derivative_count": 24,
-    "expected_source_file_count": 12,
-    "expected_window_manifest_count": 6,
+    "expected_review_derivative_count": 32,
+    "expected_source_file_count": 16,
+    "expected_window_manifest_count": 8,
     "missing_review_derivative_count": 0,
     "missing_source_file_count": 0,
     "missing_window_manifest_count": 0,
     "present_existing_pilot_artifact_count": 1,
-    "present_review_derivative_count": 24,
-    "present_source_file_count": 12,
-    "present_window_manifest_count": 6,
+    "present_review_derivative_count": 32,
+    "present_source_file_count": 16,
+    "present_window_manifest_count": 8,
     "unexpected_file_count": 0,
-    "window_count": 6
+    "window_count": 8
   },
   "task_id": "A1",
   "unexpected_files": [],
@@ -92,11 +92,11 @@
           "status": "present"
         },
         {
-          "byte_count": 4125,
+          "byte_count": 4350,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "101d21203b6fd36315ce6e97ba969bea563e9f0f6b22e9958d6646abd2c767f4",
+          "sha256": "9b3037062ab7d33f08c32005cb3344ec39199402cb8750b291471572f02f2387",
           "status": "present"
         }
       ],
@@ -116,11 +116,11 @@
       },
       "window_id": "chili_bar_existing_pilot_0_2500m",
       "window_manifest": {
-        "byte_count": 5842,
+        "byte_count": 5883,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "df8d0f58a93c0ad607818e9235a0d78af98c18ab9c668250eae3d66ff3671e9d",
+        "sha256": "510344dd3b97d6fae22f30dc4c569f378bfdab92c157c94d97eea6af5f686118",
         "status": "present"
       }
     },
@@ -167,11 +167,11 @@
           "status": "present"
         },
         {
-          "byte_count": 5122,
+          "byte_count": 5347,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "f7c9b97c354eba28d520138f48d6bc4e90ad5db47abe46903ed21266a9563097",
+          "sha256": "f88555f3c00696911aefb8ac92d9f8e5c8930378a078988fa94b78c1d988577f",
           "status": "present"
         }
       ],
@@ -191,11 +191,11 @@
       },
       "window_id": "upper_chili_bar_to_coloma_2500_10000m",
       "window_manifest": {
-        "byte_count": 5894,
+        "byte_count": 5935,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "6b6ffa5383a8651bd7f38cb8bd2bb36eac6088f78c342bb3407d8a0b7cded90a",
+        "sha256": "e35c25ff6a26844a960786b4f726a270debfd64d76e7c748845b5cad4e10cd4d",
         "status": "present"
       }
     },
@@ -242,11 +242,11 @@
           "status": "present"
         },
         {
-          "byte_count": 5014,
+          "byte_count": 5239,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "8b1bf3b847e22cef062189f5de161f5f8697779588fb052e697c2172bf666522",
+          "sha256": "e2db54be42b5b2629e716f3e52a9e27f9c7aa5daeb33eadaf2f77be61abbc7a4",
           "status": "present"
         }
       ],
@@ -266,11 +266,11 @@
       },
       "window_id": "coloma_valley_10000_24000m",
       "window_manifest": {
-        "byte_count": 5703,
+        "byte_count": 5744,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "386cdd57bcb366c099e55a5dadb5ca63c60700c10d9add7bca21aec3d3ac4894",
+        "sha256": "23d10ea30dd48c66725faea8742ecd44060bdcc1fc173453a0da8e2b4b02623e",
         "status": "present"
       }
     },
@@ -317,11 +317,11 @@
           "status": "present"
         },
         {
-          "byte_count": 5006,
+          "byte_count": 5231,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "fe6db8dd0bdf843d2e03248f6de8b4823c1fdb779a65b4852faea2233569fc75",
+          "sha256": "d6ad64931fa976fd31caae7d49382281803c542328d49d662035a8a512620bb5",
           "status": "present"
         }
       ],
@@ -341,11 +341,11 @@
       },
       "window_id": "upper_gorge_24000_28500m",
       "window_manifest": {
-        "byte_count": 5879,
+        "byte_count": 5920,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "bb2d9aa96b2ade2dfe6b393eef022b4b82493f303f9d233da6d9fee2ff7d66d4",
+        "sha256": "5712fca1521b4efa8ba5bef70f6411235c022093b2ad4caae1468826f08fab53",
         "status": "present"
       }
     },
@@ -392,11 +392,11 @@
           "status": "present"
         },
         {
-          "byte_count": 5164,
+          "byte_count": 5389,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "0b0c829b6ea56c3a232146ae948f1c80c25f8e27975154a98c7c2aa1fc09448a",
+          "sha256": "7a6925e60be3592d00f8a5fe370a1e1ce1f546e1d34c6539f0e7151b76c04824",
           "status": "present"
         }
       ],
@@ -416,11 +416,11 @@
       },
       "window_id": "lower_gorge_to_salmon_falls_28500_32991m",
       "window_manifest": {
-        "byte_count": 5944,
+        "byte_count": 5985,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "e5562098634e3caa8d162b4acd06c9fd9dd9fb28c10a93aecf0597d9cfcc9d1e",
+        "sha256": "14d4fa0d44b290ae686e8abc5c07b7978184eeaf27b33c69074aaea38eca9517",
         "status": "present"
       }
     },
@@ -467,11 +467,11 @@
           "status": "present"
         },
         {
-          "byte_count": 4207,
+          "byte_count": 5403,
           "present": true,
           "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/review/stitched_edge_report.json",
           "role": "review_derivative_window_stitched_edge_report",
-          "sha256": "bbe9f15aac9594b1801a2c98b54b6fe523bca66d1aacec6053fafcae05bc844b",
+          "sha256": "01dfee47e645fcb678f56ad1fa14eb4e74b50ca2eed90d8e5a7ea7f58cdd9ab3",
           "status": "present"
         }
       ],
@@ -491,11 +491,161 @@
       },
       "window_id": "salmon_falls_folsom_review_32991_33796m",
       "window_manifest": {
-        "byte_count": 5832,
+        "byte_count": 5873,
         "present": true,
         "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/manifest.json",
         "role": "per_window_manifest",
-        "sha256": "f352c192849c8f243bc73caa3b4c4522e6177576915dedc90db81a9b5905decc",
+        "sha256": "f5bfd0c8e29c16c679d3b134ee5c8847596a8b3399b85282339c5bf8036297c2",
+        "status": "present"
+      }
+    },
+    {
+      "aerial_imagery": {
+        "byte_count": 31969561,
+        "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13468159.725%2C4690278.11%2C-13463103.538%2C4696924.135&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/source/naip.png",
+        "role": "aerial_imagery",
+        "sha256": "5be2dd678cd2b0ddb3a7043f1d43c7c20922f69887b5aab6a3d8b5615162725d",
+        "status": "present"
+      },
+      "can_enter_stitched_validation": true,
+      "can_generate_window_derivatives": true,
+      "display_name": "Below Published Full-Run Alias Transit",
+      "existing_artifact": null,
+      "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 5266413,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "80e478b23315dd29fcafcd5047f8b69b822241852df821154d4c6d5c33b94eab",
+          "status": "present"
+        },
+        {
+          "byte_count": 2285647,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "a2c93b2e54ac04ca048a4f1a4064e7c7318de105964300ae71220461dad8dd36",
+          "status": "present"
+        },
+        {
+          "byte_count": 8852912,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "47112a4d72c8ab9568e8a88a20c030aafddf495b535d653ea772fe27623d8f8b",
+          "status": "present"
+        },
+        {
+          "byte_count": 5340,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "88a5f052edb6b158be1d855981c5c67fcde0c48bd39a90cf989429f178286e99",
+          "status": "present"
+        }
+      ],
+      "source_file_expected_count": 2,
+      "source_file_present_count": 2,
+      "station_end_m": 41500.0,
+      "station_start_m": 33796.224,
+      "status": "source_files_and_window_manifest_present_review_pending",
+      "terrain_dem": {
+        "byte_count": 16780410,
+        "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13468159.725%2C4690278.11%2C-13463103.538%2C4696924.135&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/source/3dep_dem.tif",
+        "role": "terrain_dem",
+        "sha256": "9b3f2ea630fa2e07fee454fc16af89a9d1aeea1d0cd0d0b4d9df733644067366",
+        "status": "present"
+      },
+      "window_id": "below_full_run_alias_33796_41500m",
+      "window_manifest": {
+        "byte_count": 5821,
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/manifest.json",
+        "role": "per_window_manifest",
+        "sha256": "2c178a8e913d6f993ca7fcdc30c64ef7f50b60d6f9a4d08c7dcfd6977413ea75",
+        "status": "present"
+      }
+    },
+    {
+      "aerial_imagery": {
+        "byte_count": 31300905,
+        "official_export_url": "https://gis.apfo.usda.gov/arcgis/rest/services/NAIP/USDA_CONUS_PRIME/ImageServer/exportImage?bbox=-13474834.42%2C4687354.967%2C-13467396.195%2C4690906.337&bboxSR=3857&imageSR=3857&size=4096%2C4096&format=png&f=image",
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/source/naip.png",
+        "role": "aerial_imagery",
+        "sha256": "42410c13d093914392b5eb936c9cebf4e03a8926cfc20677068f065aba17cbd4",
+        "status": "present"
+      },
+      "can_enter_stitched_validation": true,
+      "can_generate_window_derivatives": true,
+      "display_name": "Salmon Falls Take-out Approach",
+      "existing_artifact": null,
+      "production_promoted": false,
+      "review_derivative_expected_count": 4,
+      "review_derivative_present_count": 4,
+      "review_derivatives": [
+        {
+          "byte_count": 5364203,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/heightfield_2017.png",
+          "role": "review_derivative_heightfield",
+          "sha256": "db12e1ad0dbd9c74566578a261283b23d2cab018dc3237a592d0d6649273aa83",
+          "status": "present"
+        },
+        {
+          "byte_count": 2570689,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/hillshade_2048.png",
+          "role": "review_derivative_hillshade",
+          "sha256": "d00f365bb54822ea1b9633d0d0699425f5163790d7aa7bae6ebd3a8439b5b24b",
+          "status": "present"
+        },
+        {
+          "byte_count": 8413471,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/derived/naip_centerline_preview_2048.png",
+          "role": "review_derivative_naip_centerline_preview",
+          "sha256": "32b8fb4e84c58e7e37d863f01d53c4f417365d966c4124e1f27e7f6bf910fcf0",
+          "status": "present"
+        },
+        {
+          "byte_count": 4406,
+          "present": true,
+          "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/review/stitched_edge_report.json",
+          "role": "review_derivative_window_stitched_edge_report",
+          "sha256": "e494df0f326ab1a67bbc3c9cd50a1439e21d547893c498a929c3fbbb431c7eea",
+          "status": "present"
+        }
+      ],
+      "source_file_expected_count": 2,
+      "source_file_present_count": 2,
+      "station_end_m": 49077.732,
+      "station_start_m": 41500.0,
+      "status": "source_files_and_window_manifest_present_review_pending",
+      "terrain_dem": {
+        "byte_count": 16780410,
+        "official_export_url": "https://elevation.nationalmap.gov/arcgis/rest/services/3DEPElevation/ImageServer/exportImage?bbox=-13474834.42%2C4687354.967%2C-13467396.195%2C4690906.337&bboxSR=3857&imageSR=3857&size=2048%2C2048&format=tiff&pixelType=F32&interpolation=RSP_BilinearInterpolation&f=image",
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/source/3dep_dem.tif",
+        "role": "terrain_dem",
+        "sha256": "fea29b1d75d31e4b47e74dc9d9136a6cbd4822c32121fa4008d347c9d27a6a38",
+        "status": "present"
+      },
+      "window_id": "salmon_falls_takeout_approach_41500_49077m",
+      "window_manifest": {
+        "byte_count": 5876,
+        "present": true,
+        "relative_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/manifest.json",
+        "role": "per_window_manifest",
+        "sha256": "f77606dc6405861294348b05511a881d486c0fecfca218c1074b8d98fe284f5b",
         "status": "present"
       }
     }

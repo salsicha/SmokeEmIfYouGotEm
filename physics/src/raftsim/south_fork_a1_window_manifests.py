@@ -108,7 +108,7 @@ def _build_window_manifest(
     )
     return {
         "schema": "raftsim.south_fork.a1_full_reach_window_source_manifest.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": "south_fork_american_chili_bar",
         "window_id": window_id,
@@ -174,7 +174,7 @@ def _build_window_manifest(
                 "Generate review derivatives from the hash-locked DEM and NAIP source files.",
                 "Validate seams against adjacent window derivatives and the whole-window route.",
                 "Attach bank/cross-section interpretation and guide/geospatial review.",
-                "Resolve exact downstream anchor before final cropping or Unreal import.",
+                "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final cropping or Unreal import.",
             ],
         },
     }
@@ -201,7 +201,7 @@ def build_south_fork_a1_full_reach_window_source_manifests(
     ]
     return {
         "schema": "raftsim.south_fork.a1_full_reach_window_source_manifest_index.v1",
-        "generated_on": "2026-07-16",
+        "generated_on": "2026-07-17",
         "task_id": "A1",
         "river_id": pull_plan["river_id"],
         "status": "per_window_source_manifests_generated_stitched_validation_pending",
@@ -246,8 +246,8 @@ def build_south_fork_a1_full_reach_window_source_manifests(
             "can_bind_solver_windows": False,
             "next_required_actions": [
                 "Generate per-window derivatives and seam reports from these source manifests.",
-                "Build stitched whole-window validation previews across all six windows.",
-                "Resolve exact downstream anchor before final crop, Unreal import, or rapid binding.",
+                "Build stitched whole-window validation previews across all corridor windows.",
+                "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final crop, Unreal import, or rapid binding.",
             ],
         },
         "manifests": manifests,

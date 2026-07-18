@@ -32,16 +32,16 @@ def test_south_fork_a1_window_source_pull_status_records_current_downloaded_file
     status = _load_status()
     summary = status["summary"]
 
-    assert summary["window_count"] == 6
-    assert summary["expected_source_file_count"] == 12
-    assert summary["present_source_file_count"] == 12
+    assert summary["window_count"] == 8
+    assert summary["expected_source_file_count"] == 16
+    assert summary["present_source_file_count"] == 16
     assert summary["missing_source_file_count"] == 0
-    assert summary["expected_window_manifest_count"] == 6
-    assert summary["present_window_manifest_count"] == 6
+    assert summary["expected_window_manifest_count"] == 8
+    assert summary["present_window_manifest_count"] == 8
     assert summary["missing_window_manifest_count"] == 0
     assert summary["present_existing_pilot_artifact_count"] == 1
-    assert summary["expected_review_derivative_count"] == 24
-    assert summary["present_review_derivative_count"] == 24
+    assert summary["expected_review_derivative_count"] == 32
+    assert summary["present_review_derivative_count"] == 32
     assert summary["missing_review_derivative_count"] == 0
     assert summary["unexpected_file_count"] == 0
     assert summary["all_source_files_present"] is True

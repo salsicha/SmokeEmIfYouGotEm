@@ -34,15 +34,24 @@ def test_south_fork_a1_window_derivatives_cover_every_window_and_artifact_class(
     manifest = _load_manifest()
     summary = manifest["summary"]
 
-    assert summary["window_count"] == 6
-    assert summary["seam_count"] == 5
-    assert summary["derived_png_count"] == 18
-    assert summary["edge_report_count"] == 6
-    assert summary["heightfield_count"] == 6
-    assert summary["hillshade_count"] == 6
-    assert summary["naip_centerline_preview_count"] == 6
+    assert summary["window_count"] == 8
+    assert summary["seam_count"] == 7
+    assert summary["derived_png_count"] == 24
+    assert summary["edge_report_count"] == 8
+    assert summary["heightfield_count"] == 8
+    assert summary["hillshade_count"] == 8
+    assert summary["naip_centerline_preview_count"] == 8
     assert summary["all_route_overlays_drawn"] is True
-    assert len(manifest["windows"]) == 6
+    assert len(manifest["windows"]) == 8
+    basis_by_id = {
+        window["window_id"]: window["route_overlay"]["route_basis"]
+        for window in manifest["windows"]
+    }
+    assert basis_by_id["below_full_run_alias_33796_41500m"] == "adopted_route_axis"
+    assert basis_by_id["salmon_falls_takeout_approach_41500_49077m"] == "adopted_route_axis"
+    assert basis_by_id["chili_bar_existing_pilot_0_2500m"] == (
+        "directed_route_clip_21_0_mile_candidate"
+    )
 
 
 def test_south_fork_a1_window_derivative_images_and_edge_reports_exist():

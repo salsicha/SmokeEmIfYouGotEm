@@ -42,10 +42,10 @@ def test_south_fork_a1_window_source_execution_plan_covers_official_dem_and_naip
     summary = plan["summary"]
     tasks = plan["tasks"]
 
-    assert summary["task_count"] == 12
-    assert summary["terrain_task_count"] == 6
-    assert summary["aerial_task_count"] == 6
-    assert summary["destination_present_count"] == 12
+    assert summary["task_count"] == 16
+    assert summary["terrain_task_count"] == 8
+    assert summary["aerial_task_count"] == 8
+    assert summary["destination_present_count"] == 16
     assert summary["destination_missing_count"] == 0
     assert {task["role"] for task in tasks} == {"terrain_dem", "aerial_imagery"}
     assert all(task["official_export_url"].startswith("https://") for task in tasks)
@@ -86,7 +86,7 @@ def test_south_fork_a1_window_source_executor_downloads_selected_file_and_refres
     assert first_window["terrain_dem"]["present"] is True
     assert first_window["terrain_dem"]["sha256"] == hashlib.sha256(content).hexdigest()
     assert status["summary"]["present_source_file_count"] == 1
-    assert status["summary"]["missing_source_file_count"] == 11
+    assert status["summary"]["missing_source_file_count"] == 15
 
 
 def _copy_required_inputs(tmp_path: Path) -> None:

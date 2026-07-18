@@ -21,7 +21,7 @@
     "window_stitched_edge_report": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/review/stitched_edge_report.json"
   },
   "display_name": "Coloma Valley Transit",
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-17",
   "production_promoted": false,
   "promotion_gate": {
     "can_bind_named_rapid_geometry": false,
@@ -34,7 +34,7 @@
       "Generate review derivatives from the hash-locked DEM and NAIP source files.",
       "Validate seams against adjacent window derivatives and the whole-window route.",
       "Attach bank/cross-section interpretation and guide/geospatial review.",
-      "Resolve exact downstream anchor before final cropping or Unreal import."
+      "Confirm the adopted Salmon Falls take-out bank landing (P7 owner packet) before final cropping or Unreal import."
     ]
   },
   "river_id": "south_fork_american_chili_bar",
