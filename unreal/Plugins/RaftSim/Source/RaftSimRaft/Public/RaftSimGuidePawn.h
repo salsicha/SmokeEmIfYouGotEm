@@ -5,8 +5,12 @@
 
 #include "RaftSimGuidePawn.generated.h"
 
+class ARaftSimRaftActor;
 class UCameraComponent;
+class UInputAction;
+class UInputMappingContext;
 class USceneComponent;
+struct FInputActionValue;
 
 USTRUCT(BlueprintType)
 struct FRaftSimGuideCameraSettings
@@ -86,6 +90,8 @@ public:
     ARaftSimGuidePawn();
 
     virtual void Tick(float DeltaSeconds) override;
+    virtual void BeginPlay() override;
+    virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
     UCameraComponent* GetGuideCamera() const { return GuideCamera; }
@@ -132,6 +138,41 @@ public:
 protected:
     float GetEffectiveMotionIntensity() const;
     void UpdateComfortCamera(float DeltaSeconds);
+
+    void HandlePaddleStroke(const FInputActionValue& Value);
+    void HandleTurnStroke(const FInputActionValue& Value);
+    void HandleLook(const FInputActionValue& Value);
+    void HandleHighSide(const FInputActionValue& Value);
+    void HandleGuideCommand(FName CommandActionName);
+    ARaftSimRaftActor* ResolveRaft();
+
+    /** Mapping context and actions are generated assets under /Game/RaftSim/Input. */
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputMappingContext> DefaultMappingContext;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> PaddleStrokeAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> PaddleDrawAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> LookAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> HighSideAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TArray<TObjectPtr<UInputAction>> GuideCommandActions;
+
+    UPROPERTY()
+    TObjectPtr<ARaftSimRaftActor> AttachedRaft;
+
+    /** Seconds between accepted paddle strokes (stroke cadence limit). */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Input")
+    float StrokeCooldownSeconds = 0.45f;
+
+    float LastStrokeTimeSeconds = -1.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> Root;

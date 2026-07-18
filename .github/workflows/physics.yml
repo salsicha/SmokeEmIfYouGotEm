@@ -1,0 +1,36 @@
+name: physics
+
+on:
+  push:
+    branches: [main, "release/**"]
+  pull_request:
+
+jobs:
+  repo-guards:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Block oversized non-LFS files and tracked generated maps
+        run: python3 Scripts/check_repo_guards.py
+
+  physics-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - name: Run physics suite
+        working-directory: physics
+        run: uv run pytest -q
+
+  cpp-solver:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure and build water solver
+        working-directory: physics/cpp
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j
+      - name: Run solver unit tests
+        working-directory: physics/cpp
+        run: ctest --test-dir build --output-on-failure || ./build/raftsim_water_tests

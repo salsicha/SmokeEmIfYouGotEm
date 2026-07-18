@@ -16,7 +16,11 @@ public class SmokeEmIfYouGotEm : ModuleRules
             "RaftSimRaft",
             "RaftSimUI",
             "RaftSimDebug",
-            "RaftSimAudio"
+            "RaftSimAudio",
+            "RaftSimInput",
+            "RaftSimWater",
+            "UMG",
+            "EnhancedInput"
         });
     }
 }
