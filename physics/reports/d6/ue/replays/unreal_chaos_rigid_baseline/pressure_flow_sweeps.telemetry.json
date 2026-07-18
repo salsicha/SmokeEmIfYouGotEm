@@ -1,0 +1,180 @@
+{
+	"schema": "raftsim.flexible_raft.d6_ue_fixture_telemetry.v1",
+	"runtime_id": "ue_rigid_baseline",
+	"target_id": "unreal_chaos_rigid_baseline",
+	"fixture_id": "pressure_flow_sweeps",
+	"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+	"fixed_step_s": 0.033333333333333333,
+	"channels":
+	{
+		"tube.pressure_pa":
+		{
+			"port_0": 22726.392328601632,
+			"port_1": 25348.515554213227,
+			"port_2": 22993.04892781637,
+			"port_3": 25348.515554213227,
+			"bow_0": 22845.439166097061,
+			"bow_1": 22645.953520164046,
+			"starboard_3": 25348.515554213227,
+			"starboard_2": 22993.04892781637,
+			"starboard_1": 25348.515554213227,
+			"starboard_0": 23028.603141045001,
+			"stern_1": 26248.42959671907,
+			"stern_0": 22686.185919343814
+		},
+		"tube.volume_m3":
+		{
+			"port_0": 0.2647734288445478,
+			"port_1": 0.2647734288445478,
+			"port_2": 0.2647734288445478,
+			"port_3": 0.2647734288445478,
+			"bow_0": 0.23398582083936784,
+			"bow_1": 0.23398582083936784,
+			"starboard_3": 0.2647734288445478,
+			"starboard_2": 0.2647734288445478,
+			"starboard_1": 0.2647734288445478,
+			"starboard_0": 0.2647734288445478,
+			"stern_1": 0.23398582083936784,
+			"stern_0": 0.23398582083936784
+		},
+		"tube.freeboard_loss_m":
+		{
+			"port_0": 0,
+			"port_1": 0,
+			"port_2": 0,
+			"port_3": 0,
+			"bow_0": 0,
+			"bow_1": 0,
+			"starboard_3": 0,
+			"starboard_2": 0,
+			"starboard_1": 0,
+			"starboard_0": 0,
+			"stern_1": 0,
+			"stern_0": 0
+		},
+		"tube.floor_load_n":
+		{
+			"port_0": 50.358000000000004,
+			"port_1": 50.358000000000004,
+			"port_2": 50.358000000000004,
+			"port_3": 50.358000000000004,
+			"bow_0": 50.358000000000004,
+			"bow_1": 50.358000000000004,
+			"starboard_3": 50.358000000000004,
+			"starboard_2": 50.358000000000004,
+			"starboard_1": 50.358000000000004,
+			"starboard_0": 50.358000000000004,
+			"stern_1": 50.358000000000004,
+			"stern_0": 50.358000000000004
+		},
+		"tube.lacing_load_n":
+		{
+			"port_0": 44.144999999999996,
+			"port_1": 0,
+			"port_2": 88.289999999999992,
+			"port_3": 0,
+			"bow_0": 44.144999999999996,
+			"bow_1": 44.144999999999996,
+			"starboard_3": 0,
+			"starboard_2": 88.289999999999992,
+			"starboard_1": 0,
+			"starboard_0": 94.175999999999988,
+			"stern_1": 0,
+			"stern_0": 50.030999999999999
+		},
+		"overwash.overtopping_flux_m3_s":
+		{
+			"port_0": 0,
+			"port_1": 0,
+			"port_2": 0,
+			"port_3": 0,
+			"bow_0": 0,
+			"bow_1": 0,
+			"starboard_3": 0.18027749999999998,
+			"starboard_2": 0.18027749999999998,
+			"starboard_1": 0.18027749999999998,
+			"starboard_0": 0.18027749999999998,
+			"stern_1": 0,
+			"stern_0": 0
+		},
+		"overwash.entrained_water_side":
+		{
+			"port": 0,
+			"starboard": 0.024036999999999996,
+			"bow": 0,
+			"stern": 0
+		},
+		"contact.max_indentation_m": 0.22,
+		"contact.min_release_margin_n": -2857.1909417007018,
+		"combined_roll_moment_nm": 505.22873399999958
+	},
+	"metrics":
+	{
+		"sweep_case_count": 9,
+		"sweeps": [
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0.31862999999999997,
+				"retained_water_roll_moment_nm": 98.982409499999989
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0.51986999999999994,
+				"retained_water_roll_moment_nm": 161.49761549999997
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0.72110999999999992,
+				"retained_water_roll_moment_nm": 224.01282149999994
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0.31862999999999997,
+				"retained_water_roll_moment_nm": 98.982409499999989
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0.51986999999999994,
+				"retained_water_roll_moment_nm": 161.49761549999997
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0.72110999999999992,
+				"retained_water_roll_moment_nm": 224.01282149999994
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0.31862999999999997,
+				"retained_water_roll_moment_nm": 98.982409499999989
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0.51986999999999994,
+				"retained_water_roll_moment_nm": 161.49761549999997
+			},
+			{
+				"contact_min_release_margin_n": -2857.1909417007018,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0.72110999999999992,
+				"retained_water_roll_moment_nm": 224.01282149999994
+			}
+		]
+	}
+}

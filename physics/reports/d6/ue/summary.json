@@ -1,0 +1,117 @@
+{
+	"schema": "raftsim.flexible_raft.d6_ue_runner_summary.v1",
+	"generated_on": "2026-07-17",
+	"status": "ue_measured_results_recorded",
+	"d6_complete": false,
+	"production_promoted": false,
+	"runtime": "UnrealEngine5CustomReducedRigidBodyFlexibleRaftPort",
+	"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8 SmokeEmIfYouGotEm A-3 flexible-raft C++ port",
+	"source_fixture_input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+	"fixture_count": 7,
+	"jobs": [
+		{
+			"fixture_id": "static_seat_load_sag",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/static_seat_load_sag.telemetry.json",
+			"telemetry_sha256": "221d4e7a7333c8f6d47f670ca6a563c7cc296dc74df2b5b96947423a7899f796"
+		},
+		{
+			"fixture_id": "traveling_crew_shift",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/traveling_crew_shift.telemetry.json",
+			"telemetry_sha256": "aa09eefb0722334485b5a03d36fa81c48aea5f2bcf97b15ceb96aa9335ebb910"
+		},
+		{
+			"fixture_id": "rock_pinch_wrap",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/rock_pinch_wrap.telemetry.json",
+			"telemetry_sha256": "bf53e6a60cfa8f04177211c9d089d10faccb19121c2e84b9c5e6cfa261be7b3a"
+		},
+		{
+			"fixture_id": "upstream_tube_overwash_flip",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/upstream_tube_overwash_flip.telemetry.json",
+			"telemetry_sha256": "13929ae2a03c88b78852e8c87dfe4b5bdfce98480c4f185d2e4a29456580bbc7"
+		},
+		{
+			"fixture_id": "timed_high_side_save",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/timed_high_side_save.telemetry.json",
+			"telemetry_sha256": "d5385ba78b8b0222e2a4d3d458602f3a5c45b107c3b788b80822117d78f3ee57"
+		},
+		{
+			"fixture_id": "post_contact_recovery",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/post_contact_recovery.telemetry.json",
+			"telemetry_sha256": "12fde4c07786fc6c19378ccadd9b84e81ef93b8bb90bd384bcbd3a77a679ea0f"
+		},
+		{
+			"fixture_id": "pressure_flow_sweeps",
+			"target_id": "project_chrono_or_reviewed_compliant_model",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/project_chrono_or_reviewed_compliant_model/pressure_flow_sweeps.telemetry.json",
+			"telemetry_sha256": "ab047b01e6d7a0e70b32e35892f036ae8d73d191497c8cb8cd2572090477bc2d"
+		},
+		{
+			"fixture_id": "static_seat_load_sag",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/static_seat_load_sag.telemetry.json",
+			"telemetry_sha256": "06627d260cc4891c0e8301e417e635fe9f9fad7df9dc0c72fc08f248a7e1d793"
+		},
+		{
+			"fixture_id": "traveling_crew_shift",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/traveling_crew_shift.telemetry.json",
+			"telemetry_sha256": "75b5562f03a8b4a59b39529f05de283dad02d76cce43bcf693cd96433bb7fcf7"
+		},
+		{
+			"fixture_id": "rock_pinch_wrap",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/rock_pinch_wrap.telemetry.json",
+			"telemetry_sha256": "f8ae540ee0588ebf1126e8f6555050c5e1a1e871dfd0d4a286596dd42f7a824b"
+		},
+		{
+			"fixture_id": "upstream_tube_overwash_flip",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/upstream_tube_overwash_flip.telemetry.json",
+			"telemetry_sha256": "20fb960b1b9b113eead62ca7eadd79edf499fda277b5a6224c012bf451bf2105"
+		},
+		{
+			"fixture_id": "timed_high_side_save",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/timed_high_side_save.telemetry.json",
+			"telemetry_sha256": "d296fd7b52a01aeba971c423322f4050296e87b20867f5e65849dabc3bd4f243"
+		},
+		{
+			"fixture_id": "post_contact_recovery",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/post_contact_recovery.telemetry.json",
+			"telemetry_sha256": "253623bb272c8aef8efdc56fb2ae33b2e72ba9a26fdb02ba211500a7fcc7c5dd"
+		},
+		{
+			"fixture_id": "pressure_flow_sweeps",
+			"target_id": "unreal_chaos_rigid_baseline",
+			"status": "measured_engine_output",
+			"telemetry_path": "physics/reports/d6/ue/replays/unreal_chaos_rigid_baseline/pressure_flow_sweeps.telemetry.json",
+			"telemetry_sha256": "d257cc6fde7b5f1105091fab1380a885d5ced77bfa26c32807025bd7ebf34ab4"
+		}
+	],
+	"promotion_gate":
+	{
+		"may_mark_d6_complete": false,
+		"may_drive_runtime_gameplay": false,
+		"reason": "Measured UE results feed the physics-side D6 merge and comparison harness; promotion still requires the regenerated comparison report and manual review."
+	}
+}
