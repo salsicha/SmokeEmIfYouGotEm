@@ -55,6 +55,14 @@ PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
     "chili_bar_reach_0_2500m/manifest.json"
 )
+FULL_REACH_WINDOW_MANIFEST_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+    "full_reach_window_manifest.json"
+)
+FULL_REACH_WINDOW_SOURCE_STATUS_RELATIVE_PATH = (
+    "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+    "full_reach_window_source_pull_status.json"
+)
 
 
 def _load_json(repo_root: Path, relative_path: str) -> dict[str, Any]:
@@ -133,6 +141,8 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
         repo_root,
         FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
     )
+    window_manifest = _load_json(repo_root, FULL_REACH_WINDOW_MANIFEST_RELATIVE_PATH)
+    window_status = _load_json(repo_root, FULL_REACH_WINDOW_SOURCE_STATUS_RELATIVE_PATH)
 
     rapid_records = _rapid_station_records(river, adopted)
     max_rapid = max(rapid_records, key=lambda rapid: rapid["river_mile"])
@@ -266,11 +276,26 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
             "production_corridor_station_range_m": corridor_centerline[
                 "station_range_m"
             ],
+            "full_reach_window_coverage": {
+                "corridor_window_manifest": FULL_REACH_WINDOW_MANIFEST_RELATIVE_PATH,
+                "source_pull_status": FULL_REACH_WINDOW_SOURCE_STATUS_RELATIVE_PATH,
+                "window_count": window_status["summary"]["window_count"],
+                "covered_station_end_m": window_manifest["coverage_summary"][
+                    "planned_station_end_m"
+                ],
+                "covers_adopted_axis": window_manifest["coverage_summary"][
+                    "covers_adopted_axis"
+                ],
+                "all_source_files_present": window_status["summary"][
+                    "all_source_files_present"
+                ],
+            },
             "coverage_gap": (
-                "Committed DEM/NAIP window pulls cover the planned 0-33796 m "
-                "spans and the 0-2.5 km physical pilot slice; extending source "
-                "coverage to the 49078 m adopted axis is P3/P4 source-pull "
-                "work. This is a source-coverage gap, not an anchor blocker."
+                "Resolved July 17 2026: committed DEM/NAIP window pulls now "
+                "cover the full 0-49078 m adopted axis in eight hash-locked "
+                "windows. Only the 0-2.5 km physical pilot slice is promoted "
+                "corridor terrain; that is derivative/review work inside "
+                "P3/P4, not an anchor blocker."
             ),
         },
         "flow_evidence": {
@@ -321,14 +346,17 @@ def build_south_fork_a1_stationing_repair_status(repo_root: Path) -> dict[str, A
             },
             {
                 "requirement": "Extend corridor to the full Chili Bar-to-Folsom reach.",
-                "status": "unblocked_source_pull_extension_pending_p3_p4",
+                "status": "extended_full_axis_window_sources_attached",
                 "evidence": [
                     PRODUCTION_CORRIDOR_MANIFEST_RELATIVE_PATH,
                     FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
+                    FULL_REACH_WINDOW_MANIFEST_RELATIVE_PATH,
+                    FULL_REACH_WINDOW_SOURCE_STATUS_RELATIVE_PATH,
                 ],
                 "next_action": (
-                    "Regenerate and extend the windowed corridor source pulls against the "
-                    "adopted 49078 m axis during P3/P4; the anchor blocker is resolved."
+                    "None for source coverage: eight hash-locked DEM/NAIP windows cover "
+                    "the adopted 49078 m axis. Stitched-derivative review and Unreal "
+                    "import readiness continue inside P3/P4 against these sources."
                 ),
             },
             {
