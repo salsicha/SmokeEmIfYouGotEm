@@ -1,0 +1,3272 @@
+{
+  "acceptance": {
+    "authority_masks_complete": true,
+    "channel_and_bathymetry_complete": true,
+    "collision_and_render_registered": true,
+    "full_reach_continuous": true,
+    "material_masks_complete": true,
+    "procedural_infill_explicitly_labelled": true,
+    "ready_for_hydraulic_authoring_m3": true,
+    "terrain_complete": true
+  },
+  "algorithm": "south_fork_procedural_geography_v1",
+  "artifacts": {
+    "boulder_catalog": {
+      "byte_count": 39847,
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/boulder_catalog.json",
+      "sha256": "a3893b74a5a4b565da0b9fdbf86660e2d50086163fba012a83b5a09e9fb07372"
+    },
+    "canonical_grid": {
+      "byte_count": 10747112,
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "sha256": "6d0bc63772dc07580b5ae2aa085975525ddde8d2751e2a1a5fc509479e4439d0"
+    },
+    "overview": {
+      "byte_count": 761106,
+      "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_overview.png",
+      "sha256": "bebf933c0de203abd4d8f77a39929844a137107545f24c03e9ae0b00b33dd52b"
+    }
+  },
+  "authority_policy": {
+    "never_claim_as_surveyed": true,
+    "not_for_navigation": true,
+    "procedural_infill": "bathymetry, bank blend, source-window seam blend, and sub-DEM rapid controls",
+    "route_basis": "adopted NHD directed mainstem axis",
+    "source_imagery": "USDA NAIP conditions material classes",
+    "source_terrain": "USGS 3DEP sampled outside the conditioned channel and bank blend"
+  },
+  "continuity": {
+    "maximum_center_bed_step_m": 0.928162,
+    "no_unbounded_discontinuities": true,
+    "seam_blend_distance_m": 64.0,
+    "source_seam_count": 7,
+    "source_window_count": 8
+  },
+  "determinism_signature_sha256": "a790a059e3c101b92d1d8e76f8cbb11ca26b4de862dc4065d135ef5ec8a72f9c",
+  "generated_on": "2026-07-19",
+  "grid": {
+    "coordinate_system": "curvilinear station/lateral grid registered to EPSG:3857 centerline",
+    "cross_channel_count": 129,
+    "finite_sample_count": 1582959,
+    "lateral_range_m": [
+      -256.0,
+      256.0
+    ],
+    "lateral_spacing_m": 4.0,
+    "maximum_station_step_m": 4.0,
+    "no_voids": true,
+    "station_count": 12271,
+    "station_end_m": 49077.732,
+    "station_spacing_m": 4.0,
+    "station_start_m": 0.0
+  },
+  "hydraulic_features": {
+    "boulder_count": 115,
+    "feature_bit_encoding": {
+      "boulder": 4,
+      "channel": 1,
+      "eddy": 64,
+      "hole_control": 16,
+      "ledge": 8,
+      "shelf": 2,
+      "shoreline_breakup": 128,
+      "wave_train": 32
+    },
+    "nonzero_sample_counts": {
+      "boulder": 1985,
+      "channel": 136027,
+      "eddy": 3432,
+      "hole_control": 2210,
+      "ledge": 1296,
+      "shelf": 44573,
+      "shoreline_breakup": 86670,
+      "wave_train": 8901
+    },
+    "rapid_annotation_count": 20
+  },
+  "inputs": {
+    "route": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route.geojson",
+    "source_windows": [
+      {
+        "aerial_sha256": "d4db4ee9e3648cc9dfcb530e594eddf51a0b152a27dc23d1def3ca6a7c7fd343",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/chili_bar_existing_pilot_0_2500m/manifest.json",
+        "terrain_sha256": "15a08aa3a5857c36f69c34e3aaaf64fb3a618f552a8ca1b10026982ea05ef5b9",
+        "window_id": "chili_bar_existing_pilot_0_2500m"
+      },
+      {
+        "aerial_sha256": "279a08ca61d65820aa6baf797ce385f5c4708a949be5e4a8e4e8cb73b14b69aa",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_chili_bar_to_coloma_2500_10000m/manifest.json",
+        "terrain_sha256": "ebb6682d52a6a011854b4679d43ba56f1a1d62642852cce9e045b805820e59f0",
+        "window_id": "upper_chili_bar_to_coloma_2500_10000m"
+      },
+      {
+        "aerial_sha256": "5dc8296dfc06d501699a0284cad7d009ff640dcff76534adb093e98cdb77fadd",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/coloma_valley_10000_24000m/manifest.json",
+        "terrain_sha256": "03f4221679764654f0d41dc6433a0589bc4ab74e91938954cfeeb94e5d0dafa9",
+        "window_id": "coloma_valley_10000_24000m"
+      },
+      {
+        "aerial_sha256": "f68f6de316ad5867bca36955d7b942001d0d9295946dc0779a5550e0e70f9e63",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/upper_gorge_24000_28500m/manifest.json",
+        "terrain_sha256": "c0bf9a88df94f3c8b71a6a64f4c3ed8e03472ae3e2f830c334ba73a1a1554236",
+        "window_id": "upper_gorge_24000_28500m"
+      },
+      {
+        "aerial_sha256": "f208d7054420cfbd8b0119c6f890a011df923d253fc47b9c7fd5d407e71861c7",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/lower_gorge_to_salmon_falls_28500_32991m/manifest.json",
+        "terrain_sha256": "3b65c0358321a104bbe9ac9e4440329c29c18a273b66a460defc021c8c001df2",
+        "window_id": "lower_gorge_to_salmon_falls_28500_32991m"
+      },
+      {
+        "aerial_sha256": "38f5cd09bdc0f7147fb5ff88f6e87689352248b324876d4012a7d4012a67fc74",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_folsom_review_32991_33796m/manifest.json",
+        "terrain_sha256": "52ba01a222b7d5c8c659112e52bbb6e73a730caff82488d1138dbfe2cecf5d8a",
+        "window_id": "salmon_falls_folsom_review_32991_33796m"
+      },
+      {
+        "aerial_sha256": "5be2dd678cd2b0ddb3a7043f1d43c7c20922f69887b5aab6a3d8b5615162725d",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/below_full_run_alias_33796_41500m/manifest.json",
+        "terrain_sha256": "9b3f2ea630fa2e07fee454fc16af89a9d1aeea1d0cd0d0b4d9df733644067366",
+        "window_id": "below_full_run_alias_33796_41500m"
+      },
+      {
+        "aerial_sha256": "42410c13d093914392b5eb936c9cebf4e03a8926cfc20677068f065aba17cbd4",
+        "manifest_path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_windows/salmon_falls_takeout_approach_41500_49077m/manifest.json",
+        "terrain_sha256": "fea29b1d75d31e4b47e74dc9d9136a6cbd4822c32121fa4008d347c9d27a6a38",
+        "window_id": "salmon_falls_takeout_approach_41500_49077m"
+      }
+    ],
+    "stationing": "physics/data/real_world/south_fork_american_chili_bar/hydrography/full_reach_adopted_route_stationing.json",
+    "window_manifest_index": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/full_reach_window_source_manifest_index.json"
+  },
+  "provenance": {
+    "authority_encoding": {
+      "procedural_infill": "255 minus source_authority",
+      "source_authority": "0 procedural, 1..254 blend, 255 official source",
+      "uncertainty": "0 lowest uncertainty, 255 highest uncertainty"
+    },
+    "procedural_infill_fraction": 0.118501,
+    "source_authority_fraction": 0.881499
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.procedural_geography.v1",
+  "seed": 1604623895,
+  "status": "full_reach_procedural_geography_complete",
+  "unreal_import": {
+    "collision_render_contract": "same heightfield path and hash for collision and render",
+    "height_encoding": "global uint16 elevation normalization shared by all tiles",
+    "schema": "raftsim.unreal.procedural_corridor_tiles.v1",
+    "tile_count": 13,
+    "tile_overlap_rows": 1,
+    "tile_rows": 1009,
+    "tiles": [
+      {
+        "collision_heightfield": {
+          "byte_count": 181663,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_height.png",
+          "sha256": "4baae96940d431e34378b306e1d4558984aa11189ecc1617df09dfe34938f66f"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13438482.594,
+              4690009.757
+            ],
+            "normal": [
+              -0.0218082,
+              -0.9997622
+            ],
+            "station_m": 0.0
+          },
+          {
+            "epsg3857_m": [
+              -13438748.571,
+              4689842.459
+            ],
+            "normal": [
+              0.772948,
+              -0.6344694
+            ],
+            "station_m": 256.0
+          },
+          {
+            "epsg3857_m": [
+              -13438967.05,
+              4689605.459
+            ],
+            "normal": [
+              0.3593365,
+              -0.933208
+            ],
+            "station_m": 512.0
+          },
+          {
+            "epsg3857_m": [
+              -13439273.154,
+              4689695.201
+            ],
+            "normal": [
+              -0.5818895,
+              -0.8132679
+            ],
+            "station_m": 768.0
+          },
+          {
+            "epsg3857_m": [
+              -13439566.087,
+              4689825.8
+            ],
+            "normal": [
+              0.02692,
+              -0.9996376
+            ],
+            "station_m": 1024.0
+          },
+          {
+            "epsg3857_m": [
+              -13439818.559,
+              4689654.615
+            ],
+            "normal": [
+              0.8468521,
+              -0.5318284
+            ],
+            "station_m": 1280.0
+          },
+          {
+            "epsg3857_m": [
+              -13439990.073,
+              4689375.163
+            ],
+            "normal": [
+              0.782736,
+              -0.6223539
+            ],
+            "station_m": 1536.0
+          },
+          {
+            "epsg3857_m": [
+              -13440200.649,
+              4689122.924
+            ],
+            "normal": [
+              0.7862816,
+              -0.6178683
+            ],
+            "station_m": 1792.0
+          },
+          {
+            "epsg3857_m": [
+              -13440486.223,
+              4689072.633
+            ],
+            "normal": [
+              -0.5619265,
+              -0.8271872
+            ],
+            "station_m": 2048.0
+          },
+          {
+            "epsg3857_m": [
+              -13440666.691,
+              4689322.137
+            ],
+            "normal": [
+              -0.9808711,
+              -0.1946584
+            ],
+            "station_m": 2304.0
+          },
+          {
+            "epsg3857_m": [
+              -13440766.719,
+              4689629.982
+            ],
+            "normal": [
+              -0.9694178,
+              -0.2454165
+            ],
+            "station_m": 2560.0
+          },
+          {
+            "epsg3857_m": [
+              -13441017.526,
+              4689817.735
+            ],
+            "normal": [
+              0.0218137,
+              -0.9997621
+            ],
+            "station_m": 2816.0
+          },
+          {
+            "epsg3857_m": [
+              -13441339.207,
+              4689787.65
+            ],
+            "normal": [
+              0.4807033,
+              -0.8768833
+            ],
+            "station_m": 3072.0
+          },
+          {
+            "epsg3857_m": [
+              -13441626.334,
+              4689636.227
+            ],
+            "normal": [
+              0.5842122,
+              -0.8116009
+            ],
+            "station_m": 3328.0
+          },
+          {
+            "epsg3857_m": [
+              -13441880.055,
+              4689428.513
+            ],
+            "normal": [
+              0.5095603,
+              -0.8604349
+            ],
+            "station_m": 3584.0
+          },
+          {
+            "epsg3857_m": [
+              -13442200.263,
+              4689467.873
+            ],
+            "normal": [
+              -0.4300477,
+              -0.9028062
+            ],
+            "station_m": 3840.0
+          },
+          {
+            "epsg3857_m": [
+              -13442410.552,
+              4689594.832
+            ],
+            "normal": [
+              -0.6413344,
+              -0.7672615
+            ],
+            "station_m": 4032.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 15863,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_material.png",
+          "sha256": "96134b60ac7336e1f008f55ee8483f90fa2cd7ada37489851c39eb1b0b89133a"
+        },
+        "packed_authority_features": {
+          "byte_count": 8750,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_authority_features.png",
+          "sha256": "70847cf63e73e82443d41f46d33a20a6eb9f3d3ee37a9bec43c0254c0cd21020"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 181663,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_height.png",
+          "sha256": "4baae96940d431e34378b306e1d4558984aa11189ecc1617df09dfe34938f66f"
+        },
+        "row_range": [
+          0,
+          1008
+        ],
+        "station_range_m": [
+          0.0,
+          4032.0
+        ],
+        "tile_id": "south_fork_00"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 175810,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_height.png",
+          "sha256": "12d224f2925ed9894b9781a751f288056bd6ea54746a560e7381b9de9e78ee05"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13442410.552,
+              4689594.832
+            ],
+            "normal": [
+              -0.6413344,
+              -0.7672615
+            ],
+            "station_m": 4032.0
+          },
+          {
+            "epsg3857_m": [
+              -13442652.076,
+              4689817.584
+            ],
+            "normal": [
+              -0.7255659,
+              -0.6881527
+            ],
+            "station_m": 4288.0
+          },
+          {
+            "epsg3857_m": [
+              -13442741.655,
+              4690116.113
+            ],
+            "normal": [
+              -0.9999372,
+              -0.0112019
+            ],
+            "station_m": 4544.0
+          },
+          {
+            "epsg3857_m": [
+              -13442936.268,
+              4690314.25
+            ],
+            "normal": [
+              0.0221866,
+              -0.9997538
+            ],
+            "station_m": 4800.0
+          },
+          {
+            "epsg3857_m": [
+              -13443191.446,
+              4690132.019
+            ],
+            "normal": [
+              0.7928774,
+              -0.6093811
+            ],
+            "station_m": 5056.0
+          },
+          {
+            "epsg3857_m": [
+              -13443400.999,
+              4689878.769
+            ],
+            "normal": [
+              0.7492753,
+              -0.6622586
+            ],
+            "station_m": 5312.0
+          },
+          {
+            "epsg3857_m": [
+              -13443667.548,
+              4689868.954
+            ],
+            "normal": [
+              -0.7488616,
+              -0.6627265
+            ],
+            "station_m": 5568.0
+          },
+          {
+            "epsg3857_m": [
+              -13443865.479,
+              4690131.291
+            ],
+            "normal": [
+              -0.7860053,
+              -0.6182198
+            ],
+            "station_m": 5824.0
+          },
+          {
+            "epsg3857_m": [
+              -13444054.093,
+              4690400.505
+            ],
+            "normal": [
+              -0.808461,
+              -0.5885497
+            ],
+            "station_m": 6080.0
+          },
+          {
+            "epsg3857_m": [
+              -13444261.484,
+              4690653.204
+            ],
+            "normal": [
+              -0.5404772,
+              -0.8413587
+            ],
+            "station_m": 6336.0
+          },
+          {
+            "epsg3857_m": [
+              -13444574.831,
+              4690667.772
+            ],
+            "normal": [
+              0.1897653,
+              -0.9818295
+            ],
+            "station_m": 6592.0
+          },
+          {
+            "epsg3857_m": [
+              -13444899.414,
+              4690615.256
+            ],
+            "normal": [
+              0.144457,
+              -0.9895111
+            ],
+            "station_m": 6848.0
+          },
+          {
+            "epsg3857_m": [
+              -13445225.386,
+              4690636.042
+            ],
+            "normal": [
+              0.1335979,
+              -0.9910356
+            ],
+            "station_m": 7104.0
+          },
+          {
+            "epsg3857_m": [
+              -13445540.462,
+              4690554.735
+            ],
+            "normal": [
+              0.8771737,
+              -0.4801733
+            ],
+            "station_m": 7360.0
+          },
+          {
+            "epsg3857_m": [
+              -13445488.538,
+              4690270.231
+            ],
+            "normal": [
+              0.7950284,
+              0.6065722
+            ],
+            "station_m": 7616.0
+          },
+          {
+            "epsg3857_m": [
+              -13445275.246,
+              4690020.085
+            ],
+            "normal": [
+              0.7356462,
+              0.6773659
+            ],
+            "station_m": 7872.0
+          },
+          {
+            "epsg3857_m": [
+              -13445055.242,
+              4689922.102
+            ],
+            "normal": [
+              0.1751719,
+              0.9845379
+            ],
+            "station_m": 8064.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 17349,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_material.png",
+          "sha256": "e48094ea5d3164c1bc2849c1d54b866e80e0ce35448f9c8392a94b9430cdc2c6"
+        },
+        "packed_authority_features": {
+          "byte_count": 5704,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_authority_features.png",
+          "sha256": "0528108d74d9b71c4dd4b5dbd2d24f18bdb113326ad0d53011bdb5b4f4df1afe"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 175810,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_height.png",
+          "sha256": "12d224f2925ed9894b9781a751f288056bd6ea54746a560e7381b9de9e78ee05"
+        },
+        "row_range": [
+          1008,
+          2016
+        ],
+        "station_range_m": [
+          4032.0,
+          8064.0
+        ],
+        "tile_id": "south_fork_01"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 171437,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_height.png",
+          "sha256": "d2bb7826a7ad852fae97eba33cbe7d38a9876064b5a00014338eabc76fe008f6"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13445055.242,
+              4689922.102
+            ],
+            "normal": [
+              0.1751719,
+              0.9845379
+            ],
+            "station_m": 8064.0
+          },
+          {
+            "epsg3857_m": [
+              -13444795.884,
+              4689756.341
+            ],
+            "normal": [
+              0.9999017,
+              0.014025
+            ],
+            "station_m": 8320.0
+          },
+          {
+            "epsg3857_m": [
+              -13444980.431,
+              4689499.885
+            ],
+            "normal": [
+              0.7295308,
+              -0.6839479
+            ],
+            "station_m": 8576.0
+          },
+          {
+            "epsg3857_m": [
+              -13445160.77,
+              4689228.157
+            ],
+            "normal": [
+              0.6391875,
+              -0.769051
+            ],
+            "station_m": 8832.0
+          },
+          {
+            "epsg3857_m": [
+              -13445343.465,
+              4688963.055
+            ],
+            "normal": [
+              0.9224259,
+              -0.3861743
+            ],
+            "station_m": 9088.0
+          },
+          {
+            "epsg3857_m": [
+              -13445420.689,
+              4688644.279
+            ],
+            "normal": [
+              0.9946286,
+              -0.1035082
+            ],
+            "station_m": 9344.0
+          },
+          {
+            "epsg3857_m": [
+              -13445390.265,
+              4688322.812
+            ],
+            "normal": [
+              0.8930665,
+              0.4499246
+            ],
+            "station_m": 9600.0
+          },
+          {
+            "epsg3857_m": [
+              -13445296.804,
+              4688013.655
+            ],
+            "normal": [
+              0.9943072,
+              -0.1065516
+            ],
+            "station_m": 9856.0
+          },
+          {
+            "epsg3857_m": [
+              -13445552.202,
+              4687929.356
+            ],
+            "normal": [
+              -0.2820342,
+              -0.9594043
+            ],
+            "station_m": 10112.0
+          },
+          {
+            "epsg3857_m": [
+              -13445821.489,
+              4688106.433
+            ],
+            "normal": [
+              -0.7563927,
+              -0.6541179
+            ],
+            "station_m": 10368.0
+          },
+          {
+            "epsg3857_m": [
+              -13446090.23,
+              4688099.731
+            ],
+            "normal": [
+              0.7511516,
+              -0.6601298
+            ],
+            "station_m": 10624.0
+          },
+          {
+            "epsg3857_m": [
+              -13446254.353,
+              4687818.111
+            ],
+            "normal": [
+              0.6392645,
+              -0.7689869
+            ],
+            "station_m": 10880.0
+          },
+          {
+            "epsg3857_m": [
+              -13446527.961,
+              4687861.615
+            ],
+            "normal": [
+              -0.7747643,
+              -0.6322501
+            ],
+            "station_m": 11136.0
+          },
+          {
+            "epsg3857_m": [
+              -13446544.246,
+              4688176.923
+            ],
+            "normal": [
+              -0.975749,
+              0.2188923
+            ],
+            "station_m": 11392.0
+          },
+          {
+            "epsg3857_m": [
+              -13446545.946,
+              4688496.63
+            ],
+            "normal": [
+              -0.7253908,
+              -0.6883373
+            ],
+            "station_m": 11648.0
+          },
+          {
+            "epsg3857_m": [
+              -13446839.109,
+              4688579.255
+            ],
+            "normal": [
+              0.128614,
+              -0.9916947
+            ],
+            "station_m": 11904.0
+          },
+          {
+            "epsg3857_m": [
+              -13447082.893,
+              4688563.285
+            ],
+            "normal": [
+              -0.2308528,
+              -0.9729887
+            ],
+            "station_m": 12096.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 14098,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_material.png",
+          "sha256": "39c314d8f0bc70a853f8ed7fe8765e5246af84905641d152d9dfbd2fa0f2108b"
+        },
+        "packed_authority_features": {
+          "byte_count": 6080,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_authority_features.png",
+          "sha256": "8864840cdf6a15df9028018d71590ee9de55bde67882342ad16a8cb1f9d99aac"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 171437,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_height.png",
+          "sha256": "d2bb7826a7ad852fae97eba33cbe7d38a9876064b5a00014338eabc76fe008f6"
+        },
+        "row_range": [
+          2016,
+          3024
+        ],
+        "station_range_m": [
+          8064.0,
+          12096.0
+        ],
+        "tile_id": "south_fork_02"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 170184,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_height.png",
+          "sha256": "a38e6341fba7a1ad243cefd0935f2096f0eb42045706efea031fab01668bfad1"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13447082.893,
+              4688563.285
+            ],
+            "normal": [
+              -0.2308528,
+              -0.9729887
+            ],
+            "station_m": 12096.0
+          },
+          {
+            "epsg3857_m": [
+              -13447404.237,
+              4688629.097
+            ],
+            "normal": [
+              -0.052828,
+              -0.9986036
+            ],
+            "station_m": 12352.0
+          },
+          {
+            "epsg3857_m": [
+              -13447688.745,
+              4688515.757
+            ],
+            "normal": [
+              0.8130636,
+              -0.5821749
+            ],
+            "station_m": 12608.0
+          },
+          {
+            "epsg3857_m": [
+              -13447789.539,
+              4688204.328
+            ],
+            "normal": [
+              0.8903939,
+              -0.4551909
+            ],
+            "station_m": 12864.0
+          },
+          {
+            "epsg3857_m": [
+              -13448048.269,
+              4688042.825
+            ],
+            "normal": [
+              0.2848646,
+              -0.9585677
+            ],
+            "station_m": 13120.0
+          },
+          {
+            "epsg3857_m": [
+              -13448331.043,
+              4688178.422
+            ],
+            "normal": [
+              -0.5391037,
+              -0.8422394
+            ],
+            "station_m": 13376.0
+          },
+          {
+            "epsg3857_m": [
+              -13448469.778,
+              4688466.9
+            ],
+            "normal": [
+              -0.9981842,
+              0.0602357
+            ],
+            "station_m": 13632.0
+          },
+          {
+            "epsg3857_m": [
+              -13448449.974,
+              4688795.078
+            ],
+            "normal": [
+              -0.9981842,
+              0.0602357
+            ],
+            "station_m": 13888.0
+          },
+          {
+            "epsg3857_m": [
+              -13448598.507,
+              4689045.482
+            ],
+            "normal": [
+              -0.0405024,
+              -0.9991794
+            ],
+            "station_m": 14144.0
+          },
+          {
+            "epsg3857_m": [
+              -13448912.861,
+              4688987.225
+            ],
+            "normal": [
+              0.1516677,
+              -0.9884315
+            ],
+            "station_m": 14400.0
+          },
+          {
+            "epsg3857_m": [
+              -13449217.199,
+              4688877.257
+            ],
+            "normal": [
+              0.7403812,
+              -0.6721872
+            ],
+            "station_m": 14656.0
+          },
+          {
+            "epsg3857_m": [
+              -13449330.933,
+              4688579.131
+            ],
+            "normal": [
+              0.7669972,
+              -0.6416504
+            ],
+            "station_m": 14912.0
+          },
+          {
+            "epsg3857_m": [
+              -13449588.355,
+              4688390.907
+            ],
+            "normal": [
+              0.5111585,
+              -0.8594865
+            ],
+            "station_m": 15168.0
+          },
+          {
+            "epsg3857_m": [
+              -13449846.086,
+              4688217.103
+            ],
+            "normal": [
+              0.2139106,
+              -0.9768533
+            ],
+            "station_m": 15424.0
+          },
+          {
+            "epsg3857_m": [
+              -13450116.402,
+              4688342.293
+            ],
+            "normal": [
+              -0.8677745,
+              -0.4969581
+            ],
+            "station_m": 15680.0
+          },
+          {
+            "epsg3857_m": [
+              -13450373.441,
+              4688512.106
+            ],
+            "normal": [
+              -0.1979711,
+              -0.9802079
+            ],
+            "station_m": 15936.0
+          },
+          {
+            "epsg3857_m": [
+              -13450603.328,
+              4688593.919
+            ],
+            "normal": [
+              -0.2372043,
+              -0.9714598
+            ],
+            "station_m": 16128.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 17546,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_material.png",
+          "sha256": "2c85fd24d3f6e543f672e3ff1cd603c05d24421ca8745ea838f7c24c0bcb8b6e"
+        },
+        "packed_authority_features": {
+          "byte_count": 5059,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_authority_features.png",
+          "sha256": "673db5dfc849885a803a653d4b74ec8205126311957d13e0a365b1fefc9b8ebb"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 170184,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_height.png",
+          "sha256": "a38e6341fba7a1ad243cefd0935f2096f0eb42045706efea031fab01668bfad1"
+        },
+        "row_range": [
+          3024,
+          4032
+        ],
+        "station_range_m": [
+          12096.0,
+          16128.0
+        ],
+        "tile_id": "south_fork_03"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 169113,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_height.png",
+          "sha256": "90eea44ab4407f4b1506b9d5de05932aad81ee155d09cc71629dec87c9d5b413"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13450603.328,
+              4688593.919
+            ],
+            "normal": [
+              -0.2372043,
+              -0.9714598
+            ],
+            "station_m": 16128.0
+          },
+          {
+            "epsg3857_m": [
+              -13450909.789,
+              4688709.254
+            ],
+            "normal": [
+              -0.4142543,
+              -0.9101612
+            ],
+            "station_m": 16384.0
+          },
+          {
+            "epsg3857_m": [
+              -13451158.058,
+              4688922.436
+            ],
+            "normal": [
+              -0.6410674,
+              -0.7674845
+            ],
+            "station_m": 16640.0
+          },
+          {
+            "epsg3857_m": [
+              -13451445.74,
+              4689068.879
+            ],
+            "normal": [
+              -0.0826971,
+              -0.9965747
+            ],
+            "station_m": 16896.0
+          },
+          {
+            "epsg3857_m": [
+              -13451772.636,
+              4689063.003
+            ],
+            "normal": [
+              0.2427583,
+              -0.9700868
+            ],
+            "station_m": 17152.0
+          },
+          {
+            "epsg3857_m": [
+              -13452093.904,
+              4689019.918
+            ],
+            "normal": [
+              -0.0890209,
+              -0.9960297
+            ],
+            "station_m": 17408.0
+          },
+          {
+            "epsg3857_m": [
+              -13452342.867,
+              4688844.018
+            ],
+            "normal": [
+              0.4073372,
+              -0.9132778
+            ],
+            "station_m": 17664.0
+          },
+          {
+            "epsg3857_m": [
+              -13452649.986,
+              4688730.584
+            ],
+            "normal": [
+              0.1785956,
+              -0.9839225
+            ],
+            "station_m": 17920.0
+          },
+          {
+            "epsg3857_m": [
+              -13452907.888,
+              4688849.133
+            ],
+            "normal": [
+              -0.9536703,
+              -0.3008537
+            ],
+            "station_m": 18176.0
+          },
+          {
+            "epsg3857_m": [
+              -13452774.085,
+              4689138.557
+            ],
+            "normal": [
+              -0.7704715,
+              0.6374744
+            ],
+            "station_m": 18432.0
+          },
+          {
+            "epsg3857_m": [
+              -13452561.516,
+              4689389.368
+            ],
+            "normal": [
+              -0.7851747,
+              0.6192743
+            ],
+            "station_m": 18688.0
+          },
+          {
+            "epsg3857_m": [
+              -13452457.452,
+              4689698.968
+            ],
+            "normal": [
+              -0.9795328,
+              0.2012843
+            ],
+            "station_m": 18944.0
+          },
+          {
+            "epsg3857_m": [
+              -13452524.619,
+              4690018.441
+            ],
+            "normal": [
+              -0.9517463,
+              -0.3068857
+            ],
+            "station_m": 19200.0
+          },
+          {
+            "epsg3857_m": [
+              -13452699.121,
+              4690294.506
+            ],
+            "normal": [
+              -0.7482403,
+              -0.6634278
+            ],
+            "station_m": 19456.0
+          },
+          {
+            "epsg3857_m": [
+              -13452936.242,
+              4690521.107
+            ],
+            "normal": [
+              -0.5973454,
+              -0.8019841
+            ],
+            "station_m": 19712.0
+          },
+          {
+            "epsg3857_m": [
+              -13453246.479,
+              4690601.962
+            ],
+            "normal": [
+              -0.0370778,
+              -0.9993124
+            ],
+            "station_m": 19968.0
+          },
+          {
+            "epsg3857_m": [
+              -13453493.046,
+              4690603.317
+            ],
+            "normal": [
+              -0.0068503,
+              -0.9999765
+            ],
+            "station_m": 20160.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 18931,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_material.png",
+          "sha256": "2a98d9963800f742b0567902771b69d8478d20be76b7c241248733f9ee9b9c8d"
+        },
+        "packed_authority_features": {
+          "byte_count": 5019,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_authority_features.png",
+          "sha256": "60c784f1cb6511151387ad94acd7a17850cff4c99d5bed9e1e107c3ced40d574"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 169113,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_height.png",
+          "sha256": "90eea44ab4407f4b1506b9d5de05932aad81ee155d09cc71629dec87c9d5b413"
+        },
+        "row_range": [
+          4032,
+          5040
+        ],
+        "station_range_m": [
+          16128.0,
+          20160.0
+        ],
+        "tile_id": "south_fork_04"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 168681,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_height.png",
+          "sha256": "1a9d57ca63faa7cf8abf7029f24d2372823557a71503121614925040f89955f6"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13453493.046,
+              4690603.317
+            ],
+            "normal": [
+              -0.0068503,
+              -0.9999765
+            ],
+            "station_m": 20160.0
+          },
+          {
+            "epsg3857_m": [
+              -13453791.701,
+              4690728.258
+            ],
+            "normal": [
+              -0.6201427,
+              -0.784489
+            ],
+            "station_m": 20416.0
+          },
+          {
+            "epsg3857_m": [
+              -13453795.667,
+              4691053.8
+            ],
+            "normal": [
+              -0.9975957,
+              0.0693031
+            ],
+            "station_m": 20672.0
+          },
+          {
+            "epsg3857_m": [
+              -13453971.221,
+              4691318.852
+            ],
+            "normal": [
+              -0.5561875,
+              -0.8310568
+            ],
+            "station_m": 20928.0
+          },
+          {
+            "epsg3857_m": [
+              -13454273.8,
+              4691439.799
+            ],
+            "normal": [
+              -0.2237729,
+              -0.9746413
+            ],
+            "station_m": 21184.0
+          },
+          {
+            "epsg3857_m": [
+              -13454592.988,
+              4691518.98
+            ],
+            "normal": [
+              -0.2373645,
+              -0.9714206
+            ],
+            "station_m": 21440.0
+          },
+          {
+            "epsg3857_m": [
+              -13454902.278,
+              4691625.588
+            ],
+            "normal": [
+              -0.4351014,
+              -0.9003814
+            ],
+            "station_m": 21696.0
+          },
+          {
+            "epsg3857_m": [
+              -13455217.006,
+              4691716.016
+            ],
+            "normal": [
+              -0.1134439,
+              -0.9935444
+            ],
+            "station_m": 21952.0
+          },
+          {
+            "epsg3857_m": [
+              -13455539.721,
+              4691713.037
+            ],
+            "normal": [
+              -0.1853149,
+              -0.9826792
+            ],
+            "station_m": 22208.0
+          },
+          {
+            "epsg3857_m": [
+              -13455854.95,
+              4691778.019
+            ],
+            "normal": [
+              -0.7629935,
+              -0.6464062
+            ],
+            "station_m": 22464.0
+          },
+          {
+            "epsg3857_m": [
+              -13456131.813,
+              4691949.946
+            ],
+            "normal": [
+              -0.5018538,
+              -0.8649525
+            ],
+            "station_m": 22720.0
+          },
+          {
+            "epsg3857_m": [
+              -13456376.225,
+              4692162.976
+            ],
+            "normal": [
+              -0.8868322,
+              -0.4620915
+            ],
+            "station_m": 22976.0
+          },
+          {
+            "epsg3857_m": [
+              -13456457.05,
+              4692478.593
+            ],
+            "normal": [
+              -0.9962063,
+              -0.0870224
+            ],
+            "station_m": 23232.0
+          },
+          {
+            "epsg3857_m": [
+              -13456472.342,
+              4692803.107
+            ],
+            "normal": [
+              -0.9532433,
+              -0.302204
+            ],
+            "station_m": 23488.0
+          },
+          {
+            "epsg3857_m": [
+              -13456690.694,
+              4693025.319
+            ],
+            "normal": [
+              -0.2358349,
+              -0.9717931
+            ],
+            "station_m": 23744.0
+          },
+          {
+            "epsg3857_m": [
+              -13457001.784,
+              4693130.79
+            ],
+            "normal": [
+              -0.2803236,
+              -0.9599056
+            ],
+            "station_m": 24000.0
+          },
+          {
+            "epsg3857_m": [
+              -13457242.959,
+              4693182.536
+            ],
+            "normal": [
+              -0.2809831,
+              -0.9597127
+            ],
+            "station_m": 24192.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 22586,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_material.png",
+          "sha256": "5403c8c9064c4db3f62002ed2d384d954091c8a9bf171381f31c81f0e43026f8"
+        },
+        "packed_authority_features": {
+          "byte_count": 5208,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_authority_features.png",
+          "sha256": "3ce9a3b3d7e854bb226ac651a17501b396293a23c24cca834c46288cc4a71e32"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 168681,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_height.png",
+          "sha256": "1a9d57ca63faa7cf8abf7029f24d2372823557a71503121614925040f89955f6"
+        },
+        "row_range": [
+          5040,
+          6048
+        ],
+        "station_range_m": [
+          20160.0,
+          24192.0
+        ],
+        "tile_id": "south_fork_05"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 152388,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_height.png",
+          "sha256": "f428f5a508e071adae0a675dd0e895f560fdd2ddc62c900db6c8b506e8da3bb6"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13457242.959,
+              4693182.536
+            ],
+            "normal": [
+              -0.2809831,
+              -0.9597127
+            ],
+            "station_m": 24192.0
+          },
+          {
+            "epsg3857_m": [
+              -13457529.335,
+              4693327.207
+            ],
+            "normal": [
+              -0.7793109,
+              -0.6266375
+            ],
+            "station_m": 24448.0
+          },
+          {
+            "epsg3857_m": [
+              -13457666.168,
+              4693620.037
+            ],
+            "normal": [
+              -0.985499,
+              -0.1696812
+            ],
+            "station_m": 24704.0
+          },
+          {
+            "epsg3857_m": [
+              -13457839.794,
+              4693879.53
+            ],
+            "normal": [
+              -0.547905,
+              -0.8365406
+            ],
+            "station_m": 24960.0
+          },
+          {
+            "epsg3857_m": [
+              -13458054.288,
+              4694124.198
+            ],
+            "normal": [
+              -0.8208807,
+              -0.5710996
+            ],
+            "station_m": 25216.0
+          },
+          {
+            "epsg3857_m": [
+              -13458141.786,
+              4694436.113
+            ],
+            "normal": [
+              -0.9415329,
+              -0.336921
+            ],
+            "station_m": 25472.0
+          },
+          {
+            "epsg3857_m": [
+              -13458265.222,
+              4694723.159
+            ],
+            "normal": [
+              -0.8331162,
+              -0.553098
+            ],
+            "station_m": 25728.0
+          },
+          {
+            "epsg3857_m": [
+              -13458425.757,
+              4694992.147
+            ],
+            "normal": [
+              -0.5947962,
+              -0.8038765
+            ],
+            "station_m": 25984.0
+          },
+          {
+            "epsg3857_m": [
+              -13458743.043,
+              4695051.002
+            ],
+            "normal": [
+              -0.2711662,
+              -0.9625325
+            ],
+            "station_m": 26240.0
+          },
+          {
+            "epsg3857_m": [
+              -13459057.31,
+              4695053.81
+            ],
+            "normal": [
+              0.4408739,
+              -0.8975691
+            ],
+            "station_m": 26496.0
+          },
+          {
+            "epsg3857_m": [
+              -13459223.447,
+              4694818.328
+            ],
+            "normal": [
+              0.845513,
+              0.5339549
+            ],
+            "station_m": 26752.0
+          },
+          {
+            "epsg3857_m": [
+              -13458990.914,
+              4694601.383
+            ],
+            "normal": [
+              0.3391264,
+              0.9407408
+            ],
+            "station_m": 27008.0
+          },
+          {
+            "epsg3857_m": [
+              -13458734.814,
+              4694423.915
+            ],
+            "normal": [
+              0.8903648,
+              0.4552477
+            ],
+            "station_m": 27264.0
+          },
+          {
+            "epsg3857_m": [
+              -13458653.737,
+              4694115.694
+            ],
+            "normal": [
+              0.9990036,
+              0.0446294
+            ],
+            "station_m": 27520.0
+          },
+          {
+            "epsg3857_m": [
+              -13458823.634,
+              4693851.897
+            ],
+            "normal": [
+              0.6882304,
+              -0.7254922
+            ],
+            "station_m": 27776.0
+          },
+          {
+            "epsg3857_m": [
+              -13459124.215,
+              4693749.714
+            ],
+            "normal": [
+              0.1008327,
+              -0.9949034
+            ],
+            "station_m": 28032.0
+          },
+          {
+            "epsg3857_m": [
+              -13459359.938,
+              4693691.72
+            ],
+            "normal": [
+              0.0861571,
+              -0.9962816
+            ],
+            "station_m": 28224.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 24087,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_material.png",
+          "sha256": "941f408d05842c302c9efba835d7321b80a822746cf4e53be689861038ae52d5"
+        },
+        "packed_authority_features": {
+          "byte_count": 8848,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_authority_features.png",
+          "sha256": "4b75f169d968da37cae37cd5fe151fb5f8108562527e14ef63ab53db53d06e3c"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 152388,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_height.png",
+          "sha256": "f428f5a508e071adae0a675dd0e895f560fdd2ddc62c900db6c8b506e8da3bb6"
+        },
+        "row_range": [
+          6048,
+          7056
+        ],
+        "station_range_m": [
+          24192.0,
+          28224.0
+        ],
+        "tile_id": "south_fork_06"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 149573,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_height.png",
+          "sha256": "6589daa7c1503a6dc996bc29f1e2fd60b98ea76ec13b9c304a3791babdc6d1de"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13459359.938,
+              4693691.72
+            ],
+            "normal": [
+              0.0861571,
+              -0.9962816
+            ],
+            "station_m": 28224.0
+          },
+          {
+            "epsg3857_m": [
+              -13459680.976,
+              4693641.572
+            ],
+            "normal": [
+              0.4217862,
+              -0.9066953
+            ],
+            "station_m": 28480.0
+          },
+          {
+            "epsg3857_m": [
+              -13459794.313,
+              4693356.069
+            ],
+            "normal": [
+              0.913132,
+              -0.4076639
+            ],
+            "station_m": 28736.0
+          },
+          {
+            "epsg3857_m": [
+              -13460019.486,
+              4693149.352
+            ],
+            "normal": [
+              0.0583362,
+              -0.998297
+            ],
+            "station_m": 28992.0
+          },
+          {
+            "epsg3857_m": [
+              -13460342.977,
+              4693198.668
+            ],
+            "normal": [
+              -0.1750445,
+              -0.9845605
+            ],
+            "station_m": 29248.0
+          },
+          {
+            "epsg3857_m": [
+              -13460469.021,
+              4693472.759
+            ],
+            "normal": [
+              -0.9940342,
+              -0.1090684
+            ],
+            "station_m": 29504.0
+          },
+          {
+            "epsg3857_m": [
+              -13460445.53,
+              4693776.53
+            ],
+            "normal": [
+              -0.6767938,
+              0.7361726
+            ],
+            "station_m": 29760.0
+          },
+          {
+            "epsg3857_m": [
+              -13460535.037,
+              4694032.756
+            ],
+            "normal": [
+              -0.1569913,
+              -0.9876
+            ],
+            "station_m": 30016.0
+          },
+          {
+            "epsg3857_m": [
+              -13460807.057,
+              4694188.316
+            ],
+            "normal": [
+              -0.5575014,
+              -0.8301761
+            ],
+            "station_m": 30272.0
+          },
+          {
+            "epsg3857_m": [
+              -13460941.041,
+              4694464.561
+            ],
+            "normal": [
+              -0.7738853,
+              -0.6333258
+            ],
+            "station_m": 30528.0
+          },
+          {
+            "epsg3857_m": [
+              -13461190.106,
+              4694671.902
+            ],
+            "normal": [
+              -0.7960106,
+              -0.6052827
+            ],
+            "station_m": 30784.0
+          },
+          {
+            "epsg3857_m": [
+              -13461465.849,
+              4694845.212
+            ],
+            "normal": [
+              -0.4546095,
+              -0.8906909
+            ],
+            "station_m": 31040.0
+          },
+          {
+            "epsg3857_m": [
+              -13461652.446,
+              4695098.962
+            ],
+            "normal": [
+              -0.9790721,
+              -0.2035136
+            ],
+            "station_m": 31296.0
+          },
+          {
+            "epsg3857_m": [
+              -13461808.963,
+              4695376.212
+            ],
+            "normal": [
+              -0.8974866,
+              -0.4410417
+            ],
+            "station_m": 31552.0
+          },
+          {
+            "epsg3857_m": [
+              -13462070.183,
+              4695558.206
+            ],
+            "normal": [
+              -0.4088996,
+              -0.9125794
+            ],
+            "station_m": 31808.0
+          },
+          {
+            "epsg3857_m": [
+              -13462388.166,
+              4695570.354
+            ],
+            "normal": [
+              0.3537695,
+              -0.9353327
+            ],
+            "station_m": 32064.0
+          },
+          {
+            "epsg3857_m": [
+              -13462623.744,
+              4695540.025
+            ],
+            "normal": [
+              -0.3389026,
+              -0.9408215
+            ],
+            "station_m": 32256.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 20801,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_material.png",
+          "sha256": "9dbf85ff92b9660818b8fbd3ea4ad52c216c491b904e105f6aa30065c7354e8f"
+        },
+        "packed_authority_features": {
+          "byte_count": 8699,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_authority_features.png",
+          "sha256": "bf063be54d245679635709f774b66851879ff93d1cbac4199ac66544206ec6c4"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 149573,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_height.png",
+          "sha256": "6589daa7c1503a6dc996bc29f1e2fd60b98ea76ec13b9c304a3791babdc6d1de"
+        },
+        "row_range": [
+          7056,
+          8064
+        ],
+        "station_range_m": [
+          28224.0,
+          32256.0
+        ],
+        "tile_id": "south_fork_07"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 153261,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_height.png",
+          "sha256": "ce48b0ffda384c1255f6e7be8326ee821c9c5a815ab71afc279d0d109478d77a"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13462623.744,
+              4695540.025
+            ],
+            "normal": [
+              -0.3389026,
+              -0.9408215
+            ],
+            "station_m": 32256.0
+          },
+          {
+            "epsg3857_m": [
+              -13462855.23,
+              4695732.772
+            ],
+            "normal": [
+              -0.3660287,
+              -0.9306036
+            ],
+            "station_m": 32512.0
+          },
+          {
+            "epsg3857_m": [
+              -13462980.193,
+              4695990.78
+            ],
+            "normal": [
+              -0.7094554,
+              0.7047504
+            ],
+            "station_m": 32768.0
+          },
+          {
+            "epsg3857_m": [
+              -13462773.504,
+              4696243.75
+            ],
+            "normal": [
+              -0.8601667,
+              0.5100129
+            ],
+            "station_m": 33024.0
+          },
+          {
+            "epsg3857_m": [
+              -13462797.328,
+              4696528.404
+            ],
+            "normal": [
+              -0.4685262,
+              -0.8834496
+            ],
+            "station_m": 33280.0
+          },
+          {
+            "epsg3857_m": [
+              -13463110.139,
+              4696620.286
+            ],
+            "normal": [
+              -0.4358624,
+              -0.9000133
+            ],
+            "station_m": 33536.0
+          },
+          {
+            "epsg3857_m": [
+              -13463422.192,
+              4696585.474
+            ],
+            "normal": [
+              0.3401532,
+              -0.94037
+            ],
+            "station_m": 33792.0
+          },
+          {
+            "epsg3857_m": [
+              -13463664.226,
+              4696399.989
+            ],
+            "normal": [
+              0.9042932,
+              -0.4269119
+            ],
+            "station_m": 34048.0
+          },
+          {
+            "epsg3857_m": [
+              -13463715.773,
+              4696076.36
+            ],
+            "normal": [
+              0.9972595,
+              -0.0739834
+            ],
+            "station_m": 34304.0
+          },
+          {
+            "epsg3857_m": [
+              -13463784.031,
+              4695757.047
+            ],
+            "normal": [
+              0.9119247,
+              -0.4103577
+            ],
+            "station_m": 34560.0
+          },
+          {
+            "epsg3857_m": [
+              -13464084.723,
+              4695675.069
+            ],
+            "normal": [
+              -0.1094737,
+              -0.9939897
+            ],
+            "station_m": 34816.0
+          },
+          {
+            "epsg3857_m": [
+              -13464395.677,
+              4695767.321
+            ],
+            "normal": [
+              -0.4513759,
+              -0.8923339
+            ],
+            "station_m": 35072.0
+          },
+          {
+            "epsg3857_m": [
+              -13464704.958,
+              4695872.155
+            ],
+            "normal": [
+              -0.3676513,
+              -0.9299637
+            ],
+            "station_m": 35328.0
+          },
+          {
+            "epsg3857_m": [
+              -13465004.02,
+              4696008.08
+            ],
+            "normal": [
+              -0.4685793,
+              -0.8834214
+            ],
+            "station_m": 35584.0
+          },
+          {
+            "epsg3857_m": [
+              -13465290.053,
+              4695905.248
+            ],
+            "normal": [
+              0.5715135,
+              -0.8205927
+            ],
+            "station_m": 35840.0
+          },
+          {
+            "epsg3857_m": [
+              -13465514.919,
+              4695678.342
+            ],
+            "normal": [
+              0.5682325,
+              -0.822868
+            ],
+            "station_m": 36096.0
+          },
+          {
+            "epsg3857_m": [
+              -13465735.076,
+              4695571.432
+            ],
+            "normal": [
+              0.3354927,
+              -0.9420428
+            ],
+            "station_m": 36288.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 18876,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_material.png",
+          "sha256": "ffcd6c9c97a0e73a402aa504f74d9443062db13c003067b27394d2ac0cc519af"
+        },
+        "packed_authority_features": {
+          "byte_count": 5205,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_authority_features.png",
+          "sha256": "20ca8a257e66d39a4d1e1664a0bfe01ff178b799e1a4b61036e7868a2dae48cd"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 153261,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_height.png",
+          "sha256": "ce48b0ffda384c1255f6e7be8326ee821c9c5a815ab71afc279d0d109478d77a"
+        },
+        "row_range": [
+          8064,
+          9072
+        ],
+        "station_range_m": [
+          32256.0,
+          36288.0
+        ],
+        "tile_id": "south_fork_08"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 158190,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_height.png",
+          "sha256": "be343f7c1c307f5fbc6d893b6286a0c981ebd8deb60f93913cdcd21a6454e42e"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13465735.076,
+              4695571.432
+            ],
+            "normal": [
+              0.3354927,
+              -0.9420428
+            ],
+            "station_m": 36288.0
+          },
+          {
+            "epsg3857_m": [
+              -13466001.485,
+              4695390.599
+            ],
+            "normal": [
+              0.3246052,
+              -0.9458496
+            ],
+            "station_m": 36544.0
+          },
+          {
+            "epsg3857_m": [
+              -13466066.549,
+              4695133.067
+            ],
+            "normal": [
+              0.985332,
+              0.1706483
+            ],
+            "station_m": 36800.0
+          },
+          {
+            "epsg3857_m": [
+              -13465988.462,
+              4694815.114
+            ],
+            "normal": [
+              0.9794646,
+              0.2016162
+            ],
+            "station_m": 37056.0
+          },
+          {
+            "epsg3857_m": [
+              -13465916.657,
+              4694497.913
+            ],
+            "normal": [
+              0.9749944,
+              -0.2222297
+            ],
+            "station_m": 37312.0
+          },
+          {
+            "epsg3857_m": [
+              -13466126.947,
+              4694245.919
+            ],
+            "normal": [
+              0.80994,
+              -0.5865128
+            ],
+            "station_m": 37568.0
+          },
+          {
+            "epsg3857_m": [
+              -13466283.008,
+              4693963.38
+            ],
+            "normal": [
+              0.5543026,
+              -0.8323152
+            ],
+            "station_m": 37824.0
+          },
+          {
+            "epsg3857_m": [
+              -13466596.64,
+              4693909.649
+            ],
+            "normal": [
+              -0.2083026,
+              -0.9780644
+            ],
+            "station_m": 38080.0
+          },
+          {
+            "epsg3857_m": [
+              -13466920.739,
+              4693940.441
+            ],
+            "normal": [
+              -0.2496667,
+              -0.9683318
+            ],
+            "station_m": 38336.0
+          },
+          {
+            "epsg3857_m": [
+              -13467243.184,
+              4693902.989
+            ],
+            "normal": [
+              0.1106616,
+              -0.9938582
+            ],
+            "station_m": 38592.0
+          },
+          {
+            "epsg3857_m": [
+              -13467440.317,
+              4693665.155
+            ],
+            "normal": [
+              0.9989288,
+              -0.0462727
+            ],
+            "station_m": 38848.0
+          },
+          {
+            "epsg3857_m": [
+              -13467525.274,
+              4693352.873
+            ],
+            "normal": [
+              0.9002915,
+              -0.4352875
+            ],
+            "station_m": 39104.0
+          },
+          {
+            "epsg3857_m": [
+              -13467602.147,
+              4693035.544
+            ],
+            "normal": [
+              0.9832705,
+              -0.1821517
+            ],
+            "station_m": 39360.0
+          },
+          {
+            "epsg3857_m": [
+              -13467644.371,
+              4692728.439
+            ],
+            "normal": [
+              0.9224754,
+              0.3860558
+            ],
+            "station_m": 39616.0
+          },
+          {
+            "epsg3857_m": [
+              -13467536.311,
+              4692418.649
+            ],
+            "normal": [
+              0.9827192,
+              0.1851024
+            ],
+            "station_m": 39872.0
+          },
+          {
+            "epsg3857_m": [
+              -13467671.434,
+              4692158.837
+            ],
+            "normal": [
+              0.0977699,
+              -0.995209
+            ],
+            "station_m": 40128.0
+          },
+          {
+            "epsg3857_m": [
+              -13467805.166,
+              4691994.672
+            ],
+            "normal": [
+              0.9989566,
+              -0.0456694
+            ],
+            "station_m": 40320.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 21279,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_material.png",
+          "sha256": "d5bff950014fa139e48ef0fa2610f89466d60072dee07fa40816bc91045f3cd6"
+        },
+        "packed_authority_features": {
+          "byte_count": 5190,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_authority_features.png",
+          "sha256": "b10b4165a511c94b2aba43ed74cf320f77feaebdbe9837af36d01606ae3450f3"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 158190,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_height.png",
+          "sha256": "be343f7c1c307f5fbc6d893b6286a0c981ebd8deb60f93913cdcd21a6454e42e"
+        },
+        "row_range": [
+          9072,
+          10080
+        ],
+        "station_range_m": [
+          36288.0,
+          40320.0
+        ],
+        "tile_id": "south_fork_09"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 164718,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_height.png",
+          "sha256": "5a72e108a4124f0d4684ae90d7f2c32defba8b811f6e55c6dca8c2c3487ba787"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13467805.166,
+              4691994.672
+            ],
+            "normal": [
+              0.9989566,
+              -0.0456694
+            ],
+            "station_m": 40320.0
+          },
+          {
+            "epsg3857_m": [
+              -13467720.161,
+              4691688.278
+            ],
+            "normal": [
+              0.9976659,
+              0.0682837
+            ],
+            "station_m": 40576.0
+          },
+          {
+            "epsg3857_m": [
+              -13467637.998,
+              4691374.177
+            ],
+            "normal": [
+              0.7216894,
+              0.692217
+            ],
+            "station_m": 40832.0
+          },
+          {
+            "epsg3857_m": [
+              -13467576.022,
+              4691077.271
+            ],
+            "normal": [
+              0.9989148,
+              -0.0465745
+            ],
+            "station_m": 41088.0
+          },
+          {
+            "epsg3857_m": [
+              -13467587.444,
+              4690749.508
+            ],
+            "normal": [
+              0.989392,
+              -0.1452699
+            ],
+            "station_m": 41344.0
+          },
+          {
+            "epsg3857_m": [
+              -13467795.045,
+              4690509.391
+            ],
+            "normal": [
+              0.7241335,
+              -0.6896598
+            ],
+            "station_m": 41600.0
+          },
+          {
+            "epsg3857_m": [
+              -13468022.052,
+              4690276.183
+            ],
+            "normal": [
+              0.5279371,
+              -0.8492835
+            ],
+            "station_m": 41856.0
+          },
+          {
+            "epsg3857_m": [
+              -13468230.285,
+              4690027.324
+            ],
+            "normal": [
+              0.7110645,
+              -0.7031268
+            ],
+            "station_m": 42112.0
+          },
+          {
+            "epsg3857_m": [
+              -13468522.772,
+              4689885.75
+            ],
+            "normal": [
+              0.1379843,
+              -0.9904344
+            ],
+            "station_m": 42368.0
+          },
+          {
+            "epsg3857_m": [
+              -13468818.118,
+              4689755.485
+            ],
+            "normal": [
+              0.6773517,
+              -0.7356594
+            ],
+            "station_m": 42624.0
+          },
+          {
+            "epsg3857_m": [
+              -13468985.499,
+              4689490.307
+            ],
+            "normal": [
+              0.8220134,
+              -0.5694681
+            ],
+            "station_m": 42880.0
+          },
+          {
+            "epsg3857_m": [
+              -13469233.357,
+              4689282.729
+            ],
+            "normal": [
+              0.5530692,
+              -0.8331353
+            ],
+            "station_m": 43136.0
+          },
+          {
+            "epsg3857_m": [
+              -13469518.513,
+              4689119.457
+            ],
+            "normal": [
+              0.4541126,
+              -0.8909443
+            ],
+            "station_m": 43392.0
+          },
+          {
+            "epsg3857_m": [
+              -13469626.902,
+              4688828.952
+            ],
+            "normal": [
+              0.9888249,
+              -0.1490814
+            ],
+            "station_m": 43648.0
+          },
+          {
+            "epsg3857_m": [
+              -13469773.92,
+              4688540.353
+            ],
+            "normal": [
+              0.7300799,
+              -0.6833617
+            ],
+            "station_m": 43904.0
+          },
+          {
+            "epsg3857_m": [
+              -13470007.69,
+              4688311.136
+            ],
+            "normal": [
+              0.6384583,
+              -0.7696565
+            ],
+            "station_m": 44160.0
+          },
+          {
+            "epsg3857_m": [
+              -13470192.317,
+              4688147.764
+            ],
+            "normal": [
+              0.6708317,
+              -0.7416096
+            ],
+            "station_m": 44352.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 22868,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_material.png",
+          "sha256": "7bdbc304c6ed94c3ec117fe7faebfc6cc349247638037b09dc89e54855220386"
+        },
+        "packed_authority_features": {
+          "byte_count": 5174,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_authority_features.png",
+          "sha256": "c29bca25fd76abedfc9b97dee5708f967d531bd6bf44daec4fa0d706230e54f5"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 164718,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_height.png",
+          "sha256": "5a72e108a4124f0d4684ae90d7f2c32defba8b811f6e55c6dca8c2c3487ba787"
+        },
+        "row_range": [
+          10080,
+          11088
+        ],
+        "station_range_m": [
+          40320.0,
+          44352.0
+        ],
+        "tile_id": "south_fork_10"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 160746,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_height.png",
+          "sha256": "c261bc4fa9f3d399f0702eda07767c9b1622b0c3534be8908c4904d6e2c204c0"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13470192.317,
+              4688147.764
+            ],
+            "normal": [
+              0.6708317,
+              -0.7416096
+            ],
+            "station_m": 44352.0
+          },
+          {
+            "epsg3857_m": [
+              -13470436.665,
+              4687929.708
+            ],
+            "normal": [
+              0.4563628,
+              -0.8897938
+            ],
+            "station_m": 44608.0
+          },
+          {
+            "epsg3857_m": [
+              -13470651.244,
+              4687712.231
+            ],
+            "normal": [
+              0.0851783,
+              -0.9963657
+            ],
+            "station_m": 44864.0
+          },
+          {
+            "epsg3857_m": [
+              -13470958.848,
+              4687795.624
+            ],
+            "normal": [
+              -0.516523,
+              -0.8562733
+            ],
+            "station_m": 45120.0
+          },
+          {
+            "epsg3857_m": [
+              -13471080.797,
+              4688075.102
+            ],
+            "normal": [
+              -0.6804338,
+              -0.7328096
+            ],
+            "station_m": 45376.0
+          },
+          {
+            "epsg3857_m": [
+              -13471175.522,
+              4688388.586
+            ],
+            "normal": [
+              -0.9822088,
+              -0.1877922
+            ],
+            "station_m": 45632.0
+          },
+          {
+            "epsg3857_m": [
+              -13471243.731,
+              4688708.415
+            ],
+            "normal": [
+              -0.9984945,
+              -0.0548513
+            ],
+            "station_m": 45888.0
+          },
+          {
+            "epsg3857_m": [
+              -13471257.053,
+              4689036.788
+            ],
+            "normal": [
+              -0.9986424,
+              -0.0520896
+            ],
+            "station_m": 46144.0
+          },
+          {
+            "epsg3857_m": [
+              -13471314.118,
+              4689360.344
+            ],
+            "normal": [
+              -0.9753298,
+              -0.2207527
+            ],
+            "station_m": 46400.0
+          },
+          {
+            "epsg3857_m": [
+              -13471587.436,
+              4689527.793
+            ],
+            "normal": [
+              -0.337974,
+              -0.9411554
+            ],
+            "station_m": 46656.0
+          },
+          {
+            "epsg3857_m": [
+              -13471909.741,
+              4689564.982
+            ],
+            "normal": [
+              0.093469,
+              -0.9956222
+            ],
+            "station_m": 46912.0
+          },
+          {
+            "epsg3857_m": [
+              -13472211.12,
+              4689460.802
+            ],
+            "normal": [
+              0.6111795,
+              -0.791492
+            ],
+            "station_m": 47168.0
+          },
+          {
+            "epsg3857_m": [
+              -13472458.937,
+              4689245.561
+            ],
+            "normal": [
+              0.7342926,
+              -0.6788331
+            ],
+            "station_m": 47424.0
+          },
+          {
+            "epsg3857_m": [
+              -13472744.46,
+              4689109.013
+            ],
+            "normal": [
+              0.0958409,
+              -0.9953967
+            ],
+            "station_m": 47680.0
+          },
+          {
+            "epsg3857_m": [
+              -13473064.648,
+              4689079.606
+            ],
+            "normal": [
+              0.3135281,
+              -0.9495789
+            ],
+            "station_m": 47936.0
+          },
+          {
+            "epsg3857_m": [
+              -13473392.187,
+              4689066.981
+            ],
+            "normal": [
+              -0.0490202,
+              -0.9987978
+            ],
+            "station_m": 48192.0
+          },
+          {
+            "epsg3857_m": [
+              -13473626.266,
+              4689127.884
+            ],
+            "normal": [
+              -0.5475547,
+              -0.8367699
+            ],
+            "station_m": 48384.0
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 12403,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_material.png",
+          "sha256": "5395e243027b4772598585535f9c44a38910dc4529bbf6857a66af2d8d6470d7"
+        },
+        "packed_authority_features": {
+          "byte_count": 5173,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_authority_features.png",
+          "sha256": "72a68428514f7cb6c881d81d30525146ac56b73541b46d00ddacf9a07669b852"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 160746,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_height.png",
+          "sha256": "c261bc4fa9f3d399f0702eda07767c9b1622b0c3534be8908c4904d6e2c204c0"
+        },
+        "row_range": [
+          11088,
+          12096
+        ],
+        "station_range_m": [
+          44352.0,
+          48384.0
+        ],
+        "tile_id": "south_fork_11"
+      },
+      {
+        "collision_heightfield": {
+          "byte_count": 160870,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_height.png",
+          "sha256": "6529eec021c71d118af022b316d283cb39aa93be657f4d528d0167ae13288fd9"
+        },
+        "curvilinear_control_points": [
+          {
+            "epsg3857_m": [
+              -13470878.604,
+              4687749.728
+            ],
+            "normal": [
+              -0.4819119,
+              -0.8762197
+            ],
+            "station_m": 45048.0
+          },
+          {
+            "epsg3857_m": [
+              -13471015.378,
+              4688011.978
+            ],
+            "normal": [
+              -0.8325318,
+              -0.5539773
+            ],
+            "station_m": 45304.0
+          },
+          {
+            "epsg3857_m": [
+              -13471145.161,
+              4688301.354
+            ],
+            "normal": [
+              -0.9393948,
+              -0.3428373
+            ],
+            "station_m": 45560.0
+          },
+          {
+            "epsg3857_m": [
+              -13471227.715,
+              4688617.798
+            ],
+            "normal": [
+              -0.9821001,
+              -0.1883597
+            ],
+            "station_m": 45816.0
+          },
+          {
+            "epsg3857_m": [
+              -13471254.958,
+              4688944.341
+            ],
+            "normal": [
+              -0.9999033,
+              -0.0139048
+            ],
+            "station_m": 46072.0
+          },
+          {
+            "epsg3857_m": [
+              -13471293.712,
+              4689270.15
+            ],
+            "normal": [
+              -0.9753774,
+              -0.2205424
+            ],
+            "station_m": 46328.0
+          },
+          {
+            "epsg3857_m": [
+              -13471503.888,
+              4689489.047
+            ],
+            "normal": [
+              -0.502366,
+              -0.8646551
+            ],
+            "station_m": 46584.0
+          },
+          {
+            "epsg3857_m": [
+              -13471817.832,
+              4689575.179
+            ],
+            "normal": [
+              0.1139749,
+              -0.9934836
+            ],
+            "station_m": 46840.0
+          },
+          {
+            "epsg3857_m": [
+              -13472140.544,
+              4689519.71
+            ],
+            "normal": [
+              0.3265114,
+              -0.9451933
+            ],
+            "station_m": 47096.0
+          },
+          {
+            "epsg3857_m": [
+              -13472393.123,
+              4689310.426
+            ],
+            "normal": [
+              0.6793801,
+              -0.7337865
+            ],
+            "station_m": 47352.0
+          },
+          {
+            "epsg3857_m": [
+              -13472652.695,
+              4689119.273
+            ],
+            "normal": [
+              0.2967475,
+              -0.954956
+            ],
+            "station_m": 47608.0
+          },
+          {
+            "epsg3857_m": [
+              -13472977.649,
+              4689110.806
+            ],
+            "normal": [
+              0.3753746,
+              -0.9268732
+            ],
+            "station_m": 47864.0
+          },
+          {
+            "epsg3857_m": [
+              -13473299.76,
+              4689065.378
+            ],
+            "normal": [
+              0.0341295,
+              -0.9994174
+            ],
+            "station_m": 48120.0
+          },
+          {
+            "epsg3857_m": [
+              -13473617.669,
+              4689122.258
+            ],
+            "normal": [
+              -0.5475547,
+              -0.8367699
+            ],
+            "station_m": 48376.0
+          },
+          {
+            "epsg3857_m": [
+              -13473920.995,
+              4689236.647
+            ],
+            "normal": [
+              0.0527076,
+              -0.99861
+            ],
+            "station_m": 48632.0
+          },
+          {
+            "epsg3857_m": [
+              -13474248.886,
+              4689241.046
+            ],
+            "normal": [
+              0.0880854,
+              -0.9961129
+            ],
+            "station_m": 48888.0
+          },
+          {
+            "epsg3857_m": [
+              -13474484.42,
+              4689178.563
+            ],
+            "normal": [
+              0.2637776,
+              -0.9645835
+            ],
+            "station_m": 49077.732
+          }
+        ],
+        "dimensions": [
+          1009,
+          129
+        ],
+        "grid_spacing_m": [
+          4.0,
+          4.0
+        ],
+        "height_encoding": {
+          "maximum_elevation_m": 767.749451,
+          "minimum_elevation_m": 127.050789,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "lateral_range_m": [
+          -256.0,
+          256.0
+        ],
+        "material_mask": {
+          "byte_count": 11961,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_material.png",
+          "sha256": "7f2e9399d7eb0560b81716fb4a6614d111776af5b34af7c223723f748219bc4b"
+        },
+        "packed_authority_features": {
+          "byte_count": 5271,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_authority_features.png",
+          "sha256": "a1c808ef6062d9ed8629707059597777877883329d373a6e32ef8d37128f9e05"
+        },
+        "render_collision_registered": true,
+        "render_heightfield": {
+          "byte_count": 160870,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_height.png",
+          "sha256": "6529eec021c71d118af022b316d283cb39aa93be657f4d528d0167ae13288fd9"
+        },
+        "row_range": [
+          11262,
+          12270
+        ],
+        "station_range_m": [
+          45048.0,
+          49077.732
+        ],
+        "tile_id": "south_fork_12"
+      }
+    ]
+  }
+}

@@ -53,7 +53,7 @@ or used for real-world navigation.
 forces and wrap/pin telemetry, release recovers the shape, existing float/flip/run tests
 remain green, and the milestone commit is pushed.
 
-### M2 — Procedural geography completion pipeline
+### M2 — Procedural geography completion pipeline *(complete July 19, 2026)*
 
 - Implement a deterministic terrain/bathymetry infill generator using DEM, centerline,
   imagery masks, known cross-sections, flow, rapid class, and guide hazard annotations.
@@ -169,9 +169,9 @@ path is verified, and the completion goal can be marked complete.
 
 | Milestone | State | Commit | Verification |
 |---|---|---|---|
-| M1 Flexible raft/contact slice | Complete | This milestone commit | UE build; M1 1/1; river maps 5/5; physics 1,017/3 |
-| M2 Procedural geography | Next | — | — |
-| M3 South Fork hydraulics | Pending | — | — |
+| M1 Flexible raft/contact slice | Complete | `2b3be122` | UE build; M1 1/1; river maps 5/5; physics 1,017/3 |
+| M2 Procedural geography | Complete | This milestone commit | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
+| M3 South Fork hydraulics | Next | — | — |
 | M4 Photoreal environment | Pending | — | — |
 | M5 Characters/raft/rescue | Pending | — | — |
 | M6 Game/progression | Pending | — | — |
@@ -203,3 +203,27 @@ path is verified, and the completion goal can be marked complete.
   also exposed an engine-internal MassEntity/TedsCore `pthread_rwlock_init` assertion;
   clean-process reports are the accepted gameplay evidence until that UE harness issue
   is resolved.
+
+### July 19, 2026 — M2 complete
+
+- Built `south_fork_procedural_geography_v1`, a deterministic source-conditioned
+  completion pipeline over the adopted 49,077.732 m NHD axis. It samples all eight
+  hash-locked 3DEP/NAIP source windows, blends their seven seams, and produces a
+  4 m reach-local grid across a 512 m corridor with 1,582,959 finite terrain samples.
+- Preserved official DEM terrain as the valley authority while explicitly labeling
+  inferred bathymetry, thalweg, banks, shelves, seam conditioning, boulder fields,
+  ledges, hole controls, wave-train controls, eddy pockets, and shoreline breakup.
+  Separate source, procedural-infill, uncertainty, material, and feature masks report
+  11.7 percent procedural content; the manifest says it is not surveyed and must not be
+  used for navigation.
+- Bound all 20 stationed rapid annotations into the generator and emitted 115 stable,
+  seeded boulders. Solver, render, and collision consume the same canonical elevation
+  field rather than independently conditioned copies.
+- Exported thirteen overlapping Unreal tiles with globally normalized 16-bit heights,
+  packed authority/uncertainty/feature masks, material masks, and EPSG:3857 curvilinear
+  control points. Render and collision paths/hashes are identical for every tile and
+  overlap rows compare byte-for-byte.
+- Verification: a second generation kept the manifest and compressed-grid SHA-256
+  hashes unchanged; focused geography/source/stitching/stationing tests passed 19/19;
+  Unreal Editor Mac Development built successfully; the full physics/content suite
+  passed 1,021 tests with 3 expected optional-dependency path skips in 10m18s.

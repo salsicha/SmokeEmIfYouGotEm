@@ -1,0 +1,1620 @@
+{
+  "authority": "procedural_infill",
+  "boulders": [
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_00",
+      "height_m": 1.268,
+      "lateral_offset_m": -0.836,
+      "radius_m": 0.971,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 874.339,
+      "world_epsg3857_m": [
+        -13439388.557,
+        4689772.067
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_01",
+      "height_m": 1.145,
+      "lateral_offset_m": -3.015,
+      "radius_m": 2.539,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 904.841,
+      "world_epsg3857_m": [
+        -13439421.802,
+        4689795.87
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_02",
+      "height_m": 0.977,
+      "lateral_offset_m": -1.111,
+      "radius_m": 1.648,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 882.642,
+      "world_epsg3857_m": [
+        -13439397.174,
+        4689777.672
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_03",
+      "height_m": 0.8,
+      "lateral_offset_m": -2.422,
+      "radius_m": 1.026,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 960.166,
+      "world_epsg3857_m": [
+        -13439489.504,
+        4689819.088
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_04",
+      "height_m": 1.025,
+      "lateral_offset_m": -9.01,
+      "radius_m": 1.293,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 1022.079,
+      "world_epsg3857_m": [
+        -13439566.329,
+        4689834.808
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_05",
+      "height_m": 0.65,
+      "lateral_offset_m": 7.046,
+      "radius_m": 2.383,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 988.592,
+      "world_epsg3857_m": [
+        -13439526.608,
+        4689816.576
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_06",
+      "height_m": 1.418,
+      "lateral_offset_m": -7.539,
+      "radius_m": 0.996,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 1068.145,
+      "world_epsg3857_m": [
+        -13439628.502,
+        4689829.009
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_07",
+      "height_m": 0.642,
+      "lateral_offset_m": 4.032,
+      "radius_m": 2.291,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 981.214,
+      "world_epsg3857_m": [
+        -13439515.948,
+        4689817.597
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_08",
+      "height_m": 0.558,
+      "lateral_offset_m": 4.032,
+      "radius_m": 2.344,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 954.105,
+      "world_epsg3857_m": [
+        -13439480.63,
+        4689810.812
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_09",
+      "height_m": 0.989,
+      "lateral_offset_m": 4.649,
+      "radius_m": 1.891,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 963.766,
+      "world_epsg3857_m": [
+        -13439490.838,
+        4689812.144
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_10",
+      "height_m": 0.735,
+      "lateral_offset_m": -1.199,
+      "radius_m": 2.531,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 874.171,
+      "world_epsg3857_m": [
+        -13439388.368,
+        4689772.376
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "02_11",
+      "height_m": 1.299,
+      "lateral_offset_m": 6.027,
+      "radius_m": 1.735,
+      "rapid_name": "Meat Grinder",
+      "seed": 7830614257722639285,
+      "station_m": 973.783,
+      "world_epsg3857_m": [
+        -13439506.234,
+        4689813.699
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "03_00",
+      "height_m": 1.424,
+      "lateral_offset_m": -1.391,
+      "radius_m": 1.415,
+      "rapid_name": "Racehorse Bend",
+      "seed": 7469306553695592059,
+      "station_m": 1988.74,
+      "world_epsg3857_m": [
+        -13440422.317,
+        4689040.744
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "03_01",
+      "height_m": 1.309,
+      "lateral_offset_m": 3.425,
+      "radius_m": 2.333,
+      "rapid_name": "Racehorse Bend",
+      "seed": 7469306553695592059,
+      "station_m": 2133.979,
+      "world_epsg3857_m": [
+        -13440582.541,
+        4689130.6
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "03_02",
+      "height_m": 0.879,
+      "lateral_offset_m": -6.775,
+      "radius_m": 2.0,
+      "rapid_name": "Racehorse Bend",
+      "seed": 7469306553695592059,
+      "station_m": 2031.979,
+      "world_epsg3857_m": [
+        -13440465.569,
+        4689071.736
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "03_03",
+      "height_m": 0.732,
+      "lateral_offset_m": 5.285,
+      "radius_m": 1.281,
+      "rapid_name": "Racehorse Bend",
+      "seed": 7469306553695592059,
+      "station_m": 2090.639,
+      "world_epsg3857_m": [
+        -13440535.938,
+        4689100.016
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "03_04",
+      "height_m": 0.503,
+      "lateral_offset_m": -5.14,
+      "radius_m": 1.99,
+      "rapid_name": "Racehorse Bend",
+      "seed": 7469306553695592059,
+      "station_m": 2060.093,
+      "world_epsg3857_m": [
+        -13440500.333,
+        4689088.432
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_00",
+      "height_m": 1.376,
+      "lateral_offset_m": -15.288,
+      "radius_m": 2.157,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2739.217,
+      "world_epsg3857_m": [
+        -13440919.471,
+        4689799.854
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_01",
+      "height_m": 1.038,
+      "lateral_offset_m": 9.108,
+      "radius_m": 2.075,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2714.23,
+      "world_epsg3857_m": [
+        -13440902.525,
+        4689764.534
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_02",
+      "height_m": 1.316,
+      "lateral_offset_m": 2.299,
+      "radius_m": 2.184,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2672.768,
+      "world_epsg3857_m": [
+        -13440856.933,
+        4689742.205
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_03",
+      "height_m": 0.494,
+      "lateral_offset_m": -7.781,
+      "radius_m": 1.154,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2709.786,
+      "world_epsg3857_m": [
+        -13440889.893,
+        4689776.866
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_04",
+      "height_m": 1.3,
+      "lateral_offset_m": 12.825,
+      "radius_m": 2.308,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2704.814,
+      "world_epsg3857_m": [
+        -13440895.305,
+        4689756.329
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_05",
+      "height_m": 0.579,
+      "lateral_offset_m": -13.934,
+      "radius_m": 1.767,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2793.287,
+      "world_epsg3857_m": [
+        -13440989.273,
+        4689825.718
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_06",
+      "height_m": 1.18,
+      "lateral_offset_m": 6.824,
+      "radius_m": 0.976,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2682.255,
+      "world_epsg3857_m": [
+        -13440867.854,
+        4689744.812
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_07",
+      "height_m": 1.318,
+      "lateral_offset_m": -7.466,
+      "radius_m": 1.388,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2671.179,
+      "world_epsg3857_m": [
+        -13440846.938,
+        4689746.878
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_08",
+      "height_m": 1.512,
+      "lateral_offset_m": 6.74,
+      "radius_m": 1.054,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2671.527,
+      "world_epsg3857_m": [
+        -13440855.525,
+        4689735.562
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_09",
+      "height_m": 1.533,
+      "lateral_offset_m": 10.297,
+      "radius_m": 2.08,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2783.638,
+      "world_epsg3857_m": [
+        -13440979.977,
+        4689798.547
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_10",
+      "height_m": 0.9,
+      "lateral_offset_m": 7.231,
+      "radius_m": 2.378,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2653.561,
+      "world_epsg3857_m": [
+        -13440839.452,
+        4689722.747
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "05_11",
+      "height_m": 1.267,
+      "lateral_offset_m": -13.459,
+      "radius_m": 2.399,
+      "rapid_name": "Rock Garden",
+      "seed": 13598481467035599718,
+      "station_m": 2793.454,
+      "world_epsg3857_m": [
+        -13440989.385,
+        4689825.257
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "06_00",
+      "height_m": 1.031,
+      "lateral_offset_m": -5.741,
+      "radius_m": 1.478,
+      "rapid_name": "African Queen",
+      "seed": 6051422437692428799,
+      "station_m": 3217.802,
+      "world_epsg3857_m": [
+        -13441512.928,
+        4689716.346
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "06_01",
+      "height_m": 1.633,
+      "lateral_offset_m": 9.661,
+      "radius_m": 1.75,
+      "rapid_name": "African Queen",
+      "seed": 6051422437692428799,
+      "station_m": 3114.471,
+      "world_epsg3857_m": [
+        -13441384.12,
+        4689752.012
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "06_02",
+      "height_m": 0.839,
+      "lateral_offset_m": -1.276,
+      "radius_m": 2.273,
+      "rapid_name": "African Queen",
+      "seed": 6051422437692428799,
+      "station_m": 3241.448,
+      "world_epsg3857_m": [
+        -13441536.955,
+        4689696.525
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "06_03",
+      "height_m": 1.3,
+      "lateral_offset_m": 13.086,
+      "radius_m": 1.051,
+      "rapid_name": "African Queen",
+      "seed": 6051422437692428799,
+      "station_m": 3298.675,
+      "world_epsg3857_m": [
+        -13441590.447,
+        4689646.81
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "06_04",
+      "height_m": 0.488,
+      "lateral_offset_m": 6.902,
+      "radius_m": 1.735,
+      "rapid_name": "African Queen",
+      "seed": 6051422437692428799,
+      "station_m": 3145.806,
+      "world_epsg3857_m": [
+        -13441425.384,
+        4689737.849
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_00",
+      "height_m": 0.761,
+      "lateral_offset_m": 11.046,
+      "radius_m": 2.011,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5018.881,
+      "world_epsg3857_m": [
+        -13443154.51,
+        4690161.951
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_01",
+      "height_m": 1.055,
+      "lateral_offset_m": -10.334,
+      "radius_m": 1.698,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5051.114,
+      "world_epsg3857_m": [
+        -13443196.509,
+        4690142.389
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_02",
+      "height_m": 1.505,
+      "lateral_offset_m": -13.092,
+      "radius_m": 1.506,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4940.665,
+      "world_epsg3857_m": [
+        -13443111.629,
+        4690256.002
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_03",
+      "height_m": 0.797,
+      "lateral_offset_m": -10.915,
+      "radius_m": 1.219,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4942.373,
+      "world_epsg3857_m": [
+        -13443110.276,
+        4690254.297
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_04",
+      "height_m": 1.496,
+      "lateral_offset_m": -2.657,
+      "radius_m": 2.368,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4932.21,
+      "world_epsg3857_m": [
+        -13443095.85,
+        4690253.115
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_05",
+      "height_m": 1.232,
+      "lateral_offset_m": 1.881,
+      "radius_m": 2.189,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5084.87,
+      "world_epsg3857_m": [
+        -13443215.002,
+        4690098.282
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_06",
+      "height_m": 0.845,
+      "lateral_offset_m": 8.966,
+      "radius_m": 2.451,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5000.038,
+      "world_epsg3857_m": [
+        -13443143.635,
+        4690179.513
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_07",
+      "height_m": 1.041,
+      "lateral_offset_m": 4.776,
+      "radius_m": 1.375,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4903.28,
+      "world_epsg3857_m": [
+        -13443056.405,
+        4690266.858
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_08",
+      "height_m": 0.844,
+      "lateral_offset_m": 11.647,
+      "radius_m": 1.718,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4910.77,
+      "world_epsg3857_m": [
+        -13443061.973,
+        4690255.821
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_09",
+      "height_m": 1.343,
+      "lateral_offset_m": -11.469,
+      "radius_m": 1.232,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 4984.679,
+      "world_epsg3857_m": [
+        -13443147.314,
+        4690208.26
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_10",
+      "height_m": 1.186,
+      "lateral_offset_m": 11.474,
+      "radius_m": 1.195,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5073.092,
+      "world_epsg3857_m": [
+        -13443198.003,
+        4690104.658
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "07_11",
+      "height_m": 1.535,
+      "lateral_offset_m": 8.111,
+      "radius_m": 1.198,
+      "rapid_name": "Triple Threat",
+      "seed": 16726293118284257613,
+      "station_m": 5007.152,
+      "world_epsg3857_m": [
+        -13443147.444,
+        4690175.96
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_00",
+      "height_m": 0.929,
+      "lateral_offset_m": -0.28,
+      "radius_m": 2.387,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8308.438,
+      "world_epsg3857_m": [
+        -13444796.308,
+        4689766.612
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_01",
+      "height_m": 1.488,
+      "lateral_offset_m": 9.119,
+      "radius_m": 2.266,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8421.852,
+      "world_epsg3857_m": [
+        -13444838.087,
+        4689634.804
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_02",
+      "height_m": 0.935,
+      "lateral_offset_m": 6.825,
+      "radius_m": 2.039,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8318.798,
+      "world_epsg3857_m": [
+        -13444789.059,
+        4689756.437
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_03",
+      "height_m": 1.379,
+      "lateral_offset_m": 2.791,
+      "radius_m": 1.411,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8376.51,
+      "world_epsg3857_m": [
+        -13444807.315,
+        4689682.626
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_04",
+      "height_m": 1.297,
+      "lateral_offset_m": -4.137,
+      "radius_m": 2.312,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8315.801,
+      "world_epsg3857_m": [
+        -13444800.092,
+        4689761.421
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_05",
+      "height_m": 1.403,
+      "lateral_offset_m": -12.789,
+      "radius_m": 2.016,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8327.387,
+      "world_epsg3857_m": [
+        -13444808.527,
+        4689745.888
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_06",
+      "height_m": 1.204,
+      "lateral_offset_m": -12.009,
+      "radius_m": 1.542,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8431.852,
+      "world_epsg3857_m": [
+        -13444860.959,
+        4689640.174
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_07",
+      "height_m": 0.502,
+      "lateral_offset_m": 2.173,
+      "radius_m": 1.17,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8379.262,
+      "world_epsg3857_m": [
+        -13444807.794,
+        4689683.016
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_08",
+      "height_m": 1.409,
+      "lateral_offset_m": -5.879,
+      "radius_m": 1.402,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8391.702,
+      "world_epsg3857_m": [
+        -13444823.769,
+        4689676.146
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_09",
+      "height_m": 1.05,
+      "lateral_offset_m": 13.598,
+      "radius_m": 1.846,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8448.113,
+      "world_epsg3857_m": [
+        -13444859.381,
+        4689604.274
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_10",
+      "height_m": 1.193,
+      "lateral_offset_m": 1.968,
+      "radius_m": 1.696,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8365.552,
+      "world_epsg3857_m": [
+        -13444798.222,
+        4689695.098
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "08_11",
+      "height_m": 1.11,
+      "lateral_offset_m": -2.258,
+      "radius_m": 1.115,
+      "rapid_name": "Troublemaker",
+      "seed": 8848485808360243707,
+      "station_m": 8396.382,
+      "world_epsg3857_m": [
+        -13444827.449,
+        4689665.892
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_00",
+      "height_m": 0.613,
+      "lateral_offset_m": 12.683,
+      "radius_m": 2.307,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25382.936,
+      "world_epsg3857_m": [
+        -13458115.628,
+        4694325.371
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_01",
+      "height_m": 1.52,
+      "lateral_offset_m": 7.448,
+      "radius_m": 1.511,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25323.856,
+      "world_epsg3857_m": [
+        -13458094.806,
+        4694254.247
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_02",
+      "height_m": 0.777,
+      "lateral_offset_m": -9.369,
+      "radius_m": 2.356,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25345.298,
+      "world_epsg3857_m": [
+        -13458080.842,
+        4694286.479
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_03",
+      "height_m": 0.72,
+      "lateral_offset_m": -5.428,
+      "radius_m": 1.943,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25377.681,
+      "world_epsg3857_m": [
+        -13458096.844,
+        4694326.634
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_04",
+      "height_m": 1.575,
+      "lateral_offset_m": -3.804,
+      "radius_m": 2.243,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25360.449,
+      "world_epsg3857_m": [
+        -13458091.444,
+        4694306.73
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_05",
+      "height_m": 0.595,
+      "lateral_offset_m": 0.493,
+      "radius_m": 2.092,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25453.536,
+      "world_epsg3857_m": [
+        -13458135.323,
+        4694416.589
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_06",
+      "height_m": 0.573,
+      "lateral_offset_m": 0.885,
+      "radius_m": 1.103,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25323.261,
+      "world_epsg3857_m": [
+        -13458088.27,
+        4694254.84
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_07",
+      "height_m": 1.118,
+      "lateral_offset_m": -10.427,
+      "radius_m": 2.395,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25362.991,
+      "world_epsg3857_m": [
+        -13458085.208,
+        4694308.963
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_08",
+      "height_m": 0.517,
+      "lateral_offset_m": 12.94,
+      "radius_m": 1.729,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25353.105,
+      "world_epsg3857_m": [
+        -13458104.055,
+        4694292.403
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_09",
+      "height_m": 1.417,
+      "lateral_offset_m": -3.824,
+      "radius_m": 2.352,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25324.16,
+      "world_epsg3857_m": [
+        -13458084.044,
+        4694260.384
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_10",
+      "height_m": 0.886,
+      "lateral_offset_m": 5.809,
+      "radius_m": 1.62,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25360.212,
+      "world_epsg3857_m": [
+        -13458100.495,
+        4694303.49
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "09_11",
+      "height_m": 0.552,
+      "lateral_offset_m": 7.066,
+      "radius_m": 1.438,
+      "rapid_name": "Fowler's Rock",
+      "seed": 2957193952673443710,
+      "station_m": 25523.355,
+      "world_epsg3857_m": [
+        -13458139.355,
+        4694500.971
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "12_00",
+      "height_m": 1.517,
+      "lateral_offset_m": -6.048,
+      "radius_m": 1.591,
+      "rapid_name": "Satan's Cesspool",
+      "seed": 3178795728575243405,
+      "station_m": 27180.929,
+      "world_epsg3857_m": [
+        -13458795.707,
+        4694504.393
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "12_01",
+      "height_m": 1.306,
+      "lateral_offset_m": 6.212,
+      "radius_m": 1.625,
+      "rapid_name": "Satan's Cesspool",
+      "seed": 3178795728575243405,
+      "station_m": 27132.004,
+      "world_epsg3857_m": [
+        -13458836.14,
+        4694551.616
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "12_02",
+      "height_m": 1.019,
+      "lateral_offset_m": 8.196,
+      "radius_m": 1.849,
+      "rapid_name": "Satan's Cesspool",
+      "seed": 3178795728575243405,
+      "station_m": 27287.168,
+      "world_epsg3857_m": [
+        -13458713.931,
+        4694399.577
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "12_03",
+      "height_m": 0.505,
+      "lateral_offset_m": -5.447,
+      "radius_m": 2.168,
+      "rapid_name": "Satan's Cesspool",
+      "seed": 3178795728575243405,
+      "station_m": 27192.123,
+      "world_epsg3857_m": [
+        -13458784.642,
+        4694493.636
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "12_04",
+      "height_m": 1.336,
+      "lateral_offset_m": -9.982,
+      "radius_m": 1.851,
+      "rapid_name": "Satan's Cesspool",
+      "seed": 3178795728575243405,
+      "station_m": 27110.209,
+      "world_epsg3857_m": [
+        -13458867.314,
+        4694547.738
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "13_00",
+      "height_m": 0.606,
+      "lateral_offset_m": -5.954,
+      "radius_m": 2.57,
+      "rapid_name": "Son of Satan",
+      "seed": 7564259029341953662,
+      "station_m": 27290.011,
+      "world_epsg3857_m": [
+        -13458724.652,
+        4694389.008
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "13_01",
+      "height_m": 1.311,
+      "lateral_offset_m": -1.584,
+      "radius_m": 2.293,
+      "rapid_name": "Son of Satan",
+      "seed": 7564259029341953662,
+      "station_m": 27369.413,
+      "world_epsg3857_m": [
+        -13458673.775,
+        4694299.35
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "13_02",
+      "height_m": 1.382,
+      "lateral_offset_m": -10.864,
+      "radius_m": 1.883,
+      "rapid_name": "Son of Satan",
+      "seed": 7564259029341953662,
+      "station_m": 27276.404,
+      "world_epsg3857_m": [
+        -13458735.541,
+        4694400.98
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "13_03",
+      "height_m": 1.494,
+      "lateral_offset_m": 9.541,
+      "radius_m": 1.341,
+      "rapid_name": "Son of Satan",
+      "seed": 7564259029341953662,
+      "station_m": 27366.505,
+      "world_epsg3857_m": [
+        -13458667.197,
+        4694309.69
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "13_04",
+      "height_m": 1.507,
+      "lateral_offset_m": 8.194,
+      "radius_m": 2.481,
+      "rapid_name": "Son of Satan",
+      "seed": 7564259029341953662,
+      "station_m": 27417.231,
+      "world_epsg3857_m": [
+        -13458648.949,
+        4694243.16
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "14_00",
+      "height_m": 1.325,
+      "lateral_offset_m": 12.398,
+      "radius_m": 2.239,
+      "rapid_name": "Scissors",
+      "seed": 11137650705235786871,
+      "station_m": 28072.655,
+      "world_epsg3857_m": [
+        -13459177.757,
+        4693727.883
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "14_01",
+      "height_m": 1.531,
+      "lateral_offset_m": -5.844,
+      "radius_m": 1.961,
+      "rapid_name": "Scissors",
+      "seed": 11137650705235786871,
+      "station_m": 27900.914,
+      "world_epsg3857_m": [
+        -13458963.478,
+        4693768.881
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "14_02",
+      "height_m": 0.621,
+      "lateral_offset_m": -6.697,
+      "radius_m": 2.25,
+      "rapid_name": "Scissors",
+      "seed": 11137650705235786871,
+      "station_m": 27936.026,
+      "world_epsg3857_m": [
+        -13459006.794,
+        4693764.928
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "14_03",
+      "height_m": 0.852,
+      "lateral_offset_m": -7.592,
+      "radius_m": 1.145,
+      "rapid_name": "Scissors",
+      "seed": 11137650705235786871,
+      "station_m": 27958.586,
+      "world_epsg3857_m": [
+        -13459032.49,
+        4693763.969
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "14_04",
+      "height_m": 1.602,
+      "lateral_offset_m": 1.197,
+      "radius_m": 0.974,
+      "rapid_name": "Scissors",
+      "seed": 11137650705235786871,
+      "station_m": 28000.223,
+      "world_epsg3857_m": [
+        -13459088.245,
+        4693751.119
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "16_00",
+      "height_m": 0.618,
+      "lateral_offset_m": -12.097,
+      "radius_m": 1.757,
+      "rapid_name": "Bouncing Rock",
+      "seed": 10165595343353666222,
+      "station_m": 29266.378,
+      "world_epsg3857_m": [
+        -13460362.962,
+        4693217.643
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "16_01",
+      "height_m": 1.172,
+      "lateral_offset_m": -8.908,
+      "radius_m": 1.761,
+      "rapid_name": "Bouncing Rock",
+      "seed": 10165595343353666222,
+      "station_m": 29187.648,
+      "world_epsg3857_m": [
+        -13460265.074,
+        4693191.708
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "16_02",
+      "height_m": 0.993,
+      "lateral_offset_m": -15.287,
+      "radius_m": 2.195,
+      "rapid_name": "Bouncing Rock",
+      "seed": 10165595343353666222,
+      "station_m": 29192.304,
+      "world_epsg3857_m": [
+        -13460273.179,
+        4693200.689
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "16_03",
+      "height_m": 1.122,
+      "lateral_offset_m": -4.896,
+      "radius_m": 2.17,
+      "rapid_name": "Bouncing Rock",
+      "seed": 10165595343353666222,
+      "station_m": 29212.18,
+      "world_epsg3857_m": [
+        -13460301.64,
+        4693196.292
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "16_04",
+      "height_m": 0.816,
+      "lateral_offset_m": -14.496,
+      "radius_m": 1.586,
+      "rapid_name": "Bouncing Rock",
+      "seed": 10165595343353666222,
+      "station_m": 29239.132,
+      "world_epsg3857_m": [
+        -13460330.319,
+        4693211.141
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_00",
+      "height_m": 1.234,
+      "lateral_offset_m": 7.632,
+      "radius_m": 0.941,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29510.471,
+      "world_epsg3857_m": [
+        -13460477.728,
+        4693482.145
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_01",
+      "height_m": 1.499,
+      "lateral_offset_m": -4.045,
+      "radius_m": 1.626,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29674.924,
+      "world_epsg3857_m": [
+        -13460494.7,
+        4693691.509
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_02",
+      "height_m": 1.263,
+      "lateral_offset_m": -2.049,
+      "radius_m": 2.565,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29517.026,
+      "world_epsg3857_m": [
+        -13460469.226,
+        4693493.418
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_03",
+      "height_m": 0.68,
+      "lateral_offset_m": -6.271,
+      "radius_m": 1.406,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29611.569,
+      "world_epsg3857_m": [
+        -13460481.093,
+        4693611.217
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_04",
+      "height_m": 1.289,
+      "lateral_offset_m": -11.268,
+      "radius_m": 1.127,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29628.323,
+      "world_epsg3857_m": [
+        -13460480.2,
+        4693637.467
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_05",
+      "height_m": 0.716,
+      "lateral_offset_m": -12.973,
+      "radius_m": 1.012,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29596.378,
+      "world_epsg3857_m": [
+        -13460472.212,
+        4693596.935
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_06",
+      "height_m": 1.204,
+      "lateral_offset_m": 7.178,
+      "radius_m": 1.868,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29512.518,
+      "world_epsg3857_m": [
+        -13460477.838,
+        4693487.303
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "17_07",
+      "height_m": 1.135,
+      "lateral_offset_m": -9.235,
+      "radius_m": 2.594,
+      "rapid_name": "Pre-Op",
+      "seed": 573569223169186608,
+      "station_m": 29565.88,
+      "world_epsg3857_m": [
+        -13460469.91,
+        4693555.713
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_00",
+      "height_m": 0.524,
+      "lateral_offset_m": -10.518,
+      "radius_m": 1.521,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29904.341,
+      "world_epsg3857_m": [
+        -13460425.793,
+        4693951.914
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_01",
+      "height_m": 1.49,
+      "lateral_offset_m": -11.054,
+      "radius_m": 2.034,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29944.727,
+      "world_epsg3857_m": [
+        -13460452.11,
+        4693997.738
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_02",
+      "height_m": 0.808,
+      "lateral_offset_m": -6.845,
+      "radius_m": 1.729,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29850.632,
+      "world_epsg3857_m": [
+        -13460403.873,
+        4693881.104
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_03",
+      "height_m": 0.533,
+      "lateral_offset_m": 6.682,
+      "radius_m": 1.341,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29948.538,
+      "world_epsg3857_m": [
+        -13460468.768,
+        4693989.403
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_04",
+      "height_m": 0.891,
+      "lateral_offset_m": 1.45,
+      "radius_m": 2.101,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29834.249,
+      "world_epsg3857_m": [
+        -13460409.389,
+        4693858.695
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_05",
+      "height_m": 1.638,
+      "lateral_offset_m": 3.389,
+      "radius_m": 1.298,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29976.819,
+      "world_epsg3857_m": [
+        -13460495.404,
+        4694013.116
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_06",
+      "height_m": 1.307,
+      "lateral_offset_m": -5.741,
+      "radius_m": 2.441,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29855.496,
+      "world_epsg3857_m": [
+        -13460406.597,
+        4693885.797
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_07",
+      "height_m": 1.073,
+      "lateral_offset_m": 0.567,
+      "radius_m": 0.961,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29889.659,
+      "world_epsg3857_m": [
+        -13460427.199,
+        4693927.691
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_08",
+      "height_m": 1.162,
+      "lateral_offset_m": 1.495,
+      "radius_m": 2.206,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29829.94,
+      "world_epsg3857_m": [
+        -13460409.064,
+        4693853.566
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_09",
+      "height_m": 1.377,
+      "lateral_offset_m": 10.256,
+      "radius_m": 2.057,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29941.898,
+      "world_epsg3857_m": [
+        -13460467.093,
+        4693981.337
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_10",
+      "height_m": 0.883,
+      "lateral_offset_m": 12.307,
+      "radius_m": 1.415,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 29833.886,
+      "world_epsg3857_m": [
+        -13460420.218,
+        4693857.914
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "18_11",
+      "height_m": 1.272,
+      "lateral_offset_m": -11.575,
+      "radius_m": 1.532,
+      "rapid_name": "Hospital Bar",
+      "seed": 2943059889917928184,
+      "station_m": 30001.359,
+      "world_epsg3857_m": [
+        -13460517.992,
+        4694041.767
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "20_00",
+      "height_m": 0.526,
+      "lateral_offset_m": 8.653,
+      "radius_m": 2.141,
+      "rapid_name": "Surprise",
+      "seed": 14980566605210078589,
+      "station_m": 31092.897,
+      "world_epsg3857_m": [
+        -13461531.158,
+        4694877.475
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "20_01",
+      "height_m": 1.421,
+      "lateral_offset_m": 6.339,
+      "radius_m": 1.13,
+      "rapid_name": "Surprise",
+      "seed": 14980566605210078589,
+      "station_m": 31121.134,
+      "world_epsg3857_m": [
+        -13461558.323,
+        4694901.183
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "20_02",
+      "height_m": 1.045,
+      "lateral_offset_m": -0.233,
+      "radius_m": 1.65,
+      "rapid_name": "Surprise",
+      "seed": 14980566605210078589,
+      "station_m": 31024.589,
+      "world_epsg3857_m": [
+        -13461452.008,
+        4694838.409
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "20_03",
+      "height_m": 0.761,
+      "lateral_offset_m": -4.681,
+      "radius_m": 2.14,
+      "rapid_name": "Surprise",
+      "seed": 14980566605210078589,
+      "station_m": 31044.424,
+      "world_epsg3857_m": [
+        -13461472.878,
+        4694854.055
+      ]
+    },
+    {
+      "authority": "procedural_infill",
+      "boulder_id": "20_04",
+      "height_m": 0.937,
+      "lateral_offset_m": 6.217,
+      "radius_m": 1.815,
+      "rapid_name": "Surprise",
+      "seed": 14980566605210078589,
+      "station_m": 31133.453,
+      "world_epsg3857_m": [
+        -13461570.494,
+        4694910.653
+      ]
+    }
+  ],
+  "count": 115,
+  "not_for_navigation": true,
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.procedural_boulder_catalog.v1",
+  "seed": 1604623895
+}
