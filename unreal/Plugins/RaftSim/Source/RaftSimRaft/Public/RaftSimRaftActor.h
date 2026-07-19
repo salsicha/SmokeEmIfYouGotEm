@@ -126,6 +126,10 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
     TObjectPtr<UStaticMeshComponent> HullMesh;
 
+    /** Procedural inflatable-raft visual (tubes + thwarts + floor). */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
+    TObjectPtr<class UProceduralMeshComponent> RaftVisual;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|Raft")
     TObjectPtr<USceneComponent> SternSeatAttachPoint;
 
@@ -208,6 +212,7 @@ private:
     void TryReseatSwimmers();
     void UpdateCrew(float DeltaSeconds);
     void SpawnCrewVisuals();
+    void BuildRaftVisual();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
 
     UPROPERTY()

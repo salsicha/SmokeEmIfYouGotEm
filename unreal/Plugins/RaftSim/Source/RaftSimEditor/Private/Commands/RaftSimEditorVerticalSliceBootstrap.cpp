@@ -301,12 +301,9 @@ static void HandleCreateVerticalSliceCoreMaps(const TArray<FString>&)
     {
         UWorld* World = UEditorLoadingAndSavingUtils::NewBlankMap(false);
         AddCommonLighting(World);
-        // Water surface at Z=0 (matches ARaftSimRaftActor's flat-water fallback)
-        // and a bed plane 3 m below.
-        AddScaledPlane(
-            World, FVector(0.0f, 0.0f, 0.0f), FVector(400.0f, 400.0f, 1.0f),
-            TEXT("/Game/RaftSim/Rendering/M_RaftSim_SolverSurfaceWaterCandidate."
-                 "M_RaftSim_SolverSurfaceWaterCandidate"));
+        // The raft spawns the live procedural water surface + riverbed itself,
+        // so the tank needs no static water plane (a stale one z-fought the
+        // procedural surface). A bed plane 3 m down catches the eye under it.
         AddScaledPlane(
             World, FVector(0.0f, 0.0f, -300.0f), FVector(400.0f, 400.0f, 1.0f),
             TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
