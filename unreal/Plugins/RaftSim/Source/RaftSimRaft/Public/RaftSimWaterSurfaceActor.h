@@ -41,10 +41,20 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     FVector2D GridOriginCm = FVector2D(-10000.0, -10000.0);
 
-    /** Grid extent in meters (square) — covers the crux plus the approach and
-     * run-out so the rapid renders in front of the raft. */
+    /** Legacy straight-window grid extent in meters. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     float GridSizeMeters = 200.0f;
+
+    /** Curved full-reach surface length centred on the raft. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
+    float CurvedGridLengthMeters = 240.0f;
+
+    /** Curved full-reach surface width across the channel. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
+    float CurvedGridWidthMeters = 96.0f;
+
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
+    float CurvedGridRecenterDistanceMeters = 32.0f;
 
     /** World-space spacing between surface vertices in meters — fine enough for
      * smooth foam/whitewater edges through the rapid. */
@@ -58,12 +68,19 @@ protected:
 private:
     void BuildGrid();
     void RefreshSurface();
+    void RecenterCurvedGrid();
+    void ClampCurvedGridCenter();
+    void UpdateCurvedGridPlanarGeometry();
 
     UPROPERTY()
     TObjectPtr<URaftSimWaterRuntimeAdapter> WaterAdapter;
 
-    int32 GridN = 0;
+    int32 GridStationN = 0;
+    int32 GridLateralN = 0;
+    bool bUsesCurvedRiverCoordinates = false;
+    float CurvedGridCenterStationM = 0.0f;
     TArray<FVector> Vertices;
+    TArray<FVector2D> RiverCoordinatesM;
     TArray<int32> Triangles;
     TArray<FVector> Normals;
     TArray<FVector2D> UVs;

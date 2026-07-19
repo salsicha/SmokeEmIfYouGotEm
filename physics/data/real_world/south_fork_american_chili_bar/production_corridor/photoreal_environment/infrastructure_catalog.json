@@ -1,0 +1,46 @@
+{
+  "not_for_navigation": true,
+  "policy": {
+    "official_access_geometry_is_authoritative_where_available": true,
+    "procedural_infill_must_not_be_presented_as_real_access_advice": true,
+    "unconfirmed_roads_bridges_and_bank_landings_are_procedural_game_infill": true
+  },
+  "procedural_structures": [
+    {
+      "authority": "procedural_context_not_surveyed",
+      "kind": "bridge",
+      "span_m": 74.0,
+      "station_m": 5200.0,
+      "structure_id": "coloma_context_bridge"
+    }
+  ],
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.infrastructure_catalog.v1",
+  "seed": 1604640772,
+  "sites": [
+    {
+      "authority": "review_seed_conditioned_procedural_bank_furniture",
+      "kind": "put_in",
+      "lateral_m": 58.0,
+      "name": "Chili Bar Put-in",
+      "site_id": "chili_bar_put_in",
+      "station_m": 0.0
+    },
+    {
+      "authority": "review_seed_conditioned_procedural_bank_furniture",
+      "kind": "takeout_and_bridge_context",
+      "lateral_m": -62.0,
+      "name": "Coloma Access",
+      "site_id": "coloma_access",
+      "station_m": 5200.0
+    },
+    {
+      "authority": "california_state_parks_anchor_with_procedural_bank_landing",
+      "kind": "takeout",
+      "lateral_m": 54.0,
+      "name": "Salmon Falls Lower Water Raft Take-out",
+      "site_id": "salmon_falls_lower_water_takeout",
+      "station_m": 49077.732
+    }
+  ]
+}

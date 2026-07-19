@@ -13,8 +13,10 @@
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
+#include "RaftSimRiverWaterStreamingActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "RaftSimRiverbedActor.h"
+#include "RaftSimWaterVfxActor.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -113,11 +115,11 @@ void ARaftSimRaftActor::BeginPlay()
     // cells, 160x160 m) until the river window replaces it in the corridor
     // slice. Without the solver lib the bridge probe falls back to the same
     // flat Z=0 waterline.
+    ARaftSimRiverWaterConfig* RiverConfig = nullptr;
     if (URaftSimWaterRuntimeAdapter* WaterAdapter = BridgeSubsystem->GetWaterRuntime())
     {
         // River map: load a cooked steady-state flow window if the level places
         // a config actor. Otherwise the dev flat tank.
-        ARaftSimRiverWaterConfig* RiverConfig = nullptr;
         if (TActorIterator<ARaftSimRiverWaterConfig> It(GetWorld()); It)
         {
             RiverConfig = *It;
@@ -125,11 +127,26 @@ void ARaftSimRaftActor::BeginPlay()
         bool bRiverConfigured = false;
         if (RiverConfig != nullptr)
         {
-            bRiverConfigured = WaterAdapter->ConfigureRiverWindow(
-                RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
-                RiverConfig->WindowCenterM,
-                FVector2D(RiverConfig->WindowExtentM, RiverConfig->WindowExtentM),
-                /*RoughnessManning=*/0.041f);
+            const bool bCoordinateMapReady = RiverConfig->CoordinateMapPath.IsEmpty() ||
+                WaterAdapter->ConfigureRiverCoordinateMap(RiverConfig->CoordinateMapPath);
+            if (bCoordinateMapReady && RiverConfig->bEnableMovingWindowStreaming)
+            {
+                bRiverConfigured = WaterAdapter->ConfigureMovingRiverWindow(
+                    RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
+                    RiverConfig->WindowCenterM,
+                    FVector2D(
+                        RiverConfig->MovingWindowStationExtentM,
+                        RiverConfig->MovingWindowLateralExtentM),
+                    /*RoughnessManning=*/0.041f);
+            }
+            else if (bCoordinateMapReady)
+            {
+                bRiverConfigured = WaterAdapter->ConfigureRiverWindow(
+                    RiverConfig->CookedFieldsDir, RiverConfig->FlowBand.ToString(),
+                    RiverConfig->WindowCenterM,
+                    FVector2D(RiverConfig->WindowExtentM, RiverConfig->WindowExtentM),
+                    /*RoughnessManning=*/0.041f);
+            }
         }
         if (!bRiverConfigured)
         {
@@ -154,9 +171,34 @@ void ARaftSimRaftActor::BeginPlay()
                 ARaftSimWaterSurfaceActor::StaticClass(), FTransform::Identity);
         }
 
+        bool bHasWaterVfx = false;
+        if (TActorIterator<ARaftSimWaterVfxActor> It(World); It)
+        {
+            bHasWaterVfx = true;
+        }
+        if (!bHasWaterVfx)
+        {
+            World->SpawnActor<ARaftSimWaterVfxActor>(
+                ARaftSimWaterVfxActor::StaticClass(), FTransform::Identity);
+        }
+
+        if (RiverConfig && RiverConfig->bEnableMovingWindowStreaming)
+        {
+            bool bHasStreamer = false;
+            if (TActorIterator<ARaftSimRiverWaterStreamingActor> It(World); It)
+            {
+                bHasStreamer = true;
+            }
+            if (!bHasStreamer)
+            {
+                World->SpawnActor<ARaftSimRiverWaterStreamingActor>(
+                    ARaftSimRiverWaterStreamingActor::StaticClass(), FTransform::Identity);
+            }
+        }
+
         // Photoreal terrain: spawn a riverbed actor that renders the cooked
         // window's DEM bed and banks. Skipped if one is already placed.
-        bool bHasBed = false;
+        bool bHasBed = RiverConfig && RiverConfig->bMapProvidesTerrain;
         if (TActorIterator<ARaftSimRiverbedActor> It(World); It)
         {
             bHasBed = true;
@@ -202,6 +244,20 @@ void ARaftSimRaftActor::BeginPlay()
 
     BuildRaftVisual();
     SpawnCrewVisuals();
+}
+
+int32 ARaftSimRaftActor::GetActiveWaterContactCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().ContactCount
+        : 0;
+}
+
+float ARaftSimRaftActor::GetMaximumWaterContactIndentationM() const
+{
+    return RaftAdapter
+        ? static_cast<float>(RaftAdapter->GetLastFlexibleStepTelemetry().MaxIndentationM)
+        : 0.0f;
 }
 
 void ARaftSimRaftActor::BuildRaftVisual()

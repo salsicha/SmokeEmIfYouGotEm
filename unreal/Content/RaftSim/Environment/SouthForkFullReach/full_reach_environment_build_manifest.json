@@ -1,0 +1,46 @@
+{
+  "authority": "authoritative sources where present; deterministic procedural infill explicitly labelled; not for navigation",
+  "capture_set_complete": true,
+  "captures": [
+    "docs/environment-captures/south_fork_full_reach/chili_bar_launch_downstream.png",
+    "docs/environment-captures/south_fork_full_reach/meat_grinder_guide_eye.png",
+    "docs/environment-captures/south_fork_full_reach/troublemaker_approach.png",
+    "docs/environment-captures/south_fork_full_reach/coloma_bridge_context.png",
+    "docs/environment-captures/south_fork_full_reach/salmon_falls_takeout.png"
+  ],
+  "detailed_mesh_reuse_requested": true,
+  "far_field_geography_complete": true,
+  "generated_on": "2026-07-19",
+  "hlod_actor_count": 20,
+  "hlod_evidence": {
+    "byte_count": 5974,
+    "path": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "sha256": "9fdc84d3319cc44db7cd68ec8a377d8a372a81fe168340d92e6c96dcd051a432"
+  },
+  "hlod_generation_complete": true,
+  "hlod_status": "built_and_validated_terminal_instancing",
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "metrics": {
+    "boulder_instances": 115,
+    "far_field_foliage_instances": 179630,
+    "far_field_patches": 8,
+    "far_field_triangles": 804470,
+    "foliage_instances": 18325,
+    "infrastructure_actors": 72,
+    "scenic_noncolliding_bank_rock_instances": 5121,
+    "spray_mist_instances": 255,
+    "terrain_tiles": 13,
+    "terrain_triangles": 838656,
+    "water_tiles": 39,
+    "water_triangles": 927000
+  },
+  "moving_live_water_configured": true,
+  "nanite_terrain": true,
+  "owner_art_and_readability_review_passed": false,
+  "schema": "raftsim.unreal.south_fork_full_reach_build.v1",
+  "source_conditioned_vertex_materials": true,
+  "spatial_streaming_actors": true,
+  "three_flow_presentations": true,
+  "wet_bank_material_response": true,
+  "world_partition": true
+}

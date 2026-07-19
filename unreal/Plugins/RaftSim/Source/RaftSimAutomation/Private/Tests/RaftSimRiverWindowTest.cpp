@@ -225,4 +225,95 @@ bool FRaftSimFullReachTransitWindowTest::RunTest(const FString&)
 #endif // RAFTSIM_HAS_LIVE_SOLVER
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimCurvedRiverCoordinateMapTest,
+    "RaftSim.M4.CurvedRiverCoordinateMapDrivesLiveWater",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+        EAutomationTestFlags::ProductFilter)
+
+bool FRaftSimCurvedRiverCoordinateMapTest::RunTest(const FString&)
+{
+#if !RAFTSIM_HAS_LIVE_SOLVER
+    AddError(TEXT("Curved live-river tests require the live solver library"));
+    return false;
+#else
+    URaftSimWaterRuntimeAdapter* Adapter = NewObject<URaftSimWaterRuntimeAdapter>();
+    FRaftSimWaterRuntimeConfig Config;
+    Config.bRequireAcceptedReportManifest = false;
+    Config.bEnableDeterministicCapture = false;
+    Adapter->Configure(Config);
+
+    const FString CoordinateMap = TEXT(
+        "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+        "photoreal_environment/river_coordinate_map.json");
+    TestTrue(
+        TEXT("dense South Fork coordinate map loads"),
+        Adapter->ConfigureRiverCoordinateMap(CoordinateMap));
+    TestTrue(TEXT("adapter reports curved coordinate map"), Adapter->HasRiverCoordinateMap());
+
+    const FVector2D ExpectedRiverPosition(5000.0, 17.5);
+    FVector WorldPosition;
+    TestTrue(
+        TEXT("station/lateral converts to curved world"),
+        Adapter->RiverToWorldPosition(
+            ExpectedRiverPosition, Adapter->GetRiverVerticalDatumM(), WorldPosition));
+    TestTrue(TEXT("vertical datum maps to local Z zero"), FMath::IsNearlyZero(WorldPosition.Z));
+    TestTrue(
+        TEXT("curved map is not the old straight +X strip"),
+        FMath::Abs(WorldPosition.Y) > 10000.0f);
+
+    FVector2D RoundTrip;
+    FVector Tangent;
+    FVector LeftNormal;
+    TestTrue(
+        TEXT("curved world converts back to station/lateral"),
+        Adapter->WorldToRiverCoordinates(WorldPosition, RoundTrip, Tangent, LeftNormal));
+    TestTrue(
+        TEXT("station round trip stays within one dense-grid interval"),
+        FMath::IsNearlyEqual(RoundTrip.X, ExpectedRiverPosition.X, 4.1f));
+    TestTrue(
+        TEXT("lateral round trip is sub-centimetre"),
+        FMath::IsNearlyEqual(RoundTrip.Y, ExpectedRiverPosition.Y, 0.01f));
+    TestTrue(TEXT("world tangent is unit length"), Tangent.IsUnit(1.0e-3f));
+    TestTrue(TEXT("world left normal is unit length"), LeftNormal.IsUnit(1.0e-3f));
+    TestTrue(
+        TEXT("world tangent and left normal are orthogonal"),
+        FMath::IsNearlyZero(FVector::DotProduct(Tangent, LeftNormal), 1.0e-4f));
+
+    const FString TransitFieldsDir = TEXT(
+        "physics/data/real_world/south_fork_american_chili_bar/"
+        "full_hydraulics/full_reach_transit_seed");
+    TestTrue(
+        TEXT("curved live-water crop loads"),
+        Adapter->ConfigureMovingRiverWindow(
+            TransitFieldsDir, TEXT("median_runnable"),
+            FVector2D(5000.0, 0.0), FVector2D(240.0, 80.0)));
+    FVector WetWorldPosition;
+    TestTrue(
+        TEXT("mid-channel station maps to world"),
+        Adapter->RiverToWorldPosition(
+            FVector2D(5000.0, 0.0), Adapter->GetRiverVerticalDatumM(), WetWorldPosition));
+    FRaftSimWaterSample Water;
+    TestTrue(
+        TEXT("world-space probe samples the station-space live solver"),
+        Adapter->SampleWaterAtWorldPosition(WetWorldPosition, Water));
+    TestTrue(TEXT("curved mid-channel probe is wet"), Water.bWet);
+    TestTrue(TEXT("curved probe has positive depth"), Water.DepthMeters > 0.0f);
+    TestTrue(
+        TEXT("downstream station velocity rotates into the route tangent"),
+        FVector::DotProduct(Water.VelocityMetersPerSecond, Tangent) > 0.0f);
+    TestTrue(TEXT("rotated water surface normal is unit length"), Water.SurfaceNormal.IsUnit(1.0e-3f));
+
+    FVector OutsideWorldPosition;
+    TestTrue(
+        TEXT("outside-bank coordinate still maps to world"),
+        Adapter->RiverToWorldPosition(
+            FVector2D(5000.0, 180.0), Adapter->GetRiverVerticalDatumM(), OutsideWorldPosition));
+    TestFalse(
+        TEXT("outside the finite live crop does not create fallback water"),
+        Adapter->SampleWaterAtWorldPosition(OutsideWorldPosition, Water));
+    return true;
+#endif // RAFTSIM_HAS_LIVE_SOLVER
+}
+
 #endif // WITH_AUTOMATION_TESTS

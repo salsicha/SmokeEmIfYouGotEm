@@ -14,7 +14,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "low_runnable/bed.npy",
-          "sha256": "1dbcce9925b894c2f0d9fe666ae145936489653566ed5e6ca1195da12ce1528d",
+          "sha256": "85bb1c9e733b90afa341fa4b6409269d53b74f2c0f79fe1678e4b756222d2796",
           "shape": [
             21,
             101
@@ -25,7 +25,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "low_runnable/h.npy",
-          "sha256": "bd06304be0d45b72345dba557a01e85b8c9789643b6e09d86277063d249bb644",
+          "sha256": "49aca568c4c43682271be1e10a75fa2d3b15b8b0db10d292b66782ffbc79460e",
           "shape": [
             21,
             101
@@ -36,7 +36,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "low_runnable/u.npy",
-          "sha256": "98e5901c7ae66b846f6985b9910a2150d23131991ae62fd4efeebb43c9f82808",
+          "sha256": "4ae061e906acb556ee9a6b44329397f29d5715a4094e73141df673f382b55c76",
           "shape": [
             21,
             101
@@ -47,7 +47,7 @@
           "description": "Depth-averaged cross-stream velocity.",
           "dtype": "float32",
           "file": "low_runnable/v.npy",
-          "sha256": "639573d00951ea0fb5142c2af3f62b6b1dbf337a385e836edd05852eb27ec5aa",
+          "sha256": "05244ead344c062e63797c0306c776547f4e7a265d923de1fe6db65c8731a347",
           "shape": [
             21,
             101
@@ -58,7 +58,7 @@
           "description": "1 where the solver reports the cell wet.",
           "dtype": "uint8",
           "file": "low_runnable/wet_mask.npy",
-          "sha256": "e5b362d2c26672ecb25debdf4c4fc4458971ef56bb6b18a38ec6c2b450471473",
+          "sha256": "1943ad7a8a9f425d68bd798ef7ef5134274b108a3ef4732861bb342498031a7e",
           "shape": [
             21,
             101
@@ -79,7 +79,7 @@
           },
           "stage": 0.0,
           "velocity": [
-            0.4779444883150688,
+            0.4779423000215199,
             0.0
           ]
         },
@@ -89,7 +89,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": -7.199997412109383,
+          "stage": -1.6591106445312391,
           "velocity": null
         },
         {
@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/bouncing_rock/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 6.857231,
+      "solver_runtime_seconds": 7.140771,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -129,52 +129,52 @@
         },
         "feature_envelopes": [
           {
-            "bed_relief_m": 1.685613,
+            "bed_relief_m": 1.531918,
             "kind": "rock",
-            "max_froude": 1.558793,
+            "max_froude": 0.985109,
             "passed": true,
             "subfeature_id": "bouncing_rock_boulder",
             "wet_fraction": 0.916667
           },
           {
-            "bed_relief_m": 1.462984,
+            "bed_relief_m": 1.258059,
             "kind": "hole",
-            "max_froude": 1.090426,
+            "max_froude": 0.408454,
             "passed": true,
             "subfeature_id": "main_flippy_hole",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 2.161093,
+            "bed_relief_m": 2.161108,
             "kind": "shallow",
-            "max_froude": 1.154494,
+            "max_froude": 0.954088,
             "passed": true,
             "subfeature_id": "left_sneak_lines",
-            "wet_fraction": 0.941176
+            "wet_fraction": 0.882353
           },
           {
-            "bed_relief_m": 0.422714,
+            "bed_relief_m": 0.377665,
             "kind": "wave_train",
-            "max_froude": 0.539094,
+            "max_froude": 0.260971,
             "passed": true,
             "subfeature_id": "exit_wave_train_weber_creek",
             "wet_fraction": 1.0
           }
         ],
         "metrics": {
-          "discharge_ratio": 1.97544,
-          "entry_discharge_m3s": 52.857663,
-          "final_volume_m3": 17808.38737,
-          "initial_volume_m3": 17950.983089,
-          "max_froude": 1.70862,
-          "max_speed_mps": 3.424065,
-          "outlet_discharge_m3s": 79.546379,
-          "rapid_section_discharge_m3s": 50.344412,
-          "solver_mass_relative_drift": 0.007943616094720902,
+          "discharge_ratio": 1.203354,
+          "entry_discharge_m3s": 25.060086,
+          "final_volume_m3": 17925.759103,
+          "initial_volume_m3": 17950.980041,
+          "max_froude": 1.667314,
+          "max_speed_mps": 1.822924,
+          "outlet_discharge_m3s": 30.714431,
+          "rapid_section_discharge_m3s": 30.667671,
+          "solver_mass_relative_drift": 0.0014049894351123248,
           "solver_validation_passed": true,
           "target_discharge_m3s": 25.4851619328,
-          "volume_ratio": 0.992056,
-          "wet_fraction": 0.497878
+          "volume_ratio": 0.998595,
+          "wet_fraction": 0.499293
         },
         "passed": true
       }
@@ -185,7 +185,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "median_runnable/bed.npy",
-          "sha256": "1dbcce9925b894c2f0d9fe666ae145936489653566ed5e6ca1195da12ce1528d",
+          "sha256": "85bb1c9e733b90afa341fa4b6409269d53b74f2c0f79fe1678e4b756222d2796",
           "shape": [
             21,
             101
@@ -196,7 +196,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "median_runnable/h.npy",
-          "sha256": "d6186fcefa35d86ee9b4ca2e5c949ec771f7f41aa350cdaea9c3f411ff54293f",
+          "sha256": "bbcb492706296dac21a0f28bf37163b490bf44a300863e6c31deedeeba4fbd78",
           "shape": [
             21,
             101
@@ -207,7 +207,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "median_runnable/u.npy",
-          "sha256": "ba16f4766881d46ad47a311d624d5bd5c3a7644d5661a524b71f83c2864f717e",
+          "sha256": "af19ba9968f755d08c09eb0d84a3ce420ab7d6663e9253d1680351f24eee6bc0",
           "shape": [
             21,
             101
@@ -218,7 +218,7 @@
           "description": "Depth-averaged cross-stream velocity.",
           "dtype": "float32",
           "file": "median_runnable/v.npy",
-          "sha256": "39f297c43b8b2c3afe6cbf929afbbf2bdab9217a6cf37365a1140eec6f3259d1",
+          "sha256": "63d3bf7f72d0647a91f6625d7d735c98daf39a3bec92d4b2949fd3147dc2b104",
           "shape": [
             21,
             101
@@ -229,7 +229,7 @@
           "description": "1 where the solver reports the cell wet.",
           "dtype": "uint8",
           "file": "median_runnable/wet_mask.npy",
-          "sha256": "5d4c021720122c820a8f298e803d72f25c51a4baf2ac4032459596e3ed4e9656",
+          "sha256": "cafa6389eb296bff824471f55b66229de8b39f7f4aa36328871bb2a8623dedcc",
           "shape": [
             21,
             101
@@ -250,7 +250,7 @@
           },
           "stage": 0.36,
           "velocity": [
-            0.6550804242164386,
+            0.6550781118168145,
             0.0
           ]
         },
@@ -260,7 +260,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": -6.8399974121093825,
+          "stage": -1.2991106445312393,
           "velocity": null
         },
         {
@@ -284,7 +284,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/bouncing_rock/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.612742,
+      "solver_runtime_seconds": 6.781883,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -300,52 +300,52 @@
         },
         "feature_envelopes": [
           {
-            "bed_relief_m": 1.685613,
+            "bed_relief_m": 1.531918,
             "kind": "rock",
-            "max_froude": 2.047245,
+            "max_froude": 0.798987,
             "passed": true,
             "subfeature_id": "bouncing_rock_boulder",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 1.462984,
+            "bed_relief_m": 1.258059,
             "kind": "hole",
-            "max_froude": 0.819735,
+            "max_froude": 0.377745,
             "passed": true,
             "subfeature_id": "main_flippy_hole",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 2.161093,
+            "bed_relief_m": 2.161108,
             "kind": "shallow",
-            "max_froude": 0.809497,
+            "max_froude": 0.449389,
             "passed": true,
             "subfeature_id": "left_sneak_lines",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 0.422714,
+            "bed_relief_m": 0.377665,
             "kind": "wave_train",
-            "max_froude": 0.526504,
+            "max_froude": 0.272531,
             "passed": true,
             "subfeature_id": "exit_wave_train_weber_creek",
             "wet_fraction": 1.0
           }
         ],
         "metrics": {
-          "discharge_ratio": 2.037375,
-          "entry_discharge_m3s": 79.547279,
-          "final_volume_m3": 24007.619685,
-          "initial_volume_m3": 24196.723892,
-          "max_froude": 2.047245,
-          "max_speed_mps": 3.418997,
-          "outlet_discharge_m3s": 115.477229,
-          "rapid_section_discharge_m3s": 92.307239,
-          "solver_mass_relative_drift": 0.007815281439145847,
+          "discharge_ratio": 1.201309,
+          "entry_discharge_m3s": 44.217961,
+          "final_volume_m3": 24170.423838,
+          "initial_volume_m3": 24196.72094,
+          "max_froude": 1.064063,
+          "max_speed_mps": 1.912261,
+          "outlet_discharge_m3s": 50.418159,
+          "rapid_section_discharge_m3s": 54.427669,
+          "solver_mass_relative_drift": 0.0010868043920590211,
           "solver_validation_passed": true,
           "target_discharge_m3s": 45.3069545472,
-          "volume_ratio": 0.992185,
-          "wet_fraction": 0.544083
+          "volume_ratio": 0.998913,
+          "wet_fraction": 0.532768
         },
         "passed": true
       }
@@ -356,7 +356,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "high_runnable/bed.npy",
-          "sha256": "1dbcce9925b894c2f0d9fe666ae145936489653566ed5e6ca1195da12ce1528d",
+          "sha256": "85bb1c9e733b90afa341fa4b6409269d53b74f2c0f79fe1678e4b756222d2796",
           "shape": [
             21,
             101
@@ -367,7 +367,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "high_runnable/h.npy",
-          "sha256": "0ad8d9d145a0c6ae66ba0dea825c240d89b00943955383e98827b553d582a70c",
+          "sha256": "2df6b568f8123461a50b652fbe9935080b566b354e7dc6d93219f48947e3b7fd",
           "shape": [
             21,
             101
@@ -378,7 +378,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "high_runnable/u.npy",
-          "sha256": "9a61da4d2c25a4d17916f27b65c78565a07f524b14303989be55a2b3177363ba",
+          "sha256": "a449e9335cf892a761f97ac0161c1fdd33a292c733cb40fa73123c5c4ec27bbb",
           "shape": [
             21,
             101
@@ -389,7 +389,7 @@
           "description": "Depth-averaged cross-stream velocity.",
           "dtype": "float32",
           "file": "high_runnable/v.npy",
-          "sha256": "a97449b648128c69697800fdb99d5b9099810360a716c124f9e6b874939a4ec2",
+          "sha256": "bfc5cf1c1cba7ad5488e51c29282f218381eaf68e4dcb9fc971b88a621ed8c49",
           "shape": [
             21,
             101
@@ -400,7 +400,7 @@
           "description": "1 where the solver reports the cell wet.",
           "dtype": "uint8",
           "file": "high_runnable/wet_mask.npy",
-          "sha256": "bbb4341b6067f3874c15a3dd07b85b626452e7f91a4c97e4aaa0f1a70f679d2f",
+          "sha256": "c3246e2157f8349c8d2f00228f01d2a0567a90ae5a468d9c14a742535528299b",
           "shape": [
             21,
             101
@@ -421,7 +421,7 @@
           },
           "stage": 0.82,
           "velocity": [
-            0.8992120035005884,
+            0.923165970694666,
             0.0
           ]
         },
@@ -431,7 +431,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": -6.3799974121093825,
+          "stage": -0.8391106445312392,
           "velocity": null
         },
         {
@@ -455,7 +455,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/bouncing_rock/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.749743,
+      "solver_runtime_seconds": 8.387477,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -471,52 +471,52 @@
         },
         "feature_envelopes": [
           {
-            "bed_relief_m": 1.685613,
+            "bed_relief_m": 1.531918,
             "kind": "rock",
-            "max_froude": 1.707329,
+            "max_froude": 0.675902,
             "passed": true,
             "subfeature_id": "bouncing_rock_boulder",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 1.462984,
+            "bed_relief_m": 1.258059,
             "kind": "hole",
-            "max_froude": 0.706795,
+            "max_froude": 0.370564,
             "passed": true,
             "subfeature_id": "main_flippy_hole",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 2.161093,
+            "bed_relief_m": 2.161108,
             "kind": "shallow",
-            "max_froude": 0.684622,
+            "max_froude": 0.398765,
             "passed": true,
             "subfeature_id": "left_sneak_lines",
             "wet_fraction": 1.0
           },
           {
-            "bed_relief_m": 0.422714,
+            "bed_relief_m": 0.377665,
             "kind": "wave_train",
-            "max_froude": 0.520356,
+            "max_froude": 0.296403,
             "passed": true,
             "subfeature_id": "exit_wave_train_weber_creek",
             "wet_fraction": 1.0
           }
         ],
         "metrics": {
-          "discharge_ratio": 1.925212,
-          "entry_discharge_m3s": 125.89395,
-          "final_volume_m3": 34045.836105,
-          "initial_volume_m3": 34312.479213,
-          "max_froude": 1.707329,
-          "max_speed_mps": 4.109509,
-          "outlet_discharge_m3s": 178.19121,
-          "rapid_section_discharge_m3s": 163.547807,
-          "solver_mass_relative_drift": 0.007771024239383398,
+          "discharge_ratio": 1.132641,
+          "entry_discharge_m3s": 81.81171,
+          "final_volume_m3": 33395.885193,
+          "initial_volume_m3": 33418.50485,
+          "max_froude": 1.149435,
+          "max_speed_mps": 2.047769,
+          "outlet_discharge_m3s": 88.180975,
+          "rapid_section_discharge_m3s": 96.218436,
+          "solver_mass_relative_drift": 0.0006768602244428252,
           "solver_validation_passed": true,
           "target_discharge_m3s": 84.950539776,
-          "volume_ratio": 0.992229,
-          "wet_fraction": 0.719943
+          "volume_ratio": 0.999323,
+          "wet_fraction": 0.640264
         },
         "passed": true
       }

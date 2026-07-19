@@ -79,6 +79,14 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     FVector GetRaftVelocity() const;
 
+    /** Live flexible-contact count used by water/raft spray presentation. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetActiveWaterContactCount() const;
+
+    /** Deepest current tube indentation in meters, used to scale impact sheets. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    float GetMaximumWaterContactIndentationM() const;
+
     // --- Flip / swim / recover loop (P2) ---------------------------------
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")

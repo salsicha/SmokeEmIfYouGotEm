@@ -1,0 +1,38 @@
+{
+  "schema": "raftsim.generated_canopy_source_art.v1",
+  "created_utc": "2026-07-19T00:00:00Z",
+  "generator": "OpenAI image generation",
+  "ownership": "project-generated first-party source art",
+  "navigation_use": "not_for_navigation",
+  "purpose": "Photoreal masked HISM billboard canopy for the South Fork American River production environment.",
+  "postprocess": {
+    "tool": "remove_chroma_key.py",
+    "settings": {
+      "auto_key": "border",
+      "soft_matte": true,
+      "transparent_threshold": 12,
+      "opaque_threshold": 220,
+      "edge_contract": 1,
+      "edge_feather": 0.5,
+      "despill": true
+    }
+  },
+  "assets": [
+    {
+      "species": "Pinus ponderosa",
+      "generation_brief": "Create a photorealistic-natural full mature Sierra foothill ponderosa pine specimen for an Unreal Engine vegetation billboard. Show the entire tree from roots to crown in a straight-on orthographic-like view, with realistic bark, branches, and needle clusters. Isolate it against a perfectly flat #ff00ff magenta chroma background. Use even neutral daylight, no cast shadow, no ground, no scenery, no frame, no text, and no other objects.",
+      "chroma_source": "ponderosa_pine_billboard_chroma.png",
+      "chroma_sha256": "64c1effda80604ff232a90cb15467ff093f2e73f776dbe48191fc7b71a2a1f15",
+      "alpha_source": "T_PonderosaPine_Billboard.png",
+      "alpha_sha256": "abb985bb21888e5cd86f3843b12814e1fcfb9d3d911b0aca87e0470d1cac0bae"
+    },
+    {
+      "species": "Quercus wislizeni",
+      "generation_brief": "Create a photorealistic-natural mature California interior live oak specimen for an Unreal Engine vegetation billboard. Show the entire broad spreading tree from roots to canopy in a straight-on orthographic-like view, with realistic dark furrowed bark, branching, and dense small evergreen leaves. Isolate it against a perfectly flat #ff00ff magenta chroma background. Use even neutral daylight, no cast shadow, no ground, no scenery, no frame, no text, and no other objects.",
+      "chroma_source": "interior_live_oak_billboard_chroma.png",
+      "chroma_sha256": "f63672db2c33bf716bfd4ea2f20cacf740524468c55e5ee6da6f9fa0e6a389a5",
+      "alpha_source": "T_InteriorLiveOak_Billboard.png",
+      "alpha_sha256": "983dce12e28a4ef2cd15c8f1e90ef24afbc3a283c902a97c575ce0a7c924d2dc"
+    }
+  ]
+}

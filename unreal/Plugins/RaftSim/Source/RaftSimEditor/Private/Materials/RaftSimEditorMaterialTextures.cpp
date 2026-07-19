@@ -637,19 +637,24 @@ void ApplyFirstPartyMaterialTextureImportSettings(
         (Spec.MapKey.Contains(TEXT("Leaf")) ||
          Spec.MapKey.StartsWith(TEXT("BotanicalSpray")) ||
          Spec.MapKey.StartsWith(TEXT("CompoundBranchlet")));
-    Texture->MipGenSettings = bNativeCanopyLeafTexture ? TMGS_Sharpen5 : TMGS_FromTextureGroup;
+    const bool bSouthForkGeneratedCanopyTexture =
+        Spec.RiverId == TEXT("south_fork_generated_canopy") &&
+        Spec.MapKey == TEXT("BillboardAlbedoOpacity");
+    const bool bMaskedCanopyTexture =
+        bNativeCanopyLeafTexture || bSouthForkGeneratedCanopyTexture;
+    Texture->MipGenSettings = bMaskedCanopyTexture ? TMGS_Sharpen5 : TMGS_FromTextureGroup;
     Texture->LODGroup = Spec.LODGroup;
     Texture->AddressX = Spec.AddressX;
     Texture->AddressY = Spec.AddressY;
     Texture->CompressionNoAlpha = Spec.bCompressionNoAlpha;
     Texture->DeferCompression = false;
     Texture->VirtualTextureStreaming = false;
-    Texture->NeverStream = bNativeCanopyLeafTexture;
-    const bool bMaskedLeafAlbedo =
-        bNativeCanopyLeafTexture &&
-        (Spec.MapKey.EndsWith(TEXT("LeafAlbedoOpacity")) ||
-         Spec.MapKey == TEXT("BotanicalSprayAlbedoOpacity") ||
-         Spec.MapKey == TEXT("CompoundBranchletAlbedoOpacity"));
+    Texture->NeverStream = bMaskedCanopyTexture;
+    const bool bMaskedLeafAlbedo = bSouthForkGeneratedCanopyTexture ||
+        (bNativeCanopyLeafTexture &&
+         (Spec.MapKey.EndsWith(TEXT("LeafAlbedoOpacity")) ||
+          Spec.MapKey == TEXT("BotanicalSprayAlbedoOpacity") ||
+          Spec.MapKey == TEXT("CompoundBranchletAlbedoOpacity")));
     Texture->bDoScaleMipsForAlphaCoverage = bMaskedLeafAlbedo;
     const float AlphaCoverageThreshold =
         (Spec.MapKey == TEXT("BotanicalSprayAlbedoOpacity") ||

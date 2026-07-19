@@ -17,9 +17,9 @@ from raftsim.south_fork_procedural_geography import (
     PROCEDURAL_BOULDER_CATALOG_RELATIVE_PATH,
     PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH,
     PROCEDURAL_GEOGRAPHY_MANIFEST_RELATIVE_PATH,
+    _effective_raster_bounds,
     build_south_fork_procedural_geography_manifest,
 )
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -58,18 +58,40 @@ def test_procedural_geography_grid_is_continuous_complete_and_labelled():
         procedural = grid["procedural_infill"]
         uncertainty = grid["uncertainty"]
         features = grid["features"]
+        water_surface = grid["conditioned_water_surface_m"]
+        channel_half_width = grid["channel_half_width_m"]
+        ground_scale = float(grid["epsg3857_to_ground_scale"])
+        frame_smoothing_radius_m = float(grid["centerline_frame_smoothing_radius_m"])
+        center = (
+            np.column_stack(
+                (
+                    grid["centerline_epsg3857_x_m"],
+                    grid["centerline_epsg3857_y_m"],
+                )
+            )
+            * ground_scale
+        )
+        normals = np.column_stack(
+            (grid["centerline_normal_x"], grid["centerline_normal_y"])
+        )
 
         assert stations[0] == 0.0
         assert np.isclose(stations[-1], 49077.732, atol=0.01)
         assert np.max(np.diff(stations)) <= 4.001
+        assert 0.7 < ground_scale < 0.9
+        assert frame_smoothing_radius_m == 128.0
         assert lateral[0] == -256.0
         assert lateral[-1] == 256.0
         assert bed.shape == (stations.size, lateral.size)
         assert np.isfinite(bed).all()
-        assert np.array_equal(source.astype(np.uint16) + procedural, np.full(source.shape, 255))
+        assert np.array_equal(
+            source.astype(np.uint16) + procedural, np.full(source.shape, 255)
+        )
         assert np.any(source == 255)
         assert np.any(procedural == 255)
-        assert np.mean(uncertainty[procedural == 255]) > np.mean(uncertainty[source == 255])
+        assert np.mean(uncertainty[procedural == 255]) > np.mean(
+            uncertainty[source == 255]
+        )
         for bit in (
             FEATURE_CHANNEL,
             FEATURE_SHELF,
@@ -82,9 +104,54 @@ def test_procedural_geography_grid_is_continuous_complete_and_labelled():
         ):
             assert np.count_nonzero(features & bit) > 0
 
+        # The river must stay seated in its valley. This catches using an
+        # export request bbox instead of the expanded GeoTIFF response extent,
+        # which previously floated long channel sections tens of meters above
+        # their source-conditioned banks.
+        lateral_grid = np.abs(lateral[None, :])
+        near_bank = (lateral_grid >= channel_half_width[:, None] + 12.0) & (
+            lateral_grid <= channel_half_width[:, None] + 28.0
+        )
+        bank_clearance = (
+            bed[near_bank]
+            - np.repeat(water_surface[:, None], lateral.size, axis=1)[near_bank]
+        )
+        assert np.percentile(bank_clearance, 5.0) > -4.0
+        assert np.percentile(bank_clearance, 50.0) > 0.5
+
+        # A wide curvilinear strip must rotate gradually.  Raw polyline
+        # normals previously moved an outer edge over 150 m between adjacent
+        # four-metre rows, producing the floating terrain ribbons caught in
+        # the M4 captures.
+        left_edge = center + normals * 256.0
+        right_edge = center - normals * 256.0
+        maximum_edge_step = max(
+            np.max(np.linalg.norm(np.diff(left_edge, axis=0), axis=1)),
+            np.max(np.linalg.norm(np.diff(right_edge, axis=0), axis=1)),
+        )
+        assert maximum_edge_step < 16.0
+
     assert manifest["grid"]["no_voids"] is True
     assert manifest["continuity"]["no_unbounded_discontinuities"] is True
     assert manifest["continuity"]["maximum_center_bed_step_m"] < 2.0
+    assert manifest["continuity"]["maximum_corridor_edge_step_m"] < 16.0
+
+
+def test_geotiff_response_extent_overrides_non_square_request_bounds():
+    manifest = _load_manifest()
+    first_source = json.loads(
+        (
+            REPO_ROOT / manifest["inputs"]["source_windows"][0]["manifest_path"]
+        ).read_text(encoding="utf-8")
+    )
+    artifact = first_source["source_artifacts"]["dem"]
+    with Image.open(REPO_ROOT / artifact["path"]) as image:
+        actual = _effective_raster_bounds(image, artifact["source_bounds_epsg3857"])
+    requested = artifact["source_bounds_epsg3857"]
+    assert np.isclose(actual[0], requested[0], atol=0.01)
+    assert np.isclose(actual[2], requested[2], atol=0.01)
+    assert actual[1] < requested[1] - 500.0
+    assert actual[3] > requested[3] + 500.0
 
 
 def test_procedural_geography_boulders_are_seeded_and_traceable():

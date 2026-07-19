@@ -190,6 +190,11 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("RaftSim.CreateLandscapeImportCandidateMaps"),
         TEXT("Import review-gated source DEMs as isolated Unreal Landscape candidate maps and capture them; optionally pass one river_id."),
         FConsoleCommandWithArgsDelegate::CreateRaw(this, &FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand));
+    CreateSouthForkFullReachEnvironmentConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CreateSouthForkFullReachEnvironment"),
+        TEXT("Build and capture the World Partition South Fork full-reach gameplay environment."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this, &FRaftSimEditorModule::HandleCreateSouthForkFullReachEnvironmentCommand));
     CaptureZambeziCliffComparisonConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CaptureZambeziCliffComparison"),
         TEXT("Capture paired baseline and transient Namaqualand cliff analog views in the Zambezi candidate map."),
@@ -375,6 +380,8 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
     bCreateLandscapeImportCandidateMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLandscapeImportCandidateMaps"));
+    bCreateSouthForkFullReachEnvironmentOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateSouthForkFullReachEnvironment"));
     bCreateZambeziBatokaBasaltFamilyOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateZambeziBatokaBasaltFamily"));
     bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup =
@@ -425,6 +432,7 @@ void FRaftSimEditorModule::StartupModule()
     if (bCreatePhotorealEnvironmentPreviewMapsOnStartup ||
         bCapturePhotorealEnvironmentPreviewsOnStartup ||
         bCreateLandscapeImportCandidateMapsOnStartup ||
+        bCreateSouthForkFullReachEnvironmentOnStartup ||
         bCreateZambeziBatokaBasaltFamilyOnStartup ||
         bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup ||
         bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup ||
@@ -466,6 +474,7 @@ void FRaftSimEditorModule::ShutdownModule()
     CreatePhotorealEnvironmentPreviewMapsConsoleCommand.Reset();
     CapturePhotorealEnvironmentPreviewsConsoleCommand.Reset();
     CreateLandscapeImportCandidateMapsConsoleCommand.Reset();
+    CreateSouthForkFullReachEnvironmentConsoleCommand.Reset();
     CaptureZambeziCliffComparisonConsoleCommand.Reset();
     CreateZambeziBatokaBasaltFamilyConsoleCommand.Reset();
     CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand.Reset();
@@ -534,6 +543,27 @@ void FRaftSimEditorModule::HandleCreateLandscapeImportCandidateMapsCommand(
         Summary,
         Args.IsEmpty() ? FString() : Args[0]);
     UE_LOG(LogRaftSimEditor, Display, TEXT("%s"), *Summary);
+}
+
+void FRaftSimEditorModule::HandleCreateSouthForkFullReachEnvironmentCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CreateSouthForkFullReachEnvironment(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor, Display,
+            TEXT("South Fork full-reach environment build completed.\n%s"),
+            *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor, Error,
+            TEXT("South Fork full-reach environment build failed.\n%s"),
+            *Summary);
+    }
 }
 
 void FRaftSimEditorModule::HandleCaptureZambeziCliffComparisonCommand(const TArray<FString>&)
