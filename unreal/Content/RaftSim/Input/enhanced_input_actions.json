@@ -1,5 +1,5 @@
 {
-  "schema": "raftsim.unreal.enhanced_input_actions.v1",
+  "schema": "raftsim.unreal.enhanced_input_actions.v2",
   "manual_input_policy": {
     "manual_parity_required_devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
     "guided_paddle_raft_voice_eligible_actions": [
@@ -196,6 +196,46 @@
       "devices": ["keyboard_mouse", "gamepad", "vr_motion_controllers"],
       "gameplay_mode": "shared_safety",
       "deterministic_intent": "recenter_guide_camera",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "Pause",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "gameplay_mode": "game_shell",
+      "deterministic_intent": "pause_resume",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "CommandWheel",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "gameplay_mode": "guided_paddle_raft",
+      "deterministic_intent": "open_context_command_wheel",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "Scout",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "gameplay_mode": "game_shell",
+      "deterministic_intent": "pause_and_review_scout_board",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "PhotoMode",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "gameplay_mode": "game_shell",
+      "deterministic_intent": "enter_exit_photo_mode",
+      "voice_command_eligible": false
+    },
+    {
+      "action_id": "AfterActionReview",
+      "value_type": "Boolean",
+      "devices": ["keyboard_mouse", "gamepad"],
+      "gameplay_mode": "game_shell",
+      "deterministic_intent": "open_scored_run_review",
       "voice_command_eligible": false
     },
     {

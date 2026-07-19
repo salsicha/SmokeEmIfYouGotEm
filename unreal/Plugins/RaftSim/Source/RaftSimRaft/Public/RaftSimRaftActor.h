@@ -141,6 +141,19 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
     void ResetToCheckpoint();
 
+    /** Replace the recovery checkpoint and optionally move the live body now. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
+    void SetCheckpointTransform(FTransform NewCheckpoint, bool bRestoreImmediately = false);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
+    int32 GetPaddleStrokeCount() const { return PaddleStrokeCount; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
+    int32 GetHighSideResponseCount() const { return HighSideResponseCount; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Training")
+    int32 GetCompletedRescueCount() const { return CompletedRescueCount; }
+
     /** Automation/authoring hook for a passenger-overboard drill. */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
     void ForceCrewOverboardForTesting(int32 Count);
@@ -330,6 +343,9 @@ private:
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;
     float RescueFailureResetRemaining = -1.0f;
+    int32 PaddleStrokeCount = 0;
+    int32 HighSideResponseCount = 0;
+    int32 CompletedRescueCount = 0;
 
     /** Seconds between runtime rock-authority scans. */
     float RockObstacleRefreshRemaining = 0.0f;

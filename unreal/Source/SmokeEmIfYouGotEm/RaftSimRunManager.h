@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
+#include "RaftSimVerticalSliceFrontend.h"
 
 #include "RaftSimRunManager.generated.h"
 
@@ -52,6 +53,31 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
     FRaftSimGameplayScoreBreakdown GetFinalScore() const { return FinalScore; }
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    ERaftSimGameMode GetGameModeKind() const { return GameModeKind; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    float GetCurrentStationM() const { return CurrentStationM; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    float GetProgressFraction() const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    ERaftSimMedal GetAwardedMedal() const { return AwardedMedal; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    const TArray<FVector>& GetBestGhostRoute() const { return BestGhostRoute; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Run")
+    FText GetAfterActionSummary() const { return AfterActionSummary; }
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Run")
+    void ConfigureSession(
+        const FRaftSimCareerScenarioDefinition& Scenario, ERaftSimGameMode InGameMode);
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Run")
+    void RestartRun();
+
     /** Scenario id used as the save key (e.g. "troublemaker"). */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
     FName ScenarioId = TEXT("test_tank_run");
@@ -64,10 +90,19 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
     float StartLineX = -4000.0f;
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
+    float StartStationM = -1.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Run")
+    float FinishStationM = -1.0f;
+
 protected:
     void StartRun();
     void FinishRun();
     void AccumulateSignals(float DeltaSeconds);
+    bool SampleRiverStation(float& OutStationM, FVector* OutTangent = nullptr) const;
+    void TryRestoreSessionCheckpoint();
+    void RecordCheckpointIfNeeded();
 
     UPROPERTY()
     ERaftSimRunState RunState = ERaftSimRunState::Ready;
@@ -85,4 +120,16 @@ protected:
     float AngleErrorAccumDeg = 0.0f;
     float AngleSampleSeconds = 0.0f;
     FRaftSimGameplayScoreBreakdown FinalScore;
+    ERaftSimGameMode GameModeKind = ERaftSimGameMode::FreeRun;
+    ERaftSimMedal AwardedMedal = ERaftSimMedal::None;
+    FText AfterActionSummary;
+    float CurrentStationM = 0.0f;
+    float FurthestStationM = 0.0f;
+    float LastCheckpointStationM = -BIG_NUMBER;
+    float GhostSampleRemaining = 0.0f;
+    bool bCheckpointRestorePending = false;
+    bool bCheckpointRestoreAttempted = false;
+    bool bAssistUsed = false;
+    TArray<FVector> CurrentGhostRoute;
+    TArray<FVector> BestGhostRoute;
 };

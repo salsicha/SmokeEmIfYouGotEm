@@ -5,6 +5,9 @@
 #include "RaftSimGuidePlayerController.h"
 #include "RaftSimRunAudioDirector.h"
 #include "RaftSimRunManager.h"
+#include "RaftSimSaveSubsystem.h"
+#include "RaftSimTrainingDirector.h"
+#include "RaftSimVerticalSliceFrontend.h"
 
 ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 {
@@ -17,11 +20,28 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
+    ERaftSimGameMode SessionMode = ERaftSimGameMode::FreeRun;
+    FRaftSimCareerScenarioDefinition SessionScenario;
+    bool bHasSessionScenario = false;
+    if (URaftSimSaveSubsystem* Save = GetGameInstance()
+            ? GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>() : nullptr)
+    {
+        if (Save->GetSave() != nullptr)
+        {
+            SessionMode = Save->GetSave()->ActiveGameMode;
+            ActiveScenarioId = Save->GetSave()->Selection.ScenarioId;
+            bHasSessionScenario = URaftSimProgressionLibrary::FindScenario(
+                ActiveScenarioId, SessionScenario);
+        }
+    }
+
     // Ensure a run manager exists so any rapid/tank map is scored.
     bool bHasRunManager = false;
+    ARaftSimRunManager* RunManager = nullptr;
     if (TActorIterator<ARaftSimRunManager> It(GetWorld()); It)
     {
         bHasRunManager = true;
+        RunManager = *It;
     }
     if (!bHasRunManager)
     {
@@ -30,6 +50,25 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
         if (Manager != nullptr)
         {
             Manager->ScenarioId = ActiveScenarioId;
+            RunManager = Manager;
+        }
+    }
+    if (RunManager != nullptr && bHasSessionScenario)
+    {
+        RunManager->ConfigureSession(SessionScenario, SessionMode);
+    }
+
+    if (SessionMode == ERaftSimGameMode::TrainingEddy)
+    {
+        bool bHasTrainingDirector = false;
+        if (TActorIterator<ARaftSimTrainingDirector> It(GetWorld()); It)
+        {
+            bHasTrainingDirector = true;
+        }
+        if (!bHasTrainingDirector)
+        {
+            GetWorld()->SpawnActor<ARaftSimTrainingDirector>(
+                ARaftSimTrainingDirector::StaticClass(), FTransform::Identity);
         }
     }
 

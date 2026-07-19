@@ -7,6 +7,18 @@
 
 class UTextBlock;
 class ARaftSimRunManager;
+class ARaftSimTrainingDirector;
+
+UENUM(BlueprintType)
+enum class ERaftSimHudOverlay : uint8
+{
+    None,
+    CommandWheel,
+    ScoutBoard,
+    Pause,
+    PhotoMode,
+    ReplayReview
+};
 
 /**
  * In-run HUD (P3 HUD v1): run state + timer, speed, crew/swimmer status, score,
@@ -25,7 +37,16 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|HUD")
     void ShowSubtitle(const FText& Line, float DurationSeconds = 3.0f);
 
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|HUD")
+    void ShowOverlay(ERaftSimHudOverlay Overlay);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|HUD")
+    ERaftSimHudOverlay GetVisibleOverlay() const { return VisibleOverlay; }
+
 protected:
+    virtual TSharedRef<SWidget> RebuildWidget() override;
+    void BuildWidgetTree();
+
     UPROPERTY()
     TObjectPtr<UTextBlock> StatusText;
 
@@ -36,7 +57,23 @@ protected:
     TObjectPtr<UTextBlock> SubtitleText;
 
     UPROPERTY()
+    TObjectPtr<UTextBlock> ProgressText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> TrainingText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> OverlayText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> RescueText;
+
+    UPROPERTY()
     TObjectPtr<ARaftSimRunManager> RunManager;
 
+    UPROPERTY()
+    TObjectPtr<ARaftSimTrainingDirector> TrainingDirector;
+
     float SubtitleRemaining = 0.0f;
+    ERaftSimHudOverlay VisibleOverlay = ERaftSimHudOverlay::None;
 };

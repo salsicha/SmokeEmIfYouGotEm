@@ -593,6 +593,7 @@ void ARaftSimRaftActor::ApplyPaddleStroke(ERaftSimPaddleSide Side, float Forward
         AngularImpulseNms.Z = -SideSign * Scale * PaddleStrokeImpulseNs * LeverArmM * 0.35f;
     }
     RaftAdapter->AddExternalImpulse(LinearImpulseNs, AngularImpulseNms);
+    ++PaddleStrokeCount;
 }
 
 void ARaftSimRaftActor::ApplyTurnStroke(float TurnScale)
@@ -1002,6 +1003,7 @@ bool ARaftSimRaftActor::RequestSelectedReentry()
     {
         return false;
     }
+    ++CompletedRescueCount;
     RemoveSwimmerAt(TargetIndex);
     return true;
 }
@@ -1080,6 +1082,20 @@ void ARaftSimRaftActor::ResetToCheckpoint()
         State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
         State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
         RaftAdapter->SetKinematicState(State);
+    }
+}
+
+void ARaftSimRaftActor::SetCheckpointTransform(
+    FTransform NewCheckpoint, bool bRestoreImmediately)
+{
+    if (!NewCheckpoint.IsValid())
+    {
+        return;
+    }
+    CheckpointTransform = NewCheckpoint;
+    if (bRestoreImmediately)
+    {
+        ResetToCheckpoint();
     }
 }
 
@@ -1226,6 +1242,7 @@ void ARaftSimRaftActor::HandleHighSideResponse(int32 Direction)
     Action.HighSideDirection = FMath::Clamp(Direction, -1, 1);
     Action.bBrace = true;
     RaftAdapter->SetFlexibleCrewActions({Action});
+    ++HighSideResponseCount;
 }
 
 void ARaftSimRaftActor::ForceOverwashForTesting(float SurfaceHeightM, FVector FlowVelocityMps)
