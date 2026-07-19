@@ -1,0 +1,106 @@
+{
+  "schema": "raftsim.crew.m5_production_quality.v1",
+  "status": "implemented",
+  "license": "MIT project source",
+  "third_party_character_assets": [],
+  "character_authority": {
+    "source": "first_party_procedural_geometry",
+    "runtime_class": "ARaftSimCrewAvatarActor",
+    "primitive_engine_meshes_used": false,
+    "organic_mesh_recipe": "10 latitude rings by 14 radial sides with rounded ellipsoid parts",
+    "appearance_variants": [
+      "blue_green_pfd",
+      "red_pfd",
+      "yellow_pfd",
+      "blue_pfd"
+    ],
+    "protective_equipment": [
+      "splash_wetsuit",
+      "pfd",
+      "helmet"
+    ]
+  },
+  "animation_authority": {
+    "source": "deterministic_first_party_joint_rig",
+    "runtime_library": "URaftSimCrewAvatarPoseLibrary",
+    "states": [
+      "seated_idle",
+      "forward_stroke",
+      "back_stroke",
+      "turn_left",
+      "turn_right",
+      "brace",
+      "high_side_port",
+      "high_side_starboard",
+      "falling",
+      "swimming",
+      "reach_rescue",
+      "throw_line",
+      "reentry"
+    ],
+    "secondary_motion": "phase-driven breathing, stroke follow-through, swim kick, and helmet/PFD bob"
+  },
+  "rescue_runtime": {
+    "explicit_states": [
+      "idle",
+      "aiming",
+      "line_in_flight",
+      "pulling",
+      "ready_for_reentry",
+      "reseating",
+      "completed",
+      "failed"
+    ],
+    "methods": [
+      "reach_grab",
+      "paddle_grab",
+      "throw_line"
+    ],
+    "input": {
+      "keyboard_mouse": {
+        "target_select": "mouse_wheel",
+        "reach_or_paddle_grab": "E",
+        "throw_line": "R",
+        "reentry": "F"
+      },
+      "gamepad": {
+        "target_select": "left_or_right_shoulder",
+        "reach_or_paddle_grab": "face_bottom",
+        "throw_line": "right_trigger",
+        "reentry": "face_right"
+      }
+    },
+    "checkpoint_policy": "failed rescue resets to the section checkpoint after four seconds and applies a field repair"
+  },
+  "raft_fabric_runtime": {
+    "cross_section": "reciprocal-axis local flattening conserves inflated area",
+    "coupling": [
+      "outer_tube",
+      "thwarts",
+      "self_bailing_floor"
+    ],
+    "contact_states": [
+      "multi_rock_contact",
+      "overwash_surf_load",
+      "wrap",
+      "pin",
+      "release",
+      "shape_recovery"
+    ],
+    "persistent_condition": [
+      "intact",
+      "creased",
+      "abraded",
+      "punctured",
+      "critical"
+    ],
+    "physics_coupling": "pressure and integrity reduce effective tube contact radius and buoyancy support"
+  },
+  "automation": [
+    "RaftSim.M5.CrewAvatarPoseProduction",
+    "RaftSim.M5.AimedRescuePaths",
+    "RaftSim.M5.FlexibleFabricCondition",
+    "RaftSim.M5.RuntimeRescueLoop"
+  ],
+  "claim_boundary": "This manifest records implemented gameplay and first-party procedural presentation. It does not claim photogrammetric humans or surveyed rescue training validity."
+}

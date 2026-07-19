@@ -9,7 +9,9 @@ constexpr float kCmPerM = 100.0f;
 struct FPointDeformation
 {
     FVector OffsetCm = FVector::ZeroVector;
-    float RadiusScale = 1.0f;
+    FVector ContactNormal = FVector::ZeroVector;
+    float CompressionRatio = 0.0f;
+    float ContactWeight = 0.0f;
 };
 
 FPointDeformation EvaluatePointDeformation(
@@ -43,13 +45,24 @@ FPointDeformation EvaluatePointDeformation(
         Result.OffsetCm += ContactNormal *
             static_cast<float>(Segment.IndentationM * kCmPerM) * Weight;
         Result.OffsetCm.Z -= static_cast<float>(Segment.FreeboardLossM * kCmPerM) * Weight;
+        if (Segment.bWrapping || Segment.bPinned)
+        {
+            // Multi-contact wraps lift the unsupported fabric while the
+            // contacted wall follows the obstacle: the visible taco fold is
+            // derived from the authoritative D4 state, not a visual trigger.
+            Result.OffsetCm.Z += static_cast<float>(
+                Segment.IndentationM * kCmPerM * Weight * (Segment.bPinned ? 0.52 : 0.34));
+        }
+        Result.ContactNormal += ContactNormal * Weight;
+        Result.ContactWeight += Weight;
 
         const double RadialLossM = Segment.CompressionM + 0.35 * Segment.IndentationM;
         CompressionRatio = FMath::Max(
             CompressionRatio,
             static_cast<float>(RadialLossM * kCmPerM / FMath::Max(TubeCm, 1.0f)) * Weight);
     }
-    Result.RadiusScale = FMath::Clamp(1.0f - 0.65f * CompressionRatio, 0.45f, 1.0f);
+    Result.CompressionRatio = FMath::Clamp(CompressionRatio, 0.0f, 0.30f);
+    Result.ContactNormal = Result.ContactNormal.GetSafeNormal();
     return Result;
 }
 
@@ -60,7 +73,8 @@ FPointDeformation EvaluatePointDeformation(
 void SweepTube(
     const TArray<FVector>& Centerline, bool bClosed, float TubeCm, int32 RadialSegments,
     FMeshData& Out,
-    const TArray<FRaftSimFlexVisualSegmentState>* Deformation = nullptr)
+    const TArray<FRaftSimFlexVisualSegmentState>* Deformation = nullptr,
+    const FRaftSimRaftVisualCondition* Condition = nullptr)
 {
     const int32 N = Centerline.Num();
     if (N < 2)
@@ -98,8 +112,38 @@ void SweepTube(
         {
             const float A = 2.0f * PI * static_cast<float>(j) / static_cast<float>(RadialSegments);
             const FVector Dir = FMath::Cos(A) * Radial + FMath::Sin(A) * RingUp;
-            Out.Vertices.Add(P + TubeCm * Shape.RadiusScale * Dir);
-            Out.Normals.Add(Dir);
+            FVector CrossSection = Dir;
+            if (!Shape.ContactNormal.IsNearlyZero() && Shape.CompressionRatio > KINDA_SMALL_NUMBER)
+            {
+                FVector ContactAxis = Shape.ContactNormal -
+                    Tangent * FVector::DotProduct(Shape.ContactNormal, Tangent);
+                ContactAxis = ContactAxis.GetSafeNormal();
+                if (!ContactAxis.IsNearlyZero())
+                {
+                    const FVector Perpendicular =
+                        FVector::CrossProduct(Tangent, ContactAxis).GetSafeNormal();
+                    const float CompressedScale = FMath::Clamp(
+                        1.0f - 1.55f * Shape.CompressionRatio, 0.70f, 1.0f);
+                    // Reciprocal axes conserve cross-sectional area: a local
+                    // rock dent flattens and bulges an inflated tube instead
+                    // of visually deleting air volume.
+                    CrossSection =
+                        ContactAxis * FVector::DotProduct(Dir, ContactAxis) * CompressedScale +
+                        Perpendicular * FVector::DotProduct(Dir, Perpendicular) / CompressedScale;
+                }
+            }
+            const float PressureScale = Condition
+                ? FMath::Lerp(0.82f, 1.0f, FMath::Clamp(Condition->PressureFraction, 0.0f, 1.0f))
+                : 1.0f;
+            FVector Vertex = P + TubeCm * PressureScale * CrossSection;
+            if (Condition && Condition->CreaseAmplitudeM > 0.0f)
+            {
+                const float WrinkleCm = Condition->CreaseAmplitudeM * kCmPerM *
+                    FMath::Sin(0.071f * RestP.X + 0.113f * RestP.Y + 2.0f * A);
+                Vertex += Dir * WrinkleCm * (1.0f - Condition->Integrity);
+            }
+            Out.Vertices.Add(Vertex);
+            Out.Normals.Add(CrossSection.GetSafeNormal());
             Out.UVs.Add(FVector2D(
                 static_cast<float>(i) / static_cast<float>(N),
                 static_cast<float>(j) / static_cast<float>(RadialSegments)));
@@ -186,7 +230,8 @@ TArray<FVector> RoundedRectLoop(
 void BuildInflatableRaft(
     float LengthM, float WidthM, float TubeRadiusM,
     FMeshData& OutTubes, FMeshData& OutFloor,
-    const TArray<FRaftSimFlexVisualSegmentState>& Deformation)
+    const TArray<FRaftSimFlexVisualSegmentState>& Deformation,
+    const FRaftSimRaftVisualCondition& Condition)
 {
     const float L = LengthM * kCmPerM;
     const float W = WidthM * kCmPerM;
@@ -200,7 +245,7 @@ void BuildInflatableRaft(
     const TArray<FVector> Loop = RoundedRectLoop(Ax, Ay, Corner, Tr, Kick, L);
     SweepTube(
         Loop, /*bClosed=*/true, Tr, /*RadialSegments=*/14, OutTubes,
-        &Deformation);
+        &Deformation, &Condition);
 
     // Two cross thwarts (seats), slightly thinner, tucked between the side tubes.
     const float ThwartR = Tr * 0.72f;
@@ -215,7 +260,11 @@ void BuildInflatableRaft(
             const float Y = FMath::Lerp(-ThwartInset, ThwartInset, static_cast<float>(s) / Steps);
             Bar.Add(FVector(ThwartX, Y, ThwartZ));
         }
-        SweepTube(Bar, /*bClosed=*/false, ThwartR, /*RadialSegments=*/10, OutTubes);
+        // Thwarts share the same D1/D4 field, coupling them to lateral and taco
+        // folds rather than leaving rigid bars through a deforming raft.
+        SweepTube(
+            Bar, /*bClosed=*/false, ThwartR, /*RadialSegments=*/10, OutTubes,
+            &Deformation, &Condition);
     }
 
     // Inset self-bailing floor: a slightly dished grid spanning inside the tubes.
@@ -241,7 +290,13 @@ void BuildInflatableRaft(
             // The laced floor follows tube motion, but less than the contacted
             // tube wall so the raft visibly folds without shearing the deck.
             FloorShape.OffsetCm *= 0.55f;
-            OutFloor.Vertices.Add(RestVertex + FloorShape.OffsetCm);
+            FVector FloorVertex = RestVertex + FloorShape.OffsetCm;
+            if (Condition.CreaseAmplitudeM > 0.0f)
+            {
+                FloorVertex.Z += Condition.CreaseAmplitudeM * kCmPerM *
+                    (1.0f - Condition.Integrity) * FMath::Sin(6.0f * fx + 4.0f * fy);
+            }
+            OutFloor.Vertices.Add(FloorVertex);
             OutFloor.Normals.Add(FVector::UpVector);
             OutFloor.UVs.Add(FVector2D(fx * 4.0f, fy * 2.0f));
             OutFloor.Tangents.Add(FProcMeshTangent(1.0f, 0.0f, 0.0f));

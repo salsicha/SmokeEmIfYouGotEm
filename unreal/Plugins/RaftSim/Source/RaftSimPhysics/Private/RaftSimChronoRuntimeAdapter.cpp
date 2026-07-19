@@ -65,6 +65,8 @@ void URaftSimChronoRuntimeAdapter::ConfigureFlexibleRaftModel(
         NominalPressurePa);
     FlexActions.Reset();
     FlexObstacles.Reset();
+    FlexPressureFraction = 1.0f;
+    FlexFabricIntegrity = 1.0f;
     ResetFlexiblePersistentState();
 }
 
@@ -84,6 +86,14 @@ void URaftSimChronoRuntimeAdapter::SetFlexibleUniformWater(
 void URaftSimChronoRuntimeAdapter::SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles)
 {
     FlexObstacles = InObstacles;
+}
+
+void URaftSimChronoRuntimeAdapter::SetFlexibleConditionModifiers(
+    float PressureFraction,
+    float FabricIntegrity)
+{
+    FlexPressureFraction = FMath::Clamp(PressureFraction, 0.25f, 1.0f);
+    FlexFabricIntegrity = FMath::Clamp(FabricIntegrity, 0.0f, 1.0f);
 }
 
 void URaftSimChronoRuntimeAdapter::ResetFlexiblePersistentState()
@@ -122,6 +132,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     State.Orientation = KinematicState.WorldTransform.GetRotation().GetNormalized();
     State.LinearVelocity = KinematicState.LinearVelocityMetersPerSecond;
     State.AngularVelocity = KinematicState.AngularVelocityRadiansPerSecond;
+    const FRaftSimFlexRigidState PreviousFiniteState = State;
 
     const RaftSimFlex::EModelMode Mode = RaftConfig.bEnableCompliantContacts
         ? RaftSimFlex::EModelMode::Compliant
@@ -155,7 +166,7 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         SeatSolve,
         FlexObstacles,
         FlexLayout,
-        FlexParameters.TubeRadiusM,
+        FlexParameters.TubeRadiusM * FMath::Lerp(0.82, 1.0, static_cast<double>(FlexPressureFraction)),
         &IndentationBySegment,
         Mode,
         Dt);
@@ -276,7 +287,9 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         ForceN.Z += -WeightN;
         const double PerPointBuoyancyN =
             WeightN * static_cast<double>(RaftConfig.BuoyancyWeightMultiple) /
-            static_cast<double>(TubeSamplePointsM.Num());
+            static_cast<double>(TubeSamplePointsM.Num()) *
+            FMath::Lerp(0.48, 1.0, static_cast<double>(FlexPressureFraction)) *
+            FMath::Lerp(0.80, 1.0, static_cast<double>(FlexFabricIntegrity));
         const double SaturationDepthM =
             FMath::Max(2.0 * static_cast<double>(RaftConfig.TubeRadiusMeters), 1.0e-3);
         for (const FVector& LocalM : TubeSamplePointsM)
@@ -348,6 +361,27 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     {
         const FQuat Delta(State.AngularVelocity / AngularSpeed, AngularSpeed * Dt);
         State.Orientation = (Delta * State.Orientation).GetNormalized();
+    }
+
+    // Renderer-facing safety boundary: extreme coupled contact must never
+    // publish a non-finite transform. Preserve the last finite pose and shed
+    // poisoned velocity; telemetry still exposes the provoking contact.
+    const double OrientationSizeSquared = State.Orientation.SizeSquared();
+    const bool bInvalidState = State.Position.ContainsNaN() ||
+        State.LinearVelocity.ContainsNaN() || State.AngularVelocity.ContainsNaN() ||
+        State.Orientation.ContainsNaN() || !FMath::IsFinite(OrientationSizeSquared) ||
+        OrientationSizeSquared < 1.0e-8;
+    if (bInvalidState)
+    {
+        State = PreviousFiniteState;
+        State.LinearVelocity = FVector::ZeroVector;
+        State.AngularVelocity = FVector::ZeroVector;
+        const double PreviousOrientationSizeSquared = State.Orientation.SizeSquared();
+        if (State.Orientation.ContainsNaN() || !FMath::IsFinite(PreviousOrientationSizeSquared) ||
+            PreviousOrientationSizeSquared < 1.0e-8)
+        {
+            State.Orientation = FQuat::Identity;
+        }
     }
 
     KinematicState.WorldTransform.SetTranslation(State.Position * 100.0);

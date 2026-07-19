@@ -3,11 +3,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
+#include "RaftSimRaftCondition.h"
 
 #include "RaftSimRaftActor.generated.h"
 
 class UStaticMeshComponent;
 class USceneComponent;
+class ARaftSimCrewAvatarActor;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
 
@@ -96,9 +98,52 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     int32 GetSwimmerCount() const { return Swimmers.Num(); }
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Crew")
+    int32 GetCrewAvatarCount() const { return CrewAvatars.Num(); }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    FRaftSimRescueInteractionState GetRescueInteractionState() const { return RescueInteraction; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Condition")
+    FRaftSimRaftConditionState GetRaftCondition() const { return RaftCondition; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    bool GetSwimmerWorldPosition(FName PassengerId, FVector& OutWorldPositionCm) const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Rescue")
+    bool IsPassengerSwimming(FName PassengerId) const;
+
     /** Guide's request to re-right a capsized raft (bound to a recovery input). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void RequestReflip();
+
+    /** Cycle the explicit rescue target by input sign. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    void SelectRescueTarget(float Direction);
+
+    /** Store the camera/controller aim ray used by the next rescue action. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    void AimRescue(FVector WorldAimDirection);
+
+    /** Start an aimed reach, paddle-grab, or throw-line rescue. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    bool BeginRescue(ERaftSimRescueMethod Method);
+
+    /** Pull the selected swimmer over the tube once the recovery is ready. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    bool RequestSelectedReentry();
+
+    /** A swimming guide's controlled stroke toward the raft or shore. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    void ApplySwimmerStroke(FName PassengerId, FVector WorldDirection, float DistanceM = 0.42f);
+
+    /** Section checkpoint reset and field repair after a failed rescue. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Checkpoint")
+    void ResetToCheckpoint();
+
+    /** Automation/authoring hook for a passenger-overboard drill. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    void ForceCrewOverboardForTesting(int32 Count);
 
     /**
      * Timed high-side response: shift crew weight to the given side (+1 = starboard,
@@ -222,7 +267,15 @@ private:
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
     void TryReseatSwimmers();
+    void UpdateRescueInteraction(float DeltaSeconds);
+    void UpdateRescueLineVisual();
+    void SpawnSwimmers(int32 Count, bool bIncludeGuide);
+    void RemoveSwimmerAt(int32 Index);
+    int32 FindSwimmerIndex(FName PassengerId) const;
+    ARaftSimCrewAvatarActor* FindAvatar(FName PassengerId) const;
+    void AttachAvatarToSeat(ARaftSimCrewAvatarActor* Avatar, FName PassengerId);
     void UpdateCrew(float DeltaSeconds);
+    void UpdateRaftCondition(float DeltaSeconds);
     void SpawnCrewVisuals();
     void BuildRaftVisual();
     void UpdateFlexibleRaftVisual();
@@ -242,9 +295,15 @@ private:
     UPROPERTY()
     TArray<FRaftSimSwimmerRescueFrame> Swimmers;
 
-    /** Visual spheres for in-water swimmers, parallel to Swimmers. */
     UPROPERTY()
-    TArray<TObjectPtr<UStaticMeshComponent>> SwimmerMeshes;
+    FRaftSimRescueInteractionState RescueInteraction;
+
+    FVector RescueAimWorldDirection = FVector::ForwardVector;
+    int32 SelectedSwimmerIndex = INDEX_NONE;
+
+    /** Visible, sagging throw line built from project-owned procedural geometry. */
+    UPROPERTY(VisibleAnywhere)
+    TObjectPtr<class UProceduralMeshComponent> RescueLineVisual;
 
     /** Transform to respawn the raft at when recovery completes / is requested. */
     FTransform CheckpointTransform = FTransform::Identity;
@@ -263,10 +322,14 @@ private:
     ERaftSimCrewCommand PendingCrewCommand = ERaftSimCrewCommand::Rest;
 
     UPROPERTY()
-    TArray<TObjectPtr<UStaticMeshComponent>> CrewMeshes;
+    TArray<TObjectPtr<ARaftSimCrewAvatarActor>> CrewAvatars;
+
+    UPROPERTY()
+    FRaftSimRaftConditionState RaftCondition;
 
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;
+    float RescueFailureResetRemaining = -1.0f;
 
     /** Seconds between runtime rock-authority scans. */
     float RockObstacleRefreshRemaining = 0.0f;

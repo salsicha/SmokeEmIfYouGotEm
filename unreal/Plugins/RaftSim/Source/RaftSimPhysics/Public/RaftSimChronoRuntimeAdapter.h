@@ -213,6 +213,12 @@ public:
 
     void SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles);
 
+    /** Persistent damage modifiers from the shipping raft-condition model. */
+    void SetFlexibleConditionModifiers(float PressureFraction, float FabricIntegrity);
+
+    float GetFlexiblePressureFraction() const { return FlexPressureFraction; }
+    float GetFlexibleFabricIntegrity() const { return FlexFabricIntegrity; }
+
     // Clear retained-water and indentation memory (deterministic restart).
     void ResetFlexiblePersistentState();
 
@@ -251,6 +257,8 @@ private:
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
     TArray<FVector> TubeSamplePointsM;
+    float FlexPressureFraction = 1.0f;
+    float FlexFabricIntegrity = 1.0f;
     FVector PendingLinearImpulseNs = FVector::ZeroVector;
     FVector PendingAngularImpulseNms = FVector::ZeroVector;
 
