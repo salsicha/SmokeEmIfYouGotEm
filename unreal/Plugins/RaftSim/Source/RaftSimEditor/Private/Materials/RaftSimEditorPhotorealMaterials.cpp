@@ -419,7 +419,8 @@ static UMaterial* BuildPhotorealTerrainMaterial()
 // A simple solid-colour lit material (raft tubes, crew PFDs) so the gameplay
 // props read as real objects rather than the default checkerboard.
 static UMaterial* BuildSolidMaterial(
-    const TCHAR* AssetName, const FLinearColor& Color, float Roughness, float Metallic)
+    const TCHAR* AssetName, const FLinearColor& Color, float Roughness, float Metallic,
+    bool bTwoSided = false)
 {
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Materials/%s"), AssetName);
     const FString ObjectPath = FString::Printf(TEXT("%s.%s"), *PackagePath, AssetName);
@@ -441,6 +442,7 @@ static UMaterial* BuildSolidMaterial(
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->BlendMode = BLEND_Opaque;
+    Material->TwoSided = bTwoSided;
 
     UMaterialExpressionConstant3Vector* BaseColor = NewObject<UMaterialExpressionConstant3Vector>(Material);
     BaseColor->Constant = Color;
@@ -475,9 +477,19 @@ static void HandleCreatePhotorealMaterials(const TArray<FString>&)
 {
     BuildPhotorealRiverWaterMaterial();
     BuildPhotorealTerrainMaterial();
-    // Charcoal PVC raft tubes and a safety-orange crew PFD.
-    BuildSolidMaterial(TEXT("M_RaftSim_RaftTube"), FLinearColor(0.045f, 0.05f, 0.06f, 1.0f), 0.55f, 0.0f);
-    BuildSolidMaterial(TEXT("M_RaftSim_CrewPFD"), FLinearColor(0.75f, 0.20f, 0.03f, 1.0f), 0.6f, 0.0f);
+    // Raft: charcoal PVC tubes (two-sided for the swept mesh) + grippy dark floor.
+    BuildSolidMaterial(TEXT("M_RaftSim_RaftTube"), FLinearColor(0.05f, 0.055f, 0.075f, 1.0f), 0.42f, 0.0f, /*bTwoSided=*/true);
+    BuildSolidMaterial(TEXT("M_RaftSim_RaftFloor"), FLinearColor(0.02f, 0.022f, 0.026f, 1.0f), 0.8f, 0.0f, /*bTwoSided=*/true);
+    // Crew: PFD colour variants, helmet, skin, splash jacket, paddle.
+    BuildSolidMaterial(TEXT("M_RaftSim_CrewPFD"), FLinearColor(0.78f, 0.22f, 0.02f, 1.0f), 0.6f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_PFD_Red"), FLinearColor(0.62f, 0.03f, 0.03f, 1.0f), 0.6f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_PFD_Yellow"), FLinearColor(0.85f, 0.68f, 0.03f, 1.0f), 0.6f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_PFD_Blue"), FLinearColor(0.03f, 0.20f, 0.55f, 1.0f), 0.6f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_Helmet"), FLinearColor(0.90f, 0.90f, 0.93f, 1.0f), 0.22f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_Skin"), FLinearColor(0.58f, 0.40f, 0.30f, 1.0f), 0.55f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_Wetsuit"), FLinearColor(0.015f, 0.018f, 0.025f, 1.0f), 0.5f, 0.0f);
+    BuildSolidMaterial(TEXT("M_RaftSim_PaddleShaft"), FLinearColor(0.04f, 0.04f, 0.05f, 1.0f), 0.35f, 0.1f);
+    BuildSolidMaterial(TEXT("M_RaftSim_PaddleBlade"), FLinearColor(0.86f, 0.30f, 0.02f, 1.0f), 0.4f, 0.0f);
 }
 
 static FAutoConsoleCommand GCreatePhotorealMaterialsCommand(

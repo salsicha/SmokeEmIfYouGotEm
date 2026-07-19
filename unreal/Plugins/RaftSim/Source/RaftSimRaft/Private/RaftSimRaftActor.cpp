@@ -5,7 +5,9 @@
 #include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
 #include "Materials/MaterialInterface.h"
+#include "ProceduralMeshComponent.h"
 #include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimRaftMesh.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
@@ -27,6 +29,8 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
     SetRootComponent(Root);
 
+    // Collision/buoyancy footprint box — kept for the raft-body physics but
+    // hidden; the visible raft is the procedural inflatable mesh below.
     HullMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HullMesh"));
     HullMesh->SetupAttachment(Root);
     HullMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -39,12 +43,16 @@ ARaftSimRaftActor::ARaftSimRaftActor()
         HullMesh->SetRelativeScale3D(FVector(FootprintLengthM, FootprintWidthM, 0.56f));
         HullMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
     }
-    static ConstructorHelpers::FObjectFinder<UMaterialInterface> TubeMat(
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube"));
-    if (TubeMat.Succeeded())
-    {
-        HullMesh->SetMaterial(0, TubeMat.Object);
-    }
+    HullMesh->SetVisibility(false);
+
+    // Photoreal inflatable-raft visual: swept tube loop + thwarts + floor. The
+    // geometry is built in BeginPlay (BuildRaftVisual) to avoid work on the CDO.
+    RaftVisual = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RaftVisual"));
+    RaftVisual->SetupAttachment(Root);
+    RaftVisual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    // Tube bottoms build at z=0; drop so the raft floats with the lower tube in
+    // the water and the deck just above the surface.
+    RaftVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -TubeRadiusM * 0.55f * kCmPerM));
 
     SternSeatAttachPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SternSeatAttachPoint"));
     SternSeatAttachPoint->SetupAttachment(Root);
@@ -191,33 +199,133 @@ void ARaftSimRaftActor::BeginPlay()
     RaftMode = ERaftSimRaftMode::Upright;
     FlipRiskLatchSeconds = 0.0f;
 
+    BuildRaftVisual();
     SpawnCrewVisuals();
+}
+
+void ARaftSimRaftActor::BuildRaftVisual()
+{
+    if (RaftVisual == nullptr)
+    {
+        return;
+    }
+    RaftSimRaftMesh::FMeshData Tubes, Floor;
+    RaftSimRaftMesh::BuildInflatableRaft(
+        FootprintLengthM, FootprintWidthM, TubeRadiusM, Tubes, Floor);
+    const TArray<FLinearColor> NoColors;
+    RaftVisual->CreateMeshSection_LinearColor(
+        0, Tubes.Vertices, Tubes.Triangles, Tubes.Normals, Tubes.UVs, NoColors,
+        Tubes.Tangents, /*bCreateCollision=*/false);
+    RaftVisual->CreateMeshSection_LinearColor(
+        1, Floor.Vertices, Floor.Triangles, Floor.Normals, Floor.UVs, NoColors,
+        Floor.Tangents, /*bCreateCollision=*/false);
+    if (UMaterialInterface* TubeMat = LoadObject<UMaterialInterface>(
+            nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube")))
+    {
+        RaftVisual->SetMaterial(0, TubeMat);
+    }
+    if (UMaterialInterface* FloorMat = LoadObject<UMaterialInterface>(
+            nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloor.M_RaftSim_RaftFloor")))
+    {
+        RaftVisual->SetMaterial(1, FloorMat);
+    }
 }
 
 void ARaftSimRaftActor::SpawnCrewVisuals()
 {
-    UStaticMesh* SphereMesh =
-        LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    UMaterialInterface* PFDMat = LoadObject<UMaterialInterface>(
-        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"));
-    // Two rows of paddlers along the tubes, bow to stern.
+    UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    UStaticMesh* Cylinder = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
+    UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
+    auto Mat = [](const TCHAR* Path)
+    { return LoadObject<UMaterialInterface>(nullptr, Path); };
+    UMaterialInterface* SkinMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Skin.M_RaftSim_Skin"));
+    UMaterialInterface* HelmetMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"));
+    UMaterialInterface* WetsuitMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"));
+    UMaterialInterface* ShaftMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
+    UMaterialInterface* BladeMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleBlade.M_RaftSim_PaddleBlade"));
+    UMaterialInterface* PFDMats[4] = {
+        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD")),
+        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Red.M_RaftSim_PFD_Red")),
+        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Yellow.M_RaftSim_PFD_Yellow")),
+        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Blue.M_RaftSim_PFD_Blue")),
+    };
+
+    auto AddPart = [this](UStaticMesh* MeshAsset, UMaterialInterface* Material,
+                          const FVector& LocCm, const FRotator& Rot, const FVector& Scale)
+    {
+        if (MeshAsset == nullptr)
+        {
+            return;
+        }
+        UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+        C->SetupAttachment(Root);
+        C->RegisterComponent();
+        C->SetStaticMesh(MeshAsset);
+        C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        if (Material != nullptr)
+        {
+            C->SetMaterial(0, Material);
+        }
+        C->SetRelativeLocationAndRotation(LocCm, Rot);
+        C->SetRelativeScale3D(Scale);
+        CrewMeshes.Add(C);
+    };
+
+    // Build one seated paddler (metres, paddler-local: +X downstream, +Z up),
+    // offset to SeatCm on the raft. Engine primitives are 1 m (sphere r=0.5,
+    // cylinder h=1/r=0.5), so a radius r maps to scale 2r and a bar of length L
+    // to scale-Z L.
+    auto Bar = [&](UStaticMesh* MeshAsset, UMaterialInterface* Material, const FVector& SeatCm,
+                   const FVector& AMeters, const FVector& BMeters, float RadiusM)
+    {
+        const FVector A = SeatCm + AMeters * kCmPerM;
+        const FVector B = SeatCm + BMeters * kCmPerM;
+        const FVector D = B - A;
+        const float LenM = FMath::Max(D.Size() / kCmPerM, 0.01f);
+        const FRotator Rot = FRotationMatrix::MakeFromZ(D.GetSafeNormal()).Rotator();
+        AddPart(MeshAsset, Material, (A + B) * 0.5f, Rot,
+                FVector(2.0f * RadiusM, 2.0f * RadiusM, LenM));
+    };
+    auto Ball = [&](UStaticMesh* MeshAsset, UMaterialInterface* Material, const FVector& SeatCm,
+                    const FVector& PosMeters, float RadiusM)
+    {
+        AddPart(MeshAsset, Material, SeatCm + PosMeters * kCmPerM, FRotator::ZeroRotator,
+                FVector(2.0f * RadiusM));
+    };
+
+    auto BuildPaddler = [&](const FVector& SeatCm, UMaterialInterface* PFDMat)
+    {
+        // Torso + splash jacket.
+        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.0f, 0.0f, 0.02f), FVector(0.05f, 0.0f, 0.52f), 0.15f);
+        // Life jacket (PFD) over the chest.
+        Bar(Cylinder, PFDMat, SeatCm, FVector(0.03f, 0.0f, 0.28f), FVector(0.05f, 0.0f, 0.50f), 0.20f);
+        // Head + helmet.
+        Ball(Sphere, SkinMat, SeatCm, FVector(0.08f, 0.0f, 0.66f), 0.11f);
+        Ball(Sphere, HelmetMat, SeatCm, FVector(0.08f, 0.0f, 0.70f), 0.125f);
+        // Paddle held diagonally across the body: shaft + blade.
+        const FVector GripHigh(0.30f, 0.22f, 0.46f);
+        const FVector BladeEnd(0.56f, -0.30f, -0.10f);
+        Bar(Cylinder, ShaftMat, SeatCm, GripHigh, BladeEnd, 0.028f);
+        const FVector D = (BladeEnd - GripHigh).GetSafeNormal();
+        const FRotator BladeRot = FRotationMatrix::MakeFromZ(D).Rotator();
+        AddPart(Cube, BladeMat, SeatCm + (BladeEnd + D * 0.14f) * kCmPerM, BladeRot,
+                FVector(0.22f, 0.03f, 0.30f));
+        // Arms reaching to the paddle grips.
+        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.03f, 0.16f, 0.50f), GripHigh, 0.05f);
+        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.03f, -0.16f, 0.50f), FVector(0.42f, -0.02f, 0.20f), 0.05f);
+    };
+
+    // Two rows of paddlers along the tubes plus a stern guide, all facing
+    // downstream. Seats sit on the tube tops.
+    const float SeatZ = 30.0f;
     for (int32 Index = 0; Index < PaddlerCount; ++Index)
     {
-        UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
-        Mesh->SetupAttachment(Root);
-        Mesh->RegisterComponent();
-        Mesh->SetStaticMesh(SphereMesh);
-        Mesh->SetWorldScale3D(FVector(0.45f));
-        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        if (PFDMat != nullptr)
-        {
-            Mesh->SetMaterial(0, PFDMat);
-        }
-        const float Row = (Index % 2 == 0) ? -0.75f : 0.75f; // port / starboard
-        const float Bow = 1.2f - (Index / 2) * 1.2f;          // fore to aft (m)
-        Mesh->SetRelativeLocation(FVector(Bow * kCmPerM, Row * kCmPerM, 40.0f));
-        CrewMeshes.Add(Mesh);
+        const float Row = (Index % 2 == 0) ? -0.62f : 0.62f; // port / starboard
+        const float Bow = 1.15f - (Index / 2) * 1.05f;        // fore to aft (m)
+        BuildPaddler(FVector(Bow * kCmPerM, Row * kCmPerM, SeatZ), PFDMats[Index % 4]);
     }
+    // Stern guide, centred.
+    BuildPaddler(FVector(-1.75f * kCmPerM, 0.0f, SeatZ + 8.0f), PFDMats[0]);
 }
 
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
@@ -460,20 +568,48 @@ void ARaftSimRaftActor::EnterCapsize()
         LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
     UMaterialInterface* PFDMat = LoadObject<UMaterialInterface>(
         nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"));
+    UMaterialInterface* SkinMat = LoadObject<UMaterialInterface>(
+        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_Skin.M_RaftSim_Skin"));
+    UMaterialInterface* HelmetMat = LoadObject<UMaterialInterface>(
+        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"));
     for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
     {
-        UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
-        Mesh->SetupAttachment(nullptr);
-        Mesh->RegisterComponent();
-        Mesh->SetStaticMesh(SphereMesh);
-        Mesh->SetWorldScale3D(FVector(0.5f));
-        Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        // The tracked component (moved each frame) is the PFD torso; the head
+        // and helmet ride along attached to it.
+        UStaticMeshComponent* Torso = NewObject<UStaticMeshComponent>(this);
+        Torso->SetupAttachment(nullptr);
+        Torso->RegisterComponent();
+        Torso->SetStaticMesh(SphereMesh);
+        Torso->SetWorldScale3D(FVector(0.62f, 0.5f, 0.42f));
+        Torso->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         if (PFDMat != nullptr)
         {
-            Mesh->SetMaterial(0, PFDMat);
+            Torso->SetMaterial(0, PFDMat);
         }
-        Mesh->SetWorldLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
-        SwimmerMeshes.Add(Mesh);
+        Torso->SetWorldLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+
+        auto AttachBall = [this, Torso](UStaticMesh* MeshAsset, UMaterialInterface* Material,
+                                        const FVector& OffsetCm, float Scale)
+        {
+            if (MeshAsset == nullptr)
+            {
+                return;
+            }
+            UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
+            C->SetupAttachment(Torso);
+            C->RegisterComponent();
+            C->SetStaticMesh(MeshAsset);
+            C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            if (Material != nullptr)
+            {
+                C->SetMaterial(0, Material);
+            }
+            C->SetWorldScale3D(FVector(Scale));
+            C->SetRelativeLocation(OffsetCm);
+        };
+        AttachBall(SphereMesh, SkinMat, FVector(18.0f, 0.0f, 22.0f), 0.2f);
+        AttachBall(SphereMesh, HelmetMat, FVector(18.0f, 0.0f, 26.0f), 0.23f);
+        SwimmerMeshes.Add(Torso);
     }
 }
 
