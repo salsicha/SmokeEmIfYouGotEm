@@ -4,6 +4,20 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ## [Unreleased]
 
+### Game completion M2 — Procedural geography completion (July 19, 2026)
+
+- Added a deterministic full-reach South Fork geography generator that conditions all
+  eight official 3DEP/NAIP windows along the adopted 49.1 km axis and fills missing
+  bathymetry, banks, rapid controls, boulders, and shoreline detail.
+- Added explicit source-authority, procedural-infill, uncertainty, material, and
+  hydraulic-feature masks plus a seeded 115-boulder catalog. Generated content is
+  permanently marked as inferred and not suitable for navigation.
+- Added a 4 m canonical solver/collision/render grid and thirteen overlapping Unreal
+  import tiles whose collision and render height hashes are identical.
+- Added geography continuity, provenance, determinism, feature-coverage, and exact tile
+  overlap automation. The focused suite passes 19/19 and the full physics/content suite
+  passes 1,021 tests with 3 expected dependency-path skips.
+
 ### Game completion M1 — Flexible raft and rock contacts (July 19, 2026)
 
 - Added runtime-authoritative rock actors and connected nearby world rocks to the D4
