@@ -4,6 +4,23 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ## [Unreleased]
 
+### Game completion M3 — Full South Fork hydraulics (July 19, 2026)
+
+- Cooked all 20 South Fork named rapids at 900, 1,600, and 3,000 cfs through the
+  genuine first-party finite-volume solver; all 60 combinations pass finite-state,
+  mass/volume, velocity, inflow/outflow, discharge-response, and 105 catalogued
+  hydraulic-feature envelopes.
+- Added flow-specific preferred lines, scout eddies, hazards, checkpoints, rescue zones,
+  and outcome envelopes for every named rapid.
+- Added a deterministic full-reach procedural transit seed, explicit inferred/not-for-
+  navigation authority, and no-gap streaming coverage across the 49.1 km descent.
+- Added state-preserving Unreal moving-water handoffs with global stationing, authored
+  full-edge boundary forcing, transmissive crop edges, overlap depth/velocity transfer,
+  continuous solver time, handoff telemetry, and non-overlap reset rejection.
+- Added C++ replacement-state coverage, five hydraulic artifact tests, and two Unreal M3
+  automation gates. The full physics/content suite passes 1,026 tests with 3 expected
+  optional-dependency-path skips.
+
 ### Game completion M2 — Procedural geography completion (July 19, 2026)
 
 - Added a deterministic full-reach South Fork geography generator that conditions all

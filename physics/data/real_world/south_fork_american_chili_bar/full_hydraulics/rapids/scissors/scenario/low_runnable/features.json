@@ -1,0 +1,70 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 27940.857743821292,
+        "y": 10.278353502138124
+      },
+      "kind": "ledge",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "ledge",
+        "consequence_class": "swim_risk",
+        "display_name": "Diagonal bedrock ledges",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "diagonal_bedrock_ledges"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 28083.506218453742,
+        "y": -9.799043136632768
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Cabin-sized rock on the right",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "cabin_rock_right"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 27989.68278091625,
+        "y": -0.5382387075895068
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Squirrelly-water line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "squirrelly_water_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    }
+  ]
+}

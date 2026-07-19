@@ -1,0 +1,70 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26794.48083099334,
+        "y": 0.2007442652715241
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "swim_risk",
+        "display_name": "Steep entry wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "steep_entry_waves"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26957.545098295053,
+        "y": 0.5124712685384956
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "continuous_whitewater",
+        "consequence_class": "swim_risk",
+        "display_name": "Continuous run-in to Satan's Cesspool",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "continuous_runin_to_satans"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26956.321079698657,
+        "y": -8.244820690998614
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Satan's Cesspool setup line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "satans_setup_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    }
+  ]
+}

@@ -20,6 +20,9 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     CaptureState.bEnabled = Config.bEnableDeterministicCapture;
     CommittedWaterFrame = 0;
     SimTimeSeconds = 0.0;
+    LastHandoffTransferredCellCount = 0;
+    MovingWindowHandoffCount = 0;
+    bLastHandoffPreservedState = false;
 
     bool bManifestReady = !Config.bRequireAcceptedReportManifest;
     if (!Config.AcceptedReportSetManifestPath.IsEmpty())
@@ -216,6 +219,8 @@ bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
 #if RAFTSIM_HAS_LIVE_SOLVER
     LiveWindow = FRaftSimLiveWaterWindow::CreateFlatTank(
         WorldOriginM, SizeXM, SizeYM, CellSizeM, SurfaceHeightM, DepthM);
+    LastHandoffTransferredCellCount = 0;
+    bLastHandoffPreservedState = false;
     // Recover from Uninitialized or a prior failed river attempt (Faulted).
     if (Status == ERaftSimWaterRuntimeStatus::Uninitialized
         || Status == ERaftSimWaterRuntimeStatus::Faulted)
@@ -237,6 +242,8 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
     LiveWindow = FRaftSimLiveWaterWindow::CreateFromCookedFields(
         ResolveRepoRelativePath(CookedFieldsManifestDir), BandId,
         WindowCenterM, WindowExtentM, RoughnessManning, Error);
+    LastHandoffTransferredCellCount = 0;
+    bLastHandoffPreservedState = false;
     if (!LiveWindow.IsValid())
     {
         UE_LOG(
@@ -257,6 +264,55 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
 #endif
 }
 
+bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindow(
+    const FString& CookedFieldsManifestDir, const FString& BandId,
+    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning)
+{
+#if RAFTSIM_HAS_LIVE_SOLVER
+    FString Error;
+    TUniquePtr<FRaftSimLiveWaterWindow> Candidate =
+        FRaftSimLiveWaterWindow::CreateFromCookedFields(
+            ResolveRepoRelativePath(CookedFieldsManifestDir), BandId,
+            WindowCenterM, WindowExtentM, RoughnessManning, Error,
+            /*bRecenterHydraulicCrux=*/false);
+    if (!Candidate.IsValid())
+    {
+        UE_LOG(
+            LogTemp, Error,
+            TEXT("RaftSim moving river window '%s' failed to load from %s: %s"),
+            *BandId, *CookedFieldsManifestDir, *Error);
+        Status = ERaftSimWaterRuntimeStatus::Faulted;
+        return false;
+    }
+
+    LastHandoffTransferredCellCount = 0;
+    bLastHandoffPreservedState = false;
+    if (LiveWindow.IsValid())
+    {
+        LastHandoffTransferredCellCount = Candidate->TransferOverlapStateFrom(*LiveWindow);
+        if (LastHandoffTransferredCellCount <= 0)
+        {
+            UE_LOG(
+                LogTemp, Error,
+                TEXT("RaftSim rejected non-overlapping moving-window handoff for '%s'"),
+                *BandId);
+            return false;
+        }
+        ++MovingWindowHandoffCount;
+        bLastHandoffPreservedState = true;
+    }
+    LiveWindow = MoveTemp(Candidate);
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized ||
+        Status == ERaftSimWaterRuntimeStatus::Faulted)
+    {
+        Status = ERaftSimWaterRuntimeStatus::ScenarioBound;
+    }
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool URaftSimWaterRuntimeAdapter::GetLiveWindowStats(FRaftSimWaterLiveWindowStats& OutStats) const
 {
     OutStats = FRaftSimWaterLiveWindowStats();
@@ -268,6 +324,9 @@ bool URaftSimWaterRuntimeAdapter::GetLiveWindowStats(FRaftSimWaterLiveWindowStat
         OutStats.SeedWetFraction = static_cast<float>(LiveWindow->SeedWetFraction());
         OutStats.bHasNonFinite = LiveWindow->HasNonFiniteState();
         OutStats.SimTimeSeconds = static_cast<float>(LiveWindow->SimTimeSeconds());
+        OutStats.LastHandoffTransferredCellCount = LastHandoffTransferredCellCount;
+        OutStats.MovingWindowHandoffCount = MovingWindowHandoffCount;
+        OutStats.bLastHandoffPreservedState = bLastHandoffPreservedState;
         return true;
     }
 #endif

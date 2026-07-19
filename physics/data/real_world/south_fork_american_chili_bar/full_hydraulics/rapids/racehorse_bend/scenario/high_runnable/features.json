@@ -1,0 +1,114 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2030.4671065784737,
+        "y": -0.5979972180440085
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "low_nuisance",
+        "display_name": "Entry wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_wave_train"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.176,
+      "center": {
+        "x": 2088.0701806116604,
+        "y": -12.558877643180725
+      },
+      "kind": "lateral",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "lateral",
+        "consequence_class": "flip_risk",
+        "display_name": "Right-wall lateral",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "right_wall_lateral"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2105.5819885761957,
+        "y": -11.130517873563434
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "wall",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Up-tilted slate cliff",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "slate_cliff_wall"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2170.120029296247,
+        "y": -1.3871510418567694
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Center exit line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "center_exit_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2156.246105771528,
+        "y": 12.429397363168487
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "recovery_pool",
+        "consequence_class": "low_nuisance",
+        "display_name": "Big left eddy below",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "subfeature_id": "big_left_eddy_below"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

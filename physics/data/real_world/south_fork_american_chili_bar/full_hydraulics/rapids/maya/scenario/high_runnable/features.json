@@ -1,0 +1,114 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2413.938527324856,
+        "y": -11.098076145085964
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Right-side bottom drop",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "right_bottom_drop_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2417.732347664063,
+        "y": 11.115952210426293
+      },
+      "kind": "ledge",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "ledge",
+        "consequence_class": "swim_risk",
+        "display_name": "Left ledge drop",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "left_ledge_drop"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2427.9966467089757,
+        "y": 0.8485391211808984
+      },
+      "kind": "wave_train",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "wave",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Maya surf wave",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "maya_surf_wave"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2404.292902196062,
+        "y": 10.509161968499667
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "eddy_line",
+        "consequence_class": "low_nuisance",
+        "display_name": "Flanking eddies",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "flanking_eddies"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2332.1334654877087,
+        "y": -13.321887650966126
+      },
+      "kind": "shallow",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "sneak_line",
+        "consequence_class": "low_nuisance",
+        "display_name": "Right sneak line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "subfeature_id": "right_sneak_line"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

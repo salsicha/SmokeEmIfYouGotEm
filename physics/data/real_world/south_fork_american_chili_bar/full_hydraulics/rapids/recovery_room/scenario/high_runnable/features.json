@@ -1,0 +1,70 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30170.77250743867,
+        "y": -0.35808224285908086
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Little Big Hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "little_big_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30260.502236016728,
+        "y": 13.125980342439375
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "low_nuisance",
+        "display_name": "Center-left wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "center_left_wave_train"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30335.549659385757,
+        "y": -0.442385462681387
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Reservoir-stage bottom hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "reservoir_stage_bottom_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    }
+  ]
+}

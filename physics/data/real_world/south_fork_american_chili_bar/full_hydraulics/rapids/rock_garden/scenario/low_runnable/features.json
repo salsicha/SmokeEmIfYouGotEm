@@ -1,0 +1,48 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2723.5360455823015,
+        "y": 1.6176930432249077
+      },
+      "kind": "rock",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "swim_risk",
+        "display_name": "Boulder maze bed",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "boulder_maze_bed"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 2650.297165287638,
+        "y": 12.717088563142333
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "low_nuisance",
+        "display_name": "Low-water far-left line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "low_water_far_left_line"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

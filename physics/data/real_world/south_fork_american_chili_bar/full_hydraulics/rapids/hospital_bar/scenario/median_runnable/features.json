@@ -1,0 +1,114 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29866.694701037373,
+        "y": 1.3000233711907696
+      },
+      "kind": "rock",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "swim_risk",
+        "display_name": "Entry boulder bar",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_boulder_bar"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29927.692908359928,
+        "y": -8.553942979484264
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Right fast channel",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "right_fast_channel"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30004.35487579873,
+        "y": -6.884991453742785
+      },
+      "kind": "hole",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "flip_risk",
+        "display_name": "Diagonal hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "diagonal_hole"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30000.0806749485,
+        "y": 8.057174018639358
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Catchers Mitt rocks",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "subfeature_id": "catchers_mitt_rocks"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 30000.577653360066,
+        "y": 6.335086674083689
+      },
+      "kind": "shallow",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "sneak_line",
+        "consequence_class": "swim_risk",
+        "display_name": "Left dry line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "subfeature_id": "left_dry_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    }
+  ]
+}

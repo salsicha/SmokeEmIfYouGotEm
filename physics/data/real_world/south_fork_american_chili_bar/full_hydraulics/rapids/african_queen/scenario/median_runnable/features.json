@@ -1,0 +1,114 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 3155.424102479216,
+        "y": -1.568968613531666
+      },
+      "kind": "rock",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "island",
+        "consequence_class": "swim_risk",
+        "display_name": "Willow island complex",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "willow_island_complex"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 3135.4392961585895,
+        "y": -10.729479369956714
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Right-channel main line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "subfeature_id": "right_channel_main_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 3289.6510557077386,
+        "y": -9.792428239279827
+      },
+      "kind": "shallow",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "shelf",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Right-channel shallow trap",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "right_channel_end_shallow_trap"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 3135.110556216461,
+        "y": 8.970604540619975
+      },
+      "kind": "ledge",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "ledge",
+        "consequence_class": "swim_risk",
+        "display_name": "Left one-foot falls route",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "left_one_foot_falls"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 3294.748699149515,
+        "y": -1.6306237558905556
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave",
+        "consequence_class": "low_nuisance",
+        "display_name": "Second-island waves",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "second_island_waves"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

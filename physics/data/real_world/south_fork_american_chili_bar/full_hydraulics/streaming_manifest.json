@@ -1,0 +1,670 @@
+{
+  "coverage": {
+    "continuous": true,
+    "no_station_gaps": true,
+    "reach_end_m": 49077.732
+  },
+  "coverage_segments": [
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        0.0,
+        400.0
+      ],
+      "window_id": "south_fork_chili_bar_hole_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        400.0,
+        765.606
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        765.606,
+        1165.606
+      ],
+      "window_id": "south_fork_meat_grinder_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        1165.606,
+        1892.147
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        1892.147,
+        2292.147
+      ],
+      "window_id": "south_fork_racehorse_bend_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        2214.016,
+        2614.016
+      ],
+      "window_id": "south_fork_maya_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        2535.885,
+        2935.885
+      ],
+      "window_id": "south_fork_rock_garden_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        2935.885,
+        3018.688
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        3018.688,
+        3418.688
+      ],
+      "window_id": "south_fork_african_queen_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        3418.688,
+        4788.966
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        4788.966,
+        5188.966
+      ],
+      "window_id": "south_fork_triple_threat_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        5188.966,
+        8168.589
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        8168.589,
+        8568.589
+      ],
+      "window_id": "south_fork_troublemaker_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        8568.589,
+        25227.635
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        25227.635,
+        25627.635
+      ],
+      "window_id": "south_fork_fowler_s_rock_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        25627.635,
+        25871.373
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        25871.373,
+        26271.373
+      ],
+      "window_id": "south_fork_upper_haystack_canyon_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        26271.373,
+        26676.045
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        26676.045,
+        27076.045
+      ],
+      "window_id": "south_fork_lost_hat_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        26997.914,
+        27397.914
+      ],
+      "window_id": "south_fork_satan_s_cesspool_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        27158.848,
+        27558.848
+      ],
+      "window_id": "south_fork_son_of_satan_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        27558.848,
+        27802.586
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        27802.586,
+        28202.586
+      ],
+      "window_id": "south_fork_scissors_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        28124.454,
+        28524.454
+      ],
+      "window_id": "south_fork_lower_haystack_canyon_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        28524.454,
+        29090.061
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        29090.061,
+        29490.061
+      ],
+      "window_id": "south_fork_bouncing_rock_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        29411.93,
+        29811.93
+      ],
+      "window_id": "south_fork_pre_op_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        29733.798,
+        30133.798
+      ],
+      "window_id": "south_fork_hospital_bar_live_window"
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        30055.667,
+        30455.667
+      ],
+      "window_id": "south_fork_recovery_room_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        30455.667,
+        30860.339
+      ]
+    },
+    {
+      "segment_kind": "named_rapid_cooked_window",
+      "station_range_m": [
+        30860.339,
+        31260.339
+      ],
+      "window_id": "south_fork_surprise_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+      "seed_source": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
+      "segment_kind": "procedural_transit_live_window",
+      "station_range_m": [
+        31260.339,
+        49077.732
+      ]
+    }
+  ],
+  "full_reach_transit_seed": {
+    "authority": "procedural_transit_initial_condition",
+    "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+    "flow_bands": [
+      "low_runnable",
+      "median_runnable",
+      "high_runnable"
+    ],
+    "sha256": "26f6cf2b18abf97178224f241849878f17cd285b3c2b961a78daa5012fc658bc"
+  },
+  "generated_on": "2026-07-19",
+  "handoff_contract": {
+    "adapter_simulation_clock_continuous": true,
+    "cut_edges": "transmissive",
+    "full_window_edges": "authored_inflow_outflow_and_bank_boundaries",
+    "handoff_mode": "instant_overlap_state_transfer_at_crop_swap",
+    "old_and_new_windows_step_during_handoff": false,
+    "overlap_depth_and_velocity_continuous": true,
+    "overlap_state_transferred": true,
+    "raft_and_gameplay_state_reset": false,
+    "runtime_api": "URaftSimWaterRuntimeAdapter.ConfigureMovingRiverWindow"
+  },
+  "not_for_navigation": true,
+  "rapid_window_count": 20,
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.moving_water_streaming.v1",
+  "station_range_m": [
+    0.0,
+    49077.732
+  ],
+  "status": "full_reach_moving_water_streaming_ready",
+  "windows": [
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/chili_bar_hole/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Chili Bar Hole",
+      "rapid_order": 1,
+      "state_transfer_required": true,
+      "station_range_m": [
+        0.0,
+        400.0
+      ],
+      "window_id": "south_fork_chili_bar_hole_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/meat_grinder/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Meat Grinder",
+      "rapid_order": 2,
+      "state_transfer_required": true,
+      "station_range_m": [
+        765.6064,
+        1165.6064000000001
+      ],
+      "window_id": "south_fork_meat_grinder_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/racehorse_bend/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Racehorse Bend",
+      "rapid_order": 3,
+      "state_transfer_required": true,
+      "station_range_m": [
+        1892.1471999999999,
+        2292.1472
+      ],
+      "window_id": "south_fork_racehorse_bend_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/maya/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Maya",
+      "rapid_order": 4,
+      "state_transfer_required": true,
+      "station_range_m": [
+        2214.016,
+        2614.016
+      ],
+      "window_id": "south_fork_maya_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/rock_garden/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Rock Garden",
+      "rapid_order": 5,
+      "state_transfer_required": true,
+      "station_range_m": [
+        2535.8848,
+        2935.8848
+      ],
+      "window_id": "south_fork_rock_garden_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/african_queen/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "African Queen",
+      "rapid_order": 6,
+      "state_transfer_required": true,
+      "station_range_m": [
+        3018.688,
+        3418.688
+      ],
+      "window_id": "south_fork_african_queen_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/triple_threat/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Triple Threat",
+      "rapid_order": 7,
+      "state_transfer_required": true,
+      "station_range_m": [
+        4788.9664,
+        5188.9664
+      ],
+      "window_id": "south_fork_triple_threat_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/troublemaker/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Troublemaker",
+      "rapid_order": 8,
+      "state_transfer_required": true,
+      "station_range_m": [
+        8168.5887999999995,
+        8568.5888
+      ],
+      "window_id": "south_fork_troublemaker_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/fowler_s_rock/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Fowler's Rock",
+      "rapid_order": 9,
+      "state_transfer_required": true,
+      "station_range_m": [
+        25227.6352,
+        25627.6352
+      ],
+      "window_id": "south_fork_fowler_s_rock_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/upper_haystack_canyon/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Upper Haystack Canyon",
+      "rapid_order": 10,
+      "state_transfer_required": true,
+      "station_range_m": [
+        25871.3728,
+        26271.3728
+      ],
+      "window_id": "south_fork_upper_haystack_canyon_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/lost_hat/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Lost Hat",
+      "rapid_order": 11,
+      "state_transfer_required": true,
+      "station_range_m": [
+        26676.0448,
+        27076.0448
+      ],
+      "window_id": "south_fork_lost_hat_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/satan_s_cesspool/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Satan's Cesspool",
+      "rapid_order": 12,
+      "state_transfer_required": true,
+      "station_range_m": [
+        26997.9136,
+        27397.9136
+      ],
+      "window_id": "south_fork_satan_s_cesspool_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/son_of_satan/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Son of Satan",
+      "rapid_order": 13,
+      "state_transfer_required": true,
+      "station_range_m": [
+        27158.848,
+        27558.848
+      ],
+      "window_id": "south_fork_son_of_satan_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/scissors/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Scissors",
+      "rapid_order": 14,
+      "state_transfer_required": true,
+      "station_range_m": [
+        27802.5856,
+        28202.5856
+      ],
+      "window_id": "south_fork_scissors_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/lower_haystack_canyon/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Lower Haystack Canyon",
+      "rapid_order": 15,
+      "state_transfer_required": true,
+      "station_range_m": [
+        28124.4544,
+        28524.4544
+      ],
+      "window_id": "south_fork_lower_haystack_canyon_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/bouncing_rock/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Bouncing Rock",
+      "rapid_order": 16,
+      "state_transfer_required": true,
+      "station_range_m": [
+        29090.0608,
+        29490.0608
+      ],
+      "window_id": "south_fork_bouncing_rock_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/pre_op/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Pre-Op",
+      "rapid_order": 17,
+      "state_transfer_required": true,
+      "station_range_m": [
+        29411.9296,
+        29811.9296
+      ],
+      "window_id": "south_fork_pre_op_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/hospital_bar/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Hospital Bar",
+      "rapid_order": 18,
+      "state_transfer_required": true,
+      "station_range_m": [
+        29733.7984,
+        30133.7984
+      ],
+      "window_id": "south_fork_hospital_bar_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/recovery_room/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Recovery Room",
+      "rapid_order": 19,
+      "state_transfer_required": true,
+      "station_range_m": [
+        30055.6672,
+        30455.6672
+      ],
+      "window_id": "south_fork_recovery_room_live_window"
+    },
+    {
+      "cooked_fields_manifest": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/surprise/cooked/manifest.json",
+      "flow_bands": [
+        "low_runnable",
+        "median_runnable",
+        "high_runnable"
+      ],
+      "handoff_blend_distance_m": 64.0,
+      "preload_distance_m": 96.0,
+      "rapid_name": "Surprise",
+      "rapid_order": 20,
+      "state_transfer_required": true,
+      "station_range_m": [
+        30860.3392,
+        31260.3392
+      ],
+      "window_id": "south_fork_surprise_live_window"
+    }
+  ]
+}

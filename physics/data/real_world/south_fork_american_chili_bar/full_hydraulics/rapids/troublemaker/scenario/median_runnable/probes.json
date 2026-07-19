@@ -1,0 +1,51 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 8176.5887999999995,
+        "y": 0.0
+      },
+      "probe_id": "entry"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 8368.5888,
+        "y": 0.0
+      },
+      "probe_id": "rapid_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 8560.5888,
+        "y": 0.0
+      },
+      "probe_id": "exit"
+    },
+    {
+      "kind": "cross_section",
+      "length": 80.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 8368.5888,
+        "y": 0.0
+      },
+      "probe_id": "rapid_cross_section"
+    }
+  ]
+}

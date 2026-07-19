@@ -1,0 +1,92 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29283.645410853245,
+        "y": -9.705833573121527
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Bouncing Rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "bouncing_rock_boulder"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29299.11366180485,
+        "y": 1.5700425737467691
+      },
+      "kind": "hole",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "flip_risk",
+        "display_name": "Main flippy hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "main_flippy_hole"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29302.684290834288,
+        "y": 12.786737353554155
+      },
+      "kind": "shallow",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "sneak_line",
+        "consequence_class": "swim_risk",
+        "display_name": "Left sneak options",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "left_sneak_lines"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29368.029791526395,
+        "y": 0.7810258098833787
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave",
+        "consequence_class": "low_nuisance",
+        "display_name": "Exit wave train at Weber Creek",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "exit_wave_train_weber_creek"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

@@ -92,4 +92,137 @@ bool FRaftSimRiverWindowLoadsTest::RunTest(const FString&)
 #endif // RAFTSIM_HAS_LIVE_SOLVER
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimMovingRiverWindowHandoffTest,
+    "RaftSim.M3.MovingRiverWindowPreservesOverlap",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+        EAutomationTestFlags::ProductFilter)
+
+bool FRaftSimMovingRiverWindowHandoffTest::RunTest(const FString&)
+{
+#if !RAFTSIM_HAS_LIVE_SOLVER
+    AddError(TEXT("Moving river windows require the live solver library"));
+    return false;
+#else
+    URaftSimWaterRuntimeAdapter* Adapter = NewObject<URaftSimWaterRuntimeAdapter>();
+    FRaftSimWaterRuntimeConfig Config;
+    Config.bRequireAcceptedReportManifest = false;
+    Config.bEnableDeterministicCapture = false;
+    Adapter->Configure(Config);
+
+    const FString CookedFieldsDir = TEXT(
+        "physics/data/real_world/south_fork_american_chili_bar/"
+        "full_hydraulics/rapids/chili_bar_hole/cooked");
+    if (!Adapter->ConfigureMovingRiverWindow(
+            CookedFieldsDir, TEXT("median_runnable"),
+            FVector2D(120.0, 0.0), FVector2D(240.0, 80.0)))
+    {
+        AddError(TEXT("initial globally stationed river crop failed"));
+        return false;
+    }
+    for (int32 StepIndex = 0; StepIndex < 30; ++StepIndex)
+    {
+        if (!Adapter->StepWater(1.0f / 60.0f))
+        {
+            AddError(TEXT("pre-handoff water step failed"));
+            return false;
+        }
+    }
+
+    FRaftSimWaterSample Before;
+    const FVector OverlapSamplePosition(16000.0f, 0.0f, 0.0f);
+    TestTrue(
+        TEXT("pre-handoff overlap sample succeeds"),
+        Adapter->SampleWaterAtWorldPosition(OverlapSamplePosition, Before));
+    const float AdapterTimeBefore = Adapter->GetSimTimeSeconds();
+
+    if (!Adapter->ConfigureMovingRiverWindow(
+            CookedFieldsDir, TEXT("median_runnable"),
+            FVector2D(200.0, 0.0), FVector2D(240.0, 80.0)))
+    {
+        AddError(TEXT("overlapping downstream river crop handoff failed"));
+        return false;
+    }
+
+    FRaftSimWaterSample After;
+    TestTrue(
+        TEXT("post-handoff overlap sample succeeds"),
+        Adapter->SampleWaterAtWorldPosition(OverlapSamplePosition, After));
+    TestEqual(
+        TEXT("adapter simulation clock does not reset"),
+        Adapter->GetSimTimeSeconds(), AdapterTimeBefore);
+    TestTrue(
+        TEXT("overlap depth is preserved"),
+        FMath::IsNearlyEqual(After.DepthMeters, Before.DepthMeters, 1.0e-4f));
+    TestTrue(
+        TEXT("overlap downstream velocity is preserved"),
+        FMath::IsNearlyEqual(
+            After.VelocityMetersPerSecond.X,
+            Before.VelocityMetersPerSecond.X, 1.0e-4f));
+    TestTrue(
+        TEXT("overlap cross-stream velocity is preserved"),
+        FMath::IsNearlyEqual(
+            After.VelocityMetersPerSecond.Y,
+            Before.VelocityMetersPerSecond.Y, 1.0e-4f));
+
+    FRaftSimWaterLiveWindowStats Stats;
+    TestTrue(TEXT("moving-window stats are available"), Adapter->GetLiveWindowStats(Stats));
+    TestTrue(TEXT("handoff transferred cells"), Stats.LastHandoffTransferredCellCount > 0);
+    TestEqual(TEXT("one moving-window handoff recorded"), Stats.MovingWindowHandoffCount, 1);
+    TestTrue(TEXT("handoff reports preserved state"), Stats.bLastHandoffPreservedState);
+    TestTrue(
+        TEXT("solver simulation clock is preserved"),
+        FMath::IsNearlyEqual(Stats.SimTimeSeconds, AdapterTimeBefore, 1.0e-5f));
+    TestFalse(TEXT("handoff state stays finite"), Stats.bHasNonFinite);
+
+    TestTrue(TEXT("post-handoff water step succeeds"), Adapter->StepWater(1.0f / 60.0f));
+    TestTrue(TEXT("post-handoff stats are available"), Adapter->GetLiveWindowStats(Stats));
+    TestFalse(TEXT("post-handoff step stays finite"), Stats.bHasNonFinite);
+    return true;
+#endif // RAFTSIM_HAS_LIVE_SOLVER
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(
+    FRaftSimFullReachTransitWindowTest,
+    "RaftSim.M3.FullReachTransitWindowLoadsAndMoves",
+    EAutomationTestFlags::EditorContext | EAutomationTestFlags::ClientContext |
+        EAutomationTestFlags::ProductFilter)
+
+bool FRaftSimFullReachTransitWindowTest::RunTest(const FString&)
+{
+#if !RAFTSIM_HAS_LIVE_SOLVER
+    AddError(TEXT("Full-reach transit windows require the live solver library"));
+    return false;
+#else
+    URaftSimWaterRuntimeAdapter* Adapter = NewObject<URaftSimWaterRuntimeAdapter>();
+    FRaftSimWaterRuntimeConfig Config;
+    Config.bRequireAcceptedReportManifest = false;
+    Config.bEnableDeterministicCapture = false;
+    Adapter->Configure(Config);
+
+    const FString TransitFieldsDir = TEXT(
+        "physics/data/real_world/south_fork_american_chili_bar/"
+        "full_hydraulics/full_reach_transit_seed");
+    TestTrue(
+        TEXT("full-reach transit crop loads"),
+        Adapter->ConfigureMovingRiverWindow(
+            TransitFieldsDir, TEXT("median_runnable"),
+            FVector2D(5000.0, 0.0), FVector2D(240.0, 80.0)));
+    TestTrue(TEXT("transit crop steps genuine solver"), Adapter->StepWater(1.0f / 60.0f));
+    TestTrue(
+        TEXT("downstream transit crop transfers overlap"),
+        Adapter->ConfigureMovingRiverWindow(
+            TransitFieldsDir, TEXT("median_runnable"),
+            FVector2D(5080.0, 0.0), FVector2D(240.0, 80.0)));
+
+    FRaftSimWaterLiveWindowStats Stats;
+    TestTrue(TEXT("transit stats are available"), Adapter->GetLiveWindowStats(Stats));
+    TestTrue(TEXT("transit handoff moved cells"), Stats.LastHandoffTransferredCellCount > 0);
+    TestTrue(TEXT("transit handoff preserved state"), Stats.bLastHandoffPreservedState);
+    TestFalse(TEXT("transit handoff remains finite"), Stats.bHasNonFinite);
+    TestTrue(TEXT("transit water volume remains positive"), Stats.TotalWaterVolumeM3 > 0.0f);
+    return true;
+#endif // RAFTSIM_HAS_LIVE_SOLVER
+}
+
 #endif // WITH_AUTOMATION_TESTS

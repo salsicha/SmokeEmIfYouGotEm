@@ -1,0 +1,48 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26076.798253454122,
+        "y": 0.2557836468927057
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "low_nuisance",
+        "display_name": "Haystack wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "haystack_wave_train"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 26155.208908827462,
+        "y": -1.5770160927383732
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "recovery_pool",
+        "consequence_class": "low_nuisance",
+        "display_name": "Exit pool before Lost Hat",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "exit_pool_before_lost_hat"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

@@ -66,7 +66,7 @@ remain green, and the milestone commit is pushed.
 **Exit:** the entire 49.1 km reach has continuous terrain, channel, collision, material
 masks, and source-vs-infill provenance with no voids or unbounded discontinuities.
 
-### M3 — Full South Fork hydraulics and named rapids
+### M3 — Full South Fork hydraulics and named rapids *(complete July 19, 2026)*
 
 - Author and cook all 20 named rapids at 900, 1,600, and 3,000 cfs.
 - Add moving live-water windows, robust inflow/outflow forcing, wet/dry boundaries, and
@@ -170,9 +170,9 @@ path is verified, and the completion goal can be marked complete.
 | Milestone | State | Commit | Verification |
 |---|---|---|---|
 | M1 Flexible raft/contact slice | Complete | `2b3be122` | UE build; M1 1/1; river maps 5/5; physics 1,017/3 |
-| M2 Procedural geography | Complete | This milestone commit | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
-| M3 South Fork hydraulics | Next | — | — |
-| M4 Photoreal environment | Pending | — | — |
+| M2 Procedural geography | Complete | `6b44af51` | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
+| M3 South Fork hydraulics | Complete | This milestone commit | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
+| M4 Photoreal environment | Next | — | — |
 | M5 Characters/raft/rescue | Pending | — | — |
 | M6 Game/progression | Pending | — | — |
 | M7 Audio/presentation | Pending | — | — |
@@ -227,3 +227,34 @@ path is verified, and the completion goal can be marked complete.
   hashes unchanged; focused geography/source/stitching/stationing tests passed 19/19;
   Unreal Editor Mac Development built successfully; the full physics/content suite
   passed 1,021 tests with 3 expected optional-dependency path skips in 10m18s.
+
+### July 19, 2026 — M3 complete
+
+- Authored all 20 named South Fork rapid windows from the catalog's 105 guide-facing
+  subfeatures, M2 canonical geography, and deterministic interpreted bed controls.
+  Cooked every rapid through the genuine first-party order-2 HLL finite-volume solver
+  at 900, 1,600, and 3,000 cfs with fixture calibrations and reference playback off.
+- Rejected two intermediate full-matrix runs rather than weakening validation. The
+  investigation found an over-constrained inlet and then source-DEM depressions outside
+  bankfull width being flooded as false side channels. The final conditioning preserves
+  M2 bathymetry in-channel, raises only out-of-channel banks, and restores authored
+  stage-plus-velocity inlet behavior in the C++ solver.
+- All 60/60 final combinations are finite and pass wet-area, nonnegative-depth, bounded
+  velocity, bounded volume, positive inlet/outlet, bounded rapid discharge response,
+  and every catalog subfeature envelope. Peak speed spans 2.29–14.28 m/s, final/initial
+  volume 0.982–0.993, and solver mass drift remains below 1.85 percent.
+- Added per-rapid scout eddies, three flow-specific lines, hazards, entry/exit
+  checkpoints, rescue zones, and outcome envelopes. Added a deterministic 49,077.732 m
+  procedural transit seed at all three flows so the gaps between named cooks still run
+  through the genuine live solver; its arrays reproduced byte-for-byte across three
+  generations and remain explicitly inferred/not for navigation.
+- Added globally stationed Unreal moving-water crops, authored full-edge inflow/outflow
+  parsing, transmissive cut edges, overlap depth/velocity transfer, solver-clock
+  preservation, handoff telemetry, and rejection of non-overlapping resets. Corrected
+  out-of-window sampling and last-cell bilinear interpolation while retaining legacy
+  hydraulic-crux recentering for fixed rapid maps.
+- Verification: standalone C++ solver build/state-replacement test passed; Unreal Editor
+  Mac Development built successfully; both `RaftSim.M3` automation gates passed against
+  named-rapid and full-reach transit data; focused M3/editor tests passed 8/8; repository
+  guards passed; full physics/content suite passed 1,026 tests with 3 expected
+  optional-dependency-path skips in 13m59s.

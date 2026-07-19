@@ -60,6 +60,14 @@ public:
     void step(double dt);
     std::vector<Frame> run(int steps, int frame_interval);
 
+    /**
+     * Replace the live state without recreating the solver.  Moving gameplay
+     * windows use this to preserve overlapping water and simulation time
+     * during a handoff.  The replacement must match the scenario grid and be
+     * finite; derived state is recomputed before it becomes authoritative.
+     */
+    void replace_state(WaterState state, double time);
+
 private:
     Scenario scenario_;
     SolverConfig config_;
