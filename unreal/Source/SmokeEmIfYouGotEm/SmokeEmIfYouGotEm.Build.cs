@@ -21,8 +21,10 @@ public class SmokeEmIfYouGotEm : ModuleRules
             "RaftSimWater",
             "UMG",
             "EnhancedInput",
+            "InputCore",
             "RaftSimCrew",
             "RaftSimRiver",
+            "ProceduralMeshComponent",
             "Slate",
             "SlateCore"
         });

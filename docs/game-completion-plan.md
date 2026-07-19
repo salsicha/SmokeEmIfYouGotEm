@@ -78,7 +78,7 @@ masks, and source-vs-infill provenance with no voids or unbounded discontinuitie
 **Exit:** 60 rapid/flow combinations run without NaNs or mass blow-up and satisfy their
 feature/outcome envelopes; a complete descent crosses window boundaries seamlessly.
 
-### M4 — Continuous photoreal South Fork environment
+### M4 — Continuous photoreal South Fork environment *(complete July 19, 2026)*
 
 - Build the World Partition gameplay map with Landscape/Nanite terrain, HLOD, streaming,
   source-conditioned materials, wet banks, sediment, boulders, vegetation, roads,
@@ -105,7 +105,7 @@ the gameplay corridor, and passes automated artifact plus owner art/readability 
 **Exit:** all core guide commands and rescue paths work with final animation, and the
 raft's visible/contact response passes calibrated flip/wrap/pin fixtures and playtests.
 
-### M6 — Complete game modes and progression *(in progress)*
+### M6 — Complete game modes and progression *(complete July 19, 2026)*
 
 - Guided Descent career with sections, license tiers, medals, unlocks, stats, and full-run
   progression; Free Run; Training Eddy drills.
@@ -117,7 +117,7 @@ raft's visible/contact response passes calibrated flip/wrap/pin fixtures and pla
 **Exit:** a new player can learn, complete the campaign, unlock all content, recover from
 failures, and retain progress without editor/debug intervention.
 
-### M7 — Production audio, camera, and presentation polish
+### M7 — Production audio, camera, and presentation polish *(in progress)*
 
 - Layered MetaSounds for current, rocks, holes, waves, raft fabric, paddles, impacts,
   crew, rescue, canyon/riparian ambience, UI, and music; add occlusion and reverb zones.
@@ -173,9 +173,9 @@ path is verified, and the completion goal can be marked complete.
 | M2 Procedural geography | Complete | `6b44af51` | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
 | M3 South Fork hydraulics | Complete | `aa610a6c` | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
 | M4 Photoreal environment | Complete | `0032554d` | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
-| M5 Characters/raft/rescue | Complete | This milestone commit | UE build; M5 4/4; rendered rescue 1/1; P2/P3/crew safety green |
-| M6 Game/progression | In progress | — | Career, Free Run, Training Eddy, UI/save/accessibility pass next |
-| M7 Audio/presentation | Pending | — | — |
+| M5 Characters/raft/rescue | Complete | `3d08efaa` | UE build; M5 4/4; rendered rescue 1/1; P2/P3/crew safety green |
+| M6 Game/progression | Complete | This milestone commit | UE build; M6 5/5; isolated Metal menu/HUD; score/save and rescue regressions green |
+| M7 Audio/presentation | In progress | — | Audio, camera, weather, transitions, and presentation pass next |
 | M8 Validation/performance | Pending | — | — |
 | M9 Release candidates | Pending | — | — |
 | M10 Launch | Pending | — | — |
@@ -324,3 +324,37 @@ path is verified, and the completion goal can be marked complete.
   the Metal offscreen `RuntimeRescueLoop` passed 1/1 with no renderer ensure; P2 passed
   3/3, P3 passed 3/3, M1 passed 1/1, Milestone11 crew safety passed 1/1, and the focused
   flexible-raft Python suite passed 89/89.
+
+### July 19, 2026 — M6 complete
+
+- Added a version-3 migrated save/profile schema with Guided Descent, Free Run, and
+  Training Eddy modes; four continuous South Fork career sections plus the full
+  descent; license tiers, medals, unlocks, aggregate stats, best times, checkpoints,
+  settings, completed drills, and best-route ghosts. Free Run deliberately exposes all
+  maps without weakening the career unlock rules.
+- Built the complete runtime front end and in-run shell in programmatic UMG: mode and
+  scenario selection, briefings and locked states, keyboard/gamepad focus, settings,
+  assists, accessibility controls, credits/legal notice, status/progress/rescue HUD,
+  scouting, crew command wheel/hotkeys, subtitles, pause/restart/menu flows, paused photo
+  capture, and after-action route review. Saved keyboard overrides preserve gamepad
+  mappings, and shared gamepad buttons are context-dispatched instead of double-bound.
+- Added measured Training Eddy drills for paddle/stop calls, scouting/high-side response,
+  and a real swimmer recovery. Section sessions restore exact saved transforms and
+  seed a fresh live-water window before ordinary streaming resumes; career scoring now
+  follows the curved river station authority rather than world +X.
+- Added a non-colliding best-route ribbon and persistent route samples, and retained the
+  source/procedural distinction in the scout board: inferred geography is explicitly
+  an amber gameplay cue and never navigation guidance.
+- Rendered QA exposed two defects that headless tests did not: constructing UMG only in
+  `NativeConstruct` left empty widgets, and auto-size plus auto-wrap collapsed dynamic
+  training text on portrait displays. Both widgets now build in `RebuildWidget` and use
+  explicit wrapped text regions. The accepted captures are
+  `Saved/Screenshots/MacEditor/M6_MainMenuWidget.png` and
+  `Saved/Screenshots/MacEditor/M6_GameShellWidget.png`.
+- Verification: Unreal Editor Mac Development build succeeded; the complete
+  `RaftSim.M6` suite passed 5/5, including a real full-reach World Partition session;
+  isolated Metal offscreen menu and runtime-shell tests passed with legible captures;
+  `RaftSim.P3.RunScoresAndSaves` and `RaftSim.M5.RuntimeRescueLoop` passed. Combining
+  multiple rendered PIE fixtures in one editor process still trips an engine-internal
+  `SceneViewport` teardown assertion, so rendered fixtures remain isolated while the
+  complete suite is accepted under NullRHI.

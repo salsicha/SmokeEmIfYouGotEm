@@ -25,6 +25,10 @@ static const FName ReseatCrew(TEXT("ReseatCrew"));
 static const FName GuideCommandPushToTalk(TEXT("GuideCommandPushToTalk"));
 static const FName RecenterVR(TEXT("RecenterVR"));
 static const FName Pause(TEXT("Pause"));
+static const FName CommandWheel(TEXT("CommandWheel"));
+static const FName Scout(TEXT("Scout"));
+static const FName PhotoMode(TEXT("PhotoMode"));
+static const FName AfterActionReview(TEXT("AfterActionReview"));
 static const FName ReplayScrub(TEXT("ReplayScrub"));
 static const FName DebugOverlayToggle(TEXT("DebugOverlayToggle"));
 }

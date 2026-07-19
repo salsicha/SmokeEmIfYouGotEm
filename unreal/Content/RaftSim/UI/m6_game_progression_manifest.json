@@ -1,0 +1,84 @@
+{
+  "schema": "raftsim.m6.game_progression.v1",
+  "status": "implemented",
+  "save_version": 3,
+  "game_modes": {
+    "guided_descent": {
+      "south_fork_sections": 4,
+      "full_descent": true,
+      "license_tiers": ["trainee", "trip_leader", "senior_guide", "expedition_guide"],
+      "medals": ["bronze", "silver", "gold"],
+      "persistent_fields": [
+        "attempts",
+        "completions",
+        "best_scores",
+        "best_time",
+        "furthest_station",
+        "checkpoint_transform",
+        "best_ghost_route",
+        "aggregate_stats"
+      ]
+    },
+    "free_run": {
+      "ignores_career_locks": true,
+      "available_maps": 7
+    },
+    "training_eddy": {
+      "measured_drills": [
+        "forward_stop_and_brace",
+        "eddy_scout_and_high_side",
+        "swimmer_recovery"
+      ]
+    }
+  },
+  "runtime_shell": [
+    "scenario_briefing_and_locked_state",
+    "scout_board",
+    "command_wheel_and_hotkeys",
+    "run_hud_and_subtitles",
+    "rescue_feedback",
+    "pause_restart_and_menu",
+    "photo_mode_and_capture",
+    "after_action_review",
+    "best_route_ghost",
+    "credits_and_legal_notice"
+  ],
+  "accessibility": [
+    "ui_and_text_scale",
+    "color_safe_cues",
+    "shake_and_vignette_controls",
+    "hold_or_toggle_command_wheel",
+    "authentic_guided_relaxed_assists",
+    "subtitles_and_captions",
+    "keyboard_and_gamepad_navigation",
+    "persisted_runtime_key_rebinding"
+  ],
+  "geography_notice": "South Fork terrain and hydraulics include explicitly labeled deterministic procedural infill and are not for navigation.",
+  "source_authority": [
+    "docs/game-completion-plan.md",
+    "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/streaming_manifest.json",
+    "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+    "NOTICE.md",
+    "LICENSE-CONTENT.md"
+  ],
+  "automation": [
+    "RaftSim.M6.ProgressionMigration",
+    "RaftSim.M6.CareerCatalog",
+    "RaftSim.M6.RuntimeShell",
+    "RaftSim.M6.FullReachSession",
+    "RaftSim.M6.MainMenuRender",
+    "RaftSim.P3.RunScoresAndSaves",
+    "RaftSim.M5.RuntimeRescueLoop"
+  ],
+  "rendered_evidence": [
+    "Saved/Screenshots/MacEditor/M6_MainMenuWidget.png",
+    "Saved/Screenshots/MacEditor/M6_GameShellWidget.png"
+  ],
+  "honesty": {
+    "ghost_represents_prior_player_route": true,
+    "route_assist_is_not_navigation_guidance": true,
+    "free_run_bonus_slices_are_not_part_of_south_fork_1_0_campaign": true,
+    "photo_mode_is_paused_camera_look_and_screenshot_capture": true
+  }
+}

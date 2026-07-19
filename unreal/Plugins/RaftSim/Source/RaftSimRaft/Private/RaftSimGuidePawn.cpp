@@ -254,6 +254,51 @@ bool ARaftSimGuidePawn::HasCompleteRescueInputBindings() const
     return Bound.Num() == 4;
 }
 
+bool ARaftSimGuidePawn::ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey)
+{
+    if (!DefaultMappingContext || !NewKey.IsValid() || NewKey.IsGamepadKey())
+    {
+        return false;
+    }
+    UInputAction* Target = nullptr;
+    if (ActionId == TEXT("PaddleStroke")) Target = PaddleStrokeAction;
+    else if (ActionId == TEXT("PaddleDraw")) Target = PaddleDrawAction;
+    else if (ActionId == TEXT("HighSide")) Target = HighSideAction;
+    else if (ActionId == TEXT("RescueTargetSelect")) Target = RescueTargetSelectAction;
+    else if (ActionId == TEXT("RescueReachGrab")) Target = RescueReachAction;
+    else if (ActionId == TEXT("RescueThrowLine")) Target = RescueThrowLineAction;
+    else if (ActionId == TEXT("ReseatCrew")) Target = ReseatCrewAction;
+    if (Target == nullptr)
+    {
+        for (UInputAction* Action : GuideCommandActions)
+        {
+            if (Action != nullptr && Action->GetName().Contains(ActionId.ToString()))
+            {
+                Target = Action;
+                break;
+            }
+        }
+    }
+    if (Target == nullptr)
+    {
+        return false;
+    }
+    TArray<FKey> KeyboardKeys;
+    for (const FEnhancedActionKeyMapping& Mapping : DefaultMappingContext->GetMappings())
+    {
+        if (Mapping.Action == Target && !Mapping.Key.IsGamepadKey())
+        {
+            KeyboardKeys.AddUnique(Mapping.Key);
+        }
+    }
+    for (const FKey& OldKey : KeyboardKeys)
+    {
+        DefaultMappingContext->UnmapKey(Target, OldKey);
+    }
+    DefaultMappingContext->MapKey(Target, NewKey);
+    return true;
+}
+
 float ARaftSimGuidePawn::GetEffectiveMotionIntensity() const
 {
     const float BaseIntensity = FMath::Clamp(CameraSettings.MotionIntensity, 0.0f, 1.0f);

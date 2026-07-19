@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "InputCoreTypes.h"
 
 #include "RaftSimGuidePawn.generated.h"
 
@@ -148,6 +149,10 @@ public:
 
     UFUNCTION(BlueprintPure, Category = "RaftSim|Input")
     bool HasCompleteRescueInputBindings() const;
+
+    /** Apply a saved flat-screen key binding without removing gamepad parity. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Input")
+    bool ApplyRuntimeKeyBinding(FName ActionId, FKey NewKey);
 
 protected:
     float GetEffectiveMotionIntensity() const;

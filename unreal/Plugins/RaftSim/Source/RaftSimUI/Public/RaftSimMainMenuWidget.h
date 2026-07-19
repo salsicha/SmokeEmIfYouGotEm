@@ -2,6 +2,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "CoreMinimal.h"
+#include "RaftSimVerticalSliceFrontend.h"
 
 #include "RaftSimMainMenuWidget.generated.h"
 
@@ -10,9 +11,8 @@ class UTextBlock;
 class UVerticalBox;
 
 /**
- * Programmatic main menu (no Blueprint asset required): title plus
- * Enter Test Tank / Settings / Quit. A Blueprint skin can subclass this later;
- * all behavior stays in C++ so it is diffable and testable.
+ * Complete programmatic front end. It keeps every path keyboard/gamepad
+ * focusable and uses the versioned save as the single source of truth.
  */
 UCLASS()
 class RAFTSIMUI_API URaftSimMainMenuWidget : public UUserWidget
@@ -22,45 +22,83 @@ class RAFTSIMUI_API URaftSimMainMenuWidget : public UUserWidget
 public:
     virtual void NativeConstruct() override;
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Frontend")
+    ERaftSimGameMode GetSelectedMode() const { return SelectedMode; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Frontend")
+    FName GetSelectedScenarioId() const;
+
+    /** Focus target for keyboard/gamepad UI-only input. */
+    UWidget* GetDefaultFocusWidget() const;
+
 protected:
-    UFUNCTION()
-    void HandleEnterTestTank();
+    virtual TSharedRef<SWidget> RebuildWidget() override;
+    void BuildWidgetTree();
 
     UFUNCTION()
-    void HandleRunSouthFork();
+    void HandleStart();
     UFUNCTION()
-    void HandleRunColorado();
+    void HandleCycleMode();
     UFUNCTION()
-    void HandleRunPacuare();
+    void HandlePreviousScenario();
     UFUNCTION()
-    void HandleRunFutaleufu();
-    UFUNCTION()
-    void HandleRunChilko();
+    void HandleNextScenario();
 
     UFUNCTION()
-    void HandleToggleSettings();
+    void HandleToggleSubtitles();
+    UFUNCTION()
+    void HandleCycleUiScale();
+    UFUNCTION()
+    void HandleCycleColorCues();
+    UFUNCTION()
+    void HandleCycleMotion();
+    UFUNCTION()
+    void HandleCycleInteraction();
+    UFUNCTION()
+    void HandleCycleAssist();
+    UFUNCTION()
+    void HandleToggleGhostRoute();
+    UFUNCTION()
+    void HandleRebindPause();
+    UFUNCTION()
+    void HandleRestoreDefaults();
+    UFUNCTION()
+    void HandleCredits();
+    UFUNCTION()
+    void HandleLegal();
 
     UFUNCTION()
     void HandleQuit();
 
-    void OpenRiverLevel(FName LevelName);
+    void RefreshFromSave();
+    void SelectNextScenario(int32 Direction);
+    bool IsScenarioVisible(int32 Index) const;
     UButton* MakeMenuButton(UVerticalBox* Parent, const FText& Label, FName ClickHandlerName);
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> ModeText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> ScenarioText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> BriefingText;
+
+    UPROPERTY()
+    TObjectPtr<UTextBlock> ProfileText;
 
     UPROPERTY()
     TObjectPtr<UTextBlock> SettingsSummaryText;
 
-    /** Map opened by Training Eddy. */
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName TestTankLevelName = TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank");
+    UPROPERTY()
+    TObjectPtr<UTextBlock> InformationText;
 
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName SouthForkLevelName = TEXT("/Game/RaftSim/Maps/L_Troublemaker");
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName ColoradoLevelName = TEXT("/Game/RaftSim/Maps/L_Hance");
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName PacuareLevelName = TEXT("/Game/RaftSim/Maps/L_UpperHuacas");
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName FutaleufuLevelName = TEXT("/Game/RaftSim/Maps/L_Terminator");
-    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Frontend")
-    FName ChilkoLevelName = TEXT("/Game/RaftSim/Maps/L_LavaCanyon");
+    UPROPERTY()
+    TObjectPtr<UButton> StartButton;
+
+    TArray<FRaftSimCareerScenarioDefinition> ScenarioCatalog;
+    ERaftSimGameMode SelectedMode = ERaftSimGameMode::TrainingEddy;
+    int32 SelectedScenarioIndex = 0;
+    bool bModeInitialized = false;
+
 };

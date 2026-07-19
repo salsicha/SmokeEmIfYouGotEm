@@ -13,7 +13,10 @@ void ARaftSimFrontendPlayerController::BeginPlay()
     {
         MainMenuWidget->AddToViewport();
         FInputModeUIOnly InputMode;
-        InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
+        if (UWidget* FocusTarget = MainMenuWidget->GetDefaultFocusWidget())
+        {
+            InputMode.SetWidgetToFocus(FocusTarget->TakeWidget());
+        }
         SetInputMode(InputMode);
         SetShowMouseCursor(true);
     }
