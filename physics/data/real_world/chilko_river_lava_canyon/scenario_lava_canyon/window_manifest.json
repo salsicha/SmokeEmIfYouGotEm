@@ -1,0 +1,227 @@
+{
+  "adopted_axis_station_m": 9030.0,
+  "bed_parameters": {
+    "boulder_count": 26,
+    "boulder_crest_offset_max_m": -0.75,
+    "boulder_crest_offset_min_m": -1.25,
+    "boulder_radius_max_m": 3.2,
+    "boulder_radius_min_m": 1.6,
+    "boulder_seed": 20260718,
+    "broach_rock_crest_offset_m": -1.1,
+    "broach_rock_radius_m": 2.4,
+    "broach_rocks": [
+      [
+        250.0,
+        3.5
+      ],
+      [
+        300.0,
+        -4.0
+      ],
+      [
+        392.0,
+        2.0
+      ]
+    ],
+    "constriction_inner_half_width_m": 13.0,
+    "constriction_pool_offset_m": -2.5,
+    "constriction_throat_offset_m": -2.0,
+    "constriction_wall_crest_offset_m": 1.4,
+    "constriction_x": [
+      208.0,
+      356.0
+    ],
+    "entry_tongue_invert_offset_m": -1.2,
+    "entry_tongue_x": [
+      48.0,
+      128.0
+    ],
+    "entry_tongue_y": [
+      -8.0,
+      8.0
+    ],
+    "lateral_crest_offset_m": -0.35,
+    "lateral_end": [
+      340.0,
+      2.0
+    ],
+    "lateral_half_width_m": 3.4,
+    "lateral_start": [
+      320.0,
+      14.0
+    ],
+    "recovery_eddy_bar_crest_offset_m": 0.1,
+    "recovery_eddy_bar_x": [
+      496.0,
+      502.0
+    ],
+    "recovery_eddy_floor_offset_m": -1.1,
+    "recovery_eddy_x": [
+      500.0,
+      556.0
+    ],
+    "recovery_eddy_y": [
+      18.0,
+      30.0
+    ],
+    "rib_count": 18,
+    "rib_crest_offset_m": -1.55,
+    "rib_half_thickness_m": 2.6,
+    "rib_start_x": 150.0,
+    "rib_trough_offset_m": -2.0,
+    "rib_wavelength_m": 18.0,
+    "runout_wave_crest_offset_m": -1.6,
+    "runout_wave_half_width_m": 4.0,
+    "runout_wave_x": [
+      486.0,
+      508.0,
+      530.0,
+      552.0
+    ],
+    "runout_wave_y": [
+      -10.0,
+      10.0
+    ],
+    "train_half_width_m": 16.0,
+    "train_x": [
+      128.0,
+      468.0
+    ],
+    "wood_hazard_x": [
+      300.0,
+      360.0
+    ],
+    "wood_hazard_y": -33.0
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "adopted_station_descent_slope": 0.021861070131526123,
+    "adopted_station_descent_window_m": 600.0,
+    "adopted_station_search_band_m": [
+      2000.0,
+      15000.0
+    ],
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 8.0,
+    "bank_relief_cap_m": 30.0,
+    "centerline_smoothing_passes": 44,
+    "channel_half_width_m": 18.0,
+    "conditioned_max_mean_slope": 0.012,
+    "conditioned_profile_drop_m": 5.4850598494194855,
+    "continuous_wave_train_bed": "authored_periodic_rib_shelf_plus_constrictions_and_boulders_not_survey",
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 10.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "mean_slope_bound_applied": false,
+    "min_centerline_radius_m": 46.6582061189149,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 2.0,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
+    "raw_dem_floor_drop_m": 5.5410798896937195,
+    "terrain_source": "nrcan_mrdem30_dtm_30m_ground_sample_epsg4326_clip",
+    "unclamped_conditioned_drop_m": 5.4850598494194855
+  },
+  "flow_band_packages": {
+    "high_runnable": {
+      "package": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/high_runnable",
+      "scenario_id": "chilko_lava_canyon_c3_window_high_runnable",
+      "stage_east_m": 1099.1946642890048,
+      "stage_west_m": 1104.6797241384243,
+      "target_discharge_m3s": 142.6
+    },
+    "low_runnable": {
+      "package": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/low_runnable",
+      "scenario_id": "chilko_lava_canyon_c3_window_low_runnable",
+      "stage_east_m": 1098.4999703463286,
+      "stage_west_m": 1103.985030195748,
+      "target_discharge_m3s": 67.0
+    },
+    "median_runnable": {
+      "package": "physics/data/real_world/chilko_river_lava_canyon/scenario_lava_canyon/median_runnable",
+      "scenario_id": "chilko_lava_canyon_c3_window_median_runnable",
+      "stage_east_m": 1098.9086094526774,
+      "stage_west_m": 1104.393669302097,
+      "target_discharge_m3s": 105.0
+    }
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "adopted_station_descent_slope": 0.021861070131526123,
+    "anchor_lonlat": [
+      -124.08419491636039,
+      51.759902366515064
+    ],
+    "catalog_point_to_channel_snap_distance_m": 18.0,
+    "centerline_lonlat_first": [
+      -124.0883821450883,
+      51.75930831303029
+    ],
+    "centerline_lonlat_last": [
+      -124.08133365263247,
+      51.76197515469626
+    ],
+    "min_centerline_radius_m": 46.6582061189149
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 41,
+    "origin_x": 0.0,
+    "origin_y": -40.0
+  },
+  "honesty": {
+    "axis_alignment": "The window channel centerline was snapped to the DEM valley floor (18.0 m from the adopted station point). The route is the official BC Freshwater Atlas channel skeleton; axis-vs-DEM alignment remains pending_human_review.",
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "continuous_wave_train_bed": "The continuous Class IV wave train is authored as a shallow fast shelf modulated by a deterministic periodic transverse rib train plus basalt-canyon constrictions, midstream broach rocks and a fixed-seed scattered boulder field; it expresses the 'continuous whitewater / wave train / boulders' tags as interpreted geometry, not a survey.",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The source terrain is NRCan MRDEM-30 (~30 m ground sample) over an EPSG:4326 corridor clip; at 30 m it resolves only the broad glacial valley and cannot resolve in-channel rocks, ledges, the basalt canyon walls, constrictions, wave trains, or bathymetry. Every in-channel feature in these packages is an authored interpretation of the published Lava Canyon / White Mile feature tags, placed at its relative positions; features are necessarily coarse relative to the true rapid.",
+    "flow_bands": "Flow bands are an interpreted candidate derived from the 08MA002 lake-outlet gauge summer climatology (see flow_presets.json); they are not gauge-routed reach discharge and not local-guide approved. The reach discharge at Lava Canyon is somewhat higher than these lake-outlet values (tributary gain below the lake).",
+    "longitudinal_profile": "The raw MRDEM-30 route trace drains/undulates at 30 m ground sample; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it. Raw and conditioned drops are both recorded in the conditioning report.",
+    "no_committed_feature_inventory": "Unlike the South Fork rapids, the Chilko catalog records published feature *tags* only for Lava Canyon (no C1 sub-feature inventory with subfeature ids), so this feature set is an honest author interpretation of those tags, not a transcription of a surveyed inventory.",
+    "pending_human_review": true,
+    "production_promoted": false,
+    "slope_bound": "At 30 m the coarse DTM cannot resolve the basalt canyon thalweg, so the raw route drop is not a reliable rapid gradient. The conditioned profile is slope-bounded to a continuous Class IV value (~1.2%); this is a conditioning choice for solver tractability, not a survey; the window remains pending_human_review.",
+    "station_adoption": "The Chilko corridor has no committed named-rapid stationing (named_rapid_stationing: false); Lava Canyon's station was ADOPTED at the deepest sustained descent of the DEM route profile in the upper-canyon search band (2000-15000 m), consistent with the published downstream order (rapid 2 of 5). Exact stationing remains pending_human_review pending GPS/aerial/guide confirmation."
+  },
+  "rapid_name": "Lava Canyon",
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.lava_canyon_c3_water_window.v1",
+  "sources": {
+    "dem_sha256": "589f3a58ec158e7b3f09f9b3823328b45e4bbade601a754147983055eed6faeb",
+    "feature_tags": "physics/data/real_world/named_rapid_source_catalog.json",
+    "flow_presets": "physics/data/real_world/chilko_river_lava_canyon/flow_presets.json",
+    "gauge_source": "ECCC 08MA002 Chilko River at Outlet of Chilko Lake",
+    "route_centerline": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_centerline.geojson",
+    "stationing": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+    "terrain_manifest": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_manifest.json"
+  },
+  "task_id": "five-river-plan-W1-chilko-lava-canyon",
+  "window_id": "lava_canyon_station_9030m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "anchor_search_half_m": 40.0,
+    "bank_feather_m": 8.0,
+    "bank_min_height_m": 3.0,
+    "bank_relief_cap_m": 30.0,
+    "cell_size_m": 2.0,
+    "centerline_smoothing_passes": 12,
+    "channel_depth_m": 2.0,
+    "channel_half_width_m": 18.0,
+    "conditioned_max_mean_slope": 0.012,
+    "cross_half_width_m": 40.0,
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 10.0,
+    "initial_depth_cap_m": 2.6,
+    "max_profile_drop_per_cell_m": 0.3,
+    "roughness_manning_n": 0.062,
+    "trace_cross_search_m": 20.0,
+    "trace_fan_half_deg": 50,
+    "trace_fan_step_deg": 5,
+    "trace_reach_m": 380.0,
+    "trace_step_m": 8.0,
+    "trace_turn_cost_per_deg": 0.06,
+    "window_length_m": 600.0
+  }
+}

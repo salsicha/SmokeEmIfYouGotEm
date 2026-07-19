@@ -1,0 +1,47 @@
+{
+  "schema": "raftsim.chilko.lava_canyon_flow_presets.v0",
+  "status": "interpreted_candidate_bands_derived_from_08MA002_climatology_pending_daily_window_routing_and_guide_review",
+  "gauge_source": "Environment and Climate Change Canada 08MA002 Chilko River at Outlet of Chilko Lake",
+  "derivation": {
+    "source": "physics/data/real_world/chilko_river_bc/hydrology/seasonal_flow_context.json calendar_month_climatology (station 08MA002)",
+    "method": "core summer whitewater season (June-September) monthly climatology of the lake-outlet gauge mapped to three runnable bands",
+    "routing_caveat": "08MA002 is at the Chilko Lake outlet, upstream of the Chilko River Lodge put-in; it does not include the tributary gain between the lake and Lava Canyon, so the true reach discharge at the rapid is somewhat higher than these lake-outlet values. Downstream 08MA001 (near Redstone) is below the Taseko confluence and over-states the pre-confluence Chilko flow, so it cannot define the band either. These bands are an honest lower-bound-leaning interpretation from the single upstream gauge, not gauge-routed reach discharge.",
+    "authority": "interpreted_candidate_not_gauge_routed_reach_discharge_and_not_local_guide_approved",
+    "official_gameplay_bands_status": "blocked_pending_daily_window_routing_and_local_guide_review (see seasonal_flow_context.json gameplay_flow_bands)"
+  },
+  "flow_bands": [
+    {
+      "flow_band": "low_runnable",
+      "discharge_m3s": 67.0,
+      "discharge_cfs": 2366.1,
+      "season": "shoulder_summer_lower_runnable",
+      "percentile_range": [0.25, 0.5],
+      "confidence": 0.25,
+      "runnable": true,
+      "stage_ft": null,
+      "notes": "08MA002 September median (~67 m3/s): the lower runnable end of the summer window; the continuous wave train reads bonier with more exposed boulder controls and thinner recovery."
+    },
+    {
+      "flow_band": "median_runnable",
+      "discharge_m3s": 105.0,
+      "discharge_cfs": 3708.0,
+      "season": "mid_summer_commercial_reference",
+      "percentile_range": [0.4, 0.7],
+      "confidence": 0.3,
+      "runnable": true,
+      "stage_ft": null,
+      "notes": "08MA002 August median (~105 m3/s): the mid-summer reference band at which the Lava Canyon / White Mile continuous Class IV wave train is classically expressed."
+    },
+    {
+      "flow_band": "high_runnable",
+      "discharge_m3s": 142.6,
+      "discharge_cfs": 5035.9,
+      "season": "high_summer_freshet",
+      "percentile_range": [0.7, 0.9],
+      "confidence": 0.2,
+      "runnable": true,
+      "stage_ft": null,
+      "notes": "08MA002 July p90 (~142.6 m3/s): high summer freshet near the top of the runnable window; the White Mile large waves and laterals build and recovery windows shrink."
+    }
+  ]
+}
