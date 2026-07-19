@@ -16,6 +16,7 @@
 #include "Materials/MaterialExpressionLinearInterpolate.h"
 #include "Materials/MaterialExpressionMaterialFunctionCall.h"
 #include "Materials/MaterialExpressionMultiply.h"
+#include "Materials/MaterialExpressionNoise.h"
 #include "Materials/MaterialExpressionPanner.h"
 #include "Materials/MaterialExpressionScalarParameter.h"
 #include "Materials/MaterialExpressionSingleLayerWaterMaterialOutput.h"
@@ -118,9 +119,25 @@ static UMaterial* BuildPhotorealRiverWaterMaterial()
     UMaterialExpressionComponentMask* DepthMask = Mask(VertexColor, false, true, false); // G
     UMaterialExpressionLinearInterpolate* WaterColor = Lerp(ShallowColor, DeepColor, DepthMask);
 
+    // Foam mask comes in per-vertex (grid resolution) so its edges are blocky;
+    // break it up with high-frequency world-space noise so whitewater reads as
+    // organic aeration rather than grid rectangles. broken = saturate(foam*(0.55+noise)).
     UMaterialExpressionComponentMask* FoamMask = Mask(VertexColor, true, false, false); // R
-    UMaterialExpressionConstant3Vector* FoamColor = Const3(0.82f, 0.88f, 0.90f);
-    UMaterialExpressionLinearInterpolate* BaseColor = Lerp(WaterColor, FoamColor, FoamMask);
+    UMaterialExpressionNoise* FoamNoise =
+        Cast<UMaterialExpressionNoise>(Add(NewObject<UMaterialExpressionNoise>(Material)));
+    FoamNoise->Scale = 0.05f;
+    FoamNoise->bTurbulence = true;
+    FoamNoise->Levels = 5;
+    FoamNoise->OutputMin = 0.05f;
+    FoamNoise->OutputMax = 1.35f;
+    // broken = saturate(foam * noise): noise spans below and above 1 so foamy
+    // cell interiors get torn into streaks/patches rather than solid white.
+    UMaterialExpressionMultiply* FoamRaw = Mul(FoamMask, FoamNoise);
+    UMaterialExpressionClamp* FoamBroken =
+        Cast<UMaterialExpressionClamp>(Add(NewObject<UMaterialExpressionClamp>(Material)));
+    FoamBroken->Input.Expression = FoamRaw; FoamBroken->MinDefault = 0.0f; FoamBroken->MaxDefault = 1.0f;
+    UMaterialExpressionConstant3Vector* FoamColor = Const3(0.86f, 0.91f, 0.94f);
+    UMaterialExpressionLinearInterpolate* BaseColor = Lerp(WaterColor, FoamColor, FoamBroken);
 
     // --- Detail-normal ripples panned over the geometric wave normal --------
     UTexture2D* DetailNormal = LoadObject<UTexture2D>(

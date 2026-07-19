@@ -377,6 +377,11 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
         {
             RiverConfig->CookedFieldsDir = Spec.CookedFieldsDir;
             RiverConfig->FlowBand = FName(Spec.FlowBand);
+            // Load the whole cooked reach so the loader can re-centre the window
+            // on its hydraulic crux (a huge extent clamps to the full grid for
+            // any river regardless of its cooked origin).
+            RiverConfig->WindowCenterM = FVector2D::ZeroVector;
+            RiverConfig->WindowExtentM = 4000.0f;
         }
     }
     UE_LOG(LogTemp, Display, TEXT("RaftSim bootstrap: %s cooked_fields=%d"),

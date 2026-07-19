@@ -36,17 +36,20 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
     TObjectPtr<UMaterialInterface> WaterMaterial;
 
-    /** Grid origin (world cm, lower corner) — defaults to the dev tank window. */
+    /** Grid origin (world cm, lower corner). Centred on world origin, where the
+     * loader re-centres the reach's hydraulic crux. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
-    FVector2D GridOriginCm = FVector2D(-8000.0, -8000.0);
+    FVector2D GridOriginCm = FVector2D(-10000.0, -10000.0);
 
-    /** Grid extent in meters (square). */
+    /** Grid extent in meters (square) — covers the crux plus the approach and
+     * run-out so the rapid renders in front of the raft. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
-    float GridSizeMeters = 160.0f;
+    float GridSizeMeters = 200.0f;
 
-    /** World-space spacing between surface vertices in meters. */
+    /** World-space spacing between surface vertices in meters — fine enough for
+     * smooth foam/whitewater edges through the rapid. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
-    float VertexSpacingMeters = 2.5f;
+    float VertexSpacingMeters = 1.5f;
 
     /** Surface refresh interval (s); the FV field evolves slowly at gameplay scale. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
