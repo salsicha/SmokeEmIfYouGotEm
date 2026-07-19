@@ -1,0 +1,122 @@
+{
+  "array_files": {
+    "bed": "bed.npy",
+    "features": "features.json",
+    "initial_state": "initial_state.npz",
+    "probes": "probes.json"
+  },
+  "boundaries": [
+    {
+      "depth": null,
+      "edge": "west",
+      "hydrograph": [],
+      "kind": "inflow",
+      "metadata": {
+        "flow_band": "low_release_planning",
+        "manning_n": 0.058,
+        "manning_slope": 0.008043417525615269,
+        "target_discharge_m3s": 226.534772736
+      },
+      "stage": 951.8204842349771,
+      "velocity": [
+        2.416199793262433,
+        0.0
+      ]
+    },
+    {
+      "depth": null,
+      "edge": "east",
+      "hydrograph": [],
+      "kind": "outflow",
+      "metadata": {
+        "flow_band": "low_release_planning",
+        "target_discharge_m3s": 226.534772736
+      },
+      "stage": 946.994433719608,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "south",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "north",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    }
+  ],
+  "duration": 240.0,
+  "feature_count": 10,
+  "fixed_dt": 0.05,
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "metadata": {
+    "confidence_score": 0.25,
+    "coordinate_reference_system": "channel-following meters; x downstream along the committed corridor channel centered on corridor station 1250.0 m, y positive river-left",
+    "description": "Reach-local Hance C3 water window: committed Colorado corridor valley frame with a big-water conditioned channel (imposed Hance-class gradient) and authored (interpreted) Hance bed features (lead-in tongue, entry move rocks, boulder garden, two offset holes, main drop, runout wave train, low-water pin rock).",
+    "difficulty_preset": "class_8of10_hance_big_water",
+    "fixture_kind": null,
+    "flow_band": "low_release_planning",
+    "flow_percentile": 0.5,
+    "gauge_source": "USGS 09380000 Colorado River at Lees Ferry, AZ (Glen Canyon Dam release regime)",
+    "generator": "raftsim.colorado_hance_c3_window",
+    "generator_version": "w1_c3_window.v1",
+    "provenance": {
+      "adopted_axis_station_m": 1250.0,
+      "anchor_snap_distance_m": 16.000000000208033,
+      "bed_geometry_authority": "interpreted_bed_geometry",
+      "corridor_source": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m",
+      "dem_cannot_resolve_in_channel_rocks": true,
+      "dem_source_sha256": "01a6a73ac541db5143b587f861aff64f49479fde68f063b2bafb3b6b0a962e2d",
+      "feature_inventory_source": "physics/data/real_world/named_rapid_source_catalog.json",
+      "flow_bands_are_planning_placeholders": true,
+      "hance_outside_committed_corridor": true,
+      "imposed_longitudinal_gradient": true,
+      "pending_human_review": true,
+      "production_promoted": false,
+      "published_class": "8/10",
+      "published_river_mile": 77.1,
+      "rapid_name": "Hance",
+      "stage_east_m": 946.994433719608,
+      "stage_west_m": 951.8204842349771,
+      "target_discharge_m3s": 226.534772736,
+      "task": "five-river-simulation-plan W1 / Colorado Hance C3 window"
+    },
+    "river_id": "colorado_river_grand_canyon_rowing",
+    "scenario_id": "colorado_hance_c3_window_low_release_planning",
+    "scenario_type": "real_world",
+    "season_preset": null,
+    "section_id": "hance_corridor_station_1250m_c3_window",
+    "seed": 1,
+    "source_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json"
+  },
+  "probe_count": 12,
+  "raft": {
+    "drag_coefficient": 1.25,
+    "grounding_friction": 0.65,
+    "guide_mass_kg": 85.0,
+    "length_m": 4.3,
+    "mass_kg": 420.0,
+    "passenger_count": 6,
+    "passenger_mass_kg": 75.0,
+    "tube_radius_m": 0.28,
+    "width_m": 1.9
+  },
+  "roughness": 0.058,
+  "schema_version": "raftsim.scenario2_5d.v0"
+}

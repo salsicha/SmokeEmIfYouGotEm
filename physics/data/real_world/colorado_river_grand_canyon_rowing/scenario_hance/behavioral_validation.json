@@ -1,0 +1,348 @@
+{
+  "bands": {
+    "high_release_planning": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 414.5830914349647,
+        "main_drop_x308": 423.3411376750416,
+        "upstream_x100": 423.4095948454353
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.6039529412053682,
+            "garden_mean_depth_m": 3.28050753717221,
+            "garden_p90_grad": 0.05514814520907649,
+            "ratio": 6.6573508408878075,
+            "reach_mean_depth_m": 3.7477164223582045,
+            "reach_median_grad": 0.008283797343287089,
+            "shallower_than_reach": true
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness signature.",
+          "passed": true,
+          "subfeature_id": "hance_boulder_garden",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.3
+          }
+        },
+        "low_water_pin_rock_exposure": {
+          "measured": {
+            "min_depth_over_rock_m": 0.36981757317029973,
+            "reach_mean_depth_m": 3.7477164223582045
+          },
+          "note": "low_flow_difficulty tag: the runout pin rock runs shallowest at low release; informational.",
+          "passed": true,
+          "subfeature_id": "low_water_pin_rock"
+        },
+        "main_drop_hydraulic_forms": {
+          "measured": {
+            "max_face_froude": 1.4266291577746317,
+            "passed": true,
+            "surface_recovery_m": 0.9872952954266339
+          },
+          "note": "Full-channel-width main drop: supercritical sill face plus adverse plunge-pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "main_drop_ledge",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.14
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "lower_right": {
+              "max_face_froude": 3.9060964390006383,
+              "passed": true,
+              "surface_recovery_m": 1.900417884506055
+            },
+            "upper_left": {
+              "max_face_froude": 1.265127579554035,
+              "passed": true,
+              "surface_recovery_m": 1.0732641731465264
+            }
+          },
+          "note": "Two offset pourover holes; informational (offset holes are honestly harder to validate than the main drop).",
+          "passed": true,
+          "subfeature_id": "upper_left_hole+lower_right_hole",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.08
+          }
+        },
+        "runout_wave_train_forms": {
+          "measured": {
+            "ratio": 24.262290005586564,
+            "reach_median_grad": 0.008283797343287089,
+            "runout_p90_grad": 0.20098389349033888
+          },
+          "note": "p90 |grad eta| across the runout wave train vs the wetted-reach median; big-water waves build with discharge.",
+          "passed": true,
+          "required_at_this_band": true,
+          "subfeature_id": "runout_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/high_release_planning_final_fields.npz",
+      "scenario_id": "colorado_hance_c3_window_high_release_planning",
+      "stage_east_m": 948.3008330417176,
+      "stage_west_m": 953.1347179397756,
+      "target_discharge_m3s": 509.703238656
+    },
+    "low_release_planning": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 156.7934639531637,
+        "main_drop_x308": 171.2056940990314,
+        "upstream_x100": 177.35712039662417
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.5937877029400458,
+            "garden_mean_depth_m": 2.1438196115767445,
+            "garden_p90_grad": 0.03726479189443285,
+            "ratio": 5.591055011894735,
+            "reach_mean_depth_m": 2.5136757642575374,
+            "reach_median_grad": 0.006665073374372738,
+            "shallower_than_reach": true
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness signature.",
+          "passed": true,
+          "subfeature_id": "hance_boulder_garden",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.25
+          }
+        },
+        "low_water_pin_rock_exposure": {
+          "measured": {
+            "min_depth_over_rock_m": 0.0,
+            "reach_mean_depth_m": 2.5136757642575374
+          },
+          "note": "low_flow_difficulty tag: the runout pin rock runs shallowest at low release; informational.",
+          "passed": true,
+          "subfeature_id": "low_water_pin_rock"
+        },
+        "main_drop_hydraulic_forms": {
+          "measured": {
+            "max_face_froude": 1.6916252468131368,
+            "passed": true,
+            "surface_recovery_m": 0.4616306514910775
+          },
+          "note": "Full-channel-width main drop: supercritical sill face plus adverse plunge-pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "main_drop_ledge",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.05
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "lower_right": {
+              "max_face_froude": 1.298988094108452,
+              "passed": true,
+              "surface_recovery_m": 0.277317823234398
+            },
+            "upper_left": {
+              "max_face_froude": 1.4513710798180661,
+              "passed": true,
+              "surface_recovery_m": 0.7496950197505612
+            }
+          },
+          "note": "Two offset pourover holes; informational (offset holes are honestly harder to validate than the main drop).",
+          "passed": true,
+          "subfeature_id": "upper_left_hole+lower_right_hole",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.04
+          }
+        },
+        "runout_wave_train_forms": {
+          "measured": {
+            "ratio": 16.644768315715538,
+            "reach_median_grad": 0.006665073374372738,
+            "runout_p90_grad": 0.11093860212367859
+          },
+          "note": "p90 |grad eta| across the runout wave train vs the wetted-reach median; big-water waves build with discharge.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "runout_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/low_release_planning_final_fields.npz",
+      "scenario_id": "colorado_hance_c3_window_low_release_planning",
+      "stage_east_m": 946.994433719608,
+      "stage_west_m": 951.8204842349771,
+      "target_discharge_m3s": 226.534772736
+    },
+    "moderate_release_planning": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 260.46218468300054,
+        "main_drop_x308": 268.78970635556203,
+        "upstream_x100": 273.6963708857495
+      },
+      "checks": {
+        "boulder_garden_roughness_elevated": {
+          "measured": {
+            "garden_froude_p90": 0.5975990509059798,
+            "garden_mean_depth_m": 2.6496096498793777,
+            "garden_p90_grad": 0.04264072456606735,
+            "ratio": 5.818551552872591,
+            "reach_mean_depth_m": 3.062385315775452,
+            "reach_median_grad": 0.0073284088279695365,
+            "shallower_than_reach": true
+          },
+          "note": "p90 |grad eta| across the boulder garden vs the wetted-reach median; a distributed roughness signature.",
+          "passed": true,
+          "subfeature_id": "hance_boulder_garden",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.35
+          }
+        },
+        "low_water_pin_rock_exposure": {
+          "measured": {
+            "min_depth_over_rock_m": 0.12945306890534136,
+            "reach_mean_depth_m": 3.062385315775452
+          },
+          "note": "low_flow_difficulty tag: the runout pin rock runs shallowest at low release; informational.",
+          "passed": true,
+          "subfeature_id": "low_water_pin_rock"
+        },
+        "main_drop_hydraulic_forms": {
+          "measured": {
+            "max_face_froude": 1.5287407216375,
+            "passed": true,
+            "surface_recovery_m": 0.6981833352058402
+          },
+          "note": "Full-channel-width main drop: supercritical sill face plus adverse plunge-pool surface recovery.",
+          "passed": true,
+          "subfeature_id": "main_drop_ledge",
+          "thresholds": {
+            "min_face_froude": 0.85,
+            "min_surface_recovery_m": 0.1
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "offset_holes_form": {
+          "measured": {
+            "lower_right": {
+              "max_face_froude": 1.2248921035992668,
+              "passed": true,
+              "surface_recovery_m": 0.46808312577445577
+            },
+            "upper_left": {
+              "max_face_froude": 1.5451464970114015,
+              "passed": true,
+              "surface_recovery_m": 1.0785363442219023
+            }
+          },
+          "note": "Two offset pourover holes; informational (offset holes are honestly harder to validate than the main drop).",
+          "passed": true,
+          "subfeature_id": "upper_left_hole+lower_right_hole",
+          "thresholds": {
+            "min_face_froude": 0.85,
+            "min_surface_recovery_m": 0.06
+          }
+        },
+        "runout_wave_train_forms": {
+          "measured": {
+            "ratio": 19.591885741118837,
+            "reach_median_grad": 0.0073284088279695365,
+            "runout_p90_grad": 0.14357734842178577
+          },
+          "note": "p90 |grad eta| across the runout wave train vs the wetted-reach median; big-water waves build with discharge.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "runout_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        }
+      },
+      "field_capture": "fields/moderate_release_planning_final_fields.npz",
+      "scenario_id": "colorado_hance_c3_window_moderate_release_planning",
+      "stage_east_m": 947.5794900367368,
+      "stage_west_m": 952.4057086494374,
+      "target_discharge_m3s": 339.802159104
+    }
+  },
+  "generated_on": "2026-07-18",
+  "headline_gate": {
+    "boulder_garden_roughness_at_reference": true,
+    "main_drop_hydraulic_at_reference": true,
+    "parameterization_iterations": [
+      {
+        "change": "initial authored bed on the raw committed corridor profile (flatwater Lees Ferry tailwater, ~0.01% drop): boulder garden shelf, two offset holes and a main-drop ledge, runout waves; uniform big-water Manning n",
+        "iteration": 1,
+        "outcome": "the reach would not convey as a rapid -- on the near-flat tailwater profile the window relaxed to a slack pool, the authored sills barely tripped, and the delivered discharge decayed along the window (the flat profile carries no gradient to drive big water)"
+      },
+      {
+        "change": "imposed a Hance-class longitudinal gradient on the conditioned profile (the committed corridor is dam-tailwater with no rapid gradient; Hance is river mile 77.1 and outside the corridor), tilting the conditioned surface to a big-water technical slope; raised the bank berms to canyon-appropriate heights so the ~2.5-3.5 m-deep reach stays contained",
+        "iteration": 2,
+        "outcome": "the window conveyed the band discharge, but at the steeper ~1% gradient the thin low-release band ran supercritical (Fr ~2 over the drop) and the FV solver destabilized before the full settle (the deep plunge pools below near-surface sills made the thin low band especially fragile)"
+      },
+      {
+        "change": "submerged the boulder field and the barely-covered rocks (crests just below the conditioned surface), capped the initial fill depth in the deep carve, gentled the imposed gradient to ~0.8% and raised Manning n to 0.058, and eased the plunge-pool depths so the conveying reach stays comfortably subcritical at all three bands while the main-drop sill and the two offset holes still trip supercritical over their crests",
+        "iteration": 3,
+        "outcome": "the main drop trips supercritical over its sill and recovers in the plunge pool (hydraulic forms, Fr ~1.0-1.24), the boulder garden shows an elevated roughness signature (ratio ~5x), and the runout wave train forms at all bands and is required at the high band; the reach conveys near the band discharge end-to-end and all three bands are stable at the reported 4000-step (200 s) settle"
+      }
+    ],
+    "passed": true,
+    "runout_wave_train_at_high": true
+  },
+  "honesty": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "evidence_kind": "genuine_solver_behavioral_validation_not_parity",
+    "flow_bands_are_planning_placeholders": "The three release bands are the corridor's planning placeholders (must_replace_placeholders=true); results are recorded honestly pending gauge review.",
+    "hance_outside_committed_corridor": "This window sits on the committed Lees Ferry corridor valley frame with an imposed Hance-class gradient; Hance (river mile 77.1) is not in the committed corridor. The behavioral gate validates that the AUTHORED interpreted features form under the genuine solver, not that this is the surveyed Hance reach.",
+    "note": "Feature presence is validated behaviorally against the interpreted Hance inventory; no claim of numeric parity with a reference solution is made for this window."
+  },
+  "rapid_name": "Hance",
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.hance_c3_behavioral_validation.v1",
+  "solver": {
+    "boundary_mode": "scenario",
+    "disable_fixture_calibrations": true,
+    "feature_strength_scale": 0.0,
+    "fixed_dt": 0.05,
+    "flux_scheme": "hll",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 4000
+  },
+  "task_id": "W1-colorado-hance-c3-behavioral-gate",
+  "window_id": "hance_corridor_station_1250m_c3_window"
+}

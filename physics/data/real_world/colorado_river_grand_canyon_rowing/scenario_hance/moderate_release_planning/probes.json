@@ -1,0 +1,158 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 6.0,
+        "y": 0.0
+      },
+      "probe_id": "window_entry_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "entry_lead_in_tongue"
+      },
+      "normal": null,
+      "position": {
+        "x": 200.0,
+        "y": 0.0
+      },
+      "probe_id": "entry_tongue"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "hance_boulder_garden"
+      },
+      "normal": null,
+      "position": {
+        "x": 256.0,
+        "y": 0.0
+      },
+      "probe_id": "boulder_garden_mid"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "upper_left_hole"
+      },
+      "normal": null,
+      "position": {
+        "x": 284.0,
+        "y": 8.0
+      },
+      "probe_id": "upper_hole"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "main_drop_ledge"
+      },
+      "normal": null,
+      "position": {
+        "x": 316.0,
+        "y": 0.0
+      },
+      "probe_id": "main_drop"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "lower_right_hole"
+      },
+      "normal": null,
+      "position": {
+        "x": 340.0,
+        "y": -8.0
+      },
+      "probe_id": "lower_hole"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "left_recovery_eddy"
+      },
+      "normal": null,
+      "position": {
+        "x": 422.0,
+        "y": 20.0
+      },
+      "probe_id": "left_recovery_eddy"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "runout_wave_train"
+      },
+      "normal": null,
+      "position": {
+        "x": 454.0,
+        "y": 0.0
+      },
+      "probe_id": "runout_wave"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "low_water_pin_rock"
+      },
+      "normal": null,
+      "position": {
+        "x": 474.0,
+        "y": 2.0
+      },
+      "probe_id": "low_water_rock"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 594.0,
+        "y": 0.0
+      },
+      "probe_id": "window_exit_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 308.0,
+        "y": 0.0
+      },
+      "probe_id": "main_drop_cross_section"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 256.0,
+        "y": 0.0
+      },
+      "probe_id": "garden_cross_section"
+    }
+  ]
+}

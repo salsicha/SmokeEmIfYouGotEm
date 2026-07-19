@@ -1,0 +1,207 @@
+{
+  "adopted_axis_station_m": 1250.0,
+  "bed_parameters": {
+    "boulder_count": 44,
+    "boulder_crest_offset_max_m": -0.25,
+    "boulder_crest_offset_min_m": -0.85,
+    "boulder_radius_max_m": 3.8,
+    "boulder_radius_min_m": 1.6,
+    "boulder_seed": 20260718,
+    "garden_half_width_m": 20.0,
+    "garden_shelf_offset_m": -1.0,
+    "garden_x": [
+      150.0,
+      362.0
+    ],
+    "hole_apron_offset_m": -0.8,
+    "hole_half_width_m": 5.0,
+    "hole_pool_offset_m": -1.9,
+    "hole_sill_offset_m": -0.1,
+    "lead_in_invert_offset_m": -1.1,
+    "lead_in_x": [
+      150.0,
+      250.0
+    ],
+    "lead_in_y": [
+      -8.0,
+      8.0
+    ],
+    "left_eddy_bar_crest_offset_m": 0.1,
+    "left_eddy_bar_x": [
+      394.0,
+      400.0
+    ],
+    "left_eddy_floor_offset_m": -1.1,
+    "left_eddy_x": [
+      398.0,
+      446.0
+    ],
+    "left_eddy_y": [
+      14.0,
+      26.0
+    ],
+    "left_move_rock": [
+      180.0,
+      13.0
+    ],
+    "left_move_rock_radius_m": 3.6,
+    "low_water_rock": [
+      474.0,
+      2.0
+    ],
+    "low_water_rock_crest_offset_m": -0.05,
+    "low_water_rock_radius_m": 3.0,
+    "lower_hole_center": [
+      334.0,
+      -8.0
+    ],
+    "main_drop_apron_offset_m": -0.9,
+    "main_drop_half_width_m": 26.0,
+    "main_drop_pool_offset_m": -2.3,
+    "main_drop_sill_offset_m": -0.1,
+    "main_drop_x": 308.0,
+    "move_rock_crest_offset_m": -0.12,
+    "right_move_rock": [
+      212.0,
+      -13.0
+    ],
+    "right_move_rock_radius_m": 3.8,
+    "runout_wave_big_crest_offset_m": -0.12,
+    "runout_wave_big_x": 454.0,
+    "runout_wave_crest_offset_m": -0.3,
+    "runout_wave_half_width_m": 6.0,
+    "runout_wave_x": [
+      404.0,
+      420.0,
+      436.0
+    ],
+    "runout_wave_y": [
+      -9.0,
+      9.0
+    ],
+    "upper_hole_center": [
+      278.0,
+      8.0
+    ]
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 8.0,
+    "bank_min_height_m": 3.0,
+    "bank_relief_cap_m": 30.0,
+    "boulder_garden_bed": "authored_deterministic_scattered_boulder_field_not_survey",
+    "centerline_smoothing_passes": 40,
+    "channel_half_width_m": 24.0,
+    "conditioned_mean_slope": 0.008043417525615269,
+    "conditioned_profile_drop_m": 4.826050515369161,
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "floor_percentile": 20.0,
+    "floor_sample_half_width_m": 10.0,
+    "imposed_mean_slope": 0.008,
+    "interpreted_longitudinal_profile": true,
+    "max_profile_drop_per_cell_m": 0.3,
+    "min_centerline_radius_m": 47.75449377595355,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 3.0,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_imposed_gradient",
+    "raw_dem_floor_drop_m": 0.027893617250015268
+  },
+  "flow_band_packages": {
+    "high_release_planning": {
+      "package": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/high_release_planning",
+      "scenario_id": "colorado_hance_c3_window_high_release_planning",
+      "stage_east_m": 948.3008330417176,
+      "stage_west_m": 953.1347179397756,
+      "target_discharge_m3s": 509.703238656
+    },
+    "low_release_planning": {
+      "package": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/low_release_planning",
+      "scenario_id": "colorado_hance_c3_window_low_release_planning",
+      "stage_east_m": 946.994433719608,
+      "stage_west_m": 951.8204842349771,
+      "target_discharge_m3s": 226.534772736
+    },
+    "moderate_release_planning": {
+      "package": "physics/data/real_world/colorado_river_grand_canyon_rowing/scenario_hance/moderate_release_planning",
+      "scenario_id": "colorado_hance_c3_window_moderate_release_planning",
+      "stage_east_m": 947.5794900367368,
+      "stage_west_m": 952.4057086494374,
+      "target_discharge_m3s": 339.802159104
+    }
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "anchor_lonlat": [
+      -111.5522935118423,
+      36.87319299456728
+    ],
+    "catalog_point_to_channel_snap_distance_m": 16.000000000208033,
+    "centerline_lonlat_first": [
+      -111.54951165472635,
+      36.874687354756
+    ],
+    "centerline_lonlat_last": [
+      -111.55546896697932,
+      36.873402603552144
+    ],
+    "min_centerline_radius_m": 47.75449377595355
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "honesty": {
+    "axis_alignment": "The window channel centerline is the committed (review-gated) corridor centerline snapped to the DEM valley floor (16.0 m at the anchor). The corridor centerline is not gameplay authority; the window is pending_human_review.",
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "boulder_garden_bed": "The boulder-garden bed is a deterministic fixed-seed scattered field of authored boulders over a shallow shelf, not a survey; it expresses the Hance boulder_garden tag as interpreted geometry.",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The committed corridor heightfield resolves the canyon planform and valley floor but cannot resolve in-channel rocks, ledges, holes, or bathymetry; every in-channel feature in these packages is an authored interpretation of the Hance catalog feature_tags and published class, placed at its relative positions.",
+    "feature_inventory": "The Colorado catalog carries only feature_tags for Hance (boulder_garden, multiple_moves, holes, low_flow_difficulty), no per-feature inventory. The sub-feature set here is therefore an honest interpretation of those tags plus the published class, not a transcribed guide inventory.",
+    "flow_bands_are_planning_placeholders": "The Colorado flow presets record must_replace_placeholders=true and status 'planning_placeholders_require_usgs_gauge_history_and_release_context'. The three release bands are used as-is and labeled honestly, pending gauge/release review.",
+    "hance_outside_committed_corridor": "The only committed Colorado corridor terrain is the Lees Ferry pilot reach (river mile ~1.4-2.9); Hance's published location is river mile 77.1, far downstream and NOT inside the committed corridor. This window uses the committed Lees Ferry corridor as an interpreted big-water canyon valley frame for the authored Hance features; it is not a survey of the Hance reach.",
+    "imposed_longitudinal_gradient": "The committed Lees Ferry corridor is flatwater tailwater immediately below Glen Canyon Dam (raw along-channel drop ~0.01%). Hance is a steep technical rapid, so the conditioned profile is TILTED to an imposed Hance-class gradient (see conditioning.imposed_mean_slope / conditioned_profile_drop_m). The raw DEM floor drop is recorded alongside; this is an interpreted longitudinal profile for an interpreted rapid, not a survey.",
+    "pending_human_review": true,
+    "production_promoted": false
+  },
+  "published_class": "8/10",
+  "published_river_mile": 77.1,
+  "rapid_name": "Hance",
+  "river_id": "colorado_river_grand_canyon_rowing",
+  "schema": "raftsim.colorado.hance_c3_water_window.v1",
+  "sources": {
+    "centerline": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/centerline_local.json",
+    "corridor_manifest": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/manifest.json",
+    "dem_heightfield": "physics/data/real_world/colorado_river_grand_canyon_rowing/production_corridor/lees_ferry_reach_2200_4700m/derived/colorado_lees_ferry_reach_heightfield_2017.png",
+    "dem_sha256": "01a6a73ac541db5143b587f861aff64f49479fde68f063b2bafb3b6b0a962e2d",
+    "feature_inventory": "physics/data/real_world/named_rapid_source_catalog.json",
+    "flow_presets": "physics/data/real_world/colorado_river_grand_canyon_rowing/flow_presets.json"
+  },
+  "task_id": "W1-colorado-hance-c3-window",
+  "window_id": "hance_corridor_station_1250m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "axis_cross_search_m": 16.0,
+    "axis_sample_margin_m": 120.0,
+    "axis_sample_step_m": 4.0,
+    "bank_feather_m": 8.0,
+    "bank_min_height_m": 3.0,
+    "bank_relief_cap_m": 30.0,
+    "cell_size_m": 2.0,
+    "centerline_smoothing_passes": 12,
+    "channel_depth_m": 3.0,
+    "channel_half_width_m": 24.0,
+    "cross_half_width_m": 39.0,
+    "floor_percentile": 20.0,
+    "floor_sample_half_width_m": 10.0,
+    "imposed_mean_slope": 0.008,
+    "initial_depth_cap_m": 3.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "roughness_manning_n": 0.058,
+    "window_length_m": 600.0
+  }
+}
