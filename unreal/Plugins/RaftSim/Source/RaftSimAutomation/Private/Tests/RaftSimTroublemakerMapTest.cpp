@@ -8,6 +8,7 @@
 #include "Misc/AutomationTest.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRockObstacleActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "Tests/AutomationCommon.h"
 
@@ -90,6 +91,19 @@ bool FRaftSimAssertRiverMapCommand::Update()
             FString::Printf(TEXT("raft rests within depth envelope (z=%.0f)"), Raft->GetActorLocation().Z),
             FMath::Abs(Raft->GetActorLocation().Z) < 20000.0f);
     }
+
+    int32 AuthoritativeRockCount = 0;
+    for (TActorIterator<ARaftSimRockObstacleActor> It(World); It; ++It)
+    {
+        if ((*It)->GetContactRadiusM() >= 0.1f)
+        {
+            ++AuthoritativeRockCount;
+        }
+    }
+    Test->TestEqual(
+        TEXT("signature rapid has four serialized D4 rock obstacles"),
+        AuthoritativeRockCount,
+        4);
     return true;
 }
 

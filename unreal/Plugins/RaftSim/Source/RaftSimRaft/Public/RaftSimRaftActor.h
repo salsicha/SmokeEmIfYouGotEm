@@ -108,6 +108,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void ForceOverwashForTesting(float SurfaceHeightM, FVector FlowVelocityMps);
 
+    /** Automation/authoring hook: clear rigid-body and crew-command motion. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
+    void ResetMotionForTesting();
+
     /** Crew size seeded as swimmers on capsize (guide + paddlers). */
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Raft")
     void SetCrewSize(int32 InCrewSize) { CrewSize = FMath::Clamp(InCrewSize, 0, 8); }
@@ -213,6 +217,8 @@ private:
     void UpdateCrew(float DeltaSeconds);
     void SpawnCrewVisuals();
     void BuildRaftVisual();
+    void UpdateFlexibleRaftVisual();
+    void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
 
     UPROPERTY()
@@ -253,4 +259,7 @@ private:
 
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;
+
+    /** Seconds between runtime rock-authority scans. */
+    float RockObstacleRefreshRemaining = 0.0f;
 };

@@ -23,6 +23,7 @@ namespace
 template <typename T>
 T* FindAudioTestActor()
 {
+    T* NewestActor = nullptr;
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
     {
         UWorld* World = Context.World();
@@ -31,11 +32,25 @@ T* FindAudioTestActor()
         {
             if (TActorIterator<T> It(World); It)
             {
-                return *It;
+                NewestActor = *It;
             }
         }
     }
-    return nullptr;
+    return NewestActor;
+}
+
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAudioResetCommand, FAutomationTestBase*, Test);
+bool FRaftSimAudioResetCommand::Update()
+{
+    ARaftSimRaftActor* Raft = FindAudioTestActor<ARaftSimRaftActor>();
+    if (Raft == nullptr)
+    {
+        Test->AddError(TEXT("Raft missing before audio reset"));
+        return true;
+    }
+    Raft->ResetMotionForTesting();
+    return true;
 }
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
@@ -87,6 +102,11 @@ bool FRaftSimRunAudioReactsTest::RunTest(const FString&)
 {
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));
+    // This test can follow the crew-propulsion test in one editor process.
+    // Clear inherited motion, then allow the mix one frame-window to settle so
+    // the baseline cannot start at the roar clamp.
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAudioResetCommand(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(1.0f));
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAudioBaselineCommand(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(4.0f)); // crew paddles up to speed
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAudioAssertCommand(this));

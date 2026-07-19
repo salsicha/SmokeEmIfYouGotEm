@@ -25,6 +25,7 @@
 #include "Materials/MaterialInterface.h"
 #include "Misc/PackageName.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRockObstacleActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "UObject/Package.h"
 #include "UObject/SavePackage.h"
@@ -391,6 +392,35 @@ static bool BuildRiverMap(const FRiverMapSpec& Spec)
     AddActorToWorld(
         World, APlayerStart::StaticClass(),
         FTransform(FVector(-6600.0f, 0.0f, 200.0f)));
+
+    // Deterministic hydraulic-crux rock garden. These are runtime-authoritative
+    // D4 obstacles, not decorative boulders: the raft binds their transforms,
+    // radii, and friction into the same fixed-step solve that drives visible
+    // deformation. Per-river authored geometry will replace/augment them as
+    // M2/M3 procedural geography and rapid authoring land.
+    struct FRockSpec
+    {
+        FVector LocationCm;
+        float RadiusM;
+        float Friction;
+    };
+    const FRockSpec RockGarden[] = {
+        {FVector(-500.0f, -260.0f, -35.0f), 0.95f, 0.74f},
+        {FVector(0.0f, 90.0f, -28.0f), 1.25f, 0.78f},
+        {FVector(520.0f, 310.0f, -42.0f), 0.82f, 0.70f},
+        {FVector(860.0f, -340.0f, -45.0f), 0.72f, 0.68f},
+    };
+    for (const FRockSpec& RockSpec : RockGarden)
+    {
+        if (ARaftSimRockObstacleActor* Rock = Cast<ARaftSimRockObstacleActor>(
+                AddActorToWorld(
+                    World,
+                    ARaftSimRockObstacleActor::StaticClass(),
+                    FTransform(RockSpec.LocationCm))))
+        {
+            Rock->ConfigureContact(RockSpec.RadiusM, RockSpec.Friction);
+        }
+    }
 
     SetWorldGameMode(World, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
     const FString PackagePath = FString::Printf(TEXT("/Game/RaftSim/Maps/%s"), Spec.MapName);

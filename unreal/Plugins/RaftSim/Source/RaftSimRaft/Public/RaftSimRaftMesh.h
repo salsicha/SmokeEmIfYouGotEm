@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ProceduralMeshComponent.h"
+#include "RaftSimChronoRuntimeAdapter.h"
 
 // Procedural geometry for a self-bailing paddle raft (P4 photoreal track).
 // Builds a real inflatable-raft silhouette — a continuous outer tube loop with
@@ -30,8 +31,9 @@ struct FMeshData
  * @param WidthM       port-to-starboard footprint (Y)
  * @param TubeRadiusM  side-tube cross-section radius
  */
-void BuildInflatableRaft(
+RAFTSIMRAFT_API void BuildInflatableRaft(
     float LengthM, float WidthM, float TubeRadiusM,
-    FMeshData& OutTubes, FMeshData& OutFloor);
+    FMeshData& OutTubes, FMeshData& OutFloor,
+    const TArray<FRaftSimFlexVisualSegmentState>& Deformation = {});
 
 } // namespace RaftSimRaftMesh

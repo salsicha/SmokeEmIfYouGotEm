@@ -8,6 +8,7 @@
 #include "ProceduralMeshComponent.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimRaftMesh.h"
+#include "RaftSimRockObstacleActor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimFlexibleRaftModel.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
@@ -229,6 +230,67 @@ void ARaftSimRaftActor::BuildRaftVisual()
     {
         RaftVisual->SetMaterial(1, FloorMat);
     }
+}
+
+void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
+{
+    if (RaftVisual == nullptr || RaftAdapter == nullptr)
+    {
+        return;
+    }
+
+    RaftSimRaftMesh::FMeshData Tubes, Floor;
+    RaftSimRaftMesh::BuildInflatableRaft(
+        FootprintLengthM,
+        FootprintWidthM,
+        TubeRadiusM,
+        Tubes,
+        Floor,
+        RaftAdapter->GetFlexibleVisualSegments());
+    const TArray<FLinearColor> NoColors;
+    RaftVisual->UpdateMeshSection_LinearColor(
+        0, Tubes.Vertices, Tubes.Normals, Tubes.UVs, NoColors, Tubes.Tangents);
+    RaftVisual->UpdateMeshSection_LinearColor(
+        1, Floor.Vertices, Floor.Normals, Floor.UVs, NoColors, Floor.Tangents);
+}
+
+void ARaftSimRaftActor::UpdateRockObstacles()
+{
+    if (RaftAdapter == nullptr || GetWorld() == nullptr)
+    {
+        return;
+    }
+
+    TArray<FRaftSimFlexRockObstacle> Obstacles;
+    for (TActorIterator<ARaftSimRockObstacleActor> It(GetWorld()); It; ++It)
+    {
+        const ARaftSimRockObstacleActor* Rock = *It;
+        if (Rock == nullptr)
+        {
+            continue;
+        }
+        // Broad-phase bound: D4 cannot contact a rock farther away than the
+        // raft diagonal plus its radius. Keeping only local actors avoids a
+        // full river's rock catalog entering every 120 Hz solve.
+        const float ContactRangeCm =
+            (0.6f * FMath::Sqrt(FootprintLengthM * FootprintLengthM +
+                                FootprintWidthM * FootprintWidthM) +
+             Rock->GetContactRadiusM()) * kCmPerM;
+        if (FVector::DistSquared2D(GetActorLocation(), Rock->GetActorLocation()) >
+            FMath::Square(ContactRangeCm))
+        {
+            continue;
+        }
+
+        FRaftSimFlexRockObstacle Obstacle;
+        Obstacle.ObstacleId = Rock->GetName();
+        Obstacle.LocalPosition =
+            GetActorTransform().InverseTransformPosition(Rock->GetActorLocation()) / kCmPerM;
+        Obstacle.RadiusM = Rock->GetContactRadiusM();
+        Obstacle.FrictionCoefficient = Rock->GetContactFriction();
+        Obstacles.Add(MoveTemp(Obstacle));
+    }
+    RaftAdapter->SetFlexibleRockObstacles(Obstacles);
 }
 
 void ARaftSimRaftActor::SpawnCrewVisuals()
@@ -458,6 +520,13 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         return;
     }
 
+    RockObstacleRefreshRemaining -= DeltaSeconds;
+    if (RockObstacleRefreshRemaining <= 0.0f)
+    {
+        UpdateRockObstacles();
+        RockObstacleRefreshRemaining = 0.05f;
+    }
+
     FRaftSimPhysicsTickInput Input;
     Input.FrameDeltaSeconds = FMath::Min(DeltaSeconds, 0.25f);
     const FRaftSimPhysicsTickOutput Output = Bridge->TickBridge(Input);
@@ -487,6 +556,7 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 
     UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
     UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
+    UpdateFlexibleRaftVisual();
 }
 
 void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
@@ -739,4 +809,20 @@ void ARaftSimRaftActor::ForceOverwashForTesting(float SurfaceHeightM, FVector Fl
     Water.VelocityMps = FlowVelocityMps;
     Water.bWet = true;
     RaftAdapter->SetFlexibleUniformWater(Water, true);
+}
+
+void ARaftSimRaftActor::ResetMotionForTesting()
+{
+    if (RaftAdapter == nullptr)
+    {
+        return;
+    }
+    FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+    State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
+    State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+    RaftAdapter->SetKinematicState(State);
+    ActiveCrewCommand = ERaftSimCrewCommand::Rest;
+    PendingCrewCommand = ERaftSimCrewCommand::Rest;
+    CrewReactionRemaining = 0.0f;
+    CrewStrokeTimer = 0.0f;
 }
