@@ -20,6 +20,7 @@ namespace
 
 ARaftSimRaftActor* FindCrewTestRaft()
 {
+    ARaftSimRaftActor* NewestRaft = nullptr;
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
     {
         UWorld* World = Context.World();
@@ -28,11 +29,11 @@ ARaftSimRaftActor* FindCrewTestRaft()
         {
             if (TActorIterator<ARaftSimRaftActor> It(World); It)
             {
-                return *It;
+                NewestRaft = *It;
             }
         }
     }
-    return nullptr;
+    return NewestRaft;
 }
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(

@@ -21,15 +21,20 @@ namespace
 
 UWorld* GetFlipTestWorld()
 {
+    UWorld* NewestGameWorld = nullptr;
     for (const FWorldContext& Context : GEngine->GetWorldContexts())
     {
         if (Context.World() != nullptr &&
             (Context.WorldType == EWorldType::PIE || Context.WorldType == EWorldType::Game))
         {
-            return Context.World();
+            // During AutomationOpenMap turnover the old PIE context can remain
+            // first in the engine list for a few frames. The newest context is
+            // appended last; retaining it prevents commands targeting a world
+            // that is already tearing down.
+            NewestGameWorld = Context.World();
         }
     }
-    return nullptr;
+    return NewestGameWorld;
 }
 
 ARaftSimRaftActor* FindRaft()

@@ -1,4 +1,9 @@
-# RaftSim 1.0 Release Plan (revision 2)
+# RaftSim 1.0 Release Plan (revision 2, retained decisions)
+
+> **Phase ordering superseded July 19, 2026.** The executable completion sequence
+> now lives in `docs/game-completion-plan.md`. Product scope, technical decisions,
+> licensing, platform targets, honesty rules, and the execution history in this file
+> remain authoritative where the completion plan does not replace them.
 
 Written July 17, 2026, from a fresh full-repo analysis. This plan is the **single top-level driver** for taking this project to a released, playable game. It is written for an autonomous agent that **cannot ask the owner anything**: every choice is decided here; §11 gives decision principles for anything unforeseen. Steps that physically require the owner (accounts, payments, playing the release candidate, GitHub support actions) go on the §10 handoff checklist and block only the launch date, never the work.
 

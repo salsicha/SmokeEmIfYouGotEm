@@ -15,6 +15,7 @@
 #include "HAL/PlatformMisc.h"
 #include "Misc/Paths.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimRockObstacleActor.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
@@ -186,5 +187,83 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftCommand(
     TEXT("Paddle the raft downstream into the rapid, then screenshot over its "
          "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] [aheadM]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaft));
+
+// Deterministic close-up for M1: place an authoritative D4 rock against the
+// port tube, let the fixed-step solve and dynamic mesh settle for a few frames,
+// then photograph the actual contact. This is a review/capture hook only; it
+// never runs unless explicitly invoked from the console.
+static void HandleCaptureWrapTest(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    const FString Label = Args.Num() > 0 ? Args[0] : TEXT("M1_FlexibleRaftWrap");
+    const FString OutPath =
+        FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Label + TEXT(".png"));
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+
+    FTimerHandle ContactHandle;
+    World->GetTimerManager().SetTimer(
+        ContactHandle,
+        FTimerDelegate::CreateLambda([WeakWorld]()
+        {
+            UWorld* W = WeakWorld.Get();
+            ARaftSimRaftActor* Raft = FindRaft(W);
+            if (W == nullptr || Raft == nullptr)
+            {
+                return;
+            }
+            const FVector RockWorld = Raft->GetActorTransform().TransformPosition(
+                FVector(0.0f, -100.0f, -20.0f));
+            if (ARaftSimRockObstacleActor* Rock = W->SpawnActor<ARaftSimRockObstacleActor>(
+                    ARaftSimRockObstacleActor::StaticClass(), RockWorld, FRotator::ZeroRotator))
+            {
+                Rock->ConfigureContact(1.4f, 0.78f);
+            }
+        }),
+        1.0f,
+        false);
+
+    FTimerHandle ShotHandle;
+    World->GetTimerManager().SetTimer(
+        ShotHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, OutPath]()
+        {
+            UWorld* W = WeakWorld.Get();
+            if (ARaftSimRaftActor* Raft = FindRaft(W))
+            {
+                const FVector CamLoc = Raft->GetActorTransform().TransformPosition(
+                    FVector(-420.0f, -520.0f, 300.0f));
+                const FVector LookAt = Raft->GetActorLocation() + FVector(0.0f, 0.0f, 25.0f);
+                if (ACameraActor* Cam = W->SpawnActor<ACameraActor>(
+                        ACameraActor::StaticClass(), CamLoc, (LookAt - CamLoc).Rotation()))
+                {
+                    if (APlayerController* PC = W->GetFirstPlayerController())
+                    {
+                        PC->SetViewTarget(Cam);
+                    }
+                }
+            }
+            FScreenshotRequest::RequestScreenshot(OutPath, false, false);
+            if (W != nullptr)
+            {
+                FTimerHandle ExitHandle;
+                W->GetTimerManager().SetTimer(
+                    ExitHandle,
+                    FTimerDelegate::CreateLambda([]() { FPlatformMisc::RequestExit(false); }),
+                    4.0f,
+                    false);
+            }
+        }),
+        1.2f,
+        false);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GCaptureWrapTestCommand(
+    TEXT("RaftSim.CaptureWrapTest"),
+    TEXT("Place an authoritative D4 rock against the raft and capture the visibly "
+         "deformed tube. Usage: RaftSim.CaptureWrapTest [label]"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureWrapTest));
 
 } // namespace RaftSimCaptureCommand

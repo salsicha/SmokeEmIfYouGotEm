@@ -91,6 +91,7 @@ void URaftSimChronoRuntimeAdapter::ResetFlexiblePersistentState()
     RetainedVolumeBySegment.Reset();
     IndentationBySegment.Reset();
     LastFlexStepTelemetry = FRaftSimFlexStepTelemetry();
+    LastFlexVisualSegments.Reset();
 }
 
 bool URaftSimChronoRuntimeAdapter::StepRaftDynamics(float SubstepSeconds)
@@ -177,6 +178,41 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         }
         double& Stored = IndentationBySegment.FindOrAdd(Contact.SegmentId);
         Stored = FMath::Max(Stored, Contact.IndentationM);
+    }
+
+    // Export the visible shape from the exact D1-D4 result. Multiple contacts
+    // can affect one segment; retain the deepest contact and OR the discrete
+    // wrap/pin/recovery states so the rendered tube never understates the
+    // authoritative contact outcome.
+    LastFlexVisualSegments.Reset(FlexLayout.Num());
+    TMap<FString, int32> VisualIndexById;
+    for (const FRaftSimFlexSegmentResponse& Response : SeatSolve.TubeSolve.SegmentResponses)
+    {
+        FRaftSimFlexVisualSegmentState Visual;
+        Visual.SegmentId = Response.SegmentId;
+        Visual.LocalPositionM = Response.LocalPosition;
+        Visual.CompressionM = Response.CompressionM;
+        Visual.FreeboardLossM = Response.FreeboardLossM;
+        const FString SegmentId = Visual.SegmentId;
+        const int32 VisualIndex = LastFlexVisualSegments.Add(MoveTemp(Visual));
+        VisualIndexById.Add(SegmentId, VisualIndex);
+    }
+    for (const FRaftSimFlexRockContact& Contact : Contacts.Contacts)
+    {
+        const int32* FoundIndex = VisualIndexById.Find(Contact.SegmentId);
+        if (FoundIndex == nullptr || !LastFlexVisualSegments.IsValidIndex(*FoundIndex))
+        {
+            continue;
+        }
+        FRaftSimFlexVisualSegmentState& Visual = LastFlexVisualSegments[*FoundIndex];
+        if (Contact.IndentationM >= Visual.IndentationM)
+        {
+            Visual.IndentationM = Contact.IndentationM;
+            Visual.ContactNormalLocal = Contact.ContactNormalLocal;
+        }
+        Visual.bWrapping |= Contact.bWrapping;
+        Visual.bPinned |= Contact.bPinned;
+        Visual.bRecovering |= Contact.bRecovering;
     }
 
     // Quasi-static force/moment modifiers on the kinematic state.

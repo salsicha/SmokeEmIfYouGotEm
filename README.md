@@ -2,7 +2,7 @@
 
 An open-source, photorealistic whitewater rafting simulator built with Unreal Engine 5.8 and a first-party shallow-water physics stack. You are the river guide: read the rapid, set the angle, call the strokes, keep your crew in the boat.
 
-**Status (July 2026): pre-release, in active development.** The physics/validation foundation and environment-authoring pipeline are mature; the playable game layer is being built now. The 1.0 release targets one complete river — the **South Fork American, Chili Bar to Salmon Falls** — with all 20 named rapids at three real flow levels. See [docs/release-1.0-plan.md](docs/release-1.0-plan.md) for the full plan and [CHANGELOG.md](CHANGELOG.md) for progress.
+**Status (July 2026): pre-release, in active development.** The physics/validation foundation and environment-authoring pipeline are mature; the playable game layer is being built now. The 1.0 release targets one complete river — the **South Fork American, Chili Bar to Salmon Falls** — with all 20 named rapids at three real flow levels. See [docs/game-completion-plan.md](docs/game-completion-plan.md) for the active milestone plan and [CHANGELOG.md](CHANGELOG.md) for progress.
 
 ## What's in this repository
 

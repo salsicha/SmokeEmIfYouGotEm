@@ -4,6 +4,19 @@ All notable changes to this project are recorded here, newest first. Versioning 
 
 ## [Unreleased]
 
+### Game completion M1 — Flexible raft and rock contacts (July 19, 2026)
+
+- Added runtime-authoritative rock actors and connected nearby world rocks to the D4
+  flexible contact/wrap/pin/release solve.
+- Exported D1-D4 per-segment visual state and made the procedural raft tubes and floor
+  visibly compress, lose freeboard, indent around contacts, and recover after release.
+- Regenerated all five runnable river maps with deterministic hydraulic-crux rock gardens
+  and added automation for wrap deformation, stable topology, recovery, and serialized
+  contact authority.
+- Added an explicit wrap-test capture command and made latent gameplay tests select the
+  newest PIE world/reset inherited motion when run after other tests.
+- Published `docs/game-completion-plan.md` as the active milestone roadmap through 1.0.
+
 ### Phase 0 — Governance reset, licensing, repo trim (July 17, 2026)
 
 - Froze the superseded five-river execution plan and its external-review/DoD apparatus; `docs/release-1.0-plan.md` (revision 2) is the single top-level driver.

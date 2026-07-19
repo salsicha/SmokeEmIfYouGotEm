@@ -131,6 +131,23 @@ struct FRaftSimFlexStepTelemetry
     FVector AppliedTorqueNm = FVector::ZeroVector;
 };
 
+// Per-segment shape state exported by the authoritative D1-D4 solve for the
+// runtime inflatable mesh. Positions and deformation distances are in meters
+// in raft-local space. This is presentation data derived from the same solve
+// that applies forces; it is not a second visual-only contact simulation.
+struct RAFTSIMPHYSICS_API FRaftSimFlexVisualSegmentState
+{
+    FString SegmentId;
+    FVector LocalPositionM = FVector::ZeroVector;
+    FVector ContactNormalLocal = FVector::ZeroVector;
+    double CompressionM = 0.0;
+    double FreeboardLossM = 0.0;
+    double IndentationM = 0.0;
+    bool bWrapping = false;
+    bool bPinned = false;
+    bool bRecovering = false;
+};
+
 UCLASS(BlueprintType)
 class RAFTSIMPHYSICS_API URaftSimChronoRuntimeAdapter : public UObject
 {
@@ -216,6 +233,11 @@ public:
         return IndentationBySegment;
     }
 
+    const TArray<FRaftSimFlexVisualSegmentState>& GetFlexibleVisualSegments() const
+    {
+        return LastFlexVisualSegments;
+    }
+
 private:
     UPROPERTY()
     FRaftSimRaftBodyConfig RaftConfig;
@@ -243,6 +265,7 @@ private:
     TMap<FString, double> RetainedVolumeBySegment;
     TMap<FString, double> IndentationBySegment;
     FRaftSimFlexStepTelemetry LastFlexStepTelemetry;
+    TArray<FRaftSimFlexVisualSegmentState> LastFlexVisualSegments;
 
     bool StepFlexibleRaftDynamics(double SubstepSeconds);
 };

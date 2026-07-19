@@ -1,6 +1,6 @@
 # TODO
 
-> Milestones 0–25A are complete and archived in [docs/todo-archive.md](docs/todo-archive.md). Active work is driven by [docs/release-1.0-plan.md](docs/release-1.0-plan.md).
+> Milestones 0–25A are complete and archived in [docs/todo-archive.md](docs/todo-archive.md). Active game-completion work is driven by [docs/game-completion-plan.md](docs/game-completion-plan.md). The historical environment backlog below remains source evidence and feeds that plan.
 
 ## Milestone 26: Photoreal River Environment Production
 
