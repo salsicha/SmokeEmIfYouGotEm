@@ -12,6 +12,37 @@ ReducedShallowWaterSolver::ReducedShallowWaterSolver(Scenario scenario, SolverCo
     recompute_state(state_);
 }
 
+void ReducedShallowWaterSolver::replace_state(WaterState state, double time) {
+    if (!std::isfinite(time) || time < 0.0) {
+        throw std::runtime_error("Replacement solver time must be finite and non-negative.");
+    }
+    const std::size_t nx = scenario_.grid.nx;
+    const std::size_t ny = scenario_.grid.ny;
+    auto require_shape = [&](const Array2D& field, const char* name) {
+        if (field.nx() != nx || field.ny() != ny) {
+            throw std::runtime_error(std::string("Replacement ") + name + " shape does not match solver grid.");
+        }
+        for (double value : field.values()) {
+            if (!std::isfinite(value)) {
+                throw std::runtime_error(std::string("Replacement ") + name + " contains a non-finite value.");
+            }
+        }
+    };
+    require_shape(state.h, "h");
+    require_shape(state.eta, "eta");
+    require_shape(state.u, "u");
+    require_shape(state.v, "v");
+    require_shape(state.hu, "hu");
+    require_shape(state.hv, "hv");
+    if (state.wet.nx != nx || state.wet.ny != ny || state.wet.values.size() != nx * ny) {
+        throw std::runtime_error("Replacement wet mask shape does not match solver grid.");
+    }
+    recompute_state(state);
+    state_ = std::move(state);
+    time_ = time;
+    initial_mass_ = compute_mass(scenario_, state_);
+}
+
 Frame ReducedShallowWaterSolver::make_frame() const {
     return Frame{time_, state_, compute_derived_fields(scenario_, state_, config_)};
 }
@@ -1060,6 +1091,10 @@ void ReducedShallowWaterSolver::apply_boundaries() {
                     }
                 } else if (boundary.has_stage) {
                     state_.h(row, col) = std::max(0.0, boundary.stage - scenario_.bed(row, col));
+                    if (boundary.kind == "inflow" && boundary.has_velocity) {
+                        state_.u(row, col) = boundary.velocity_x;
+                        state_.v(row, col) = boundary.velocity_y;
+                    }
                 } else if (scenario_.grid.nx > 1) {
                     state_.h(row, col) = state_.h(row, col + 1);
                     state_.u(row, col) = state_.u(row, col + 1);

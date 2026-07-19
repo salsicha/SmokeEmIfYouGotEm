@@ -81,6 +81,40 @@ void assert_finite_volume_second_order_is_deterministic(const raftsim::Scenario&
     expect(max_abs_diff(first_frames.back().state.v, second_frames.back().state.v) < 1.0e-12, "second-order v run is not deterministic");
 }
 
+void assert_live_state_can_be_replaced(const raftsim::Scenario& scenario) {
+    raftsim::ReducedShallowWaterSolver solver(scenario, finite_volume_second_order_config());
+    raftsim::WaterState replacement = solver.state();
+    const std::size_t row = scenario.grid.ny / 2;
+    const std::size_t col = scenario.grid.nx / 2;
+    replacement.h(row, col) = std::max(0.25, replacement.h(row, col) + 0.125);
+    replacement.u(row, col) = 1.75;
+    replacement.v(row, col) = -0.25;
+    // Deliberately stale derived fields must be corrected by replace_state.
+    replacement.eta(row, col) = -999.0;
+    replacement.hu(row, col) = -999.0;
+    replacement.hv(row, col) = -999.0;
+    replacement.wet.values[row * scenario.grid.nx + col] = 0;
+    solver.replace_state(std::move(replacement), 3.25);
+    expect(std::abs(solver.time() - 3.25) < 1.0e-12, "replacement did not preserve requested solver time");
+    expect(std::abs(solver.state().eta(row, col) -
+                    (scenario.bed(row, col) + solver.state().h(row, col))) < 1.0e-12,
+           "replacement eta was not recomputed");
+    expect(std::abs(solver.state().hu(row, col) -
+                    solver.state().h(row, col) * solver.state().u(row, col)) < 1.0e-12,
+           "replacement momentum was not recomputed");
+    expect(solver.state().wet(row, col), "replacement wet mask was not recomputed");
+
+    raftsim::WaterState bad_shape = solver.state();
+    bad_shape.h = raftsim::Array2D(1, 1, 1.0);
+    bool rejected = false;
+    try {
+        solver.replace_state(std::move(bad_shape), 4.0);
+    } catch (const std::runtime_error&) {
+        rejected = true;
+    }
+    expect(rejected, "shape-mismatched replacement state was accepted");
+}
+
 void assert_finite_volume_second_order_is_well_balanced(const raftsim::Scenario& scenario) {
     // A lake-at-rest state over the scenario bathymetry (with reflective walls) must
     // stay exactly at rest under the second-order MUSCL path, including partially
@@ -167,6 +201,7 @@ int main(int argc, char** argv) {
         assert_scenario_loads(scenario);
         assert_solver_is_deterministic(scenario);
         assert_finite_volume_second_order_is_deterministic(scenario);
+        assert_live_state_can_be_replaced(scenario);
         assert_finite_volume_second_order_is_well_balanced(scenario);
         assert_chrono_coupling_samples_water_and_contact(scenario);
         if (argc == 3) {

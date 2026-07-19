@@ -1,0 +1,70 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29610.829674942248,
+        "y": -0.46994476636637583
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "low_nuisance",
+        "display_name": "Standing waves on the right bend",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "standing_waves_bend"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29603.087524615115,
+        "y": 11.824329839055586
+      },
+      "kind": "rock",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "swim_risk",
+        "display_name": "Bank rocks and holes",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "bank_rocks_and_holes"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 29531.692553280882,
+        "y": -1.2421560695493026
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Right-of-center line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "right_of_center_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    }
+  ]
+}

@@ -6,9 +6,9 @@
 // are disabled unconditionally: game water is always the genuine solver.
 //
 // P2 slice one: a self-contained flat tank window (replaces the constant-depth
-// placeholder). This slice adds river windows seeded from cooked per-flow-band
-// steady fields (raftsim.cooked_flow_fields.v1); the moving-window recenter
-// lands with the corridor streaming slice.
+// placeholder). River windows are seeded from cooked per-flow-band steady
+// fields (raftsim.cooked_flow_fields.v1) and can hand overlapping state to a
+// downstream crop without resetting solver time.
 
 #include "CoreMinimal.h"
 
@@ -68,7 +68,8 @@ public:
     static TUniquePtr<FRaftSimLiveWaterWindow> CreateFromCookedFields(
         const FString& CookedFieldsDir, const FString& BandId,
         const FVector2D& WindowCenterM, const FVector2D& WindowExtentM,
-        float RoughnessManning, FString& OutError);
+        float RoughnessManning, FString& OutError,
+        bool bRecenterHydraulicCrux = true);
 
     ~FRaftSimLiveWaterWindow();
 
@@ -92,6 +93,13 @@ public:
 
     /** True if any h/u/v cell is NaN or infinite. */
     bool HasNonFiniteState() const;
+
+    /**
+     * Copy depth and velocity from every world-space cell shared with the
+     * previous window, preserve its solver clock, and return the number of
+     * transferred cells.  Zero means the windows do not overlap.
+     */
+    int32 TransferOverlapStateFrom(const FRaftSimLiveWaterWindow& PreviousWindow);
 
 private:
     FRaftSimLiveWaterWindow();

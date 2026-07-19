@@ -344,6 +344,50 @@ raftsim::BoundaryCondition MakeEdgeBoundary(const char* Edge, const char* Kind)
     return Boundary;
 }
 
+bool TryReadRuntimeBoundary(
+    const TSharedPtr<FJsonObject>& Band, const FString& Edge,
+    double VerticalDatum, raftsim::BoundaryCondition& OutBoundary)
+{
+    const TArray<TSharedPtr<FJsonValue>>* RuntimeBoundaries = nullptr;
+    if (!Band.IsValid() || !Band->TryGetArrayField(TEXT("runtime_boundaries"), RuntimeBoundaries))
+    {
+        return false;
+    }
+    for (const TSharedPtr<FJsonValue>& Value : *RuntimeBoundaries)
+    {
+        const TSharedPtr<FJsonObject> Object = Value->AsObject();
+        FString CandidateEdge;
+        FString Kind;
+        if (!Object.IsValid() || !Object->TryGetStringField(TEXT("edge"), CandidateEdge) ||
+            CandidateEdge != Edge || !Object->TryGetStringField(TEXT("kind"), Kind))
+        {
+            continue;
+        }
+        OutBoundary = MakeEdgeBoundary(TCHAR_TO_UTF8(*CandidateEdge), TCHAR_TO_UTF8(*Kind));
+        double Stage = 0.0;
+        if (Object->TryGetNumberField(TEXT("stage"), Stage))
+        {
+            OutBoundary.has_stage = true;
+            OutBoundary.stage = Stage - VerticalDatum;
+        }
+        double Depth = 0.0;
+        if (Object->TryGetNumberField(TEXT("depth"), Depth))
+        {
+            OutBoundary.has_depth = true;
+            OutBoundary.depth = Depth;
+        }
+        const TArray<TSharedPtr<FJsonValue>>* Velocity = nullptr;
+        if (Object->TryGetArrayField(TEXT("velocity"), Velocity) && Velocity->Num() == 2)
+        {
+            OutBoundary.has_velocity = true;
+            OutBoundary.velocity_x = (*Velocity)[0]->AsNumber();
+            OutBoundary.velocity_y = (*Velocity)[1]->AsNumber();
+        }
+        return true;
+    }
+    return false;
+}
+
 } // namespace
 
 FRaftSimLiveWaterWindow::FRaftSimLiveWaterWindow() = default;
@@ -400,7 +444,7 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFlatTank(
 TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFields(
     const FString& CookedFieldsDir, const FString& BandId,
     const FVector2D& WindowCenterM, const FVector2D& WindowExtentM,
-    float RoughnessManning, FString& OutError)
+    float RoughnessManning, FString& OutError, bool bRecenterHydraulicCrux)
 {
     OutError.Reset();
 
@@ -655,16 +699,26 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
         }
     }
 
-    // Boundaries: cross-stream edges that coincide with the cooked banks keep
-    // the bank condition the fields were cooked with; every cut edge is
-    // transmissive (copy-neighbor). Scenario-level inflow/outflow forcing for
-    // long-lived windows arrives with the moving-window recenter slice.
-    Scenario.boundaries.push_back(MakeEdgeBoundary("west", "transmissive"));
-    Scenario.boundaries.push_back(MakeEdgeBoundary("east", "transmissive"));
-    Scenario.boundaries.push_back(
-        MakeEdgeBoundary("south", Row0 == 0 ? "bank" : "transmissive"));
-    Scenario.boundaries.push_back(
-        MakeEdgeBoundary("north", Row1 == FullNy - 1 ? "bank" : "transmissive"));
+    // Boundaries: a crop edge uses transmissive copy-neighbor flow.  An edge
+    // coincident with the full cooked grid restores its authored boundary,
+    // including the stage/velocity inflow and stage outflow emitted by M3.
+    // Authored stages share the pre-loader vertical datum, hence the same
+    // datum shift applied to bed/eta above is applied here.
+    const auto AddBoundary = [&Scenario, &Band, VerticalDatum](
+                                 const TCHAR* Edge, bool bFullGridEdge,
+                                 const char* FallbackKind)
+    {
+        raftsim::BoundaryCondition Boundary;
+        if (!bFullGridEdge || !TryReadRuntimeBoundary(Band, Edge, VerticalDatum, Boundary))
+        {
+            Boundary = MakeEdgeBoundary(TCHAR_TO_UTF8(Edge), FallbackKind);
+        }
+        Scenario.boundaries.push_back(MoveTemp(Boundary));
+    };
+    AddBoundary(TEXT("west"), Col0 == 0, "transmissive");
+    AddBoundary(TEXT("east"), Col1 == FullNx - 1, "transmissive");
+    AddBoundary(TEXT("south"), Row0 == 0, Row0 == 0 ? "bank" : "transmissive");
+    AddBoundary(TEXT("north"), Row1 == FullNy - 1, Row1 == FullNy - 1 ? "bank" : "transmissive");
 
     // --- Solver config: the manifest's cook settings ----------------------
     raftsim::SolverConfig Config;
@@ -683,6 +737,11 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     // Game water is always the genuine solver, whatever the manifest says.
     Config.disable_fixture_calibrations = true;
 
+    const FVector2D RuntimeOriginM = bRecenterHydraulicCrux
+        ? FVector2D(
+              -static_cast<double>(CruxCol) * Dx,
+              -static_cast<double>(CruxRow) * Dy)
+        : FVector2D(Scenario.grid.origin_x, Scenario.grid.origin_y);
     TUniquePtr<FRaftSimLiveWaterWindow> Window(new FRaftSimLiveWaterWindow());
     try
     {
@@ -695,12 +754,10 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
             TEXT("solver rejected the seeded river window: %hs"), Exception.what());
         return nullptr;
     }
-    // Re-centre the window so the hydraulic crux sits at world origin: the maps
-    // spawn the raft/player/camera around world (0,0) and render a fixed patch
-    // there, so this places the actual rapid in front of the raft (world of a
-    // sample = OriginM + cell*Cell; crux cell -> world 0).
-    Window->OriginM = FVector2D(
-        -static_cast<double>(CruxCol) * Dx, -static_cast<double>(CruxRow) * Dy);
+    // Legacy fixed rapid maps re-centre their hydraulic crux on world origin.
+    // Moving corridor windows retain global station/lateral coordinates so an
+    // overlapping downstream crop addresses the same physical cells.
+    Window->OriginM = RuntimeOriginM;
     Window->CellXM = static_cast<float>(Dx);
     Window->CellYM = static_cast<float>(Dy);
     Window->SeedWetFractionValue =
@@ -780,6 +837,65 @@ bool FRaftSimLiveWaterWindow::HasNonFiniteState() const
     return false;
 }
 
+int32 FRaftSimLiveWaterWindow::TransferOverlapStateFrom(
+    const FRaftSimLiveWaterWindow& PreviousWindow)
+{
+    if (!Solver.IsValid() || !PreviousWindow.Solver.IsValid())
+    {
+        return 0;
+    }
+    const raftsim::Scenario& Scenario = Solver->scenario();
+    const raftsim::Scenario& PreviousScenario = PreviousWindow.Solver->scenario();
+    const double PreviousMaxX = PreviousWindow.OriginM.X +
+        static_cast<double>(PreviousScenario.grid.nx - 1) * PreviousWindow.CellXM;
+    const double PreviousMaxY = PreviousWindow.OriginM.Y +
+        static_cast<double>(PreviousScenario.grid.ny - 1) * PreviousWindow.CellYM;
+    raftsim::WaterState State = Solver->state();
+    int32 TransferredCells = 0;
+    for (std::size_t Row = 0; Row < Scenario.grid.ny; ++Row)
+    {
+        for (std::size_t Col = 0; Col < Scenario.grid.nx; ++Col)
+        {
+            const FVector2D WorldPosition(
+                OriginM.X + static_cast<double>(Col) * CellXM,
+                OriginM.Y + static_cast<double>(Row) * CellYM);
+            if (WorldPosition.X < PreviousWindow.OriginM.X || WorldPosition.X > PreviousMaxX ||
+                WorldPosition.Y < PreviousWindow.OriginM.Y || WorldPosition.Y > PreviousMaxY)
+            {
+                continue;
+            }
+            const FRaftSimLiveWaterSampleResult Sampled = PreviousWindow.Sample(WorldPosition);
+            if (!Sampled.bValid)
+            {
+                continue;
+            }
+            const double Depth = FMath::Max(static_cast<double>(Sampled.DepthM), 0.0);
+            State.h(Row, Col) = Depth;
+            State.u(Row, Col) = Sampled.bWet ? static_cast<double>(Sampled.VelocityMps.X) : 0.0;
+            State.v(Row, Col) = Sampled.bWet ? static_cast<double>(Sampled.VelocityMps.Y) : 0.0;
+            State.eta(Row, Col) = Scenario.bed(Row, Col) + Depth;
+            State.hu(Row, Col) = Depth * State.u(Row, Col);
+            State.hv(Row, Col) = Depth * State.v(Row, Col);
+            State.wet.values[Row * Scenario.grid.nx + Col] = Sampled.bWet ? 1 : 0;
+            ++TransferredCells;
+        }
+    }
+    if (TransferredCells == 0)
+    {
+        return 0;
+    }
+    try
+    {
+        Solver->replace_state(MoveTemp(State), PreviousWindow.SimTimeSeconds());
+    }
+    catch (const std::exception&)
+    {
+        return 0;
+    }
+    StepCounter = PreviousWindow.StepCounter;
+    return TransferredCells;
+}
+
 FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
     const FVector2D& WorldPositionM) const
 {
@@ -797,14 +913,17 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
     const double GridY = (WorldPositionM.Y - OriginM.Y) / CellYM;
     const std::size_t Nx = Scenario.grid.nx;
     const std::size_t Ny = Scenario.grid.ny;
-    if (Nx < 2 || Ny < 2)
+    if (Nx < 2 || Ny < 2 || GridX < 0.0 || GridY < 0.0 ||
+        GridX > static_cast<double>(Nx - 1) || GridY > static_cast<double>(Ny - 1))
     {
         return Result;
     }
-    const double ClampedX = FMath::Clamp(GridX, 0.0, static_cast<double>(Nx - 2));
-    const double ClampedY = FMath::Clamp(GridY, 0.0, static_cast<double>(Ny - 2));
-    const std::size_t Col = static_cast<std::size_t>(ClampedX);
-    const std::size_t Row = static_cast<std::size_t>(ClampedY);
+    const double ClampedX = FMath::Clamp(GridX, 0.0, static_cast<double>(Nx - 1));
+    const double ClampedY = FMath::Clamp(GridY, 0.0, static_cast<double>(Ny - 1));
+    const std::size_t Col = FMath::Min(
+        static_cast<std::size_t>(FMath::FloorToDouble(ClampedX)), Nx - 2);
+    const std::size_t Row = FMath::Min(
+        static_cast<std::size_t>(FMath::FloorToDouble(ClampedY)), Ny - 2);
     const double Fx = ClampedX - static_cast<double>(Col);
     const double Fy = ClampedY - static_cast<double>(Row);
 

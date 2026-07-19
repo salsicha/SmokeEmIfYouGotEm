@@ -1,0 +1,70 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 36.17784613700999,
+        "y": 0.5052497048176008
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Chili Bar surf hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "chili_bar_surf_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 39.29988390051292,
+        "y": 9.277027185759508
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "eddy_line",
+        "consequence_class": "low_nuisance",
+        "display_name": "Left service eddy",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "left_service_eddy"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 59.454573310319006,
+        "y": -1.4840740346079864
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "recovery_pool",
+        "consequence_class": "low_nuisance",
+        "display_name": "Recovery pools below",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "recovery_pools_below"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

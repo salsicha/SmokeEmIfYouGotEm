@@ -1,0 +1,378 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8304.746354035577,
+        "y": 8.670821786816306
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "scout",
+        "consequence_class": "low_nuisance",
+        "display_name": "Left-bank scout eddy",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "left_bank_scout_eddy"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8286.617883339504,
+        "y": 1.3149542723118688
+      },
+      "kind": "rock",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "island",
+        "consequence_class": "swim_risk",
+        "display_name": "Entry rock/tree island",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_rock_island"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8295.079578425823,
+        "y": 0.9772498819458413
+      },
+      "kind": "strainer",
+      "length": 52.0,
+      "metadata": {
+        "catalog_feature_type": "sieve",
+        "consequence_class": "entrapment_life_threat",
+        "display_name": "Lead-in center sieve pile",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "lead_in_center_sieve"
+      },
+      "radius": 7.0,
+      "strength": 1.0,
+      "width": 20.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8299.895670244747,
+        "y": 0.8736687868073743
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "S-bend entry line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "s_bend_entry_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8305.142107458421,
+        "y": 11.865588825898032
+      },
+      "kind": "shallow",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "sneak_line",
+        "consequence_class": "swim_risk",
+        "display_name": "Far-left S-channel sneak",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "far_left_s_channel_sneak"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.176,
+      "center": {
+        "x": 8363.433775577863,
+        "y": -11.80486656328532
+      },
+      "kind": "lateral",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "lateral",
+        "consequence_class": "flip_risk",
+        "display_name": "Right diagonal wave",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "right_diagonal_wave"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8359.21515092638,
+        "y": 0.6366020279556053
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Main hole (the gut)",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "main_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8364.083054261602,
+        "y": -9.435010695034755
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Second hole on the right-hand turn",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "right_turn_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8362.118538023768,
+        "y": 11.877533940371832
+      },
+      "kind": "eddy_line",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "eddy_line",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Hard-exit left eddy",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "left_ferry_eddy"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8376.18594366067,
+        "y": 11.458272466111874
+      },
+      "kind": "rock",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "wall",
+        "consequence_class": "flip_risk",
+        "display_name": "Peanut Gallery left wall",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "peanut_gallery_left_wall"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8445.857802181306,
+        "y": -0.14081671883836777
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "pin_rock",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Gunsight Rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "gunsight_rock"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8427.795939891854,
+        "y": 0.4130319297344034
+      },
+      "kind": "ledge",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "ledge",
+        "consequence_class": "flip_risk",
+        "display_name": "Final drop at Gunsight",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "gunsight_final_drop"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8366.360233540567,
+        "y": -11.807573777380648
+      },
+      "kind": "wave_train",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "flip_risk",
+        "display_name": "Double Trouble right line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "double_trouble_right_line"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8286.367300773893,
+        "y": 10.200256051809934
+      },
+      "kind": "wave_train",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "surf_or_retention",
+        "display_name": "High-water left-of-island entry",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "high_water_left_island_entry"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8450.41124391642,
+        "y": -1.642025637357036
+      },
+      "kind": "strainer",
+      "length": 52.0,
+      "metadata": {
+        "catalog_feature_type": "sieve",
+        "consequence_class": "entrapment_life_threat",
+        "display_name": "Runout center sieve pile",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "runout_center_sieve"
+      },
+      "radius": 7.0,
+      "strength": 1.0,
+      "width": 20.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8442.832892365783,
+        "y": -11.689189403978801
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "recovery_pool",
+        "consequence_class": "low_nuisance",
+        "display_name": "Right safety eddy",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "right_safety_eddy"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 8451.176853563746,
+        "y": -1.5412530944545877
+      },
+      "kind": "hole",
+      "length": 52.0,
+      "metadata": {
+        "catalog_feature_type": "pourover",
+        "consequence_class": "entrapment_life_threat",
+        "display_name": "Hazard Rock pourover (below rapid)",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "hazard_rock_pourover_below"
+      },
+      "radius": 7.0,
+      "strength": 1.0,
+      "width": 20.0
+    }
+  ]
+}

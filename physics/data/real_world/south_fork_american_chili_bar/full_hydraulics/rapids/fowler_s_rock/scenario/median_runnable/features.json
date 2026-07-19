@@ -1,0 +1,158 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25342.42296165582,
+        "y": 1.661443940284998
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Entry line choices",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_line_choices"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25352.165607184394,
+        "y": -10.25965184739736
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "pin_rock",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "House Rock submerged boulder",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "subfeature_id": "house_rock_submerged_boulder"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25414.99593012961,
+        "y": -1.1947436060744208
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Center-channel hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "center_channel_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25425.27349975008,
+        "y": 7.526567584412302
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Left-side hole",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "left_channel_hole"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25439.189526227296,
+        "y": -1.0680625790422928
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Fowler's Rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "fowlers_rock_boulder"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25493.8263770795,
+        "y": -1.414652729270666
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Diagonal boulder-fence slot",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "diagonal_boulder_fence_slot"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 25439.980287269867,
+        "y": 10.187536187666824
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "High-flow left line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "subfeature_id": "high_flow_left_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    }
+  ]
+}

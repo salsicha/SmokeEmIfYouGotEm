@@ -1,0 +1,246 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 882.8010898613113,
+        "y": 1.6973975542228197
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Lead-in entry line",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_lead_in_line"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 891.4477141518462,
+        "y": 5.709020789533932
+      },
+      "kind": "rock",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "low_nuisance",
+        "display_name": "Diversion canal rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "entry",
+        "subfeature_id": "diversion_canal_rock"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 896.9455820735623,
+        "y": 0.0397087107504972
+      },
+      "kind": "wave_train",
+      "length": 38.56,
+      "metadata": {
+        "catalog_feature_type": "line",
+        "consequence_class": "swim_risk",
+        "display_name": "Entry slot between submerged rocks",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "subfeature_id": "entry_slot_between_submerged_rocks"
+      },
+      "radius": 5.5600000000000005,
+      "strength": 0.52,
+      "width": 14.24
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 972.1849871540612,
+        "y": -1.5756020591537472
+      },
+      "kind": "rock",
+      "length": 52.0,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "entrapment_life_threat",
+        "display_name": "Shallow boulder-garden bed",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "shallow_boulder_garden_bed"
+      },
+      "radius": 7.0,
+      "strength": 1.0,
+      "width": 20.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 965.982530003104,
+        "y": 0.3560096077518562
+      },
+      "kind": "hole",
+      "length": 43.040000000000006,
+      "metadata": {
+        "catalog_feature_type": "hole",
+        "consequence_class": "surf_or_retention",
+        "display_name": "Offset mid-river holes",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "offset_midriver_holes"
+      },
+      "radius": 6.04,
+      "strength": 0.68,
+      "width": 16.16
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 961.0668500898767,
+        "y": 1.5690624051655324
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "pin_rock",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Death Star Rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "subfeature_id": "death_star_rock"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 957.397749284768,
+        "y": -5.253892380459515
+      },
+      "kind": "wave_train",
+      "length": 46.959999999999994,
+      "metadata": {
+        "catalog_feature_type": "wave_train",
+        "consequence_class": "flip_risk",
+        "display_name": "Rhino funnel wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "subfeature_id": "rhino_funnel_wave_train"
+      },
+      "radius": 6.46,
+      "strength": 0.82,
+      "width": 17.84
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 1024.1259705416892,
+        "y": -8.238104161285195
+      },
+      "kind": "rock",
+      "length": 49.760000000000005,
+      "metadata": {
+        "catalog_feature_type": "boulder",
+        "consequence_class": "wrap_or_pin",
+        "display_name": "Rhino Rock",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "subfeature_id": "rhino_rock"
+      },
+      "radius": 6.76,
+      "strength": 0.92,
+      "width": 19.04
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 1044.297561714655,
+        "y": 7.701066697301432
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "eddy_line",
+        "consequence_class": "low_nuisance",
+        "display_name": "Left exit eddy",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "subfeature_id": "left_exit_recovery_eddy"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 1045.6986640967398,
+        "y": 1.1276070631871948
+      },
+      "kind": "wave_train",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "wave",
+        "consequence_class": "low_nuisance",
+        "display_name": "Exit wave train",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "subfeature_id": "exit_wave_train"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 906.1104111147109,
+        "y": -6.107092739928143
+      },
+      "kind": "eddy_line",
+      "length": 32.4,
+      "metadata": {
+        "catalog_feature_type": "scout",
+        "consequence_class": "low_nuisance",
+        "display_name": "Railroad-grade scout/portage trail",
+        "geometry_authority": "procedural_infill_interpreted_from_guide_inventory",
+        "guide_review_status": "required",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "subfeature_id": "railroad_grade_scout_portage"
+      },
+      "radius": 4.9,
+      "strength": 0.3,
+      "width": 11.6
+    }
+  ]
+}

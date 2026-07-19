@@ -119,6 +119,15 @@ struct FRaftSimWaterLiveWindowStats
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
     float SimTimeSeconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    int32 LastHandoffTransferredCellCount = 0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    int32 MovingWindowHandoffCount = 0;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    bool bLastHandoffPreservedState = false;
 };
 
 USTRUCT(BlueprintType)
@@ -184,6 +193,18 @@ public:
         FVector2D WindowCenterM, FVector2D WindowExtentM,
         float RoughnessManning = 0.041f);
 
+    /**
+     * Load a globally stationed river crop and, when a live crop already
+     * exists, transfer every overlapping water cell and preserve solver time.
+     * A non-overlapping replacement is rejected so gameplay cannot silently
+     * reset the river during a descent.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool ConfigureMovingRiverWindow(
+        const FString& CookedFieldsManifestDir, const FString& BandId,
+        FVector2D WindowCenterM, FVector2D WindowExtentM,
+        float RoughnessManning = 0.041f);
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool GetLiveWindowStats(FRaftSimWaterLiveWindowStats& OutStats) const;
 
@@ -232,6 +253,9 @@ private:
 
     int32 CommittedWaterFrame = 0;
     double SimTimeSeconds = 0.0;
+    int32 LastHandoffTransferredCellCount = 0;
+    int32 MovingWindowHandoffCount = 0;
+    bool bLastHandoffPreservedState = false;
 
     FString BuildDeterministicFrameHash() const;
     void AppendDeterministicCaptureFrame();
