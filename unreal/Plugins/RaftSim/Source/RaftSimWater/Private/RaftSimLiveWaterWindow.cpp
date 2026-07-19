@@ -573,6 +573,15 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     double SurfaceSum = 0.0;
     int64 SurfaceSamples = 0;
     double BedSum = 0.0;
+    // Horizontal datum: locate the reach's hydraulic crux (the strongest
+    // whitewater) so the window can be re-centred on it. ColFroude sums the
+    // Froude number per stream-wise column; the Froude-weighted row centroid
+    // gives the crux's lateral position. Froude = |u| / sqrt(g h).
+    constexpr double kGravity = 9.80665;
+    TArray<double> ColFroude;
+    ColFroude.Init(0.0, static_cast<int32>(Nx));
+    double FroudeRowSum = 0.0;
+    double FroudeTotal = 0.0;
     for (std::size_t Row = 0; Row < Ny; ++Row)
     {
         for (std::size_t Col = 0; Col < Nx; ++Col)
@@ -582,14 +591,46 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
             BedSum += CellBed;
             if (WetMask.Bytes[Source] != 0)
             {
-                SurfaceSum += CellBed + FMath::Max(Depth.Float64[Source], 0.0);
+                const double CellH = FMath::Max(Depth.Float64[Source], 0.0);
+                SurfaceSum += CellBed + CellH;
                 ++SurfaceSamples;
+                if (CellH > 0.05)
+                {
+                    const double Speed = FMath::Sqrt(
+                        VelU.Float64[Source] * VelU.Float64[Source] +
+                        VelV.Float64[Source] * VelV.Float64[Source]);
+                    const double Froude = Speed / FMath::Sqrt(kGravity * CellH);
+                    ColFroude[static_cast<int32>(Col)] += Froude;
+                    FroudeRowSum += static_cast<double>(Row) * Froude;
+                    FroudeTotal += Froude;
+                }
             }
         }
     }
     const double VerticalDatum = SurfaceSamples > 0
         ? SurfaceSum / static_cast<double>(SurfaceSamples)
         : BedSum / static_cast<double>(Nx * Ny);
+
+    // Crux column = strongest cross-stream Froude; crux row = Froude-weighted
+    // lateral centroid. Falls back to the window centre if no supercritical
+    // flow was cooked (a calm window stays centred as before).
+    std::size_t CruxCol = Nx / 2;
+    if (FroudeTotal > 0.0)
+    {
+        double Best = -1.0;
+        for (int32 Col = 0; Col < ColFroude.Num(); ++Col)
+        {
+            if (ColFroude[Col] > Best)
+            {
+                Best = ColFroude[Col];
+                CruxCol = static_cast<std::size_t>(Col);
+            }
+        }
+    }
+    const std::size_t CruxRow = FroudeTotal > 0.0
+        ? static_cast<std::size_t>(FMath::Clamp(
+              FroudeRowSum / FroudeTotal, 0.0, static_cast<double>(Ny - 1)))
+        : Ny / 2;
 
     int64 SeedWetCells = 0;
     for (std::size_t Row = 0; Row < Ny; ++Row)
@@ -654,7 +695,12 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
             TEXT("solver rejected the seeded river window: %hs"), Exception.what());
         return nullptr;
     }
-    Window->OriginM = FVector2D(OriginX + Col0 * Dx, OriginY + Row0 * Dy);
+    // Re-centre the window so the hydraulic crux sits at world origin: the maps
+    // spawn the raft/player/camera around world (0,0) and render a fixed patch
+    // there, so this places the actual rapid in front of the raft (world of a
+    // sample = OriginM + cell*Cell; crux cell -> world 0).
+    Window->OriginM = FVector2D(
+        -static_cast<double>(CruxCol) * Dx, -static_cast<double>(CruxRow) * Dy);
     Window->CellXM = static_cast<float>(Dx);
     Window->CellYM = static_cast<float>(Dy);
     Window->SeedWetFractionValue =

@@ -135,9 +135,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                     NormalOut = Sample.SurfaceNormal.GetSafeNormal();
                     const float Speed = Sample.VelocityMetersPerSecond.Size2D();
                     const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
-                    // Froude number = speed / sqrt(g * depth); >~1 breaks white.
+                    // Froude number = speed / sqrt(g * depth). Foam only where
+                    // the flow is genuinely supercritical (the holes and wave
+                    // crests), not across all moderately fast water, so the
+                    // whitewater stays tight to the real hydraulic features.
                     const float Froude = Speed / FMath::Sqrt(kGravity * Depth);
-                    Foam = FMath::Clamp((Froude - 0.6f) / 0.8f, 0.0f, 1.0f);
+                    Foam = FMath::Clamp((Froude - 1.0f) / 1.1f, 0.0f, 1.0f);
                     // Depth (over ~4 m) drives the base-colour deepening; speed
                     // (over ~8 m/s) is available for flow-driven shading.
                     DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
