@@ -118,7 +118,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
         {
             const int32 Index = Y * GridN + X;
             const FVector& V = Vertices[Index];
-            float SurfaceZCm = 0.0f;
+            // Dry cells are pushed 1.5 m below the bed so they hide under the
+            // terrain rather than rendering as a flat sheet that the banks poke
+            // through; only the genuinely wet channel shows water.
+            float SurfaceZCm = -1.0e5f;
             FVector NormalOut = FVector::UpVector;
             float Foam = 0.0f;
 
@@ -128,23 +131,31 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             {
                 FRaftSimWaterSample Sample;
                 if (WaterAdapter->SampleWaterAtWorldPosition(
-                        FVector(V.X, V.Y, 0.0f), Sample) &&
-                    Sample.bWet)
+                        FVector(V.X, V.Y, 0.0f), Sample))
                 {
-                    SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM;
-                    NormalOut = Sample.SurfaceNormal.GetSafeNormal();
-                    const float Speed = Sample.VelocityMetersPerSecond.Size2D();
-                    const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
-                    // Froude number = speed / sqrt(g * depth). Foam only where
-                    // the flow is genuinely supercritical (the holes and wave
-                    // crests), not across all moderately fast water, so the
-                    // whitewater stays tight to the real hydraulic features.
-                    const float Froude = Speed / FMath::Sqrt(kGravity * Depth);
-                    Foam = FMath::Clamp((Froude - 1.0f) / 1.1f, 0.0f, 1.0f);
-                    // Depth (over ~4 m) drives the base-colour deepening; speed
-                    // (over ~8 m/s) is available for flow-driven shading.
-                    DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
-                    SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);
+                    if (Sample.bWet)
+                    {
+                        SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM;
+                        NormalOut = Sample.SurfaceNormal.GetSafeNormal();
+                        const float Speed = Sample.VelocityMetersPerSecond.Size2D();
+                        const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
+                        // Froude number = speed / sqrt(g * depth). Foam only where
+                        // the flow is genuinely supercritical (the holes and wave
+                        // crests), not across all moderately fast water, so the
+                        // whitewater stays tight to the real hydraulic features.
+                        const float Froude = Speed / FMath::Sqrt(kGravity * Depth);
+                        Foam = FMath::Clamp((Froude - 1.0f) / 1.1f, 0.0f, 1.0f);
+                        // Depth (over ~4 m) drives the base-colour deepening; speed
+                        // (over ~8 m/s) is available for flow-driven shading.
+                        DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
+                        SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);
+                    }
+                    else
+                    {
+                        // Bury under the terrain (bed sits ~here); keeps the
+                        // dry banks free of a stray water sheet.
+                        SurfaceZCm = Sample.BedHeightMeters * kSurfCmPerM - 150.0f;
+                    }
                 }
             }
 

@@ -10,14 +10,28 @@
 #include "Camera/CameraActor.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
+#include "EngineUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "HAL/PlatformMisc.h"
 #include "Misc/Paths.h"
+#include "RaftSimRaftActor.h"
 #include "TimerManager.h"
 #include "UnrealClient.h"
 
 namespace RaftSimCaptureCommand
 {
+
+static ARaftSimRaftActor* FindRaft(UWorld* World)
+{
+    if (World != nullptr)
+    {
+        if (TActorIterator<ARaftSimRaftActor> It(World); It)
+        {
+            return *It;
+        }
+    }
+    return nullptr;
+}
 
 static void HandleCaptureAfter(const TArray<FString>& Args, UWorld* World)
 {
@@ -86,5 +100,91 @@ static FAutoConsoleCommandWithWorldAndArgs GCaptureAfterCommand(
          "screenshot the viewport and exit. "
          "Usage: RaftSim.CaptureAfter <seconds> [label] [x y z pitch yaw]"),
     FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureAfter));
+
+// Over-the-shoulder capture: order the crew to paddle downstream so the raft
+// runs into the rapid, then place the camera behind the raft's live position
+// (it is physics-driven, so it cannot be teleported) looking downstream.
+static void HandleCaptureRaft(const TArray<FString>& Args, UWorld* World)
+{
+    if (World == nullptr)
+    {
+        return;
+    }
+    const float Delay = Args.Num() > 0 ? FMath::Max(FCString::Atof(*Args[0]), 0.5f) : 14.0f;
+    const FString Label = Args.Num() > 1 ? Args[1] : TEXT("RaftSimRaft");
+    const float BackM = Args.Num() > 2 ? FCString::Atof(*Args[2]) : 8.0f;
+    const float UpM = Args.Num() > 3 ? FCString::Atof(*Args[3]) : 4.0f;
+    const float AheadM = Args.Num() > 4 ? FCString::Atof(*Args[4]) : 22.0f;
+    const FString OutPath =
+        FPaths::Combine(FPaths::ProjectSavedDir(), TEXT("Screenshots"), Label + TEXT(".png"));
+
+    TWeakObjectPtr<UWorld> WeakWorld(World);
+
+    // Start the crew paddling downstream once the raft has spawned.
+    FTimerHandle PaddleHandle;
+    World->GetTimerManager().SetTimer(
+        PaddleHandle,
+        FTimerDelegate::CreateLambda([WeakWorld]()
+        {
+            if (ARaftSimRaftActor* Raft = FindRaft(WeakWorld.Get()))
+            {
+                Raft->IssueCrewCommand(ERaftSimCrewCommand::AllForward);
+            }
+        }),
+        1.0f, false);
+
+    FTimerHandle ShotHandle;
+    World->GetTimerManager().SetTimer(
+        ShotHandle,
+        FTimerDelegate::CreateLambda([WeakWorld, OutPath, BackM, UpM, AheadM]()
+        {
+            UWorld* W = WeakWorld.Get();
+            if (ARaftSimRaftActor* Raft = FindRaft(W))
+            {
+                const FVector RaftLoc = Raft->GetActorLocation();
+                FVector Fwd = Raft->GetActorForwardVector();
+                Fwd.Z = 0.0f;
+                Fwd = Fwd.GetSafeNormal();
+                if (Fwd.IsNearlyZero())
+                {
+                    Fwd = FVector(1.0f, 0.0f, 0.0f);
+                }
+                const FVector CamLoc =
+                    RaftLoc - Fwd * (BackM * 100.0f) + FVector(0.0f, 0.0f, UpM * 100.0f);
+                const FVector LookAt =
+                    RaftLoc + Fwd * (AheadM * 100.0f) - FVector(0.0f, 0.0f, 150.0f);
+                const FRotator CamRot = (LookAt - CamLoc).Rotation();
+                if (ACameraActor* Cam = W->SpawnActor<ACameraActor>(
+                        ACameraActor::StaticClass(), CamLoc, CamRot))
+                {
+                    if (APlayerController* PC = W->GetFirstPlayerController())
+                    {
+                        PC->SetViewTarget(Cam);
+                    }
+                }
+                UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureRaft: raft at %s"), *RaftLoc.ToString());
+            }
+            FScreenshotRequest::RequestScreenshot(OutPath, false, false);
+
+            if (W != nullptr)
+            {
+                FTimerHandle ExitHandle;
+                W->GetTimerManager().SetTimer(
+                    ExitHandle,
+                    FTimerDelegate::CreateLambda([]() { FPlatformMisc::RequestExit(false); }),
+                    4.0f, false);
+            }
+        }),
+        Delay, false);
+
+    UE_LOG(LogTemp, Display, TEXT("RaftSim.CaptureRaft: paddling then shooting in %.1fs -> %s"),
+           Delay, *OutPath);
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GCaptureRaftCommand(
+    TEXT("RaftSim.CaptureRaft"),
+    TEXT("Paddle the raft downstream into the rapid, then screenshot over its "
+         "shoulder. Usage: RaftSim.CaptureRaft <seconds> [label] [backM] [upM] [aheadM]"),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleCaptureRaft));
 
 } // namespace RaftSimCaptureCommand
