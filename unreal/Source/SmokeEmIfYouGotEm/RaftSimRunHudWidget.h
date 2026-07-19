@@ -8,6 +8,7 @@
 class UTextBlock;
 class ARaftSimRunManager;
 class ARaftSimTrainingDirector;
+class ARaftSimPresentationDirector;
 
 UENUM(BlueprintType)
 enum class ERaftSimHudOverlay : uint8
@@ -40,8 +41,14 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|HUD")
     void ShowOverlay(ERaftSimHudOverlay Overlay);
 
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|HUD")
+    void BeginScenarioPresentation(const FText& Title, const FText& Briefing);
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|HUD")
     ERaftSimHudOverlay GetVisibleOverlay() const { return VisibleOverlay; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|HUD")
+    bool IsScenarioTransitionVisible() const { return TransitionRemaining > 0.0f; }
 
 protected:
     virtual TSharedRef<SWidget> RebuildWidget() override;
@@ -60,6 +67,9 @@ protected:
     TObjectPtr<UTextBlock> ProgressText;
 
     UPROPERTY()
+    TObjectPtr<UTextBlock> EnvironmentText;
+
+    UPROPERTY()
     TObjectPtr<UTextBlock> TrainingText;
 
     UPROPERTY()
@@ -69,11 +79,19 @@ protected:
     TObjectPtr<UTextBlock> RescueText;
 
     UPROPERTY()
+    TObjectPtr<UTextBlock> TransitionText;
+
+    UPROPERTY()
     TObjectPtr<ARaftSimRunManager> RunManager;
 
     UPROPERTY()
     TObjectPtr<ARaftSimTrainingDirector> TrainingDirector;
 
+    UPROPERTY()
+    TObjectPtr<ARaftSimPresentationDirector> PresentationDirector;
+
     float SubtitleRemaining = 0.0f;
+    float TransitionRemaining = 0.0f;
+    uint8 LastObservedRunState = 255;
     ERaftSimHudOverlay VisibleOverlay = ERaftSimHudOverlay::None;
 };

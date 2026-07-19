@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimGuidePlayerController.h"
+#include "RaftSimPresentationDirector.h"
 #include "RaftSimRunAudioDirector.h"
 #include "RaftSimRunManager.h"
 #include "RaftSimSaveSubsystem.h"
@@ -72,7 +73,20 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
         }
     }
 
-    // River audio director (P3 audio pass 1).
+    // Deterministic weather/time presentation precedes the audio director so
+    // the initial canyon/weather mix is valid on its first frame.
+    bool bHasPresentation = false;
+    if (TActorIterator<ARaftSimPresentationDirector> It(GetWorld()); It)
+    {
+        bHasPresentation = true;
+    }
+    if (!bHasPresentation)
+    {
+        GetWorld()->SpawnActor<ARaftSimPresentationDirector>(
+            ARaftSimPresentationDirector::StaticClass(), FTransform::Identity);
+    }
+
+    // Layered production river/raft/crew/music audio director.
     bool bHasAudio = false;
     if (TActorIterator<ARaftSimRunAudioDirector> It(GetWorld()); It)
     {

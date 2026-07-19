@@ -86,6 +86,24 @@ struct FRaftSimGuideCameraRuntimeState
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     float PendingHapticAmplitude = 0.0f;
 
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    FVector FlowMotionOffsetCm = FVector::ZeroVector;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    FRotator FlowMotionRotation = FRotator::ZeroRotator;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    float CurrentFieldOfView = 90.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    bool bChaseCameraActive = false;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    bool bIntroCameraActive = false;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    float ChaseWaterClearanceCm = 0.0f;
+
     FVector TargetImpactOffsetCm = FVector::ZeroVector;
     FRotator TargetImpactRotation = FRotator::ZeroRotator;
 };
@@ -99,6 +117,7 @@ public:
     ARaftSimGuidePawn();
 
     virtual void Tick(float DeltaSeconds) override;
+    virtual void CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult) override;
     virtual void BeginPlay() override;
     virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -144,6 +163,21 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
     float ConsumePendingHapticPulse();
 
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
+    void SetChaseCameraAllowed(bool bAllowed);
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
+    bool ToggleChaseCamera();
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
+    bool IsChaseCameraActive() const { return CameraRuntimeState.bChaseCameraActive; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|GuideCamera")
+    UCameraComponent* GetChaseCamera() const { return ChaseCamera; }
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
+    void BeginScenarioCameraPresentation(float DurationSeconds = 4.0f);
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Guide")
     ERaftSimGuideMobilityMode GetMobilityMode() const { return MobilityMode; }
 
@@ -157,6 +191,7 @@ public:
 protected:
     float GetEffectiveMotionIntensity() const;
     void UpdateComfortCamera(float DeltaSeconds);
+    void UpdateChaseCamera();
 
     void HandlePaddleStroke(const FInputActionValue& Value);
     void HandleTurnStroke(const FInputActionValue& Value);
@@ -252,9 +287,17 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<UCameraComponent> GuideCamera;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
+    TObjectPtr<UCameraComponent> ChaseCamera;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|GuideCamera")
     FRaftSimGuideCameraSettings CameraSettings;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     FRaftSimGuideCameraRuntimeState CameraRuntimeState;
+
+    bool bChaseCameraAllowed = false;
+    FVector PreviousRaftVelocityMps = FVector::ZeroVector;
+    float IntroCameraRemaining = 0.0f;
+    float IntroCameraDuration = 4.0f;
 };

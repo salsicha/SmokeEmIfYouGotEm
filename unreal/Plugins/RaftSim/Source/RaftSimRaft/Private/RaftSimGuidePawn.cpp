@@ -4,6 +4,7 @@
 #include "Components/SceneComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Engine/GameInstance.h"
 #include "Engine/LocalPlayer.h"
 #include "EngineUtils.h"
 #include "InputAction.h"
@@ -13,7 +14,9 @@
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "RaftSimInputActions.h"
+#include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
+#include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -143,13 +146,108 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     GuideCamera->SetRelativeLocation(FVector::ZeroVector);
     GuideCamera->bUsePawnControlRotation = true;
     GuideCamera->SetFieldOfView(90.0f);
+
+    ChaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FreeRunChaseCamera"));
+    ChaseCamera->SetupAttachment(Root);
+    // The guide inherits the flexible raft's full transform. Keep the optional
+    // chase view in absolute world space so a rolled or wrapped boat cannot
+    // invert the horizon or drag the camera beneath the water surface.
+    ChaseCamera->SetUsingAbsoluteLocation(true);
+    ChaseCamera->SetUsingAbsoluteRotation(true);
+    ChaseCamera->bUsePawnControlRotation = false;
+    ChaseCamera->SetFieldOfView(86.0f);
+    ChaseCamera->SetActive(false);
 }
 
 void ARaftSimGuidePawn::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     UpdateComfortCamera(DeltaSeconds);
+    UpdateChaseCamera();
     UpdateSwimmingAndRescueAim();
+}
+
+void ARaftSimGuidePawn::CalcCamera(float DeltaTime, FMinimalViewInfo& OutResult)
+{
+    // APawn's generic camera-component search is intentionally permissive and
+    // can select the first-person component for a frame after an active-state
+    // change. Explicit selection prevents a flexible-raft roll from leaking
+    // into the rendered Free Run chase view.
+    if (CameraRuntimeState.bChaseCameraActive && ChaseCamera && ChaseCamera->IsActive())
+    {
+        ChaseCamera->GetCameraView(DeltaTime, OutResult);
+        return;
+    }
+    Super::CalcCamera(DeltaTime, OutResult);
+}
+
+void ARaftSimGuidePawn::UpdateChaseCamera()
+{
+    if (ChaseCamera == nullptr)
+    {
+        return;
+    }
+
+    FVector PlanarForward = GetActorForwardVector();
+    PlanarForward.Z = 0.0f;
+    if (!PlanarForward.Normalize())
+    {
+        PlanarForward = GetControlRotation().Vector();
+        PlanarForward.Z = 0.0f;
+        PlanarForward.Normalize();
+    }
+    if (PlanarForward.IsNearlyZero())
+    {
+        PlanarForward = FVector::ForwardVector;
+    }
+
+    const FVector SubjectLocation = GetActorLocation();
+    float SubjectSurfaceZCm = SubjectLocation.Z;
+    float CameraSurfaceZCm = SubjectSurfaceZCm;
+    const URaftSimWaterRuntimeAdapter* Water = nullptr;
+    if (const UGameInstance* GI = GetGameInstance())
+    {
+        if (const URaftSimPhysicsBridgeSubsystem* Bridge =
+                GI->GetSubsystem<URaftSimPhysicsBridgeSubsystem>())
+        {
+            Water = Bridge->GetWaterRuntime();
+            if (Water != nullptr)
+            {
+                FRaftSimWaterSample SubjectSample;
+                if (Water->SampleWaterAtWorldPosition(SubjectLocation, SubjectSample) && SubjectSample.bWet)
+                {
+                    SubjectSurfaceZCm = SubjectSample.SurfaceHeightMeters * 100.0f;
+                    CameraSurfaceZCm = SubjectSurfaceZCm;
+                    FVector FlowForward = SubjectSample.VelocityMetersPerSecond;
+                    FlowForward.Z = 0.0f;
+                    if (FlowForward.Normalize())
+                    {
+                        PlanarForward = FlowForward;
+                    }
+                }
+            }
+        }
+    }
+
+    FVector CameraLocation = SubjectLocation - PlanarForward * 680.0f;
+    if (Water != nullptr)
+    {
+        FRaftSimWaterSample CameraSample;
+        if (Water->SampleWaterAtWorldPosition(CameraLocation, CameraSample) && CameraSample.bWet)
+        {
+            CameraSurfaceZCm = CameraSample.SurfaceHeightMeters * 100.0f;
+        }
+    }
+    CameraLocation.Z = FMath::Max(SubjectLocation.Z + 380.0f, CameraSurfaceZCm + 340.0f);
+    const FVector LookTarget(
+        SubjectLocation.X + PlanarForward.X * 1400.0f,
+        SubjectLocation.Y + PlanarForward.Y * 1400.0f,
+        FMath::Max(SubjectLocation.Z + 80.0f, SubjectSurfaceZCm + 90.0f));
+    FRotator CameraRotation = (LookTarget - CameraLocation).Rotation();
+    CameraRotation.Roll = 0.0f;
+    ChaseCamera->SetWorldLocationAndRotation(CameraLocation, CameraRotation);
+    CameraRuntimeState.ChaseWaterClearanceCm =
+        ChaseCamera->GetComponentLocation().Z - CameraSurfaceZCm;
 }
 
 void ARaftSimGuidePawn::UpdateSwimmingAndRescueAim()
@@ -233,6 +331,36 @@ float ARaftSimGuidePawn::ConsumePendingHapticPulse()
     const float Pulse = CameraRuntimeState.PendingHapticAmplitude;
     CameraRuntimeState.PendingHapticAmplitude = 0.0f;
     return Pulse;
+}
+
+void ARaftSimGuidePawn::SetChaseCameraAllowed(bool bAllowed)
+{
+    bChaseCameraAllowed = bAllowed;
+    if (!bAllowed && CameraRuntimeState.bChaseCameraActive)
+    {
+        CameraRuntimeState.bChaseCameraActive = false;
+        if (GuideCamera) GuideCamera->SetActive(true);
+        if (ChaseCamera) ChaseCamera->SetActive(false);
+    }
+}
+
+bool ARaftSimGuidePawn::ToggleChaseCamera()
+{
+    if (!bChaseCameraAllowed || GuideCamera == nullptr || ChaseCamera == nullptr)
+    {
+        return false;
+    }
+    CameraRuntimeState.bChaseCameraActive = !CameraRuntimeState.bChaseCameraActive;
+    GuideCamera->SetActive(!CameraRuntimeState.bChaseCameraActive);
+    ChaseCamera->SetActive(CameraRuntimeState.bChaseCameraActive);
+    return true;
+}
+
+void ARaftSimGuidePawn::BeginScenarioCameraPresentation(float DurationSeconds)
+{
+    IntroCameraDuration = FMath::Max(DurationSeconds, 0.25f);
+    IntroCameraRemaining = IntroCameraDuration;
+    CameraRuntimeState.bIntroCameraActive = true;
 }
 
 bool ARaftSimGuidePawn::HasCompleteRescueInputBindings() const
@@ -349,10 +477,60 @@ void ARaftSimGuidePawn::UpdateComfortCamera(float DeltaSeconds)
         StabilizedRotation.Roll *= 1.0f - Stabilization;
     }
 
+    FVector FlowOffset = FVector::ZeroVector;
+    FRotator FlowRotation = FRotator::ZeroRotator;
+    float SpeedMps = 0.0f;
+    if (AttachedRaft != nullptr && DeltaSeconds > KINDA_SMALL_NUMBER)
+    {
+        const FVector VelocityMps = AttachedRaft->GetRaftVelocity();
+        const FVector AccelerationMps2 = (VelocityMps - PreviousRaftVelocityMps) / DeltaSeconds;
+        PreviousRaftVelocityMps = VelocityMps;
+        SpeedMps = VelocityMps.Size();
+        const FVector LocalAcceleration = AttachedRaft->GetActorTransform().InverseTransformVectorNoScale(
+            AccelerationMps2);
+        const float Motion = GetEffectiveMotionIntensity();
+        FlowOffset = FVector(
+            FMath::Clamp(-LocalAcceleration.X * 0.32f, -7.0f, 7.0f),
+            FMath::Clamp(-LocalAcceleration.Y * 0.22f, -5.0f, 5.0f),
+            FMath::Clamp(FMath::Abs(LocalAcceleration.Z) * -0.12f, -3.5f, 0.0f)) * Motion;
+        FlowRotation = FRotator(
+            FMath::Clamp(-LocalAcceleration.X * 0.14f, -2.5f, 2.5f),
+            0.0f,
+            FMath::Clamp(LocalAcceleration.Y * 0.18f, -3.5f, 3.5f)) * Motion;
+    }
+    CameraRuntimeState.FlowMotionOffsetCm = FMath::VInterpTo(
+        CameraRuntimeState.FlowMotionOffsetCm, FlowOffset, DeltaSeconds, 4.0f);
+    CameraRuntimeState.FlowMotionRotation = FMath::RInterpTo(
+        CameraRuntimeState.FlowMotionRotation, FlowRotation, DeltaSeconds, 4.0f);
+
     if (CameraImpactAnchor)
     {
-        CameraImpactAnchor->SetRelativeLocation(CameraRuntimeState.FilteredImpactOffsetCm);
-        CameraImpactAnchor->SetRelativeRotation(StabilizedRotation);
+        CameraImpactAnchor->SetRelativeLocation(
+            CameraRuntimeState.FilteredImpactOffsetCm + CameraRuntimeState.FlowMotionOffsetCm);
+        CameraImpactAnchor->SetRelativeRotation(
+            StabilizedRotation + CameraRuntimeState.FlowMotionRotation);
+    }
+
+    CameraRuntimeState.CurrentFieldOfView = 90.0f +
+        FMath::Clamp(SpeedMps * 0.7f, 0.0f, 5.0f) * GetEffectiveMotionIntensity();
+    if (GuideCamera)
+    {
+        FVector IntroOffset = FVector::ZeroVector;
+        float IntroPitch = 0.0f;
+        float IntroFovOffset = 0.0f;
+        if (IntroCameraRemaining > 0.0f)
+        {
+            IntroCameraRemaining = FMath::Max(0.0f, IntroCameraRemaining - DeltaSeconds);
+            const float Alpha = 1.0f - IntroCameraRemaining / IntroCameraDuration;
+            const float Ease = FMath::InterpEaseInOut(0.0f, 1.0f, Alpha, 2.0f);
+            IntroOffset = FMath::Lerp(FVector(-72.0f, 0.0f, 42.0f), FVector::ZeroVector, Ease);
+            IntroPitch = FMath::Lerp(-5.0f, 0.0f, Ease);
+            IntroFovOffset = FMath::Lerp(-9.0f, 0.0f, Ease);
+            CameraRuntimeState.bIntroCameraActive = IntroCameraRemaining > 0.0f;
+        }
+        GuideCamera->SetRelativeLocation(IntroOffset);
+        GuideCamera->SetRelativeRotation(FRotator(IntroPitch, 0.0f, 0.0f));
+        GuideCamera->SetFieldOfView(CameraRuntimeState.CurrentFieldOfView + IntroFovOffset);
     }
 
     const float ImpactMagnitude = FMath::Clamp(

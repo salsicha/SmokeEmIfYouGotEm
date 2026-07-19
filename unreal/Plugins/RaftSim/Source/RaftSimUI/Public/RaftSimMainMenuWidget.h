@@ -9,6 +9,7 @@
 class UButton;
 class UTextBlock;
 class UVerticalBox;
+class USoundWaveProcedural;
 
 /**
  * Complete programmatic front end. It keeps every path keyboard/gamepad
@@ -37,6 +38,10 @@ protected:
 
     UFUNCTION()
     void HandleStart();
+    UFUNCTION()
+    void HandleMenuAudioCue();
+    UFUNCTION()
+    void OpenPendingLevel();
     UFUNCTION()
     void HandleCycleMode();
     UFUNCTION()
@@ -96,9 +101,15 @@ protected:
     UPROPERTY()
     TObjectPtr<UButton> StartButton;
 
+    UPROPERTY()
+    TObjectPtr<USoundWaveProcedural> MenuConfirmTone;
+
     TArray<FRaftSimCareerScenarioDefinition> ScenarioCatalog;
     ERaftSimGameMode SelectedMode = ERaftSimGameMode::TrainingEddy;
     int32 SelectedScenarioIndex = 0;
     bool bModeInitialized = false;
+    FName PendingLevelName;
+    FTimerHandle PendingTravelTimer;
+    TArray<uint8> MenuConfirmPcm;
 
 };
