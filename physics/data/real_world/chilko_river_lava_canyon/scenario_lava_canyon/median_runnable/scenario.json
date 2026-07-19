@@ -1,0 +1,119 @@
+{
+  "array_files": {
+    "bed": "bed.npy",
+    "features": "features.json",
+    "initial_state": "initial_state.npz",
+    "probes": "probes.json"
+  },
+  "boundaries": [
+    {
+      "depth": null,
+      "edge": "west",
+      "hydrograph": [],
+      "kind": "inflow",
+      "metadata": {
+        "flow_band": "median_runnable",
+        "manning_n": 0.062,
+        "manning_slope": 0.009141766415699143,
+        "target_discharge_m3s": 105.0
+      },
+      "stage": 1104.393669302097,
+      "velocity": [
+        1.9473154222604687,
+        0.0
+      ]
+    },
+    {
+      "depth": null,
+      "edge": "east",
+      "hydrograph": [],
+      "kind": "outflow",
+      "metadata": {
+        "flow_band": "median_runnable",
+        "target_discharge_m3s": 105.0
+      },
+      "stage": 1098.9086094526774,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "south",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "north",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    }
+  ],
+  "duration": 240.0,
+  "feature_count": 10,
+  "fixed_dt": 0.05,
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 41,
+    "origin_x": 0.0,
+    "origin_y": -40.0
+  },
+  "metadata": {
+    "confidence_score": 0.3,
+    "coordinate_reference_system": "channel-following meters; x downstream along the traced MRDEM-30 channel centered on adopted-axis station 9030.0 m, y positive river-left",
+    "description": "Reach-local Lava Canyon (Chilko / White Mile) C3 water window: MRDEM-30 valley frame with a conditioned channel and authored (interpreted) continuous Class IV wave-train bed geometry (periodic rib shelf, basalt-canyon constrictions, midstream broach rocks, lateral, exit wave train, limited-recovery eddy).",
+    "difficulty_preset": "class_IV_continuous_lava_canyon_white_mile",
+    "fixture_kind": null,
+    "flow_band": "median_runnable",
+    "flow_percentile": 0.55,
+    "gauge_source": "ECCC 08MA002 Chilko River at Outlet of Chilko Lake",
+    "generator": "raftsim.chilko_lava_canyon_c3_window",
+    "generator_version": "p3_c3_window.v1",
+    "provenance": {
+      "adopted_axis_station_m": 9030.0,
+      "anchor_snap_distance_m": 18.0,
+      "bed_geometry_authority": "interpreted_bed_geometry",
+      "dem_cannot_resolve_in_channel_rocks": true,
+      "dem_ground_sample_m": 30.0,
+      "dem_source_sha256": "589f3a58ec158e7b3f09f9b3823328b45e4bbade601a754147983055eed6faeb",
+      "feature_inventory_source": "named_rapid_source_catalog.v1:chilko_river_lava_canyon:Lava Canyon:feature_tags_interpreted",
+      "pending_human_review": true,
+      "production_promoted": false,
+      "rapid_name": "Lava Canyon",
+      "stage_east_m": 1098.9086094526774,
+      "stage_west_m": 1104.393669302097,
+      "station_adoption": "deterministic_upper_canyon_max_sustained_descent_order_2_of_5_pending_review",
+      "stationing_source": "physics/data/real_world/chilko_river_bc/production_corridor/chilko_river_lodge_to_taseko_junction/hydrography/route_stationing.json",
+      "target_discharge_m3s": 105.0,
+      "task": "five-river-plan W1 Chilko: signature-rapid C3 window"
+    },
+    "river_id": "chilko_river_lava_canyon",
+    "scenario_id": "chilko_lava_canyon_c3_window_median_runnable",
+    "scenario_type": "real_world",
+    "season_preset": "mid_summer_commercial_reference",
+    "section_id": "lava_canyon_station_9030m_c3_window",
+    "seed": 1,
+    "source_manifest": "physics/data/real_world/chilko_river_bc/source/terrain/nrcan_mrdem30_chilko_corridor_manifest.json"
+  },
+  "probe_count": 12,
+  "raft": {
+    "drag_coefficient": 1.25,
+    "grounding_friction": 0.65,
+    "guide_mass_kg": 85.0,
+    "length_m": 4.3,
+    "mass_kg": 420.0,
+    "passenger_count": 6,
+    "passenger_mass_kg": 75.0,
+    "tube_radius_m": 0.28,
+    "width_m": 1.9
+  },
+  "roughness": 0.062,
+  "schema_version": "raftsim.scenario2_5d.v0"
+}

@@ -1,0 +1,226 @@
+{
+  "bands": {
+    "high_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 121.26382720882361,
+        "train_x300": 126.32830515192802,
+        "upstream_x100": 126.85758541190262
+      },
+      "checks": {
+        "constrictions_accelerate": {
+          "measured": {
+            "accel_floor": 0.5033592848818769,
+            "constriction_max_froude": [
+              0.5549404328637411,
+              0.8025257272024464
+            ],
+            "reach_froude_median": 0.31459955305117304
+          },
+          "note": "Max Froude in each pinch throat exceeds max(0.35, ratio x the wetted-reach median Froude).",
+          "passed": true,
+          "subfeature_id": "basalt_canyon_constriction",
+          "thresholds": {
+            "min_abs_froude": 0.35,
+            "reach_ratio": 1.6
+          }
+        },
+        "continuous_wave_train_forms": {
+          "measured": {
+            "grad_ratio": 8.576312633424232,
+            "mean_wave_amplitude_m": 0.07576540754881478,
+            "reach_median_grad": 0.005997673863972031,
+            "standing_wave_count": 16,
+            "train_froude_p90": 0.6747654848108418,
+            "train_p90_grad": 0.05143792613074166
+          },
+          "note": "Detrended centerline surface-crest count down the train, elevated p90 |grad eta| vs the wetted-reach median, and near-critical p90 Froude = a continuous standing-wave train.",
+          "passed": true,
+          "subfeature_id": "continuous_wave_train",
+          "thresholds": {
+            "min_froude": 0.48,
+            "min_grad_ratio": 1.4,
+            "min_standing_waves": 6,
+            "min_wave_prominence_m": 0.04
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        }
+      },
+      "field_capture": "fields/high_runnable_final_fields.npz",
+      "scenario_id": "chilko_lava_canyon_c3_window_high_runnable",
+      "stage_east_m": 1099.1946642890048,
+      "stage_west_m": 1104.6797241384243,
+      "target_discharge_m3s": 142.6
+    },
+    "low_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 54.237696760844074,
+        "train_x300": 59.08608675992376,
+        "upstream_x100": 59.05658775107951
+      },
+      "checks": {
+        "constrictions_accelerate": {
+          "measured": {
+            "accel_floor": 0.42729897768110325,
+            "constriction_max_froude": [
+              0.439125038206738,
+              1.1749430967348997
+            ],
+            "reach_froude_median": 0.2670618610506895
+          },
+          "note": "Max Froude in each pinch throat exceeds max(0.35, ratio x the wetted-reach median Froude).",
+          "passed": true,
+          "subfeature_id": "basalt_canyon_constriction",
+          "thresholds": {
+            "min_abs_froude": 0.35,
+            "reach_ratio": 1.6
+          }
+        },
+        "continuous_wave_train_forms": {
+          "measured": {
+            "grad_ratio": 8.98311958709182,
+            "mean_wave_amplitude_m": 0.05743426828012667,
+            "reach_median_grad": 0.0049270269279138214,
+            "standing_wave_count": 9,
+            "train_froude_p90": 0.6584364888748451,
+            "train_p90_grad": 0.04426007210227149
+          },
+          "note": "Detrended centerline surface-crest count down the train, elevated p90 |grad eta| vs the wetted-reach median, and near-critical p90 Froude = a continuous standing-wave train.",
+          "passed": true,
+          "subfeature_id": "continuous_wave_train",
+          "thresholds": {
+            "min_froude": 0.38,
+            "min_grad_ratio": 1.3,
+            "min_standing_waves": 4,
+            "min_wave_prominence_m": 0.03
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        }
+      },
+      "field_capture": "fields/low_runnable_final_fields.npz",
+      "scenario_id": "chilko_lava_canyon_c3_window_low_runnable",
+      "stage_east_m": 1098.4999703463286,
+      "stage_west_m": 1103.985030195748,
+      "target_discharge_m3s": 67.0
+    },
+    "median_runnable": {
+      "achieved_discharge_m3s": {
+        "downstream_x500": 88.1613316003256,
+        "train_x300": 93.62199450059617,
+        "upstream_x100": 94.13666044943474
+      },
+      "checks": {
+        "constrictions_accelerate": {
+          "measured": {
+            "accel_floor": 0.47196500386265594,
+            "constriction_max_froude": [
+              0.5159099777700215,
+              0.8879305519832449
+            ],
+            "reach_froude_median": 0.29497812741415996
+          },
+          "note": "Max Froude in each pinch throat exceeds max(0.35, ratio x the wetted-reach median Froude).",
+          "passed": true,
+          "subfeature_id": "basalt_canyon_constriction",
+          "thresholds": {
+            "min_abs_froude": 0.35,
+            "reach_ratio": 1.6
+          }
+        },
+        "continuous_wave_train_forms": {
+          "measured": {
+            "grad_ratio": 9.316360885266135,
+            "mean_wave_amplitude_m": 0.06350655953273278,
+            "reach_median_grad": 0.005383907937302342,
+            "standing_wave_count": 13,
+            "train_froude_p90": 0.6612922691540232,
+            "train_p90_grad": 0.050158429316957416
+          },
+          "note": "Detrended centerline surface-crest count down the train, elevated p90 |grad eta| vs the wetted-reach median, and near-critical p90 Froude = a continuous standing-wave train.",
+          "passed": true,
+          "subfeature_id": "continuous_wave_train",
+          "thresholds": {
+            "min_froude": 0.42,
+            "min_grad_ratio": 1.4,
+            "min_standing_waves": 6,
+            "min_wave_prominence_m": 0.04
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        }
+      },
+      "field_capture": "fields/median_runnable_final_fields.npz",
+      "scenario_id": "chilko_lava_canyon_c3_window_median_runnable",
+      "stage_east_m": 1098.9086094526774,
+      "stage_west_m": 1104.393669302097,
+      "target_discharge_m3s": 105.0
+    }
+  },
+  "generated_on": "2026-07-18",
+  "headline_gate": {
+    "constrictions_accelerate_at_reference": true,
+    "continuous_wave_train_at_high": true,
+    "continuous_wave_train_at_reference": true,
+    "parameterization_iterations": [
+      {
+        "change": "initial authored bed as a thin, fast wave-train shelf (bed raised near the surface) modulated by near-critical full-width transverse sills, plus basalt-canyon constrictions with raised bottom sills and exposed midstream broach rocks",
+        "iteration": 1,
+        "outcome": "the full-width sills and the raised shelf acted as a staircase of dams: the reach would not convey (the discharge decayed from ~95 m3/s at the inflow to <20 m3/s downstream, mass accumulated upstream) and the FV solver destabilized past ~1,500-2,000 steps (rc=2)"
+      },
+      {
+        "change": "deepened the wave-train troughs and raised Manning n toward a boulder-canyon value to slow the near-critical front",
+        "iteration": 2,
+        "outcome": "runs survived a little longer but the reach still choked -- the full-width sills remained critical controls in series, so the window kept backing up and crashing"
+      },
+      {
+        "change": "made the base channel itself the conveying channel (a flat carved trough so the steady water surface sits at the conditioned proxy), replaced the damming full-width sills with low subcritical transverse ribs (~0.45 m amplitude) that undulate the surface without choking, converted the constrictions to lateral wall pinches with a partial-width throat wave (so the flow conveys around it), and submerged the midstream rocks.  A persistent thin near-dry cell over the boulder field still spiked the local velocity to ~8 m/s and collapsed the CFL timestep, so every authored crest was deepened to >=0.7 m submergence and the channel was widened/deepened for conveyance and n set to 0.062",
+        "iteration": 3,
+        "outcome": "the reach conveys (flux roughly constant end-to-end), stays stable at the reported settle, and the continuous subcritical standing-wave train forms down the reach with the constrictions accelerating the flow; the ~30 m MRDEM-30 source cannot resolve the true basalt-canyon geometry, so the train is honestly a coarse interpreted expression of the continuous-whitewater tags, not surveyed rapid geometry"
+      }
+    ],
+    "passed": true
+  },
+  "honesty": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "dem_resolution_gap": "The terrain source is MRDEM-30 (~30 m ground sample); it cannot resolve the basalt canyon walls, constrictions, rocks, or wave trains. The continuous wave train, constrictions and boulders are authored interpreted geometry, necessarily coarse relative to the true rapid; the solver validates that the authored geometry produces a continuous standing-wave train, not that it matches surveyed rapid geometry.",
+    "evidence_kind": "genuine_solver_behavioral_validation_not_parity",
+    "flow_band_gap": "Bands are an interpreted candidate from the 08MA002 lake-outlet gauge climatology, not gauge-routed reach discharge nor guide-approved; the true reach discharge is somewhat higher (tributary gain below the lake).",
+    "note": "Feature presence is validated behaviorally against the published Lava Canyon / White Mile feature tags; no claim of numeric parity with a reference solution is made.",
+    "settle_and_conveyance": "The report captures the developed settle at which all three bands are stable and the continuous wave train is fully formed. The reach conveys roughly 82-88% of the injected band target at this settle (the wall-pinch constrictions and the rib train add real head loss and the reach is still slowly relaxing), with the flux decaying a little from the inflow to the exit; recorded honestly as achieved_discharge_m3s rather than forced to the target. The lower basalt constriction runs locally supercritical and stronger with flow (a genuine constriction jet), which keeps feature-scale cells unsteady -- honest solver output, not numerically perfect steadiness."
+  },
+  "rapid_name": "Lava Canyon",
+  "river_id": "chilko_river_lava_canyon",
+  "schema": "raftsim.chilko.lava_canyon_c3_behavioral_validation.v1",
+  "solver": {
+    "boundary_mode": "scenario",
+    "disable_fixture_calibrations": true,
+    "feature_strength_scale": 0.0,
+    "fixed_dt": 0.05,
+    "flux_scheme": "hll",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 4000
+  },
+  "task_id": "five-river-plan-W1-chilko-lava-canyon-behavioral-gate",
+  "window_id": "lava_canyon_station_9030m_c3_window"
+}
