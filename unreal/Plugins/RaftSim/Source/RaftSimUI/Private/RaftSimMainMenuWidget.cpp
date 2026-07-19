@@ -12,6 +12,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "RaftSimSaveSubsystem.h"
 #include "RaftSimVerticalSliceFrontend.h"
+#include "Sound/SoundWaveProcedural.h"
+#include "TimerManager.h"
 
 namespace
 {
@@ -26,6 +28,27 @@ FText ModeName(ERaftSimGameMode Mode)
         default:
             return NSLOCTEXT("RaftSim", "TrainingEddy", "Training Eddy");
     }
+}
+
+TArray<uint8> BuildMenuConfirmTone()
+{
+    constexpr int32 UiSampleRate = 48000;
+    constexpr float DurationSeconds = 0.11f;
+    const int32 SampleCount = FMath::RoundToInt(UiSampleRate * DurationSeconds);
+    TArray<int16> Samples;
+    Samples.SetNumUninitialized(SampleCount);
+    for (int32 Index = 0; Index < SampleCount; ++Index)
+    {
+        const float T = static_cast<float>(Index) / UiSampleRate;
+        const float Envelope = FMath::Sin(PI * FMath::Clamp(T / DurationSeconds, 0.0f, 1.0f));
+        const float Signal = (FMath::Sin(2.0f * PI * 659.25f * T) * 0.55f +
+            FMath::Sin(2.0f * PI * 987.77f * T) * 0.25f) * Envelope;
+        Samples[Index] = static_cast<int16>(Signal * 32767.0f);
+    }
+    TArray<uint8> Bytes;
+    Bytes.SetNumUninitialized(Samples.Num() * sizeof(int16));
+    FMemory::Memcpy(Bytes.GetData(), Samples.GetData(), Bytes.Num());
+    return Bytes;
 }
 }
 
@@ -127,6 +150,17 @@ void URaftSimMainMenuWidget::NativeConstruct()
     Super::NativeConstruct();
 
     ScenarioCatalog = URaftSimProgressionLibrary::GetScenarioCatalog();
+    if (MenuConfirmTone == nullptr)
+    {
+        MenuConfirmPcm = BuildMenuConfirmTone();
+        MenuConfirmTone = NewObject<USoundWaveProcedural>(this);
+        MenuConfirmTone->SetSampleRate(48000);
+        MenuConfirmTone->NumChannels = 1;
+        MenuConfirmTone->Duration = 0.11f;
+        MenuConfirmTone->SoundGroup = SOUNDGROUP_UI;
+        MenuConfirmTone->bLooping = false;
+        MenuConfirmTone->QueueAudio(MenuConfirmPcm.GetData(), MenuConfirmPcm.Num());
+    }
     RefreshFromSave();
     if (StartButton != nullptr)
     {
@@ -143,12 +177,29 @@ UButton* URaftSimMainMenuWidget::MakeMenuButton(
     Button->AddChild(ButtonText);
 
     FScriptDelegate ClickDelegate;
+    ClickDelegate.BindUFunction(this, GET_FUNCTION_NAME_CHECKED(
+        URaftSimMainMenuWidget, HandleMenuAudioCue));
+    Button->OnClicked.Add(ClickDelegate);
+    ClickDelegate.Unbind();
     ClickDelegate.BindUFunction(this, ClickHandlerName);
     Button->OnClicked.Add(ClickDelegate);
 
     UVerticalBoxSlot* ButtonSlot = Parent->AddChildToVerticalBox(Button);
     ButtonSlot->SetPadding(FMargin(0.0f, 12.0f, 0.0f, 0.0f));
     return Button;
+}
+
+void URaftSimMainMenuWidget::HandleMenuAudioCue()
+{
+    if (MenuConfirmTone == nullptr || MenuConfirmPcm.IsEmpty())
+    {
+        return;
+    }
+    if (MenuConfirmTone->GetAvailableAudioByteCount() < MenuConfirmPcm.Num() / 2)
+    {
+        MenuConfirmTone->QueueAudio(MenuConfirmPcm.GetData(), MenuConfirmPcm.Num());
+    }
+    UGameplayStatics::PlaySound2D(this, MenuConfirmTone, 0.28f, 1.0f);
 }
 
 FName URaftSimMainMenuWidget::GetSelectedScenarioId() const
@@ -258,7 +309,21 @@ void URaftSimMainMenuWidget::HandleStart()
     const FRaftSimCareerScenarioDefinition& Scenario = ScenarioCatalog[SelectedScenarioIndex];
     if (Save && Save->BeginSession(SelectedMode, Scenario.ScenarioId))
     {
-        UGameplayStatics::OpenLevel(this, Scenario.LevelName);
+        PendingLevelName = Scenario.LevelName;
+        StartButton->SetIsEnabled(false);
+        InformationText->SetText(FText::Format(
+            NSLOCTEXT("RaftSim", "LoadingRun", "LOADING — {0}\nPreparing live water, crew, weather, and checkpoint…"),
+            Scenario.DisplayName));
+        GetWorld()->GetTimerManager().SetTimer(
+            PendingTravelTimer, this, &URaftSimMainMenuWidget::OpenPendingLevel, 0.18f, false);
+    }
+}
+
+void URaftSimMainMenuWidget::OpenPendingLevel()
+{
+    if (!PendingLevelName.IsNone())
+    {
+        UGameplayStatics::OpenLevel(this, PendingLevelName);
     }
 }
 

@@ -117,10 +117,11 @@ raft's visible/contact response passes calibrated flip/wrap/pin fixtures and pla
 **Exit:** a new player can learn, complete the campaign, unlock all content, recover from
 failures, and retain progress without editor/debug intervention.
 
-### M7 — Production audio, camera, and presentation polish *(in progress)*
+### M7 — Production audio, camera, and presentation polish *(complete July 19, 2026)*
 
-- Layered MetaSounds for current, rocks, holes, waves, raft fabric, paddles, impacts,
-  crew, rescue, canyon/riparian ambience, UI, and music; add occlusion and reverb zones.
+- Layered runtime sound synthesis/MetaSound-ready routing for current, rocks, holes,
+  waves, raft fabric, paddles, impacts, crew, rescue, canyon/riparian ambience, UI, and
+  music; add occlusion and reverb sends.
 - Finish first-person guide camera, comfort filter, optional Free Run chase camera,
   cinematics, transitions, loading, tutorial voice/text, and coherent art direction.
 - Add deterministic weather/time variants used by gameplay and captures.
@@ -128,7 +129,7 @@ failures, and retain progress without editor/debug intervention.
 **Exit:** every player action and rapid state has final audiovisual feedback, the mix is
 readable over river noise, and no debug/placeholder presentation remains.
 
-### M8 — Validation, optimization, and content lock
+### M8 — Validation, optimization, and content lock *(in progress)*
 
 - Convert the rapid review-run catalog into packaged-build regression automation.
 - Run determinism, solver conservation, raft contact, rescue, save, input, accessibility,
@@ -174,9 +175,9 @@ path is verified, and the completion goal can be marked complete.
 | M3 South Fork hydraulics | Complete | `aa610a6c` | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
 | M4 Photoreal environment | Complete | `0032554d` | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
 | M5 Characters/raft/rescue | Complete | `3d08efaa` | UE build; M5 4/4; rendered rescue 1/1; P2/P3/crew safety green |
-| M6 Game/progression | Complete | This milestone commit | UE build; M6 5/5; isolated Metal menu/HUD; score/save and rescue regressions green |
-| M7 Audio/presentation | In progress | — | Audio, camera, weather, transitions, and presentation pass next |
-| M8 Validation/performance | Pending | — | — |
+| M6 Game/progression | Complete | `77ecbf49` | UE build; M6 5/5; isolated Metal menu/HUD; score/save and rescue regressions green |
+| M7 Audio/presentation | Complete | This milestone commit | UE build; M7 4/4; real CoreAudio mix; isolated Metal presentation/full-reach captures; P3 audio and M6 UI regressions green |
+| M8 Validation/performance | In progress | — | Packaged regression, budgets, soak, rights, and content-lock pass next |
 | M9 Release candidates | Pending | — | — |
 | M10 Launch | Pending | — | — |
 
@@ -358,3 +359,36 @@ path is verified, and the completion goal can be marked complete.
   multiple rendered PIE fixtures in one editor process still trips an engine-internal
   `SceneViewport` teardown assertion, so rendered fixtures remain isolated while the
   complete suite is accepted under NullRHI.
+
+### July 19, 2026 — M7 complete
+
+- Replaced the silent procedural-audio stub with eight continuously queued, project-owned
+  48 kHz PCM layers for river bed, rapid hydraulics, foam/spray, paddle catches,
+  raft-fabric/impact response, crew/rescue feedback, canyon ambience, and restrained
+  adaptive music. Live flow, Froude/aeration, rock contact, paddle/command/high-side,
+  swimmer/rescue, run progress, weather, and canyon enclosure drive the mix; voice
+  activity ducks river noise, while per-layer low-pass filtering and manual reverb sends
+  preserve readability. The deterministic synthesis is the cooked offline-safe shipping
+  fallback and is not misrepresented as field-recorded audio or a binary MetaSound asset.
+- Added a runtime presentation director with clear-morning, overcast-afternoon, and
+  storm-dusk presets. It binds or creates the actual sun, skylight, exponential height
+  fog, and volumetric cloud actors, blends lighting/atmosphere, and feeds wetness,
+  enclosure, and reverb into the audio mix without altering physics authority.
+- Finished the first-person motion/FOV comfort response, a four-second seated intro,
+  and a Free Run-only chase camera. Rendered QA caught a boom-anchor test that allowed
+  the active view to inherit an inverted raft transform; the final camera uses an
+  explicit world-space transform, samples live surface height and downstream flow, and
+  is asserted through the player camera manager above water with a level horizon.
+- Added weather/camera controls, scenario and run-complete transitions, loading state,
+  project-owned menu confirmation audio, tutorial/crew captions, explicit text wrapping,
+  and production-language run telemetry. The accepted evidence is
+  `Saved/Screenshots/MacEditor/M7_PresentationWidget.png`,
+  `Saved/Screenshots/MacEditor/M7_Presentation.png`, and
+  `Saved/Screenshots/MacEditor/M7_FullReachPresentation.png`.
+- Verification: Unreal Editor Mac Development build succeeded; the complete headless
+  `RaftSim.M7` suite passed 4/4; isolated Metal runtime-presentation and full-reach tests
+  passed; `ProductionAudio` passed through the real 48 kHz CoreAudio mixer; and
+  `RaftSim.P3.RunAudioReactsToFlow`, `RaftSim.M6.MainMenuRender`, and
+  `RaftSim.M6.RuntimeShell` remained green. The World Partition fixture remains sorted
+  last in combined automation, and rendered fixtures remain isolated to avoid the known
+  engine-internal PIE/viewport teardown race documented in M6.

@@ -44,6 +44,8 @@ private:
     void CloseCommandWheel();
     void HandleGamepadDPadDown();
     void HandleGamepadFaceButtonBottom();
+    void ToggleChaseCamera();
+    void CycleWeatherVariant();
     void ToggleReview();
     void RestartCheckpoint();
     void ReturnToMainMenu();

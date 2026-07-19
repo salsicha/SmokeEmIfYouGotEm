@@ -1,0 +1,90 @@
+{
+  "schema": "raftsim.m7.production_presentation.v1",
+  "status": "implemented",
+  "audio": {
+    "authority": "deterministic_project_owned_runtime_synthesis",
+    "format": {
+      "sample_rate_hz": 48000,
+      "channels": 1,
+      "continuous_queued_pcm": true,
+      "cooked_offline_fallback": true
+    },
+    "layers": [
+      "river_bed",
+      "rapid_features",
+      "foam_and_spray",
+      "paddle",
+      "fabric_and_impact",
+      "crew_and_rescue",
+      "canyon_ambience",
+      "adaptive_music"
+    ],
+    "telemetry_inputs": [
+      "live_flow_speed",
+      "froude_and_aeration",
+      "paddle_strokes",
+      "rock_contact_and_indentation",
+      "crew_commands_and_high_side",
+      "swimmer_and_rescue_state",
+      "run_progress",
+      "weather_wetness",
+      "canyon_enclosure"
+    ],
+    "mix_features": [
+      "crew_voice_ducking",
+      "per_layer_low_pass_occlusion",
+      "manual_reverb_send",
+      "event_envelopes",
+      "flow_and_contact_pitch_response"
+    ],
+    "ui_confirmation_audio": "project_owned_generated_pcm"
+  },
+  "presentation": {
+    "weather_time_variants": [
+      "clear_morning",
+      "overcast_afternoon",
+      "storm_dusk"
+    ],
+    "bound_environment_actors": [
+      "directional_sun",
+      "skylight",
+      "exponential_height_fog",
+      "volumetric_cloud"
+    ],
+    "camera": [
+      "first_person_velocity_and_impact_comfort_filter",
+      "four_second_seated_intro",
+      "free_run_only_world_up_chase",
+      "live_water_clearance",
+      "downstream_flow_composition"
+    ],
+    "shell": [
+      "scenario_intro",
+      "run_complete_transition",
+      "loading_state",
+      "tutorial_and_crew_captions",
+      "weather_and_camera_controls",
+      "production_run_telemetry"
+    ]
+  },
+  "automation": [
+    "RaftSim.M7.CameraWeather",
+    "RaftSim.M7.ProductionAudio",
+    "RaftSim.M7.RuntimePresentation",
+    "RaftSim.M7.ZFullReachPresentation",
+    "RaftSim.P3.RunAudioReactsToFlow",
+    "RaftSim.M6.MainMenuRender",
+    "RaftSim.M6.RuntimeShell"
+  ],
+  "rendered_evidence": [
+    "Saved/Screenshots/MacEditor/M7_PresentationWidget.png",
+    "Saved/Screenshots/MacEditor/M7_Presentation.png",
+    "Saved/Screenshots/MacEditor/M7_FullReachPresentation.png"
+  ],
+  "claim_boundary": {
+    "field_recorded_audio_claimed": false,
+    "binary_metasound_assets_claimed": false,
+    "weather_affects_physics_authority": false,
+    "procedural_geography_is_navigation_guidance": false
+  }
+}

@@ -8,6 +8,7 @@
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "RaftSimGuidePawn.h"
+#include "RaftSimPresentationDirector.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRunHudWidget.h"
 #include "RaftSimRunManager.h"
@@ -39,12 +40,26 @@ void ARaftSimGuidePlayerController::BeginPlay()
     if (RunHud != nullptr)
     {
         RunHud->AddToViewport();
+        if (const URaftSimSaveSubsystem* Save = GetGameInstance()
+                ? GetGameInstance()->GetSubsystem<URaftSimSaveSubsystem>() : nullptr)
+        {
+            FRaftSimCareerScenarioDefinition Scenario;
+            if (Save->GetSave() != nullptr && URaftSimProgressionLibrary::FindScenario(
+                    Save->GetSave()->Selection.ScenarioId, Scenario))
+            {
+                RunHud->BeginScenarioPresentation(Scenario.DisplayName, Scenario.Briefing);
+            }
+        }
     }
     // Game input drives the raft; the HUD is non-interactive.
     SetInputMode(FInputModeGameOnly());
     SetShowMouseCursor(false);
     PrimaryActorTick.bTickEvenWhenPaused = true;
     ApplySavedSettings();
+    if (ARaftSimGuidePawn* Guide = Cast<ARaftSimGuidePawn>(GetPawn()))
+    {
+        Guide->BeginScenarioCameraPresentation();
+    }
 }
 
 void ARaftSimGuidePlayerController::SetupInputComponent()
@@ -86,6 +101,10 @@ void ARaftSimGuidePlayerController::SetupInputComponent()
     InputComponent->BindKey(EKeys::Gamepad_FaceButton_Right, IE_Pressed, this, &ARaftSimGuidePlayerController::ReturnToMainMenu);
     InputComponent->BindKey(EKeys::V, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleReview);
     InputComponent->BindKey(EKeys::Gamepad_LeftTrigger, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleReview);
+    InputComponent->BindKey(EKeys::C, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleChaseCamera);
+    InputComponent->BindKey(EKeys::Gamepad_RightThumbstick, IE_Pressed, this, &ARaftSimGuidePlayerController::ToggleChaseCamera);
+    InputComponent->BindKey(EKeys::T, IE_Pressed, this, &ARaftSimGuidePlayerController::CycleWeatherVariant);
+    InputComponent->BindKey(EKeys::Gamepad_LeftThumbstick, IE_Pressed, this, &ARaftSimGuidePlayerController::CycleWeatherVariant);
     InputComponent->BindKey(EKeys::One, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandForward);
     InputComponent->BindKey(EKeys::Two, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandBackward);
     InputComponent->BindKey(EKeys::Three, IE_Pressed, this, &ARaftSimGuidePlayerController::CommandLeft);
@@ -115,9 +134,48 @@ void ARaftSimGuidePlayerController::ApplySavedSettings()
     Camera.ComfortVignetteStrength = S.VignetteStrength;
     Guide->ApplyGuideCameraSettings(Camera);
     Guide->SetAccessibilityComfortMode(S.AssistLevel == ERaftSimAssistLevel::Relaxed);
+    Guide->SetChaseCameraAllowed(Save->GetSave()->ActiveGameMode == ERaftSimGameMode::FreeRun);
     for (const TPair<FName, FName>& Binding : Save->GetSave()->InputBindings)
     {
         Guide->ApplyRuntimeKeyBinding(Binding.Key, FKey(Binding.Value));
+    }
+}
+
+void ARaftSimGuidePlayerController::ToggleChaseCamera()
+{
+    if (bPauseVisible || bScoutVisible || bPhotoMode)
+    {
+        return;
+    }
+    if (ARaftSimGuidePawn* Guide = Cast<ARaftSimGuidePawn>(GetPawn()))
+    {
+        if (Guide->ToggleChaseCamera() && RunHud)
+        {
+            RunHud->ShowSubtitle(
+                Guide->IsChaseCameraActive()
+                    ? NSLOCTEXT("RaftSim", "ChaseCameraOn", "Free Run chase camera")
+                    : NSLOCTEXT("RaftSim", "GuideCameraOn", "Stern guide camera"),
+                1.8f);
+        }
+    }
+}
+
+void ARaftSimGuidePlayerController::CycleWeatherVariant()
+{
+    if (bPauseVisible || bScoutVisible || bPhotoMode)
+    {
+        return;
+    }
+    if (ARaftSimPresentationDirector* Presentation =
+            FindActor<ARaftSimPresentationDirector>(GetWorld()))
+    {
+        Presentation->CycleWeatherVariant();
+        if (RunHud)
+        {
+            RunHud->ShowSubtitle(FText::Format(
+                NSLOCTEXT("RaftSim", "WeatherChanged", "Weather: {0}"),
+                Presentation->GetWeatherDisplayName()), 2.2f);
+        }
     }
 }
 
