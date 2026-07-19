@@ -91,7 +91,7 @@ feature/outcome envelopes; a complete descent crosses window boundaries seamless
 **Exit:** the full reach is visually continuous, has no placeholder/blockout assets in
 the gameplay corridor, and passes automated artifact plus owner art/readability review.
 
-### M5 — Guide, crew, raft, and rescue production quality
+### M5 — Guide, crew, raft, and rescue production quality *(complete July 19, 2026)*
 
 - Replace primitive crew with licensed first-party characters, clothing/PFD/helmet
   variants, Control Rig paddling, command reactions, bracing, high-side, falls, swimming,
@@ -105,7 +105,7 @@ the gameplay corridor, and passes automated artifact plus owner art/readability 
 **Exit:** all core guide commands and rescue paths work with final animation, and the
 raft's visible/contact response passes calibrated flip/wrap/pin fixtures and playtests.
 
-### M6 — Complete game modes and progression
+### M6 — Complete game modes and progression *(in progress)*
 
 - Guided Descent career with sections, license tiers, medals, unlocks, stats, and full-run
   progression; Free Run; Training Eddy drills.
@@ -172,9 +172,9 @@ path is verified, and the completion goal can be marked complete.
 | M1 Flexible raft/contact slice | Complete | `2b3be122` | UE build; M1 1/1; river maps 5/5; physics 1,017/3 |
 | M2 Procedural geography | Complete | `6b44af51` | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
 | M3 South Fork hydraulics | Complete | `aa610a6c` | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
-| M4 Photoreal environment | Complete | This milestone commit | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
-| M5 Characters/raft/rescue | In progress | — | Production character, raft, and rescue pass next |
-| M6 Game/progression | Pending | — | — |
+| M4 Photoreal environment | Complete | `0032554d` | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
+| M5 Characters/raft/rescue | Complete | This milestone commit | UE build; M5 4/4; rendered rescue 1/1; P2/P3/crew safety green |
+| M6 Game/progression | In progress | — | Career, Free Run, Training Eddy, UI/save/accessibility pass next |
 | M7 Audio/presentation | Pending | — | — |
 | M8 Validation/performance | Pending | — | — |
 | M9 Release candidates | Pending | — | — |
@@ -288,3 +288,39 @@ path is verified, and the completion goal can be marked complete.
   Verification: Unreal Editor Mac Development build succeeded; `RaftSim.M4` passed 3/3;
   all South Fork Python tests passed 144/144; Ruff lint/format checks passed; HLOD setup
   and build completed 20/20 with zero errors and deterministic package hashes.
+
+### July 19, 2026 — M5 complete
+
+- Replaced all sphere/cylinder crew assembly with `ARaftSimCrewAvatarActor`, a
+  first-party MIT procedural organic mesh and deterministic joint rig. Five live
+  avatars now carry splash clothing, four PFD variants, helmets, paddles, shadows, and
+  final poses for idle, forward/back/turn strokes, brace, both high sides, falling,
+  swimming, reach, rope throw, and re-entry. The fallback ships without a third-party
+  mannequin license or raw character asset; it is not represented as a photogrammetric
+  human.
+- Bound the guide plus passenger masses into the authoritative D1-D4 seat solve. Crew
+  commands now change the same mass distribution that their animation depicts, while
+  command latency/cadence and the existing guide propulsion tests remain intact.
+- Added explicit rescue targeting, camera aim validation, distinct 1.2 m reach, 2.0 m
+  paddle-grab, and 8.0 m throw-line envelopes, visible sagging rope, elapsed-time throw
+  flight/pull, deliberate tube-side re-entry, swimmer control, guide detach/reboard,
+  stable feedback codes, and a four-second failed-rescue checkpoint reset/field repair.
+  Keyboard/mouse and gamepad rescue mappings are installed in shipping runtime code and
+  mirrored in the editor asset generator.
+- Upgraded the raft mesh from uniform shrinkage to area-preserving reciprocal-axis tube
+  buckling. Authoritative wrap/pin state now drives taco lift, thwarts and the
+  self-bailing floor follow the deformation field, and persistent crease, abrasion,
+  puncture, critical damage, pressure loss, and repair states feed back into effective
+  contact radius and buoyancy.
+- A rendered offscreen run caught a latitude-ring roundoff defect that NullRHI could not:
+  fractional power of a tiny negative `sin(pi)` produced NaN vertices. The generator now
+  clamps the domain, every avatar gate inspects its procedural vertex buffer and
+  transforms, and both the solver adapter and actor reject non-finite transforms at the
+  renderer boundary.
+- Evidence is recorded in `Content/RaftSim/Crew/m5_production_quality_manifest.json` and
+  `Saved/Screenshots/MacEditor/M5_RescueProduction.png`. The capture is implementation
+  evidence for crew/raft/rope readability, not a claim of final photogrammetric humans.
+- Verification: Unreal Editor Mac Development build succeeded; `RaftSim.M5` passed 4/4;
+  the Metal offscreen `RuntimeRescueLoop` passed 1/1 with no renderer ensure; P2 passed
+  3/3, P3 passed 3/3, M1 passed 1/1, Milestone11 crew safety passed 1/1, and the focused
+  flexible-raft Python suite passed 89/89.

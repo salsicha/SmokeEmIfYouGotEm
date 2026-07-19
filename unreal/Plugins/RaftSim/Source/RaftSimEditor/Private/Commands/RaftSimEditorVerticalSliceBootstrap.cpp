@@ -144,6 +144,10 @@ static void HandleCreateVerticalSliceInputAssets(const TArray<FString>&)
     AddKeyMapping(Context, Actions[TEXT("GuideCommandLeftPaddle")], EKeys::Three);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandRightPaddle")], EKeys::Four);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandStop")], EKeys::Five);
+    AddKeyMapping(Context, Actions[TEXT("RescueTargetSelect")], EKeys::MouseWheelAxis);
+    AddKeyMapping(Context, Actions[TEXT("RescueReachGrab")], EKeys::E);
+    AddKeyMapping(Context, Actions[TEXT("RescueThrowLine")], EKeys::R);
+    AddKeyMapping(Context, Actions[TEXT("ReseatCrew")], EKeys::F);
 
     // Gamepad.
     AddKeyMapping(Context, Actions[TEXT("PaddleStroke")], EKeys::Gamepad_LeftY);
@@ -159,6 +163,11 @@ static void HandleCreateVerticalSliceInputAssets(const TArray<FString>&)
     AddKeyMapping(Context, Actions[TEXT("GuideCommandLeftPaddle")], EKeys::Gamepad_DPad_Left);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandRightPaddle")], EKeys::Gamepad_DPad_Right);
     AddKeyMapping(Context, Actions[TEXT("GuideCommandStop")], EKeys::Gamepad_FaceButton_Top);
+    AddKeyMapping(Context, Actions[TEXT("RescueTargetSelect")], EKeys::Gamepad_LeftShoulder, /*bNegate=*/true);
+    AddKeyMapping(Context, Actions[TEXT("RescueTargetSelect")], EKeys::Gamepad_RightShoulder);
+    AddKeyMapping(Context, Actions[TEXT("RescueReachGrab")], EKeys::Gamepad_FaceButton_Bottom);
+    AddKeyMapping(Context, Actions[TEXT("RescueThrowLine")], EKeys::Gamepad_RightTrigger);
+    AddKeyMapping(Context, Actions[TEXT("ReseatCrew")], EKeys::Gamepad_FaceButton_Right);
 
     const bool bSaved = SaveAssetPackage(Package, Context);
     UE_LOG(

@@ -12,6 +12,14 @@ class UInputMappingContext;
 class USceneComponent;
 struct FInputActionValue;
 
+UENUM(BlueprintType)
+enum class ERaftSimGuideMobilityMode : uint8
+{
+    InRaft,
+    Swimming,
+    Reboarding
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimGuideCameraSettings
 {
@@ -135,6 +143,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|GuideCamera")
     float ConsumePendingHapticPulse();
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Guide")
+    ERaftSimGuideMobilityMode GetMobilityMode() const { return MobilityMode; }
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Input")
+    bool HasCompleteRescueInputBindings() const;
+
 protected:
     float GetEffectiveMotionIntensity() const;
     void UpdateComfortCamera(float DeltaSeconds);
@@ -144,6 +158,11 @@ protected:
     void HandleLook(const FInputActionValue& Value);
     void HandleHighSide(const FInputActionValue& Value);
     void HandleGuideCommand(FName CommandActionName);
+    void HandleRescueTargetSelect(const FInputActionValue& Value);
+    void HandleRescueReach(const FInputActionValue& Value);
+    void HandleRescueThrowLine(const FInputActionValue& Value);
+    void HandleReseatCrew(const FInputActionValue& Value);
+    void UpdateSwimmingAndRescueAim();
     ARaftSimRaftActor* ResolveRaft();
 
     /** Mapping context and actions are generated assets under /Game/RaftSim/Input. */
@@ -163,6 +182,18 @@ protected:
     TObjectPtr<UInputAction> HighSideAction;
 
     UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> RescueTargetSelectAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> RescueReachAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> RescueThrowLineAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
+    TObjectPtr<UInputAction> ReseatCrewAction;
+
+    UPROPERTY(EditDefaultsOnly, Category = "RaftSim|Input")
     TArray<TObjectPtr<UInputAction>> GuideCommandActions;
 
     UPROPERTY()
@@ -173,6 +204,9 @@ protected:
     float StrokeCooldownSeconds = 0.45f;
 
     float LastStrokeTimeSeconds = -1.0f;
+
+    UPROPERTY(VisibleAnywhere, Category = "RaftSim|Guide")
+    ERaftSimGuideMobilityMode MobilityMode = ERaftSimGuideMobilityMode::InRaft;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RaftSim|GuideCamera")
     TObjectPtr<USceneComponent> Root;

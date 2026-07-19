@@ -7,6 +7,7 @@
 #include "Materials/MaterialInterface.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimChronoRuntimeAdapter.h"
+#include "RaftSimCrewAvatarActor.h"
 #include "RaftSimRaftMesh.h"
 #include "RaftSimRockObstacleActor.h"
 #include "RaftSimCrewStateContracts.h"
@@ -23,6 +24,11 @@
 namespace
 {
 constexpr float kCmPerM = 100.0f;
+
+bool IsFiniteVector(const FVector& Value)
+{
+    return FMath::IsFinite(Value.X) && FMath::IsFinite(Value.Y) && FMath::IsFinite(Value.Z);
+}
 }
 
 ARaftSimRaftActor::ARaftSimRaftActor()
@@ -56,6 +62,11 @@ ARaftSimRaftActor::ARaftSimRaftActor()
     // Tube bottoms build at z=0; drop so the raft floats with the lower tube in
     // the water and the deck just above the surface.
     RaftVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -TubeRadiusM * 0.55f * kCmPerM));
+
+    RescueLineVisual = CreateDefaultSubobject<UProceduralMeshComponent>(TEXT("RescueLineVisual"));
+    RescueLineVisual->SetupAttachment(Root);
+    RescueLineVisual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    RescueLineVisual->SetVisibility(false);
 
     SternSeatAttachPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SternSeatAttachPoint"));
     SternSeatAttachPoint->SetupAttachment(Root);
@@ -216,17 +227,18 @@ void ARaftSimRaftActor::BeginPlay()
         return;
     }
 
-    // D1-D4 flexible-raft stack behind the adapter: tube layout from this
-    // hull, no crew seats yet (the crew slice binds them).
+    // D1-D4 flexible-raft stack with the actual production crew load bound to
+    // seats. Commands now move the same masses that the avatars depict.
     FRaftSimFlexParameters FlexParameters;
     FlexParameters.MassKg = MassKg;
     FlexParameters.LengthM = FootprintLengthM;
     FlexParameters.WidthM = FootprintWidthM;
     FlexParameters.TubeRadiusM = TubeRadiusM;
-    FlexParameters.GuideMassKg = 0.0;
-    FlexParameters.PassengerMassKg = 0.0;
-    FlexParameters.PassengerCount = 0;
-    Adapter->ConfigureFlexibleRaftModel(FlexParameters, {});
+    FlexParameters.GuideMassKg = 85.0;
+    FlexParameters.PassengerMassKg = 75.0;
+    FlexParameters.PassengerCount = PaddlerCount;
+    Adapter->ConfigureFlexibleRaftModel(
+        FlexParameters, RaftSimFlex::BuildDefaultCrewSeats(FlexParameters));
 
     // Seed the adapter's kinematic state from the spawn transform.
     FRaftSimRaftKinematicState InitialState;
@@ -268,7 +280,11 @@ void ARaftSimRaftActor::BuildRaftVisual()
     }
     RaftSimRaftMesh::FMeshData Tubes, Floor;
     RaftSimRaftMesh::BuildInflatableRaft(
-        FootprintLengthM, FootprintWidthM, TubeRadiusM, Tubes, Floor);
+        FootprintLengthM, FootprintWidthM, TubeRadiusM, Tubes, Floor, {},
+        RaftSimRaftMesh::FRaftSimRaftVisualCondition{
+            RaftCondition.PressureFraction,
+            RaftCondition.FabricIntegrity,
+            RaftCondition.PermanentCreaseAmplitudeM});
     const TArray<FLinearColor> NoColors;
     RaftVisual->CreateMeshSection_LinearColor(
         0, Tubes.Vertices, Tubes.Triangles, Tubes.Normals, Tubes.UVs, NoColors,
@@ -302,7 +318,11 @@ void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
         TubeRadiusM,
         Tubes,
         Floor,
-        RaftAdapter->GetFlexibleVisualSegments());
+        RaftAdapter->GetFlexibleVisualSegments(),
+        RaftSimRaftMesh::FRaftSimRaftVisualCondition{
+            RaftCondition.PressureFraction,
+            RaftCondition.FabricIntegrity,
+            RaftCondition.PermanentCreaseAmplitudeM});
     const TArray<FLinearColor> NoColors;
     RaftVisual->UpdateMeshSection_LinearColor(
         0, Tubes.Vertices, Tubes.Normals, Tubes.UVs, NoColors, Tubes.Tangents);
@@ -351,99 +371,81 @@ void ARaftSimRaftActor::UpdateRockObstacles()
 
 void ARaftSimRaftActor::SpawnCrewVisuals()
 {
-    UStaticMesh* Sphere = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    UStaticMesh* Cylinder = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
-    UStaticMesh* Cube = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Cube.Cube"));
-    auto Mat = [](const TCHAR* Path)
-    { return LoadObject<UMaterialInterface>(nullptr, Path); };
-    UMaterialInterface* SkinMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Skin.M_RaftSim_Skin"));
-    UMaterialInterface* HelmetMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"));
-    UMaterialInterface* WetsuitMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_Wetsuit.M_RaftSim_Wetsuit"));
-    UMaterialInterface* ShaftMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleShaft.M_RaftSim_PaddleShaft"));
-    UMaterialInterface* BladeMat = Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PaddleBlade.M_RaftSim_PaddleBlade"));
-    UMaterialInterface* PFDMats[4] = {
-        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD")),
-        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Red.M_RaftSim_PFD_Red")),
-        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Yellow.M_RaftSim_PFD_Yellow")),
-        Mat(TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Blue.M_RaftSim_PFD_Blue")),
-    };
-
-    auto AddPart = [this](UStaticMesh* MeshAsset, UMaterialInterface* Material,
-                          const FVector& LocCm, const FRotator& Rot, const FVector& Scale)
+    if (!GetWorld())
     {
-        if (MeshAsset == nullptr)
+        return;
+    }
+    for (ARaftSimCrewAvatarActor* Avatar : CrewAvatars)
+    {
+        if (Avatar)
         {
-            return;
+            Avatar->Destroy();
         }
-        UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
-        C->SetupAttachment(Root);
-        C->RegisterComponent();
-        C->SetStaticMesh(MeshAsset);
-        C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        if (Material != nullptr)
-        {
-            C->SetMaterial(0, Material);
-        }
-        C->SetRelativeLocationAndRotation(LocCm, Rot);
-        C->SetRelativeScale3D(Scale);
-        CrewMeshes.Add(C);
-    };
-
-    // Build one seated paddler (metres, paddler-local: +X downstream, +Z up),
-    // offset to SeatCm on the raft. Engine primitives are 1 m (sphere r=0.5,
-    // cylinder h=1/r=0.5), so a radius r maps to scale 2r and a bar of length L
-    // to scale-Z L.
-    auto Bar = [&](UStaticMesh* MeshAsset, UMaterialInterface* Material, const FVector& SeatCm,
-                   const FVector& AMeters, const FVector& BMeters, float RadiusM)
-    {
-        const FVector A = SeatCm + AMeters * kCmPerM;
-        const FVector B = SeatCm + BMeters * kCmPerM;
-        const FVector D = B - A;
-        const float LenM = FMath::Max(D.Size() / kCmPerM, 0.01f);
-        const FRotator Rot = FRotationMatrix::MakeFromZ(D.GetSafeNormal()).Rotator();
-        AddPart(MeshAsset, Material, (A + B) * 0.5f, Rot,
-                FVector(2.0f * RadiusM, 2.0f * RadiusM, LenM));
-    };
-    auto Ball = [&](UStaticMesh* MeshAsset, UMaterialInterface* Material, const FVector& SeatCm,
-                    const FVector& PosMeters, float RadiusM)
-    {
-        AddPart(MeshAsset, Material, SeatCm + PosMeters * kCmPerM, FRotator::ZeroRotator,
-                FVector(2.0f * RadiusM));
-    };
-
-    auto BuildPaddler = [&](const FVector& SeatCm, UMaterialInterface* PFDMat)
-    {
-        // Torso + splash jacket.
-        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.0f, 0.0f, 0.02f), FVector(0.05f, 0.0f, 0.52f), 0.15f);
-        // Life jacket (PFD) over the chest.
-        Bar(Cylinder, PFDMat, SeatCm, FVector(0.03f, 0.0f, 0.28f), FVector(0.05f, 0.0f, 0.50f), 0.20f);
-        // Head + helmet.
-        Ball(Sphere, SkinMat, SeatCm, FVector(0.08f, 0.0f, 0.66f), 0.11f);
-        Ball(Sphere, HelmetMat, SeatCm, FVector(0.08f, 0.0f, 0.70f), 0.125f);
-        // Paddle held diagonally across the body: shaft + blade.
-        const FVector GripHigh(0.30f, 0.22f, 0.46f);
-        const FVector BladeEnd(0.56f, -0.30f, -0.10f);
-        Bar(Cylinder, ShaftMat, SeatCm, GripHigh, BladeEnd, 0.028f);
-        const FVector D = (BladeEnd - GripHigh).GetSafeNormal();
-        const FRotator BladeRot = FRotationMatrix::MakeFromZ(D).Rotator();
-        AddPart(Cube, BladeMat, SeatCm + (BladeEnd + D * 0.14f) * kCmPerM, BladeRot,
-                FVector(0.22f, 0.03f, 0.30f));
-        // Arms reaching to the paddle grips.
-        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.03f, 0.16f, 0.50f), GripHigh, 0.05f);
-        Bar(Cylinder, WetsuitMat, SeatCm, FVector(0.03f, -0.16f, 0.50f), FVector(0.42f, -0.02f, 0.20f), 0.05f);
-    };
-
-    // Two rows of paddlers along the tubes plus a stern guide, all facing
-    // downstream. Seats sit on the tube tops.
-    const float SeatZ = 30.0f;
+    }
+    CrewAvatars.Reset();
     for (int32 Index = 0; Index < PaddlerCount; ++Index)
     {
-        const float Row = (Index % 2 == 0) ? -0.62f : 0.62f; // port / starboard
-        const float Bow = 1.15f - (Index / 2) * 1.05f;        // fore to aft (m)
-        BuildPaddler(FVector(Bow * kCmPerM, Row * kCmPerM, SeatZ), PFDMats[Index % 4]);
+        FActorSpawnParameters Params;
+        Params.Owner = this;
+        ARaftSimCrewAvatarActor* Avatar = GetWorld()->SpawnActor<ARaftSimCrewAvatarActor>(
+            ARaftSimCrewAvatarActor::StaticClass(), GetActorTransform(), Params);
+        if (!Avatar)
+        {
+            continue;
+        }
+        const int32 Side = (Index % 2 == 0) ? -1 : 1;
+        Avatar->ConfigureAppearance(Index, Side, false);
+        CrewAvatars.Add(Avatar);
+        AttachAvatarToSeat(Avatar, FName(*FString::Printf(TEXT("paddler_%d"), Index + 1)));
     }
-    // Stern guide, centred.
-    BuildPaddler(FVector(-1.75f * kCmPerM, 0.0f, SeatZ + 8.0f), PFDMats[0]);
+    FActorSpawnParameters GuideParams;
+    GuideParams.Owner = this;
+    if (ARaftSimCrewAvatarActor* Guide = GetWorld()->SpawnActor<ARaftSimCrewAvatarActor>(
+            ARaftSimCrewAvatarActor::StaticClass(), GetActorTransform(), GuideParams))
+    {
+        Guide->ConfigureAppearance(0, 1, true);
+        CrewAvatars.Add(Guide);
+        AttachAvatarToSeat(Guide, TEXT("guide"));
+    }
+}
+
+ARaftSimCrewAvatarActor* ARaftSimRaftActor::FindAvatar(FName PassengerId) const
+{
+    if (PassengerId == TEXT("guide"))
+    {
+        return CrewAvatars.IsEmpty() ? nullptr : CrewAvatars.Last();
+    }
+    FString Id = PassengerId.ToString();
+    if (!Id.RemoveFromStart(TEXT("paddler_")))
+    {
+        return nullptr;
+    }
+    const int32 Index = FCString::Atoi(*Id) - 1;
+    return CrewAvatars.IsValidIndex(Index) ? CrewAvatars[Index] : nullptr;
+}
+
+void ARaftSimRaftActor::AttachAvatarToSeat(
+    ARaftSimCrewAvatarActor* Avatar,
+    FName PassengerId)
+{
+    if (!Avatar)
+    {
+        return;
+    }
+    FVector SeatCm(-175.0f, 0.0f, 38.0f);
+    if (PassengerId != TEXT("guide"))
+    {
+        FString Id = PassengerId.ToString();
+        Id.RemoveFromStart(TEXT("paddler_"));
+        const int32 Index = FMath::Max(FCString::Atoi(*Id) - 1, 0);
+        const float Side = (Index % 2 == 0) ? -1.0f : 1.0f;
+        const float BowM = 1.15f - (Index / 2) * 1.05f;
+        SeatCm = FVector(BowM * kCmPerM, Side * 62.0f, 30.0f);
+    }
+    Avatar->AttachToComponent(Root, FAttachmentTransformRules::KeepWorldTransform);
+    Avatar->SetActorRelativeLocation(SeatCm);
+    Avatar->SetActorRelativeRotation(FRotator::ZeroRotator);
+    Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::SeatedIdle);
 }
 
 void ARaftSimRaftActor::IssueCrewCommand(ERaftSimCrewCommand Command)
@@ -490,6 +492,42 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         Actions.Add(Action);
     }
     RaftAdapter->SetFlexibleCrewActions(Actions);
+
+    ERaftSimCrewAvatarAction AvatarAction = ERaftSimCrewAvatarAction::SeatedIdle;
+    switch (ActiveCrewCommand)
+    {
+        case ERaftSimCrewCommand::AllForward:
+            AvatarAction = ERaftSimCrewAvatarAction::ForwardStroke;
+            break;
+        case ERaftSimCrewCommand::AllBackward:
+            AvatarAction = ERaftSimCrewAvatarAction::BackStroke;
+            break;
+        case ERaftSimCrewCommand::TurnLeft:
+            AvatarAction = ERaftSimCrewAvatarAction::TurnLeft;
+            break;
+        case ERaftSimCrewCommand::TurnRight:
+            AvatarAction = ERaftSimCrewAvatarAction::TurnRight;
+            break;
+        case ERaftSimCrewCommand::Stop:
+        case ERaftSimCrewCommand::GetDown:
+            AvatarAction = ERaftSimCrewAvatarAction::Brace;
+            break;
+        case ERaftSimCrewCommand::HighSide:
+            AvatarAction = GetActorRotation().Roll >= 0.0f
+                ? ERaftSimCrewAvatarAction::HighSidePort
+                : ERaftSimCrewAvatarAction::HighSideStarboard;
+            break;
+        case ERaftSimCrewCommand::Rest:
+        default:
+            break;
+    }
+    for (ARaftSimCrewAvatarActor* Avatar : CrewAvatars)
+    {
+        if (Avatar && Avatar->GetAttachParentActor() == this)
+        {
+            Avatar->SetAvatarAction(AvatarAction);
+        }
+    }
 
     // Paddle strokes on cadence for propulsion/turn commands.
     CrewStrokeTimer -= DeltaSeconds;
@@ -606,12 +644,29 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
             Clamped.LinearVelocityMetersPerSecond = FVector::ZeroVector;
             RaftAdapter->SetKinematicState(Clamped);
         }
-        SetActorLocationAndRotation(
-            Location, Output.RaftState.WorldTransform.GetRotation().GetNormalized());
+        FQuat Rotation = Output.RaftState.WorldTransform.GetRotation().GetNormalized();
+        if (Rotation.ContainsNaN() || !FMath::IsFinite(Rotation.SizeSquared()) ||
+            Rotation.SizeSquared() < 1.0e-8)
+        {
+            Rotation = GetActorQuat();
+            if (Rotation.ContainsNaN() || !FMath::IsFinite(Rotation.SizeSquared()) ||
+                Rotation.SizeSquared() < 1.0e-8)
+            {
+                Rotation = FQuat::Identity;
+            }
+            FRaftSimRaftKinematicState Clamped = RaftAdapter->GetKinematicState();
+            Clamped.WorldTransform.SetRotation(Rotation);
+            Clamped.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+            RaftAdapter->SetKinematicState(Clamped);
+        }
+        SetActorLocationAndRotation(Location, Rotation);
     }
 
     UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
     UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
+    UpdateRescueInteraction(FMath::Min(DeltaSeconds, 0.25f));
+    UpdateRaftCondition(FMath::Min(DeltaSeconds, 0.25f));
+    UpdateRescueLineVisual();
     UpdateFlexibleRaftVisual();
 }
 
@@ -633,7 +688,10 @@ void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
         {
             EnterCapsize();
         }
-        return;
+        if (Swimmers.IsEmpty())
+        {
+            return;
+        }
     }
 
     // Capsized or Recovering: swimmers drift and can be reseated.
@@ -663,79 +721,53 @@ void ARaftSimRaftActor::EnterCapsize()
     // retained water keeps it inverted until the guide re-flips.
     AddActorLocalRotation(FRotator(0.0f, 0.0f, 160.0f));
 
-    // Eject the crew as swimmers at the raft, drifting downstream.
+    SpawnSwimmers(CrewSize, true);
+}
+
+void ARaftSimRaftActor::SpawnSwimmers(int32 Count, bool bIncludeGuide)
+{
     Swimmers.Reset();
-    const FVector RaftM = CapsizeLocation / kCmPerM;
-    const FVector FlowMps = SampleWaterVelocityMps(CapsizeLocation);
-    for (int32 Index = 0; Index < CrewSize; ++Index)
+    RescueInteraction = FRaftSimRescueInteractionState{};
+    SelectedSwimmerIndex = INDEX_NONE;
+    const int32 Available = FMath::Clamp(Count, 0, PaddlerCount + (bIncludeGuide ? 1 : 0));
+    const FVector RaftWorldCm = IsFiniteVector(GetActorLocation())
+        ? GetActorLocation()
+        : CheckpointTransform.GetLocation();
+    const FVector RaftM = RaftWorldCm / kCmPerM;
+    const FVector FlowMps = SampleWaterVelocityMps(RaftWorldCm);
+    for (int32 Index = 0; Index < Available; ++Index)
     {
         FRaftSimSwimmerRescueFrame Swimmer;
-        Swimmer.PassengerId = (Index == 0) ? FName(TEXT("guide")) : FName(*FString::Printf(TEXT("paddler_%d"), Index));
-        // Scatter swimmers slightly around the flip point.
-        const float Angle = (2.0f * PI * Index) / FMath::Max(1, CrewSize);
+        Swimmer.PassengerId = bIncludeGuide && Index == 0
+            ? FName(TEXT("guide"))
+            : FName(*FString::Printf(TEXT("paddler_%d"), Index + (bIncludeGuide ? 0 : 1)));
+        const float Angle = (2.0f * PI * Index) / FMath::Max(1, Available);
         Swimmer.SwimmerWorldPositionMeters =
             RaftM + FVector(FMath::Cos(Angle), FMath::Sin(Angle), 0.0f) * 1.5f;
         Swimmer.SwimmerDriftVelocityMetersPerSecond = FlowMps;
-        Swimmer.RescueWindowSeconds = 12.0f;
+        Swimmer.RescueWindowSeconds = 22.0f;
         Swimmer.bThrowLineAvailable = true;
         Swimmers.Add(Swimmer);
-    }
 
-    // Visual spheres for each swimmer.
-    for (UStaticMeshComponent* Mesh : SwimmerMeshes)
-    {
-        if (Mesh != nullptr)
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
         {
-            Mesh->DestroyComponent();
+            Avatar->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+            Avatar->SetActorTransform(FTransform(
+                FQuat::Identity,
+                Swimmer.SwimmerWorldPositionMeters * kCmPerM,
+                FVector::OneVector));
+            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
         }
     }
-    SwimmerMeshes.Reset();
-    UStaticMesh* SphereMesh =
-        LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
-    UMaterialInterface* PFDMat = LoadObject<UMaterialInterface>(
-        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"));
-    UMaterialInterface* SkinMat = LoadObject<UMaterialInterface>(
-        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_Skin.M_RaftSim_Skin"));
-    UMaterialInterface* HelmetMat = LoadObject<UMaterialInterface>(
-        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_Helmet.M_RaftSim_Helmet"));
-    for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
+    if (!Swimmers.IsEmpty())
     {
-        // The tracked component (moved each frame) is the PFD torso; the head
-        // and helmet ride along attached to it.
-        UStaticMeshComponent* Torso = NewObject<UStaticMeshComponent>(this);
-        Torso->SetupAttachment(nullptr);
-        Torso->RegisterComponent();
-        Torso->SetStaticMesh(SphereMesh);
-        Torso->SetWorldScale3D(FVector(0.62f, 0.5f, 0.42f));
-        Torso->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        if (PFDMat != nullptr)
-        {
-            Torso->SetMaterial(0, PFDMat);
-        }
-        Torso->SetWorldLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
-
-        auto AttachBall = [this, Torso](UStaticMesh* MeshAsset, UMaterialInterface* Material,
-                                        const FVector& OffsetCm, float Scale)
-        {
-            if (MeshAsset == nullptr)
-            {
-                return;
-            }
-            UStaticMeshComponent* C = NewObject<UStaticMeshComponent>(this);
-            C->SetupAttachment(Torso);
-            C->RegisterComponent();
-            C->SetStaticMesh(MeshAsset);
-            C->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-            if (Material != nullptr)
-            {
-                C->SetMaterial(0, Material);
-            }
-            C->SetWorldScale3D(FVector(Scale));
-            C->SetRelativeLocation(OffsetCm);
-        };
-        AttachBall(SphereMesh, SkinMat, FVector(18.0f, 0.0f, 22.0f), 0.2f);
-        AttachBall(SphereMesh, HelmetMat, FVector(18.0f, 0.0f, 26.0f), 0.23f);
-        SwimmerMeshes.Add(Torso);
+        SelectedSwimmerIndex = 0;
+        RescueInteraction.Phase = ERaftSimRescueInteractionPhase::Aiming;
+        RescueInteraction.TargetPassengerId = Swimmers[0].PassengerId;
+        RescueInteraction.DistanceMeters = FVector::Distance(
+            Swimmers[0].SwimmerWorldPositionMeters,
+            GetActorLocation() / kCmPerM);
+        RescueInteraction.FeedbackCode = TEXT("rescue_target_selected");
     }
 }
 
@@ -747,10 +779,32 @@ void ARaftSimRaftActor::DriftSwimmers(float DeltaSeconds)
         const FVector FlowMps = SampleWaterVelocityMps(SwimmerCm);
         Swimmers[Index] = URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
             Swimmers[Index], FlowMps, DeltaSeconds);
-        if (SwimmerMeshes.IsValidIndex(Index) && SwimmerMeshes[Index] != nullptr)
+        if (!IsFiniteVector(Swimmers[Index].SwimmerWorldPositionMeters))
         {
-            SwimmerMeshes[Index]->SetWorldLocation(
-                Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+            Swimmers[Index].SwimmerWorldPositionMeters =
+                (IsFiniteVector(GetActorLocation())
+                    ? GetActorLocation()
+                    : CheckpointTransform.GetLocation()) / kCmPerM;
+            Swimmers[Index].SwimmerDriftVelocityMetersPerSecond = FVector::ZeroVector;
+        }
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmers[Index].PassengerId))
+        {
+            Avatar->SetActorLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
+            Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Swimming);
+        }
+        if (Swimmers[Index].TimeInWaterSeconds > Swimmers[Index].RescueWindowSeconds &&
+            Swimmers[Index].FailedRescueReason.IsNone())
+        {
+            Swimmers[Index].FailedRescueReason = TEXT("rescue_window_expired");
+            RescueFailureResetRemaining = 4.0f;
+        }
+    }
+    if (RescueFailureResetRemaining >= 0.0f)
+    {
+        RescueFailureResetRemaining -= DeltaSeconds;
+        if (RescueFailureResetRemaining <= 0.0f)
+        {
+            ResetToCheckpoint();
         }
     }
 }
@@ -780,13 +834,338 @@ void ARaftSimRaftActor::TryReseatSwimmers()
         // Reseated once the guide finishes pulling the swimmer in.
         if (Result.PullInProgress >= 1.0f)
         {
-            if (SwimmerMeshes.IsValidIndex(Index) && SwimmerMeshes[Index] != nullptr)
-            {
-                SwimmerMeshes[Index]->DestroyComponent();
-            }
-            SwimmerMeshes.RemoveAt(Index);
-            Swimmers.RemoveAt(Index);
+            RemoveSwimmerAt(Index);
         }
+    }
+}
+
+int32 ARaftSimRaftActor::FindSwimmerIndex(FName PassengerId) const
+{
+    return Swimmers.IndexOfByPredicate(
+        [PassengerId](const FRaftSimSwimmerRescueFrame& Swimmer)
+        { return Swimmer.PassengerId == PassengerId; });
+}
+
+bool ARaftSimRaftActor::GetSwimmerWorldPosition(
+    FName PassengerId,
+    FVector& OutWorldPositionCm) const
+{
+    const int32 Index = FindSwimmerIndex(PassengerId);
+    if (!Swimmers.IsValidIndex(Index))
+    {
+        return false;
+    }
+    OutWorldPositionCm = Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM;
+    return true;
+}
+
+bool ARaftSimRaftActor::IsPassengerSwimming(FName PassengerId) const
+{
+    return FindSwimmerIndex(PassengerId) != INDEX_NONE;
+}
+
+void ARaftSimRaftActor::SelectRescueTarget(float Direction)
+{
+    if (Swimmers.IsEmpty())
+    {
+        SelectedSwimmerIndex = INDEX_NONE;
+        RescueInteraction = FRaftSimRescueInteractionState{};
+        return;
+    }
+    const int32 Step = Direction < 0.0f ? -1 : 1;
+    SelectedSwimmerIndex = SelectedSwimmerIndex == INDEX_NONE
+        ? 0
+        : (SelectedSwimmerIndex + Step + Swimmers.Num()) % Swimmers.Num();
+    RescueInteraction = FRaftSimRescueInteractionState{};
+    RescueInteraction.Phase = ERaftSimRescueInteractionPhase::Aiming;
+    RescueInteraction.TargetPassengerId = Swimmers[SelectedSwimmerIndex].PassengerId;
+    RescueInteraction.LineEndWorldMeters =
+        Swimmers[SelectedSwimmerIndex].SwimmerWorldPositionMeters;
+    RescueInteraction.DistanceMeters = FVector::Distance(
+        Swimmers[SelectedSwimmerIndex].SwimmerWorldPositionMeters,
+        GetActorLocation() / kCmPerM);
+    RescueInteraction.FeedbackCode = TEXT("rescue_target_selected");
+}
+
+void ARaftSimRaftActor::AimRescue(FVector WorldAimDirection)
+{
+    if (!WorldAimDirection.ContainsNaN() && !WorldAimDirection.IsNearlyZero())
+    {
+        RescueAimWorldDirection = WorldAimDirection.GetSafeNormal();
+    }
+}
+
+bool ARaftSimRaftActor::BeginRescue(ERaftSimRescueMethod Method)
+{
+    if (!Swimmers.IsValidIndex(SelectedSwimmerIndex))
+    {
+        SelectRescueTarget(1.0f);
+    }
+    if (!Swimmers.IsValidIndex(SelectedSwimmerIndex))
+    {
+        return false;
+    }
+    const FRaftSimSwimmerRescueFrame& Swimmer = Swimmers[SelectedSwimmerIndex];
+    FRaftSimSwimmingSkillProfile Skill =
+        URaftSimSwimmingSkillLibrary::MakeSwimmingSkillProfile(
+            ERaftSimSwimmingSkillLevel::AverageSwimmer);
+    const FVector LineStartM =
+        (GetActorLocation() + GetActorForwardVector() * 45.0f + FVector(0.0f, 0.0f, 65.0f)) /
+        kCmPerM;
+    RescueInteraction = URaftSimSwimmerRescueLibrary::BeginRescueInteraction(
+        Swimmer.PassengerId,
+        Method,
+        LineStartM,
+        Swimmer.SwimmerWorldPositionMeters,
+        RescueAimWorldDirection,
+        Swimmer.bThrowLineAvailable,
+        Swimmer.TimeInWaterSeconds,
+        Skill);
+    if (ARaftSimCrewAvatarActor* Guide = FindAvatar(TEXT("guide")))
+    {
+        Guide->SetAvatarAction(
+            Method == ERaftSimRescueMethod::ThrowLine
+                ? ERaftSimCrewAvatarAction::ThrowLine
+                : ERaftSimCrewAvatarAction::ReachRescue);
+    }
+    return RescueInteraction.Phase == ERaftSimRescueInteractionPhase::LineInFlight ||
+        RescueInteraction.Phase == ERaftSimRescueInteractionPhase::Pulling;
+}
+
+void ARaftSimRaftActor::UpdateRescueInteraction(float DeltaSeconds)
+{
+    const int32 TargetIndex = FindSwimmerIndex(RescueInteraction.TargetPassengerId);
+    if (!Swimmers.IsValidIndex(TargetIndex))
+    {
+        if (Swimmers.IsEmpty())
+        {
+            RescueInteraction = FRaftSimRescueInteractionState{};
+            SelectedSwimmerIndex = INDEX_NONE;
+        }
+        return;
+    }
+    if (RescueInteraction.Phase != ERaftSimRescueInteractionPhase::LineInFlight &&
+        RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Pulling)
+    {
+        return;
+    }
+
+    const FVector StartM =
+        (GetActorLocation() + GetActorForwardVector() * 45.0f + FVector(0.0f, 0.0f, 65.0f)) /
+        kCmPerM;
+    FRaftSimSwimmerRescueFrame& Swimmer = Swimmers[TargetIndex];
+    RescueInteraction = URaftSimSwimmerRescueLibrary::AdvanceRescueInteraction(
+        RescueInteraction,
+        StartM,
+        Swimmer.SwimmerWorldPositionMeters,
+        DeltaSeconds);
+
+    if (RescueInteraction.Phase == ERaftSimRescueInteractionPhase::Pulling ||
+        RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry)
+    {
+        const FVector RaftM = GetActorLocation() / kCmPerM;
+        FVector Away = (Swimmer.SwimmerWorldPositionMeters - RaftM).GetSafeNormal2D();
+        if (Away.IsNearlyZero())
+        {
+            Away = FVector::RightVector;
+        }
+        const FVector TubeTarget = RaftM + Away * 0.9f;
+        const float PullAlpha = 1.0f - FMath::Exp(-DeltaSeconds * 1.6f);
+        Swimmer.SwimmerWorldPositionMeters = FMath::Lerp(
+            Swimmer.SwimmerWorldPositionMeters, TubeTarget, PullAlpha);
+        Swimmer.PullInProgress = RescueInteraction.PullProgress;
+        Swimmer.RescueMethod = RescueInteraction.Method;
+        if (RescueInteraction.Phase == ERaftSimRescueInteractionPhase::ReadyForReentry)
+        {
+            Swimmer.SwimmerWorldPositionMeters = TubeTarget;
+            if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
+            {
+                Avatar->SetAvatarAction(ERaftSimCrewAvatarAction::Reentry);
+            }
+        }
+    }
+}
+
+bool ARaftSimRaftActor::RequestSelectedReentry()
+{
+    const int32 TargetIndex = FindSwimmerIndex(RescueInteraction.TargetPassengerId);
+    if (!Swimmers.IsValidIndex(TargetIndex))
+    {
+        return false;
+    }
+    const float DistanceM = FVector::Distance(
+        Swimmers[TargetIndex].SwimmerWorldPositionMeters,
+        GetActorLocation() / kCmPerM);
+    RescueInteraction = URaftSimSwimmerRescueLibrary::CompleteReseat(
+        RescueInteraction, DistanceM);
+    if (RescueInteraction.Phase != ERaftSimRescueInteractionPhase::Completed)
+    {
+        return false;
+    }
+    RemoveSwimmerAt(TargetIndex);
+    return true;
+}
+
+void ARaftSimRaftActor::RemoveSwimmerAt(int32 Index)
+{
+    if (!Swimmers.IsValidIndex(Index))
+    {
+        return;
+    }
+    const FName PassengerId = Swimmers[Index].PassengerId;
+    if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(PassengerId))
+    {
+        AttachAvatarToSeat(Avatar, PassengerId);
+    }
+    Swimmers.RemoveAt(Index);
+    if (Swimmers.IsEmpty())
+    {
+        SelectedSwimmerIndex = INDEX_NONE;
+        RescueInteraction = FRaftSimRescueInteractionState{};
+    }
+    else
+    {
+        SelectedSwimmerIndex = FMath::Clamp(SelectedSwimmerIndex, 0, Swimmers.Num() - 1);
+        RescueInteraction = FRaftSimRescueInteractionState{};
+        RescueInteraction.Phase = ERaftSimRescueInteractionPhase::Aiming;
+        RescueInteraction.TargetPassengerId = Swimmers[SelectedSwimmerIndex].PassengerId;
+        RescueInteraction.DistanceMeters = FVector::Distance(
+            Swimmers[SelectedSwimmerIndex].SwimmerWorldPositionMeters,
+            GetActorLocation() / kCmPerM);
+        RescueInteraction.FeedbackCode = TEXT("rescue_target_selected");
+    }
+}
+
+void ARaftSimRaftActor::ApplySwimmerStroke(
+    FName PassengerId,
+    FVector WorldDirection,
+    float DistanceM)
+{
+    const int32 Index = FindSwimmerIndex(PassengerId);
+    if (!Swimmers.IsValidIndex(Index) || WorldDirection.ContainsNaN())
+    {
+        return;
+    }
+    Swimmers[Index].SwimmerWorldPositionMeters +=
+        WorldDirection.GetSafeNormal2D() * FMath::Clamp(DistanceM, 0.0f, 0.65f);
+}
+
+void ARaftSimRaftActor::ForceCrewOverboardForTesting(int32 Count)
+{
+    SpawnSwimmers(Count, false);
+}
+
+void ARaftSimRaftActor::ResetToCheckpoint()
+{
+    for (const FRaftSimSwimmerRescueFrame& Swimmer : Swimmers)
+    {
+        if (ARaftSimCrewAvatarActor* Avatar = FindAvatar(Swimmer.PassengerId))
+        {
+            AttachAvatarToSeat(Avatar, Swimmer.PassengerId);
+        }
+    }
+    Swimmers.Reset();
+    RescueInteraction = FRaftSimRescueInteractionState{};
+    SelectedSwimmerIndex = INDEX_NONE;
+    RescueFailureResetRemaining = -1.0f;
+    RaftMode = ERaftSimRaftMode::Upright;
+    FlipRiskLatchSeconds = 0.0f;
+    SetActorTransform(CheckpointTransform);
+    RaftCondition = URaftSimRaftConditionLibrary::ApplyCheckpointRepair(RaftCondition);
+    if (RaftAdapter)
+    {
+        RaftAdapter->ResetFlexiblePersistentState();
+        FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+        State.WorldTransform = CheckpointTransform;
+        State.LinearVelocityMetersPerSecond = FVector::ZeroVector;
+        State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+        RaftAdapter->SetKinematicState(State);
+    }
+}
+
+void ARaftSimRaftActor::UpdateRaftCondition(float DeltaSeconds)
+{
+    if (!RaftAdapter)
+    {
+        return;
+    }
+    const FRaftSimFlexStepTelemetry& Telemetry = RaftAdapter->GetLastFlexibleStepTelemetry();
+    FRaftSimRaftContactExposure Exposure;
+    Exposure.DeltaSeconds = DeltaSeconds;
+    Exposure.MaximumIndentationM = static_cast<float>(Telemetry.MaxIndentationM);
+    Exposure.ContactCount = Telemetry.ContactCount;
+    Exposure.WrappingContactCount = Telemetry.WrappingContactCount;
+    Exposure.PinnedObstacleCount = Telemetry.PinnedObstacleCount;
+    Exposure.RetainedWaterMassKg = static_cast<float>(Telemetry.TotalRetainedWaterMassKg);
+    RaftCondition = URaftSimRaftConditionLibrary::AdvanceCondition(RaftCondition, Exposure);
+    RaftAdapter->SetFlexibleConditionModifiers(
+        RaftCondition.PressureFraction, RaftCondition.FabricIntegrity);
+}
+
+void ARaftSimRaftActor::UpdateRescueLineVisual()
+{
+    if (!RescueLineVisual)
+    {
+        return;
+    }
+    if (!RescueInteraction.bLineVisible)
+    {
+        RescueLineVisual->SetVisibility(false);
+        return;
+    }
+    RescueLineVisual->SetVisibility(true);
+    constexpr int32 Rings = 13;
+    constexpr int32 Sides = 6;
+    constexpr float RadiusCm = 1.2f;
+    const FVector Start = GetActorTransform().InverseTransformPosition(
+        RescueInteraction.LineStartWorldMeters * kCmPerM);
+    const FVector End = GetActorTransform().InverseTransformPosition(
+        RescueInteraction.LineEndWorldMeters * kCmPerM);
+    TArray<FVector> Vertices, Normals;
+    TArray<int32> Triangles;
+    TArray<FVector2D> UVs;
+    TArray<FProcMeshTangent> Tangents;
+    for (int32 Ring = 0; Ring < Rings; ++Ring)
+    {
+        const float T = static_cast<float>(Ring) / (Rings - 1);
+        FVector Center = FMath::Lerp(Start, End, T);
+        Center.Z -= 28.0f * 4.0f * T * (1.0f - T);
+        const FVector Tangent = (End - Start + FVector(0.0f, 0.0f, -28.0f * 4.0f * (1.0f - 2.0f * T))).GetSafeNormal();
+        FVector SideAxis = FVector::CrossProduct(Tangent, FVector::UpVector).GetSafeNormal();
+        if (SideAxis.IsNearlyZero())
+        {
+            SideAxis = FVector::RightVector;
+        }
+        const FVector UpAxis = FVector::CrossProduct(SideAxis, Tangent).GetSafeNormal();
+        for (int32 Side = 0; Side < Sides; ++Side)
+        {
+            const float A = 2.0f * PI * Side / Sides;
+            const FVector Normal = FMath::Cos(A) * SideAxis + FMath::Sin(A) * UpAxis;
+            Vertices.Add(Center + Normal * RadiusCm);
+            Normals.Add(Normal);
+            UVs.Add(FVector2D(T * 8.0f, static_cast<float>(Side) / Sides));
+            Tangents.Add(FProcMeshTangent(Tangent, false));
+        }
+    }
+    for (int32 Ring = 0; Ring < Rings - 1; ++Ring)
+    {
+        for (int32 Side = 0; Side < Sides; ++Side)
+        {
+            const int32 NextSide = (Side + 1) % Sides;
+            const int32 A = Ring * Sides + Side;
+            const int32 B = (Ring + 1) * Sides + Side;
+            const int32 C = Ring * Sides + NextSide;
+            const int32 D = (Ring + 1) * Sides + NextSide;
+            Triangles.Append({A, B, C, C, B, D});
+        }
+    }
+    const TArray<FLinearColor> Colors;
+    RescueLineVisual->CreateMeshSection_LinearColor(
+        0, Vertices, Triangles, Normals, UVs, Colors, Tangents, false);
+    if (UMaterialInterface* RopeMat = LoadObject<UMaterialInterface>(
+            nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_PFD_Yellow.M_RaftSim_PFD_Yellow")))
+    {
+        RescueLineVisual->SetMaterial(0, RopeMat);
     }
 }
 

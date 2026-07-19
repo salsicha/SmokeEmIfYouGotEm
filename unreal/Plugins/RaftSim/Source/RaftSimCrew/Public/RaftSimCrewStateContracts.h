@@ -55,6 +55,20 @@ enum class ERaftSimRescueMethod : uint8
     ThrowLine
 };
 
+/** Player-facing lifecycle for an aimed rescue. */
+UENUM(BlueprintType)
+enum class ERaftSimRescueInteractionPhase : uint8
+{
+    Idle,
+    Aiming,
+    LineInFlight,
+    Pulling,
+    ReadyForReentry,
+    Reseating,
+    Completed,
+    Failed
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimCrewSeatOccupancy
 {
@@ -289,6 +303,50 @@ struct FRaftSimRescueAttempt
     float TimeInWaterSeconds = 0.0f;
 };
 
+/**
+ * Deterministic runtime state shared by flat-screen, gamepad, and VR rescue
+ * input. Positions are world meters. FeedbackCode is stable UI/audio data,
+ * not localized display text.
+ */
+USTRUCT(BlueprintType)
+struct FRaftSimRescueInteractionState
+{
+    GENERATED_BODY()
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    ERaftSimRescueInteractionPhase Phase = ERaftSimRescueInteractionPhase::Idle;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    FName TargetPassengerId;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    ERaftSimRescueMethod Method = ERaftSimRescueMethod::None;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    FVector LineStartWorldMeters = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    FVector LineEndWorldMeters = FVector::ZeroVector;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    float DistanceMeters = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    float AimAlignment = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    float PullProgress = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    float PhaseElapsedSeconds = 0.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    bool bLineVisible = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RaftSim|Rescue")
+    FName FeedbackCode = TEXT("rescue_idle");
+};
+
 USTRUCT(BlueprintType)
 struct FRaftSimGameplayScoringSignals
 {
@@ -429,6 +487,35 @@ public:
         const FRaftSimSwimmerRescueFrame& CurrentFrame,
         const FRaftSimRescueAttempt& Attempt,
         const FRaftSimSwimmingSkillProfile& SkillProfile
+    );
+
+    /** Validate range/aim and begin an explicit player rescue interaction. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    static FRaftSimRescueInteractionState BeginRescueInteraction(
+        FName TargetPassengerId,
+        ERaftSimRescueMethod Method,
+        FVector LineStartWorldMeters,
+        FVector TargetWorldMeters,
+        FVector AimDirection,
+        bool bThrowLineAvailable,
+        float TimeInWaterSeconds,
+        const FRaftSimSwimmingSkillProfile& SkillProfile
+    );
+
+    /** Advance throw flight and pull-in using real elapsed seconds. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    static FRaftSimRescueInteractionState AdvanceRescueInteraction(
+        const FRaftSimRescueInteractionState& CurrentState,
+        FVector LineStartWorldMeters,
+        FVector TargetWorldMeters,
+        float DeltaSeconds
+    );
+
+    /** Complete the deliberate tube-side re-entry step. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Rescue")
+    static FRaftSimRescueInteractionState CompleteReseat(
+        const FRaftSimRescueInteractionState& CurrentState,
+        float DistanceToRaftMeters
     );
 };
 

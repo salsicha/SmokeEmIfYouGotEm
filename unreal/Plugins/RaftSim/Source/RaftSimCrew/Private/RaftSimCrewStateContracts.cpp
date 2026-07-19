@@ -281,6 +281,22 @@ float PullInSecondsForRescueMethod(ERaftSimRescueMethod Method)
             return 1000000.0f;
     }
 }
+
+float AimThresholdForRescueMethod(ERaftSimRescueMethod Method)
+{
+    switch (Method)
+    {
+        case ERaftSimRescueMethod::ReachGrab:
+            return 0.45f;
+        case ERaftSimRescueMethod::PaddleGrab:
+            return 0.60f;
+        case ERaftSimRescueMethod::ThrowLine:
+            return 0.82f;
+        case ERaftSimRescueMethod::None:
+        default:
+            return 1.0f;
+    }
+}
 }
 
 FRaftSimSwimmerRescueFrame URaftSimSwimmerRescueLibrary::IntegrateSwimmerDrift(
@@ -342,6 +358,135 @@ FRaftSimSwimmerRescueFrame URaftSimSwimmerRescueLibrary::EvaluateRescueAttempt(
         ? FName(TEXT("time_to_critical_exceeded"))
         : FName(TEXT("out_of_reach"));
     return NextFrame;
+}
+
+FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::BeginRescueInteraction(
+    FName TargetPassengerId,
+    ERaftSimRescueMethod Method,
+    FVector LineStartWorldMeters,
+    FVector TargetWorldMeters,
+    FVector AimDirection,
+    bool bThrowLineAvailable,
+    float TimeInWaterSeconds,
+    const FRaftSimSwimmingSkillProfile& SkillProfile
+)
+{
+    FRaftSimRescueInteractionState State;
+    State.TargetPassengerId = TargetPassengerId;
+    State.Method = Method;
+    State.LineStartWorldMeters = LineStartWorldMeters;
+    State.LineEndWorldMeters = TargetWorldMeters;
+    const FVector ToTarget = TargetWorldMeters - LineStartWorldMeters;
+    State.DistanceMeters = ToTarget.Size();
+    const FVector SafeAim = AimDirection.GetSafeNormal();
+    State.AimAlignment = SafeAim.IsNearlyZero() || ToTarget.IsNearlyZero()
+        ? 0.0f
+        : FVector::DotProduct(SafeAim, ToTarget.GetSafeNormal());
+
+    const float MaxDistance = MaxDistanceForRescueMethod(Method, bThrowLineAvailable);
+    if (TargetPassengerId.IsNone() || Method == ERaftSimRescueMethod::None)
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::Failed;
+        State.FeedbackCode = TEXT("rescue_no_target");
+    }
+    else if (TimeInWaterSeconds > SkillProfile.TimeToCriticalSeconds)
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::Failed;
+        State.FeedbackCode = TEXT("rescue_window_expired");
+    }
+    else if (State.DistanceMeters > MaxDistance)
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::Failed;
+        State.FeedbackCode = TEXT("rescue_out_of_range");
+    }
+    else if (State.AimAlignment < AimThresholdForRescueMethod(Method))
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::Aiming;
+        State.FeedbackCode = TEXT("rescue_adjust_aim");
+    }
+    else
+    {
+        State.Phase = Method == ERaftSimRescueMethod::ThrowLine
+            ? ERaftSimRescueInteractionPhase::LineInFlight
+            : ERaftSimRescueInteractionPhase::Pulling;
+        State.bLineVisible = Method == ERaftSimRescueMethod::ThrowLine;
+        State.FeedbackCode = Method == ERaftSimRescueMethod::ThrowLine
+            ? FName(TEXT("rescue_line_thrown"))
+            : FName(TEXT("rescue_contact"));
+    }
+    return State;
+}
+
+FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::AdvanceRescueInteraction(
+    const FRaftSimRescueInteractionState& CurrentState,
+    FVector LineStartWorldMeters,
+    FVector TargetWorldMeters,
+    float DeltaSeconds
+)
+{
+    FRaftSimRescueInteractionState State = CurrentState;
+    const float Step = FMath::Clamp(DeltaSeconds, 0.0f, 0.25f);
+    State.LineStartWorldMeters = LineStartWorldMeters;
+    State.LineEndWorldMeters = TargetWorldMeters;
+    State.DistanceMeters = FVector::Distance(LineStartWorldMeters, TargetWorldMeters);
+    State.PhaseElapsedSeconds += Step;
+
+    if (State.Phase == ERaftSimRescueInteractionPhase::LineInFlight)
+    {
+        State.bLineVisible = true;
+        if (State.PhaseElapsedSeconds >= 0.45f)
+        {
+            State.Phase = ERaftSimRescueInteractionPhase::Pulling;
+            State.PhaseElapsedSeconds = 0.0f;
+            State.FeedbackCode = TEXT("rescue_line_connected");
+        }
+        return State;
+    }
+    if (State.Phase != ERaftSimRescueInteractionPhase::Pulling)
+    {
+        return State;
+    }
+
+    const float PullSeconds = PullInSecondsForRescueMethod(State.Method);
+    State.PullProgress = FMath::Clamp(
+        State.PullProgress + Step / FMath::Max(PullSeconds, KINDA_SMALL_NUMBER),
+        0.0f,
+        1.0f);
+    State.bLineVisible = State.Method == ERaftSimRescueMethod::ThrowLine;
+    if (State.PullProgress >= 1.0f)
+    {
+        State.Phase = ERaftSimRescueInteractionPhase::ReadyForReentry;
+        State.PhaseElapsedSeconds = 0.0f;
+        State.FeedbackCode = TEXT("rescue_ready_reentry");
+    }
+    else
+    {
+        State.FeedbackCode = TEXT("rescue_pulling");
+    }
+    return State;
+}
+
+FRaftSimRescueInteractionState URaftSimSwimmerRescueLibrary::CompleteReseat(
+    const FRaftSimRescueInteractionState& CurrentState,
+    float DistanceToRaftMeters
+)
+{
+    FRaftSimRescueInteractionState State = CurrentState;
+    if (State.Phase != ERaftSimRescueInteractionPhase::ReadyForReentry)
+    {
+        State.FeedbackCode = TEXT("rescue_not_ready");
+        return State;
+    }
+    if (DistanceToRaftMeters > 1.35f)
+    {
+        State.FeedbackCode = TEXT("rescue_bring_to_tube");
+        return State;
+    }
+    State.Phase = ERaftSimRescueInteractionPhase::Completed;
+    State.PullProgress = 1.0f;
+    State.bLineVisible = false;
+    State.FeedbackCode = TEXT("rescue_reseated");
+    return State;
 }
 
 FRaftSimGameplayScoreBreakdown URaftSimGameplayScoringLibrary::EvaluateGameplayScore(

@@ -22,6 +22,17 @@ struct FMeshData
     TArray<FProcMeshTangent> Tangents;
 };
 
+/** Persistent presentation state derived from calibrated contact exposure. */
+struct FRaftSimRaftVisualCondition
+{
+    /** Remaining inflation, where one is nominal pressure. */
+    float PressureFraction = 1.0f;
+    /** Remaining fabric integrity, where one is undamaged. */
+    float Integrity = 1.0f;
+    /** Permanent crease amplitude in metres. */
+    float CreaseAmplitudeM = 0.0f;
+};
+
 /**
  * Build the tube loop + thwarts (OutTubes) and the floor (OutFloor) for a raft
  * of the given footprint. Units are centimetres, centred on the actor origin,
@@ -34,6 +45,7 @@ struct FMeshData
 RAFTSIMRAFT_API void BuildInflatableRaft(
     float LengthM, float WidthM, float TubeRadiusM,
     FMeshData& OutTubes, FMeshData& OutFloor,
-    const TArray<FRaftSimFlexVisualSegmentState>& Deformation = {});
+    const TArray<FRaftSimFlexVisualSegmentState>& Deformation = {},
+    const FRaftSimRaftVisualCondition& Condition = {});
 
 } // namespace RaftSimRaftMesh
