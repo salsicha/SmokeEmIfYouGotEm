@@ -1,0 +1,256 @@
+{
+  "bed_parameters": {
+    "entry_wave_crest_offset_m": -0.32,
+    "entry_wave_half_width_m": 5.0,
+    "entry_wave_x": [
+      132.0,
+      150.0,
+      168.0,
+      186.0
+    ],
+    "entry_wave_y": [
+      -15.0,
+      13.0
+    ],
+    "hole2_center": [
+      322.0,
+      10.0
+    ],
+    "hole2_half_width_m": 6.0,
+    "hole2_pool_offset_m": -2.2,
+    "hole_apron_offset_m": -0.8,
+    "hole_center": [
+      300.0,
+      -2.0
+    ],
+    "hole_half_width_m": 8.0,
+    "hole_pool_offset_m": -2.6,
+    "hole_sill_offset_m": -0.05,
+    "marker_rock_crest_offset_m": 0.7,
+    "marker_rock_radius_m": 3.2,
+    "marker_rock_x": 266.0,
+    "marker_rock_y": -8.0,
+    "portage_trail_x": [
+      232.0,
+      372.0
+    ],
+    "portage_trail_y": -40.0,
+    "recovery_eddy_bar_crest_offset_m": 0.15,
+    "recovery_eddy_bar_x": [
+      464.0,
+      470.0
+    ],
+    "recovery_eddy_floor_offset_m": -1.1,
+    "recovery_eddy_x": [
+      468.0,
+      520.0
+    ],
+    "recovery_eddy_y": [
+      -34.0,
+      -22.0
+    ],
+    "right_line_crest_offset_m": -0.3,
+    "right_line_end": [
+      332.0,
+      -12.0
+    ],
+    "right_line_half_width_m": 3.5,
+    "right_line_start": [
+      300.0,
+      -24.0
+    ],
+    "scout_eddy_bar_crest_offset_m": 0.2,
+    "scout_eddy_bar_x": [
+      192.0,
+      198.0
+    ],
+    "scout_eddy_floor_offset_m": -1.2,
+    "scout_eddy_x": [
+      196.0,
+      246.0
+    ],
+    "scout_eddy_y": [
+      -34.0,
+      -22.0
+    ],
+    "sneak_berm_crest_offset_m": 0.2,
+    "sneak_berm_y": [
+      21.5,
+      25.0
+    ],
+    "sneak_exit_end": [
+      418.0,
+      12.0
+    ],
+    "sneak_exit_invert_offset_m": -1.4,
+    "sneak_exit_start": [
+      392.0,
+      30.0
+    ],
+    "sneak_feeder_end": [
+      258.0,
+      30.0
+    ],
+    "sneak_feeder_invert_offset_m": -1.9,
+    "sneak_feeder_start": [
+      230.0,
+      4.0
+    ],
+    "sneak_invert_offset_m": -1.9,
+    "sneak_x": [
+      250.0,
+      396.0
+    ],
+    "sneak_y": [
+      26.0,
+      34.0
+    ],
+    "tongue_invert_offset_m": -1.1,
+    "tongue_x": [
+      250.0,
+      289.0
+    ],
+    "tongue_y": [
+      -9.0,
+      7.0
+    ],
+    "wave_train_big_crest_offset_m": -0.12,
+    "wave_train_big_x": 404.0,
+    "wave_train_crest_offset_m": -0.3,
+    "wave_train_half_width_m": 6.0,
+    "wave_train_x": [
+      372.0,
+      388.0,
+      404.0,
+      420.0,
+      438.0
+    ],
+    "wave_train_y": [
+      -17.0,
+      13.0
+    ]
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 9.0,
+    "bank_relief_cap_m": 25.0,
+    "centerline_smoothing_passes": 1180,
+    "channel_half_width_m": 24.0,
+    "committed_corridor_surface_drop_m": 7.817504204236769,
+    "conditioned_max_mean_slope": 0.02,
+    "conditioned_profile_drop_m": 7.865059862975784,
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 10.0,
+    "max_profile_drop_per_cell_m": 0.3,
+    "mean_slope_bound_applied": false,
+    "min_centerline_radius_m": 48.17721720438087,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 2.8,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
+    "raw_heightfield_floor_drop_m": 7.865059862975784,
+    "terrain_source": "copernicus_dem_glo30_corridor_conditioned_heightfield_30m_post_spacing",
+    "unclamped_conditioned_drop_m": 7.865059862975784,
+    "window_axis": "committed_corridor_centerline_no_thalweg_snap"
+  },
+  "corridor_river_id": "futaleufu_terminator",
+  "flow_band_packages": {
+    "high_runnable": {
+      "flow_band_source": "high_big_water",
+      "package": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/high_runnable",
+      "scenario_id": "futaleufu_terminator_c3_window_high_runnable",
+      "stage_east_m": 203.2431998352697,
+      "stage_west_m": 211.1082596982455,
+      "target_discharge_m3s": 400.0
+    },
+    "low_runnable": {
+      "flow_band_source": "low_technical",
+      "package": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/low_runnable",
+      "scenario_id": "futaleufu_terminator_c3_window_low_runnable",
+      "stage_east_m": 201.85347656592006,
+      "stage_west_m": 209.71853642889585,
+      "target_discharge_m3s": 110.0
+    },
+    "median_runnable": {
+      "flow_band_source": "normal_runnable",
+      "package": "physics/data/real_world/futaleufu_river_chile/scenario_terminator/median_runnable",
+      "scenario_id": "futaleufu_terminator_c3_window_median_runnable",
+      "stage_east_m": 202.48657777476865,
+      "stage_west_m": 210.35163763774443,
+      "target_discharge_m3s": 230.0
+    }
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "anchor_lonlat": [
+      -71.97165598561236,
+      -43.314848255802275
+    ],
+    "axis_to_heightfield_thalweg_offset_m": 18.0,
+    "centerline_lonlat_first": [
+      -71.97422892383875,
+      -43.31635138105208
+    ],
+    "centerline_lonlat_last": [
+      -71.97144857491433,
+      -43.317460119372726
+    ],
+    "min_centerline_radius_m": 48.17721720438087
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 43,
+    "origin_x": 0.0,
+    "origin_y": -42.0
+  },
+  "honesty": {
+    "axis_alignment": "The window axis is the committed corridor centerline (OSM-derived), so no thalweg snap is applied; the measured axis-to-heightfield-thalweg offset is 18.0 m. Axis-vs-terrain alignment remains pending_human_review.",
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The terrain source is Copernicus DEM GLO-30 (~30 m post spacing), conditioned by the international-corridor generator into a 2017x2017 heightfield. At 30 m it cannot resolve the channel, in-channel rocks, ledges, holes, or bathymetry at all; within the conditioned channel core the heightfield is the corridor's bounded VISUAL bed (render-only authority, not surveyed bathymetry). Every in-channel feature in these packages is an authored interpretation of Terminator's published feature_tags (the catalog records no committed C1 sub-feature inventory for this rapid).",
+    "flow_bands": "Flow bands are derived from the corridor's DGA seasonal planning bands, which are review-only until gauge-to-reach translation and guide validation are complete; each output band is its source planning band's range midpoint and inherits that provenance.",
+    "longitudinal_profile": "The raw heightfield floor drop through the traced window is recorded in the conditioning report; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it, and it agrees with the corridor's own committed conditioned-surface drop to within a fraction of a metre.",
+    "pending_human_review": true,
+    "production_promoted": false,
+    "slope_bound": "The conditioned profile is slope-bounded to a Class III+/IV gradient (2%, the corridor's own visual-conditioning cap); the heightfield floor here drops ~7.9 m over the 600 m window (~1.31%), below that bound, so the bound is retained but inactive (mean_slope_bound_applied=false). The same policy protected the steeper Meat Grinder window; both raw and conditioned drops are recorded.",
+    "stationing": "Terminator's station is order-distributed on the OSM route scaffold (order 2 of 5 rapids; order_distributed_route_work_window_not_authoritative). The exact station, line direction, and rapid span remain pending_human_review."
+  },
+  "rapid_name": "Terminator",
+  "river_id": "futaleufu_river_chile",
+  "route_order_station_m": 5312.259,
+  "schema": "raftsim.futaleufu.terminator_c3_water_window.v1",
+  "sources": {
+    "centerline_local": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/centerline_local.json",
+    "corridor_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json",
+    "feature_tags": "physics/data/real_world/named_rapid_source_catalog.json",
+    "heightfield_sha256": "69bad66c4abfd36613cac68d0f24ba90c8fb8aa64ec7876eb1bb1f6c7d517fff",
+    "seasonal_flow_context": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrology/seasonal_flow_context.json",
+    "stationing": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/hydrography/route_stationing.json",
+    "stationing_window": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_work_window_manifest.json",
+    "terrain_heightfield": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/derived/heightfield_2017.png"
+  },
+  "task_id": "five-river-simulation-plan-W1-futaleufu-terminator",
+  "window_id": "terminator_station_5312m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "bank_feather_m": 9.0,
+    "bank_min_height_m": 1.2,
+    "bank_relief_cap_m": 25.0,
+    "cell_size_m": 2.0,
+    "channel_depth_m": 2.8,
+    "channel_half_width_m": 24.0,
+    "conditioned_max_mean_slope": 0.02,
+    "cross_half_width_m": 42.0,
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 10.0,
+    "initial_depth_cap_m": 2.6,
+    "max_profile_drop_per_cell_m": 0.3,
+    "max_smoothing_passes": 6000,
+    "roughness_manning_n": 0.045,
+    "window_axis_pad_m": 340.0,
+    "window_length_m": 600.0
+  }
+}

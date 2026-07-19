@@ -1,0 +1,123 @@
+{
+  "array_files": {
+    "bed": "bed.npy",
+    "features": "features.json",
+    "initial_state": "initial_state.npz",
+    "probes": "probes.json"
+  },
+  "boundaries": [
+    {
+      "depth": null,
+      "edge": "west",
+      "hydrograph": [],
+      "kind": "inflow",
+      "metadata": {
+        "flow_band": "median_runnable",
+        "manning_n": 0.045,
+        "manning_slope": 0.01310843310495964,
+        "target_discharge_m3s": 230.0
+      },
+      "stage": 210.35163763774443,
+      "velocity": [
+        3.4572369392041185,
+        0.0
+      ]
+    },
+    {
+      "depth": null,
+      "edge": "east",
+      "hydrograph": [],
+      "kind": "outflow",
+      "metadata": {
+        "flow_band": "median_runnable",
+        "target_discharge_m3s": 230.0
+      },
+      "stage": 202.48657777476865,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "south",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    },
+    {
+      "depth": null,
+      "edge": "north",
+      "hydrograph": [],
+      "kind": "bank",
+      "metadata": {},
+      "stage": null,
+      "velocity": null
+    }
+  ],
+  "duration": 240.0,
+  "feature_count": 11,
+  "fixed_dt": 0.05,
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 43,
+    "origin_x": 0.0,
+    "origin_y": -42.0
+  },
+  "metadata": {
+    "confidence_score": 0.2,
+    "coordinate_reference_system": "channel-following meters; x downstream along the committed corridor centerline centered on order-distributed route station 5312.259 m, y positive river-left",
+    "description": "Reach-local Terminator C3 water window: Copernicus GLO-30 corridor valley frame with a conditioned channel and authored (interpreted) Terminator bed geometry (entry tongue/seam, the Terminator hole, an offset second hole, the flip-wave train, a river-left sneak line, scout/recovery eddies, shore portage).",
+    "difficulty_preset": "class_V_terminator_big_water",
+    "fixture_kind": null,
+    "flow_band": "median_runnable",
+    "flow_percentile": 0.5,
+    "gauge_source": "DGA Chile 10704002-1 Rio Futaleufu ante junta rio Malito (downstream mainstem; route translation review required)",
+    "generator": "raftsim.futaleufu_terminator_c3_window",
+    "generator_version": "p3_c3_window.v1",
+    "provenance": {
+      "anchor_snap_distance_m": 18.0,
+      "bed_geometry_authority": "interpreted_bed_geometry",
+      "corridor_river_id": "futaleufu_terminator",
+      "dem_cannot_resolve_in_channel_rocks": true,
+      "feature_authority": "interpreted_from_published_feature_tags_no_committed_subfeature_inventory",
+      "feature_source": "physics/data/real_world/named_rapid_source_catalog.json",
+      "flow_authority": "review_only_corridor_planning_band",
+      "flow_band_source": "normal_runnable",
+      "pending_human_review": true,
+      "production_promoted": false,
+      "rapid_name": "Terminator",
+      "route_order_station_m": 5312.259,
+      "stage_east_m": 202.48657777476865,
+      "stage_west_m": 210.35163763774443,
+      "stationing_authority": "order_distributed_route_work_window_not_authoritative",
+      "stationing_source": "physics/data/real_world/futaleufu_river_chile/review/a4_stationing_digitizing_work_window_manifest.json",
+      "target_discharge_m3s": 230.0,
+      "task": "five-river-simulation-plan W1 / Futaleufu Terminator C3 window",
+      "terrain_source": "copernicus_dem_glo30_corridor_conditioned_heightfield",
+      "terrain_source_sha256": "69bad66c4abfd36613cac68d0f24ba90c8fb8aa64ec7876eb1bb1f6c7d517fff"
+    },
+    "river_id": "futaleufu_river_chile",
+    "scenario_id": "futaleufu_terminator_c3_window_median_runnable",
+    "scenario_type": "real_world",
+    "season_preset": null,
+    "section_id": "terminator_station_5312m_c3_window",
+    "seed": 1,
+    "source_manifest": "physics/data/real_world/futaleufu_river_chile/production_corridor/rio_azul_swinging_bridge_to_pasarela/manifest.json"
+  },
+  "probe_count": 12,
+  "raft": {
+    "drag_coefficient": 1.25,
+    "grounding_friction": 0.65,
+    "guide_mass_kg": 85.0,
+    "length_m": 4.3,
+    "mass_kg": 420.0,
+    "passenger_count": 6,
+    "passenger_mass_kg": 75.0,
+    "tube_radius_m": 0.28,
+    "width_m": 1.9
+  },
+  "roughness": 0.045,
+  "schema_version": "raftsim.scenario2_5d.v0"
+}

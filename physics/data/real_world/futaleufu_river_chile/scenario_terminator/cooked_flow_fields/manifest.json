@@ -1,0 +1,1085 @@
+{
+  "bands": [
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "low_runnable/bed.npy",
+          "sha256": "d29c54624a27fed2fd5e8d7f954065a742427703f594804a4d6b52e57dd44c19",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "low_runnable/h.npy",
+          "sha256": "371bee8ec7ad2cedfd74f6efeef5673f6f57415144a80747468e097409767137",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "low_runnable/u.npy",
+          "sha256": "e79a6f91dbcd507af35441f4cf28c341f6e3ec237dbf1da0d6996b389ea366f2",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "low_runnable/v.npy",
+          "sha256": "aeed316eb7caf3130ea12d1f93d4f33235645ffa45148f44a1531d2b02573bcf",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "low_runnable/wet_mask.npy",
+          "sha256": "1f3810f86ed83d905ca2a3106140e357820f70fbff399c3900d0b7fd600b0025",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "low_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 400.0,
+          "max_abs_dh_m": 0.136314641314369,
+          "max_abs_du_m_per_s": 2.4930551661884977,
+          "max_abs_dv_m_per_s": 0.9821775752910319
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 0.9985248510744058,
+            "max_abs_du_m_per_s": 4.5,
+            "max_abs_dv_m_per_s": 4.655635065025393
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 0.7394096935816705,
+            "max_abs_du_m_per_s": 2.9954508388666485,
+            "max_abs_dv_m_per_s": 3.563223290459865
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 0.571266398871193,
+            "max_abs_du_m_per_s": 3.2733800650904614,
+            "max_abs_dv_m_per_s": 3.6783111236990838
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 0.50741786225701,
+            "max_abs_du_m_per_s": 3.2001593773574224,
+            "max_abs_dv_m_per_s": 3.0315135848934314
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 0.4777967881419114,
+            "max_abs_du_m_per_s": 2.481966995372127,
+            "max_abs_dv_m_per_s": 2.8900725395008298
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.3792195503490737,
+            "max_abs_du_m_per_s": 3.842264500595467,
+            "max_abs_dv_m_per_s": 1.6207346125523738
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 0.4001414958918099,
+            "max_abs_du_m_per_s": 2.443937609060157,
+            "max_abs_dv_m_per_s": 1.688384508907868
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.42110621437823403,
+            "max_abs_du_m_per_s": 4.547877211409141,
+            "max_abs_dv_m_per_s": 1.9964159073595795
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.6052294052589057,
+            "max_abs_du_m_per_s": 2.7955613706098266,
+            "max_abs_dv_m_per_s": 1.601781765740793
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 0.44296908484215525,
+            "max_abs_du_m_per_s": 1.907962768216998,
+            "max_abs_dv_m_per_s": 1.2465291239511331
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.3931309829333866,
+            "max_abs_du_m_per_s": 1.5638789537774032,
+            "max_abs_dv_m_per_s": 1.35238350685195
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.3109067415560146,
+            "max_abs_du_m_per_s": 3.4100405612246942,
+            "max_abs_dv_m_per_s": 1.9734269499553239
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.20180582917015233,
+            "max_abs_du_m_per_s": 1.8132511293901463,
+            "max_abs_dv_m_per_s": 1.639483861131284
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.4569468178192435,
+            "max_abs_du_m_per_s": 2.1878299647642603,
+            "max_abs_dv_m_per_s": 2.684842288427248
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.16352190005316114,
+            "max_abs_du_m_per_s": 1.783939342478095,
+            "max_abs_dv_m_per_s": 1.8282577570210856
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.16943190231901561,
+            "max_abs_du_m_per_s": 1.5037197823975914,
+            "max_abs_dv_m_per_s": 2.615600167918713
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.2294158277167926,
+            "max_abs_du_m_per_s": 2.0717025544892373,
+            "max_abs_dv_m_per_s": 0.7420915424899874
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.20663137618403637,
+            "max_abs_du_m_per_s": 1.8036619491158667,
+            "max_abs_dv_m_per_s": 2.2270767615640112
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.11711494417088025,
+            "max_abs_du_m_per_s": 1.7058274168138694,
+            "max_abs_dv_m_per_s": 1.1673805515083968
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.13689024097661795,
+            "max_abs_du_m_per_s": 1.506376477134146,
+            "max_abs_dv_m_per_s": 1.5390198213754949
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.09282567953622822,
+            "max_abs_du_m_per_s": 0.8555550040819311,
+            "max_abs_dv_m_per_s": 0.8860551845662653
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.13853176065078998,
+            "max_abs_du_m_per_s": 0.8667299796689832,
+            "max_abs_dv_m_per_s": 0.964700607931237
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.21309575189055374,
+            "max_abs_du_m_per_s": 1.1571100336072164,
+            "max_abs_dv_m_per_s": 1.90789010909664
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.3743757419290353,
+            "max_abs_du_m_per_s": 1.9720107937095204,
+            "max_abs_dv_m_per_s": 1.837068805070617
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 0.10725895071705834,
+            "max_abs_du_m_per_s": 2.2373074948748792,
+            "max_abs_dv_m_per_s": 1.8281253188588422
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.1947251391073641,
+            "max_abs_du_m_per_s": 2.0931794550569225,
+            "max_abs_dv_m_per_s": 0.7313997453498808
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.27165472936648993,
+            "max_abs_du_m_per_s": 1.9120507791460413,
+            "max_abs_dv_m_per_s": 0.5315223257035058
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.2519344778321837,
+            "max_abs_du_m_per_s": 1.7736087679276582,
+            "max_abs_dv_m_per_s": 0.901333640702366
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.14781979079416802,
+            "max_abs_du_m_per_s": 2.0108946835310433,
+            "max_abs_dv_m_per_s": 0.6339091938951978
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.3864361217831803,
+            "max_abs_du_m_per_s": 2.437436701012428,
+            "max_abs_dv_m_per_s": 0.4666523838401351
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.3239735976516648,
+            "max_abs_du_m_per_s": 1.59404204194994,
+            "max_abs_dv_m_per_s": 0.7628706745477822
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.18140793185719012,
+            "max_abs_du_m_per_s": 1.5556728115178733,
+            "max_abs_dv_m_per_s": 0.697235484298639
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.16683500322252032,
+            "max_abs_du_m_per_s": 1.0339871553391697,
+            "max_abs_dv_m_per_s": 0.697235484298639
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.15364710531686,
+            "max_abs_du_m_per_s": 1.1083619669913505,
+            "max_abs_dv_m_per_s": 0.6856480825188176
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.14556199074610296,
+            "max_abs_du_m_per_s": 2.3001722192697276,
+            "max_abs_dv_m_per_s": 0.4616492975216425
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.16378108233113806,
+            "max_abs_du_m_per_s": 2.2279877167065885,
+            "max_abs_dv_m_per_s": 0.4296889455982009
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.14887840818864034,
+            "max_abs_du_m_per_s": 1.745196684049633,
+            "max_abs_dv_m_per_s": 0.5970936384388867
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.15581840782949075,
+            "max_abs_du_m_per_s": 1.953652657592651,
+            "max_abs_dv_m_per_s": 0.547259675188903
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.15683684604109643,
+            "max_abs_du_m_per_s": 1.871494100133133,
+            "max_abs_dv_m_per_s": 0.3514158858396851
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.136314641314369,
+            "max_abs_du_m_per_s": 2.4930551661884977,
+            "max_abs_dv_m_per_s": 0.9821775752910319
+          }
+        ]
+      },
+      "difficulty": "class_V_terminator_big_water",
+      "directory": "low_runnable",
+      "discharge_steady_m3s": {
+        "east": 63.982041623056354,
+        "mid": 72.19945480335791,
+        "west": 73.21760048812709
+      },
+      "discharge_target_m3s": 110.0,
+      "effective_manning_n": 0.045,
+      "field_stats": {
+        "h_max_m": 3.2367916107177734,
+        "h_mean_m": 0.7638834480772022,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 5.967058437452718,
+        "wet_fraction": 0.5646295294753921
+      },
+      "manning_n": 0.045,
+      "scenario_id": "futaleufu_terminator_c3_window_low_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "e33447542c63b858f3de1cc7cc0beacc92890be565255cffbead7883103daf5a",
+        "initial_state.npz": "907eeab17f41555fc6042996d00eb58ffede005f3497a83acf9d54683818c8d3",
+        "scenario.json": "0e79a0afacc35f7731a88cb59520b349fa4a8d0301155760df43ee3f5edce82c"
+      },
+      "season": null
+    },
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "median_runnable/bed.npy",
+          "sha256": "d29c54624a27fed2fd5e8d7f954065a742427703f594804a4d6b52e57dd44c19",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "median_runnable/h.npy",
+          "sha256": "9ddd92aaec8db4be56579b058198bfd9a885a5c08ef95bd535b870804bba1ebe",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "median_runnable/u.npy",
+          "sha256": "d7413a44291c312b695ec5781512ea1a5e706aa0ecc24b5434ca9795ae2e7f62",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "median_runnable/v.npy",
+          "sha256": "5cdf1133d0324573d2efee38928924a799b031000cc27aac7d0c24c56c054239",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "median_runnable/wet_mask.npy",
+          "sha256": "5b20194e0d5d5c2a82e4417e94620b286ecd3f51c01bf17d644019417fe58bb3",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "median_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 400.0,
+          "max_abs_dh_m": 0.2736481273531577,
+          "max_abs_du_m_per_s": 1.0678007393688542,
+          "max_abs_dv_m_per_s": 0.6442324449318582
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 1.404052342018486,
+            "max_abs_du_m_per_s": 4.961847305848103,
+            "max_abs_dv_m_per_s": 5.7587008115198355
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 0.9392026055344,
+            "max_abs_du_m_per_s": 4.3452927345784405,
+            "max_abs_dv_m_per_s": 5.362182307289065
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 0.7445240721637854,
+            "max_abs_du_m_per_s": 4.555517195826278,
+            "max_abs_dv_m_per_s": 4.269967871015548
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 0.5870697991593752,
+            "max_abs_du_m_per_s": 3.3745927445146418,
+            "max_abs_dv_m_per_s": 3.267628139553887
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 0.8863676044045876,
+            "max_abs_du_m_per_s": 3.4866302181990503,
+            "max_abs_dv_m_per_s": 2.7318720225172304
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.9568866083345565,
+            "max_abs_du_m_per_s": 4.933752199595176,
+            "max_abs_dv_m_per_s": 2.817598934017632
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 0.497073945211563,
+            "max_abs_du_m_per_s": 1.7309041978484105,
+            "max_abs_dv_m_per_s": 1.4108172818228844
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.37344591495278623,
+            "max_abs_du_m_per_s": 2.472745810956105,
+            "max_abs_dv_m_per_s": 1.8128384068912293
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.4985821468160432,
+            "max_abs_du_m_per_s": 1.725635498942912,
+            "max_abs_dv_m_per_s": 1.5551771406840018
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 1.18616178985009,
+            "max_abs_du_m_per_s": 3.341014465998994,
+            "max_abs_dv_m_per_s": 3.0339785809609303
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.30243792538740677,
+            "max_abs_du_m_per_s": 1.476327537403714,
+            "max_abs_dv_m_per_s": 3.186512677502433
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.4508369198529858,
+            "max_abs_du_m_per_s": 3.064365815327301,
+            "max_abs_dv_m_per_s": 2.392489713516634
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.40690557838296315,
+            "max_abs_du_m_per_s": 1.6492471286810082,
+            "max_abs_dv_m_per_s": 1.850684356652013
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.480745500533186,
+            "max_abs_du_m_per_s": 1.5985776665723546,
+            "max_abs_dv_m_per_s": 2.47582456254841
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.2847631180142609,
+            "max_abs_du_m_per_s": 1.4996987623574962,
+            "max_abs_dv_m_per_s": 2.1997724212944503
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.4060468688273162,
+            "max_abs_du_m_per_s": 2.8239223779617184,
+            "max_abs_dv_m_per_s": 1.2777465045971987
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.38267968140413,
+            "max_abs_du_m_per_s": 2.7944556488999135,
+            "max_abs_dv_m_per_s": 1.284638369044284
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.3056744845417123,
+            "max_abs_du_m_per_s": 2.0291871054892106,
+            "max_abs_dv_m_per_s": 0.9795589463108405
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.2338160801337592,
+            "max_abs_du_m_per_s": 2.952794990069126,
+            "max_abs_dv_m_per_s": 1.3013517283880032
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.1634217301205284,
+            "max_abs_du_m_per_s": 0.8577370942402731,
+            "max_abs_dv_m_per_s": 1.0933446152200645
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.17801331722211444,
+            "max_abs_du_m_per_s": 1.8735809678913269,
+            "max_abs_dv_m_per_s": 2.861841242578838
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.20685277152565687,
+            "max_abs_du_m_per_s": 1.5221590443938409,
+            "max_abs_dv_m_per_s": 1.2715396466742273
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.17184860493145693,
+            "max_abs_du_m_per_s": 0.8046830120781621,
+            "max_abs_dv_m_per_s": 0.7725990852230363
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.13287909216342397,
+            "max_abs_du_m_per_s": 0.5754853031646676,
+            "max_abs_dv_m_per_s": 0.8748871702216309
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 0.22286532674813309,
+            "max_abs_du_m_per_s": 1.8166274780479648,
+            "max_abs_dv_m_per_s": 0.7729129012873713
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.39789995811602236,
+            "max_abs_du_m_per_s": 3.466246431680344,
+            "max_abs_dv_m_per_s": 0.8422090805668097
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.22410754822453371,
+            "max_abs_du_m_per_s": 1.589323517589745,
+            "max_abs_dv_m_per_s": 1.033757164577556
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.21261433345825875,
+            "max_abs_du_m_per_s": 1.0645613898087078,
+            "max_abs_dv_m_per_s": 0.5286479774117183
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.30468086802397065,
+            "max_abs_du_m_per_s": 1.0004074692974592,
+            "max_abs_dv_m_per_s": 0.8503163716206193
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.23901880996892644,
+            "max_abs_du_m_per_s": 1.0961824639683277,
+            "max_abs_dv_m_per_s": 0.6794409027939315
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.1965719300430645,
+            "max_abs_du_m_per_s": 1.900422385438922,
+            "max_abs_dv_m_per_s": 1.264361868601225
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.5387276305329276,
+            "max_abs_du_m_per_s": 2.7342754601507155,
+            "max_abs_dv_m_per_s": 1.4414245523458056
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.43860038184695593,
+            "max_abs_du_m_per_s": 1.4733018661967057,
+            "max_abs_dv_m_per_s": 0.8582820144709036
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.23633072335695116,
+            "max_abs_du_m_per_s": 1.3338781956743568,
+            "max_abs_dv_m_per_s": 0.5957618380817649
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.5326670778044941,
+            "max_abs_du_m_per_s": 2.8767982817666518,
+            "max_abs_dv_m_per_s": 0.9044010488371493
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.39255173319604,
+            "max_abs_du_m_per_s": 1.8424478733660041,
+            "max_abs_dv_m_per_s": 0.9374466660941932
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.1858753794900122,
+            "max_abs_du_m_per_s": 1.3833761977755188,
+            "max_abs_dv_m_per_s": 0.5975136255126449
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.18276727484776023,
+            "max_abs_du_m_per_s": 0.7957826142487604,
+            "max_abs_dv_m_per_s": 1.9838457249289512
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.13570177480399526,
+            "max_abs_du_m_per_s": 0.8653638869558975,
+            "max_abs_dv_m_per_s": 2.073333700871277
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.2736481273531577,
+            "max_abs_du_m_per_s": 1.0678007393688542,
+            "max_abs_dv_m_per_s": 0.6442324449318582
+          }
+        ]
+      },
+      "difficulty": "class_V_terminator_big_water",
+      "directory": "median_runnable",
+      "discharge_steady_m3s": {
+        "east": 166.38451120003612,
+        "mid": 174.92626869196954,
+        "west": 181.64569752349712
+      },
+      "discharge_target_m3s": 230.0,
+      "effective_manning_n": 0.045,
+      "field_stats": {
+        "h_max_m": 3.96189546585083,
+        "h_mean_m": 1.2036462815435711,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 7.116095936830008,
+        "wet_fraction": 0.6759638414587036
+      },
+      "manning_n": 0.045,
+      "scenario_id": "futaleufu_terminator_c3_window_median_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "e33447542c63b858f3de1cc7cc0beacc92890be565255cffbead7883103daf5a",
+        "initial_state.npz": "124be8b1624c6c4ffbbffe6f74e91dfcfe9d74c7cdaec81dc2befe84c4a76acf",
+        "scenario.json": "5105e0cbf70ba496aa3104c5dc38a81016b82117a4b6c13ab5bcd1bc2ff232f0"
+      },
+      "season": null
+    },
+    {
+      "arrays": {
+        "bed": {
+          "description": "Bed elevation in scenario-local meters.",
+          "dtype": "float32",
+          "file": "high_runnable/bed.npy",
+          "sha256": "d29c54624a27fed2fd5e8d7f954065a742427703f594804a4d6b52e57dd44c19",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "h": {
+          "description": "Water depth above bed.",
+          "dtype": "float32",
+          "file": "high_runnable/h.npy",
+          "sha256": "7aa0392582935465f275bae647cf4f1ec4453ca5e9cf84cd8d1c32381ad66679",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m"
+        },
+        "u": {
+          "description": "Depth-averaged x (downstream) velocity.",
+          "dtype": "float32",
+          "file": "high_runnable/u.npy",
+          "sha256": "d33a043a1703b867de1a25a32c56be65d31693abdc209230b2f7f88a5b456ac5",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "v": {
+          "description": "Depth-averaged y (cross-stream) velocity.",
+          "dtype": "float32",
+          "file": "high_runnable/v.npy",
+          "sha256": "76747ea43d7945e0f257effa2548f0b3d15c03493379588cf00c88750cbae7e2",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "m_per_s"
+        },
+        "wet_mask": {
+          "description": "1 where the solver reports the cell wet.",
+          "dtype": "uint8",
+          "file": "high_runnable/wet_mask.npy",
+          "sha256": "6f79a96ef774b02367b907af611365422cf2da8a06691997ab6b022b87676f50",
+          "shape": [
+            43,
+            301
+          ],
+          "units": "boolean"
+        }
+      },
+      "band_id": "high_runnable",
+      "convergence": {
+        "converged": false,
+        "final_window": {
+          "end_time_s": 400.0,
+          "max_abs_dh_m": 0.8760881862681558,
+          "max_abs_du_m_per_s": 2.454591260150331,
+          "max_abs_dv_m_per_s": 5.689326466953057
+        },
+        "thresholds": {
+          "consecutive_windows_required": 3,
+          "max_abs_dh_m": 0.002,
+          "max_abs_du_m_per_s": 0.01,
+          "max_abs_dv_m_per_s": 0.01
+        },
+        "window_seconds": 10.0,
+        "windows": [
+          {
+            "end_time_s": 10.0,
+            "max_abs_dh_m": 1.999647541299125,
+            "max_abs_du_m_per_s": 5.054018964313994,
+            "max_abs_dv_m_per_s": 7.109821640003976
+          },
+          {
+            "end_time_s": 20.0,
+            "max_abs_dh_m": 1.261969541155427,
+            "max_abs_du_m_per_s": 5.742892314809133,
+            "max_abs_dv_m_per_s": 4.419117731353538
+          },
+          {
+            "end_time_s": 30.0,
+            "max_abs_dh_m": 1.545217090858172,
+            "max_abs_du_m_per_s": 4.041984300107814,
+            "max_abs_dv_m_per_s": 4.5632550209098595
+          },
+          {
+            "end_time_s": 40.0,
+            "max_abs_dh_m": 1.3966101282002148,
+            "max_abs_du_m_per_s": 4.320300533208371,
+            "max_abs_dv_m_per_s": 4.964412199287934
+          },
+          {
+            "end_time_s": 50.0,
+            "max_abs_dh_m": 1.2563115044473356,
+            "max_abs_du_m_per_s": 4.8572687159015855,
+            "max_abs_dv_m_per_s": 2.9461299641739735
+          },
+          {
+            "end_time_s": 60.0,
+            "max_abs_dh_m": 0.7601072151495861,
+            "max_abs_du_m_per_s": 2.4886430545851286,
+            "max_abs_dv_m_per_s": 1.8901411641081851
+          },
+          {
+            "end_time_s": 70.0,
+            "max_abs_dh_m": 1.3957573224797333,
+            "max_abs_du_m_per_s": 5.154111615845894,
+            "max_abs_dv_m_per_s": 1.4008427527645366
+          },
+          {
+            "end_time_s": 80.0,
+            "max_abs_dh_m": 0.6470877092618565,
+            "max_abs_du_m_per_s": 3.9875129411198373,
+            "max_abs_dv_m_per_s": 2.196276315195908
+          },
+          {
+            "end_time_s": 90.0,
+            "max_abs_dh_m": 0.31459580689503275,
+            "max_abs_du_m_per_s": 3.7992683562523983,
+            "max_abs_dv_m_per_s": 2.393302578652057
+          },
+          {
+            "end_time_s": 100.0,
+            "max_abs_dh_m": 0.34358544252155643,
+            "max_abs_du_m_per_s": 1.7514933081883628,
+            "max_abs_dv_m_per_s": 4.53928863106646
+          },
+          {
+            "end_time_s": 110.0,
+            "max_abs_dh_m": 0.5182926731875577,
+            "max_abs_du_m_per_s": 1.5850513467824807,
+            "max_abs_dv_m_per_s": 4.870846909337234
+          },
+          {
+            "end_time_s": 120.0,
+            "max_abs_dh_m": 0.5618258928237743,
+            "max_abs_du_m_per_s": 1.7023520015178675,
+            "max_abs_dv_m_per_s": 6.514162041662072
+          },
+          {
+            "end_time_s": 130.0,
+            "max_abs_dh_m": 0.7099485330193744,
+            "max_abs_du_m_per_s": 2.4181245739062662,
+            "max_abs_dv_m_per_s": 5.491251583942395
+          },
+          {
+            "end_time_s": 140.0,
+            "max_abs_dh_m": 0.8894675457030998,
+            "max_abs_du_m_per_s": 2.711819753888753,
+            "max_abs_dv_m_per_s": 5.274604255459405
+          },
+          {
+            "end_time_s": 150.0,
+            "max_abs_dh_m": 0.7676329821094494,
+            "max_abs_du_m_per_s": 2.7371077944848508,
+            "max_abs_dv_m_per_s": 6.051707364601786
+          },
+          {
+            "end_time_s": 160.0,
+            "max_abs_dh_m": 0.6825991862727441,
+            "max_abs_du_m_per_s": 1.9249107363718225,
+            "max_abs_dv_m_per_s": 6.246680687705126
+          },
+          {
+            "end_time_s": 170.0,
+            "max_abs_dh_m": 0.906707985078334,
+            "max_abs_du_m_per_s": 1.681800620719631,
+            "max_abs_dv_m_per_s": 4.808691103416885
+          },
+          {
+            "end_time_s": 180.0,
+            "max_abs_dh_m": 0.4613802663114628,
+            "max_abs_du_m_per_s": 1.250056897397207,
+            "max_abs_dv_m_per_s": 2.784243052469028
+          },
+          {
+            "end_time_s": 190.0,
+            "max_abs_dh_m": 0.7574882844999057,
+            "max_abs_du_m_per_s": 4.4002459063243196,
+            "max_abs_dv_m_per_s": 6.359668884181527
+          },
+          {
+            "end_time_s": 200.0,
+            "max_abs_dh_m": 0.849953417633884,
+            "max_abs_du_m_per_s": 3.9326502731438557,
+            "max_abs_dv_m_per_s": 9.536273415218954
+          },
+          {
+            "end_time_s": 210.0,
+            "max_abs_dh_m": 0.899143395488963,
+            "max_abs_du_m_per_s": 3.670838342728517,
+            "max_abs_dv_m_per_s": 9.03529084778572
+          },
+          {
+            "end_time_s": 220.0,
+            "max_abs_dh_m": 0.9198984772915034,
+            "max_abs_du_m_per_s": 2.285254727762327,
+            "max_abs_dv_m_per_s": 5.576046269763577
+          },
+          {
+            "end_time_s": 230.0,
+            "max_abs_dh_m": 0.7343506838777842,
+            "max_abs_du_m_per_s": 2.045266292633685,
+            "max_abs_dv_m_per_s": 6.691627887581976
+          },
+          {
+            "end_time_s": 240.0,
+            "max_abs_dh_m": 0.8859517905951553,
+            "max_abs_du_m_per_s": 2.8325378034485365,
+            "max_abs_dv_m_per_s": 8.06341269083807
+          },
+          {
+            "end_time_s": 250.0,
+            "max_abs_dh_m": 1.1108317349159065,
+            "max_abs_du_m_per_s": 2.678678340607445,
+            "max_abs_dv_m_per_s": 7.166030613757345
+          },
+          {
+            "end_time_s": 260.0,
+            "max_abs_dh_m": 0.6612040952257707,
+            "max_abs_du_m_per_s": 2.0062835364966167,
+            "max_abs_dv_m_per_s": 5.522635611907294
+          },
+          {
+            "end_time_s": 270.0,
+            "max_abs_dh_m": 0.8415327872852598,
+            "max_abs_du_m_per_s": 2.3843297322572,
+            "max_abs_dv_m_per_s": 5.815311848690686
+          },
+          {
+            "end_time_s": 280.0,
+            "max_abs_dh_m": 0.8002259919379459,
+            "max_abs_du_m_per_s": 2.724514751668615,
+            "max_abs_dv_m_per_s": 4.861260243690981
+          },
+          {
+            "end_time_s": 290.0,
+            "max_abs_dh_m": 0.7602771986661675,
+            "max_abs_du_m_per_s": 1.69195271947838,
+            "max_abs_dv_m_per_s": 5.666453226860017
+          },
+          {
+            "end_time_s": 300.0,
+            "max_abs_dh_m": 0.864678620152208,
+            "max_abs_du_m_per_s": 2.080940290197983,
+            "max_abs_dv_m_per_s": 8.43906500017345
+          },
+          {
+            "end_time_s": 310.0,
+            "max_abs_dh_m": 0.8337848708021411,
+            "max_abs_du_m_per_s": 3.85869342762613,
+            "max_abs_dv_m_per_s": 8.02644544902377
+          },
+          {
+            "end_time_s": 320.0,
+            "max_abs_dh_m": 0.8269366903360141,
+            "max_abs_du_m_per_s": 3.8876668947198243,
+            "max_abs_dv_m_per_s": 4.608269444295068
+          },
+          {
+            "end_time_s": 330.0,
+            "max_abs_dh_m": 0.6484648479867318,
+            "max_abs_du_m_per_s": 1.9561201930832333,
+            "max_abs_dv_m_per_s": 5.150344954255029
+          },
+          {
+            "end_time_s": 340.0,
+            "max_abs_dh_m": 0.609083049807355,
+            "max_abs_du_m_per_s": 2.6869393168235627,
+            "max_abs_dv_m_per_s": 5.3053054380708575
+          },
+          {
+            "end_time_s": 350.0,
+            "max_abs_dh_m": 0.7750627018058021,
+            "max_abs_du_m_per_s": 2.379990078123793,
+            "max_abs_dv_m_per_s": 5.789821871615433
+          },
+          {
+            "end_time_s": 360.0,
+            "max_abs_dh_m": 0.7863019715883373,
+            "max_abs_du_m_per_s": 2.9396048187328927,
+            "max_abs_dv_m_per_s": 5.517109615889936
+          },
+          {
+            "end_time_s": 370.0,
+            "max_abs_dh_m": 0.7536280466901786,
+            "max_abs_du_m_per_s": 2.3198653972434222,
+            "max_abs_dv_m_per_s": 4.216227996372548
+          },
+          {
+            "end_time_s": 380.0,
+            "max_abs_dh_m": 0.6718451920729575,
+            "max_abs_du_m_per_s": 2.3876172259284623,
+            "max_abs_dv_m_per_s": 6.297002348126297
+          },
+          {
+            "end_time_s": 390.0,
+            "max_abs_dh_m": 0.6228391136492911,
+            "max_abs_du_m_per_s": 2.0565662498133594,
+            "max_abs_dv_m_per_s": 6.4870524433747745
+          },
+          {
+            "end_time_s": 400.0,
+            "max_abs_dh_m": 0.8760881862681558,
+            "max_abs_du_m_per_s": 2.454591260150331,
+            "max_abs_dv_m_per_s": 5.689326466953057
+          }
+        ]
+      },
+      "difficulty": "class_V_terminator_big_water",
+      "directory": "high_runnable",
+      "discharge_steady_m3s": {
+        "east": 310.0601145033102,
+        "mid": 313.9650780979395,
+        "west": 331.09912352286653
+      },
+      "discharge_target_m3s": 400.0,
+      "effective_manning_n": 0.045,
+      "field_stats": {
+        "h_max_m": 5.097848415374756,
+        "h_mean_m": 1.7633974564473642,
+        "h_min_m": 0.0,
+        "speed_max_m_per_s": 11.937989529662886,
+        "wet_fraction": 0.8892065208993278
+      },
+      "manning_n": 0.045,
+      "scenario_id": "futaleufu_terminator_c3_window_high_runnable",
+      "scenario_input_sha256": {
+        "bed.npy": "e33447542c63b858f3de1cc7cc0beacc92890be565255cffbead7883103daf5a",
+        "initial_state.npz": "96bed08ffc6144c0bc0597b2048fe4605a3fd0c4232dfc5ea7b3f294849b80b7",
+        "scenario.json": "835b7741692b618efe499d797a76122db7db9f0b0d3647cd8790f26e9b976963"
+      },
+      "season": null
+    }
+  ],
+  "generated_on": "2026-07-18",
+  "generator": "raftsim.cooked_flow_fields",
+  "grid": {
+    "crs": "channel-following meters; x downstream along the committed corridor centerline centered on order-distributed route station 5312.259 m, y positive river-left",
+    "downstream_axis": "+x",
+    "dx_m": 2.0,
+    "dy_m": 2.0,
+    "index_to_world": "world_x = origin_x_m + col * dx_m; world_y = origin_y_m + row * dy_m (cell-centered samples)",
+    "layout": "row_major_c_order",
+    "nx": 301,
+    "ny": 43,
+    "origin_x_m": 0.0,
+    "origin_y_m": -42.0
+  },
+  "notes": [
+    "Fields are the genuine finite-volume solver's approximate steady state for the authored Terminator C3 window: order 2, HLL, calibrations disabled, feature_strength_scale=0 (the interpreted Terminator features are authored bed geometry, not dynamic feature forcing), matching the settings the window was behaviorally validated with.",
+    "The terrain source is Copernicus DEM GLO-30 (~30 m), corridor-conditioned; it cannot resolve the channel, so the whole cross-section and every in-channel feature are interpreted bed geometry. The window is pending_human_review and not production_promoted; these cooked fields inherit that provenance and make no claim of numeric parity with a reference solution.",
+    "The UE river-window loader (FRaftSimLiveWaterWindow::CreateFromCookedFields) must run the embedded live solver with this manifest's solver settings (notably roughness_scale and bed_slope_source_scale) and each band's manning_n, or the seeded window drifts off the cooked state.",
+    "manning_n / effective_manning_n are recorded per band from each scenario's roughness; effective_manning_n = manning_n * roughness_scale is what the solver applied.",
+    "Convergence is recorded honestly per band against the pilot thresholds; the strong authored hydraulics (the Terminator hole/jump, the offset hole, the flip-wave train) keep feature-scale cells unsteady, and the thin low band does not fully convey to the window exit at big-water low technical flow, so a band that does not meet the thresholds is recorded as converged=false rather than hidden."
+  ],
+  "rapid_name": "Terminator",
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.cooked_flow_fields.v1",
+  "section_id": "terminator_station_5312m_c3_window",
+  "solver": {
+    "bed_slope_source_scale": 1.0,
+    "binary_sha256": "f2b9a8dcedf3c4cd54f59ff2410d22847396a4840add3f5173ee58887fd1b738",
+    "boundary_mode": "scenario",
+    "cfl": 0.45,
+    "disable_fixture_calibrations": true,
+    "dry_tolerance": 1e-06,
+    "feature_strength_scale": 0.0,
+    "fixed_dt_s": 0.05,
+    "flux_scheme": "hll",
+    "frame_interval_steps": 200,
+    "preserve_initial_mass": false,
+    "roughness_scale": 1.0,
+    "simulated_seconds": 400.0,
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 8000
+  },
+  "source_commit": "ce4e2400f7fa9e1603d4ba3c469c905aecb50ea9",
+  "source_package": "physics/data/real_world/futaleufu_river_chile/scenario_terminator",
+  "window_id": "terminator_station_5312m_c3_window",
+  "window_provenance": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "corridor_river_id": "futaleufu_terminator",
+    "pending_human_review": true,
+    "production_promoted": false,
+    "roughness_manning_n": 0.045,
+    "route_order_station_m": 5312.259
+  }
+}
