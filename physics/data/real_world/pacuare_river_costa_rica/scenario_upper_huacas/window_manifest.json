@@ -1,0 +1,226 @@
+{
+  "anchor_preview_station_m": 17000.0,
+  "bed_parameters": {
+    "constriction_crest_offset_m": 0.35,
+    "constriction_inner_y_m": 9.0,
+    "constriction_x": [
+      270.0,
+      292.0
+    ],
+    "drop_apron_offset_m": -0.8,
+    "drop_half_width_m": 11.0,
+    "drop_pool_offset_m": -2.6,
+    "drop_sill_offset_m": -0.08,
+    "drop_x": 300.0,
+    "entry_boulder_a": [
+      250.0,
+      9.0
+    ],
+    "entry_boulder_b": [
+      258.0,
+      -8.0
+    ],
+    "entry_boulder_crest_offset_m": 0.6,
+    "entry_boulder_radius_m": 3.0,
+    "exit_wave_big_crest_offset_m": -0.03,
+    "exit_wave_big_x": 400.0,
+    "exit_wave_crest_offset_m": -0.08,
+    "exit_wave_half_width_m": 5.0,
+    "exit_wave_x": [
+      350.0,
+      362.0,
+      374.0,
+      386.0
+    ],
+    "exit_wave_y": [
+      -8.0,
+      8.0
+    ],
+    "lead_in_invert_offset_m": -0.9,
+    "lead_in_x": [
+      206.0,
+      268.0
+    ],
+    "lead_in_y": [
+      -6.0,
+      6.0
+    ],
+    "recovery_eddy_bar_crest_offset_m": 0.15,
+    "recovery_eddy_bar_x": [
+      348.0,
+      354.0
+    ],
+    "recovery_eddy_floor_offset_m": -1.0,
+    "recovery_eddy_x": [
+      352.0,
+      396.0
+    ],
+    "recovery_eddy_y": [
+      16.0,
+      27.0
+    ],
+    "second_hole_apron_offset_m": -0.6,
+    "second_hole_center": [
+      330.0,
+      5.0
+    ],
+    "second_hole_half_width_m": 4.5,
+    "second_hole_pool_offset_m": -1.9,
+    "second_hole_sill_offset_m": -0.12,
+    "wall_lateral_crest_offset_m": -0.25,
+    "wall_lateral_end": [
+      324.0,
+      -2.0
+    ],
+    "wall_lateral_half_width_m": 3.2,
+    "wall_lateral_start": [
+      306.0,
+      -12.0
+    ],
+    "waterfall_ref_x": 296.0,
+    "waterfall_ref_y": -34.0
+  },
+  "cell_size_m": 2.0,
+  "conditioning": {
+    "authority": "interpreted_solver_window_geometry_not_surveyed_bathymetry_or_production_terrain",
+    "bank_feather_width_m": 8.0,
+    "bank_relief_cap_m": 20.0,
+    "centerline_smoothing_passes": 28,
+    "channel_half_width_m": 13.0,
+    "conditioned_max_mean_slope": 0.013,
+    "conditioned_profile_drop_m": 7.800000000000011,
+    "cross_channel_convention": "y_positive_is_river_left_looking_downstream",
+    "dem_ground_resolution_m": 30.0,
+    "dem_source": "copernicus_glo30_1_arcsecond_~30m",
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "gorge_wall_height_m": 6.0,
+    "in_channel_geometry": "authored_interpretation_of_catalog_feature_tags_not_survey",
+    "max_profile_drop_per_cell_m": 0.3,
+    "mean_slope_bound_applied": true,
+    "min_centerline_radius_m": 49.35982731088964,
+    "monotone_downstream": true,
+    "nominal_channel_depth_m": 1.8,
+    "policy": "corridor_conditioning_policy_low_percentile_monotone_slope_bounded",
+    "raw_dem_floor_drop_m": 23.76769517524201,
+    "unclamped_conditioned_drop_m": 29.565052397455872
+  },
+  "flow_band_packages": {
+    "clear_season_low_planning": {
+      "discharge_authority": "interpreted_planning_value_not_gauge_calibrated",
+      "flow_band_runnable_status": "planning_only",
+      "package": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/clear_season_low_planning",
+      "scenario_id": "pacuare_upper_huacas_c3_window_clear_season_low_planning",
+      "stage_east_m": 450.0942189738756,
+      "stage_west_m": 457.9005283997818,
+      "target_discharge_m3s": 20.0
+    },
+    "rainfed_runnable_planning": {
+      "discharge_authority": "interpreted_planning_value_not_gauge_calibrated",
+      "flow_band_runnable_status": "planning_only",
+      "package": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/rainfed_runnable_planning",
+      "scenario_id": "pacuare_upper_huacas_c3_window_rainfed_runnable_planning",
+      "stage_east_m": 450.38854607695407,
+      "stage_west_m": 458.23694462886385,
+      "target_discharge_m3s": 45.0
+    },
+    "rainy_season_high_planning": {
+      "discharge_authority": "interpreted_planning_value_not_gauge_calibrated",
+      "flow_band_runnable_status": "review_only",
+      "package": "physics/data/real_world/pacuare_river_costa_rica/scenario_upper_huacas/rainy_season_high_planning",
+      "scenario_id": "pacuare_upper_huacas_c3_window_rainy_season_high_planning",
+      "stage_east_m": 450.7035286113992,
+      "stage_west_m": 458.55192716330896,
+      "target_discharge_m3s": 80.0
+    }
+  },
+  "flow_bands_interpreted_discharge_m3s": {
+    "clear_season_low_planning": 20.0,
+    "rainfed_runnable_planning": 45.0,
+    "rainy_season_high_planning": 80.0
+  },
+  "generated_on": "2026-07-18",
+  "geometry": {
+    "anchor_lonlat": [
+      -83.62888703034494,
+      9.935277503944274
+    ],
+    "catalog_point_to_channel_snap_distance_m": 91.21403400793103,
+    "catalog_seed_lonlat": [
+      -83.6282304,
+      9.9347709
+    ],
+    "centerline_lonlat_first": [
+      -83.62966758244343,
+      9.932668189427243
+    ],
+    "centerline_lonlat_last": [
+      -83.63113120830742,
+      9.93688801931259
+    ],
+    "min_centerline_radius_m": 49.35982731088964
+  },
+  "grid": {
+    "dx": 2.0,
+    "dy": 2.0,
+    "nx": 301,
+    "ny": 40,
+    "origin_x": 0.0,
+    "origin_y": -39.0
+  },
+  "honesty": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "curvilinear_frame": "The rectangular solver grid is a channel-following frame; planform curvature is not represented inside the grid.",
+    "dem_cannot_resolve_in_channel_rocks": "The source DEM is Copernicus GLO-30 (~30 m / 1 arc-second); it resolves the valley at ridge scale only and cannot resolve the channel planform, in-channel rocks, ledges, holes, or bathymetry. A far larger share of this window than the 2 m-DEM South Fork windows is authored interpretation; every in-channel feature is an authored interpretation of the committed Upper Huacas feature_tags.",
+    "flow_bands": "The corridor flow presets carry no numeric discharge (numeric_discharge_values_allowed: false). The three band discharges here are interpreted planning values derived from published commercial-outfitter runnable ranges and the wet/dry precipitation regime, keyed to the committed preset band ids; they are NOT gauge-calibrated and NOT tied to a station id or date. Hydrology review owns the real numbers.",
+    "gorge_walls": "The 30 m DEM under-resolves the Class IV gorge walls; the containing walls are authored above the DEM relief to keep the flow in the slot. Interpreted geometry, not survey.",
+    "longitudinal_profile": "The raw GLO-30 floor drop through the traced window is recorded in the conditioning report; the solver profile is the corridor-policy conditioned (low-percentile, monotone, slope-bounded) version of it.",
+    "pending_human_review": true,
+    "production_promoted": false,
+    "slope_bound": "The raw GLO-30 floor trace drops ~24 m over the 600 m window (~4.1%). At that gradient the FV solver runs supercritical and does not convey (the window ponds upstream and drains downstream). Because the station is order-only and the trace snaps ~90 m to the DEM valley floor at 30 m resolution, the steep raw gradient cannot be trusted as the true thalweg. The conditioned profile is slope-bounded to a Class III-IV gradient (~1.3%, matching the committed South Fork windows); both raw and conditioned drops are recorded. This is a conditioning choice for solver tractability, not a survey.",
+    "stationing_authority": "Named-rapid stationing for this corridor is order-only (published_map_order_only): there is no surveyed adopted-route station for Upper Huacas. The window is anchored at the corridor's own gorge/hole rapid review seed (preview station 17,000 m) as the best available proxy for Upper Huacas (order 4), then snapped 91.2 m to the DEM valley floor. Stationing remains pending_human_review."
+  },
+  "rapid_class": "IV",
+  "rapid_name": "Upper Huacas",
+  "rapid_order": 4,
+  "river_id": "pacuare_river_costa_rica",
+  "schema": "raftsim.pacuare.upper_huacas_c3_water_window.v1",
+  "sources": {
+    "catalog": "physics/data/real_world/named_rapid_source_catalog.json",
+    "centerline": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/centerline.geojson",
+    "dem_heightfield_manifest": "physics/data/real_world/pacuare_river_costa_rica/terrain/pacuare_copernicus_dem_corridor_heightfield_manifest.json",
+    "dem_sha256": "068e212e279fe5361076ec3c0100a763472712ca7c2aa7bfb2083b8d5637ed41",
+    "dem_tile": "physics/data/real_world/pacuare_river_costa_rica/terrain/copernicus_dem_glo30_N09_W084.tif",
+    "flow_presets": "physics/data/real_world/pacuare_river_costa_rica/flow_presets.json",
+    "stationing_scaffold": "physics/data/real_world/pacuare_river_costa_rica/hydrography/production_import_pilot/rapid_and_access_stationing.geojson"
+  },
+  "task_id": "P3-signature-rapid-pacuare-upper-huacas",
+  "window_id": "upper_huacas_station_17000m_c3_window",
+  "window_length_m": 600.0,
+  "window_parameters": {
+    "anchor_search_half_m": 100.0,
+    "bank_feather_m": 8.0,
+    "bank_min_height_m": 0.6,
+    "bank_relief_cap_m": 20.0,
+    "cell_size_m": 2.0,
+    "centerline_smoothing_passes": 12,
+    "channel_depth_m": 1.8,
+    "channel_half_width_m": 13.0,
+    "conditioned_max_mean_slope": 0.013,
+    "cross_half_width_m": 39.0,
+    "floor_percentile": 10.0,
+    "floor_sample_half_width_m": 8.0,
+    "gorge_wall_height_m": 6.0,
+    "gorge_wall_inner_y_m": 17.0,
+    "initial_depth_cap_m": 1.7,
+    "max_profile_drop_per_cell_m": 0.3,
+    "roughness_manning_n": 0.055,
+    "trace_cross_search_m": 16.0,
+    "trace_fan_half_deg": 50,
+    "trace_fan_step_deg": 5,
+    "trace_reach_m": 380.0,
+    "trace_step_m": 8.0,
+    "trace_turn_cost_per_deg": 0.06,
+    "window_length_m": 600.0
+  }
+}
