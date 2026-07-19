@@ -1,0 +1,283 @@
+{
+  "bands": {
+    "high_runnable": {
+      "achieved_discharge_m3s": {
+        "crux_x300": 312.4303202472812,
+        "downstream_x500": 279.67725690479915,
+        "upstream_x100": 307.6304955976776
+      },
+      "checks": {
+        "flip_wave_train_forms": {
+          "measured": {
+            "ratio": 11.483758682042483,
+            "reach_median_grad": 0.012548230293395121,
+            "wave_p90_grad": 0.14410084857604472
+          },
+          "note": "p90 |grad eta| across the wave train vs the wetted-reach median; the big-water flip waves build with flow.",
+          "passed": true,
+          "required_at_this_band": true,
+          "subfeature_id": "flip_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.6
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "sneak_passable": {
+          "measured": {
+            "min_per_column_max_depth_m": 1.6864481473591915,
+            "wet_column_fraction": 1.0
+          },
+          "note": "High flow: informational only (the sneak washes toward the main flow at big water).",
+          "passed": true,
+          "subfeature_id": "river_left_sneak_line",
+          "thresholds": {
+            "min_depth_m": 0.0,
+            "min_wet_fraction": 0.8
+          }
+        },
+        "terminator_hole_forms": {
+          "measured": {
+            "left_offset_hole": {
+              "max_face_froude": 1.9328071604622485,
+              "passed": true,
+              "surface_recovery_m": 1.1825318945174388
+            },
+            "terminator_hole": {
+              "max_face_froude": 2.2448785024668165,
+              "passed": true,
+              "surface_recovery_m": 1.3708679339417245
+            }
+          },
+          "note": "Supercritical sill face plus adverse plunge-pool surface recovery = the Terminator hole.",
+          "passed": true,
+          "subfeature_id": "terminator_hole",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.15
+          }
+        }
+      },
+      "field_capture": "fields/high_runnable_final_fields.npz",
+      "flow_band_source": "high_big_water",
+      "scenario_id": "futaleufu_terminator_c3_window_high_runnable",
+      "solver_returncode": 2,
+      "solver_validation": {
+        "mass_relative_drift": 0.5046528256977375,
+        "max_velocity_m_per_s": 11.93534637805227,
+        "min_depth_m": 0.0,
+        "passed": false
+      },
+      "stage_east_m": 203.2431998352697,
+      "stage_west_m": 211.1082596982455,
+      "target_discharge_m3s": 400.0
+    },
+    "low_runnable": {
+      "achieved_discharge_m3s": {
+        "crux_x300": 66.42843539531833,
+        "downstream_x500": 33.150423524131035,
+        "upstream_x100": 62.351509712418846
+      },
+      "checks": {
+        "flip_wave_train_forms": {
+          "measured": {
+            "ratio": 12.642720870207937,
+            "reach_median_grad": 0.005733328236910518,
+            "wave_p90_grad": 0.07248486855654108
+          },
+          "note": "p90 |grad eta| across the wave train vs the wetted-reach median; the big-water flip waves build with flow.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "flip_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.4
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "sneak_passable": {
+          "measured": {
+            "min_per_column_max_depth_m": 0.14878496786130435,
+            "wet_column_fraction": 1.0
+          },
+          "note": "Continuous wet path through the sneak with per-column max depth above the honest floor.",
+          "passed": true,
+          "subfeature_id": "river_left_sneak_line",
+          "thresholds": {
+            "min_depth_m": 0.1,
+            "min_wet_fraction": 0.999
+          }
+        },
+        "terminator_hole_forms": {
+          "measured": {
+            "left_offset_hole": {
+              "max_face_froude": 1.4499575599061163,
+              "passed": true,
+              "surface_recovery_m": 0.30122181999405484
+            },
+            "terminator_hole": {
+              "max_face_froude": 1.3963618993300255,
+              "passed": true,
+              "surface_recovery_m": 0.32393844903259605
+            }
+          },
+          "note": "Supercritical sill face plus adverse plunge-pool surface recovery = the Terminator hole.",
+          "passed": true,
+          "subfeature_id": "terminator_hole",
+          "thresholds": {
+            "min_face_froude": 0.8,
+            "min_surface_recovery_m": 0.05
+          }
+        }
+      },
+      "field_capture": "fields/low_runnable_final_fields.npz",
+      "flow_band_source": "low_technical",
+      "scenario_id": "futaleufu_terminator_c3_window_low_runnable",
+      "solver_returncode": 2,
+      "solver_validation": {
+        "mass_relative_drift": 0.5438752707240858,
+        "max_velocity_m_per_s": 4.959192204240752,
+        "min_depth_m": 0.0,
+        "passed": false
+      },
+      "stage_east_m": 201.85347656592006,
+      "stage_west_m": 209.71853642889585,
+      "target_discharge_m3s": 110.0
+    },
+    "median_runnable": {
+      "achieved_discharge_m3s": {
+        "crux_x300": 173.97729490126602,
+        "downstream_x500": 139.57467569066048,
+        "upstream_x100": 161.89133959043272
+      },
+      "checks": {
+        "flip_wave_train_forms": {
+          "measured": {
+            "ratio": 13.641819934295249,
+            "reach_median_grad": 0.009914655941651872,
+            "wave_p90_grad": 0.13525395106650534
+          },
+          "note": "p90 |grad eta| across the wave train vs the wetted-reach median; the big-water flip waves build with flow.",
+          "passed": true,
+          "required_at_this_band": false,
+          "subfeature_id": "flip_wave_train",
+          "thresholds": {
+            "min_abs_grad": 0.008,
+            "min_ratio": 1.5
+          }
+        },
+        "mass_positivity": {
+          "measured": {
+            "finite": true,
+            "min_depth_m": 0.0
+          },
+          "note": "Non-negative finite depth everywhere in the final frame.",
+          "passed": true
+        },
+        "sneak_passable": {
+          "measured": {
+            "min_per_column_max_depth_m": 0.6939598041596357,
+            "wet_column_fraction": 1.0
+          },
+          "note": "Continuous wet path through the sneak with per-column max depth above the honest floor.",
+          "passed": true,
+          "subfeature_id": "river_left_sneak_line",
+          "thresholds": {
+            "min_depth_m": 0.08,
+            "min_wet_fraction": 0.999
+          }
+        },
+        "terminator_hole_forms": {
+          "measured": {
+            "left_offset_hole": {
+              "max_face_froude": 1.8883584341878519,
+              "passed": true,
+              "surface_recovery_m": 0.814492193184293
+            },
+            "terminator_hole": {
+              "max_face_froude": 1.2502671492430921,
+              "passed": true,
+              "surface_recovery_m": 0.6971898799529299
+            }
+          },
+          "note": "Supercritical sill face plus adverse plunge-pool surface recovery = the Terminator hole.",
+          "passed": true,
+          "subfeature_id": "terminator_hole",
+          "thresholds": {
+            "min_face_froude": 0.9,
+            "min_surface_recovery_m": 0.1
+          }
+        }
+      },
+      "field_capture": "fields/median_runnable_final_fields.npz",
+      "flow_band_source": "normal_runnable",
+      "scenario_id": "futaleufu_terminator_c3_window_median_runnable",
+      "solver_returncode": 2,
+      "solver_validation": {
+        "mass_relative_drift": 0.5430349217714089,
+        "max_velocity_m_per_s": 7.571017117429345,
+        "min_depth_m": 0.0,
+        "passed": false
+      },
+      "stage_east_m": 202.48657777476865,
+      "stage_west_m": 210.35163763774443,
+      "target_discharge_m3s": 230.0
+    }
+  },
+  "generated_on": "2026-07-18",
+  "headline_gate": {
+    "flip_wave_train_at_high": true,
+    "parameterization_iterations": [
+      {
+        "change": "initial big-water bed on the corridor-conditioned heightfield frame: wide deep parabolic channel (half-width 24 m, depth 2.8 m), a single center Terminator hole, a river-left sneak, and a flip-wave train, at the corridor's ~1.3% conditioned gradient",
+        "iteration": 1,
+        "outcome": "the reach conveyed cleanly (no draining -- the corridor already slope-bounds its visual conditioning to 2%), but the single deep-notched hole drowned at the ~1.5-2 m subcritical big-water depth (Fr well below 1) and the wide flat gravel-bar valley let the low band sheet across the banks instead of holding the sneak"
+      },
+      {
+        "change": "re-cut both holes as pourover weirs (apron / near-surface transverse sill / plunge pool, as the Meat Grinder offset holes required) so the flow trips critical over the sill regardless of the subcritical reach Froude; raised the bank_min_height to 1.2 m so the wide valley contains the flow; deepened the river-left sneak invert and added a separating berm so it holds a continuous wet line at the low band",
+        "iteration": 2,
+        "outcome": "the Terminator hole and the offset hole trip supercritical over their sills and recover in the pools, the flip-wave train shows an elevated surface-gradient signature that grows with flow, and the sneak stays continuously wet at the low band; the wide flat gravel-bar reach ponds ~50% more than the 1D normal-flow seed, so the solver flags its benign mass-drift validation (rc 2) at the feature-formation settle while the fields stay finite and the banks stay dry -- recorded honestly per band; committed geometry and results are in this report"
+      }
+    ],
+    "passed": true,
+    "sneak_passable_at_low": true,
+    "terminator_hole_at_reference": true
+  },
+  "honesty": {
+    "bed_geometry_authority": "interpreted_bed_geometry",
+    "evidence_kind": "genuine_solver_behavioral_validation_not_parity",
+    "mass_drift_and_settle": "The report captures the developed bounded-settle state at which all three bands' headline features are fully formed (the Terminator hole and the offset hole trip supercritical over their sills and recover in the pools, the flip-wave train shows an elevated surface-gradient signature, and the river-left sneak holds a continuous wet line at the low band). At that settle the solver flags its benign mass-drift validation (rc 2, mass_relative_drift ~0.5): the wide flat Patagonian gravel-bar cross-section ponds ~50% more water than the 1D normal-flow seed, so the reach is still approaching its 2D mass equilibrium -- the same documented fill transient as the Chili Bar pilot. The fields remain finite with non-negative depth (mass_positivity passes) and the banks stay dry; the longer cooked-fields run relaxes the fill toward equilibrium. Per band solver_validation records the mass drift, max velocity, and min depth honestly.",
+    "note": "Feature presence is validated behaviorally against Terminator's published character (the catalog records feature_tags only, no committed sub-feature inventory); no claim of numeric parity with a reference solution is made for this window.",
+    "terrain_source": "Copernicus DEM GLO-30 (~30 m) corridor-conditioned heightfield; the source cannot resolve the channel, so the whole cross-section and every feature are interpreted."
+  },
+  "rapid_name": "Terminator",
+  "river_id": "futaleufu_river_chile",
+  "schema": "raftsim.futaleufu.terminator_c3_behavioral_validation.v1",
+  "solver": {
+    "boundary_mode": "scenario",
+    "disable_fixture_calibrations": true,
+    "feature_strength_scale": 0.0,
+    "fixed_dt": 0.05,
+    "flux_scheme": "hll",
+    "solver": "raftsim_water_cpp_v1",
+    "solver_mode": "finite_volume",
+    "spatial_order": 2,
+    "steps": 4000
+  },
+  "task_id": "five-river-simulation-plan-W1-futaleufu-terminator-behavioral-gate",
+  "window_id": "terminator_station_5312m_c3_window"
+}

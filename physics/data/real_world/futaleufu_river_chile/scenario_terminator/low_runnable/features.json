@@ -1,0 +1,246 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 159.0,
+        "y": -1.0
+      },
+      "kind": "wave_train",
+      "length": 54.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "wave_train",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "entry_wave_train"
+      },
+      "radius": 6.0,
+      "strength": 0.55,
+      "width": 28.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 221.0,
+        "y": -28.0
+      },
+      "kind": "eddy_line",
+      "length": 50.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "scout",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "right_scout_eddy"
+      },
+      "radius": 6.0,
+      "strength": 0.3,
+      "width": 12.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 266.0,
+        "y": -8.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "boulder",
+        "relative_position_across": "right",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "entry_marker_boulder"
+      },
+      "radius": 3.2,
+      "strength": 0.55,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 269.5,
+        "y": -1.0
+      },
+      "kind": "constriction",
+      "length": 39.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "tongue",
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "entry_tongue_seam"
+      },
+      "radius": 4.0,
+      "strength": 0.85,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 306.0,
+        "y": -2.0
+      },
+      "kind": "hole",
+      "length": 18.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "entrapment_life_threat",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "hole",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "terminator_hole"
+      },
+      "radius": 8.0,
+      "strength": 1.0,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 327.0,
+        "y": 10.0
+      },
+      "kind": "hole",
+      "length": 16.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "surf_or_retention",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "hole",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "left_offset_hole"
+      },
+      "radius": 6.0,
+      "strength": 0.7,
+      "width": 12.0
+    },
+    {
+      "angle": 0.35877067027057225,
+      "center": {
+        "x": 316.0,
+        "y": -18.0
+      },
+      "kind": "lateral",
+      "length": 34.17601498127012,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "lateral",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "right_line_lateral"
+      },
+      "radius": 3.5,
+      "strength": 0.85,
+      "width": 7.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 405.0,
+        "y": -2.0
+      },
+      "kind": "wave_train",
+      "length": 66.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "flip_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "wave_train",
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "flip_wave_train"
+      },
+      "radius": 6.0,
+      "strength": 0.85,
+      "width": 30.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 323.0,
+        "y": 30.0
+      },
+      "kind": "shallow",
+      "length": 146.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "sneak_line",
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "river_left_sneak_line"
+      },
+      "radius": 4.0,
+      "strength": 0.55,
+      "width": 8.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 494.0,
+        "y": -28.0
+      },
+      "kind": "eddy_line",
+      "length": 52.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "recovery_pool",
+        "relative_position_across": "right",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "left_recovery_eddy"
+      },
+      "radius": 6.0,
+      "strength": 0.3,
+      "width": 12.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 302.0,
+        "y": -40.0
+      },
+      "kind": "eddy_line",
+      "length": 140.0,
+      "metadata": {
+        "authored_bed_change": false,
+        "consequence_class": "low_nuisance",
+        "interpreted_bed_geometry": true,
+        "interpreted_feature_type": "portage",
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Futaleufu:Terminator:feature_tags_interpreted",
+        "subfeature_id": "right_bank_scout_portage"
+      },
+      "radius": 4.0,
+      "strength": 0.3,
+      "width": 0.0
+    }
+  ]
+}
