@@ -467,8 +467,20 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     }
     if (!Band.IsValid())
     {
-        OutError = FString::Printf(TEXT("band '%s' not found in cooked manifest"), *BandId);
-        return nullptr;
+        // Rivers name their flow bands differently (median_runnable,
+        // rainfed_runnable, ...). When the requested band is absent, fall back
+        // to the middle band of whatever the manifest provides so a map's
+        // "reference" request resolves regardless of the river's band scheme.
+        if (Bands->Num() > 0)
+        {
+            const int32 MidIndex = Bands->Num() / 2;
+            Band = (*Bands)[MidIndex]->AsObject();
+        }
+        if (!Band.IsValid())
+        {
+            OutError = FString::Printf(TEXT("band '%s' not found in cooked manifest"), *BandId);
+            return nullptr;
+        }
     }
     const TSharedPtr<FJsonObject>* Arrays = nullptr;
     if (!Band->TryGetObjectField(TEXT("arrays"), Arrays))
