@@ -5,7 +5,10 @@
 #include "Camera/CameraActor.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Editor.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Components/SkyLightComponent.h"
 #include "Engine/DirectionalLight.h"
+#include "Components/ExponentialHeightFogComponent.h"
 #include "Engine/ExponentialHeightFog.h"
 #include "Engine/PostProcessVolume.h"
 #include "Engine/SkyLight.h"
@@ -170,17 +173,73 @@ static AActor* AddActorToWorld(UWorld* World, UClass* Class, const FTransform& T
 
 static void AddCommonLighting(UWorld* World)
 {
-    AddActorToWorld(
-        World, ADirectionalLight::StaticClass(),
-        FTransform(FRotator(-38.0f, 42.0f, 0.0f), FVector(0.0f, 0.0f, 1200.0f)));
-    AddActorToWorld(World, ASkyLight::StaticClass(), FTransform(FVector(0.0f, 0.0f, 1100.0f)));
+    // Warm mid-morning Sierra sun, angled for raking water highlights.
+    if (ADirectionalLight* Sun = Cast<ADirectionalLight>(AddActorToWorld(
+            World, ADirectionalLight::StaticClass(),
+            FTransform(FRotator(-42.0f, 55.0f, 0.0f), FVector(0.0f, 0.0f, 1200.0f)))))
+    {
+        if (UDirectionalLightComponent* SunComp = Sun->GetComponent())
+        {
+            SunComp->SetIntensity(10.0f);
+            SunComp->SetLightColor(FLinearColor(1.0f, 0.955f, 0.86f));
+            SunComp->SetAtmosphereSunLight(true);
+        }
+    }
+    if (ASkyLight* Sky = Cast<ASkyLight>(
+            AddActorToWorld(World, ASkyLight::StaticClass(), FTransform(FVector(0.0f, 0.0f, 1100.0f)))))
+    {
+        if (USkyLightComponent* SkyComp = Sky->GetLightComponent())
+        {
+            SkyComp->SetMobility(EComponentMobility::Movable);
+            SkyComp->bRealTimeCapture = true;
+            // Lower ambient fill so the sun casts real shadows on the walls.
+            SkyComp->SetIntensity(0.6f);
+        }
+    }
     if (UClass* SkyAtmosphereClass =
             LoadClass<AActor>(nullptr, TEXT("/Script/Engine.SkyAtmosphere")))
     {
         AddActorToWorld(World, SkyAtmosphereClass, FTransform(FVector::ZeroVector));
     }
-    AddActorToWorld(
-        World, AExponentialHeightFog::StaticClass(), FTransform(FVector(0.0f, 0.0f, -150.0f)));
+    if (UClass* VolumetricCloudClass =
+            LoadClass<AActor>(nullptr, TEXT("/Script/Engine.VolumetricCloud")))
+    {
+        AddActorToWorld(World, VolumetricCloudClass, FTransform(FVector::ZeroVector));
+    }
+    // Thin canyon haze only — the default fog density (~0.02) washes the whole
+    // ~150 m gorge into milk; a light density keeps depth without the milkiness.
+    if (AExponentialHeightFog* Fog = Cast<AExponentialHeightFog>(AddActorToWorld(
+            World, AExponentialHeightFog::StaticClass(), FTransform(FVector(0.0f, 0.0f, -400.0f)))))
+    {
+        if (UExponentialHeightFogComponent* FogComp = Fog->GetComponent())
+        {
+            FogComp->SetFogDensity(0.0025f);
+            FogComp->SetFogHeightFalloff(0.35f);
+            FogComp->SetFogInscatteringColor(FLinearColor(0.55f, 0.62f, 0.72f));
+            FogComp->SetStartDistance(2500.0f);
+        }
+    }
+
+    // Unbound post-process: fixed exposure + subtle bloom for a photographic
+    // look, and high Lumen quality for the reflective water.
+    if (APostProcessVolume* PP = Cast<APostProcessVolume>(AddActorToWorld(
+            World, APostProcessVolume::StaticClass(), FTransform(FVector::ZeroVector))))
+    {
+        PP->bUnbound = true;
+        FPostProcessSettings& S = PP->Settings;
+        S.bOverride_AutoExposureMethod = true;
+        S.AutoExposureMethod = AEM_Manual;
+        S.bOverride_AutoExposureBias = true;
+        S.AutoExposureBias = 9.5f;
+        S.bOverride_BloomIntensity = true;
+        S.BloomIntensity = 0.35f;
+        S.bOverride_LumenReflectionQuality = true;
+        S.LumenReflectionQuality = 2.0f;
+        S.bOverride_LumenFinalGatherQuality = true;
+        S.LumenFinalGatherQuality = 2.0f;
+        S.bOverride_LumenReflectionsScreenTraces = true;
+        S.LumenReflectionsScreenTraces = 1;
+    }
 }
 
 static void SetWorldGameMode(UWorld* World, const TCHAR* GameModeClassPath)

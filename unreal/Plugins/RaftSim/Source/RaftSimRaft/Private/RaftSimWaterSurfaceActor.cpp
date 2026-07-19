@@ -23,11 +23,21 @@ ARaftSimWaterSurfaceActor::ARaftSimWaterSurfaceActor()
     SurfaceMesh->bUseAsyncCooking = true;
 
     static ConstructorHelpers::FObjectFinder<UMaterialInterface> WaterMat(
-        TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate."
-             "M_RaftSim_SingleLayerWaterCandidate"));
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater.M_RaftSim_PhotorealRiverWater"));
     if (WaterMat.Succeeded())
     {
         WaterMaterial = WaterMat.Object;
+    }
+    else
+    {
+        // Fallback before the photoreal material is authored.
+        static ConstructorHelpers::FObjectFinder<UMaterialInterface> FallbackMat(
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SingleLayerWaterCandidate."
+                 "M_RaftSim_SingleLayerWaterCandidate"));
+        if (FallbackMat.Succeeded())
+        {
+            WaterMaterial = FallbackMat.Object;
+        }
     }
 }
 
@@ -112,6 +122,8 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             FVector NormalOut = FVector::UpVector;
             float Foam = 0.0f;
 
+            float DepthNorm = 0.0f;
+            float SpeedNorm = 0.0f;
             if (WaterAdapter != nullptr)
             {
                 FRaftSimWaterSample Sample;
@@ -121,18 +133,23 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 {
                     SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM;
                     NormalOut = Sample.SurfaceNormal.GetSafeNormal();
-                    // Froude number = speed / sqrt(g * depth); >~1 breaks white.
                     const float Speed = Sample.VelocityMetersPerSecond.Size2D();
                     const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
+                    // Froude number = speed / sqrt(g * depth); >~1 breaks white.
                     const float Froude = Speed / FMath::Sqrt(kGravity * Depth);
                     Foam = FMath::Clamp((Froude - 0.6f) / 0.8f, 0.0f, 1.0f);
+                    // Depth (over ~4 m) drives the base-colour deepening; speed
+                    // (over ~8 m/s) is available for flow-driven shading.
+                    DepthNorm = FMath::Clamp(Sample.DepthMeters / 4.0f, 0.0f, 1.0f);
+                    SpeedNorm = FMath::Clamp(Speed / 8.0f, 0.0f, 1.0f);
                 }
             }
 
             Vertices[Index].Z = SurfaceZCm;
             Normals[Index] = NormalOut;
-            // Foam in vertex-colour R; the water material reads it as white water.
-            VertexColors[Index] = FLinearColor(Foam, Foam, Foam, 1.0f);
+            // R = foam, G = depth, B = flow speed (consumed by the photoreal
+            // water material for whitewater, depth colour, and flow response).
+            VertexColors[Index] = FLinearColor(Foam, DepthNorm, SpeedNorm, 1.0f);
         }
     }
 

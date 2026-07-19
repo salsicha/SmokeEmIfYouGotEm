@@ -11,6 +11,7 @@
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RaftSimWaterRuntimeAdapter.h"
+#include "RaftSimRiverbedActor.h"
 #include "RaftSimWaterSurfaceActor.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -37,6 +38,12 @@ ARaftSimRaftActor::ARaftSimRaftActor()
         // 14 ft paddle raft footprint: 4.3 m x 2.0 m x 0.56 m (engine cube is 1 m).
         HullMesh->SetRelativeScale3D(FVector(FootprintLengthM, FootprintWidthM, 0.56f));
         HullMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+    }
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> TubeMat(
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube"));
+    if (TubeMat.Succeeded())
+    {
+        HullMesh->SetMaterial(0, TubeMat.Object);
     }
 
     SternSeatAttachPoint = CreateDefaultSubobject<USceneComponent>(TEXT("SternSeatAttachPoint"));
@@ -137,6 +144,19 @@ void ARaftSimRaftActor::BeginPlay()
             World->SpawnActor<ARaftSimWaterSurfaceActor>(
                 ARaftSimWaterSurfaceActor::StaticClass(), FTransform::Identity);
         }
+
+        // Photoreal terrain: spawn a riverbed actor that renders the cooked
+        // window's DEM bed and banks. Skipped if one is already placed.
+        bool bHasBed = false;
+        if (TActorIterator<ARaftSimRiverbedActor> It(World); It)
+        {
+            bHasBed = true;
+        }
+        if (!bHasBed)
+        {
+            World->SpawnActor<ARaftSimRiverbedActor>(
+                ARaftSimRiverbedActor::StaticClass(), FTransform::Identity);
+        }
     }
 
     URaftSimChronoRuntimeAdapter* Adapter = BridgeSubsystem->GetRaftRuntime();
@@ -178,6 +198,8 @@ void ARaftSimRaftActor::SpawnCrewVisuals()
 {
     UStaticMesh* SphereMesh =
         LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    UMaterialInterface* PFDMat = LoadObject<UMaterialInterface>(
+        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"));
     // Two rows of paddlers along the tubes, bow to stern.
     for (int32 Index = 0; Index < PaddlerCount; ++Index)
     {
@@ -187,6 +209,10 @@ void ARaftSimRaftActor::SpawnCrewVisuals()
         Mesh->SetStaticMesh(SphereMesh);
         Mesh->SetWorldScale3D(FVector(0.45f));
         Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        if (PFDMat != nullptr)
+        {
+            Mesh->SetMaterial(0, PFDMat);
+        }
         const float Row = (Index % 2 == 0) ? -0.75f : 0.75f; // port / starboard
         const float Bow = 1.2f - (Index / 2) * 1.2f;          // fore to aft (m)
         Mesh->SetRelativeLocation(FVector(Bow * kCmPerM, Row * kCmPerM, 40.0f));
@@ -432,6 +458,8 @@ void ARaftSimRaftActor::EnterCapsize()
     SwimmerMeshes.Reset();
     UStaticMesh* SphereMesh =
         LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+    UMaterialInterface* PFDMat = LoadObject<UMaterialInterface>(
+        nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_CrewPFD.M_RaftSim_CrewPFD"));
     for (int32 Index = 0; Index < Swimmers.Num(); ++Index)
     {
         UStaticMeshComponent* Mesh = NewObject<UStaticMeshComponent>(this);
@@ -440,6 +468,10 @@ void ARaftSimRaftActor::EnterCapsize()
         Mesh->SetStaticMesh(SphereMesh);
         Mesh->SetWorldScale3D(FVector(0.5f));
         Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        if (PFDMat != nullptr)
+        {
+            Mesh->SetMaterial(0, PFDMat);
+        }
         Mesh->SetWorldLocation(Swimmers[Index].SwimmerWorldPositionMeters * kCmPerM);
         SwimmerMeshes.Add(Mesh);
     }
