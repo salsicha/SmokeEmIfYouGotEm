@@ -1,0 +1,202 @@
+{
+  "features": [
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 237.0,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 62.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "feature_tag": "gorge",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "gorge_boulder_lead_in"
+      },
+      "radius": 5.0,
+      "strength": 0.55,
+      "width": 12.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 254.0,
+        "y": 0.5
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "feature_tag": "gorge",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "gorge_mouth_boulders"
+      },
+      "radius": 3.0,
+      "strength": 0.55,
+      "width": 0.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 281.0,
+        "y": 0.0
+      },
+      "kind": "constriction",
+      "length": 22.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "flip_risk",
+        "feature_tag": "gorge",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "entry",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "gorge_constriction"
+      },
+      "radius": 4.0,
+      "strength": 0.85,
+      "width": 18.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 306.0,
+        "y": 0.0
+      },
+      "kind": "hole",
+      "length": 18.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "surf_or_retention",
+        "feature_tag": "drop",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "main_drop_hole"
+      },
+      "radius": 6.0,
+      "strength": 0.7,
+      "width": 22.0
+    },
+    {
+      "angle": 0.507098504392337,
+      "center": {
+        "x": 315.0,
+        "y": -7.0
+      },
+      "kind": "lateral",
+      "length": 20.591260281974,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "flip_risk",
+        "feature_tag": "gorge",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "gorge_wall_lateral"
+      },
+      "radius": 3.2,
+      "strength": 0.85,
+      "width": 6.4
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 335.0,
+        "y": 5.0
+      },
+      "kind": "hole",
+      "length": 12.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "surf_or_retention",
+        "feature_tag": "hole",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "secondary_pourover"
+      },
+      "radius": 4.0,
+      "strength": 0.7,
+      "width": 9.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 375.0,
+        "y": 0.0
+      },
+      "kind": "wave_train",
+      "length": 50.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "swim_risk",
+        "feature_tag": "flow_sensitive",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "center",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "exit_wave_train"
+      },
+      "radius": 5.0,
+      "strength": 0.55,
+      "width": 16.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 374.0,
+        "y": 21.5
+      },
+      "kind": "eddy_line",
+      "length": 44.0,
+      "metadata": {
+        "authored_bed_change": true,
+        "consequence_class": "low_nuisance",
+        "feature_tag": "gorge",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "left",
+        "relative_position_along": "exit",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "left_recovery_eddy"
+      },
+      "radius": 5.0,
+      "strength": 0.3,
+      "width": 11.0
+    },
+    {
+      "angle": 0.0,
+      "center": {
+        "x": 296.0,
+        "y": -34.0
+      },
+      "kind": "rock",
+      "length": 0.0,
+      "metadata": {
+        "authored_bed_change": false,
+        "consequence_class": "low_nuisance",
+        "feature_tag": "waterfall_context",
+        "interpreted_bed_geometry": true,
+        "relative_position_across": "right",
+        "relative_position_along": "middle",
+        "source": "named_rapid_source_catalog.v1:Upper Huacas:feature_tags",
+        "subfeature_id": "waterfall_context_reference"
+      },
+      "radius": 4.0,
+      "strength": 0.3,
+      "width": 0.0
+    }
+  ]
+}

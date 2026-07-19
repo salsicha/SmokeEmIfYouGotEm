@@ -1,0 +1,132 @@
+{
+  "probes": [
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 6.0,
+        "y": 0.0
+      },
+      "probe_id": "window_entry_center"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "gorge_constriction"
+      },
+      "normal": null,
+      "position": {
+        "x": 281.0,
+        "y": 0.0
+      },
+      "probe_id": "gorge_constriction"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "main_drop_hole"
+      },
+      "normal": null,
+      "position": {
+        "x": 306.0,
+        "y": 0.0
+      },
+      "probe_id": "main_drop"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "gorge_wall_lateral"
+      },
+      "normal": null,
+      "position": {
+        "x": 315.0,
+        "y": -7.0
+      },
+      "probe_id": "gorge_wall_lateral"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "secondary_pourover"
+      },
+      "normal": null,
+      "position": {
+        "x": 335.0,
+        "y": 5.0
+      },
+      "probe_id": "secondary_pourover"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "exit_wave_train"
+      },
+      "normal": null,
+      "position": {
+        "x": 400.0,
+        "y": 0.0
+      },
+      "probe_id": "exit_wave"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {
+        "subfeature_id": "left_recovery_eddy"
+      },
+      "normal": null,
+      "position": {
+        "x": 374.0,
+        "y": 21.5
+      },
+      "probe_id": "recovery_eddy"
+    },
+    {
+      "kind": "point",
+      "length": 0.0,
+      "metadata": {},
+      "normal": null,
+      "position": {
+        "x": 594.0,
+        "y": 0.0
+      },
+      "probe_id": "window_exit_center"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 300.0,
+        "y": 0.0
+      },
+      "probe_id": "drop_cross_section"
+    },
+    {
+      "kind": "cross_section",
+      "length": 70.0,
+      "metadata": {},
+      "normal": {
+        "x": 0.0,
+        "y": 1.0
+      },
+      "position": {
+        "x": 281.0,
+        "y": 0.0
+      },
+      "probe_id": "constriction_cross_section"
+    }
+  ]
+}
