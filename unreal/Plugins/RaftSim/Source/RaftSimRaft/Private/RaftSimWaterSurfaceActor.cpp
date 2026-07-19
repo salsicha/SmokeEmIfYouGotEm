@@ -1,9 +1,11 @@
 #include "RaftSimWaterSurfaceActor.h"
 
 #include "Engine/GameInstance.h"
+#include "EngineUtils.h"
 #include "Materials/MaterialInterface.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
+#include "RaftSimRaftActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -60,41 +62,91 @@ void ARaftSimWaterSurfaceActor::BeginPlay()
 
 void ARaftSimWaterSurfaceActor::BuildGrid()
 {
-    GridN = FMath::Max(2, FMath::RoundToInt(GridSizeMeters / VertexSpacingMeters) + 1);
-    const int32 VertCount = GridN * GridN;
+    bUsesCurvedRiverCoordinates = WaterAdapter && WaterAdapter->HasRiverCoordinateMap();
+    GridStationN = FMath::Max(
+        2, FMath::RoundToInt(
+            (bUsesCurvedRiverCoordinates ? CurvedGridLengthMeters : GridSizeMeters) /
+            VertexSpacingMeters) + 1);
+    GridLateralN = FMath::Max(
+        2, FMath::RoundToInt(
+            (bUsesCurvedRiverCoordinates ? CurvedGridWidthMeters : GridSizeMeters) /
+            VertexSpacingMeters) + 1);
+    const int32 VertCount = GridStationN * GridLateralN;
     Vertices.SetNum(VertCount);
+    RiverCoordinatesM.SetNum(VertCount);
     Normals.SetNum(VertCount);
     UVs.SetNum(VertCount);
     VertexColors.SetNum(VertCount);
     Tangents.SetNum(VertCount);
-    Triangles.Reset((GridN - 1) * (GridN - 1) * 6);
+    Triangles.Reset((GridStationN - 1) * (GridLateralN - 1) * 6);
 
     // Grid actor sits at world origin; vertices are in world cm relative to it.
     SetActorLocation(FVector::ZeroVector);
 
-    for (int32 Y = 0; Y < GridN; ++Y)
+    if (bUsesCurvedRiverCoordinates)
     {
-        for (int32 X = 0; X < GridN; ++X)
+        TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld());
+        if (RaftIt)
         {
-            const int32 Index = Y * GridN + X;
-            const float WorldX = GridOriginCm.X + X * VertexSpacingMeters * kSurfCmPerM;
-            const float WorldY = GridOriginCm.Y + Y * VertexSpacingMeters * kSurfCmPerM;
-            Vertices[Index] = FVector(WorldX, WorldY, 0.0f);
+            FVector2D RiverPosition;
+            FVector Tangent;
+            FVector LeftNormal;
+            if (WaterAdapter->WorldToRiverCoordinates(
+                    RaftIt->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+            {
+                CurvedGridCenterStationM = RiverPosition.X;
+            }
+        }
+        ClampCurvedGridCenter();
+    }
+
+    for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
+    {
+        for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
+        {
+            const int32 Index = LateralIndex * GridStationN + StationIndex;
+            if (bUsesCurvedRiverCoordinates)
+            {
+                const float StationM = CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
+                    StationIndex * VertexSpacingMeters;
+                const float LateralM = -CurvedGridWidthMeters * 0.5f +
+                    LateralIndex * VertexSpacingMeters;
+                RiverCoordinatesM[Index] = FVector2D(StationM, LateralM);
+                // Populated in one pass below so tangents can be derived from
+                // adjacent curved-world vertices as well as positions.
+                Vertices[Index] = FVector::ZeroVector;
+            }
+            else
+            {
+                const float WorldX = GridOriginCm.X +
+                    StationIndex * VertexSpacingMeters * kSurfCmPerM;
+                const float WorldY = GridOriginCm.Y +
+                    LateralIndex * VertexSpacingMeters * kSurfCmPerM;
+                Vertices[Index] = FVector(WorldX, WorldY, 0.0f);
+                RiverCoordinatesM[Index] = FVector2D(
+                    WorldX / kSurfCmPerM, WorldY / kSurfCmPerM);
+            }
             Normals[Index] = FVector::UpVector;
             UVs[Index] = FVector2D(
-                static_cast<float>(X) / (GridN - 1), static_cast<float>(Y) / (GridN - 1));
+                static_cast<float>(StationIndex) / (GridStationN - 1),
+                static_cast<float>(LateralIndex) / (GridLateralN - 1));
             VertexColors[Index] = FLinearColor(0.0f, 0.0f, 0.0f, 1.0f);
             Tangents[Index] = FProcMeshTangent(1.0f, 0.0f, 0.0f);
         }
     }
 
-    for (int32 Y = 0; Y < GridN - 1; ++Y)
+    if (bUsesCurvedRiverCoordinates)
     {
-        for (int32 X = 0; X < GridN - 1; ++X)
+        UpdateCurvedGridPlanarGeometry();
+    }
+
+    for (int32 Y = 0; Y < GridLateralN - 1; ++Y)
+    {
+        for (int32 X = 0; X < GridStationN - 1; ++X)
         {
-            const int32 I0 = Y * GridN + X;
+            const int32 I0 = Y * GridStationN + X;
             const int32 I1 = I0 + 1;
-            const int32 I2 = I0 + GridN;
+            const int32 I2 = I0 + GridStationN;
             const int32 I3 = I2 + 1;
             Triangles.Add(I0); Triangles.Add(I2); Triangles.Add(I1);
             Triangles.Add(I1); Triangles.Add(I2); Triangles.Add(I3);
@@ -110,13 +162,112 @@ void ARaftSimWaterSurfaceActor::BuildGrid()
     }
 }
 
+void ARaftSimWaterSurfaceActor::RecenterCurvedGrid()
+{
+    if (!bUsesCurvedRiverCoordinates || !WaterAdapter)
+    {
+        return;
+    }
+    float DesiredCenterStationM = CurvedGridCenterStationM;
+    TActorIterator<ARaftSimRaftActor> RaftIt(GetWorld());
+    if (RaftIt)
+    {
+        FVector2D RiverPosition;
+        FVector Tangent;
+        FVector LeftNormal;
+        if (WaterAdapter->WorldToRiverCoordinates(
+                RaftIt->GetActorLocation(), RiverPosition, Tangent, LeftNormal))
+        {
+            DesiredCenterStationM = RiverPosition.X;
+        }
+    }
+    if (FMath::Abs(DesiredCenterStationM - CurvedGridCenterStationM) <
+        CurvedGridRecenterDistanceMeters)
+    {
+        return;
+    }
+    CurvedGridCenterStationM = DesiredCenterStationM;
+    ClampCurvedGridCenter();
+    for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
+    {
+        for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
+        {
+            const int32 Index = LateralIndex * GridStationN + StationIndex;
+            RiverCoordinatesM[Index] = FVector2D(
+                CurvedGridCenterStationM - CurvedGridLengthMeters * 0.5f +
+                    StationIndex * VertexSpacingMeters,
+                -CurvedGridWidthMeters * 0.5f + LateralIndex * VertexSpacingMeters);
+        }
+    }
+    UpdateCurvedGridPlanarGeometry();
+}
+
+void ARaftSimWaterSurfaceActor::ClampCurvedGridCenter()
+{
+    float MinimumStationM = 0.0f;
+    float MaximumStationM = 0.0f;
+    if (!WaterAdapter ||
+        !WaterAdapter->GetRiverStationRangeM(MinimumStationM, MaximumStationM))
+    {
+        return;
+    }
+    const float HalfLengthM = CurvedGridLengthMeters * 0.5f;
+    if (MaximumStationM - MinimumStationM <= CurvedGridLengthMeters)
+    {
+        CurvedGridCenterStationM = 0.5f * (MinimumStationM + MaximumStationM);
+        return;
+    }
+    CurvedGridCenterStationM = FMath::Clamp(
+        CurvedGridCenterStationM,
+        MinimumStationM + HalfLengthM,
+        MaximumStationM - HalfLengthM);
+}
+
+void ARaftSimWaterSurfaceActor::UpdateCurvedGridPlanarGeometry()
+{
+    for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
+    {
+        for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
+        {
+            const int32 Index = LateralIndex * GridStationN + StationIndex;
+            FVector WorldPosition;
+            const bool bMapped = WaterAdapter && WaterAdapter->RiverToWorldPosition(
+                RiverCoordinatesM[Index], WaterAdapter->GetRiverVerticalDatumM(),
+                WorldPosition);
+            checkf(bMapped, TEXT("Clamped curved water grid left its coordinate-map domain"));
+            Vertices[Index].X = WorldPosition.X;
+            Vertices[Index].Y = WorldPosition.Y;
+        }
+    }
+
+    // The material's flow basis follows the river rather than world X, which
+    // prevents visible UV/normal-map direction changes around tight bends.
+    for (int32 LateralIndex = 0; LateralIndex < GridLateralN; ++LateralIndex)
+    {
+        for (int32 StationIndex = 0; StationIndex < GridStationN; ++StationIndex)
+        {
+            const int32 PreviousStationIndex = FMath::Max(StationIndex - 1, 0);
+            const int32 NextStationIndex = FMath::Min(StationIndex + 1, GridStationN - 1);
+            const FVector& Previous = Vertices[
+                LateralIndex * GridStationN + PreviousStationIndex];
+            const FVector& Next = Vertices[
+                LateralIndex * GridStationN + NextStationIndex];
+            const FVector FlowTangent = FVector(
+                Next.X - Previous.X, Next.Y - Previous.Y, 0.0f).GetSafeNormal();
+            Tangents[LateralIndex * GridStationN + StationIndex] =
+                FProcMeshTangent(FlowTangent, false);
+        }
+    }
+}
+
 void ARaftSimWaterSurfaceActor::RefreshSurface()
 {
-    for (int32 Y = 0; Y < GridN; ++Y)
+    RecenterCurvedGrid();
+    for (int32 Y = 0; Y < GridLateralN; ++Y)
     {
-        for (int32 X = 0; X < GridN; ++X)
+        for (int32 X = 0; X < GridStationN; ++X)
         {
-            const int32 Index = Y * GridN + X;
+            const int32 Index = Y * GridStationN + X;
             const FVector& V = Vertices[Index];
             // Dry cells are pushed 1.5 m below the bed so they hide under the
             // terrain rather than rendering as a flat sheet that the banks poke
@@ -135,7 +286,10 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 {
                     if (Sample.bWet)
                     {
-                        SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM;
+                        // The authored seasonal surface remains beneath this
+                        // live solver patch. A 2 cm presentation lift prevents
+                        // depth fighting without changing any physics sample.
+                        SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM + 2.0f;
                         NormalOut = Sample.SurfaceNormal.GetSafeNormal();
                         const float Speed = Sample.VelocityMetersPerSecond.Size2D();
                         const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);

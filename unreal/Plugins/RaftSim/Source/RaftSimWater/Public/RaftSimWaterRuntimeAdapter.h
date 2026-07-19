@@ -205,6 +205,35 @@ public:
         FVector2D WindowCenterM, FVector2D WindowExtentM,
         float RoughnessManning = 0.041f);
 
+    /**
+     * Bind a dense station/lateral -> curved-world coordinate map. Once bound,
+     * world-space water probes are projected onto the real river axis before
+     * sampling the solver, and velocities/normals are rotated back into world
+     * space. Elevations are shifted by the map's vertical datum so the Unreal
+     * world remains near its local origin.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool ConfigureRiverCoordinateMap(const FString& CoordinateMapPath);
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
+    bool HasRiverCoordinateMap() const { return RiverCoordinatePoints.Num() >= 2; }
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool WorldToRiverCoordinates(
+        const FVector& WorldPositionCm, FVector2D& OutStationLateralM,
+        FVector& OutWorldTangent, FVector& OutWorldLeftNormal) const;
+
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool RiverToWorldPosition(
+        FVector2D StationLateralM, float ElevationM, FVector& OutWorldPositionCm) const;
+
+    /** Inclusive station domain authored by the bound coordinate map. */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool GetRiverStationRangeM(float& OutMinimumStationM, float& OutMaximumStationM) const;
+
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Water")
+    float GetRiverVerticalDatumM() const { return RiverVerticalDatumM; }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool GetLiveWindowStats(FRaftSimWaterLiveWindowStats& OutStats) const;
 
@@ -260,6 +289,22 @@ private:
     FString BuildDeterministicFrameHash() const;
     void AppendDeterministicCaptureFrame();
     FString ResolveRepoRelativePath(const FString& Path) const;
+
+    struct FRiverCoordinatePoint
+    {
+        double StationM = 0.0;
+        FVector2D LocalPositionM = FVector2D::ZeroVector;
+        FVector2D LeftNormal = FVector2D(0.0, 1.0);
+    };
+
+    static constexpr float RiverSpatialHashCellM = 128.0f;
+    FIntPoint RiverSpatialHashKey(const FVector2D& PositionM) const;
+    void RebuildRiverSpatialHash();
+
+    TArray<FRiverCoordinatePoint> RiverCoordinatePoints;
+    TMap<FIntPoint, TArray<int32>> RiverSpatialHash;
+    float RiverVerticalDatumM = 0.0f;
+    FString RiverCoordinateMapPath;
 
     TUniquePtr<FRaftSimLiveWaterWindow> LiveWindow;
 };

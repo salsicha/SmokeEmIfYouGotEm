@@ -1457,6 +1457,18 @@ UStaticMesh* ConvertNativeCanopyProceduralActorToStaticMesh(
     Mesh->SetLightMapCoordinateIndex(1);
     Mesh->GetNaniteSettings().bEnabled = bEnableNanite;
     Mesh->GetNaniteSettings().ShapePreservation = ShapePreservation;
+    if (bEnableNanite &&
+        Component->GetCollisionEnabled() != ECollisionEnabled::NoCollision)
+    {
+        // A collision-bearing Nanite mesh must keep a full fallback mesh:
+        // Chaos complex collision reads the fallback, not Nanite clusters.
+        // Reducing it with the automatic heuristic visibly decouples rocks,
+        // rafts, and people from the authored terrain surface.
+        Mesh->GetNaniteSettings().GenerateFallback = ENaniteGenerateFallback::Enabled;
+        Mesh->GetNaniteSettings().FallbackTarget =
+            ENaniteFallbackTarget::PercentTriangles;
+        Mesh->GetNaniteSettings().FallbackPercentTriangles = 1.0f;
+    }
     Mesh->Build(false);
     Mesh->PostEditChange();
     Mesh->MarkPackageDirty();

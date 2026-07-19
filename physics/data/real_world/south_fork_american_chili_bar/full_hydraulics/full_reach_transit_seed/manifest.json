@@ -14,7 +14,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "low_runnable/bed.npy",
-          "sha256": "1f951ee2355e7ef0d18377c92bc6601aca701caabb0c5f1692fc9d1a4d52ff23",
+          "sha256": "53c928400b489da10d95119e5223d4c55ba7470d941f4400a8502af876263313",
           "shape": [
             21,
             12271
@@ -25,7 +25,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "low_runnable/h.npy",
-          "sha256": "6d9fc39bd9061611c627b7a037762ca1d011610c87b959fd34585f1cc267e0fc",
+          "sha256": "23b4248ad574a60b6ccc33069a0a7defdf627ddd60da8253482d40021bfef5b4",
           "shape": [
             21,
             12271
@@ -36,7 +36,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "low_runnable/u.npy",
-          "sha256": "f93c8d3d0785b8a5758fcdaa9f0aae0fa3507ce112334a1b70e4e05a2c407de8",
+          "sha256": "4c69615e451c472df57d46f742d8d8c4a8df4db3f01a7eb324aeaee5b83c58f1",
           "shape": [
             21,
             12271
@@ -77,7 +77,7 @@
             "target_discharge_cfs": 900.0,
             "target_discharge_m3s": 25.4851619328
           },
-          "stage": 646.661865234375,
+          "stage": 463.6930847167969,
           "velocity": [
             0.639604078751693,
             0.0
@@ -89,7 +89,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": 145.10206604003906,
+          "stage": 126.19767761230469,
           "velocity": null
         },
         {
@@ -122,8 +122,8 @@
           "positive_wet_area": true
         },
         "metrics": {
-          "initial_volume_m3": 3856227.956004,
-          "max_seed_speed_mps": 2.533954,
+          "initial_volume_m3": 3856228.156797,
+          "max_seed_speed_mps": 2.534044,
           "wet_fraction": 0.527093
         },
         "passed": true
@@ -135,7 +135,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "median_runnable/bed.npy",
-          "sha256": "1f951ee2355e7ef0d18377c92bc6601aca701caabb0c5f1692fc9d1a4d52ff23",
+          "sha256": "53c928400b489da10d95119e5223d4c55ba7470d941f4400a8502af876263313",
           "shape": [
             21,
             12271
@@ -146,7 +146,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "median_runnable/h.npy",
-          "sha256": "a0fdb20b26d607edf6cd285a2de862d6d64fb3cf8d98375a201da3a737145d09",
+          "sha256": "94b6280d7b92cff86e734bf23126a57d9ff73de28e0d4da894a37f9c18fe21f1",
           "shape": [
             21,
             12271
@@ -157,7 +157,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "median_runnable/u.npy",
-          "sha256": "6b11ff6fb3660fc69b984d78b972d67565219ff9febd2a4e964f652aa92b2a24",
+          "sha256": "b928b89e7c3475be8db10b10acd506d5a82c82ef50c9782ece9f9a76e502dee4",
           "shape": [
             21,
             12271
@@ -179,7 +179,7 @@
           "description": "1 where the solver reports the cell wet.",
           "dtype": "uint8",
           "file": "median_runnable/wet_mask.npy",
-          "sha256": "ff0568f13563f7925704f933a23639e54db9ee8fdb271481cc37a3b210c423ae",
+          "sha256": "69284a0b67f120e7e84d1feff5f3e3135fb3ddd192e5d9366690a9d8572fb0b9",
           "shape": [
             21,
             12271
@@ -198,7 +198,7 @@
             "target_discharge_cfs": 1600.0,
             "target_discharge_m3s": 45.3069545472
           },
-          "stage": 647.021865234375,
+          "stage": 464.0530847167969,
           "velocity": [
             0.8580015190026651,
             0.0
@@ -210,7 +210,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": 145.46206604003908,
+          "stage": 126.55767761230469,
           "velocity": null
         },
         {
@@ -243,9 +243,9 @@
           "positive_wet_area": true
         },
         "metrics": {
-          "initial_volume_m3": 4658903.580697,
-          "max_seed_speed_mps": 2.457017,
-          "wet_fraction": 0.571871
+          "initial_volume_m3": 4662752.080951,
+          "max_seed_speed_mps": 2.457064,
+          "wet_fraction": 0.579884
         },
         "passed": true
       }
@@ -256,7 +256,7 @@
           "description": "Interpreted game bed elevation.",
           "dtype": "float32",
           "file": "high_runnable/bed.npy",
-          "sha256": "1f951ee2355e7ef0d18377c92bc6601aca701caabb0c5f1692fc9d1a4d52ff23",
+          "sha256": "53c928400b489da10d95119e5223d4c55ba7470d941f4400a8502af876263313",
           "shape": [
             21,
             12271
@@ -267,7 +267,7 @@
           "description": "Water depth above bed.",
           "dtype": "float32",
           "file": "high_runnable/h.npy",
-          "sha256": "0de62caab5d9aa5fbf08af150a2ad8643b1e8ab220d527b19c247bdd59488519",
+          "sha256": "53b24bb51860e032357c3e4b109d6373d7be6c90c0306875bbeb8201aa6720a9",
           "shape": [
             21,
             12271
@@ -278,7 +278,7 @@
           "description": "Depth-averaged downstream velocity.",
           "dtype": "float32",
           "file": "high_runnable/u.npy",
-          "sha256": "1289596f4b935239813033906cb520f2cc8e0a4b1cfc3426f7c615de824a4493",
+          "sha256": "7197c6a01abf321a9c8cd31e8a31b25928758c652aca32137c3a8b1c2c19b15c",
           "shape": [
             21,
             12271
@@ -300,7 +300,7 @@
           "description": "1 where the solver reports the cell wet.",
           "dtype": "uint8",
           "file": "high_runnable/wet_mask.npy",
-          "sha256": "21414129747e8adb087f1a970b027c2314d5e993aa48cea492a66ddfa55145eb",
+          "sha256": "28b8aa308c3fd3dd1d4839ceb6ba401be30f96885be2e6ce63b08f6418b32c88",
           "shape": [
             21,
             12271
@@ -319,9 +319,9 @@
             "target_discharge_cfs": 3000.0,
             "target_discharge_m3s": 84.950539776
           },
-          "stage": 647.481865234375,
+          "stage": 464.51308471679687,
           "velocity": [
-            1.1815202602405817,
+            1.187091174174473,
             0.0
           ]
         },
@@ -331,7 +331,7 @@
           "hydrograph": [],
           "kind": "outflow",
           "metadata": {},
-          "stage": 145.92206604003906,
+          "stage": 127.01767761230468,
           "velocity": null
         },
         {
@@ -364,9 +364,9 @@
           "positive_wet_area": true
         },
         "metrics": {
-          "initial_volume_m3": 5846571.540559,
-          "max_seed_speed_mps": 2.407586,
-          "wet_fraction": 0.673943
+          "initial_volume_m3": 5844027.648638,
+          "max_seed_speed_mps": 2.64333,
+          "wet_fraction": 0.656996
         },
         "passed": true
       }

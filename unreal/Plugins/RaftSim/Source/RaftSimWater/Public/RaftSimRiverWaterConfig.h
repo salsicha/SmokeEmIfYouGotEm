@@ -35,4 +35,29 @@ public:
     /** Window extent in meters (square). */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water")
     float WindowExtentM = 600.0f;
+
+    /** Optional dense station/lateral-to-curved-world coordinate map. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
+    FString CoordinateMapPath;
+
+    /** M3 full-reach moving-window manifest. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
+    FString StreamingManifestPath;
+
+    /** Follow the raft and swap overlapping transit/named-rapid solver crops. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming")
+    bool bEnableMovingWindowStreaming = false;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming", meta = (ClampMin = "80.0"))
+    float MovingWindowStationExtentM = 320.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming", meta = (ClampMin = "40.0"))
+    float MovingWindowLateralExtentM = 80.0f;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Water|Streaming", meta = (ClampMin = "8.0"))
+    float MovingWindowAdvanceM = 80.0f;
+
+    /** Full-reach production terrain exists in the map; suppress local bed proxy. */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "RaftSim|Environment")
+    bool bMapProvidesTerrain = false;
 };

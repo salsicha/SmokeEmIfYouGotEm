@@ -171,9 +171,9 @@ path is verified, and the completion goal can be marked complete.
 |---|---|---|---|
 | M1 Flexible raft/contact slice | Complete | `2b3be122` | UE build; M1 1/1; river maps 5/5; physics 1,017/3 |
 | M2 Procedural geography | Complete | `6b44af51` | UE build; geo 19/19; physics 1,021/3; byte-stable regeneration |
-| M3 South Fork hydraulics | Complete | This milestone commit | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
-| M4 Photoreal environment | Next | — | — |
-| M5 Characters/raft/rescue | Pending | — | — |
+| M3 South Fork hydraulics | Complete | `aa610a6c` | 60/60 hydraulic cooks; M3 UE 2/2; physics 1,026/3 |
+| M4 Photoreal environment | Complete | This milestone commit | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
+| M5 Characters/raft/rescue | In progress | — | Production character, raft, and rescue pass next |
 | M6 Game/progression | Pending | — | — |
 | M7 Audio/presentation | Pending | — | — |
 | M8 Validation/performance | Pending | — | — |
@@ -258,3 +258,33 @@ path is verified, and the completion goal can be marked complete.
   named-rapid and full-reach transit data; focused M3/editor tests passed 8/8; repository
   guards passed; full physics/content suite passed 1,026 tests with 3 expected
   optional-dependency-path skips in 13m59s.
+
+### July 19, 2026 — M4 complete
+
+- Upgraded the full-reach geography to fold-safe, smoothed curvilinear frames and
+  registered eight source-window far-field DEM/imagery patches by nearest global
+  station ownership. Regenerated dependent South Fork geography and hydraulic products
+  so render, collision, live water, and procedural provenance remain registered.
+- Authored the 49.1 km World Partition gameplay map with thirteen 64,512-triangle
+  Nanite terrain tiles, 39 flow-band water meshes, eight far-field patches, 20 terminal
+  instanced HLOD cells, curved streaming coordinates, wet-bank response, 115 hydraulic
+  boulders, 5,121 non-colliding bank rocks, and 72 bridge/access infrastructure actors.
+- Added source-conditioned per-tile and far-field macro albedo, CC0 triplanar ground and
+  rock detail, depth/velocity water optics, deterministic sub-grid standing waves,
+  hydraulic foam/aeration, 255 spray/mist instances, and runtime pooled water-contact
+  VFX without making the presentation layer authoritative over the shallow-water solver.
+- Replaced near conifers with full-geometry CC0 Poly Haven pine variants and created
+  project-owned Ponderosa pine/interior live-oak canopy fallbacks from first-party
+  generated source art. The final map contains 18,325 detailed-corridor and 179,630
+  far-field foliage instances with deterministic sparse-bank understory infill.
+- Added Chili Bar, Meat Grinder, Troublemaker, Coloma bridge, and Salmon Falls
+  guide/river-eye captures. Automated artifact, map, HLOD, VFX, source/procedural label,
+  and readability checks pass. The build manifest deliberately leaves the subjective
+  `owner_art_and_readability_review_passed` field false until the owner accepts the
+  captures; under operating rule 5 this is a recorded launch follow-up, not an
+  implementation stop or a claim that the captures are real-world navigation imagery.
+- Corrected curved river inverse mapping to solve the same interpolated-normal ruled
+  corridor used by forward mapping, restoring sub-centimetre station/lateral round trips.
+  Verification: Unreal Editor Mac Development build succeeded; `RaftSim.M4` passed 3/3;
+  all South Fork Python tests passed 144/144; Ruff lint/format checks passed; HLOD setup
+  and build completed 20/20 with zero errors and deterministic package hashes.

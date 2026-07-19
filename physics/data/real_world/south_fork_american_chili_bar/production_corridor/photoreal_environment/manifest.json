@@ -1,0 +1,1822 @@
+{
+  "acceptance": {
+    "all_flow_bands_present": true,
+    "coordinate_map_complete": true,
+    "far_field_geography_complete": true,
+    "full_reach_visual_products_continuous": true,
+    "owner_art_and_readability_review_passed": false,
+    "procedural_infill_labelled": true,
+    "representative_captures_complete": false,
+    "source_conditioned_materials_present": true,
+    "unreal_world_partition_build_complete": false,
+    "vegetation_and_vfx_masks_present": true
+  },
+  "algorithm": "south_fork_photoreal_environment_v12_fold_safe_registered_corridor",
+  "asset_policy": {
+    "near_field_species": "South-Fork-curated project-owned or CC0 meshes only",
+    "procedural_infill_explicit": true,
+    "terrain_detail": "project-owned procedural textures and CC0 physical materials",
+    "unconfirmed_infrastructure_is_game_context_not_real_access_guidance": true
+  },
+  "boulder_catalog": {
+    "byte_count": 39854,
+    "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/boulder_catalog.json",
+    "sha256": "965f027ed58957dc99917d826b2035f0697c08a64943247c1b984a6d7778ac1f"
+  },
+  "coordinate_map": {
+    "byte_count": 1170771,
+    "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/river_coordinate_map.json",
+    "sha256": "5a696762e8b3b79d58300d8a49f53071a54c3e998357c22f379e702ef094e6e4"
+  },
+  "determinism_signature_sha256": "06d7f0a25c1ef75e0225e66e6995926b93fdaee0a4e3432f32da542623b0f6dc",
+  "far_field": {
+    "authority": "USGS 3DEP and USDA NAIP where available; deterministic corridor underlay conditioning and uncovered geography are procedural game infill",
+    "continuous_underlay": true,
+    "corridor_exclusion_radius_m": 52.0,
+    "corridor_underlay_falloff_m": 80.0,
+    "corridor_underlay_max_depth_m": 6.4,
+    "grid_size": 257,
+    "not_for_navigation": true,
+    "patch_count": 8,
+    "patches": [
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -2023.372,
+          -1528.385,
+          272.605,
+          767.592
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1187,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_corridor_exclusion.png",
+          "sha256": "ff0ec4b2e16bcbefe705cac1a307dbf78e6cb3ebfc563699ab6d1b22590ed5ef"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 102003,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_height.png",
+          "sha256": "c344f6bc8edc65486257f7d642433388c3b2359b747e128cf34899870caa740b"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 792.423828,
+          "minimum_elevation_m": 398.942413,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 142303,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_macro_albedo.png",
+          "sha256": "a64a6720a32d84f702c70a009c539c18c85de8a805707b2fee44c63eb730884f"
+        },
+        "owned_vertex_fraction": 0.875168,
+        "patch_id": "far_field_00",
+        "source_window_id": "chili_bar_existing_pilot_0_2500m",
+        "source_window_ownership_mask": {
+          "byte_count": 600,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_00_source_window_ownership.png",
+          "sha256": "31dee6dd033b6c4babbbca87bbe5da444b422f8ee5755d42292a6f512133a753"
+        },
+        "visible_vertex_fraction": 0.943345
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -5809.824,
+          -2713.129,
+          -1486.417,
+          1610.277
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1376,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_corridor_exclusion.png",
+          "sha256": "a800d5214f3f86902b484f5bea14c6e1d6b0cce8304f0699f05dd773e50f15dc"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 105753,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_height.png",
+          "sha256": "c490ad59d3536860e7baf435bda79f6acd68b6a8b49c7aa850ab84ea08012619"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 842.18573,
+          "minimum_elevation_m": 298.207825,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 143199,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_macro_albedo.png",
+          "sha256": "c971aa30e0966cc64cac471658713fe60c2a0696dada55b8e2e211b8beec7afc"
+        },
+        "owned_vertex_fraction": 0.854805,
+        "patch_id": "far_field_01",
+        "source_window_id": "upper_chili_bar_to_coloma_2500_10000m",
+        "source_window_ownership_mask": {
+          "byte_count": 693,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_01_source_window_ownership.png",
+          "sha256": "1c8657ba4a8e988556bbd9756657ea3314cadb6a3711331be943e477cd6ebbbc"
+        },
+        "visible_vertex_fraction": 0.953232
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -14700.42,
+          -4427.372,
+          -5153.461,
+          5119.587
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1089,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_corridor_exclusion.png",
+          "sha256": "b3faf6bf7d37be1ca2d93af3aca36aa1f15c5c42808723b6e44603c92df0d84e"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 111297,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_height.png",
+          "sha256": "43ca274a3a828d3dc3eddffc051b1b21ac900bd39eb1d3c6d2121d39c588e506"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 777.365417,
+          "minimum_elevation_m": 220.025467,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 147994,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_macro_albedo.png",
+          "sha256": "620aacfbb9a712bb59280431b58eff92fc7f352b3383caee9e4f5b8a340eef2e"
+        },
+        "owned_vertex_fraction": 0.796621,
+        "patch_id": "far_field_02",
+        "source_window_id": "coloma_valley_10000_24000m",
+        "source_window_ownership_mask": {
+          "byte_count": 713,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_02_source_window_ownership.png",
+          "sha256": "d8a4bb9a7baaae05b0aeade95429ec9910728c7bc36dee353092d1601ddae410"
+        },
+        "visible_vertex_fraction": 0.982286
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -16786.886,
+          1989.899,
+          -14337.514,
+          4439.271
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1384,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_corridor_exclusion.png",
+          "sha256": "660d5050593efa9de82892abbce4c5e23e7136647dcc78568565370091a7155a"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 101885,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_height.png",
+          "sha256": "a59ad3c51fe627aa2637da1f7c95d1687b74ad6f706d8221a89efac2e0aa0312"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 497.032623,
+          "minimum_elevation_m": 205.475128,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 154157,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_macro_albedo.png",
+          "sha256": "da229a3e3915351ccd46d03d5150db2e4f1d88284ff7c7bd6ab0ae5112cf2391"
+        },
+        "owned_vertex_fraction": 0.8851,
+        "patch_id": "far_field_03",
+        "source_window_id": "upper_gorge_24000_28500m",
+        "source_window_ownership_mask": {
+          "byte_count": 750,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_03_source_window_ownership.png",
+          "sha256": "3725542ca076f723b7503c0661496eafe40ebd07c3db6aaeb90f95c67b045979"
+        },
+        "visible_vertex_fraction": 0.912716
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -19357.097,
+          2062.12,
+          -16267.489,
+          5151.729
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1260,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_corridor_exclusion.png",
+          "sha256": "2e1b10d6c047d529e41a3abc1fc2e99322df454aa0f7160782607c68b448918e"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 102074,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_height.png",
+          "sha256": "13323a7fe02f0774a6c584770a9cc0cc1988fc23b5d78dada2c9f0f02e6429e2"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 491.84198,
+          "minimum_elevation_m": 190.435593,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 154564,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_macro_albedo.png",
+          "sha256": "cc7781cb606b3f2ba8a4be51274053d8365433703d92451b32364884c0802365"
+        },
+        "owned_vertex_fraction": 0.806916,
+        "patch_id": "far_field_04",
+        "source_window_id": "lower_gorge_to_salmon_falls_28500_32991m",
+        "source_window_ownership_mask": {
+          "byte_count": 865,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_04_source_window_ownership.png",
+          "sha256": "2766b38be063228bc357ad5e1e8515b98003b49276cb7e1375cd56b2a06a5a6b"
+        },
+        "visible_vertex_fraction": 0.942376
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -19711.202,
+          4462.361,
+          -18604.337,
+          5569.226
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1155,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_corridor_exclusion.png",
+          "sha256": "27f541c29ca25e45d7abcddcb849f3d5dc5a94053028ed7d89f269b4ff452c21"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 102126,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_height.png",
+          "sha256": "8ba867ce7af3b202d91a99d4378cd17d0cf98dd3e77d3bdadc16c95d16378e18"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 292.512054,
+          "minimum_elevation_m": 189.191895,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 144083,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_macro_albedo.png",
+          "sha256": "8f796eb759a9f3a8b66252115686fdc289ac4c125afbf752a6cf0360371e40e3"
+        },
+        "owned_vertex_fraction": 0.527487,
+        "patch_id": "far_field_05",
+        "source_window_id": "salmon_falls_folsom_review_32991_33796m",
+        "source_window_ownership_mask": {
+          "byte_count": 757,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_05_source_window_ownership.png",
+          "sha256": "be3f591152efcc71d3da64290210f8494ece73cd69b03028597af02ad597354e"
+        },
+        "visible_vertex_fraction": 0.830656
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -23733.771,
+          209.012,
+          -18557.38,
+          5385.403
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1176,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_corridor_exclusion.png",
+          "sha256": "07dee99ae163deb9888ae0267b4f8ebff48468c34fb5c6ea6d7292ca47967160"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 108174,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_height.png",
+          "sha256": "7b979013b12868f00913c4fa3047137a70d70c618511cf298ceb825e5e330778"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 515.15155,
+          "minimum_elevation_m": 160.643845,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 154187,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_macro_albedo.png",
+          "sha256": "3023abc860b8c1f4055ef8cbd45e1c6f6e5124c4aa865fa2dcf2503fb1de03fc"
+        },
+        "owned_vertex_fraction": 0.801329,
+        "patch_id": "far_field_06",
+        "source_window_id": "below_full_run_alias_33796_41500m",
+        "source_window_ownership_mask": {
+          "byte_count": 698,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_06_source_window_ownership.png",
+          "sha256": "8c063cdac19625d358e7d030102fd7c88f4131b65b8132d15cea9773190c4fb2"
+        },
+        "visible_vertex_fraction": 0.963588
+      },
+      {
+        "authority": "USGS_3DEP_and_USDA_NAIP_with_procedural_continuous_channel_underlay",
+        "bounds_local_m": [
+          -28313.353,
+          -3581.415,
+          -22519.942,
+          2211.997
+        ],
+        "corridor_exclusion_mask": {
+          "byte_count": 1125,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_corridor_exclusion.png",
+          "sha256": "04658104c08baf3c04a93bc64b86c73fffcab6807a0d0b020b4bfdcc146e3211"
+        },
+        "dimensions": [
+          257,
+          257
+        ],
+        "height": {
+          "byte_count": 109670,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_height.png",
+          "sha256": "64316c99e95f3db1443b1ef3f8dad92c0ebea66a9ae9df19e5d6db1b37b02b4a"
+        },
+        "height_encoding": {
+          "maximum_elevation_m": 495.238129,
+          "minimum_elevation_m": 120.834717,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "macro_albedo": {
+          "byte_count": 140705,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_macro_albedo.png",
+          "sha256": "09e211422463008a9154d6b3c3cdc8c14a34f29759a455a488d388612e05efa4"
+        },
+        "owned_vertex_fraction": 0.901967,
+        "patch_id": "far_field_07",
+        "source_window_id": "salmon_falls_takeout_approach_41500_49077m",
+        "source_window_ownership_mask": {
+          "byte_count": 641,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/far_field/far_field_07_source_window_ownership.png",
+          "sha256": "3d2a022645c66fc380b31a07a3b48118dabe779bef88ef040826599de598f0b5"
+        },
+        "visible_vertex_fraction": 0.972157
+      }
+    ],
+    "procedural_infill_explicit": true
+  },
+  "generated_on": "2026-07-19",
+  "grid": {
+    "lateral_count": 129,
+    "lateral_range_m": [
+      -256.0,
+      256.0
+    ],
+    "station_count": 12271,
+    "station_range_m": [
+      0.0,
+      49077.732
+    ],
+    "tile_count": 13,
+    "tile_overlap_rows": 1,
+    "vertical_datum_m": 120.0
+  },
+  "infrastructure_catalog": {
+    "byte_count": 1402,
+    "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/infrastructure_catalog.json",
+    "sha256": "db1fd386503356ed86710b9c6e6e701c4ecb45795bca8b023bb7bfd1004de1d2"
+  },
+  "inputs": {
+    "boulder_catalog": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/boulder_catalog.json",
+    "full_reach_transit_water": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/full_reach_transit_seed/manifest.json",
+    "naip_source_window_count": 8,
+    "procedural_geography": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/manifest.json"
+  },
+  "not_for_navigation": true,
+  "presentation": {
+    "flow_bands": [
+      "low_runnable",
+      "median_runnable",
+      "high_runnable"
+    ],
+    "naip_seam_count": 7,
+    "terrain": "NAIP-conditioned macro colour plus deterministic PBR surface response",
+    "vegetation_channels": [
+      "conifer",
+      "broadleaf_oak_proxy",
+      "riparian_willow_alder_proxy",
+      "understory_groundcover"
+    ],
+    "vfx_channels": [
+      "wet_bank",
+      "spray",
+      "mist",
+      "water_contact"
+    ],
+    "water_channels": [
+      "foam",
+      "depth",
+      "speed",
+      "wet_mask"
+    ]
+  },
+  "river_id": "south_fork_american_chili_bar",
+  "schema": "raftsim.south_fork.photoreal_environment.v1",
+  "seed": 1604640772,
+  "status": "full_reach_environment_products_ready_for_unreal_build",
+  "unreal_import": {
+    "far_field_representation": "source-backed regular-grid static-mesh patches forming a deterministic lowered underlay beneath the detailed channel",
+    "hlod_and_streaming_required": true,
+    "schema": "raftsim.unreal.south_fork_full_reach_environment.v1",
+    "terrain_representation": "curved Nanite static-mesh tiles sharing M2 collision height",
+    "tiles": [
+      {
+        "ao_roughness_height": {
+          "byte_count": 228275,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_ao_roughness_height.png",
+          "sha256": "0b0bf7af0b4238fc6e8ad053f2044f2a39d1f051d3396767badaf1b72fac4dae"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 219741,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_macro_albedo.png",
+          "sha256": "0df2675e9948c1f23c3d68eaa5f8a5a14f16036f059086bfbceffce8cc69987d"
+        },
+        "material_mask": {
+          "byte_count": 12689,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_material.png",
+          "sha256": "0cc5206627e5c3178a5522d6158fc13c66080d09b7eee10b33dfe497d979f940"
+        },
+        "normal": {
+          "byte_count": 226355,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_normal.png",
+          "sha256": "7eaad144024245ee46ff50dd540a54c1f3681f8e7e9685d5b3e47a64b3eb49ff"
+        },
+        "row_range": [
+          0,
+          1008
+        ],
+        "source_authority_features": {
+          "byte_count": 8750,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_authority_features.png",
+          "sha256": "70847cf63e73e82443d41f46d33a20a6eb9f3d3ee37a9bec43c0254c0cd21020"
+        },
+        "station_range_m": [
+          0.0,
+          4032.0
+        ],
+        "terrain_height": {
+          "byte_count": 179102,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_height.png",
+          "sha256": "74667147b30ae915931f2d97508313f731f87fd658a10dd716df648624e441ac"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_00",
+        "vegetation_species_density": {
+          "byte_count": 95384,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_vegetation_species_density.png",
+          "sha256": "aec26920b5c2f33cd69764af199525b84bfd5a688b88aa9854002368deb22476"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 8880,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_high_runnable_presentation.png",
+              "sha256": "7f4ba1113246668af4fd1ed03185d8f9473e549c6e33502258e744f2665f0940"
+            },
+            "surface_height": {
+              "byte_count": 17592,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_high_runnable_height.png",
+              "sha256": "6222ef0b2e67a4d21bec9376577a3787f98b64d16351934c5097e5b55cacf11c"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 6325,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_low_runnable_presentation.png",
+              "sha256": "30c1c2ea28889638fae20348a054b32f348824a59e2ea98ae7c8a0fad71124ee"
+            },
+            "surface_height": {
+              "byte_count": 19348,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_low_runnable_height.png",
+              "sha256": "3199c8f4abde070f7e457d653fa8df1bafa783c3963da8838a75d84e1ebd5a67"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 7373,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_median_runnable_presentation.png",
+              "sha256": "b943591f77530e463b25d9a53e2956970f7ab22ef4ae45d20cd54d41b88ec314"
+            },
+            "surface_height": {
+              "byte_count": 18596,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_median_runnable_height.png",
+              "sha256": "3c336302886061373d3a1a0ab5bb13fda3d4b13da79ed70c6ebf406acbd33e0c"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 3883,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_00_water_vfx_zones.png",
+          "sha256": "6e2fe47b3ed9e7764e7a8dbc2eee3476338bd67bf810d4c6c7e29fa2144db35e"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 215257,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_ao_roughness_height.png",
+          "sha256": "89ac422ad02fbec2087edee4b2af5299bbf14c863c659bb626bef9eb434554dd"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 207837,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_macro_albedo.png",
+          "sha256": "f7a26a04b1cfe8e512f35b5bceb36ae8b068d3f3d484a8f94b636cdb5f079549"
+        },
+        "material_mask": {
+          "byte_count": 10938,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_material.png",
+          "sha256": "fae58504ec12ca5ebec7ea85d936ad5434bdefd65fd3e53417048ddeb8a7a0ab"
+        },
+        "normal": {
+          "byte_count": 210911,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_normal.png",
+          "sha256": "c7c121b7a780cbdc982617e172f062e51685c5c256b213cf353c138505180420"
+        },
+        "row_range": [
+          1008,
+          2016
+        ],
+        "source_authority_features": {
+          "byte_count": 5704,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_authority_features.png",
+          "sha256": "0528108d74d9b71c4dd4b5dbd2d24f18bdb113326ad0d53011bdb5b4f4df1afe"
+        },
+        "station_range_m": [
+          4032.0,
+          8064.0
+        ],
+        "terrain_height": {
+          "byte_count": 175548,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_height.png",
+          "sha256": "cfeb307f773f0948ec3a5c9ca0e3a3aea78e94a421777e9ed6c389c67e9c3e20"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_01",
+        "vegetation_species_density": {
+          "byte_count": 107045,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_vegetation_species_density.png",
+          "sha256": "28aa17ba35be26d79afa3c9e109cb98eb7ddd7a53e41049e08b4e08444a512ec"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 5665,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_high_runnable_presentation.png",
+              "sha256": "9ef749c6d71cc63efe62eee5f24eec487e9c0a7d2ae5c82730ff640d60baf2d5"
+            },
+            "surface_height": {
+              "byte_count": 15503,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_high_runnable_height.png",
+              "sha256": "5b95d855bb74cde2a8cdb3439a410d1b21927d5ab56f5cc1baadd443c42111ca"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2887,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_low_runnable_presentation.png",
+              "sha256": "047340484384127a6cbacffe615cc0b48ba93ca4bbe8f10171d56086f14f264c"
+            },
+            "surface_height": {
+              "byte_count": 17540,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_low_runnable_height.png",
+              "sha256": "315a1aa1202448454fa3252647cc710a429a01e74a487e222c49c85e84dcb55b"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 3532,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_median_runnable_presentation.png",
+              "sha256": "31cbbc37a2335cabd813b384b5773e8492a96ae3440fc54674ea2d51510aade7"
+            },
+            "surface_height": {
+              "byte_count": 17005,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_median_runnable_height.png",
+              "sha256": "f3166e33dac97067dfdd92817a3dcab5bf65db2449337d7a524461705aaa6ead"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 2025,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_01_water_vfx_zones.png",
+          "sha256": "266e8688133cb9c99d871b6c1cf531559339ba3e64ceebb9e03f3eb113034505"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 202152,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_ao_roughness_height.png",
+          "sha256": "9774f177e9205e3ba679386b9625a0f45a4f96b415aa2cb1a8faabc544c8eae8"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 190648,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_macro_albedo.png",
+          "sha256": "3718c3553783db8c098e8809898c7000bf726366eec8e0fb5075eacd9fc2abc9"
+        },
+        "material_mask": {
+          "byte_count": 9224,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_material.png",
+          "sha256": "b05963fc02bdeeda1c9d61e2594a7fefb8435593cb3211dfaf831466235d6b58"
+        },
+        "normal": {
+          "byte_count": 192119,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_normal.png",
+          "sha256": "5212718aaa57fd33634627f2aa953a6f4331186b98b25c9285de083bc914017b"
+        },
+        "row_range": [
+          2016,
+          3024
+        ],
+        "source_authority_features": {
+          "byte_count": 6080,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_authority_features.png",
+          "sha256": "8864840cdf6a15df9028018d71590ee9de55bde67882342ad16a8cb1f9d99aac"
+        },
+        "station_range_m": [
+          8064.0,
+          12096.0
+        ],
+        "terrain_height": {
+          "byte_count": 169919,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_height.png",
+          "sha256": "ec5f61372f2bbdb438f5414b2486f5c8da82e69f47796f5a8ba3cbca8b2ee38f"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_02",
+        "vegetation_species_density": {
+          "byte_count": 82902,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_vegetation_species_density.png",
+          "sha256": "ceb03e00be9b6c145e1bae2f9b2e8225918b82ffc2d5b501972a6911aa178e5f"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 6371,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_high_runnable_presentation.png",
+              "sha256": "883bebe0c305c6a2cd8ca3704d5103c6b9b57ee509f51ea07f69ccd3c4314a1c"
+            },
+            "surface_height": {
+              "byte_count": 13589,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_high_runnable_height.png",
+              "sha256": "801fc50dc80ebaa640e712a933cd9f87767aae004f87a9f5162b58071c36c01a"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 3181,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_low_runnable_presentation.png",
+              "sha256": "c38d0b109d80bad2940cf7dc0c72d73a2eb3bf4287628975922e446b8faf6f4e"
+            },
+            "surface_height": {
+              "byte_count": 15195,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_low_runnable_height.png",
+              "sha256": "1a32f167748c82964e6134460d1220cd2f53fe1bf53a1b843612844a89f6f174"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 3928,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_median_runnable_presentation.png",
+              "sha256": "869d6c40280819c883ab6e6451d9ef46dfd4a3935b2c1a2e67fd594afa88c413"
+            },
+            "surface_height": {
+              "byte_count": 14764,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_median_runnable_height.png",
+              "sha256": "aa0727efa303ac195aeb91c131017021429c3688538d07572a58a00b06a85219"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 2681,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_02_water_vfx_zones.png",
+          "sha256": "4d19de074ab1e0504832759bea0cb84149b33cd7f6f6ee1c43db9db9ef9e1bd0"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 199308,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_ao_roughness_height.png",
+          "sha256": "5fa0cbc4e5d17bec84b282818f7acc7c6b0f3fcb80634d90f892325fa5ecc8f3"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 194930,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_macro_albedo.png",
+          "sha256": "2e5fff91be13e799f50eb4af7868b9c005ce2096628b84cc87880318706e7ce1"
+        },
+        "material_mask": {
+          "byte_count": 10627,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_material.png",
+          "sha256": "39b6fb2a272bad68809b800b92252a351a6e4b911c0ac7d03467ff3385e9047e"
+        },
+        "normal": {
+          "byte_count": 186959,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_normal.png",
+          "sha256": "ec340924c0eb640f70549a77003254ec57f323dc669707be03a12211356f8413"
+        },
+        "row_range": [
+          3024,
+          4032
+        ],
+        "source_authority_features": {
+          "byte_count": 5059,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_authority_features.png",
+          "sha256": "673db5dfc849885a803a653d4b74ec8205126311957d13e0a365b1fefc9b8ebb"
+        },
+        "station_range_m": [
+          12096.0,
+          16128.0
+        ],
+        "terrain_height": {
+          "byte_count": 158913,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_height.png",
+          "sha256": "3c7c5ef60defcd4c601660cf6ae462bbb262a87bab046fd961c1268c4657956c"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_03",
+        "vegetation_species_density": {
+          "byte_count": 119046,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_vegetation_species_density.png",
+          "sha256": "1e419f98f13f6a3f9dfa59df515f9cab43a4620fbce55cf1686865f522b3e9b4"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 4523,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_high_runnable_presentation.png",
+              "sha256": "4e7efbf3547f448291379e991a1d2d015471d3d222a9f4f5e59a010d84535a61"
+            },
+            "surface_height": {
+              "byte_count": 9183,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_high_runnable_height.png",
+              "sha256": "51affe9175204a33499ff0e4a4f79e496b722b6a241801d16f5c5b31c34c4994"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2047,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_low_runnable_presentation.png",
+              "sha256": "504b389843e2e6479340fbef8a2bca2755245aa6864cfbe518c8e7d3b11af2dc"
+            },
+            "surface_height": {
+              "byte_count": 10548,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_low_runnable_height.png",
+              "sha256": "078bf236d3967e2ba8376b545c85457fdf9ccaec66f5435286ab1fff132e65ea"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2597,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_median_runnable_presentation.png",
+              "sha256": "a298eec834d9bf22de35bc041b919d9cf169b30e6346faa7ae44a5534605b279"
+            },
+            "surface_height": {
+              "byte_count": 10196,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_median_runnable_height.png",
+              "sha256": "509c1ec23613cf8915c34cc8c7e0d3417439b19c99bd03799dc2c5b9f8c802f9"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1963,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_03_water_vfx_zones.png",
+          "sha256": "834c33164077071806899605d51c644b66f54a41262e174d6087fae26d36a6d0"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 198697,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_ao_roughness_height.png",
+          "sha256": "94956f823fd76d59e827e95a78f5931306e8e3bc9854932fc330700677fa4e0f"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 206034,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_macro_albedo.png",
+          "sha256": "2c9aad45ba42e046923bd7c99d8cee29acee9948f65dde02000263c2f2ba3337"
+        },
+        "material_mask": {
+          "byte_count": 10870,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_material.png",
+          "sha256": "338298d481830022c08f51aff0a066017f0fbf0f0f2d05bca1fc2664b182fef3"
+        },
+        "normal": {
+          "byte_count": 187656,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_normal.png",
+          "sha256": "d9c66985047a712d5e3db7903fc539c02d422055597c4da8be19f50b8ab53481"
+        },
+        "row_range": [
+          4032,
+          5040
+        ],
+        "source_authority_features": {
+          "byte_count": 5019,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_authority_features.png",
+          "sha256": "60c784f1cb6511151387ad94acd7a17850cff4c99d5bed9e1e107c3ced40d574"
+        },
+        "station_range_m": [
+          16128.0,
+          20160.0
+        ],
+        "terrain_height": {
+          "byte_count": 170254,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_height.png",
+          "sha256": "dfdd8200d12d9ef7904880b3ba5fe6e3a16f2bef2989a78ba5fa2dbf56410b20"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_04",
+        "vegetation_species_density": {
+          "byte_count": 85231,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_vegetation_species_density.png",
+          "sha256": "ec0f44b939621d3592d4a94b985b6a62910f2c1c8f988682aae6c3a62c9c714f"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 4954,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_high_runnable_presentation.png",
+              "sha256": "345281ff4da7459f79825d50c41bd8723375586a4f9715a5b363a7cb599a4126"
+            },
+            "surface_height": {
+              "byte_count": 14905,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_high_runnable_height.png",
+              "sha256": "1ae810a637d4f2c516ac918543758f0428e313cd0e54201473355f37dcaa5c7d"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2021,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_low_runnable_presentation.png",
+              "sha256": "40430c4b28e9da26f2dad7aa757a9de0422153345afbdfb850ee59e200c95f06"
+            },
+            "surface_height": {
+              "byte_count": 16648,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_low_runnable_height.png",
+              "sha256": "030acf50b72c6f8c49a6c7cd41d8d6fb6614c9cb054cb4a0ca1ba0fb9cf9f5f2"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2439,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_median_runnable_presentation.png",
+              "sha256": "35ed1d782aa05872616e29c68ace79e79727a12773516629b65780311039d522"
+            },
+            "surface_height": {
+              "byte_count": 16211,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_median_runnable_height.png",
+              "sha256": "55b9affb608bb2f75930779571c223522a090ecef196399e0ee67f7650582aa3"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1982,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_04_water_vfx_zones.png",
+          "sha256": "ec7e2d6a2372bf1c8a8dba3bb51cd1b5378e63c00f085e0586f89839ce7b6c0d"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 203643,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_ao_roughness_height.png",
+          "sha256": "a476460440817967d53c597d73d7b5e46df815653b6011168cacf9d94547b4f8"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 222959,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_macro_albedo.png",
+          "sha256": "9dd86b785e90cac6dcf4e6d828a4f9ba7fdece1c3ed839a571b51f7d15ab0262"
+        },
+        "material_mask": {
+          "byte_count": 15441,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_material.png",
+          "sha256": "d708a1817ef131833cc6d22efb48062546dd2c8787eee43b7be275f75d333dea"
+        },
+        "normal": {
+          "byte_count": 189770,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_normal.png",
+          "sha256": "63623bec00ed8e1d23763d680efdd7062f59115a4465a01904e344c92dfb7a91"
+        },
+        "row_range": [
+          5040,
+          6048
+        ],
+        "source_authority_features": {
+          "byte_count": 5208,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_authority_features.png",
+          "sha256": "3ce9a3b3d7e854bb226ac651a17501b396293a23c24cca834c46288cc4a71e32"
+        },
+        "station_range_m": [
+          20160.0,
+          24192.0
+        ],
+        "terrain_height": {
+          "byte_count": 163443,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_height.png",
+          "sha256": "209e942729c3fc70c4e5f9ca06bf445fad0d1b13b556e536e7cd4ac8711c0108"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_05",
+        "vegetation_species_density": {
+          "byte_count": 122243,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_vegetation_species_density.png",
+          "sha256": "d61695423d90fb07fa165f8681c5585b154f42b4879178e7bfa8d49bf5f69db7"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 4987,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_high_runnable_presentation.png",
+              "sha256": "1a7d178353781b20ce3545acc5015e4946faa40768fa96c3845c86c47574d7d9"
+            },
+            "surface_height": {
+              "byte_count": 14130,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_high_runnable_height.png",
+              "sha256": "3cafe518f0c55cb76b560bb56d6d81048d9117b042bf84b46df242320d36fa29"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2067,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_low_runnable_presentation.png",
+              "sha256": "6d1ba843aae68b29de906ca08a4ce3304d24244aad70085387303170dbf5ece1"
+            },
+            "surface_height": {
+              "byte_count": 15725,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_low_runnable_height.png",
+              "sha256": "152e8ece384c0bfb96e688cc089f997acfcc6efba02a396841470c1bea2467db"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2452,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_median_runnable_presentation.png",
+              "sha256": "857ba20894daf250b06f3875485c692afc883f0707b9753e93bf9e44a835013a"
+            },
+            "surface_height": {
+              "byte_count": 15298,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_median_runnable_height.png",
+              "sha256": "f023b04c2969e0a439d9653eea07f932f00fd31d2f2f3e061a8a1c82d3977847"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1983,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_05_water_vfx_zones.png",
+          "sha256": "1ed5a2f79572dc22a606dd4e00bfc7248d0a76b5d74dae988ea24ea35489125f"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 218076,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_ao_roughness_height.png",
+          "sha256": "2be884805bb64a8cd999b8dcadd039ebf93cd15fb2f9ca3e554579d0c718e3da"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 273585,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_macro_albedo.png",
+          "sha256": "9515202bb3a6e8f0edb7abea61aaa9bc203848e5e8cc238959d0d66c4f792a9b"
+        },
+        "material_mask": {
+          "byte_count": 24684,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_material.png",
+          "sha256": "5bed77775f14d85de8399e6a78caae28413c201063f8d183db807334676f0329"
+        },
+        "normal": {
+          "byte_count": 199916,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_normal.png",
+          "sha256": "96623cf91631f67bdcc3bc9fe74f2e3274a8b90ed496d2adf4ebb4402b3bb54a"
+        },
+        "row_range": [
+          6048,
+          7056
+        ],
+        "source_authority_features": {
+          "byte_count": 8848,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_authority_features.png",
+          "sha256": "4b75f169d968da37cae37cd5fe151fb5f8108562527e14ef63ab53db53d06e3c"
+        },
+        "station_range_m": [
+          24192.0,
+          28224.0
+        ],
+        "terrain_height": {
+          "byte_count": 154411,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_height.png",
+          "sha256": "5bd2fa21381772ee38afeca02102cb59c9840be0dba30993641cfcc2700a0fab"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_06",
+        "vegetation_species_density": {
+          "byte_count": 210695,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_vegetation_species_density.png",
+          "sha256": "850c8f8ced391643f85d71da0c2b70b62f74cc2d1ed1cf810c8fcf4f37d1ff8c"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 9471,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_high_runnable_presentation.png",
+              "sha256": "95ebbfad2d68f8e77d0ab1a1c8dee1c5aa3d244d241d01e1c5e01c22c2c6f2ef"
+            },
+            "surface_height": {
+              "byte_count": 12807,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_high_runnable_height.png",
+              "sha256": "98844e9dfe1eeb54fee7a0ffa0e4e7fc42d1bb72d8d66fea26f822db34f7395f"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 5824,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_low_runnable_presentation.png",
+              "sha256": "556f1bba797a02053828514d3be38041606f31f079b42e4d559e3443947d3a66"
+            },
+            "surface_height": {
+              "byte_count": 14685,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_low_runnable_height.png",
+              "sha256": "1c20576eab25aaed42a8a0167833c8b29c3435849a4e395452400153bea02708"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 6728,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_median_runnable_presentation.png",
+              "sha256": "0de64df8bfe946ff923495bc6dad231753c19dedf94735e5cc2eb7f7a13bdb46"
+            },
+            "surface_height": {
+              "byte_count": 14218,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_median_runnable_height.png",
+              "sha256": "3f80dd3d182b738277d7dc90ce2fed70d29264b358e677f07699af3c36fb431f"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 4022,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_06_water_vfx_zones.png",
+          "sha256": "37a34ca29f796e858226e881d237731af6f21319b807efd6c1c4b0fa8450fcd2"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 215686,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_ao_roughness_height.png",
+          "sha256": "bc8e04159f21f68557f1d53f9f3048e5b4c506601b3fdb562bc8d00e8ee4e6b5"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 277869,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_macro_albedo.png",
+          "sha256": "cc7beb927000e6a658ec3bffc9beae8de0778e6e2bbfaa6cbda8aa8b8e46465d"
+        },
+        "material_mask": {
+          "byte_count": 22097,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_material.png",
+          "sha256": "4eddac5ce0970698eb030ba6170eb8b330455426df08bc75d590adc51c810043"
+        },
+        "normal": {
+          "byte_count": 200583,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_normal.png",
+          "sha256": "64efeab8e44e0205907135ddd554faa6716ae101b39bf16e44cce92002523c61"
+        },
+        "row_range": [
+          7056,
+          8064
+        ],
+        "source_authority_features": {
+          "byte_count": 8699,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_authority_features.png",
+          "sha256": "bf063be54d245679635709f774b66851879ff93d1cbac4199ac66544206ec6c4"
+        },
+        "station_range_m": [
+          28224.0,
+          32256.0
+        ],
+        "terrain_height": {
+          "byte_count": 154600,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_height.png",
+          "sha256": "54e6ec1cf0b13d5afe939de49ce08cb2f8a6c5d43e945d431802f2cb28281fc3"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_07",
+        "vegetation_species_density": {
+          "byte_count": 216887,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_vegetation_species_density.png",
+          "sha256": "1ff7799e673d7503db16fd542bedf62464788fcfbfecd9d4ef5b31c5bafbe6c9"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 9853,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_high_runnable_presentation.png",
+              "sha256": "6b8f9eb8f4a2a49a84f6f6bb67624fc998497c498e4d2f4008107fcaf9b76b01"
+            },
+            "surface_height": {
+              "byte_count": 12738,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_high_runnable_height.png",
+              "sha256": "e0290283c4fedc323ad73ba0e4f5f3c935afac9f8f778c3e305e6d015a41c70b"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 5639,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_low_runnable_presentation.png",
+              "sha256": "8996c8d1963a75e54d6c46116a27fa3240619faf428e64d94e38503cc46e842d"
+            },
+            "surface_height": {
+              "byte_count": 14734,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_low_runnable_height.png",
+              "sha256": "8334509f44df8610663dd63c3c40f6878a5da9a86829caec4557dd5621af8471"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 6908,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_median_runnable_presentation.png",
+              "sha256": "1b4495a338894c72dd5430275e61f1b4e79b791ea10aa05903b1e6b6cdce2b36"
+            },
+            "surface_height": {
+              "byte_count": 14246,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_median_runnable_height.png",
+              "sha256": "ab6f0d5d0f544367ea5541975811b044ec938f37369ae6b74171b6091da4cd46"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 3619,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_07_water_vfx_zones.png",
+          "sha256": "fa5b8ba800687da7de07c1e884c8a641e9de2304e1835279b7d26dcb120e3949"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 203714,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_ao_roughness_height.png",
+          "sha256": "13ce6aa11133f013a4d1410a6ebcc9db342914f6383528572dc7ce33da3bbe62"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 258899,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_macro_albedo.png",
+          "sha256": "19ad74731bf19535468ee244547ae79d8582cab53f4523b114cc7de8fe1a2185"
+        },
+        "material_mask": {
+          "byte_count": 19146,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_material.png",
+          "sha256": "a0afbdae4c887f192cc1c9e59ed4aeda533a678d8065f9b7f39b47f7a81771ef"
+        },
+        "normal": {
+          "byte_count": 186195,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_normal.png",
+          "sha256": "631be24780f3e08b054e5d1e119e20fa6152f090dfaf5fd89fbe6fd338118fa4"
+        },
+        "row_range": [
+          8064,
+          9072
+        ],
+        "source_authority_features": {
+          "byte_count": 5205,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_authority_features.png",
+          "sha256": "20ca8a257e66d39a4d1e1664a0bfe01ff178b799e1a4b61036e7868a2dae48cd"
+        },
+        "station_range_m": [
+          32256.0,
+          36288.0
+        ],
+        "terrain_height": {
+          "byte_count": 157238,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_height.png",
+          "sha256": "08b2d7ca64bae9b664dc04565f5740ba360fe68ae3c74039c2017fdee1d08765"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_08",
+        "vegetation_species_density": {
+          "byte_count": 189123,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_vegetation_species_density.png",
+          "sha256": "77f41fa6d67e6dc9d7289862a0c81802e7377495d5b1625678df7f3c000b428f"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 4904,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_high_runnable_presentation.png",
+              "sha256": "db732677f70f9bfe19ad7feaa09a2900aa33d1290f50fc7c0294e8c240dfa0a8"
+            },
+            "surface_height": {
+              "byte_count": 11462,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_high_runnable_height.png",
+              "sha256": "dd59e0ee143a8a26cc832738365e5c95bf07776de5eda6cff5de72e067e052cb"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2196,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_low_runnable_presentation.png",
+              "sha256": "7fa87254adec021c080c463cf293e76dd5c861244bea3252b1d4ba67b0edd33b"
+            },
+            "surface_height": {
+              "byte_count": 12978,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_low_runnable_height.png",
+              "sha256": "66e9ef88e44ac47bb6a2fd53c1826fefc6b981dd907bc219bc73c9fa4c21f675"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2796,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_median_runnable_presentation.png",
+              "sha256": "8bc162c48741fd9a7da3a2268731ffc07289385440f5fd61f2c6c57690f29cb4"
+            },
+            "surface_height": {
+              "byte_count": 12528,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_median_runnable_height.png",
+              "sha256": "522b5e11ed550450556ade306ecb94379c1b0413bef7415717a42f6dfe76e0f7"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1983,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_08_water_vfx_zones.png",
+          "sha256": "b9238fdd4eeea61c51baae4be81edefc10d464948e1e4b04597b94b18c6c6946"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 198842,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_ao_roughness_height.png",
+          "sha256": "625165e646eccbaac57841d760fec6ed5ba84062edc182bc057580be35238d43"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 243184,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_macro_albedo.png",
+          "sha256": "17f6163a6749aa08617065ac3267e589cbf9c92b9a6489830d3a7e4e180d5a2e"
+        },
+        "material_mask": {
+          "byte_count": 20846,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_material.png",
+          "sha256": "fda8a2b3681099d71fb3cf245718de97743d4e9539f9f923b0dacda5622463fc"
+        },
+        "normal": {
+          "byte_count": 177745,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_normal.png",
+          "sha256": "bd5209237255297fb9d396975bb018d701392c16a2b9fdf969e50bd6f6961f5a"
+        },
+        "row_range": [
+          9072,
+          10080
+        ],
+        "source_authority_features": {
+          "byte_count": 5190,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_authority_features.png",
+          "sha256": "b10b4165a511c94b2aba43ed74cf320f77feaebdbe9837af36d01606ae3450f3"
+        },
+        "station_range_m": [
+          36288.0,
+          40320.0
+        ],
+        "terrain_height": {
+          "byte_count": 160438,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_height.png",
+          "sha256": "9f6c34fb72e5b51b6467f70d1e7ce060464420602f351977a5527fedb5d1126f"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_09",
+        "vegetation_species_density": {
+          "byte_count": 156572,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_vegetation_species_density.png",
+          "sha256": "016197f7fd43b89c249dc490562e67d661f35b0d2e444a05ea85db3eb646a5a0"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 4175,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_high_runnable_presentation.png",
+              "sha256": "b7a3ce3a490652715ba782a43f115d1ccd44a02a04cce8f651f334c6f2cc4268"
+            },
+            "surface_height": {
+              "byte_count": 9121,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_high_runnable_height.png",
+              "sha256": "0fa1098362f23d9856ac1de91076126dcf7924a3fac93ef342c8c263bf656d6f"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2458,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_low_runnable_presentation.png",
+              "sha256": "b198ab853c1e0e5c317cc912f65aa685fc8406fe881d1129efe361f1d1ce3adc"
+            },
+            "surface_height": {
+              "byte_count": 10611,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_low_runnable_height.png",
+              "sha256": "18d994839a246871c22608f25380a885205bd390aee24b18fe9fa2972be62591"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2948,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_median_runnable_presentation.png",
+              "sha256": "c39718feb4f776d96a1438f8dd33d9ca106d3c7b6a3d145ec03af4341319a5f7"
+            },
+            "surface_height": {
+              "byte_count": 10025,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_median_runnable_height.png",
+              "sha256": "1671f0964a4cd746cd0de816b7b43401db8315ed13c1f7d985f5db77ef04f7e5"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 2001,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_09_water_vfx_zones.png",
+          "sha256": "bfaea4321bfa623483b303ae3d1055df42a6143addcc421f8ce744b2367b1837"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 200095,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_ao_roughness_height.png",
+          "sha256": "9f08826e45d6694fda937e6b4037002f9d443cc99b98b4b4c8296617aa578fbe"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 240847,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_macro_albedo.png",
+          "sha256": "abdad83e9defa3be0df59f9e056faf45a619cb2ec3244b10305ea4dd206c03fc"
+        },
+        "material_mask": {
+          "byte_count": 19485,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_material.png",
+          "sha256": "f6f022af112ed15177587f2c5d91bba01708298a36b57e5262e093ea7bb3fb97"
+        },
+        "normal": {
+          "byte_count": 179158,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_normal.png",
+          "sha256": "6c1fa9a9ec868d71a8b90eb6e9ef8fea12c1a380b391354828adfe70237a0ee4"
+        },
+        "row_range": [
+          10080,
+          11088
+        ],
+        "source_authority_features": {
+          "byte_count": 5174,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_authority_features.png",
+          "sha256": "c29bca25fd76abedfc9b97dee5708f967d531bd6bf44daec4fa0d706230e54f5"
+        },
+        "station_range_m": [
+          40320.0,
+          44352.0
+        ],
+        "terrain_height": {
+          "byte_count": 163063,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_height.png",
+          "sha256": "0e5af5deee4b29d8e4c02697b50af1419e75add8211948f64d0805f9be807df4"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_10",
+        "vegetation_species_density": {
+          "byte_count": 137548,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_vegetation_species_density.png",
+          "sha256": "ebd10c87a1e7307ad4dbf418a710247da5dcb19ec5c6bf35b04a0306b5930598"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 3642,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_high_runnable_presentation.png",
+              "sha256": "4ae83e05d6558161af2fb2ec8881d75b9e91a0176b674a9084b145db0d01eb8d"
+            },
+            "surface_height": {
+              "byte_count": 6429,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_high_runnable_height.png",
+              "sha256": "3a2b1e85b9c4a561e8594003fe4bec21bc9ba25f71280a249e70a6dea273dcdc"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2921,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_low_runnable_presentation.png",
+              "sha256": "8ceb58dc58d6f129362e908ac04c4df093a0fad87a47034fdec6f2a04489ac8c"
+            },
+            "surface_height": {
+              "byte_count": 7706,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_low_runnable_height.png",
+              "sha256": "61676720a0762bb052d5e41eb7500f3346c32d928301ea1033777aebb2d568f7"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 3086,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_median_runnable_presentation.png",
+              "sha256": "1bf675722f70514aa048007b94b24192ed8d7040d4494f0456759e0665e3b62e"
+            },
+            "surface_height": {
+              "byte_count": 7172,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_median_runnable_height.png",
+              "sha256": "7ca8e3f03908b89357739b7a53fdf4466d3b055bf86b9a69ae108a81c5f0357b"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1982,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_10_water_vfx_zones.png",
+          "sha256": "6041c403ec8ecb3f87ab03f2e4dd9497a4e3d33d65aa141c4b372ded14099393"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 192552,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_ao_roughness_height.png",
+          "sha256": "94d022ef83e86307128b8cd627a09818fa81eb230d42899110876df74a961f2d"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 188287,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_macro_albedo.png",
+          "sha256": "2a0d9b2c3325180686b3d9434b1d580e419ab33c0f80090e5007233f6f1c6d06"
+        },
+        "material_mask": {
+          "byte_count": 10627,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_material.png",
+          "sha256": "09605b0244523d64fe7fc1ce7333d4aa24c9765e46c03ee5b08de53e6d004ea7"
+        },
+        "normal": {
+          "byte_count": 181979,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_normal.png",
+          "sha256": "d86d93af0297ac23aa53c6865ee337136ce6ca1b372ac3b50b3f04686d0fa93d"
+        },
+        "row_range": [
+          11088,
+          12096
+        ],
+        "source_authority_features": {
+          "byte_count": 5173,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_authority_features.png",
+          "sha256": "72a68428514f7cb6c881d81d30525146ac56b73541b46d00ddacf9a07669b852"
+        },
+        "station_range_m": [
+          44352.0,
+          48384.0
+        ],
+        "terrain_height": {
+          "byte_count": 159768,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_height.png",
+          "sha256": "94e4760f0efec6dd26c3851ccf6a3e7b8131fe825b08bd92d2b252f90dbe3f97"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_11",
+        "vegetation_species_density": {
+          "byte_count": 5327,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_vegetation_species_density.png",
+          "sha256": "123fdfccbf7997e7b21b53f545d8ed78c69c81685c7fb9e2b2c5f8a8ce0ac0e1"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 2748,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_high_runnable_presentation.png",
+              "sha256": "cc42b3d6d5f4dea953a4c1f9af4be785b30231d55d5268bae3627b3c8663ff61"
+            },
+            "surface_height": {
+              "byte_count": 3081,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_high_runnable_height.png",
+              "sha256": "a5d9cc1a2b05e5a2b5ee79cc0d7dbe2352f3e9db825397940a3b7c1197c1eb71"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2810,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_low_runnable_presentation.png",
+              "sha256": "0cbdc0d2a5ab08985bccc5c5a9723f40082cd74a86a015423c4276e27e078715"
+            },
+            "surface_height": {
+              "byte_count": 3648,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_low_runnable_height.png",
+              "sha256": "cb2579566596c358ab985efd9d130f6dce7af831c94cb7e3554d1821cb2d4a6d"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2785,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_median_runnable_presentation.png",
+              "sha256": "0cca652cf6b25f63254a7b6d85fd88f5f0aa40659ca60c3a25c9b6529e96c543"
+            },
+            "surface_height": {
+              "byte_count": 3432,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_median_runnable_height.png",
+              "sha256": "e7073057395320625a583d5dc8d3df29a9c7c78c03e08d976c95923ef0f6b6a2"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1968,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_11_water_vfx_zones.png",
+          "sha256": "e4d3cb25cedb95c52cf4b796e0e130e5e3f2d94d837e0b23348dbb432f9b256b"
+        }
+      },
+      {
+        "ao_roughness_height": {
+          "byte_count": 191885,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_ao_roughness_height.png",
+          "sha256": "c953e3678fe63a1f12ac4575bd5d057845e01bdba9b81946eb4b80660d046e56"
+        },
+        "dimensions": [
+          1009,
+          129
+        ],
+        "macro_albedo": {
+          "byte_count": 187981,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_macro_albedo.png",
+          "sha256": "18efe96888a61428b0010e634ae6813c6f5ee07dbb385ef096062f59dd2c5cd0"
+        },
+        "material_mask": {
+          "byte_count": 10349,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_material.png",
+          "sha256": "a4aa30c0d3793538dc929c64322917f7ea882761ec40bf2def67a2bec962bb82"
+        },
+        "normal": {
+          "byte_count": 181347,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_normal.png",
+          "sha256": "9a93443fd07b4cd0ea3496fadee38d21240f0e086d1958b7d896eb73b0f1bbc8"
+        },
+        "row_range": [
+          11262,
+          12270
+        ],
+        "source_authority_features": {
+          "byte_count": 5271,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_authority_features.png",
+          "sha256": "a1c808ef6062d9ed8629707059597777877883329d373a6e32ef8d37128f9e05"
+        },
+        "station_range_m": [
+          45048.0,
+          49077.732
+        ],
+        "terrain_height": {
+          "byte_count": 158708,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_height.png",
+          "sha256": "38e3ede3d945333827457475c9c000cffa1115f46d028611efa2d2727cabe6d5"
+        },
+        "terrain_height_encoding": {
+          "maximum_elevation_m": 652.171509,
+          "minimum_elevation_m": 121.747681,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "tile_id": "south_fork_12",
+        "vegetation_species_density": {
+          "byte_count": 3225,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_vegetation_species_density.png",
+          "sha256": "6d0aa97461c50bb5cc697da90fa891e4087f3d8a5a146947e1e5d8b76a0d65af"
+        },
+        "water_bands": {
+          "high_runnable": {
+            "presentation": {
+              "byte_count": 2635,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_high_runnable_presentation.png",
+              "sha256": "d21f32a205d1b3fb5e2f79ff9e62f42e533e570374016c662209188b6b1f73d8"
+            },
+            "surface_height": {
+              "byte_count": 2708,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_high_runnable_height.png",
+              "sha256": "ce085c267cfeb95970e39336c6dfb6eefab37d3112d5dc6fa18db1f34b72682f"
+            }
+          },
+          "low_runnable": {
+            "presentation": {
+              "byte_count": 2872,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_low_runnable_presentation.png",
+              "sha256": "6088867547b64d8826414fc63d127f45bfdd79edbe8eaeb2e53910681c04bb32"
+            },
+            "surface_height": {
+              "byte_count": 3149,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_low_runnable_height.png",
+              "sha256": "2d4c12a5026411633c3ef61a717b82f97050b58842d2d9dae784bfd8d530debb"
+            }
+          },
+          "median_runnable": {
+            "presentation": {
+              "byte_count": 2779,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_median_runnable_presentation.png",
+              "sha256": "ce2d5ac31d3d89d64cfd371c81d033bef5ec6ade2853fd5d99666cf043eb65a3"
+            },
+            "surface_height": {
+              "byte_count": 2936,
+              "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_median_runnable_height.png",
+              "sha256": "32594ac72aaf2513c176974fac94a2398129d4e8c8149a9f7d2c469d436ce3fe"
+            }
+          }
+        },
+        "water_height_encoding": {
+          "maximum_elevation_m": 507.034912,
+          "minimum_elevation_m": 126.197678,
+          "uint16_max": 65535,
+          "uint16_min": 0
+        },
+        "water_vfx_zones": {
+          "byte_count": 1982,
+          "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/unreal_tiles/south_fork_12_water_vfx_zones.png",
+          "sha256": "0a312b9601fd4eac47ef4aa725cc948addd8e88cac64d2c7609949789048b585"
+        }
+      }
+    ],
+    "world_partition_map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach"
+  }
+}

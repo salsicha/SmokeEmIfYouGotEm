@@ -31,7 +31,6 @@ from .south_fork_a1_window_source_pulls import (
     _route_coordinates_with_station,
 )
 
-
 PROCEDURAL_GEOGRAPHY_DIRECTORY_RELATIVE_PATH = (
     "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
     "procedural_completion"
@@ -49,11 +48,12 @@ PROCEDURAL_OVERVIEW_RELATIVE_PATH = (
     f"{PROCEDURAL_GEOGRAPHY_DIRECTORY_RELATIVE_PATH}/full_reach_overview.png"
 )
 
-ALGORITHM_VERSION = "south_fork_procedural_geography_v1"
+ALGORITHM_VERSION = "south_fork_procedural_geography_v4_smooth_frames"
 DEFAULT_SEED = 0x5FA49E17
 STATION_SPACING_M = 4.0
 LATERAL_SPACING_M = 4.0
 CORRIDOR_HALF_WIDTH_M = 256.0
+FRAME_SMOOTHING_RADIUS_ROWS = 32
 SEAM_BLEND_M = 64.0
 UNREAL_TILE_ROWS = 1009
 UNREAL_TILE_OVERLAP_ROWS = 1
@@ -81,7 +81,9 @@ def _load_json(repo_root: Path, relative_path: str) -> dict[str, Any]:
 
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
 
 
 def _sha256(path: Path) -> str:
@@ -106,7 +108,7 @@ def _regular_stations(reach_length_m: float) -> np.ndarray:
 
 def _route_grid(
     repo_root: Path, stations_m: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, float]:
     route = _load_json(repo_root, FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH)
     points = _route_coordinates_with_station(route, ADOPTED_ROUTE_FEATURE_ID)
     source_stations = np.asarray(
@@ -119,12 +121,24 @@ def _route_grid(
     unique_stations, unique_indices = np.unique(source_stations, return_index=True)
     x = np.interp(stations_m, unique_stations, xy[unique_indices, 0])
     y = np.interp(stations_m, unique_stations, xy[unique_indices, 1])
-    tangent_x = np.gradient(x, stations_m)
-    tangent_y = np.gradient(y, stations_m)
+    # The adopted route is a piecewise-linear hydrography trace.  Computing
+    # cross-section frames directly from each raw vertex makes a 512 m terrain
+    # strip pivot tens of degrees in one four-metre row.  That creates long,
+    # folded triangles even though the centerline itself is continuous.  Keep
+    # the authoritative centerline positions, but derive its lateral frame from
+    # a 260 m low-pass window so terrain, imagery, water, and collision turn
+    # continuously through bends.
+    frame_x = _moving_average(x, radius=FRAME_SMOOTHING_RADIUS_ROWS)
+    frame_y = _moving_average(y, radius=FRAME_SMOOTHING_RADIUS_ROWS)
+    tangent_x = np.gradient(frame_x, stations_m)
+    tangent_y = np.gradient(frame_y, stations_m)
     tangent_length = np.maximum(np.hypot(tangent_x, tangent_y), 1e-9)
     normal_x = -tangent_y / tangent_length
     normal_y = tangent_x / tangent_length
-    return x, y, normal_x, normal_y
+    epsg3857_length_m = float(np.sum(np.hypot(np.diff(x), np.diff(y))))
+    ground_length_m = float(stations_m[-1] - stations_m[0])
+    epsg3857_to_ground_scale = ground_length_m / max(epsg3857_length_m, 1.0)
+    return x, y, normal_x, normal_y, epsg3857_to_ground_scale
 
 
 def _load_window_manifests(repo_root: Path) -> list[dict[str, Any]]:
@@ -136,13 +150,55 @@ def _load_window_manifests(repo_root: Path) -> list[dict[str, Any]]:
     return sorted(manifests, key=lambda item: float(item["station_range_m"]["start"]))
 
 
-def _load_dem(path: Path) -> np.ndarray:
-    dem = np.asarray(Image.open(path), dtype=np.float32)
+def _effective_raster_bounds(
+    image: Image.Image, requested_bounds: list[float]
+) -> list[float]:
+    """Return the actual georeferenced extent represented by a raster.
+
+    ArcGIS ``exportImage`` preserves square pixels. When a non-square request
+    is written into a square TIFF, the service expands the shorter world axis;
+    the original request bounds therefore no longer describe the returned
+    pixels. GeoTIFF model tags are authoritative when present. The aspect-ratio
+    fallback reproduces the service behavior for imagery without those tags.
+    """
+
+    tie_points = image.tag_v2.get(33922) if hasattr(image, "tag_v2") else None
+    pixel_scale = image.tag_v2.get(33550) if hasattr(image, "tag_v2") else None
+    if tie_points and pixel_scale and len(tie_points) >= 6 and len(pixel_scale) >= 2:
+        minimum_x = float(tie_points[3] - tie_points[0] * pixel_scale[0])
+        maximum_y = float(tie_points[4] + tie_points[1] * pixel_scale[1])
+        maximum_x = minimum_x + image.width * float(pixel_scale[0])
+        minimum_y = maximum_y - image.height * float(pixel_scale[1])
+        return [minimum_x, minimum_y, maximum_x, maximum_y]
+
+    minimum_x, minimum_y, maximum_x, maximum_y = map(float, requested_bounds)
+    center_x = 0.5 * (minimum_x + maximum_x)
+    center_y = 0.5 * (minimum_y + maximum_y)
+    world_units_per_pixel = max(
+        (maximum_x - minimum_x) / max(image.width, 1),
+        (maximum_y - minimum_y) / max(image.height, 1),
+    )
+    half_width = 0.5 * world_units_per_pixel * image.width
+    half_height = 0.5 * world_units_per_pixel * image.height
+    return [
+        center_x - half_width,
+        center_y - half_height,
+        center_x + half_width,
+        center_y + half_height,
+    ]
+
+
+def _load_dem(
+    path: Path, requested_bounds: list[float]
+) -> tuple[np.ndarray, list[float]]:
+    with Image.open(path) as image:
+        dem = np.asarray(image, dtype=np.float32)
+        geotiff_bounds = _effective_raster_bounds(image, requested_bounds)
     finite = np.isfinite(dem)
     if not finite.any():
         raise ValueError(f"DEM contains no finite samples: {path}")
     replacement = float(np.median(dem[finite]))
-    return np.where(finite, dem, replacement).astype(np.float32)
+    return np.where(finite, dem, replacement).astype(np.float32), geotiff_bounds
 
 
 def _bilinear_sample(
@@ -201,15 +257,22 @@ def _sample_window(
     artifacts = manifest["source_artifacts"]
     dem_artifact = artifacts["dem"]
     aerial_artifact = artifacts["aerial"]
-    dem = _load_dem(repo_root / dem_artifact["path"])
+    dem, geotiff_bounds = _load_dem(
+        repo_root / dem_artifact["path"],
+        dem_artifact["source_bounds_epsg3857"],
+    )
     terrain = _bilinear_sample(
-        dem, x, y, dem_artifact["source_bounds_epsg3857"]
+        dem,
+        x,
+        y,
+        geotiff_bounds,
     )
     with Image.open(repo_root / aerial_artifact["path"]) as source_image:
         aerial = np.asarray(source_image.convert("RGB"))
-    vegetation_score = _nearest_rgb_score(
-        aerial, x, y, aerial_artifact["source_bounds_epsg3857"]
-    )
+        aerial_bounds = _effective_raster_bounds(
+            source_image, aerial_artifact["source_bounds_epsg3857"]
+        )
+    vegetation_score = _nearest_rgb_score(aerial, x, y, aerial_bounds)
     return terrain, vegetation_score
 
 
@@ -248,10 +311,11 @@ def _sample_sources(
         downstream_terrain = terrain[selected_indices[-1]].copy()
         upstream_vegetation = vegetation[selected_indices[0]].copy()
         downstream_vegetation = vegetation[selected_indices[-1]].copy()
-        terrain[selected] = upstream_terrain * (1.0 - alpha) + downstream_terrain * alpha
+        terrain[selected] = (
+            upstream_terrain * (1.0 - alpha) + downstream_terrain * alpha
+        )
         vegetation[selected] = np.rint(
-            upstream_vegetation * (1.0 - alpha)
-            + downstream_vegetation * alpha
+            upstream_vegetation * (1.0 - alpha) + downstream_vegetation * alpha
         ).astype(np.uint8)
         seam_blend[selected] = True
     return terrain, vegetation, seam_blend
@@ -263,14 +327,19 @@ def _moving_average(values: np.ndarray, radius: int) -> np.ndarray:
     return np.convolve(padded, kernel, mode="valid")
 
 
-def _condition_water_surface(center_dem: np.ndarray, stations_m: np.ndarray) -> np.ndarray:
+def _condition_water_surface(
+    center_dem: np.ndarray, stations_m: np.ndarray
+) -> np.ndarray:
     smoothed = _moving_average(center_dem.astype(np.float64), radius=32)
     result = np.empty_like(smoothed)
     result[0] = smoothed[0] - 0.35
     for index in range(1, result.size):
         delta_station = max(1e-6, float(stations_m[index] - stations_m[index - 1]))
         minimum_drop = 0.00008 * delta_station
-        maximum_drop = 0.018 * delta_station
+        # The South Fork contains short, steep bedrock reaches. Five percent
+        # allows the conditioned thalweg to follow source terrain through those
+        # drops while the 128 m smoothing window removes DEM spikes.
+        maximum_drop = 0.05 * delta_station
         result[index] = np.clip(
             smoothed[index] - 0.35,
             result[index - 1] - maximum_drop,
@@ -326,6 +395,7 @@ def _generate_boulders(
     normal_x: np.ndarray,
     normal_y: np.ndarray,
     channel_half_width: np.ndarray,
+    epsg3857_to_ground_scale: float,
     seed: int,
 ) -> list[dict[str, Any]]:
     boulders: list[dict[str, Any]] = []
@@ -364,8 +434,20 @@ def _generate_boulders(
                     "radius_m": round(radius, 3),
                     "height_m": round(height, 3),
                     "world_epsg3857_m": [
-                        round(float(center_x[row] + normal_x[row] * lateral), 3),
-                        round(float(center_y[row] + normal_y[row] * lateral), 3),
+                        round(
+                            float(
+                                center_x[row]
+                                + normal_x[row] * lateral / epsg3857_to_ground_scale
+                            ),
+                            3,
+                        ),
+                        round(
+                            float(
+                                center_y[row]
+                                + normal_y[row] * lateral / epsg3857_to_ground_scale
+                            ),
+                            3,
+                        ),
                     ],
                     "authority": "procedural_infill",
                     "seed": int(_stable_seed(seed, str(rapid["name"]))),
@@ -391,7 +473,9 @@ def _apply_rapid_features(
         envelope = np.exp(-0.5 * ((stations_m - station) / 92.0) ** 2)[:, None]
         channel_lateral = np.exp(-0.5 * (lateral_grid / 13.0) ** 2)
         if any("ledge" in tag for tag in tags):
-            ledge = -0.55 * strength * (0.5 + 0.5 * np.tanh((station_grid - station) / 5.0))
+            ledge = (
+                -0.55 * strength * (0.5 + 0.5 * np.tanh((station_grid - station) / 5.0))
+            )
             ledge = (
                 ledge
                 * np.exp(-0.5 * ((station_grid - station) / 65.0) ** 2)
@@ -401,8 +485,16 @@ def _apply_rapid_features(
             bed += np.where(selected, ledge, 0.0).astype(np.float32)
             feature_mask[selected] |= FEATURE_LEDGE
         if any("hole" in tag for tag in tags):
-            control = 0.34 * strength * np.exp(-0.5 * ((station_grid - station + 12.0) / 8.0) ** 2)
-            scour = -0.62 * strength * np.exp(-0.5 * ((station_grid - station - 9.0) / 11.0) ** 2)
+            control = (
+                0.34
+                * strength
+                * np.exp(-0.5 * ((station_grid - station + 12.0) / 8.0) ** 2)
+            )
+            scour = (
+                -0.62
+                * strength
+                * np.exp(-0.5 * ((station_grid - station - 9.0) / 11.0) ** 2)
+            )
             hole = (control + scour) * channel_lateral
             selected = np.abs(hole) > 0.01
             bed += np.where(selected, hole, 0.0).astype(np.float32)
@@ -415,15 +507,21 @@ def _apply_rapid_features(
             feature_mask[selected] |= FEATURE_WAVE_TRAIN
         if "eddy" in tags or "lateral" in tags:
             side = -1.0 if int(rapid["order"]) % 2 else 1.0
-            pocket = -0.32 * strength * envelope * np.exp(
-                -0.5 * ((lateral_grid - side * 16.0) / 7.0) ** 2
+            pocket = (
+                -0.32
+                * strength
+                * envelope
+                * np.exp(-0.5 * ((lateral_grid - side * 16.0) / 7.0) ** 2)
             )
             selected = np.abs(pocket) > 0.01
             bed += np.where(selected, pocket, 0.0).astype(np.float32)
             feature_mask[selected] |= FEATURE_EDDY
         if "shallow_shelf" in tags or "multiple_channels" in tags:
-            shelf = 0.28 * strength * envelope * np.exp(
-                -0.5 * ((np.abs(lateral_grid) - 10.0) / 5.0) ** 2
+            shelf = (
+                0.28
+                * strength
+                * envelope
+                * np.exp(-0.5 * ((np.abs(lateral_grid) - 10.0) / 5.0) ** 2)
             )
             selected = shelf > 0.01
             bed += np.where(selected, shelf, 0.0).astype(np.float32)
@@ -434,8 +532,9 @@ def _apply_rapid_features(
         lateral_radius = max(3.0, float(boulder["radius_m"]) * 1.2)
         influence = float(boulder["height_m"]) * np.exp(
             -0.5 * ((station_grid - float(boulder["station_m"])) / station_radius) ** 2
-            -0.5
-            * ((lateral_grid - float(boulder["lateral_offset_m"])) / lateral_radius) ** 2
+            - 0.5
+            * ((lateral_grid - float(boulder["lateral_offset_m"])) / lateral_radius)
+            ** 2
         )
         selected = influence > 0.01
         bed += np.where(selected, influence, 0.0).astype(np.float32)
@@ -457,9 +556,12 @@ def _build_geography_arrays(
         LATERAL_SPACING_M,
         dtype=np.float32,
     )
-    center_x, center_y, normal_x, normal_y = _route_grid(repo_root, stations_m)
-    world_x = center_x[:, None] + normal_x[:, None] * lateral_offsets_m[None, :]
-    world_y = center_y[:, None] + normal_y[:, None] * lateral_offsets_m[None, :]
+    center_x, center_y, normal_x, normal_y, epsg3857_to_ground_scale = _route_grid(
+        repo_root, stations_m
+    )
+    epsg_lateral_offsets_m = lateral_offsets_m / epsg3857_to_ground_scale
+    world_x = center_x[:, None] + normal_x[:, None] * epsg_lateral_offsets_m[None, :]
+    world_y = center_y[:, None] + normal_y[:, None] * epsg_lateral_offsets_m[None, :]
     manifests = _load_window_manifests(repo_root)
     source_dem, vegetation_score, seam_blend = _sample_sources(
         repo_root, manifests, stations_m, world_x, world_y
@@ -473,7 +575,9 @@ def _build_geography_arrays(
     absolute_lateral = np.abs(lateral_offsets_m)[None, :]
     half_width = channel_half_width[:, None]
     inside_channel = absolute_lateral <= half_width
-    normalized_channel = np.clip(absolute_lateral / np.maximum(half_width, 1.0), 0.0, 1.0)
+    normalized_channel = np.clip(
+        absolute_lateral / np.maximum(half_width, 1.0), 0.0, 1.0
+    )
     depth = 0.05 + center_depth[:, None] * (1.0 - normalized_channel**2) ** 1.15
     channel_bed = water_surface[:, None] - depth
     bank_distance = absolute_lateral - half_width
@@ -491,7 +595,9 @@ def _build_geography_arrays(
     source_authority = np.full(bed.shape, 255, dtype=np.uint8)
     source_authority[inside_channel] = 0
     transition = (~inside_channel) & (bank_distance < bank_blend_width)
-    source_authority[transition] = np.rint(smooth_t[transition] * 255.0).astype(np.uint8)
+    source_authority[transition] = np.rint(smooth_t[transition] * 255.0).astype(
+        np.uint8
+    )
     source_authority[seam_blend, :] = np.minimum(source_authority[seam_blend, :], 192)
     procedural_infill = (255 - source_authority).astype(np.uint8)
     uncertainty = np.full(bed.shape, 45, dtype=np.uint8)
@@ -513,6 +619,7 @@ def _build_geography_arrays(
         normal_x,
         normal_y,
         channel_half_width,
+        epsg3857_to_ground_scale,
         seed,
     )
     _apply_rapid_features(
@@ -556,6 +663,12 @@ def _build_geography_arrays(
         "centerline_epsg3857_y_m": center_y.astype(np.float64),
         "centerline_normal_x": normal_x.astype(np.float32),
         "centerline_normal_y": normal_y.astype(np.float32),
+        "epsg3857_to_ground_scale": np.asarray(
+            epsg3857_to_ground_scale, dtype=np.float64
+        ),
+        "centerline_frame_smoothing_radius_m": np.asarray(
+            FRAME_SMOOTHING_RADIUS_ROWS * STATION_SPACING_M, dtype=np.float64
+        ),
         "source_dem_elevation_m": source_dem,
         "bed_elevation_m": bed,
         "conditioned_water_surface_m": water_surface,
@@ -738,12 +851,42 @@ def write_south_fork_procedural_geography(
     station_steps = np.diff(arrays["stations_m"].astype(np.float64))
     center_bed = arrays["bed_elevation_m"][:, arrays["bed_elevation_m"].shape[1] // 2]
     source_fraction = float(np.mean(arrays["source_authority"]) / 255.0)
+    lateral_grid = np.abs(arrays["lateral_offsets_m"][None, :])
+    bank_sample_mask = (
+        lateral_grid >= arrays["channel_half_width_m"][:, None] + 12.0
+    ) & (lateral_grid <= arrays["channel_half_width_m"][:, None] + 28.0)
+    bank_clearance_m = (
+        arrays["bed_elevation_m"] - arrays["conditioned_water_surface_m"][:, None]
+    )[bank_sample_mask]
+    ground_scale = float(arrays["epsg3857_to_ground_scale"])
+    local_center = (
+        np.column_stack(
+            (
+                arrays["centerline_epsg3857_x_m"],
+                arrays["centerline_epsg3857_y_m"],
+            )
+        )
+        * ground_scale
+    )
+    normals = np.column_stack(
+        (arrays["centerline_normal_x"], arrays["centerline_normal_y"])
+    )
+    left_edge = local_center + normals * CORRIDOR_HALF_WIDTH_M
+    right_edge = local_center - normals * CORRIDOR_HALF_WIDTH_M
+    maximum_corridor_edge_step_m = float(
+        max(
+            np.max(np.linalg.norm(np.diff(left_edge, axis=0), axis=1)),
+            np.max(np.linalg.norm(np.diff(right_edge, axis=0), axis=1)),
+        )
+    )
     feature_counts = {
         "channel": int(np.count_nonzero(arrays["features"] & FEATURE_CHANNEL)),
         "shelf": int(np.count_nonzero(arrays["features"] & FEATURE_SHELF)),
         "boulder": int(np.count_nonzero(arrays["features"] & FEATURE_BOULDER)),
         "ledge": int(np.count_nonzero(arrays["features"] & FEATURE_LEDGE)),
-        "hole_control": int(np.count_nonzero(arrays["features"] & FEATURE_HOLE_CONTROL)),
+        "hole_control": int(
+            np.count_nonzero(arrays["features"] & FEATURE_HOLE_CONTROL)
+        ),
         "wave_train": int(np.count_nonzero(arrays["features"] & FEATURE_WAVE_TRAIN)),
         "eddy": int(np.count_nonzero(arrays["features"] & FEATURE_EDDY)),
         "shoreline_breakup": int(
@@ -778,6 +921,16 @@ def write_south_fork_procedural_geography(
             "never_claim_as_surveyed": True,
             "not_for_navigation": True,
         },
+        "source_sampling": {
+            "dem_extent_authority": (
+                "embedded GeoTIFF ModelTiepointTag and ModelPixelScaleTag"
+            ),
+            "imagery_extent_fallback": (
+                "square-pixel response extent reconstructed from requested center "
+                "and returned aspect ratio"
+            ),
+            "request_bounds_are_not_assumed_to_equal_export_response_bounds": True,
+        },
         "inputs": {
             "stationing": FULL_REACH_ADOPTED_ROUTE_STATIONING_RELATIVE_PATH,
             "route": FULL_REACH_ADOPTED_ROUTE_GEOJSON_RELATIVE_PATH,
@@ -795,6 +948,12 @@ def write_south_fork_procedural_geography(
             "station_spacing_m": STATION_SPACING_M,
             "maximum_station_step_m": round(float(np.max(station_steps)), 6),
             "lateral_spacing_m": LATERAL_SPACING_M,
+            "epsg3857_to_ground_scale": round(
+                float(arrays["epsg3857_to_ground_scale"]), 9
+            ),
+            "centerline_frame_smoothing_radius_m": round(
+                float(arrays["centerline_frame_smoothing_radius_m"]), 3
+            ),
             "lateral_range_m": [
                 float(arrays["lateral_offsets_m"][0]),
                 float(arrays["lateral_offsets_m"][-1]),
@@ -833,7 +992,12 @@ def write_south_fork_procedural_geography(
             "maximum_center_bed_step_m": round(
                 float(np.max(np.abs(np.diff(center_bed)))), 6
             ),
+            "maximum_corridor_edge_step_m": round(maximum_corridor_edge_step_m, 6),
             "no_unbounded_discontinuities": True,
+            "near_bank_clearance_m": {
+                "p05": round(float(np.percentile(bank_clearance_m, 5.0)), 6),
+                "median": round(float(np.median(bank_clearance_m)), 6),
+            },
         },
         "artifacts": {
             "canonical_grid": _artifact_record(repo_root, grid_path),

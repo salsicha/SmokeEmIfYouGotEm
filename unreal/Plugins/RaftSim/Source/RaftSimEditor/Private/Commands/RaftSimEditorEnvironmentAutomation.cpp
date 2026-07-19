@@ -53,6 +53,11 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
         bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
     }
 
+    if (bCreateSouthForkFullReachEnvironmentOnStartup)
+    {
+        bSucceeded &= CreateSouthForkFullReachEnvironment(Summary);
+    }
+
     if (bCreateZambeziBatokaBasaltFamilyOnStartup)
     {
         bSucceeded &= CreateZambeziBatokaBasaltFamily(Summary);
