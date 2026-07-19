@@ -564,13 +564,40 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
     Scenario.initial.wet.nx = Nx;
     Scenario.initial.wet.values.assign(Ny * Nx, 0);
 
-    int64 SeedWetCells = 0;
+    // Vertical datum: the cooked bed carries its absolute DEM elevation (e.g.
+    // ~316 m for Troublemaker), but every river map places the raft, player,
+    // and lighting around z=0. Re-zero the window to a local datum equal to the
+    // mean wet free-surface elevation so the rendered water sits at ~z=0 and the
+    // raft rests on it. Subtracting one constant from bed and eta leaves the
+    // shallow-water dynamics identical (only bed gradients and depth h matter).
+    double SurfaceSum = 0.0;
+    int64 SurfaceSamples = 0;
+    double BedSum = 0.0;
     for (std::size_t Row = 0; Row < Ny; ++Row)
     {
         for (std::size_t Col = 0; Col < Nx; ++Col)
         {
             const int64 Source = (Row0 + static_cast<int64>(Row)) * FullNx + (Col0 + static_cast<int64>(Col));
             const double CellBed = Bed.Float64[Source];
+            BedSum += CellBed;
+            if (WetMask.Bytes[Source] != 0)
+            {
+                SurfaceSum += CellBed + FMath::Max(Depth.Float64[Source], 0.0);
+                ++SurfaceSamples;
+            }
+        }
+    }
+    const double VerticalDatum = SurfaceSamples > 0
+        ? SurfaceSum / static_cast<double>(SurfaceSamples)
+        : BedSum / static_cast<double>(Nx * Ny);
+
+    int64 SeedWetCells = 0;
+    for (std::size_t Row = 0; Row < Ny; ++Row)
+    {
+        for (std::size_t Col = 0; Col < Nx; ++Col)
+        {
+            const int64 Source = (Row0 + static_cast<int64>(Row)) * FullNx + (Col0 + static_cast<int64>(Col));
+            const double CellBed = Bed.Float64[Source] - VerticalDatum;
             const double CellH = FMath::Max(Depth.Float64[Source], 0.0);
             const double CellU = VelU.Float64[Source];
             const double CellV = VelV.Float64[Source];
