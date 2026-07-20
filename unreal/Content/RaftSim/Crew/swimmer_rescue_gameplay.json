@@ -1,54 +1,4 @@
 {
-  "schema": "raftsim.unreal.swimmer_rescue_gameplay.v1",
-  "status": "swimmer_drift_rescue_and_recovery_ready_for_runtime_wiring",
-  "source_manifests": {
-    "crew_overboard_safety_states": "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json",
-    "swimming_skill_assignment": "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json",
-    "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
-    "voice_command_grammar": "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
-  },
-  "runtime_contract": {
-    "module": "RaftSimCrew",
-    "rescue_method_enum": "ERaftSimRescueMethod",
-    "swimmer_frame_struct": "FRaftSimSwimmerRescueFrame",
-    "rescue_attempt_struct": "FRaftSimRescueAttempt",
-    "rescue_library": "URaftSimSwimmerRescueLibrary"
-  },
-  "swimmer_model": {
-    "drift_source": "custom_cxx_water_velocity_sample_plus_swimmer_drag",
-    "visibility_factors": [
-      "distance_from_raft",
-      "foam_or_spray_occlusion",
-      "guide_line_of_sight",
-      "callout_recentness"
-    ],
-    "callout_priorities": [
-      "non_swimmer",
-      "long_time_in_water",
-      "approaching_hazard",
-      "low_visibility"
-    ]
-  },
-  "rescue_methods": [
-    {
-      "method": "reach_grab",
-      "max_distance_m": 1.2,
-      "requires_throw_line": false,
-      "pull_in_seconds": 2.5
-    },
-    {
-      "method": "paddle_grab",
-      "max_distance_m": 2.0,
-      "requires_throw_line": false,
-      "pull_in_seconds": 3.5
-    },
-    {
-      "method": "throw_line",
-      "max_distance_m": 8.0,
-      "requires_throw_line": true,
-      "pull_in_seconds": 6.0
-    }
-  ],
   "input_and_voice_coverage": {
     "input_action_ids": [
       "PaddleStroke",
@@ -71,6 +21,11 @@
       "ReseatCrew",
       "GuideCommandPushToTalk",
       "RecenterVR",
+      "Pause",
+      "CommandWheel",
+      "Scout",
+      "PhotoMode",
+      "AfterActionReview",
       "ReplayScrub",
       "DebugOverlayToggle"
     ],
@@ -89,22 +44,78 @@
       "crew_recovery"
     ]
   },
+  "pass_policy": {
+    "pull_in_reseat_and_failed_rescue_emit_telemetry": true,
+    "reach_paddle_and_throw_line_methods_are_supported": true,
+    "swimmer_drift_is_water_velocity_driven": true,
+    "target_selection_prioritizes_non_swimmers_and_low_visibility": true
+  },
   "recovery_effects": {
+    "failed_rescue_transitions": [
+      "swimming",
+      "failed_rescue"
+    ],
+    "fatigue_delta_on_failure": 0.35,
+    "fatigue_delta_on_success": 0.08,
+    "linked_safety_state_schema": "raftsim.unreal.crew_overboard_safety_states.v1",
+    "non_swimmer_priority_uses_skill_schema": "raftsim.unreal.swimming_skill_assignment.v1",
     "successful_rescue_transitions": [
       "rescue_targeted",
       "rescued",
       "reseated_recovered"
     ],
-    "failed_rescue_transitions": [
-      "swimming",
-      "failed_rescue"
-    ],
-    "fatigue_delta_on_success": 0.08,
-    "fatigue_delta_on_failure": 0.35,
-    "trust_delta_on_success": 0.08,
     "trust_delta_on_failure": -0.25,
-    "non_swimmer_priority_uses_skill_schema": "raftsim.unreal.swimming_skill_assignment.v1",
-    "linked_safety_state_schema": "raftsim.unreal.crew_overboard_safety_states.v1"
+    "trust_delta_on_success": 0.08
+  },
+  "rescue_methods": [
+    {
+      "max_distance_m": 1.2,
+      "method": "reach_grab",
+      "pull_in_seconds": 2.5,
+      "requires_throw_line": false
+    },
+    {
+      "max_distance_m": 2.0,
+      "method": "paddle_grab",
+      "pull_in_seconds": 3.5,
+      "requires_throw_line": false
+    },
+    {
+      "max_distance_m": 8.0,
+      "method": "throw_line",
+      "pull_in_seconds": 6.0,
+      "requires_throw_line": true
+    }
+  ],
+  "runtime_contract": {
+    "module": "RaftSimCrew",
+    "rescue_attempt_struct": "FRaftSimRescueAttempt",
+    "rescue_library": "URaftSimSwimmerRescueLibrary",
+    "rescue_method_enum": "ERaftSimRescueMethod",
+    "swimmer_frame_struct": "FRaftSimSwimmerRescueFrame"
+  },
+  "schema": "raftsim.unreal.swimmer_rescue_gameplay.v1",
+  "source_manifests": {
+    "crew_overboard_safety_states": "unreal/Content/RaftSim/Crew/crew_overboard_safety_states.json",
+    "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+    "swimming_skill_assignment": "unreal/Content/RaftSim/Crew/swimming_skill_assignment.json",
+    "voice_command_grammar": "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+  },
+  "status": "swimmer_drift_rescue_and_recovery_ready_for_runtime_wiring",
+  "swimmer_model": {
+    "callout_priorities": [
+      "non_swimmer",
+      "long_time_in_water",
+      "approaching_hazard",
+      "low_visibility"
+    ],
+    "drift_source": "custom_cxx_water_velocity_sample_plus_swimmer_drag",
+    "visibility_factors": [
+      "distance_from_raft",
+      "foam_or_spray_occlusion",
+      "guide_line_of_sight",
+      "callout_recentness"
+    ]
   },
   "telemetry_fields": [
     "passenger_id",
@@ -122,11 +133,5 @@
     "fatigue_delta",
     "trust_delta",
     "failed_rescue_reason"
-  ],
-  "pass_policy": {
-    "swimmer_drift_is_water_velocity_driven": true,
-    "target_selection_prioritizes_non_swimmers_and_low_visibility": true,
-    "reach_paddle_and_throw_line_methods_are_supported": true,
-    "pull_in_reseat_and_failed_rescue_emit_telemetry": true
-  }
+  ]
 }

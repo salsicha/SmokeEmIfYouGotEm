@@ -9,6 +9,7 @@ BUILD_DIR="$REPO_ROOT/physics/cpp/build-ue"
 cmake -S "$REPO_ROOT/physics/cpp" -B "$BUILD_DIR" \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_OSX_ARCHITECTURES=arm64 \
+  -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
   -DCMAKE_CXX_VISIBILITY_PRESET=hidden
 cmake --build "$BUILD_DIR" --target raftsim_water -j

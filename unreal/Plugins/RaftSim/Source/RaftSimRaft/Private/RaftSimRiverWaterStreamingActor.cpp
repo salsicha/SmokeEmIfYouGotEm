@@ -54,12 +54,8 @@ bool ARaftSimRiverWaterStreamingActor::LoadStreamingManifest()
     {
         return false;
     }
-    FString FullPath = RiverConfig->StreamingManifestPath;
-    if (FPaths::IsRelative(FullPath))
-    {
-        FullPath = FPaths::ConvertRelativePathToFull(
-            FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), FullPath));
-    }
+    const FString FullPath = URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(
+        RiverConfig->StreamingManifestPath);
     FString Text;
     if (!FFileHelper::LoadFileToString(Text, *FullPath))
     {

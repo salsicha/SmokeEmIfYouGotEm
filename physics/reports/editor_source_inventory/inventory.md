@@ -1,8 +1,8 @@
 # RaftSim Editor Source Inventory
 
-Implementation files: **38**.
-Implementation lines: **51461**.
-Registered console commands: **34**.
+Implementation files: **39**.
+Implementation lines: **54480**.
+Registered console commands: **35**.
 
 ## Source Files
 
@@ -11,17 +11,18 @@ Registered console commands: **34**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorEnvironmentCaptures.cpp` | 2274 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorFutaleufuDiagnostics.cpp` | 1589 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Captures/RaftSimEditorPhotorealCaptureDirector.cpp` | 437 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 889 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp` | 469 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp` | 894 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp` | 478 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorAtmosphereAndFoliage.cpp` | 1602 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentBridge.cpp` | 385 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentCatalog.cpp` | 1544 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h` | 2109 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp` | 1884 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReach.cpp` | 2588 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp` | 1323 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorTerrainAuthoring.cpp` | 2819 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorWaterAndBanks.cpp` | 1657 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorCanopyGeometry.cpp` | 2579 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorCanopyGeometry.cpp` | 2591 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorCanopyReviewDirector.cpp` | 2442 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorFoliageInternal.h` | 256 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorProceduralVegetation.cpp` | 2156 |
@@ -33,10 +34,10 @@ Registered console commands: **34**.
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeFoliage.cpp` | 1158 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Landscape/RaftSimEditorLandscapeGeometry.cpp` | 591 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialInstances.cpp` | 612 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp` | 2349 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp` | 2354 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp` | 2630 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp` | 501 |
-| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp` | 1035 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp` | 871 |
+| `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp` | 1065 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp` | 1 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimFeatureTuningEditorShell.cpp` | 196 |
 | `unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimRapidRiverEditorShell.cpp` | 90 |
@@ -58,6 +59,7 @@ Registered console commands: **34**.
 | `RaftSim.CreatePhotorealEnvironmentPreviewMaps` | `CreatePhotorealEnvironmentPreviewMapsConsoleCommand` | `HandleCreatePhotorealEnvironmentPreviewMapsCommand` |
 | `RaftSim.CapturePhotorealEnvironmentPreviews` | `CapturePhotorealEnvironmentPreviewsConsoleCommand` | `HandleCapturePhotorealEnvironmentPreviewsCommand` |
 | `RaftSim.CreateLandscapeImportCandidateMaps` | `CreateLandscapeImportCandidateMapsConsoleCommand` | `HandleCreateLandscapeImportCandidateMapsCommand` |
+| `RaftSim.CreateSouthForkFullReachEnvironment` | `CreateSouthForkFullReachEnvironmentConsoleCommand` | `HandleCreateSouthForkFullReachEnvironmentCommand` |
 | `RaftSim.CaptureZambeziCliffComparison` | `CaptureZambeziCliffComparisonConsoleCommand` | `HandleCaptureZambeziCliffComparisonCommand` |
 | `RaftSim.CreateZambeziBatokaBasaltFamily` | `CreateZambeziBatokaBasaltFamilyConsoleCommand` | `HandleCreateZambeziBatokaBasaltFamilyCommand` |
 | `RaftSim.CaptureZambeziBatokaBasaltCorridorComparison` | `CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand` | `HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand` |
@@ -113,7 +115,15 @@ Registered console commands: **34**.
 - `RaftSimCreateFutaleufuCordilleraCypressVolumetricNearReview`
 - `RaftSimCreateLandscapeImportCandidateMaps`
 - `RaftSimCreatePhotorealEnvironmentPreviewMaps`
+- `RaftSimCreateSouthForkFullReachEnvironment`
 - `RaftSimCreateZambeziBatokaBasaltFamily`
+- `RaftSimDiagnosticHideSouthForkFarField`
+- `RaftSimDiagnosticHideSouthForkWater`
 - `RaftSimExitAfterEnvironmentAutomation`
 - `RaftSimExitAfterPveGeneration`
+- `RaftSimReuseSouthForkDetailedTerrainMeshes`
+- `RaftSimReuseSouthForkFarFieldMeshes`
+- `RaftSimReuseSouthForkFullReachMeshes`
+- `RaftSimReuseSouthForkWaterMeshes`
 - `RaftSimSkipPhotorealFlowVariantCaptures`
+- `RaftSimUseSouthForkVertexMacro`

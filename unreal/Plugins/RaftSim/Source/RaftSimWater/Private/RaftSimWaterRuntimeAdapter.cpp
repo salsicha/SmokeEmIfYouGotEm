@@ -6,6 +6,8 @@ URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 
 #include "Dom/JsonObject.h"
 #include "HAL/FileManager.h"
+#include "HAL/PlatformProcess.h"
+#include "HAL/PlatformTime.h"
 #include "Misc/Crc.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
@@ -23,6 +25,10 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     LastHandoffTransferredCellCount = 0;
     MovingWindowHandoffCount = 0;
     bLastHandoffPreservedState = false;
+    TotalSolverStepMilliseconds = 0.0;
+    LastSolverStepMillisecondsValue = 0.0;
+    MaxSolverStepMilliseconds = 0.0;
+    TimedSolverStepCount = 0;
     RiverCoordinatePoints.Reset();
     RiverSpatialHash.Reset();
     RiverVerticalDatumM = 0.0f;
@@ -45,7 +51,7 @@ bool URaftSimWaterRuntimeAdapter::LoadAcceptedReportManifest(const FString& Mani
     ReportManifestState.ManifestPath = ManifestPath;
 
     FString ManifestText;
-    const FString FullPath = ResolveRepoRelativePath(ManifestPath);
+    const FString FullPath = ResolveRuntimeDataPath(ManifestPath);
     if (!FFileHelper::LoadFileToString(ManifestText, *FullPath))
     {
         Status = ERaftSimWaterRuntimeStatus::Faulted;
@@ -113,7 +119,15 @@ bool URaftSimWaterRuntimeAdapter::StepWater(float DeltaSeconds)
 #if RAFTSIM_HAS_LIVE_SOLVER
     if (LiveWindow.IsValid())
     {
+        const double StartSeconds = FPlatformTime::Seconds();
         LiveWindow->Step(DeltaSeconds);
+        const double ElapsedMilliseconds =
+            (FPlatformTime::Seconds() - StartSeconds) * 1000.0;
+        LastSolverStepMillisecondsValue = ElapsedMilliseconds;
+        TotalSolverStepMilliseconds += ElapsedMilliseconds;
+        MaxSolverStepMilliseconds = FMath::Max(
+            MaxSolverStepMilliseconds, ElapsedMilliseconds);
+        ++TimedSolverStepCount;
     }
 #endif
     SimTimeSeconds += DeltaSeconds;
@@ -175,6 +189,81 @@ bool URaftSimWaterRuntimeAdapter::SampleWaterAtWorldPosition(
     return true;
 }
 
+bool URaftSimWaterRuntimeAdapter::SampleWaterAtRiverCoordinates(
+    FVector2D StationLateralM,
+    FRaftSimWaterSample& OutSample
+) const
+{
+    FRaftSimWaterSample RiverSample;
+    if (!SampleWaterFieldAtRiverCoordinates(StationLateralM, RiverSample))
+    {
+        return false;
+    }
+
+    FVector WorldPositionCm = FVector::ZeroVector;
+    FVector WorldTangent = FVector::ForwardVector;
+    FVector WorldLeftNormal = FVector::RightVector;
+    if (!ResolveRiverBasis(
+            StationLateralM,
+            RiverSample.SurfaceHeightMeters + RiverVerticalDatumM,
+            WorldPositionCm, WorldTangent, WorldLeftNormal))
+    {
+        return false;
+    }
+
+    OutSample = RiverSample;
+    OutSample.WorldPosition = WorldPositionCm;
+    OutSample.VelocityMetersPerSecond =
+        WorldTangent * RiverSample.VelocityMetersPerSecond.X +
+        WorldLeftNormal * RiverSample.VelocityMetersPerSecond.Y;
+    OutSample.SurfaceNormal = (
+        WorldTangent * RiverSample.SurfaceNormal.X +
+        WorldLeftNormal * RiverSample.SurfaceNormal.Y +
+        FVector::UpVector * RiverSample.SurfaceNormal.Z).GetSafeNormal();
+    return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::SampleWaterFieldAtRiverCoordinates(
+    FVector2D StationLateralM,
+    FRaftSimWaterSample& OutSample
+) const
+{
+    if (Status == ERaftSimWaterRuntimeStatus::Uninitialized)
+    {
+        return false;
+    }
+
+#if RAFTSIM_HAS_LIVE_SOLVER
+    if (LiveWindow.IsValid())
+    {
+        const FRaftSimLiveWaterSampleResult Live = LiveWindow->Sample(StationLateralM);
+        if (!Live.bValid)
+        {
+            return false;
+        }
+        OutSample.WorldPosition = FVector::ZeroVector;
+        OutSample.SurfaceHeightMeters = Live.SurfaceHeightM - RiverVerticalDatumM;
+        OutSample.BedHeightMeters = Live.BedHeightM - RiverVerticalDatumM;
+        OutSample.DepthMeters = Live.DepthM;
+        OutSample.VelocityMetersPerSecond = FVector(
+            Live.VelocityMps.X, Live.VelocityMps.Y, 0.0);
+        OutSample.SurfaceNormal = Live.SurfaceNormal;
+        OutSample.bWet = Live.bWet;
+        return true;
+    }
+#endif
+
+    OutSample.WorldPosition = FVector(
+        StationLateralM.X * 100.0f, StationLateralM.Y * 100.0f, 0.0f);
+    OutSample.SurfaceHeightMeters = 0.0f;
+    OutSample.BedHeightMeters = -1.0f;
+    OutSample.DepthMeters = 1.0f;
+    OutSample.VelocityMetersPerSecond = FVector::ZeroVector;
+    OutSample.SurfaceNormal = FVector::UpVector;
+    OutSample.bWet = true;
+    return true;
+}
+
 FIntPoint URaftSimWaterRuntimeAdapter::RiverSpatialHashKey(
     const FVector2D& PositionM) const
 {
@@ -202,7 +291,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
     RiverCoordinateMapPath.Reset();
 
     FString Text;
-    const FString FullPath = ResolveRepoRelativePath(CoordinateMapPath);
+    const FString FullPath = ResolveRuntimeDataPath(CoordinateMapPath);
     if (!FFileHelper::LoadFileToString(Text, *FullPath))
     {
         UE_LOG(LogTemp, Error, TEXT("RaftSim coordinate map not found: %s"), *FullPath);
@@ -418,14 +507,18 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     return true;
 }
 
-bool URaftSimWaterRuntimeAdapter::RiverToWorldPosition(
-    FVector2D StationLateralM, float ElevationM, FVector& OutWorldPositionCm) const
+bool URaftSimWaterRuntimeAdapter::ResolveRiverBasis(
+    FVector2D StationLateralM, float ElevationM,
+    FVector& OutWorldPositionCm, FVector& OutWorldTangent,
+    FVector& OutWorldLeftNormal) const
 {
     if (!HasRiverCoordinateMap())
     {
         OutWorldPositionCm = FVector(
             StationLateralM.X * 100.0, StationLateralM.Y * 100.0,
             (ElevationM - RiverVerticalDatumM) * 100.0);
+        OutWorldTangent = FVector::ForwardVector;
+        OutWorldLeftNormal = FVector::RightVector;
         return true;
     }
     if (StationLateralM.X < RiverCoordinatePoints[0].StationM ||
@@ -455,11 +548,24 @@ bool URaftSimWaterRuntimeAdapter::RiverToWorldPosition(
     const FVector2D Center = FMath::Lerp(A.LocalPositionM, B.LocalPositionM, Alpha);
     const FVector2D LeftNormal = FMath::Lerp(
         A.LeftNormal, B.LeftNormal, Alpha).GetSafeNormal();
+    const FVector2D Tangent(LeftNormal.Y, -LeftNormal.X);
     const FVector2D WorldXYM = Center + LeftNormal * StationLateralM.Y;
     OutWorldPositionCm = FVector(
         WorldXYM.X * 100.0, WorldXYM.Y * 100.0,
         (ElevationM - RiverVerticalDatumM) * 100.0);
+    OutWorldTangent = FVector(Tangent.X, Tangent.Y, 0.0);
+    OutWorldLeftNormal = FVector(LeftNormal.X, LeftNormal.Y, 0.0);
     return true;
+}
+
+bool URaftSimWaterRuntimeAdapter::RiverToWorldPosition(
+    FVector2D StationLateralM, float ElevationM, FVector& OutWorldPositionCm) const
+{
+    FVector WorldTangent;
+    FVector WorldLeftNormal;
+    return ResolveRiverBasis(
+        StationLateralM, ElevationM, OutWorldPositionCm,
+        WorldTangent, WorldLeftNormal);
 }
 
 bool URaftSimWaterRuntimeAdapter::GetRiverStationRangeM(
@@ -509,15 +615,35 @@ void URaftSimWaterRuntimeAdapter::AppendDeterministicCaptureFrame()
         *ReportManifestState.LockHash,
         *CaptureState.LastFrameHash
     );
-    const FString FullPath = ResolveRepoRelativePath(Config.DeterministicCapturePath);
+    const FString FullPath = ResolveRuntimeDataPath(Config.DeterministicCapturePath);
     IFileManager::Get().MakeDirectory(*FPaths::GetPath(FullPath), true);
     FFileHelper::SaveStringToFile(CaptureLine, *FullPath, FFileHelper::EEncodingOptions::AutoDetect, &IFileManager::Get(), FILEWRITE_Append);
 }
 
-FString URaftSimWaterRuntimeAdapter::ResolveRepoRelativePath(const FString& Path) const
+FString URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(const FString& Path)
 {
     if (FPaths::IsRelative(Path))
     {
+        // A self-contained macOS app keeps the project payload under
+        // Contents/UE/<Project>/Binaries/Mac while the Mach-O executable is
+        // under Contents/MacOS. Windows keeps these locations closer, but the
+        // project-binaries candidate is portable across both layouts.
+        const FString PackagedProjectBinaries = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(
+                FPaths::ProjectDir(), TEXT("Binaries"),
+                FPlatformProcess::GetBinariesSubdirectory(),
+                TEXT("RaftSimRuntimeData"), Path));
+        if (FPaths::FileExists(PackagedProjectBinaries) ||
+            FPaths::DirectoryExists(PackagedProjectBinaries))
+        {
+            return PackagedProjectBinaries;
+        }
+        const FString PackagedRelative = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(FPlatformProcess::BaseDir(), TEXT("RaftSimRuntimeData"), Path));
+        if (FPaths::FileExists(PackagedRelative) || FPaths::DirectoryExists(PackagedRelative))
+        {
+            return PackagedRelative;
+        }
         const FString RepoRelative = FPaths::ConvertRelativePathToFull(
             FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), Path)
         );
@@ -559,7 +685,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
 #if RAFTSIM_HAS_LIVE_SOLVER
     FString Error;
     LiveWindow = FRaftSimLiveWaterWindow::CreateFromCookedFields(
-        ResolveRepoRelativePath(CookedFieldsManifestDir), BandId,
+        ResolveRuntimeDataPath(CookedFieldsManifestDir), BandId,
         WindowCenterM, WindowExtentM, RoughnessManning, Error);
     LastHandoffTransferredCellCount = 0;
     bLastHandoffPreservedState = false;
@@ -591,7 +717,7 @@ bool URaftSimWaterRuntimeAdapter::ConfigureMovingRiverWindow(
     FString Error;
     TUniquePtr<FRaftSimLiveWaterWindow> Candidate =
         FRaftSimLiveWaterWindow::CreateFromCookedFields(
-            ResolveRepoRelativePath(CookedFieldsManifestDir), BandId,
+            ResolveRuntimeDataPath(CookedFieldsManifestDir), BandId,
             WindowCenterM, WindowExtentM, RoughnessManning, Error,
             /*bRecenterHydraulicCrux=*/false);
     if (!Candidate.IsValid())
@@ -643,6 +769,12 @@ bool URaftSimWaterRuntimeAdapter::GetLiveWindowStats(FRaftSimWaterLiveWindowStat
         OutStats.SeedWetFraction = static_cast<float>(LiveWindow->SeedWetFraction());
         OutStats.bHasNonFinite = LiveWindow->HasNonFiniteState();
         OutStats.SimTimeSeconds = static_cast<float>(LiveWindow->SimTimeSeconds());
+        OutStats.LastSolverStepMilliseconds =
+            static_cast<float>(LastSolverStepMillisecondsValue);
+        OutStats.AverageSolverStepMilliseconds = TimedSolverStepCount > 0
+            ? static_cast<float>(TotalSolverStepMilliseconds / TimedSolverStepCount)
+            : 0.0f;
+        OutStats.MaxSolverStepMilliseconds = static_cast<float>(MaxSolverStepMilliseconds);
         OutStats.LastHandoffTransferredCellCount = LastHandoffTransferredCellCount;
         OutStats.MovingWindowHandoffCount = MovingWindowHandoffCount;
         OutStats.bLastHandoffPreservedState = bLastHandoffPreservedState;

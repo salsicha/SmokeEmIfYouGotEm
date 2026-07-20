@@ -306,7 +306,7 @@ def test_live_water_adapter_lives_in_water_module_with_manifest_capture_contract
     assert "bEnableRenderInterpolation" in header_text
     assert "LoadAcceptedReportManifest" in cpp_text
     assert "AppendDeterministicCaptureFrame" in cpp_text
-    assert "ResolveRepoRelativePath" in cpp_text
+    assert "ResolveRuntimeDataPath" in cpp_text
 
 
 def test_unreal_regression_fixture_import_matches_generator():

@@ -121,6 +121,15 @@ struct FRaftSimWaterLiveWindowStats
     float SimTimeSeconds = 0.0f;
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float LastSolverStepMilliseconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float AverageSolverStepMilliseconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
+    float MaxSolverStepMilliseconds = 0.0f;
+
+    UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
     int32 LastHandoffTransferredCellCount = 0;
 
     UPROPERTY(BlueprintReadOnly, Category = "RaftSim|Water")
@@ -267,6 +276,28 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
     bool SampleWaterAtWorldPosition(const FVector& WorldPosition, FRaftSimWaterSample& OutSample) const;
 
+    /**
+     * Sample the live solver directly in station/lateral coordinates. This is
+     * the preferred path for river-aligned render meshes and other systems
+     * that already know their authored river coordinates, because it avoids
+     * the substantially more expensive world-to-curved-river inversion.
+     */
+    UFUNCTION(BlueprintCallable, Category = "RaftSim|Water")
+    bool SampleWaterAtRiverCoordinates(
+        FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+
+    /**
+     * Lightweight river-field sample for render grids. Velocity XY and the
+     * surface-normal XY components remain in station/lateral solver space;
+     * callers that cache their curved-world basis can transform them without
+     * repeating coordinate-map searches for every vertex.
+     */
+    bool SampleWaterFieldAtRiverCoordinates(
+        FVector2D StationLateralM, FRaftSimWaterSample& OutSample) const;
+
+    /** Resolve repository-relative source data in editor and staged NonUFS data in builds. */
+    static FString ResolveRuntimeDataPath(const FString& Path);
+
 private:
     UPROPERTY()
     FRaftSimWaterRuntimeConfig Config;
@@ -285,11 +316,13 @@ private:
     int32 LastHandoffTransferredCellCount = 0;
     int32 MovingWindowHandoffCount = 0;
     bool bLastHandoffPreservedState = false;
+    double TotalSolverStepMilliseconds = 0.0;
+    double LastSolverStepMillisecondsValue = 0.0;
+    double MaxSolverStepMilliseconds = 0.0;
+    int32 TimedSolverStepCount = 0;
 
     FString BuildDeterministicFrameHash() const;
     void AppendDeterministicCaptureFrame();
-    FString ResolveRepoRelativePath(const FString& Path) const;
-
     struct FRiverCoordinatePoint
     {
         double StationM = 0.0;
@@ -300,6 +333,10 @@ private:
     static constexpr float RiverSpatialHashCellM = 128.0f;
     FIntPoint RiverSpatialHashKey(const FVector2D& PositionM) const;
     void RebuildRiverSpatialHash();
+    bool ResolveRiverBasis(
+        FVector2D StationLateralM, float ElevationM,
+        FVector& OutWorldPositionCm, FVector& OutWorldTangent,
+        FVector& OutWorldLeftNormal) const;
 
     TArray<FRiverCoordinatePoint> RiverCoordinatePoints;
     TMap<FIntPoint, TArray<int32>> RiverSpatialHash;
