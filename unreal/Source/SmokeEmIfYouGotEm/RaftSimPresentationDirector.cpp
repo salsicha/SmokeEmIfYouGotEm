@@ -120,6 +120,10 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
         SkyLight->GetLightComponent()->SetMobility(EComponentMobility::Movable);
+        // Weather changes alter skylight intensity directly. Recapturing the
+        // entire atmosphere and cloud volume every frame added ~3.7 ms on the
+        // Apple M5 reference machine without a visible gameplay benefit.
+        SkyLight->GetLightComponent()->SetRealTimeCaptureEnabled(false);
     }
     if (HeightFog == nullptr)
     {
@@ -130,6 +134,17 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
     {
         VolumetricCloud = GetWorld()->SpawnActor<AVolumetricCloud>(
             AVolumetricCloud::StaticClass(), FTransform::Identity);
+    }
+    if (VolumetricCloud != nullptr)
+    {
+        if (UVolumetricCloudComponent* Cloud =
+                VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
+        {
+            Cloud->SetViewSampleCountScale(0.083333f);
+            Cloud->SetReflectionViewSampleCountScale(0.4f);
+            Cloud->SetShadowViewSampleCountScale(0.4f);
+            Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
+        }
     }
 }
 
@@ -155,6 +170,10 @@ void ARaftSimPresentationDirector::SetWeatherVariant(
     if (bImmediate)
     {
         CurrentState = TargetState;
+        if (Sun != nullptr)
+        {
+            Sun->SetActorRotation(FRotator(TargetSunPitch, TargetSunYaw, 0.0f));
+        }
         ApplyEnvironmentState();
     }
 }
@@ -186,11 +205,23 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
     if (Sun != nullptr)
     {
         const FRotator CurrentRotation = Sun->GetActorRotation();
-        const float SlowSolarDrift = FMath::Fmod(ElapsedSeconds * 0.004f, 8.0f);
-        Sun->SetActorRotation(FRotator(
-            FMath::FInterpTo(CurrentRotation.Pitch, TargetSunPitch, GetWorld()->GetDeltaSeconds(), 0.5f),
-            FMath::FInterpTo(CurrentRotation.Yaw, TargetSunYaw + SlowSolarDrift, GetWorld()->GetDeltaSeconds(), 0.5f),
-            0.0f));
+        float NewPitch = FMath::FInterpTo(
+            CurrentRotation.Pitch, TargetSunPitch, GetWorld()->GetDeltaSeconds(), 0.5f);
+        float NewYaw = FMath::FInterpTo(
+            CurrentRotation.Yaw, TargetSunYaw, GetWorld()->GetDeltaSeconds(), 0.5f);
+        if (FMath::IsNearlyEqual(NewPitch, TargetSunPitch, 0.02f))
+        {
+            NewPitch = TargetSunPitch;
+        }
+        if (FMath::IsNearlyEqual(NewYaw, TargetSunYaw, 0.02f))
+        {
+            NewYaw = TargetSunYaw;
+        }
+        if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, NewPitch, 0.001f) ||
+            !FMath::IsNearlyEqual(CurrentRotation.Yaw, NewYaw, 0.001f))
+        {
+            Sun->SetActorRotation(FRotator(NewPitch, NewYaw, 0.0f));
+        }
         if (UDirectionalLightComponent* Light = Cast<UDirectionalLightComponent>(Sun->GetLightComponent()))
         {
             Light->SetIntensity(CurrentState.SunIntensity);

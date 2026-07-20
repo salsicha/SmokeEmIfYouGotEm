@@ -1,153 +1,6 @@
 {
-  "schema": "raftsim.unreal.crew_weight_distribution.v1",
-  "status": "crew_seating_weight_shift_and_outcome_modifiers_ready_for_runtime_wiring",
-  "source_manifests": {
-    "crew_seats_roles": "unreal/Content/RaftSim/Network/crew_seats_roles.json",
-    "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
-    "voice_command_grammar": "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json",
-    "contact_response_telemetry": "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json"
-  },
-  "runtime_contract": {
-    "module": "RaftSimCrew",
-    "evaluator": "URaftSimCrewWeightDistributionLibrary::EvaluateWeightDistribution",
-    "input_structs": [
-      "FRaftSimCrewSeatOccupancy",
-      "FRaftSimCrewWeightShiftCommand"
-    ],
-    "output_struct": "FRaftSimCrewWeightDistributionFrame",
-    "solver_consumer": "URaftSimPhysicsBridgeSubsystem"
-  },
-  "seating_model": {
-    "seat_count": 6,
-    "default_passenger_mass_kg": 82.0,
-    "seats": [
-      {
-        "seat_id": "stern_guide",
-        "role": "stern_guide",
-        "local_position_m": [
-          -1.8,
-          0.0,
-          0.45
-        ],
-        "can_be_human": true,
-        "can_ai_fill": false
-      },
-      {
-        "seat_id": "bow_left",
-        "role": "bow_left_paddler",
-        "local_position_m": [
-          1.45,
-          -0.72,
-          0.35
-        ],
-        "can_be_human": true,
-        "can_ai_fill": true
-      },
-      {
-        "seat_id": "bow_right",
-        "role": "bow_right_paddler",
-        "local_position_m": [
-          1.45,
-          0.72,
-          0.35
-        ],
-        "can_be_human": true,
-        "can_ai_fill": true
-      },
-      {
-        "seat_id": "mid_left",
-        "role": "mid_left_paddler",
-        "local_position_m": [
-          0.15,
-          -0.82,
-          0.35
-        ],
-        "can_be_human": true,
-        "can_ai_fill": true
-      },
-      {
-        "seat_id": "mid_right",
-        "role": "mid_right_paddler",
-        "local_position_m": [
-          0.15,
-          0.82,
-          0.35
-        ],
-        "can_be_human": true,
-        "can_ai_fill": true
-      },
-      {
-        "seat_id": "safety_rescue",
-        "role": "safety_rescue",
-        "local_position_m": [
-          -0.85,
-          0.0,
-          0.35
-        ],
-        "can_be_human": true,
-        "can_ai_fill": true
-      }
-    ]
-  },
-  "weight_shift_actions": [
-    {
-      "action_id": "brace",
-      "crew_intent": "crew_brace",
-      "cog_offset_m": [
-        0.0,
-        0.0,
-        -0.12
-      ],
-      "effect": "lowers_center_of_gravity_and_reduces_flip_risk"
-    },
-    {
-      "action_id": "lean_left",
-      "crew_intent": "crew_lean_left",
-      "cog_offset_m": [
-        0.0,
-        -0.28,
-        0.0
-      ],
-      "effect": "moves_center_of_gravity_left_for_angle_and_pin_control"
-    },
-    {
-      "action_id": "lean_right",
-      "crew_intent": "crew_lean_right",
-      "cog_offset_m": [
-        0.0,
-        0.28,
-        0.0
-      ],
-      "effect": "moves_center_of_gravity_right_for_angle_and_pin_control"
-    },
-    {
-      "action_id": "high_side_left",
-      "crew_intent": "crew_high_side_left",
-      "cog_offset_m": [
-        0.0,
-        -0.55,
-        0.08
-      ],
-      "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes"
-    },
-    {
-      "action_id": "high_side_right",
-      "crew_intent": "crew_high_side_right",
-      "cog_offset_m": [
-        0.0,
-        0.55,
-        0.08
-      ],
-      "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes"
-    }
-  ],
   "outcome_coupling": {
     "contact_telemetry_schema": "raftsim.unreal.raft_contact_telemetry.v1",
-    "uses_contact_families": [
-      "pin_release",
-      "surf_flush",
-      "flip"
-    ],
     "outputs": [
       "center_of_gravity_local_m",
       "roll_moment_n_m",
@@ -156,6 +9,100 @@
       "release_assist_modifier",
       "brace_count",
       "high_side_count"
+    ],
+    "uses_contact_families": [
+      "pin_release",
+      "surf_flush",
+      "flip"
+    ]
+  },
+  "pass_policy": {
+    "all_playable_seats_have_mass_and_local_position": true,
+    "brace_lean_and_high_side_shift_center_of_gravity": true,
+    "deterministic_inputs_and_voice_commands_cover_weight_shift_actions": true,
+    "weight_distribution_modifies_pin_flip_release_outcomes": true
+  },
+  "runtime_contract": {
+    "evaluator": "URaftSimCrewWeightDistributionLibrary::EvaluateWeightDistribution",
+    "input_structs": [
+      "FRaftSimCrewSeatOccupancy",
+      "FRaftSimCrewWeightShiftCommand"
+    ],
+    "module": "RaftSimCrew",
+    "output_struct": "FRaftSimCrewWeightDistributionFrame",
+    "solver_consumer": "URaftSimPhysicsBridgeSubsystem"
+  },
+  "schema": "raftsim.unreal.crew_weight_distribution.v1",
+  "seating_model": {
+    "default_passenger_mass_kg": 82.0,
+    "seat_count": 6,
+    "seats": [
+      {
+        "can_ai_fill": false,
+        "can_be_human": true,
+        "local_position_m": [
+          -1.8,
+          0.0,
+          0.45
+        ],
+        "role": "stern_guide",
+        "seat_id": "stern_guide"
+      },
+      {
+        "can_ai_fill": true,
+        "can_be_human": true,
+        "local_position_m": [
+          1.45,
+          -0.72,
+          0.35
+        ],
+        "role": "bow_left_paddler",
+        "seat_id": "bow_left"
+      },
+      {
+        "can_ai_fill": true,
+        "can_be_human": true,
+        "local_position_m": [
+          1.45,
+          0.72,
+          0.35
+        ],
+        "role": "bow_right_paddler",
+        "seat_id": "bow_right"
+      },
+      {
+        "can_ai_fill": true,
+        "can_be_human": true,
+        "local_position_m": [
+          0.15,
+          -0.82,
+          0.35
+        ],
+        "role": "mid_left_paddler",
+        "seat_id": "mid_left"
+      },
+      {
+        "can_ai_fill": true,
+        "can_be_human": true,
+        "local_position_m": [
+          0.15,
+          0.82,
+          0.35
+        ],
+        "role": "mid_right_paddler",
+        "seat_id": "mid_right"
+      },
+      {
+        "can_ai_fill": true,
+        "can_be_human": true,
+        "local_position_m": [
+          -0.85,
+          0.0,
+          0.35
+        ],
+        "role": "safety_rescue",
+        "seat_id": "safety_rescue"
+      }
     ]
   },
   "source_action_coverage": {
@@ -180,6 +127,11 @@
       "ReseatCrew",
       "GuideCommandPushToTalk",
       "RecenterVR",
+      "Pause",
+      "CommandWheel",
+      "Scout",
+      "PhotoMode",
+      "AfterActionReview",
       "ReplayScrub",
       "DebugOverlayToggle"
     ],
@@ -198,10 +150,63 @@
       "crew_recovery"
     ]
   },
-  "pass_policy": {
-    "all_playable_seats_have_mass_and_local_position": true,
-    "brace_lean_and_high_side_shift_center_of_gravity": true,
-    "weight_distribution_modifies_pin_flip_release_outcomes": true,
-    "deterministic_inputs_and_voice_commands_cover_weight_shift_actions": true
-  }
+  "source_manifests": {
+    "contact_response_telemetry": "unreal/Content/RaftSim/Physics/raft_contact_response_telemetry.json",
+    "crew_seats_roles": "unreal/Content/RaftSim/Network/crew_seats_roles.json",
+    "input_actions": "unreal/Content/RaftSim/Input/enhanced_input_actions.json",
+    "voice_command_grammar": "unreal/Content/RaftSim/AI/guide_voice_command_grammar.json"
+  },
+  "status": "crew_seating_weight_shift_and_outcome_modifiers_ready_for_runtime_wiring",
+  "weight_shift_actions": [
+    {
+      "action_id": "brace",
+      "cog_offset_m": [
+        0.0,
+        0.0,
+        -0.12
+      ],
+      "crew_intent": "crew_brace",
+      "effect": "lowers_center_of_gravity_and_reduces_flip_risk"
+    },
+    {
+      "action_id": "lean_left",
+      "cog_offset_m": [
+        0.0,
+        -0.28,
+        0.0
+      ],
+      "crew_intent": "crew_lean_left",
+      "effect": "moves_center_of_gravity_left_for_angle_and_pin_control"
+    },
+    {
+      "action_id": "lean_right",
+      "cog_offset_m": [
+        0.0,
+        0.28,
+        0.0
+      ],
+      "crew_intent": "crew_lean_right",
+      "effect": "moves_center_of_gravity_right_for_angle_and_pin_control"
+    },
+    {
+      "action_id": "high_side_left",
+      "cog_offset_m": [
+        0.0,
+        -0.55,
+        0.08
+      ],
+      "crew_intent": "crew_high_side_left",
+      "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes"
+    },
+    {
+      "action_id": "high_side_right",
+      "cog_offset_m": [
+        0.0,
+        0.55,
+        0.08
+      ],
+      "crew_intent": "crew_high_side_right",
+      "effect": "creates_large_lateral_roll_moment_for_pin_flip_release_outcomes"
+    }
+  ]
 }

@@ -24,7 +24,10 @@ public class SmokeEmIfYouGotEm : ModuleRules
             "InputCore",
             "RaftSimCrew",
             "RaftSimRiver",
+            "Json",
             "ProceduralMeshComponent",
+            "RenderCore",
+            "RHI",
             "Slate",
             "SlateCore"
         });

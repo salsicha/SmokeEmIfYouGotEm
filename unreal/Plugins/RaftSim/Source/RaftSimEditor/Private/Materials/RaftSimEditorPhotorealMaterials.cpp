@@ -72,6 +72,7 @@ static UMaterial* BuildPhotorealRiverWaterMaterial()
     Material->TwoSided = true;
     Material->bTangentSpaceNormal = true;
     Material->SetMaterialUsage(MATUSAGE_Water);
+    Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
 
     auto Add = [Material](UMaterialExpression* E) { Material->GetExpressionCollection().AddExpression(E); return E; };
     auto Scalar = [&](const TCHAR* Name, float V)
@@ -332,6 +333,7 @@ static UMaterial* BuildPhotorealTerrainMaterial()
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = false;
     Material->SetMaterialUsage(MATUSAGE_Nanite);
+    Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
     // WorldAlignedNormal outputs a world-space normal.
     Material->bTangentSpaceNormal = false;
 
@@ -673,6 +675,7 @@ static UMaterial* BuildSolidMaterial(
     Material->GetExpressionCollection().Empty();
     Material->BlendMode = BLEND_Opaque;
     Material->TwoSided = bTwoSided;
+    Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
 
     UMaterialExpressionConstant3Vector* BaseColor = NewObject<UMaterialExpressionConstant3Vector>(Material);
     BaseColor->Constant = Color;
@@ -770,10 +773,13 @@ static bool EnableReviewedEnvironmentMaterialUsages(const TCHAR* ObjectPath)
         return false;
     }
     Material->Modify();
-    const bool bNanite = Material->SetMaterialUsage(MATUSAGE_Nanite);
-    const bool bInstances = Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes);
-    Material->PostEditChange();
-    FAssetCompilingManager::Get().FinishAllCompilation();
+    // UE 5.8's SetUsageByFlag intentionally avoids preview-shader compilation.
+    // The package cooker builds the required platform permutations after these
+    // persisted flags are saved, which keeps this metadata repair deterministic.
+    Material->SetUsageByFlag(MATUSAGE_Nanite, true);
+    Material->SetUsageByFlag(MATUSAGE_InstancedStaticMeshes, true);
+    const bool bNanite = Material->GetUsageByFlag(MATUSAGE_Nanite);
+    const bool bInstances = Material->GetUsageByFlag(MATUSAGE_InstancedStaticMeshes);
 
     UPackage* Package = Material->GetOutermost();
     Package->MarkPackageDirty();
@@ -787,6 +793,40 @@ static bool EnableReviewedEnvironmentMaterialUsages(const TCHAR* ObjectPath)
         TEXT("RaftSim: promoted reviewed material %s Nanite=%d HISM=%d saved=%d"),
         ObjectPath, bNanite ? 1 : 0, bInstances ? 1 : 0, bSaved ? 1 : 0);
     return bNanite && bInstances && bSaved;
+}
+
+static void PromoteReviewedEnvironmentMaterials()
+{
+    for (const TCHAR* MaterialPath : {
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_Bark.M_PineTree01_Bark"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_Needles.M_PineTree01_Needles"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_NeedlesMasked.M_PineTree01_NeedlesMasked"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_TrunkA.M_PineTree01_TrunkA"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_TrunkB.M_PineTree01_TrunkB"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+             "M_PineTree01_TrunkC.M_PineTree01_TrunkC"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
+             "M_TreeSmall02_Trunk.M_TreeSmall02_Trunk"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
+             "M_TreeSmall02_Branches.M_TreeSmall02_Branches"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
+             "M_TreeSmall02_Leaves.M_TreeSmall02_Leaves"),
+        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/"
+             "M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"),
+        TEXT("/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder")})
+    {
+        EnableReviewedEnvironmentMaterialUsages(MaterialPath);
+    }
+}
+
+static void HandlePromoteReviewedEnvironmentMaterials(const TArray<FString>&)
+{
+    PromoteReviewedEnvironmentMaterials();
 }
 
 static void HandleCreatePhotorealMaterials(const TArray<FString>&)
@@ -813,19 +853,7 @@ static void HandleCreatePhotorealMaterials(const TArray<FString>&)
     BuildSolidMaterial(TEXT("M_RaftSim_WeatheredConcrete"), FLinearColor(0.29f, 0.28f, 0.25f, 1.0f), 0.86f, 0.0f);
     BuildSolidMaterial(TEXT("M_RaftSim_RiverBoulder"), FLinearColor(0.34f, 0.30f, 0.23f, 1.0f), 0.88f, 0.0f);
     BuildSprayMistMaterial();
-    for (const TCHAR* MaterialPath : {
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
-             "M_TreeSmall02_Trunk.M_TreeSmall02_Trunk"),
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
-             "M_TreeSmall02_Branches.M_TreeSmall02_Branches"),
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
-             "M_TreeSmall02_Leaves.M_TreeSmall02_Leaves"),
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/"
-             "M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"),
-        TEXT("/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder")})
-    {
-        EnableReviewedEnvironmentMaterialUsages(MaterialPath);
-    }
+    PromoteReviewedEnvironmentMaterials();
 }
 
 static FAutoConsoleCommand GCreatePhotorealMaterialsCommand(
@@ -833,5 +861,11 @@ static FAutoConsoleCommand GCreatePhotorealMaterialsCommand(
     TEXT("Author the photoreal single-layer river-water material "
          "(/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater)."),
     FConsoleCommandWithArgsDelegate::CreateStatic(&HandleCreatePhotorealMaterials));
+
+static FAutoConsoleCommand GPromoteReviewedEnvironmentMaterialsCommand(
+    TEXT("RaftSim.PromoteReviewedEnvironmentMaterials"),
+    TEXT("Save reviewed foliage/rock materials with Nanite and HISM usage enabled."),
+    FConsoleCommandWithArgsDelegate::CreateStatic(
+        &HandlePromoteReviewedEnvironmentMaterials));
 
 } // namespace RaftSimPhotorealMaterials

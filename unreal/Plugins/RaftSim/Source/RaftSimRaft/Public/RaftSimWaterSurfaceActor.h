@@ -56,14 +56,16 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water|Full Reach")
     float CurvedGridRecenterDistanceMeters = 32.0f;
 
-    /** World-space spacing between surface vertices in meters — fine enough for
-     * smooth foam/whitewater edges through the rapid. */
+    /** World-space spacing between surface vertices in meters. The production
+     * hydraulic grid is four metres, so three-metre interpolation preserves
+     * every resolved feature without wastefully oversampling the solver. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
-    float VertexSpacingMeters = 1.5f;
+    float VertexSpacingMeters = 3.0f;
 
-    /** Surface refresh interval (s); the FV field evolves slowly at gameplay scale. */
+    /** Surface refresh interval (s); physics remains fixed-step while this
+     * presentation mesh interpolates the much more slowly changing FV field. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water")
-    float RefreshIntervalSeconds = 1.0f / 30.0f;
+    float RefreshIntervalSeconds = 1.0f / 15.0f;
 
 private:
     void BuildGrid();

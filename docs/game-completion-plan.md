@@ -129,7 +129,7 @@ failures, and retain progress without editor/debug intervention.
 **Exit:** every player action and rapid state has final audiovisual feedback, the mix is
 readable over river noise, and no debug/placeholder presentation remains.
 
-### M8 — Validation, optimization, and content lock *(in progress)*
+### M8 — Validation, optimization, and content lock *(complete July 19, 2026)*
 
 - Convert the rapid review-run catalog into packaged-build regression automation.
 - Run determinism, solver conservation, raft contact, rescue, save, input, accessibility,
@@ -176,8 +176,8 @@ path is verified, and the completion goal can be marked complete.
 | M4 Photoreal environment | Complete | `0032554d` | UE build; M4 3/3; South Fork 144/144; HLOD 20/20 |
 | M5 Characters/raft/rescue | Complete | `3d08efaa` | UE build; M5 4/4; rendered rescue 1/1; P2/P3/crew safety green |
 | M6 Game/progression | Complete | `77ecbf49` | UE build; M6 5/5; isolated Metal menu/HUD; score/save and rescue regressions green |
-| M7 Audio/presentation | Complete | This milestone commit | UE build; M7 4/4; real CoreAudio mix; isolated Metal presentation/full-reach captures; P3 audio and M6 UI regressions green |
-| M8 Validation/performance | In progress | — | Packaged regression, budgets, soak, rights, and content-lock pass next |
+| M7 Audio/presentation | Complete | `223a111f` | UE build; M7 4/4; real CoreAudio mix; isolated Metal presentation/full-reach captures; P3 audio and M6 UI regressions green |
+| M8 Validation/performance | Complete | This milestone commit | Mac package/signature; 60/60 packaged rapid cases; 1080p High/75% p95 15.331 ms, zero hitches; M8 3/3; physics 1,040/3 |
 | M9 Release candidates | Pending | — | — |
 | M10 Launch | Pending | — | — |
 
@@ -392,3 +392,40 @@ path is verified, and the completion goal can be marked complete.
   `RaftSim.M6.RuntimeShell` remained green. The World Partition fixture remains sorted
   last in combined automation, and rendered fixtures remain isolated to avoid the known
   engine-internal PIE/viewport teardown race documented in M6.
+
+### July 19, 2026 — M8 complete
+
+- Staged the complete JSON/GeoJSON/NumPy runtime-data tree into packaged builds and added
+  a package-aware resolver, so the shipping C++ water solver loads the same hash-checked
+  South Fork hydraulic fields as editor validation. The final app contains 611 staged
+  runtime-data files, boots without repository access, and reports no missing runtime
+  data, material fallback, deployment, or linker warnings during cook.
+- Converted the 20-rapid catalog into an in-package 60-case regression across all three
+  flow bands. The final Mac Development package passed 60/60 with the compiled live
+  solver, deterministic repeat checks, accepted field hashes, and rapid feature
+  envelopes; worst case-average solver cost was 0.359 ms and worst individual step was
+  0.401 ms against the 1.6 ms budget.
+- Removed per-tick gameplay JSON capture, added direct curvilinear field sampling, kept
+  water/raft physics at 60/120 Hz, refreshed visible water at 15 Hz on a 3 m mesh, and
+  instrumented solver, game, render, GPU, wall-clock, hitch, resolution, quality, and
+  memory measurements. Accurate live-water swimmer drift exposed a stale capsize-point
+  re-flip assumption; re-flip now occurs at the guide's current downstream position and
+  the isolated flip/reseat regression passes again.
+- A delayed packaged GPU profile isolated stock volumetric-cloud tracing and real-time
+  skylight capture as the dominant costs. Bounded temporally reconstructed cloud samples,
+  a cached skylight, and stable sun transforms retain volumetric weather while meeting
+  the frame budget. The exact final package passed a 30-second 1920x1080 High/75% soak
+  on Apple M5: 2,071 frames, 15.331 ms workload p95, 15.915 ms wall-clock p95, zero
+  hitches above 33 ms, 0.286 ms average solver time, 0.614 ms maximum solver step, and
+  6,119.6 MB peak used physical memory.
+- Disabled OpenXR for the flat-screen 1.0 scope, persisted production material usage
+  flags, explicitly cooked all release maps, verified the final self-contained app's
+  ad-hoc development signature, and locked source/procedural/rights/release-scope facts in
+  `Content/RaftSim/Production/m8_content_lock_manifest.json`. Procedural geography remains
+  seeded, labeled, not surveyed, and not for navigation.
+- Verification: final Mac package and signature valid; final packaged rapid regression
+  60/60; final `RaftSim.M8` automation 3/3; isolated live-water flip/reseat regression
+  green; repository guards green; full physics/content suite 1,040 passed with 3 expected
+  optional PyClaw/GeoClaw dependency-path skips. M2 Pro, RTX 3060/4070, Windows/Proton,
+  and named human guide/geospatial/art/legal signoff were unavailable locally and remain
+  explicit M10 acceptance exceptions rather than fabricated completions.

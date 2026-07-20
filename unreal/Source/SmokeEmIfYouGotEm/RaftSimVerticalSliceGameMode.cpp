@@ -3,6 +3,7 @@
 #include "EngineUtils.h"
 #include "RaftSimGuidePawn.h"
 #include "RaftSimGuidePlayerController.h"
+#include "RaftSimContentLockDirector.h"
 #include "RaftSimPresentationDirector.h"
 #include "RaftSimRunAudioDirector.h"
 #include "RaftSimRunManager.h"
@@ -20,6 +21,13 @@ ARaftSimVerticalSliceGameMode::ARaftSimVerticalSliceGameMode()
 void ARaftSimVerticalSliceGameMode::BeginPlay()
 {
     Super::BeginPlay();
+
+    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested())
+    {
+        GetWorld()->SpawnActor<ARaftSimContentLockDirector>(
+            ARaftSimContentLockDirector::StaticClass(), FTransform::Identity);
+        return;
+    }
 
     ERaftSimGameMode SessionMode = ERaftSimGameMode::FreeRun;
     FRaftSimCareerScenarioDefinition SessionScenario;
@@ -96,6 +104,12 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
     {
         GetWorld()->SpawnActor<ARaftSimRunAudioDirector>(
             ARaftSimRunAudioDirector::StaticClass(), FTransform::Identity);
+    }
+
+    if (ARaftSimContentLockDirector::IsPerformanceCaptureRequested())
+    {
+        GetWorld()->SpawnActor<ARaftSimContentLockDirector>(
+            ARaftSimContentLockDirector::StaticClass(), FTransform::Identity);
     }
 }
 

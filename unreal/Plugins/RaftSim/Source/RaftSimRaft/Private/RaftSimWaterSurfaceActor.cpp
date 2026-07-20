@@ -281,8 +281,12 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
             if (WaterAdapter != nullptr)
             {
                 FRaftSimWaterSample Sample;
-                if (WaterAdapter->SampleWaterAtWorldPosition(
-                        FVector(V.X, V.Y, 0.0f), Sample))
+                const bool bSampled = bUsesCurvedRiverCoordinates
+                    ? WaterAdapter->SampleWaterFieldAtRiverCoordinates(
+                        RiverCoordinatesM[Index], Sample)
+                    : WaterAdapter->SampleWaterAtWorldPosition(
+                        FVector(V.X, V.Y, 0.0f), Sample);
+                if (bSampled)
                 {
                     if (Sample.bWet)
                     {
@@ -290,7 +294,20 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                         // live solver patch. A 2 cm presentation lift prevents
                         // depth fighting without changing any physics sample.
                         SurfaceZCm = Sample.SurfaceHeightMeters * kSurfCmPerM + 2.0f;
-                        NormalOut = Sample.SurfaceNormal.GetSafeNormal();
+                        if (bUsesCurvedRiverCoordinates)
+                        {
+                            const FVector FlowTangent = Tangents[Index].TangentX;
+                            const FVector LeftNormal(
+                                -FlowTangent.Y, FlowTangent.X, 0.0f);
+                            NormalOut = (
+                                FlowTangent * Sample.SurfaceNormal.X +
+                                LeftNormal * Sample.SurfaceNormal.Y +
+                                FVector::UpVector * Sample.SurfaceNormal.Z).GetSafeNormal();
+                        }
+                        else
+                        {
+                            NormalOut = Sample.SurfaceNormal.GetSafeNormal();
+                        }
                         const float Speed = Sample.VelocityMetersPerSecond.Size2D();
                         const float Depth = FMath::Max(Sample.DepthMeters, 0.05f);
                         // Froude number = speed / sqrt(g * depth). Foam only where

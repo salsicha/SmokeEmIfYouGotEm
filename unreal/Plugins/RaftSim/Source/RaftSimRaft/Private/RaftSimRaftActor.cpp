@@ -98,6 +98,10 @@ void ARaftSimRaftActor::BeginPlay()
     // not the genuine-solver window, so the gate requirement is disabled.
     FRaftSimWaterRuntimeConfig WaterConfig;
     WaterConfig.bRequireAcceptedReportManifest = false;
+    // Deterministic stepping and replay hashes remain available, but gameplay
+    // must not append a JSON line to disk on every fixed water tick. Validation
+    // tools opt into capture explicitly when they need an audit artifact.
+    WaterConfig.bEnableDeterministicCapture = false;
 
     FRaftSimRaftBodyConfig BodyConfig;
     BodyConfig.Runtime = ERaftSimRaftDynamicsRuntime::CustomReducedRigidBody;
@@ -1213,11 +1217,27 @@ void ARaftSimRaftActor::RequestReflip()
     {
         return;
     }
-    // Re-right the hull at the capsize location (the guide flips the boat
-    // among the crew), drain retained water, and begin reseating swimmers.
+    // The guide and boat continue downstream after a capsize. Re-right the
+    // hull where the guide is now swimming instead of teleporting it back to
+    // the stale capsize point; this keeps the crew reachable when the live
+    // hydraulic field carries them through fast current.
+    FVector ReflipLocation = CapsizeLocation;
+    const int32 GuideIndex = FindSwimmerIndex(TEXT("guide"));
+    if (Swimmers.IsValidIndex(GuideIndex))
+    {
+        const FVector GuideWorldCm =
+            Swimmers[GuideIndex].SwimmerWorldPositionMeters * kCmPerM;
+        if (IsFiniteVector(GuideWorldCm))
+        {
+            ReflipLocation.X = GuideWorldCm.X;
+            ReflipLocation.Y = GuideWorldCm.Y;
+        }
+    }
+
+    // Drain retained water and begin reseating swimmers around the guide.
     RaftMode = ERaftSimRaftMode::Recovering;
     SetActorLocationAndRotation(
-        CapsizeLocation, FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
+        ReflipLocation, FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
     if (RaftAdapter != nullptr)
     {
         RaftAdapter->ResetFlexiblePersistentState();

@@ -30,4 +30,5 @@ class SMOKEEMIFYOUGOTEM_API ARaftSimBootGameMode : public AGameModeBase
 
 public:
     ARaftSimBootGameMode();
+    virtual void BeginPlay() override;
 };

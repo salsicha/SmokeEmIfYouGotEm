@@ -20,8 +20,6 @@
   },
   "enabled_project_plugins": [
     "EnhancedInput",
-    "OpenXR",
-    "OpenXRHandTracking",
     "Niagara",
     "PCG",
     "ProceduralVegetationEditor",

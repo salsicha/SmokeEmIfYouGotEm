@@ -15,11 +15,11 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 889
+      "line_count": 894
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
-      "line_count": 469
+      "line_count": 478
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorAtmosphereAndFoliage.cpp",
@@ -42,6 +42,10 @@
       "line_count": 1884
     },
     {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReach.cpp",
+      "line_count": 2588
+    },
+    {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp",
       "line_count": 1323
     },
@@ -55,7 +59,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorCanopyGeometry.cpp",
-      "line_count": 2579
+      "line_count": 2591
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Foliage/RaftSimEditorCanopyReviewDirector.cpp",
@@ -103,7 +107,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp",
-      "line_count": 2349
+      "line_count": 2354
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
@@ -111,11 +115,11 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
-      "line_count": 501
+      "line_count": 871
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
-      "line_count": 1035
+      "line_count": 1065
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp",
@@ -154,9 +158,9 @@
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 38,
-  "implementation_line_count": 51461,
-  "registered_console_command_count": 34,
+  "implementation_file_count": 39,
+  "implementation_line_count": 54480,
+  "registered_console_command_count": 35,
   "registered_console_commands": [
     {
       "command": "RaftSim.OpenTool",
@@ -192,6 +196,11 @@
       "command": "RaftSim.CreateLandscapeImportCandidateMaps",
       "member": "CreateLandscapeImportCandidateMapsConsoleCommand",
       "handler": "HandleCreateLandscapeImportCandidateMapsCommand"
+    },
+    {
+      "command": "RaftSim.CreateSouthForkFullReachEnvironment",
+      "member": "CreateSouthForkFullReachEnvironmentConsoleCommand",
+      "handler": "HandleCreateSouthForkFullReachEnvironmentCommand"
     },
     {
       "command": "RaftSim.CaptureZambeziCliffComparison",
@@ -344,10 +353,18 @@
     "RaftSimCreateFutaleufuCordilleraCypressVolumetricNearReview",
     "RaftSimCreateLandscapeImportCandidateMaps",
     "RaftSimCreatePhotorealEnvironmentPreviewMaps",
+    "RaftSimCreateSouthForkFullReachEnvironment",
     "RaftSimCreateZambeziBatokaBasaltFamily",
+    "RaftSimDiagnosticHideSouthForkFarField",
+    "RaftSimDiagnosticHideSouthForkWater",
     "RaftSimExitAfterEnvironmentAutomation",
     "RaftSimExitAfterPveGeneration",
-    "RaftSimSkipPhotorealFlowVariantCaptures"
+    "RaftSimReuseSouthForkDetailedTerrainMeshes",
+    "RaftSimReuseSouthForkFarFieldMeshes",
+    "RaftSimReuseSouthForkFullReachMeshes",
+    "RaftSimReuseSouthForkWaterMeshes",
+    "RaftSimSkipPhotorealFlowVariantCaptures",
+    "RaftSimUseSouthForkVertexMacro"
   ],
   "river_build_targets": [
     {

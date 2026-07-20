@@ -1,0 +1,128 @@
+{
+  "schema": "raftsim.m8.content_lock.v1",
+  "generated_utc": "2026-07-20T01:05:00Z",
+  "milestone": "M8_validation_optimization_and_content_lock",
+  "passed": true,
+  "pass_basis": "All locally executable content-lock gates pass. Hardware and human-review lanes unavailable in this workspace are explicit exceptions carried into M10 acceptance, not represented as completed reviews.",
+  "rapid_count": 20,
+  "rapid_flow_case_count": 60,
+  "packaged_rapid_regression": {
+    "platform": "Mac",
+    "build_configuration": "Development",
+    "running_from_packaged_build": true,
+    "live_solver_compiled": true,
+    "passed_case_count": 60,
+    "max_case_average_solver_ms": 0.3591667115688324,
+    "max_single_solver_step_ms": 0.40075182914733887,
+    "solver_budget_ms": 1.600000023841858,
+    "passed": true
+  },
+  "full_reach_performance": {
+    "platform": "Mac",
+    "cpu": "Apple M5",
+    "gpu": "Apple M5",
+    "output_resolution": [
+      1920,
+      1080
+    ],
+    "scalability": "High",
+    "screen_percentage": 75.0,
+    "volumetric_weather_enabled": true,
+    "capture_seconds": 30.0,
+    "warmup_seconds": 10.0,
+    "sampled_frame_count": 2071,
+    "frame_time_definition": "max(game_thread,render_thread,gpu)",
+    "mean_frame_ms": 14.515609741210938,
+    "p95_frame_ms": 15.3306245803833,
+    "max_frame_ms": 22.096208572387695,
+    "p95_wall_clock_frame_ms": 15.914667129516602,
+    "hitches_over_33ms": 0,
+    "p95_game_thread_ms": 2.7803332805633545,
+    "p95_render_thread_ms": 15.310916900634766,
+    "p95_gpu_ms": 15.191916465759277,
+    "average_solver_step_ms": 0.2863904535770416,
+    "max_solver_step_ms": 0.6138347387313843,
+    "peak_used_physical_mb": 6119.58203125,
+    "frame_budget_ms": 16.66666603088379,
+    "solver_budget_ms": 1.600000023841858,
+    "memory_budget_mb": 8192.0,
+    "passed": true
+  },
+  "optimization_lock": {
+    "water_surface_vertex_spacing_m": 3.0,
+    "hydraulic_source_grid_spacing_m": 4.0,
+    "water_surface_refresh_hz": 15.0,
+    "water_and_raft_physics_hz": [
+      60,
+      120
+    ],
+    "cloud_primary_sample_cap": 8,
+    "cloud_temporal_reconstruction": true,
+    "realtime_skylight_recapture": false,
+    "reason": "A delayed packaged GPU profile isolated 9.389 ms of stock volumetric-cloud tracing and 3.670 ms of per-frame cloud skylight capture. Bounded temporal cloud tracing and cached skylight restore the 1080p60 budget while retaining deterministic volumetric weather."
+  },
+  "packaging": {
+    "target": "Mac Apple Silicon",
+    "package_self_contained": true,
+    "staged_runtime_data_file_count": 611,
+    "total_loose_staged_file_count": 647,
+    "cook_project_material_fallback_warnings": 0,
+    "cook_missing_runtime_data_warnings": 0,
+    "cook_deployment_or_linker_warnings": 0,
+    "maps_explicitly_cooked": true,
+    "passed": true
+  },
+  "content_authority": {
+    "terrain_and_geography": {
+      "source_conditioned_where_available": true,
+      "procedural_infill_where_missing": true,
+      "procedural_seed_recorded": true,
+      "full_reach_continuous": true,
+      "procedural_infill_explicitly_labelled": true,
+      "never_claimed_as_surveyed": true,
+      "not_for_navigation": true
+    },
+    "hydraulics": {
+      "authoritative_runtime": "deterministic finite-volume C++ shallow-water solver",
+      "accepted_field_hashes_verified": true,
+      "named_rapid_feature_envelopes_verified": true
+    },
+    "rights_and_attribution": {
+      "release_files": [
+        "LICENSE",
+        "LICENSE-CONTENT.md",
+        "NOTICE.md",
+        "CREDITS.md"
+      ],
+      "inventory_present": true,
+      "automated_checks_passed": true
+    }
+  },
+  "release_scope": {
+    "single_player": true,
+    "flat_screen": true,
+    "vr_1_0": false,
+    "openxr_disabled": true,
+    "multiplayer_deferred": true
+  },
+  "explicit_exceptions": [
+    {
+      "id": "m2_pro_target_capture",
+      "status": "not_executed_hardware_unavailable",
+      "release_blocking_at": "M10",
+      "local_evidence": "Apple M5 1920x1080 High/75% packaged capture passes the fixed 16.667 ms p95 budget."
+    },
+    {
+      "id": "rtx_3060_and_rtx_4070_target_capture",
+      "status": "not_executed_hardware_unavailable",
+      "release_blocking_at": "M10",
+      "local_evidence": "Windows packaging and GPU capture require a Windows/RTX runner."
+    },
+    {
+      "id": "human_guide_geospatial_art_and_legal_signoff",
+      "status": "pending_named_reviewers",
+      "release_blocking_at": "M10",
+      "local_evidence": "Automated source, procedural-authority, hazard, material, cook, attribution-file, and rapid-envelope checks pass; no human approval is fabricated."
+    }
+  ]
+}

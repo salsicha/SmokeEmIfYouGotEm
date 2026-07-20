@@ -951,7 +951,7 @@ void AddSouthForkLighting(UWorld* World)
         Sky->SetActorLabel(TEXT("RaftSim_SouthFork_SkyLight"));
         Sky->GetLightComponent()->SetIntensity(0.82f);
         Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
-        Sky->GetLightComponent()->SetRealTimeCaptureEnabled(true);
+        Sky->GetLightComponent()->SetRealTimeCaptureEnabled(false);
         SetSpatiallyLoadedIfAllowed(Sky, false);
     }
     ASkyAtmosphere* Atmosphere = World->SpawnActor<ASkyAtmosphere>(
@@ -976,6 +976,14 @@ void AddSouthForkLighting(UWorld* World)
     if (Clouds)
     {
         Clouds->SetActorLabel(TEXT("RaftSim_SouthFork_SeasonalClouds"));
+        if (UVolumetricCloudComponent* Cloud =
+                Clouds->FindComponentByClass<UVolumetricCloudComponent>())
+        {
+            Cloud->SetViewSampleCountScale(0.083333f);
+            Cloud->SetReflectionViewSampleCountScale(0.4f);
+            Cloud->SetShadowViewSampleCountScale(0.4f);
+            Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
+        }
         SetSpatiallyLoadedIfAllowed(Clouds, false);
     }
     APostProcessVolume* Post = World->SpawnActor<APostProcessVolume>(

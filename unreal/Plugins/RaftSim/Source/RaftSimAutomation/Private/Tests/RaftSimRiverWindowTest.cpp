@@ -304,6 +304,40 @@ bool FRaftSimCurvedRiverCoordinateMapTest::RunTest(const FString&)
         FVector::DotProduct(Water.VelocityMetersPerSecond, Tangent) > 0.0f);
     TestTrue(TEXT("rotated water surface normal is unit length"), Water.SurfaceNormal.IsUnit(1.0e-3f));
 
+    FRaftSimWaterSample DirectWater;
+    TestTrue(
+        TEXT("river-coordinate probe samples without inverse projection"),
+        Adapter->SampleWaterAtRiverCoordinates(FVector2D(5000.0, 0.0), DirectWater));
+    TestTrue(TEXT("direct curved probe is wet"), DirectWater.bWet);
+    TestTrue(
+        TEXT("direct and world probes agree on depth"),
+        FMath::IsNearlyEqual(DirectWater.DepthMeters, Water.DepthMeters, 1.0e-4f));
+    TestTrue(
+        TEXT("direct and world probes agree on velocity"),
+        DirectWater.VelocityMetersPerSecond.Equals(
+            Water.VelocityMetersPerSecond, 1.0e-4f));
+    TestTrue(
+        TEXT("direct probe reports its curved world location"),
+        DirectWater.WorldPosition.Equals(
+            FVector(WetWorldPosition.X, WetWorldPosition.Y,
+                DirectWater.SurfaceHeightMeters * 100.0f),
+            0.1f));
+
+    FRaftSimWaterSample FieldWater;
+    TestTrue(
+        TEXT("lightweight river-field probe samples without a world-basis lookup"),
+        Adapter->SampleWaterFieldAtRiverCoordinates(
+            FVector2D(5000.0, 0.0), FieldWater));
+    TestTrue(
+        TEXT("field and transformed probes agree on speed"),
+        FMath::IsNearlyEqual(
+            FieldWater.VelocityMetersPerSecond.Size(),
+            DirectWater.VelocityMetersPerSecond.Size(), 1.0e-4f));
+    TestTrue(
+        TEXT("field and transformed probes agree on depth"),
+        FMath::IsNearlyEqual(
+            FieldWater.DepthMeters, DirectWater.DepthMeters, 1.0e-4f));
+
     FVector OutsideWorldPosition;
     TestTrue(
         TEXT("outside-bank coordinate still maps to world"),
@@ -312,6 +346,9 @@ bool FRaftSimCurvedRiverCoordinateMapTest::RunTest(const FString&)
     TestFalse(
         TEXT("outside the finite live crop does not create fallback water"),
         Adapter->SampleWaterAtWorldPosition(OutsideWorldPosition, Water));
+    TestFalse(
+        TEXT("direct probe outside the finite crop does not create fallback water"),
+        Adapter->SampleWaterAtRiverCoordinates(FVector2D(5000.0, 180.0), Water));
     return true;
 #endif // RAFTSIM_HAS_LIVE_SOLVER
 }

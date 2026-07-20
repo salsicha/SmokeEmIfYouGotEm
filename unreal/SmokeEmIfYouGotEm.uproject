@@ -2,7 +2,7 @@
   "FileVersion": 3,
   "EngineAssociation": "5.8",
   "Category": "Simulation",
-  "Description": "Photorealistic white water rafting simulator with custom shallow-water physics, hybrid raft/contact runtime evaluation, VR support, local AI crew systems, and immersive audio.",
+  "Description": "Photorealistic whitewater guide game with custom shallow-water physics, flexible raft/contact simulation, AI crew systems, rescue, progression, and immersive audio.",
   "Modules": [
     {
       "Name": "SmokeEmIfYouGotEm",
@@ -21,11 +21,11 @@
     },
     {
       "Name": "OpenXR",
-      "Enabled": true
+      "Enabled": false
     },
     {
       "Name": "OpenXRHandTracking",
-      "Enabled": true,
+      "Enabled": false,
       "Optional": true
     },
     {

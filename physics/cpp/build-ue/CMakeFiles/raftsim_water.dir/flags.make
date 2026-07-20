@@ -6,7 +6,7 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/Users/alexmoran/repos/SmokeEmIfYouGotEm/physics/cpp/include
 
-CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64 -fPIC -fvisibility=hidden -Wall -Wextra -Wpedantic
+CXX_FLAGSarm64 = -O3 -DNDEBUG -std=c++17 -arch arm64 -mmacosx-version-min=14.0 -fPIC -fvisibility=hidden -Wall -Wextra -Wpedantic
 
-CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64 -fPIC -fvisibility=hidden -Wall -Wextra -Wpedantic
+CXX_FLAGS = -O3 -DNDEBUG -std=c++17 -arch arm64 -mmacosx-version-min=14.0 -fPIC -fvisibility=hidden -Wall -Wextra -Wpedantic
 
