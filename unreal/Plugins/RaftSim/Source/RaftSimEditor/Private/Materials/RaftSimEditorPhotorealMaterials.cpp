@@ -144,7 +144,28 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionVectorParameter* DeepColor =
         Vector(TEXT("DeepWaterColor"), FLinearColor(0.006f, 0.015f, 0.021f, 0.0f));
     UMaterialExpressionComponentMask* DepthMask = Mask(VertexColor, false, true, false); // G
-    UMaterialExpressionLinearInterpolate* WaterColor = Lerp(ShallowColor, DeepColor, DepthMask);
+    UMaterialExpressionLinearInterpolate* DepthWaterColor =
+        Lerp(ShallowColor, DeepColor, DepthMask);
+
+    // Natural optical variation: a real river drifts between olive, green and
+    // gray-teal at the tens-of-metres scale (upwelling, dissolved load, bed
+    // changes). One very-low-frequency world-space noise blends the depth
+    // colour toward a relative olive shift of itself, so long reaches never
+    // render as a single uniform colour sheet. The shift is multiplicative,
+    // which preserves the shallow/deep depth relationship.
+    UMaterialExpressionNoise* ReachHueNoise =
+        Cast<UMaterialExpressionNoise>(Add(NewObject<UMaterialExpressionNoise>(Material)));
+    ReachHueNoise->Scale = 0.00055f;
+    ReachHueNoise->bTurbulence = true;
+    ReachHueNoise->Levels = 2;
+    ReachHueNoise->OutputMin = 0.0f;
+    ReachHueNoise->OutputMax = 1.0f;
+    UMaterialExpressionMultiply* OliveShiftedColor = Mul(
+        DepthWaterColor, Const3(1.16f, 1.10f, 0.74f));
+    UMaterialExpressionMultiply* ReachHueAlpha = Mul(
+        ReachHueNoise, Scalar(TEXT("ReachHueVariation"), 0.16f));
+    UMaterialExpressionLinearInterpolate* WaterColor =
+        Lerp(DepthWaterColor, OliveShiftedColor, ReachHueAlpha);
 
     // Scene captures do not have the guide camera's full temporal reflection
     // history. Preserve readable metre-scale surface modulation in calm water
@@ -282,6 +303,9 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
         TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
              "T_RaftSim_SouthForkWater_FlowNormal.T_RaftSim_SouthForkWater_FlowNormal"));
     UMaterialExpression* FinalNormal = nullptr;
+    // Slick/riffle patch mask; built with the detail normal, reused by the
+    // roughness section so slicks stay glassy while riffled patches keep grain.
+    UMaterialExpression* RiffleMask = nullptr;
     if (DetailNormal != nullptr)
     {
         UMaterialExpressionTextureCoordinate* UV =
@@ -360,14 +384,46 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
             NormalStrength,
             Mul(NormalStrength, Scalar(TEXT("RippleGrazingFloor"), 0.25f)),
             RippleGrazingFresnel);
-        FinalNormal = Lerp(FlatN, CombinedNormal, GrazingFilteredNormalStrength);
+        // Wind-riffle patches vs slicks: real rivers alternate between glassy
+        // slicks and wind/current-textured patches at the ten-metre scale —
+        // the single most recognisable natural variation on moving water. One
+        // low-frequency world-space mask suppresses the detail ripple inside
+        // slicks (the same mask glosses roughness below). Contrast-remapped so
+        // patches have readable edges rather than a smooth gradient.
+        UMaterialExpressionNoise* RifflePatchNoise =
+            Cast<UMaterialExpressionNoise>(Add(NewObject<UMaterialExpressionNoise>(Material)));
+        RifflePatchNoise->Scale = 0.00085f;
+        RifflePatchNoise->bTurbulence = true;
+        RifflePatchNoise->Levels = 2;
+        RifflePatchNoise->OutputMin = -0.9f;
+        RifflePatchNoise->OutputMax = 2.1f;
+        UMaterialExpressionClamp* RiffleMaskClamp =
+            Cast<UMaterialExpressionClamp>(Add(NewObject<UMaterialExpressionClamp>(Material)));
+        RiffleMaskClamp->Input.Expression = RifflePatchNoise;
+        RiffleMaskClamp->MinDefault = 0.0f;
+        RiffleMaskClamp->MaxDefault = 1.0f;
+        RiffleMask = RiffleMaskClamp;
+        UMaterialExpression* SlickFilteredNormalStrength = Lerp(
+            Mul(GrazingFilteredNormalStrength, Scalar(TEXT("SlickNormalFloor"), 0.30f)),
+            GrazingFilteredNormalStrength,
+            RiffleMask);
+        FinalNormal = Lerp(FlatN, CombinedNormal, SlickFilteredNormalStrength);
     }
 
     // --- Roughness: glassy water, rougher in foam; Fresnel-lifted specular ---
+    // Slicks read glassier than riffled patches; foam stays rough either way.
     UMaterialExpressionScalarParameter* BaseRough = Scalar(TEXT("WaterRoughness"), 0.24f);
+    UMaterialExpression* PatchedRough = BaseRough;
+    if (RiffleMask != nullptr)
+    {
+        PatchedRough = Lerp(
+            Mul(BaseRough, Scalar(TEXT("SlickRoughnessScale"), 0.45f)),
+            BaseRough,
+            RiffleMask);
+    }
     UMaterialExpressionScalarParameter* FoamRoughScale = Scalar(TEXT("FoamRoughness"), 0.55f);
     UMaterialExpressionMultiply* FoamRough = Mul(FoamBroken, FoamRoughScale);
-    UMaterialExpressionAdd* Roughness = AddNode(BaseRough, FoamRough);
+    UMaterialExpressionAdd* Roughness = AddNode(PatchedRough, FoamRough);
 
     UMaterialExpressionFresnel* Fresnel =
         Cast<UMaterialExpressionFresnel>(Add(NewObject<UMaterialExpressionFresnel>(Material)));
@@ -423,7 +479,25 @@ static UMaterial* BuildPhotorealRiverWaterMaterial(
     UMaterialExpressionScalarParameter* PhaseG = Scalar(TEXT("WaterPhaseG"), 0.15f);
     UMaterialExpressionVectorParameter* BehindWaterScale = Vector(
         TEXT("RiverbedColorScale"), FLinearColor(0.16f, 0.17f, 0.17f, 0.0f));
-    WaterOutput->ScatteringCoefficients.Expression = Scattering;
+    // Aeration: entrained bubbles scatter light strongly, so whitewater is
+    // milky through the water BODY, not only painted on the surface. Blend the
+    // volumetric scattering toward a near-white aerated coefficient wherever
+    // the surface carries foam (with a smaller fast-water contribution), so a
+    // hole's white pile keeps its optical depth when a swimmer or the camera
+    // looks into it. Per-pixel, presentation only.
+    UMaterialExpressionVectorParameter* AeratedScattering = Vector(
+        TEXT("AeratedWaterScattering"), FLinearColor(0.052f, 0.058f, 0.060f, 0.0f));
+    UMaterialExpressionMultiply* SpeedAeration =
+        Mul(SpeedMask, Scalar(TEXT("SpeedAerationFraction"), 0.22f));
+    UMaterialExpressionAdd* AerationRaw = AddNode(FoamBroken, SpeedAeration);
+    UMaterialExpressionClamp* AerationMask =
+        Cast<UMaterialExpressionClamp>(Add(NewObject<UMaterialExpressionClamp>(Material)));
+    AerationMask->Input.Expression = AerationRaw;
+    AerationMask->MinDefault = 0.0f;
+    AerationMask->MaxDefault = 1.0f;
+    UMaterialExpressionLinearInterpolate* AeratedScatteringBlend =
+        Lerp(Scattering, AeratedScattering, AerationMask);
+    WaterOutput->ScatteringCoefficients.Expression = AeratedScatteringBlend;
     WaterOutput->AbsorptionCoefficients.Expression = Absorption;
     WaterOutput->PhaseG.Expression = PhaseG;
     WaterOutput->ColorScaleBehindWater.Expression = BehindWaterScale;

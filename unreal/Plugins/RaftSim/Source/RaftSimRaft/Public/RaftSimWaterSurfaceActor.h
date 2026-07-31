@@ -201,10 +201,12 @@ protected:
     float FoamHalfLifeSeconds = 4.0f;
 
     /** Presentation-only crest lift applied at a detected hydraulic jump so the
-     * breaking face leans over its downstream pile. Bounded and visual only —
-     * never fed back into sampling, collision, buoyancy, D3, or D4. */
+     * breaking face leans over its downstream pile, followed by a decaying
+     * tailwater wave train. Bounded (comparable to the authored 26.8 cm
+     * standing-wave envelope) and visual only — never fed back into sampling,
+     * collision, buoyancy, D3, or D4. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Water", meta = (ClampMin = "0.0", ClampMax = "0.25"))
-    float BreakingCrestLiftMeters = 0.10f;
+    float BreakingCrestLiftMeters = 0.22f;
 
 private:
     void BuildGrid();

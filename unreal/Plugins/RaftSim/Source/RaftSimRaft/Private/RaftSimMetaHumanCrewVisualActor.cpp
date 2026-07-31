@@ -36,7 +36,7 @@ const TCHAR* ProductionBuildRoot = TEXT(
 // locations, preserving the host's centimetre-space pose contract.
 const FQuat MeshToAvatarRotation = FRotator(0.0f, -90.0f, 0.0f).Quaternion();
 
-const FName DrivenBones[] = {
+const FName MetaHumanDrivenBones[] = {
     TEXT("pelvis"),
     TEXT("spine_01"),
     TEXT("spine_02"),
@@ -1292,7 +1292,7 @@ bool ARaftSimMetaHumanCrewVisualActor::HasFinitePose() const
     {
         return false;
     }
-    for (const FName BoneName : DrivenBones)
+    for (const FName BoneName : MetaHumanDrivenBones)
     {
         if (Body->GetBoneIndex(BoneName) != INDEX_NONE &&
             Body->GetBoneTransformByName(BoneName, EBoneSpaces::ComponentSpace).ContainsNaN())
