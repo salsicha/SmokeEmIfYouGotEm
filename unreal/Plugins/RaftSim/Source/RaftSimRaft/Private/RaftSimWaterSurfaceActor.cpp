@@ -1391,11 +1391,25 @@ void ARaftSimWaterSurfaceActor::RefreshSurface()
                 SourceFoam[UpstreamIndex], 0.55f * Intensity + 0.15f);
             SourceFoam[Index] = FMath::Max(
                 SourceFoam[Index], 0.85f * Intensity + 0.15f);
-            const int32 TailIndex = Index + 1;
-            if (X + 1 < GridStationN && WetVertexMask[TailIndex] != 0)
+
+            // Decaying tailwater wave train: the oscillatory surface every
+            // hydraulic jump sheds downstream. Alternating, exponentially
+            // decaying crests/troughs (bounded by the crest lift) give the
+            // rapid readable hydraulic volume instead of a flat run-out, and
+            // each surviving crest keeps generating a little foam.
+            for (int32 Tail = 1; Tail <= 6; ++Tail)
             {
+                const int32 TailIndex = Index + Tail;
+                if (X + Tail >= GridStationN || WetVertexMask[TailIndex] == 0)
+                {
+                    break;
+                }
+                const float Decay = FMath::Exp(-0.42f * Tail);
+                const float Phase = FMath::Cos(2.05f * Tail);
+                Vertices[TailIndex].Z += 0.62f * LiftCm * Decay * Phase;
                 SourceFoam[TailIndex] = FMath::Max(
-                    SourceFoam[TailIndex], 0.60f * Intensity);
+                    SourceFoam[TailIndex],
+                    Intensity * FMath::Max(Phase, 0.0f) * 0.55f * Decay + 0.30f * Decay);
             }
 
             FBreakingSite Site;

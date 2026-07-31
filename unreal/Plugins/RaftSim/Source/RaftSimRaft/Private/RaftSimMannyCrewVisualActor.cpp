@@ -12,7 +12,7 @@ namespace
 const TCHAR* MannyMeshPath =
     TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple");
 
-const FName DrivenBones[] = {
+const FName MannyDrivenBones[] = {
     TEXT("pelvis"),
     TEXT("spine_01"),
     TEXT("spine_02"),
@@ -80,7 +80,7 @@ void ARaftSimMannyCrewVisualActor::CacheReferencePose()
     {
         return;
     }
-    for (const FName BoneName : DrivenBones)
+    for (const FName BoneName : MannyDrivenBones)
     {
         if (Body->GetBoneIndex(BoneName) != INDEX_NONE)
         {
@@ -274,7 +274,7 @@ bool ARaftSimMannyCrewVisualActor::HasFinitePose() const
     {
         return false;
     }
-    for (const FName BoneName : DrivenBones)
+    for (const FName BoneName : MannyDrivenBones)
     {
         if (Body->GetBoneIndex(BoneName) != INDEX_NONE &&
             Body->GetBoneTransformByName(BoneName, EBoneSpaces::ComponentSpace).ContainsNaN())
