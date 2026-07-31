@@ -24,6 +24,7 @@
 #include "Components/SkyLightComponent.h"
 #include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/TextRenderComponent.h"
 #include "Components/SkyAtmosphereComponent.h"
 #include "Dom/JsonObject.h"
 #include "UDynamicMesh.h"
@@ -167,6 +168,7 @@ struct FRaftSimLandscapeImportCandidateSpec
     FString HeightfieldManifestRelativePath;
     FString ImportContractRelativePath;
     FString LocalCenterlineRelativePath;
+    FString ScenarioRelativePath;
     FString MapPackagePath;
     int32 LandscapeSize = 1009;
     float HorizontalSpanXCm = 32300.0f;
@@ -2089,6 +2091,12 @@ AActor* AddLandscapeCandidatePhysicalRiverRibbon(
     FString& OutSummary);
 
 AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary);
+
+bool AddLandscapeCandidateScenarioMarkers(
     UWorld* World,
     ALandscape* Landscape,
     const FRaftSimLandscapeImportCandidateSpec& Candidate,

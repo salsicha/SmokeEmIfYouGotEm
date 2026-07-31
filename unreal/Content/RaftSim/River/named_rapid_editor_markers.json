@@ -8172,10 +8172,21 @@
     },
     {
       "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
+      "local_reference_sources": [
+        {
+          "authority": "rapid_order_names_and_relative_spacing_only_not_georeferenced",
+          "path": "victoria-falls-rapids-map.pdf",
+          "rights_status": "user_supplied_reference_rights_review_required",
+          "sha256": "8000a0d2f319fdd1ee37b60070a16a45189fbb98294fab3756cac505a2564a09",
+          "source_id": "user_supplied_victoria_falls_rapids_map"
+        }
+      ],
       "marker_count": 25,
       "markers": [
         {
-          "aliases": [],
+          "aliases": [
+            "The Wall"
+          ],
           "class_reported_range": null,
           "difficulty_label": "IV-V",
           "display_name": "Against the Wall",
@@ -8184,8 +8195,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.85077554,
-              -17.92945395
+              25.858278,
+              -17.926081
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8234,14 +8245,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 1,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 1052.263
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.0,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 0.0
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8256,8 +8270,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.85373208,
-              -17.93136288
+              25.85414207,
+              -17.92901478
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8307,14 +8321,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 2,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 2104.527
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.02531433,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 692.571
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8329,8 +8346,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.85678901,
-              -17.93363711
+              25.84791759,
+              -17.92987278
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8380,14 +8397,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 3,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 3156.79
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.04971555,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 1360.16
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8402,8 +8422,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.84760458,
-              -17.93694359
+              25.84994556,
+              -17.93140029
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8454,14 +8474,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 4,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 4209.054
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.06227525,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 1703.779
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8476,8 +8499,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.84760319,
-              -17.94427598
+              25.85906917,
+              -17.9324584
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8529,14 +8552,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 5,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 5261.317
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.10532943,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 2881.692
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8551,8 +8577,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.85624905,
-              -17.94798817
+              25.84656567,
+              -17.9408174
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8603,14 +8629,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 6,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 6313.58
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.1736374,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 4750.519
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8625,8 +8654,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.86059885,
-              -17.9541138
+              25.85772051,
+              -17.9487423
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8674,14 +8703,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 7,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 7365.844
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.23723173,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 6490.387
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8696,8 +8728,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.8568404,
-              -17.96265399
+              25.85932959,
+              -17.95539177
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8749,14 +8781,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 8,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 8418.107
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.27639271,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 7561.786
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8771,8 +8806,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.86206971,
-              -17.96915632
+              25.85683072,
+              -17.96259217
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8825,14 +8860,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 9,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 9470.37
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.30743828,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 8411.157
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8847,8 +8885,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.85843354,
-              -17.97547253
+              25.86007081,
+              -17.96841414
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8898,14 +8936,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 10,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 10522.634
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.3377553,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 9240.596
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -8920,8 +8961,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.86799657,
-              -17.97503539
+              25.85772931,
+              -17.97393562
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -8970,20 +9011,25 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 11,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 11574.897
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.37605187,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 10288.346
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
-          "aliases": [],
+          "aliases": [
+            "The Three Ugly Sisters"
+          ],
           "class_reported_range": null,
           "difficulty_label": "III-IV",
           "display_name": "Three Ugly Sisters",
@@ -8992,8 +9038,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.87792469,
-              -17.97486542
+              25.87136795,
+              -17.97492033
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9041,14 +9087,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 12,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 12627.161
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.43611884,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 11931.709
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9063,8 +9112,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.88177052,
-              -17.97815545
+              25.87592328,
+              -17.97478012
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9115,14 +9164,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 13,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 13679.424
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.4537387,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 12413.768
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9137,8 +9189,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.88995238,
-              -17.9802515
+              25.88629366,
+              -17.98054135
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9186,14 +9238,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 14,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 14731.687
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.52426861,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 14343.385
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9208,8 +9263,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.89921346,
-              -17.98200109
+              25.9020097,
+              -17.98388505
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9261,21 +9316,25 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 15,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 15783.951
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.59017084,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 16146.394
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
         },
         {
           "aliases": [
-            "Terminator I and II"
+            "Terminator I and II",
+            "The Terminator 1&2"
           ],
           "class_reported_range": null,
           "difficulty_label": "IV",
@@ -9285,8 +9344,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.90849938,
-              -17.98383704
+              25.90929858,
+              -17.98378669
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9336,14 +9395,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 16,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 16836.214
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.61848089,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 16920.925
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9358,8 +9420,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.91154846,
-              -17.9916818
+              25.91065569,
+              -17.98898688
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9409,14 +9471,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 17,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 17888.478
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.64233092,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 17573.434
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9431,8 +9496,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.91915748,
-              -17.99702905
+              25.91774808,
+              -17.9967225
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9486,14 +9551,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 18,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 18940.741
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.68628545,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 18775.979
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9508,8 +9576,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.92876794,
-              -17.99458856
+              25.94058748,
+              -17.99216883
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9558,14 +9626,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 19,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 19993.004
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.77758992,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 21273.964
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9580,8 +9651,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.93847073,
-              -17.99249275
+              25.94491627,
+              -17.99551751
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9630,14 +9701,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 20,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 21045.268
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.79972144,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 21879.457
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9652,8 +9726,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.94684637,
-              -17.9962074
+              25.9500612,
+              -17.99690293
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9701,14 +9775,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 21,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 22097.531
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.82050064,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 22447.952
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9723,8 +9800,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.95660764,
-              -17.99587424
+              25.96329078,
+              -17.99780727
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9774,14 +9851,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 22,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 23149.794
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.87754138,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 24008.521
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9796,8 +9876,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.96349244,
-              -17.99952491
+              25.96846004,
+              -18.001938
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9845,14 +9925,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 23,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 24202.058
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.90686179,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 24810.694
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9867,8 +9950,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.97185794,
-              -18.0014545
+              25.97492166,
+              -17.99982689
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9916,14 +9999,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 24,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 25254.321
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 0.93700708,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 25635.434
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -9938,8 +10024,8 @@
           "editor_map_geometry": {
             "binding_method": "station_interpolation_on_review_gated_candidate_centerline",
             "coordinates": [
-              25.981146,
-              -17.99868946
+              25.99002378,
+              -17.99567778
             ],
             "production_authoritative": false,
             "source_path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
@@ -9987,14 +10073,17 @@
           "solver_window_status": "not_authored",
           "source_ids": [
             "zambezi_whitewater_guidebook",
-            "zambezi_victoria_falls_guide"
+            "zambezi_victoria_falls_guide",
+            "zambezi_shearwater_operator_guide"
           ],
           "stationing": {
             "production_authoritative": false,
-            "published_unit": "downstream_order",
-            "published_value": 25,
-            "station_kind": "provisional_downstream_order_interpolation",
-            "station_m": 26306.585
+            "published_unit": "illustrative_map_fraction",
+            "published_value": 1.0,
+            "source_path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+            "source_status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative",
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "station_m": 27358.848
           },
           "subfeature_count": 0,
           "subfeature_editor_pin_status": "blocked_until_c1_inventory_and_exact_geometry"
@@ -10019,9 +10108,17 @@
           "source_kind": "guide_flow_behavior_description",
           "title": "Victoria Falls Rafting Rapid Guide",
           "url": "https://www.victoriafalls-guide.net/victoria-falls-rafting.html"
+        },
+        {
+          "rights_status": "link_only_factual_index",
+          "river_id": "zambezi_batoka_gorge",
+          "source_id": "zambezi_shearwater_operator_guide",
+          "source_kind": "operator_seasonal_route_description",
+          "title": "Shearwater Zambezi River White Water Rafting",
+          "url": "https://www.shearwatervictoriafalls.com/experience/white-water-rafting/"
         }
       ],
-      "stationing_authority": "published_rapid_number_order_only"
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
     },
     {
       "display_name": "Futaleufu River: Rio Azul Swinging Bridge to The Pasarela",

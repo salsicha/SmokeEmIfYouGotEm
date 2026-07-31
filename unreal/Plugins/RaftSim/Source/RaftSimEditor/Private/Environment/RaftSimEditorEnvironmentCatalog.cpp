@@ -1240,6 +1240,8 @@ TArray<FRaftSimLandscapeImportCandidateSpec> GetLandscapeImportCandidateSpecs()
             Candidate.ImportContractRelativePath = PreviewSpec.SourceManifest;
             Candidate.LocalCenterlineRelativePath =
                 TEXT("physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/centerline_local.json");
+            Candidate.ScenarioRelativePath =
+                TEXT("physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json");
             Candidate.MapPackagePath =
                 TEXT("/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate");
             Candidate.LandscapeSize = 2017;

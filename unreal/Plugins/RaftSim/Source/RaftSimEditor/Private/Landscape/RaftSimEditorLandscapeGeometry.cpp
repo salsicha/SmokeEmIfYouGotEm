@@ -476,6 +476,154 @@ AActor* AddLandscapeCandidatePhysicalBankCorridorMesh(
     return FirstActor;
 }
 
+bool AddLandscapeCandidateScenarioMarkers(
+    UWorld* World,
+    ALandscape* Landscape,
+    const FRaftSimLandscapeImportCandidateSpec& Candidate,
+    FString& OutSummary)
+{
+    if (Candidate.ScenarioRelativePath.IsEmpty())
+    {
+        return true;
+    }
+    if (!World || !Landscape)
+    {
+        return false;
+    }
+
+    TArray<FRaftSimLandscapeCandidateCenterlinePoint> SourcePoints;
+    if (!LoadLandscapeCandidateLocalCenterline(Candidate, SourcePoints, OutSummary) ||
+        SourcePoints.Num() < 2)
+    {
+        return false;
+    }
+
+    const FString ScenarioPath = FPaths::ConvertRelativePathToFull(
+        FPaths::Combine(GetRepoRoot(), Candidate.ScenarioRelativePath));
+    FString ScenarioText;
+    if (!FFileHelper::LoadFileToString(ScenarioText, *ScenarioPath))
+    {
+        OutSummary += FString::Printf(TEXT("Could not read scenario %s.\n"), *ScenarioPath);
+        return false;
+    }
+    TSharedPtr<FJsonObject> ScenarioRoot;
+    const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(ScenarioText);
+    if (!FJsonSerializer::Deserialize(Reader, ScenarioRoot) || !ScenarioRoot.IsValid())
+    {
+        OutSummary += FString::Printf(TEXT("Could not parse scenario %s.\n"), *ScenarioPath);
+        return false;
+    }
+    if (ScenarioRoot->GetStringField(TEXT("river_id")) != Candidate.PreviewSpec.RiverId ||
+        ScenarioRoot->GetBoolField(TEXT("production_promoted")))
+    {
+        OutSummary += TEXT("Scenario river mismatch or unsafe production-promotion flag.\n");
+        return false;
+    }
+    const TArray<TSharedPtr<FJsonValue>>* RapidValues = nullptr;
+    if (!ScenarioRoot->TryGetArrayField(TEXT("rapids"), RapidValues) || !RapidValues ||
+        RapidValues->Num() < 1)
+    {
+        OutSummary += TEXT("Scenario has no rapid marker definitions.\n");
+        return false;
+    }
+
+    UStaticMesh* ConeMesh = LoadPreviewMesh(TEXT("/Engine/BasicShapes/Cone.Cone"));
+    if (!ConeMesh)
+    {
+        OutSummary += TEXT("Could not load the engine cone used for scenario markers.\n");
+        return false;
+    }
+    const float LandscapeMinX = -5800.0f;
+    const float LandscapeMinY = -Candidate.HorizontalSpanYCm * 0.5f;
+    float PreviousStationM = -1.0f;
+    int32 SpawnedCount = 0;
+    for (const TSharedPtr<FJsonValue>& RapidValue : *RapidValues)
+    {
+        const TSharedPtr<FJsonObject> Rapid = RapidValue ? RapidValue->AsObject() : nullptr;
+        if (!Rapid.IsValid())
+        {
+            return false;
+        }
+        const float StationM = static_cast<float>(Rapid->GetNumberField(TEXT("station_m")));
+        if (StationM < PreviousStationM || StationM > SourcePoints.Last().StationMeters)
+        {
+            OutSummary += TEXT("Scenario rapid stations are not monotonic or leave the candidate centerline.\n");
+            return false;
+        }
+        PreviousStationM = StationM;
+
+        FVector2D LocalCm = SourcePoints.Last().LocalCm;
+        FVector2D Tangent = FVector2D(1.0f, 0.0f);
+        for (int32 PointIndex = 0; PointIndex + 1 < SourcePoints.Num(); ++PointIndex)
+        {
+            const FRaftSimLandscapeCandidateCenterlinePoint& A = SourcePoints[PointIndex];
+            const FRaftSimLandscapeCandidateCenterlinePoint& B = SourcePoints[PointIndex + 1];
+            if (StationM > B.StationMeters)
+            {
+                continue;
+            }
+            const float SpanM = FMath::Max(B.StationMeters - A.StationMeters, KINDA_SMALL_NUMBER);
+            const float Alpha = FMath::Clamp((StationM - A.StationMeters) / SpanM, 0.0f, 1.0f);
+            LocalCm = FMath::Lerp(A.LocalCm, B.LocalCm, Alpha);
+            Tangent = (B.LocalCm - A.LocalCm).GetSafeNormal();
+            break;
+        }
+        const FVector2D WorldXY(LandscapeMinX + LocalCm.X, LandscapeMinY + LocalCm.Y);
+        const float TerrainZ = Landscape->GetHeightAtLocation(
+            FVector(WorldXY.X, WorldXY.Y, 0.0f),
+            EHeightfieldSource::Editor).Get(0.0f);
+        const FString RapidNumber = Rapid->GetStringField(TEXT("rapid_number"));
+        const FString DisplayName = Rapid->GetStringField(TEXT("display_name"));
+        const bool bMandatoryPortage = Rapid->GetBoolField(TEXT("mandatory_commercial_portage"));
+
+        AStaticMeshActor* MarkerActor = World->SpawnActor<AStaticMeshActor>(
+            FVector(WorldXY.X, WorldXY.Y, TerrainZ + 650.0f),
+            FRotator::ZeroRotator);
+        if (!MarkerActor)
+        {
+            return false;
+        }
+        UStaticMeshComponent* MarkerMesh = MarkerActor->GetStaticMeshComponent();
+        MarkerMesh->SetStaticMesh(ConeMesh);
+        MarkerMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        MarkerMesh->SetWorldScale3D(FVector(4.0f, 4.0f, 12.0f));
+        MarkerMesh->SetCastShadow(false);
+        MarkerActor->SetActorHiddenInGame(true);
+        MarkerActor->SetActorLabel(FString::Printf(
+            TEXT("RaftSim_ZambeziRapid_%s_%s"),
+            *RapidNumber,
+            *DisplayName.Replace(TEXT(" "), TEXT("_"))));
+        MarkerActor->Tags.Add(TEXT("RaftSimScenarioMarker"));
+        MarkerActor->Tags.Add(TEXT("RaftSimZambeziRun"));
+        if (bMandatoryPortage)
+        {
+            MarkerActor->Tags.Add(TEXT("RaftSimMandatoryPortage"));
+        }
+
+        UTextRenderComponent* Label = NewObject<UTextRenderComponent>(MarkerActor);
+        Label->SetupAttachment(MarkerMesh);
+        Label->SetText(FText::FromString(FString::Printf(
+            TEXT("%s  %s%s"),
+            *RapidNumber,
+            *DisplayName,
+            bMandatoryPortage ? TEXT("  PORTAGE") : TEXT(""))));
+        Label->SetTextRenderColor(bMandatoryPortage ? FColor::Red : FColor(255, 170, 45));
+        Label->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
+        Label->SetWorldSize(1100.0f);
+        Label->SetRelativeLocation(FVector(0.0f, 0.0f, 150.0f));
+        Label->SetRelativeRotation(FRotator(-90.0f, FMath::RadiansToDegrees(
+            FMath::Atan2(Tangent.Y, Tangent.X)), 0.0f));
+        Label->SetHiddenInGame(true);
+        Label->RegisterComponent();
+        ++SpawnedCount;
+    }
+    OutSummary += FString::Printf(
+        TEXT("Added %d review-gated Zambezi scenario rapid markers from %s; map labels are editor-only and Rapid 9 carries the mandatory-portage tag.\n"),
+        SpawnedCount,
+        *Candidate.ScenarioRelativePath);
+    return SpawnedCount == RapidValues->Num();
+}
+
 void RepositionLandscapeCandidatePhysicalCameras(
     UWorld* World,
     ALandscape* Landscape,

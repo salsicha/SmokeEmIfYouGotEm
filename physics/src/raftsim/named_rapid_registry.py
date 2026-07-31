@@ -319,7 +319,11 @@ def _normalised_feature_inventory(
     ]
 
 
-def _station_record(river: dict[str, Any], rapid: dict[str, Any]) -> dict[str, Any]:
+def _station_record(
+    river: dict[str, Any],
+    rapid: dict[str, Any],
+    repo_root: Path,
+) -> dict[str, Any]:
     if "river_mile" in rapid:
         station_m = float(rapid["river_mile"]) * MILES_TO_METERS
         return {
@@ -336,6 +340,39 @@ def _station_record(river: dict[str, Any], rapid: dict[str, Any]) -> dict[str, A
             "published_value": rapid["river_km"],
             "published_unit": "river_kilometer",
             "production_authoritative": True,
+        }
+
+    map_stationing_source = river.get("map_stationing_source")
+    if map_stationing_source:
+        source_path = repo_root / map_stationing_source["path"]
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+        expected_schema = map_stationing_source.get("schema")
+        if expected_schema and payload.get("schema") != expected_schema:
+            raise ValueError(
+                f"Unexpected map stationing schema for {river['river_id']}: "
+                f"{payload.get('schema')}"
+            )
+        rapid_number = str(rapid.get("rapid_number", ""))
+        digitized = next(
+            (
+                candidate
+                for candidate in payload.get("rapids", [])
+                if str(candidate.get("rapid_number")) == rapid_number
+            ),
+            None,
+        )
+        if digitized is None:
+            raise ValueError(
+                f"Map stationing is missing rapid {rapid_number} for {river['river_id']}"
+            )
+        return {
+            "station_m": round(float(digitized["station_m"]), 3),
+            "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+            "published_value": digitized["map_relative_station_fraction"],
+            "published_unit": "illustrative_map_fraction",
+            "source_path": map_stationing_source["path"],
+            "source_status": map_stationing_source["status"],
+            "production_authoritative": False,
         }
 
     rapids = river["rapids"]
@@ -474,7 +511,7 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
         markers = []
         for rapid in river["rapids"]:
             feature_id = rapid_feature_id(river["river_id"], rapid["name"])
-            station = _station_record(river, rapid)
+            station = _station_record(river, rapid, repo_root)
             map_geometry = _project_station_to_candidate_geometry(
                 repo_root,
                 river,
@@ -530,18 +567,19 @@ def build_editor_markers(catalog: dict[str, Any], repo_root: Path) -> dict[str, 
                     ),
                 }
             )
-        rivers.append(
-            {
-                "river_id": river["river_id"],
-                "portfolio_role": river["portfolio_role"],
-                "display_name": river["display_name"],
-                "run_length_m": river["run_length_m"],
-                "stationing_authority": river["stationing_authority"],
-                "source_refs": [source_lookup[source_id] for source_id in river["source_ids"]],
-                "marker_count": len(markers),
-                "markers": markers,
-            }
-        )
+        river_record = {
+            "river_id": river["river_id"],
+            "portfolio_role": river["portfolio_role"],
+            "display_name": river["display_name"],
+            "run_length_m": river["run_length_m"],
+            "stationing_authority": river["stationing_authority"],
+            "source_refs": [source_lookup[source_id] for source_id in river["source_ids"]],
+            "marker_count": len(markers),
+            "markers": markers,
+        }
+        if river.get("local_reference_sources"):
+            river_record["local_reference_sources"] = river["local_reference_sources"]
+        rivers.append(river_record)
     return {
         "schema": "raftsim.unreal.named_rapid_editor_markers.v1",
         "status": "editor_review_markers_ready_exact_geometry_and_guide_review_required",

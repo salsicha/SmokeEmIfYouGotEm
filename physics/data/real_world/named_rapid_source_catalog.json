@@ -100,6 +100,14 @@
       "rights_status": "link_only_factual_index"
     },
     {
+      "source_id": "zambezi_shearwater_operator_guide",
+      "river_id": "zambezi_batoka_gorge",
+      "title": "Shearwater Zambezi River White Water Rafting",
+      "url": "https://www.shearwatervictoriafalls.com/experience/white-water-rafting/",
+      "source_kind": "operator_seasonal_route_description",
+      "rights_status": "link_only_factual_index"
+    },
+    {
       "source_id": "futaleufu_rivers_of_chile_terminator",
       "river_id": "futaleufu_river_chile",
       "title": "Rio Futaleufu: Terminator Section",
@@ -2148,16 +2156,30 @@
       "portfolio_role": "additional_active_environment",
       "display_name": "Zambezi River: Boiling Pot to Mukuni Beach",
       "run_length_m": 27358.848,
-      "stationing_authority": "published_rapid_number_order_only",
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed",
+      "map_stationing_source": {
+        "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+        "schema": "raftsim.zambezi.rapid_map_digitization.v1",
+        "status": "illustrative_pdf_relative_spacing_not_surveyed_or_production_authoritative"
+      },
       "editor_geometry_source": {
         "path": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/hydrography/route_stationing.json",
         "format": "route_stationing_json",
         "status": "osm_boundary_trace_low_precision_not_surveyed_centerline",
         "binding_enabled": true
       },
-      "source_ids": ["zambezi_whitewater_guidebook", "zambezi_victoria_falls_guide"],
+      "source_ids": ["zambezi_whitewater_guidebook", "zambezi_victoria_falls_guide", "zambezi_shearwater_operator_guide"],
+      "local_reference_sources": [
+        {
+          "source_id": "user_supplied_victoria_falls_rapids_map",
+          "path": "victoria-falls-rapids-map.pdf",
+          "sha256": "8000a0d2f319fdd1ee37b60070a16a45189fbb98294fab3756cac505a2564a09",
+          "rights_status": "user_supplied_reference_rights_review_required",
+          "authority": "rapid_order_names_and_relative_spacing_only_not_georeferenced"
+        }
+      ],
       "rapids": [
-        {"name": "Against the Wall", "rapid_number": "1", "order": 1, "class": "IV-V", "feature_tags": ["wall_cushion", "eddy_ferry", "boils", "flow_sensitive"], "review_priority": "critical"},
+        {"name": "Against the Wall", "aliases": ["The Wall"], "rapid_number": "1", "order": 1, "class": "IV-V", "feature_tags": ["wall_cushion", "eddy_ferry", "boils", "flow_sensitive"], "review_priority": "critical"},
         {"name": "The Bridge", "rapid_number": "2", "order": 2, "class": "III", "feature_tags": ["surf_wave", "hole"], "review_priority": "high"},
         {"name": "Between Two Worlds", "rapid_number": "3", "order": 3, "class": "IV", "feature_tags": ["wave", "hole"], "review_priority": "high"},
         {"name": "Morning Glory", "rapid_number": "4", "order": 4, "class": "IV-V", "feature_tags": ["dragons_back", "tight_line", "wave_train", "low_flow_sensitive"], "review_priority": "critical"},
@@ -2168,11 +2190,11 @@
         {"name": "Commercial Suicide", "rapid_number": "9", "order": 9, "class": "V-VI", "feature_tags": ["river_wide_pourover", "narrow_slot", "mandatory_commercial_portage", "high_consequence"], "review_priority": "critical"},
         {"name": "Gnashing Jaws of Death", "rapid_number": "10", "order": 10, "class": "IV", "feature_tags": ["large_waves", "holes"], "review_priority": "high"},
         {"name": "Overland Truck Eater", "rapid_number": "11", "order": 11, "class": "V", "feature_tags": ["boils", "large_waves", "high_water_put_in"], "review_priority": "critical"},
-        {"name": "Three Ugly Sisters", "rapid_number": "12", "order": 12, "class": "III-IV", "feature_tags": ["large_wave_train", "surf_wave"], "review_priority": "critical"},
+        {"name": "Three Ugly Sisters", "aliases": ["The Three Ugly Sisters"], "rapid_number": "12", "order": 12, "class": "III-IV", "feature_tags": ["large_wave_train", "surf_wave"], "review_priority": "critical"},
         {"name": "The Mother", "rapid_number": "13", "order": 13, "class": "IV-V", "feature_tags": ["large_wave_train", "holes"], "review_priority": "critical"},
         {"name": "Surprise Surprise", "rapid_number": "14", "order": 14, "class": "III", "feature_tags": ["waves", "boils"], "review_priority": "medium"},
         {"name": "The Washing Machine", "rapid_number": "15", "order": 15, "class": "IV-V", "feature_tags": ["recirculating_pourover", "central_hole", "multiple_avoidance_lines", "flow_sensitive"], "review_priority": "critical"},
-        {"name": "The Terminators", "aliases": ["Terminator I and II"], "rapid_number": "16", "order": 16, "class": "IV", "feature_tags": ["large_wave_train", "flip_wave", "high_flow_sensitive"], "review_priority": "critical"},
+        {"name": "The Terminators", "aliases": ["Terminator I and II", "The Terminator 1&2"], "rapid_number": "16", "order": 16, "class": "IV", "feature_tags": ["large_wave_train", "flip_wave", "high_flow_sensitive"], "review_priority": "critical"},
         {"name": "Double Trouble", "rapid_number": "17", "order": 17, "class": "V", "feature_tags": ["two_large_holes", "flow_sensitive", "multiple_avoidance_lines"], "review_priority": "critical"},
         {"name": "Oblivion", "rapid_number": "18", "order": 18, "class": "V", "feature_tags": ["crashing_hole", "third_wave", "flip_hazard", "surf", "flow_sensitive"], "review_priority": "critical"},
         {"name": "The Last Straw", "rapid_number": "19", "order": 19, "class": "II-III", "feature_tags": ["wave_train", "boils"], "review_priority": "medium"},
