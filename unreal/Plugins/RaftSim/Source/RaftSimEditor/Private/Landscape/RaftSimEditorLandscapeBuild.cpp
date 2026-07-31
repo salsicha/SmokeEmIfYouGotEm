@@ -318,6 +318,13 @@ bool BuildLandscapeImportCandidateMap(
             *Candidate.PreviewSpec.RiverId);
         return false;
     }
+    if (!AddLandscapeCandidateScenarioMarkers(World, Landscape, Candidate, OutSummary))
+    {
+        OutSummary += FString::Printf(
+            TEXT("Scenario marker generation failed for %s.\n"),
+            *Candidate.PreviewSpec.RiverId);
+        return false;
+    }
     AddPreviewCameraAndStart(World, Candidate.PreviewSpec);
     RepositionLandscapeCandidatePhysicalCameras(World, Landscape, Candidate, OutSummary);
 

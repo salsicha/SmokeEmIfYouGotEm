@@ -1,0 +1,465 @@
+{
+  "acceptance_gates": [
+    "local guide approves put-in, take-out, rapid stations, lines, portages, and rescue routes",
+    "geospatial reviewer approves centerline alignment and terrain datum",
+    "rights reviewer approves supplied PDF/image use and all shipped source products",
+    "seasonal-flow reviewer resolves high-water start/take-out variants and flow bands",
+    "each rapid receives validated hydraulic geometry and C++ solver windows before gameplay promotion",
+    "desktop and VR performance plus lifelike visual review pass on the generated Unreal map"
+  ],
+  "display_name": "Zambezi: Boiling Pot to Mukuni Beach",
+  "gameplay": {
+    "control_mode": "guided_paddle_crew",
+    "flexible_raft_enabled": true,
+    "rapid_9_policy": "mandatory_commercial_portage_not_normal_runnable_line",
+    "rock_wrap_and_flip_enabled": true,
+    "swimmer_and_rescue_enabled": true,
+    "voice_paddle_commands_enabled": true
+  },
+  "production_promoted": false,
+  "rapid_count": 25,
+  "rapid_map_digitization": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+  "rapids": [
+    {
+      "difficulty_label": "IV-V",
+      "display_name": "Against the Wall",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wall_cushion",
+        "eddy_ferry",
+        "boils",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Wall",
+      "rapid_number": "1",
+      "station_m": 0.0
+    },
+    {
+      "difficulty_label": "III",
+      "display_name": "The Bridge",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "surf_wave",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Bridge",
+      "rapid_number": "2",
+      "station_m": 692.571
+    },
+    {
+      "difficulty_label": "IV",
+      "display_name": "Between Two Worlds",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wave",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Between Two Worlds",
+      "rapid_number": "3",
+      "station_m": 1360.16
+    },
+    {
+      "difficulty_label": "IV-V",
+      "display_name": "Morning Glory",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "dragons_back",
+        "tight_line",
+        "wave_train",
+        "low_flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Morning Glory",
+      "rapid_number": "4",
+      "station_m": 1703.779
+    },
+    {
+      "difficulty_label": "V",
+      "display_name": "Stairway to Heaven",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "drop",
+        "hole",
+        "wave_train"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Stairway to Heaven",
+      "rapid_number": "5",
+      "station_m": 2881.692
+    },
+    {
+      "difficulty_label": "IV",
+      "display_name": "Devil's Toilet Bowl",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_wave_train",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Devil's Toilet Bowl",
+      "rapid_number": "6",
+      "station_m": 4750.519
+    },
+    {
+      "difficulty_label": "V",
+      "display_name": "Gulliver's Travels",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_diagonal",
+        "large_waves",
+        "multiple_moves"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Gulliver's Travels",
+      "rapid_number": "7",
+      "station_m": 6490.387
+    },
+    {
+      "difficulty_label": "III-V",
+      "display_name": "Midnight Diner",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_hole",
+        "multiple_lines",
+        "star_trek_line",
+        "muncher_line",
+        "chicken_line"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Midnight Diner",
+      "rapid_number": "8",
+      "station_m": 7561.786
+    },
+    {
+      "difficulty_label": "V-VI",
+      "display_name": "Commercial Suicide",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "river_wide_pourover",
+        "narrow_slot",
+        "mandatory_commercial_portage",
+        "high_consequence"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": true,
+      "map_label": "Commercial Suicide",
+      "rapid_number": "9",
+      "station_m": 8411.157
+    },
+    {
+      "difficulty_label": "IV",
+      "display_name": "Gnashing Jaws of Death",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_waves",
+        "holes"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Gnashing Jaws of Death",
+      "rapid_number": "10",
+      "station_m": 9240.596
+    },
+    {
+      "difficulty_label": "V",
+      "display_name": "Overland Truck Eater",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "boils",
+        "large_waves",
+        "high_water_put_in"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Overland Truck Eater",
+      "rapid_number": "11",
+      "station_m": 10288.346
+    },
+    {
+      "difficulty_label": "III-IV",
+      "display_name": "Three Ugly Sisters",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_wave_train",
+        "surf_wave"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Three Ugly Sisters",
+      "rapid_number": "12",
+      "station_m": 11931.709
+    },
+    {
+      "difficulty_label": "IV-V",
+      "display_name": "The Mother",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_wave_train",
+        "holes"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Mother",
+      "rapid_number": "13",
+      "station_m": 12413.768
+    },
+    {
+      "difficulty_label": "III",
+      "display_name": "Surprise Surprise",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Surprise Surprise",
+      "rapid_number": "14",
+      "station_m": 14343.385
+    },
+    {
+      "difficulty_label": "IV-V",
+      "display_name": "The Washing Machine",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "recirculating_pourover",
+        "central_hole",
+        "multiple_avoidance_lines",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Washing Machine",
+      "rapid_number": "15",
+      "station_m": 16146.394
+    },
+    {
+      "difficulty_label": "IV",
+      "display_name": "The Terminators",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "large_wave_train",
+        "flip_wave",
+        "high_flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Terminator 1&2",
+      "rapid_number": "16",
+      "station_m": 16920.925
+    },
+    {
+      "difficulty_label": "V",
+      "display_name": "Double Trouble",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "two_large_holes",
+        "flow_sensitive",
+        "multiple_avoidance_lines"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Double Trouble",
+      "rapid_number": "17",
+      "station_m": 17573.434
+    },
+    {
+      "difficulty_label": "V",
+      "display_name": "Oblivion",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "crashing_hole",
+        "third_wave",
+        "flip_hazard",
+        "surf",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Oblivion",
+      "rapid_number": "18",
+      "station_m": 18775.979
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "The Last Straw",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wave_train",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "The Last Straw",
+      "rapid_number": "19",
+      "station_m": 21273.964
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Rapid 20",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "waves",
+        "eddy_lines"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Rapid 20",
+      "rapid_number": "20",
+      "station_m": 21879.457
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Rapid 21",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Rapid 21",
+      "rapid_number": "21",
+      "station_m": 22447.952
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Morning Shave",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wave_train",
+        "eddy_lines"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Morning Shave",
+      "rapid_number": "22",
+      "station_m": 24008.521
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Morning Shower",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wave_train",
+        "high_water_takeout_context"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Morning Shower",
+      "rapid_number": "23",
+      "station_m": 24810.694
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Rapid 24",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Rapid 24",
+      "rapid_number": "24",
+      "station_m": 25635.434
+    },
+    {
+      "difficulty_label": "II-III",
+      "display_name": "Rapid 25",
+      "exact_geometry_status": "required_before_production",
+      "feature_tags": [
+        "wave_train",
+        "takeout_context"
+      ],
+      "guide_review_status": "required",
+      "mandatory_commercial_portage": false,
+      "map_label": "Rapid 25",
+      "rapid_number": "25",
+      "station_m": 27358.848
+    }
+  ],
+  "river_id": "zambezi_batoka_gorge",
+  "route_evidence": [
+    {
+      "rights_status": "link_only_factual_index",
+      "source_id": "zambezi_whitewater_guidebook",
+      "supports": [
+        "approximately_17_miles_to_rapid_25",
+        "boiling_pot_rapid_1_put_in",
+        "rapid_25_standard_full_day_takeout",
+        "rapid_9_commercial_portage",
+        "rapid_11_high_water_put_in_context",
+        "rapid_23_high_water_takeout_context"
+      ],
+      "url": "https://www.whitewaterguidebook.com/africa/zambezi-river-batoka-gorge/"
+    },
+    {
+      "rights_status": "link_only_factual_index",
+      "source_id": "zambezi_shearwater_operator_guide",
+      "supports": [
+        "low_water_boiling_pot_start",
+        "january_to_april_candidate_rapid_11_to_23"
+      ],
+      "url": "https://www.shearwatervictoriafalls.com/experience/white-water-rafting/"
+    },
+    {
+      "rights_status": "link_only_factual_index",
+      "source_id": "zambezi_victoria_falls_guide",
+      "supports": [
+        "low_water_candidate_rapid_1_to_25",
+        "high_water_candidate_rapid_14_to_25",
+        "rapid_names_and_flow_behavior_context"
+      ],
+      "url": "https://www.victoriafalls-guide.net/victoria-falls-rafting.html"
+    }
+  ],
+  "route_variants": [
+    {
+      "end_rapid": "25",
+      "selection_policy": "default_reference_corridor",
+      "start_rapid": "1",
+      "status": "editor_preview_ready_not_physics_runnable",
+      "variant_id": "full_reference_run_1_to_25"
+    },
+    {
+      "end_rapid": "23",
+      "selection_policy": "disabled_until_flow_band_review",
+      "source_id": "zambezi_shearwater_operator_guide",
+      "start_rapid": "11",
+      "status": "operator_source_candidate_requires_local_guide_and_flow_review",
+      "variant_id": "high_water_candidate_11_to_23"
+    },
+    {
+      "end_rapid": "25",
+      "selection_policy": "disabled_until_flow_band_review",
+      "source_id": "zambezi_victoria_falls_guide",
+      "start_rapid": "14",
+      "status": "alternate_published_candidate_requires_local_guide_and_flow_review",
+      "variant_id": "high_water_candidate_14_to_25"
+    }
+  ],
+  "run_length_m": 27358.848,
+  "scenario_id": "zambezi_boiling_pot_to_mukuni_beach_reference_run",
+  "schema": "raftsim.zambezi.run_scenario.v1",
+  "status": "map_and_run_definition_ready_hydraulic_windows_and_guide_review_pending",
+  "terrain": {
+    "authority": "copernicus_dem_glo30_source_scale_technical_corridor",
+    "collision_and_height_query_authority": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/manifest.json",
+    "heightfield": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/heightfield_2017.png",
+    "user_reference_authority": "visual_comparison_only_not_collision_or_physics",
+    "user_reference_morphology_mesh": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/zambezi_batoka_user_reference_morphology.obj"
+  },
+  "unreal_map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate"
+}

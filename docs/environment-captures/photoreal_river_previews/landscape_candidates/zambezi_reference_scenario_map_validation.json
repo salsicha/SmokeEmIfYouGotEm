@@ -1,0 +1,339 @@
+{
+  "actor_count": 49,
+  "mandatory_portage_actor": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
+  "mandatory_portage_marker_count": 1,
+  "map_package": "/Game/RaftSim/Maps/EnvironmentPreviews/LandscapeCandidates/L_ZambeziBatokaGorge_PhysicalCorridorCandidate",
+  "markers": [
+    {
+      "actor_label": "RaftSim_ZambeziRapid_10_Gnashing_Jaws_of_Death",
+      "location_cm": [
+        345079.118,
+        44898.457,
+        8709.73
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_11_Overland_Truck_Eater",
+      "location_cm": [
+        320284.337,
+        106363.481,
+        8630.498
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_12_Three_Ugly_Sisters",
+      "location_cm": [
+        464707.841,
+        117325.334,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_13_The_Mother",
+      "location_cm": [
+        512945.508,
+        115764.498,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_14_Surprise_Surprise",
+      "location_cm": [
+        622760.656,
+        179898.551,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_15_The_Washing_Machine",
+      "location_cm": [
+        789182.377,
+        217120.581,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_16_The_Terminators",
+      "location_cm": [
+        866366.644,
+        216025.689,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_17_Double_Trouble",
+      "location_cm": [
+        880737.323,
+        273914.137,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_18_Oblivion",
+      "location_cm": [
+        955840.667,
+        360027.05,
+        8404.079
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_19_The_Last_Straw",
+      "location_cm": [
+        1197693.99,
+        309335.68,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_1_Against_the_Wall",
+      "location_cm": [
+        326094.562,
+        -426354.062,
+        16382.836
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_20_Rapid_20",
+      "location_cm": [
+        1243532.749,
+        346613.174,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_21_Rapid_21",
+      "location_cm": [
+        1298013.795,
+        362035.644,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_22_Morning_Shave",
+      "location_cm": [
+        1438105.786,
+        372102.84,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_23_Morning_Shower",
+      "location_cm": [
+        1492844.427,
+        418085.96,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_24_Rapid_24",
+      "location_cm": [
+        1561268.574,
+        394585.176,
+        8404.33
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_25_Rapid_25",
+      "location_cm": [
+        1721189.342,
+        348397.338,
+        6883.354
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_2_The_Bridge",
+      "location_cm": [
+        282298.016,
+        -393695.224,
+        14741.732
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_3_Between_Two_Worlds",
+      "location_cm": [
+        216385.125,
+        -384144.012,
+        14877.193
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_4_Morning_Glory",
+      "location_cm": [
+        237859.955,
+        -367139.717,
+        14877.193
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_5_Stairway_to_Heaven",
+      "location_cm": [
+        334472.465,
+        -355360.845,
+        14049.756
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_6_Devil's_Toilet_Bowl",
+      "location_cm": [
+        202069.218,
+        -262308.425,
+        12444.577
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_7_Gulliver's_Travels",
+      "location_cm": [
+        320191.171,
+        -174088.466,
+        11196.572
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_8_Midnight_Diner",
+      "location_cm": [
+        337230.096,
+        -100066.53,
+        11196.531
+      ],
+      "tags": [
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    },
+    {
+      "actor_label": "RaftSim_ZambeziRapid_9_Commercial_Suicide",
+      "location_cm": [
+        310768.877,
+        -19911.675,
+        10375.064
+      ],
+      "tags": [
+        "RaftSimMandatoryPortage",
+        "RaftSimScenarioMarker",
+        "RaftSimZambeziRun"
+      ]
+    }
+  ],
+  "passed": true,
+  "rapid_numbers": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25
+  ],
+  "scenario_marker_count": 25,
+  "schema": "raftsim.unreal.zambezi_reference_scenario_map_validation.v1"
+}

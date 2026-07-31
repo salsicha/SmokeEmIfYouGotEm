@@ -1,0 +1,839 @@
+{
+  "method": {
+    "duplicate_pin_policy": "mean_tip_position_for_rapids_12_and_16",
+    "limitations": [
+      "The PDF is illustrative and is not a surveyed or georeferenced river map.",
+      "Pin-to-pin curves approximate relative spacing; they do not establish exact coordinates.",
+      "Stations may drive editor markers but cannot authorize hydraulic geometry or production lines."
+    ],
+    "pin_policy": "manual_red_pin_tip_digitization_on_complete_page_render",
+    "run_length_m": 27358.848,
+    "run_length_source": "named_rapid_source_catalog_and_linked_17_mile_guide_reference",
+    "station_policy": "cumulative_euclidean_distance_between_ordered_pin_tips_scaled_to_published_17_mile_run"
+  },
+  "production_promoted": false,
+  "rapid_count": 25,
+  "rapids": [
+    {
+      "catalog_name": "Against the Wall",
+      "difficulty_label": "IV-V",
+      "feature_tags": [
+        "wall_cushion",
+        "eddy_ferry",
+        "boils",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 0.0,
+      "map_relative_station_fraction": 0.0,
+      "map_segment_length_px": 0.0,
+      "pdf_label": "The Wall",
+      "pin_tips_px": [
+        [
+          809.5,
+          1176.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "1",
+      "representative_tip_normalized": [
+        0.21152339,
+        0.3607362
+      ],
+      "representative_tip_px": [
+        809.5,
+        1176.0
+      ],
+      "station_m": 0.0,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "The Bridge",
+      "difficulty_label": "III",
+      "feature_tags": [
+        "surf_wave",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 136.2975,
+      "map_relative_station_fraction": 0.02531433,
+      "map_segment_length_px": 136.2975,
+      "pdf_label": "The Bridge",
+      "pin_tips_px": [
+        [
+          673.5,
+          1185.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "2",
+      "representative_tip_normalized": [
+        0.17598641,
+        0.36349693
+      ],
+      "representative_tip_px": [
+        673.5,
+        1185.0
+      ],
+      "station_m": 692.571,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Between Two Worlds",
+      "difficulty_label": "IV",
+      "feature_tags": [
+        "wave",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 267.6786,
+      "map_relative_station_fraction": 0.04971555,
+      "map_segment_length_px": 131.3811,
+      "pdf_label": "Between Two Worlds",
+      "pin_tips_px": [
+        [
+          542.5,
+          1195.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "3",
+      "representative_tip_normalized": [
+        0.14175594,
+        0.36656442
+      ],
+      "representative_tip_px": [
+        542.5,
+        1195.0
+      ],
+      "station_m": 1360.16,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Morning Glory",
+      "difficulty_label": "IV-V",
+      "feature_tags": [
+        "dragons_back",
+        "tight_line",
+        "wave_train",
+        "low_flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 335.3026,
+      "map_relative_station_fraction": 0.06227525,
+      "map_segment_length_px": 67.624,
+      "pdf_label": "Morning Glory",
+      "pin_tips_px": [
+        [
+          584.5,
+          1248.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "4",
+      "representative_tip_normalized": [
+        0.1527306,
+        0.38282209
+      ],
+      "representative_tip_px": [
+        584.5,
+        1248.0
+      ],
+      "station_m": 1703.779,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Stairway to Heaven",
+      "difficulty_label": "V",
+      "feature_tags": [
+        "drop",
+        "hole",
+        "wave_train"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 567.115,
+      "map_relative_station_fraction": 0.10532943,
+      "map_segment_length_px": 231.8124,
+      "pdf_label": "Stairway to Heaven",
+      "pin_tips_px": [
+        [
+          813.5,
+          1284.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "5",
+      "representative_tip_normalized": [
+        0.21256859,
+        0.39386503
+      ],
+      "representative_tip_px": [
+        813.5,
+        1284.0
+      ],
+      "station_m": 2881.692,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Devil's Toilet Bowl",
+      "difficulty_label": "IV",
+      "feature_tags": [
+        "large_wave_train",
+        "hole"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 934.8989,
+      "map_relative_station_fraction": 0.1736374,
+      "map_segment_length_px": 367.7839,
+      "pdf_label": "Devil's Toilet Bowl",
+      "pin_tips_px": [
+        [
+          509.5,
+          1491.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "6",
+      "representative_tip_normalized": [
+        0.133133,
+        0.45736196
+      ],
+      "representative_tip_px": [
+        509.5,
+        1491.0
+      ],
+      "station_m": 4750.519,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Gulliver's Travels",
+      "difficulty_label": "V",
+      "feature_tags": [
+        "large_diagonal",
+        "large_waves",
+        "multiple_moves"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 1277.3036,
+      "map_relative_station_fraction": 0.23723173,
+      "map_segment_length_px": 342.4047,
+      "pdf_label": "Gulliver's Travels",
+      "pin_tips_px": [
+        [
+          784.5,
+          1695.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "7",
+      "representative_tip_normalized": [
+        0.20499085,
+        0.51993865
+      ],
+      "representative_tip_px": [
+        784.5,
+        1695.0
+      ],
+      "station_m": 6490.387,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Midnight Diner",
+      "difficulty_label": "III-V",
+      "feature_tags": [
+        "large_hole",
+        "multiple_lines",
+        "star_trek_line",
+        "muncher_line",
+        "chicken_line"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 1488.1543,
+      "map_relative_station_fraction": 0.27639271,
+      "map_segment_length_px": 210.8507,
+      "pdf_label": "Midnight Diner",
+      "pin_tips_px": [
+        [
+          841.5,
+          1898.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "8",
+      "representative_tip_normalized": [
+        0.21988503,
+        0.58220859
+      ],
+      "representative_tip_px": [
+        841.5,
+        1898.0
+      ],
+      "station_m": 7561.786,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Commercial Suicide",
+      "difficulty_label": "V-VI",
+      "feature_tags": [
+        "river_wide_pourover",
+        "narrow_slot",
+        "mandatory_commercial_portage",
+        "high_consequence"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 1655.3099,
+      "map_relative_station_fraction": 0.30743828,
+      "map_segment_length_px": 167.1556,
+      "pdf_label": "Commercial Suicide",
+      "pin_tips_px": [
+        [
+          776.5,
+          2052.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "9",
+      "representative_tip_normalized": [
+        0.20290044,
+        0.62944785
+      ],
+      "representative_tip_px": [
+        776.5,
+        2052.0
+      ],
+      "station_m": 8411.157,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Gnashing Jaws of Death",
+      "difficulty_label": "IV",
+      "feature_tags": [
+        "large_waves",
+        "holes"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 1818.5428,
+      "map_relative_station_fraction": 0.3377553,
+      "map_segment_length_px": 163.233,
+      "pdf_label": "Gnashing Jaws of Death",
+      "pin_tips_px": [
+        [
+          838.5,
+          2203.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "10",
+      "representative_tip_normalized": [
+        0.21910112,
+        0.67576687
+      ],
+      "representative_tip_px": [
+        838.5,
+        2203.0
+      ],
+      "station_m": 9240.596,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Overland Truck Eater",
+      "difficulty_label": "V",
+      "feature_tags": [
+        "boils",
+        "large_waves",
+        "high_water_put_in"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 2024.7394,
+      "map_relative_station_fraction": 0.37605187,
+      "map_segment_length_px": 206.1965,
+      "pdf_label": "Overland Truck Eater",
+      "pin_tips_px": [
+        [
+          884.5,
+          2404.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "11",
+      "representative_tip_normalized": [
+        0.23112098,
+        0.73742331
+      ],
+      "representative_tip_px": [
+        884.5,
+        2404.0
+      ],
+      "station_m": 10288.346,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Three Ugly Sisters",
+      "difficulty_label": "III-IV",
+      "feature_tags": [
+        "large_wave_train",
+        "surf_wave"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 2348.1521,
+      "map_relative_station_fraction": 0.43611884,
+      "map_segment_length_px": 323.4127,
+      "pdf_label": "The Three Ugly Sisters",
+      "pin_tips_px": [
+        [
+          1150.5,
+          2384.0
+        ],
+        [
+          1207.5,
+          2387.0
+        ],
+        [
+          1264.5,
+          2392.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "12",
+      "representative_tip_normalized": [
+        0.3155213,
+        0.73241309
+      ],
+      "representative_tip_px": [
+        1207.5,
+        2387.667
+      ],
+      "station_m": 11931.709,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "The Mother",
+      "difficulty_label": "IV-V",
+      "feature_tags": [
+        "large_wave_train",
+        "holes"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 2443.021,
+      "map_relative_station_fraction": 0.4537387,
+      "map_segment_length_px": 94.8689,
+      "pdf_label": "The Mother",
+      "pin_tips_px": [
+        [
+          1224.5,
+          2481.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "13",
+      "representative_tip_normalized": [
+        0.31996342,
+        0.76104294
+      ],
+      "representative_tip_px": [
+        1224.5,
+        2481.0
+      ],
+      "station_m": 12413.768,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Surprise Surprise",
+      "difficulty_label": "III",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 2822.7683,
+      "map_relative_station_fraction": 0.52426861,
+      "map_segment_length_px": 379.7473,
+      "pdf_label": "Surprise Surprise",
+      "pin_tips_px": [
+        [
+          1572.5,
+          2633.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "14",
+      "representative_tip_normalized": [
+        0.41089626,
+        0.80766871
+      ],
+      "representative_tip_px": [
+        1572.5,
+        2633.0
+      ],
+      "station_m": 14343.385,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "The Washing Machine",
+      "difficulty_label": "IV-V",
+      "feature_tags": [
+        "recirculating_pourover",
+        "central_hole",
+        "multiple_avoidance_lines",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 3177.5992,
+      "map_relative_station_fraction": 0.59017084,
+      "map_segment_length_px": 354.8309,
+      "pdf_label": "The Washing Machine",
+      "pin_tips_px": [
+        [
+          1925.5,
+          2669.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "15",
+      "representative_tip_normalized": [
+        0.50313562,
+        0.81871166
+      ],
+      "representative_tip_px": [
+        1925.5,
+        2669.0
+      ],
+      "station_m": 16146.394,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "The Terminators",
+      "difficulty_label": "IV",
+      "feature_tags": [
+        "large_wave_train",
+        "flip_wave",
+        "high_flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 3330.0262,
+      "map_relative_station_fraction": 0.61848089,
+      "map_segment_length_px": 152.427,
+      "pdf_label": "The Terminator 1&2",
+      "pin_tips_px": [
+        [
+          2033.5,
+          2716.0
+        ],
+        [
+          2107.5,
+          2716.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "16",
+      "representative_tip_normalized": [
+        0.5410243,
+        0.83312883
+      ],
+      "representative_tip_px": [
+        2070.5,
+        2716.0
+      ],
+      "station_m": 16920.925,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Double Trouble",
+      "difficulty_label": "V",
+      "feature_tags": [
+        "two_large_holes",
+        "flow_sensitive",
+        "multiple_avoidance_lines"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 3458.4396,
+      "map_relative_station_fraction": 0.64233092,
+      "map_segment_length_px": 128.4134,
+      "pdf_label": "Double Trouble",
+      "pin_tips_px": [
+        [
+          2191.5,
+          2759.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "17",
+      "representative_tip_normalized": [
+        0.57264176,
+        0.84631902
+      ],
+      "representative_tip_px": [
+        2191.5,
+        2759.0
+      ],
+      "station_m": 17573.434,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Oblivion",
+      "difficulty_label": "V",
+      "feature_tags": [
+        "crashing_hole",
+        "third_wave",
+        "flip_hazard",
+        "surf",
+        "flow_sensitive"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 3695.0997,
+      "map_relative_station_fraction": 0.68628545,
+      "map_segment_length_px": 236.6601,
+      "pdf_label": "Oblivion",
+      "pin_tips_px": [
+        [
+          2273.5,
+          2981.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "18",
+      "representative_tip_normalized": [
+        0.59406846,
+        0.91441718
+      ],
+      "representative_tip_px": [
+        2273.5,
+        2981.0
+      ],
+      "station_m": 18775.979,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "The Last Straw",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "wave_train",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 4186.7014,
+      "map_relative_station_fraction": 0.77758992,
+      "map_segment_length_px": 491.6017,
+      "pdf_label": "The Last Straw",
+      "pin_tips_px": [
+        [
+          2765.0,
+          2991.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "19",
+      "representative_tip_normalized": [
+        0.72249804,
+        0.91748466
+      ],
+      "representative_tip_px": [
+        2765.0,
+        2991.0
+      ],
+      "station_m": 21273.964,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Rapid 20",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "waves",
+        "eddy_lines"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 4305.8621,
+      "map_relative_station_fraction": 0.79972144,
+      "map_segment_length_px": 119.1606,
+      "pdf_label": "Rapid 20",
+      "pin_tips_px": [
+        [
+          2874.5,
+          3038.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "20",
+      "representative_tip_normalized": [
+        0.75111053,
+        0.93190184
+      ],
+      "representative_tip_px": [
+        2874.5,
+        3038.0
+      ],
+      "station_m": 21879.457,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Rapid 21",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 4417.7415,
+      "map_relative_station_fraction": 0.82050064,
+      "map_segment_length_px": 111.8794,
+      "pdf_label": "Rapid 21",
+      "pin_tips_px": [
+        [
+          2985.5,
+          3052.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "21",
+      "representative_tip_normalized": [
+        0.78011497,
+        0.93619632
+      ],
+      "representative_tip_px": [
+        2985.5,
+        3052.0
+      ],
+      "station_m": 22447.952,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Morning Shave",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "wave_train",
+        "eddy_lines"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 4724.8603,
+      "map_relative_station_fraction": 0.87754138,
+      "map_segment_length_px": 307.1189,
+      "pdf_label": "Morning Shave",
+      "pin_tips_px": [
+        [
+          3286.5,
+          3113.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "22",
+      "representative_tip_normalized": [
+        0.85876666,
+        0.95490798
+      ],
+      "representative_tip_px": [
+        3286.5,
+        3113.0
+      ],
+      "station_m": 24008.521,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Morning Shower",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "wave_train",
+        "high_water_takeout_context"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 4882.7274,
+      "map_relative_station_fraction": 0.90686179,
+      "map_segment_length_px": 157.867,
+      "pdf_label": "Morning Shower",
+      "pin_tips_px": [
+        [
+          3427.5,
+          3184.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "23",
+      "representative_tip_normalized": [
+        0.89561014,
+        0.97668712
+      ],
+      "representative_tip_px": [
+        3427.5,
+        3184.0
+      ],
+      "station_m": 24810.694,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Rapid 24",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "waves",
+        "boils"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 5045.0357,
+      "map_relative_station_fraction": 0.93700708,
+      "map_segment_length_px": 162.3083,
+      "pdf_label": "Rapid 24",
+      "pin_tips_px": [
+        [
+          3577.5,
+          3122.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "24",
+      "representative_tip_normalized": [
+        0.93480533,
+        0.95766871
+      ],
+      "representative_tip_px": [
+        3577.5,
+        3122.0
+      ],
+      "station_m": 25635.434,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    },
+    {
+      "catalog_name": "Rapid 25",
+      "difficulty_label": "II-III",
+      "feature_tags": [
+        "wave_train",
+        "takeout_context"
+      ],
+      "guide_review_status": "required",
+      "map_cumulative_length_px": 5384.2023,
+      "map_relative_station_fraction": 1.0,
+      "map_segment_length_px": 339.1666,
+      "pdf_label": "Rapid 25",
+      "pin_tips_px": [
+        [
+          3674.5,
+          2797.0
+        ]
+      ],
+      "production_authoritative": false,
+      "rapid_number": "25",
+      "representative_tip_normalized": [
+        0.96015155,
+        0.85797546
+      ],
+      "representative_tip_px": [
+        3674.5,
+        2797.0
+      ],
+      "station_m": 27358.848,
+      "stationing_authority": "stylized_map_relative_spacing_not_surveyed"
+    }
+  ],
+  "river_id": "zambezi_batoka_gorge",
+  "schema": "raftsim.zambezi.rapid_map_digitization.v1",
+  "source": {
+    "page": 1,
+    "page_count": 1,
+    "path": "victoria-falls-rapids-map.pdf",
+    "render_dpi": 72,
+    "rendered_reference_size_px": [
+      3827,
+      3260
+    ],
+    "rights_status": "user_supplied_reference_rights_review_required",
+    "sha256": "8000a0d2f319fdd1ee37b60070a16a45189fbb98294fab3756cac505a2564a09"
+  },
+  "status": "digitized_relative_stationing_ready_exact_survey_and_guide_review_required"
+}

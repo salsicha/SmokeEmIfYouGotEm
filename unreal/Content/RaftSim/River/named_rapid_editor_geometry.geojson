@@ -379,8 +379,8 @@
     {
       "geometry": {
         "coordinates": [
-          25.85077554,
-          -17.92945395
+          25.858278,
+          -17.926081
         ],
         "type": "Point"
       },
@@ -396,16 +396,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 1052.263
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 0.0
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.85373208,
-          -17.93136288
+          25.85414207,
+          -17.92901478
         ],
         "type": "Point"
       },
@@ -421,16 +421,16 @@
         "production_authoritative": false,
         "review_priority": "high",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 2104.527
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 692.571
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.85678901,
-          -17.93363711
+          25.84791759,
+          -17.92987278
         ],
         "type": "Point"
       },
@@ -446,16 +446,16 @@
         "production_authoritative": false,
         "review_priority": "high",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 3156.79
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 1360.16
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.84760458,
-          -17.93694359
+          25.84994556,
+          -17.93140029
         ],
         "type": "Point"
       },
@@ -471,16 +471,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 4209.054
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 1703.779
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.84760319,
-          -17.94427598
+          25.85906917,
+          -17.9324584
         ],
         "type": "Point"
       },
@@ -496,16 +496,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 5261.317
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 2881.692
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.85624905,
-          -17.94798817
+          25.84656567,
+          -17.9408174
         ],
         "type": "Point"
       },
@@ -521,16 +521,16 @@
         "production_authoritative": false,
         "review_priority": "high",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 6313.58
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 4750.519
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.86059885,
-          -17.9541138
+          25.85772051,
+          -17.9487423
         ],
         "type": "Point"
       },
@@ -546,16 +546,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 7365.844
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 6490.387
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.8568404,
-          -17.96265399
+          25.85932959,
+          -17.95539177
         ],
         "type": "Point"
       },
@@ -571,16 +571,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 8418.107
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 7561.786
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.86206971,
-          -17.96915632
+          25.85683072,
+          -17.96259217
         ],
         "type": "Point"
       },
@@ -596,16 +596,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 9470.37
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 8411.157
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.85843354,
-          -17.97547253
+          25.86007081,
+          -17.96841414
         ],
         "type": "Point"
       },
@@ -621,16 +621,16 @@
         "production_authoritative": false,
         "review_priority": "high",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 10522.634
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 9240.596
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.86799657,
-          -17.97503539
+          25.85772931,
+          -17.97393562
         ],
         "type": "Point"
       },
@@ -646,16 +646,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 11574.897
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 10288.346
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.87792469,
-          -17.97486542
+          25.87136795,
+          -17.97492033
         ],
         "type": "Point"
       },
@@ -671,16 +671,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 12627.161
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 11931.709
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.88177052,
-          -17.97815545
+          25.87592328,
+          -17.97478012
         ],
         "type": "Point"
       },
@@ -696,16 +696,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 13679.424
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 12413.768
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.88995238,
-          -17.9802515
+          25.88629366,
+          -17.98054135
         ],
         "type": "Point"
       },
@@ -721,16 +721,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 14731.687
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 14343.385
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.89921346,
-          -17.98200109
+          25.9020097,
+          -17.98388505
         ],
         "type": "Point"
       },
@@ -746,16 +746,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 15783.951
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 16146.394
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.90849938,
-          -17.98383704
+          25.90929858,
+          -17.98378669
         ],
         "type": "Point"
       },
@@ -771,16 +771,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 16836.214
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 16920.925
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.91154846,
-          -17.9916818
+          25.91065569,
+          -17.98898688
         ],
         "type": "Point"
       },
@@ -796,16 +796,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 17888.478
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 17573.434
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.91915748,
-          -17.99702905
+          25.91774808,
+          -17.9967225
         ],
         "type": "Point"
       },
@@ -821,16 +821,16 @@
         "production_authoritative": false,
         "review_priority": "critical",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 18940.741
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 18775.979
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.92876794,
-          -17.99458856
+          25.94058748,
+          -17.99216883
         ],
         "type": "Point"
       },
@@ -846,16 +846,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 19993.004
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 21273.964
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.93847073,
-          -17.99249275
+          25.94491627,
+          -17.99551751
         ],
         "type": "Point"
       },
@@ -871,16 +871,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 21045.268
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 21879.457
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.94684637,
-          -17.9962074
+          25.9500612,
+          -17.99690293
         ],
         "type": "Point"
       },
@@ -896,16 +896,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 22097.531
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 22447.952
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.95660764,
-          -17.99587424
+          25.96329078,
+          -17.99780727
         ],
         "type": "Point"
       },
@@ -921,16 +921,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 23149.794
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 24008.521
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.96349244,
-          -17.99952491
+          25.96846004,
+          -18.001938
         ],
         "type": "Point"
       },
@@ -946,16 +946,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 24202.058
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 24810.694
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.97185794,
-          -18.0014545
+          25.97492166,
+          -17.99982689
         ],
         "type": "Point"
       },
@@ -971,16 +971,16 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 25254.321
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 25635.434
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          25.981146,
-          -17.99868946
+          25.99002378,
+          -17.99567778
         ],
         "type": "Point"
       },
@@ -996,8 +996,8 @@
         "production_authoritative": false,
         "review_priority": "medium",
         "river_id": "zambezi_batoka_gorge",
-        "station_kind": "provisional_downstream_order_interpolation",
-        "station_m": 26306.585
+        "station_kind": "stylized_map_relative_spacing_scaled_to_published_run_length",
+        "station_m": 27358.848
       },
       "type": "Feature"
     },

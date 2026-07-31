@@ -1,0 +1,99 @@
+{
+  "artifacts": {
+    "height_preview": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/zambezi_batoka_user_reference_height_preview.png",
+      "sha256": "5950c95a9cde2faf27bf7edf34303308c3f66a6d1ce5460d1055ab57f73723be"
+    },
+    "heightfield_16bit": {
+      "encoding": "unsigned_16_bit_linear_659_to_1029_m",
+      "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/zambezi_batoka_user_reference_heightfield_16bit.png",
+      "physics_authority": false,
+      "sha256": "01bb539d0699ad324a02c178d3cad7ed26495a0f8d96332a227322b76df5771e",
+      "size_px": [
+        1009,
+        625
+      ]
+    },
+    "morphology_mesh": {
+      "base_elevation_m": 659.0,
+      "collision_authority": false,
+      "coordinate_system": "local_x_east_y_south_z_up_metres",
+      "format": "Wavefront OBJ",
+      "grid_size": [
+        513,
+        321
+      ],
+      "import_scale_cm_per_unit": 100.0,
+      "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/zambezi_batoka_user_reference_morphology.obj",
+      "physics_authority": false,
+      "sha256": "3de7c1076abc9d863bad1995b2e25828d22d562e45339f319dc6644ae02f58b3",
+      "triangle_count": 327680,
+      "vertex_count": 164673
+    },
+    "rapid_map_digitization": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/reference/user_supplied/rapid_map_digitization.json",
+      "sha256": "e9f7bc2cacf27fd005895fdcf2dbfb19d1a9c7413eb87e36264709608b68aa6d"
+    },
+    "scenario": {
+      "path": "physics/data/real_world/zambezi_batoka_gorge/scenario_zambezi_run/scenario.json",
+      "sha256": "9a5cef34ebc8f3295d09077d23e43070021c17a202fd184acfc79bf55b8baacc"
+    }
+  },
+  "height_conversion": {
+    "legend_elevation_range_m": [
+      659.0,
+      1029.0
+    ],
+    "limitations": [
+      "The source is colourised, compressed, and composited over OpenStreetMap labels and roads.",
+      "Legend inversion cannot recover elevation precision lost before the screenshot was captured.",
+      "The affine fit is not a geospatial registration and cannot replace the Copernicus DEM."
+    ],
+    "method": "piecewise_rgb_projection_onto_sampled_20_band_legend",
+    "overlay_rejected_fraction": 0.24771587,
+    "overlay_rejection_distance_rgb": 32.0,
+    "registration": "provisional_affine_fit_to_existing_corridor_physical_extents_for_visual_comparison",
+    "repair": "9_pixel_median_for_rejected_pixels_then_1_pixel_gaussian",
+    "source_crop_px": [
+      0,
+      0,
+      2000,
+      1040
+    ]
+  },
+  "physical_extents_m": {
+    "height": 12527.081108492886,
+    "width": 20254.775910292545
+  },
+  "production_promoted": false,
+  "river_id": "zambezi_batoka_gorge",
+  "schema": "raftsim.zambezi.user_reference_bundle.v1",
+  "sources": [
+    {
+      "authority": "visual_morphology_reference_not_dem_or_physics_authority",
+      "path": "zambezi_batoka_heightmap.png",
+      "pixel_format": "8_bit_rgba_display_p3_screenshot",
+      "rights_status": "user_supplied_reference_rights_review_required",
+      "role": "colour_height_reference",
+      "sha256": "f54d690504cc3841b472f2f958262777c768263adb3f046c316f638c7a7342b4",
+      "size_px": [
+        2126,
+        1076
+      ]
+    },
+    {
+      "authority": "illustrative_map_not_surveyed_or_georeferenced",
+      "page_count": 1,
+      "path": "victoria-falls-rapids-map.pdf",
+      "rights_status": "user_supplied_reference_rights_review_required",
+      "role": "rapid_order_and_relative_spacing_reference",
+      "sha256": "8000a0d2f319fdd1ee37b60070a16a45189fbb98294fab3756cac505a2564a09"
+    }
+  ],
+  "status": "reference_products_generated_review_gated_not_terrain_authority",
+  "terrain_authority": {
+    "heightfield": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/derived/heightfield_2017.png",
+    "manifest": "physics/data/real_world/zambezi_batoka_gorge/production_corridor/boiling_pot_to_mukuni_beach/manifest.json",
+    "policy": "Copernicus DEM remains Unreal Landscape collision and height-query authority"
+  }
+}
