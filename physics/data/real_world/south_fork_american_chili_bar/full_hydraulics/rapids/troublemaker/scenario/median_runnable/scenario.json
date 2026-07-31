@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Troublemaker",
       "rapid_order": 8,
+      "source_elevation_datum_m": 321.21716293945315,
       "station_m": 8368.5888,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,

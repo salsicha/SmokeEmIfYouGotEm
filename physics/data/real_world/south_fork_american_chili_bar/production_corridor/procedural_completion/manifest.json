@@ -9,7 +9,7 @@
     "ready_for_hydraulic_authoring_m3": true,
     "terrain_complete": true
   },
-  "algorithm": "south_fork_procedural_geography_v4_smooth_frames",
+  "algorithm": "south_fork_procedural_geography_v6_erosion_conditioned_banks",
   "artifacts": {
     "boulder_catalog": {
       "byte_count": 39854,
@@ -17,37 +17,58 @@
       "sha256": "965f027ed58957dc99917d826b2035f0697c08a64943247c1b984a6d7778ac1f"
     },
     "canonical_grid": {
-      "byte_count": 10826373,
+      "byte_count": 11785156,
       "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_geography.npz",
-      "sha256": "56b6280945a210688b460dc63f36e04adbbe0a4efce6d70514b2aaa870bf6ae0"
+      "sha256": "d7bac4f47257fc8a357c3085307833ba958960f47337bb0a938a1a20f38e7041"
     },
     "overview": {
-      "byte_count": 724846,
+      "byte_count": 723154,
       "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/full_reach_overview.png",
-      "sha256": "e28ac251b67f1bf15458c0cf4ece64c6321c01e99310dc3af3b7fbae2403d6a7"
+      "sha256": "03b6c665303554bb106aa6813b4805edf94284d86f8f58bf0eeed383ee3ae733"
     }
   },
   "authority_policy": {
     "never_claim_as_surveyed": true,
     "not_for_navigation": true,
-    "procedural_infill": "bathymetry, bank blend, source-window seam blend, and sub-DEM rapid controls",
+    "procedural_infill": "bathymetry, erosion-conditioned bank transition, source-window seam blend, and sub-DEM rapid controls",
     "route_basis": "adopted NHD directed mainstem axis",
     "source_imagery": "USDA NAIP conditions material classes",
     "source_terrain": "USGS 3DEP sampled outside the conditioned channel and bank blend"
+  },
+  "bank_conditioning": {
+    "algorithm": "world_space_bounded_erosion_envelope_v1",
+    "authority": "procedural game infill where the adopted route and source DEM thalweg are horizontally misregistered; never surveyed",
+    "full_conditioning_distance_from_bank_m": 88.0,
+    "maximum_erosion_relief_m": 5.5,
+    "profile_base_m": 0.35,
+    "profile_linear_grade": 0.09,
+    "profile_quadratic_grade": 0.00032,
+    "provenance_mask_updated_per_changed_sample": true,
+    "source_fade_distance_from_bank_m": 224.0,
+    "source_samples_retained": true,
+    "wet_transition_m": 14.0
   },
   "continuity": {
     "maximum_center_bed_step_m": 0.924561,
     "maximum_corridor_edge_step_m": 12.664656,
     "near_bank_clearance_m": {
-      "median": 5.018456,
-      "p05": 0.263744
+      "median": 1.64991,
+      "p05": 0.360352
     },
     "no_unbounded_discontinuities": true,
     "seam_blend_distance_m": 64.0,
     "source_seam_count": 7,
-    "source_window_count": 8
+    "source_window_count": 8,
+    "unreal_detailed_ribbon_orientation": {
+      "affected_row_count": 0,
+      "cell_count": 687120,
+      "half_width_m": 112.0,
+      "inverted_or_degenerate_triangle_count": 0,
+      "minimum_signed_triangle_area_m2": 0.325483,
+      "mixed_orientation_cell_count": 0
+    }
   },
-  "determinism_signature_sha256": "5bb7611a3cfaa69f6d585aa8f1fe273023535142d5b115e64e42ea1f49a98cc7",
+  "determinism_signature_sha256": "b28d2248c72fb5494c076489de3b53413e318e007b477a2d87b88e8f237b6eb3",
   "generated_on": "2026-07-19",
   "grid": {
     "centerline_frame_smoothing_radius_m": 128.0,
@@ -152,8 +173,8 @@
       "source_authority": "0 procedural, 1..254 blend, 255 official source",
       "uncertainty": "0 lowest uncertainty, 255 highest uncertainty"
     },
-    "procedural_infill_fraction": 0.118501,
-    "source_authority_fraction": 0.881499
+    "procedural_infill_fraction": 0.587308,
+    "source_authority_fraction": 0.412692
   },
   "river_id": "south_fork_american_chili_bar",
   "schema": "raftsim.south_fork.procedural_geography.v1",
@@ -164,6 +185,17 @@
     "request_bounds_are_not_assumed_to_equal_export_response_bounds": true
   },
   "status": "full_reach_procedural_geography_complete",
+  "surface_classification": {
+    "maximum_wooded_cross_slope": 1.25,
+    "policy": "preserve strong NAIP vegetation on plausible wooded slopes; classify weak/non-green or extreme faces as exposed rock",
+    "source_vegetation_score_threshold": 137,
+    "strong_source_vegetation_score_threshold": 142,
+    "visible_bank_lateral_range_m": [
+      34.0,
+      112.0
+    ],
+    "visible_strong_source_canopy_preserved_fraction": 0.97267
+  },
   "unreal_import": {
     "collision_render_contract": "same heightfield path and hash for collision and render",
     "height_encoding": "global uint16 elevation normalization shared by all tiles",
@@ -174,9 +206,9 @@
     "tiles": [
       {
         "collision_heightfield": {
-          "byte_count": 179102,
+          "byte_count": 131695,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_height.png",
-          "sha256": "74667147b30ae915931f2d97508313f731f87fd658a10dd716df648624e441ac"
+          "sha256": "c9c3b98af3c127ae4c43b5b713712a463364478692b5fd9ebfe4cdac9e070f9e"
         },
         "curvilinear_control_points": [
           {
@@ -386,20 +418,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 12689,
+          "byte_count": 20506,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_material.png",
-          "sha256": "0cc5206627e5c3178a5522d6158fc13c66080d09b7eee10b33dfe497d979f940"
+          "sha256": "559bc83c4a90c7d861634cce53465adc792484fe77ab87aeee7ea6a43633a659"
         },
         "packed_authority_features": {
-          "byte_count": 8750,
+          "byte_count": 12015,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_authority_features.png",
-          "sha256": "70847cf63e73e82443d41f46d33a20a6eb9f3d3ee37a9bec43c0254c0cd21020"
+          "sha256": "2644e3b2d55a353dbff5e0a26235559dbbecd6882ea9aaeceea1cd57681c5e75"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 179102,
+          "byte_count": 131695,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_00_height.png",
-          "sha256": "74667147b30ae915931f2d97508313f731f87fd658a10dd716df648624e441ac"
+          "sha256": "c9c3b98af3c127ae4c43b5b713712a463364478692b5fd9ebfe4cdac9e070f9e"
         },
         "row_range": [
           0,
@@ -413,9 +445,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 175548,
+          "byte_count": 128754,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_height.png",
-          "sha256": "cfeb307f773f0948ec3a5c9ca0e3a3aea78e94a421777e9ed6c389c67e9c3e20"
+          "sha256": "944c13fd2f3201c895ac7684068c4fb2b36ceb4d69f8cd299c40070131168ac3"
         },
         "curvilinear_control_points": [
           {
@@ -625,20 +657,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 10938,
+          "byte_count": 16075,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_material.png",
-          "sha256": "fae58504ec12ca5ebec7ea85d936ad5434bdefd65fd3e53417048ddeb8a7a0ab"
+          "sha256": "a28a5d815508c0114aab23d135fe38e1f1d203782eba01579110787db1e3caf4"
         },
         "packed_authority_features": {
-          "byte_count": 5704,
+          "byte_count": 9991,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_authority_features.png",
-          "sha256": "0528108d74d9b71c4dd4b5dbd2d24f18bdb113326ad0d53011bdb5b4f4df1afe"
+          "sha256": "9ce4b0ad1e3ca93f5839451c467e7b524a9353e8baff2ab9127ae5fe3bebf37f"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 175548,
+          "byte_count": 128754,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_01_height.png",
-          "sha256": "cfeb307f773f0948ec3a5c9ca0e3a3aea78e94a421777e9ed6c389c67e9c3e20"
+          "sha256": "944c13fd2f3201c895ac7684068c4fb2b36ceb4d69f8cd299c40070131168ac3"
         },
         "row_range": [
           1008,
@@ -652,9 +684,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 169919,
+          "byte_count": 125954,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_height.png",
-          "sha256": "ec5f61372f2bbdb438f5414b2486f5c8da82e69f47796f5a8ba3cbca8b2ee38f"
+          "sha256": "9f1a4fbe14cfd1be5737de997a25f552850240f896caf89f5c0aa3cae6f9e892"
         },
         "curvilinear_control_points": [
           {
@@ -864,20 +896,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 9224,
+          "byte_count": 15415,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_material.png",
-          "sha256": "b05963fc02bdeeda1c9d61e2594a7fefb8435593cb3211dfaf831466235d6b58"
+          "sha256": "670a4ba2ae5cc3c112ddc294d92a237b13a7b33da76f784cdf98b076faa422ef"
         },
         "packed_authority_features": {
-          "byte_count": 6080,
+          "byte_count": 10127,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_authority_features.png",
-          "sha256": "8864840cdf6a15df9028018d71590ee9de55bde67882342ad16a8cb1f9d99aac"
+          "sha256": "c49e7e3ffb30bebf7825f0f62ad53954a7ad7aab42995b60ec3aa8a683c0bab2"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 169919,
+          "byte_count": 125954,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_02_height.png",
-          "sha256": "ec5f61372f2bbdb438f5414b2486f5c8da82e69f47796f5a8ba3cbca8b2ee38f"
+          "sha256": "9f1a4fbe14cfd1be5737de997a25f552850240f896caf89f5c0aa3cae6f9e892"
         },
         "row_range": [
           2016,
@@ -891,9 +923,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 158913,
+          "byte_count": 125773,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_height.png",
-          "sha256": "3c7c5ef60defcd4c601660cf6ae462bbb262a87bab046fd961c1268c4657956c"
+          "sha256": "38099bbe2e851d166e44cdb7cb855d68ba0c5489243879eec9440e101b870f4f"
         },
         "curvilinear_control_points": [
           {
@@ -1103,20 +1135,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 10627,
+          "byte_count": 12516,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_material.png",
-          "sha256": "39b6fb2a272bad68809b800b92252a351a6e4b911c0ac7d03467ff3385e9047e"
+          "sha256": "4a27b4ce8d3731bd228fa2364519989264f40d01c12ec75c6f8aa224d1394b34"
         },
         "packed_authority_features": {
-          "byte_count": 5059,
+          "byte_count": 12070,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_authority_features.png",
-          "sha256": "673db5dfc849885a803a653d4b74ec8205126311957d13e0a365b1fefc9b8ebb"
+          "sha256": "c945273626ba709a00cb7e9b4a539a7a722a67e079cd6d60f2888a514359757a"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 158913,
+          "byte_count": 125773,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_03_height.png",
-          "sha256": "3c7c5ef60defcd4c601660cf6ae462bbb262a87bab046fd961c1268c4657956c"
+          "sha256": "38099bbe2e851d166e44cdb7cb855d68ba0c5489243879eec9440e101b870f4f"
         },
         "row_range": [
           3024,
@@ -1130,9 +1162,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 170254,
+          "byte_count": 128123,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_height.png",
-          "sha256": "dfdd8200d12d9ef7904880b3ba5fe6e3a16f2bef2989a78ba5fa2dbf56410b20"
+          "sha256": "2a58379c7a1bf84290cafc98d26dc73e43602553b9a47a5678754a59627fab3e"
         },
         "curvilinear_control_points": [
           {
@@ -1342,20 +1374,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 10870,
+          "byte_count": 21248,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_material.png",
-          "sha256": "338298d481830022c08f51aff0a066017f0fbf0f0f2d05bca1fc2664b182fef3"
+          "sha256": "d8a349e9f9ee891fb57b5cfefbdb45da92870c848c137a1630db2d8af12aacf7"
         },
         "packed_authority_features": {
-          "byte_count": 5019,
+          "byte_count": 8922,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_authority_features.png",
-          "sha256": "60c784f1cb6511151387ad94acd7a17850cff4c99d5bed9e1e107c3ced40d574"
+          "sha256": "209b567af4a33eae9d91d2d2c8b47b4613e742f56f9ad0ba876fea9cc27fd1e9"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 170254,
+          "byte_count": 128123,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_04_height.png",
-          "sha256": "dfdd8200d12d9ef7904880b3ba5fe6e3a16f2bef2989a78ba5fa2dbf56410b20"
+          "sha256": "2a58379c7a1bf84290cafc98d26dc73e43602553b9a47a5678754a59627fab3e"
         },
         "row_range": [
           4032,
@@ -1369,9 +1401,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 163443,
+          "byte_count": 124283,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_height.png",
-          "sha256": "209e942729c3fc70c4e5f9ca06bf445fad0d1b13b556e536e7cd4ac8711c0108"
+          "sha256": "256eeb549fd7755bb6bdace51f13036a1da92c3a3eff8ded6caf3707795cfe1b"
         },
         "curvilinear_control_points": [
           {
@@ -1581,20 +1613,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 15441,
+          "byte_count": 20262,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_material.png",
-          "sha256": "d708a1817ef131833cc6d22efb48062546dd2c8787eee43b7be275f75d333dea"
+          "sha256": "3b77966a5051879db936e73b97e602b2c59e0a2ca8915d3d01f860c4cbebbe86"
         },
         "packed_authority_features": {
-          "byte_count": 5208,
+          "byte_count": 10265,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_authority_features.png",
-          "sha256": "3ce9a3b3d7e854bb226ac651a17501b396293a23c24cca834c46288cc4a71e32"
+          "sha256": "e7f8c77dbeceb6ccb74b9b3d270b3584546f873d8e226245bdb2501aa0c39cec"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 163443,
+          "byte_count": 124283,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_05_height.png",
-          "sha256": "209e942729c3fc70c4e5f9ca06bf445fad0d1b13b556e536e7cd4ac8711c0108"
+          "sha256": "256eeb549fd7755bb6bdace51f13036a1da92c3a3eff8ded6caf3707795cfe1b"
         },
         "row_range": [
           5040,
@@ -1608,9 +1640,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 154411,
+          "byte_count": 136112,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_height.png",
-          "sha256": "5bd2fa21381772ee38afeca02102cb59c9840be0dba30993641cfcc2700a0fab"
+          "sha256": "579e7629d732eb0a34687e92843f906f9a1185a5c8f6cd9ea0b99bca1baeccab"
         },
         "curvilinear_control_points": [
           {
@@ -1820,20 +1852,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 24684,
+          "byte_count": 24044,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_material.png",
-          "sha256": "5bed77775f14d85de8399e6a78caae28413c201063f8d183db807334676f0329"
+          "sha256": "0104cf1f7bd8db958136eb2e30314e75da85563dd00498ad6eed924fb23a6c19"
         },
         "packed_authority_features": {
-          "byte_count": 8848,
+          "byte_count": 14392,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_authority_features.png",
-          "sha256": "4b75f169d968da37cae37cd5fe151fb5f8108562527e14ef63ab53db53d06e3c"
+          "sha256": "da15d75eee6d3c12445a769ebfae8504e07e2f8c68a468d77717caa7f566d817"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 154411,
+          "byte_count": 136112,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_06_height.png",
-          "sha256": "5bd2fa21381772ee38afeca02102cb59c9840be0dba30993641cfcc2700a0fab"
+          "sha256": "579e7629d732eb0a34687e92843f906f9a1185a5c8f6cd9ea0b99bca1baeccab"
         },
         "row_range": [
           6048,
@@ -1847,9 +1879,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 154600,
+          "byte_count": 137117,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_height.png",
-          "sha256": "54e6ec1cf0b13d5afe939de49ce08cb2f8a6c5d43e945d431802f2cb28281fc3"
+          "sha256": "0a03a5b221b61d8737e26ec8be5c63988ee568fdeb9fae23706aad30286fd476"
         },
         "curvilinear_control_points": [
           {
@@ -2059,20 +2091,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 22097,
+          "byte_count": 21709,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_material.png",
-          "sha256": "4eddac5ce0970698eb030ba6170eb8b330455426df08bc75d590adc51c810043"
+          "sha256": "68b8173a55ddd85d47b92b11959bf3293abe5f15570827b244c6f6cdb84fa3ff"
         },
         "packed_authority_features": {
-          "byte_count": 8699,
+          "byte_count": 13911,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_authority_features.png",
-          "sha256": "bf063be54d245679635709f774b66851879ff93d1cbac4199ac66544206ec6c4"
+          "sha256": "e90ba268d7a6cf9573c70a74b46394d3dff79f8eca1c3413ba41c5090dfad530"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 154600,
+          "byte_count": 137117,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_07_height.png",
-          "sha256": "54e6ec1cf0b13d5afe939de49ce08cb2f8a6c5d43e945d431802f2cb28281fc3"
+          "sha256": "0a03a5b221b61d8737e26ec8be5c63988ee568fdeb9fae23706aad30286fd476"
         },
         "row_range": [
           7056,
@@ -2086,9 +2118,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 157238,
+          "byte_count": 123159,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_height.png",
-          "sha256": "08b2d7ca64bae9b664dc04565f5740ba360fe68ae3c74039c2017fdee1d08765"
+          "sha256": "8b1ad5d481e14905c4c0c514a42209c887dfc96de65cadb29708843d19288854"
         },
         "curvilinear_control_points": [
           {
@@ -2298,20 +2330,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 19146,
+          "byte_count": 19927,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_material.png",
-          "sha256": "a0afbdae4c887f192cc1c9e59ed4aeda533a678d8065f9b7f39b47f7a81771ef"
+          "sha256": "d39afdb156e72119165bd62f72ab7efd0eecf29a5c12c57dfe644b05ade21915"
         },
         "packed_authority_features": {
-          "byte_count": 5205,
+          "byte_count": 12759,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_authority_features.png",
-          "sha256": "20ca8a257e66d39a4d1e1664a0bfe01ff178b799e1a4b61036e7868a2dae48cd"
+          "sha256": "00c0200cbedc2c60c73bf4e2dbea54418c866dd8602121a5f914e337759d3120"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 157238,
+          "byte_count": 123159,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_08_height.png",
-          "sha256": "08b2d7ca64bae9b664dc04565f5740ba360fe68ae3c74039c2017fdee1d08765"
+          "sha256": "8b1ad5d481e14905c4c0c514a42209c887dfc96de65cadb29708843d19288854"
         },
         "row_range": [
           8064,
@@ -2325,9 +2357,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 160438,
+          "byte_count": 112582,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_height.png",
-          "sha256": "9f6c34fb72e5b51b6467f70d1e7ce060464420602f351977a5527fedb5d1126f"
+          "sha256": "743de82e9429ebf935307efea62c48dd229b64601bb80d82b3d115c6f482c3a6"
         },
         "curvilinear_control_points": [
           {
@@ -2537,20 +2569,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 20846,
+          "byte_count": 22720,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_material.png",
-          "sha256": "fda8a2b3681099d71fb3cf245718de97743d4e9539f9f923b0dacda5622463fc"
+          "sha256": "5ab221bda3e3bc5228a031f542980723e86151b7713d4c35b6b0381c259936ab"
         },
         "packed_authority_features": {
-          "byte_count": 5190,
+          "byte_count": 11603,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_authority_features.png",
-          "sha256": "b10b4165a511c94b2aba43ed74cf320f77feaebdbe9837af36d01606ae3450f3"
+          "sha256": "44d3989d8d5803fd44f12f0151f5b95fb1d21ac0cb79e54fe6d4edf878f56a11"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 160438,
+          "byte_count": 112582,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_09_height.png",
-          "sha256": "9f6c34fb72e5b51b6467f70d1e7ce060464420602f351977a5527fedb5d1126f"
+          "sha256": "743de82e9429ebf935307efea62c48dd229b64601bb80d82b3d115c6f482c3a6"
         },
         "row_range": [
           9072,
@@ -2564,9 +2596,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 163063,
+          "byte_count": 113995,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_height.png",
-          "sha256": "0e5af5deee4b29d8e4c02697b50af1419e75add8211948f64d0805f9be807df4"
+          "sha256": "eb013df250a6a0b37111b3d71b95851802c40a250d338919cff8127c825f2789"
         },
         "curvilinear_control_points": [
           {
@@ -2776,20 +2808,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 19485,
+          "byte_count": 23793,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_material.png",
-          "sha256": "f6f022af112ed15177587f2c5d91bba01708298a36b57e5262e093ea7bb3fb97"
+          "sha256": "8f5219344d9f12c4f9284073a7aeb0d55bde52e3e257296eddaa8b2508fc44f6"
         },
         "packed_authority_features": {
-          "byte_count": 5174,
+          "byte_count": 8711,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_authority_features.png",
-          "sha256": "c29bca25fd76abedfc9b97dee5708f967d531bd6bf44daec4fa0d706230e54f5"
+          "sha256": "2cb79383d88c38fe9bdfafaa64190703c04419a233a314af94ad9b35465c6432"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 163063,
+          "byte_count": 113995,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_10_height.png",
-          "sha256": "0e5af5deee4b29d8e4c02697b50af1419e75add8211948f64d0805f9be807df4"
+          "sha256": "eb013df250a6a0b37111b3d71b95851802c40a250d338919cff8127c825f2789"
         },
         "row_range": [
           10080,
@@ -2803,9 +2835,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 159768,
+          "byte_count": 106754,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_height.png",
-          "sha256": "94e4760f0efec6dd26c3851ccf6a3e7b8131fe825b08bd92d2b252f90dbe3f97"
+          "sha256": "7dd1ca6568911fb7625f42c32f4a306f628889ef88bd6b2e4a21aec6fbd5e751"
         },
         "curvilinear_control_points": [
           {
@@ -3015,20 +3047,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 10627,
+          "byte_count": 11264,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_material.png",
-          "sha256": "09605b0244523d64fe7fc1ce7333d4aa24c9765e46c03ee5b08de53e6d004ea7"
+          "sha256": "60ed3067f8a7bfa59a744de88bede4bbbcaef3ceede92c86d5ed9cdb7f5557d1"
         },
         "packed_authority_features": {
-          "byte_count": 5173,
+          "byte_count": 7641,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_authority_features.png",
-          "sha256": "72a68428514f7cb6c881d81d30525146ac56b73541b46d00ddacf9a07669b852"
+          "sha256": "d6198fe7ed91a6df3993cfd1f78f6390947b35b45f53c9f2bddf3124e3fe8f5f"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 159768,
+          "byte_count": 106754,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_11_height.png",
-          "sha256": "94e4760f0efec6dd26c3851ccf6a3e7b8131fe825b08bd92d2b252f90dbe3f97"
+          "sha256": "7dd1ca6568911fb7625f42c32f4a306f628889ef88bd6b2e4a21aec6fbd5e751"
         },
         "row_range": [
           11088,
@@ -3042,9 +3074,9 @@
       },
       {
         "collision_heightfield": {
-          "byte_count": 158708,
+          "byte_count": 105658,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_height.png",
-          "sha256": "38e3ede3d945333827457475c9c000cffa1115f46d028611efa2d2727cabe6d5"
+          "sha256": "e75287860059f002a3d1d5635e60431f56acb6988dd611c0629be169e6ed4cbc"
         },
         "curvilinear_control_points": [
           {
@@ -3254,20 +3286,20 @@
           256.0
         ],
         "material_mask": {
-          "byte_count": 10349,
+          "byte_count": 10965,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_material.png",
-          "sha256": "a4aa30c0d3793538dc929c64322917f7ea882761ec40bf2def67a2bec962bb82"
+          "sha256": "b5a44abb3e7b5879d84078a500ac1c9d2a5d5aecef58c805f30897e9228c0b41"
         },
         "packed_authority_features": {
-          "byte_count": 5271,
+          "byte_count": 7697,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_authority_features.png",
-          "sha256": "a1c808ef6062d9ed8629707059597777877883329d373a6e32ef8d37128f9e05"
+          "sha256": "e8b6999cf2cd5484d241f8af635841e0340983e50e0c30d8c9a75d13be0d5f02"
         },
         "render_collision_registered": true,
         "render_heightfield": {
-          "byte_count": 158708,
+          "byte_count": 105658,
           "path": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/procedural_completion/unreal_tiles/south_fork_12_height.png",
-          "sha256": "38e3ede3d945333827457475c9c000cffa1115f46d028611efa2d2727cabe6d5"
+          "sha256": "e75287860059f002a3d1d5635e60431f56acb6988dd611c0629be169e6ed4cbc"
         },
         "row_range": [
           11262,

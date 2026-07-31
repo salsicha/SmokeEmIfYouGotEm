@@ -1,0 +1,33 @@
+{
+  "schema": "raftsim.m9.solver_gated_breaking_relief_review.v1",
+  "reviewed_utc": "2026-07-29T21:36:00Z",
+  "revision_id": "v182",
+  "status": "technical_relief_accepted_photoreal_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "implementation": {
+    "authority": "positive solver-derived aeration only",
+    "presentation": "bounded non-colliding surface microrelief",
+    "maximum_source_contribution_m": 0.42,
+    "presentation_only": true,
+    "hydraulics_collision_navigation_or_gameplay_changed": false
+  },
+  "evidence": {
+    "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v182_solver_gated_breaking_relief",
+    "captured_views": 5,
+    "build_log": "/private/tmp/raftsim_m9_v182_solver_gated_breaking_relief_build.log",
+    "build_log_sha256": "cc3a344639bbdb6374b6d8b1721c2c55ba23a92f1d1b5ebaaf5a4254e3cdc888"
+  },
+  "decision": {
+    "technical_mechanism_retained": true,
+    "photoreal_water_accepted": false,
+    "reason": "The bounded relief makes Meat Grinder more legible, but the two-metre overlay topology reads as isolated triangular shards and Troublemaker remains too flat and sparse."
+  },
+  "release_effect": {
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  }
+}

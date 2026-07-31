@@ -1,0 +1,144 @@
+{
+  "schema": "raftsim.review.south_fork_live_oak_dense_woody.v211",
+  "reviewed_on": "2026-07-29",
+  "milestone": "M9",
+  "candidate": "interior_live_oak_dense_woody_v2_with_leaf_clusters_v3",
+  "status": "visual_promotion_rejected_stronger_technical_source_retained",
+  "production_promoted": false,
+  "photoreal_accepted": false,
+  "source": {
+    "species_visual_target": "Quercus wislizeni / California interior live oak",
+    "generator": "OpenAI built-in image generation",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "referenced_images": [],
+    "prompt_location": "physics/src/raftsim/south_fork_live_oak_leaf_clusters_v3.py:IMAGEGEN_PROMPT",
+    "chroma": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3_Chroma.png",
+      "sha256": "29c9bf2239cf67e2cc5ac5e185d676f38c24c4687b0abb00f90670865b9d61bc"
+    },
+    "alpha": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3.png",
+      "sha256": "ba0a5930c0f7aa4a0afe077f319c4b2a1b99ec83fe40e4ecf925d6c793a1cdfb",
+      "tool": "imagegen skill remove_chroma_key.py",
+      "auto_key": "border",
+      "reported_key_color": "#fa02f9",
+      "soft_matte": true,
+      "transparent_threshold": 12,
+      "opaque_threshold": 220,
+      "despill": true,
+      "transparent_pixels": 949905,
+      "partially_transparent_pixels": 71553,
+      "total_pixels": 1572516
+    },
+    "atlas": {
+      "layout": "four cleaned 2x2 source quadrants in the first row of a 2048-square 4x4 runtime atlas",
+      "occupied_tiles": [0, 1, 2, 3],
+      "reserved_transparent_tiles": [4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      "occupied_band_opaque_pixel_count": 399118,
+      "reserved_band_opaque_pixel_count": 0,
+      "component_cleanup": "retain the largest eight-connected alpha silhouette inside each generated source quadrant before resizing",
+      "mip_padding_pixels": 24,
+      "tile_boundary_crossing_allowed": false
+    },
+    "map_hashes": {
+      "albedo_opacity": "6f5db19fa3e9bad386da4c29c5f2633b804fa0aba0bb7555e784086a87fe042e",
+      "normal": "0b085fcb5e46e10e84b8749b5d89152eda4f1cdd896c3e0f8f8ea272064d600e",
+      "ao_roughness_subsurface": "5e03edc813904d14f885745d43c2dea2ce797d6aa2d6a609be40fd3502d4efb7"
+    }
+  },
+  "authoring": {
+    "authoring_flag": "RaftSimOnlyLiveOakDenseWoodyV2Review",
+    "mode": "normal offscreen editor startup with ExecCmds and QUIT_EDITOR",
+    "validated_textures": 6,
+    "source_dimensions": [2048, 2048],
+    "platform_dimensions": [2048, 2048],
+    "mips_per_texture": 12,
+    "mesh": {
+      "object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakDenseWoodyV2_OpenGrownMature.SM_RaftSim_SouthForkInteriorLiveOakDenseWoodyV2_OpenGrownMature",
+      "woody_segments": 72,
+      "terminal_branches": 45,
+      "leaf_cards": 90,
+      "leaf_atlas_tiles": 4,
+      "leaf_card_scale": 1.12,
+      "billboard_core": 0,
+      "vertices": 1664,
+      "bark_triangles": 1016,
+      "leaf_triangles": 180,
+      "total_triangles": 1196,
+      "materials": 2,
+      "collision": "disabled",
+      "nanite": "disabled"
+    },
+    "asset_hashes": {
+      "bark_albedo_texture": "3c23c8b2f87141b61a9b4616138a566f11f5c258096b9c939881630e8fb68e18",
+      "bark_normal_texture": "9b0bb1d90468040da7f443a6d4f9f752da69a58d587f3f4d97402ec853410295",
+      "bark_packed_texture": "bd26bc4d2178beac899556cedacdc08166b369ac621460f8c1b58cc34af0e504",
+      "leaf_albedo_opacity_texture": "164b7131ce8f64ea3a4ecd01aef7f564188cf91cefd11149e456bc302d282f49",
+      "leaf_normal_texture": "e2861bf4d38cfa4b8c280036bc544211a4bbfc1e4c225cebd038448e457cc157",
+      "leaf_packed_texture": "a4d56e7e8b6483742d47ae3780b8c39c87ae93eae92737689e3a436410568cc4",
+      "bark_material": "7e3f630c4489739c8acef01f36957b9b99cbbf0dcd82dcb4de696d7ddce11bad",
+      "leaf_material": "df1bae2a597c9382e7598f939fab51df3627b795b37f891c9bd6ee81c536a21e",
+      "mesh": "e4da5a095680c131e5ea82474c624ed98ebbfbed1b8c28f215067432f8324ac9"
+    }
+  },
+  "capture": {
+    "capture_flag": "RaftSimLiveOakDenseWoodyV2Review",
+    "directory": "docs/environment-captures/south_fork_full_reach/photographic_v211_live_oak_dense_woody_v2",
+    "transient_component_swaps": 21,
+    "transient_instance_swaps": 24830,
+    "saved_map_changed": false,
+    "hashes": {
+      "chili_bar_launch_downstream.png": "e0eb7116ebe41a27ade631ba695cfb5ad6bd5c65900982772a1bd405aabfebe6",
+      "coloma_bridge_context.png": "3b029af0f4df20252e4432ca262bb0aa6ad2a6874a66dfb6d9da089e30010405",
+      "meat_grinder_guide_eye.png": "ff7d5993ffbb6317ae1d88c744140261b3b13da1c07b1d443e861445fe250c57",
+      "salmon_falls_takeout.png": "a264f6aa44711ef3e844ea69bd6cde8c50a40c90eb0dce0d2c49bcf373bf64cf",
+      "troublemaker_approach.png": "c825f59ca02779c2316e267b1af2bef3d82e074351ae436a81bd8e3041e5d0f7"
+    },
+    "comparison_to_v202": {
+      "mean_absolute_rgb_average": 1.554656,
+      "percent_pixels_any_channel_gt_8_average": 4.113021,
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.925275, 3.215495],
+        "coloma_bridge_context.png": [2.207796, 5.552734],
+        "meat_grinder_guide_eye.png": [1.268557, 3.950521],
+        "salmon_falls_takeout.png": [1.361102, 2.267904],
+        "troublemaker_approach.png": [2.010549, 5.578451]
+      },
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"]
+    },
+    "comparison_to_v210": {
+      "mean_absolute_rgb_average": 0.669217,
+      "percent_pixels_any_channel_gt_8_average": 2.042361
+    }
+  },
+  "manual_review": {
+    "positive_findings": [
+      "The new source is materially leaf-dominant and eliminates the twig-heavy miniature-tree silhouettes in V2.",
+      "Crown continuity is visibly stronger than v210 in every fixed view.",
+      "The exact same true-woody scaffold now accepts independently derived leaf atlases without changing production placement or runtime authority."
+    ],
+    "rejection_reasons": [
+      "Four cluster shapes repeat as dark rounded clumps, especially at Troublemaker, Coloma, and Salmon Falls.",
+      "A single scaffold topology repeated across 24830 instances exposes regular fork and crown patterns.",
+      "Near/mid/far lighting and representation transitions do not preserve believable leaf volume or color.",
+      "Terrain, water, other foliage, and lighting remain synthetic, so no frame is acceptable release media."
+    ],
+    "decision": "Reject v211 visual promotion. Retain the V3 source, deterministic atlas derivation, strict authoring path, and captures as the strongest current technical live-oak input.",
+    "next_required_visual_input": "Several irregular crown-age/form variants, per-component or per-instance variant selection, calibrated two-sided foliage lighting and color response, and controlled near/mid/far transitions followed by named art/ecology review."
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "affects_gameplay": false
+  },
+  "milestone_gate": {
+    "m9_passed": false,
+    "authoritative_visual_baseline": "v184",
+    "commit_allowed": false,
+    "push_allowed": false
+  }
+}

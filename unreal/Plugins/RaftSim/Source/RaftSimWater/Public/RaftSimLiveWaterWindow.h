@@ -27,6 +27,7 @@ struct FRaftSimLiveWaterSampleResult
 {
     bool bValid = false;
     bool bWet = false;
+    /** Absolute source-data elevations; cooked windows restore their internal solver datum. */
     float SurfaceHeightM = 0.0f;
     float BedHeightM = 0.0f;
     float DepthM = 0.0f;
@@ -109,6 +110,8 @@ private:
     FVector2D OriginM = FVector2D::ZeroVector;
     float CellXM = 1.0f;
     float CellYM = 1.0f;
+    /** Datum removed from cooked bed/stage fields before solving, restored when sampling. */
+    double ElevationDatumM = 0.0;
     double SeedWetFractionValue = 1.0;
     uint64 StepCounter = 0;
 };

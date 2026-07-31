@@ -1,0 +1,82 @@
+{
+  "schema": "raftsim.release_review.south_fork_clustered_embedded_bank_rock.v191",
+  "generated_on": "2026-07-29",
+  "status": "rejected_scale_regression_source_corrected_before_any_promotion",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimEmbeddedBankRockReview -RaftSimExitAfterEnvironmentAutomation",
+  "comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v190_scan_rock_bank_morphology",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v191_clustered_embedded_bank_rock",
+  "implementation": {
+    "shore_candidates": 15702,
+    "visible_clustered_instances": 2446,
+    "collision_authority_changed": false,
+    "hydraulic_authority_changed": false,
+    "navigation_changed": false,
+    "map_or_asset_package_saved": false,
+    "transforms_and_meshes_restored_after_capture": true,
+    "failed_assumption": "UStaticMesh bounds were treated as centimetres when the isolated donor import retained source-scale bounds; absolute target-size division therefore produced landscape-scale multipliers"
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v191_clustered_embedded_bank_rock_build.log",
+    "log_sha256": "60d1fdbb313ae7d918ff7bb675529ea962ada9f803530bc6957c7281ca2e7360",
+    "result": "succeeded",
+    "total_execution_seconds": 76.91
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v191_clustered_embedded_bank_rock_capture.log",
+    "log_sha256": "bec159ed2345552e3d0b14e5ae43fb34bd6beac96b43c096531e7e3273516da9",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "cfe4ec74ba9c0cb1a7e6807059a6ae868cb45a6007c7db63111bd396f2f4cc97",
+    "meat_grinder_guide_eye": "701db8d47333085be7a12c0c8aeb13c41f390ca1c8f617d86e3786f6ce6bc920",
+    "troublemaker_approach": "e5aea8a9a60726d2f6cfd6b992cae23fe15a56df3e31cdc72b12549ee46a927d",
+    "coloma_bridge_context": "4999aeb751d6913cd27f80da55ecf8ca28fa5c35c9f977bb65c85829b5f5f5bf",
+    "salmon_falls_takeout": "dd49337f007d95992fd2cf43f903b015fe49a22bd728b4797c566123d30d162c"
+  },
+  "pixel_delta_from_v190": {
+    "chili_bar_launch_downstream": {
+      "mean_absolute_rgb": 23.06424,
+      "pixels_any_channel_gt_8_percent": 30.018229,
+      "pixels_any_channel_gt_16_percent": 29.443251
+    },
+    "meat_grinder_guide_eye": {
+      "mean_absolute_rgb": 51.854283,
+      "pixels_any_channel_gt_8_percent": 49.495443,
+      "pixels_any_channel_gt_16_percent": 47.442491
+    },
+    "troublemaker_approach": {
+      "mean_absolute_rgb": 35.560414,
+      "pixels_any_channel_gt_8_percent": 58.271593,
+      "pixels_any_channel_gt_16_percent": 57.879232
+    },
+    "coloma_bridge_context": {
+      "mean_absolute_rgb": 19.405434,
+      "pixels_any_channel_gt_8_percent": 22.061198,
+      "pixels_any_channel_gt_16_percent": 21.665582
+    },
+    "salmon_falls_takeout": {
+      "mean_absolute_rgb": 2.917732,
+      "pixels_any_channel_gt_8_percent": 4.629232,
+      "pixels_any_channel_gt_16_percent": 4.562826
+    }
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "rejection_reasons": [
+      "Landscape-scale donor meshes occlude the river, terrain, bridge, and vegetation in four fixed views.",
+      "The candidate is neither physically plausible nor navigable as a visual composition, even though gameplay collision and hydraulics were not changed.",
+      "The absolute-size conversion depended on an invalid unit assumption at the isolated donor-asset boundary."
+    ],
+    "corrective_action": "remove absolute donor-bounds division and derive the corrected v192 scale only from the already validated v190 world transforms using a bounded 1.80-3.20x multiplier",
+    "candidate_retention": "retain captures and ledger as negative regression evidence; do not retain the unsafe scale formula"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

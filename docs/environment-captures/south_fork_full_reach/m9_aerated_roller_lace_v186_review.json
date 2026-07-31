@@ -1,0 +1,31 @@
+{
+  "schema": "raftsim.m9.aerated_roller_experiment_review.v1",
+  "reviewed_utc": "2026-07-29T22:32:00Z",
+  "revision_id": "v186",
+  "status": "visually_rejected_implementation_removed",
+  "human_approved": false,
+  "technical_result": {
+    "editor_build": "succeeded",
+    "presentation_only": true,
+    "collision_hydraulics_navigation_or_gameplay_changed": false,
+    "material_change": "carrier-free translucent lace"
+  },
+  "evidence": {
+    "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v186_aerated_roller_lace",
+    "build_log": "/private/tmp/raftsim_m9_v186_aerated_roller_lace_build.log",
+    "build_log_sha256": "e0a67290f189623366b9fb776d1ad0f333b306011213e737a61021bb1163a149",
+    "views": {
+      "chili_bar_launch_downstream": "250a8015d6d54b8364f3857e40aee922519eae3e2c463b5f83ecde718934f76f",
+      "coloma_bridge_context": "f00a95dbf7ecb1da1042dd5350092d10a3f54e25d1996a6787adfda6b9d59f71",
+      "meat_grinder_guide_eye": "b7bdde5e835f3b3e64b1d0144d3cec9d4ccc3826a6f24658eaece7489a2049b4",
+      "salmon_falls_takeout": "080ddbc2d61ae979d9036ead468763e210f7b1070ef055ce73e1473b08df914e",
+      "troublemaker_approach": "87d2ba14dc05633fe1a3c47e8105c75e865450ea2c9c2897999457acd92ddfaa"
+    }
+  },
+  "decision": {
+    "retained": false,
+    "reason": "Removing the translucent water carrier barely changes the review frames and does not remove the glass-like mound silhouette, so the shader-only correction does not solve the presentation failure.",
+    "source_removed": true,
+    "negative_capture_evidence_retained": true
+  }
+}

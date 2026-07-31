@@ -1,0 +1,65 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_boulder_01_meat_grinder_hero_2k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "boulder_01_2k.gltf",
+      "sha256": "52d118b56748a18509e4ec0075d07b254d72a0401793f22363c0bb3a682e7361",
+      "bytes": 2773
+    },
+    {
+      "relative_path": "boulder_01.bin",
+      "sha256": "7f5b06503d62bd95bfe9c6b8a354a5cc8ff04a4d271a8cf87a3e3125db4232d7",
+      "bytes": 2938808
+    },
+    {
+      "relative_path": "textures/boulder_01_diff_2k.jpg",
+      "sha256": "90bbaa17c1fe0254d2b0b6e5148264fa834953a72724d566f14af029eebe3ca3",
+      "bytes": 3672483
+    },
+    {
+      "relative_path": "textures/boulder_01_nor_gl_2k.jpg",
+      "sha256": "5174b318712ac7725cbcb55d422607f9c66d7f8d035c5412ab897b5939e2db6b",
+      "bytes": 4649207
+    },
+    {
+      "relative_path": "textures/boulder_01_arm_2k.jpg",
+      "sha256": "ab52859dde519b4822111aa60916b6d21f8a6966c67b6cec44d1cd0775b8a86a",
+      "bytes": 2273068
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/SM_Boulder01.SM_Boulder01",
+      "dimensions_cm": [
+        127.21356201171875,
+        183.0334243774414,
+        100.38301944732666
+      ],
+      "base_z_cm": -7.364296913146973,
+      "lod0_build_scale": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "nanite_enabled": true,
+      "static_mesh_editor_subsystem_available": false,
+      "nanite_fallback_triangle_count_lod0": 16094,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/M_Boulder01_ReviewLit.M_Boulder01_ReviewLit",
+      "collision_policy": "disabled_on_transient_review_components"
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/T_Boulder01_ARM_2K.T_Boulder01_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/T_Boulder01_BaseColor_2K.T_Boulder01_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/T_Boulder01_NormalGL_2K.T_Boulder01_NormalGL_2K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/M_Boulder01_ReviewLit.M_Boulder01_ReviewLit",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/M_MeatGrinderBank_ReviewLit.M_MeatGrinderBank_ReviewLit"
+  ]
+}

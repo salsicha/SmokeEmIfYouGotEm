@@ -1,0 +1,136 @@
+{
+  "schema": "raftsim.m9.solver_breaking_water_lip_review.v1",
+  "reviewed_utc": "2026-07-28T20:43:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "runtime_surface": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+    "runtime_surface_sha256": "8a99dc233052ff71d72d8d556a2d22f78c830ec3af2c9d79c9510b0f05b85eb2",
+    "runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+    "runtime_header_sha256": "7cbb45866e855d72b69af7a457520d4d68e2a7312417b9b3ba38b1b681865a0a",
+    "material_authoring": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp",
+    "material_authoring_sha256": "018891867871f93c52ff23d915dcdcbc8193aae85760b28417ab0530f70f5186",
+    "material_authoring_script": "unreal/Scripts/create_breaking_water_lip_material.py",
+    "material_authoring_script_sha256": "4a00ffaa5df994d7ea44f229e59446eb1eba8dd9ce66ad77d12bcd0d6fe743d5",
+    "capture_harness": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+    "capture_harness_sha256": "a1eede95045673ad3d2a5ac99d4e62cb48df4f4e640cca3e8fd39f7f2d45c358",
+    "project_owned_foam_lace": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FoamLace.png",
+    "external_asset_inputs": []
+  },
+  "runtime_asset": {
+    "material": "unreal/Content/RaftSim/Materials/M_RaftSim_BreakingWaterLip.uasset",
+    "material_sha256": "92f524cb6ed7b99d218bec1e52fc7439c1bcad893945c0b2b9bd49e897647f0b",
+    "blend_mode": "BLEND_Translucent",
+    "two_sided": true,
+    "serialized_texture_dependencies": [
+      "/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/T_RaftSim_SouthForkWater_FoamLace",
+      "/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/T_RaftSim_SouthForkWater_FlowNormal"
+    ],
+    "metal_sm6_default_material_fallback": false
+  },
+  "implementation": {
+    "site_authority": "existing solver-detected supercritical-to-subcritical hydraulic jumps",
+    "site_thresholds": {
+      "upstream_froude_minimum": 1.12,
+      "downstream_froude_maximum": 0.94,
+      "minimum_intensity": 0.08
+    },
+    "maximum_site_count": 24,
+    "minimum_site_spacing_m": 6.0,
+    "across_segments_per_site": 8,
+    "curl_segments_per_site": 8,
+    "triangles_per_site": 128,
+    "maximum_triangle_count": 3072,
+    "profile_sweep_degrees": 240.0,
+    "minimum_radius_cm": 60.0,
+    "maximum_radius_cm": 130.0,
+    "minimum_height_cm": 35.0,
+    "maximum_height_cm": 105.0,
+    "multi_valued_overhang": true,
+    "separate_from_solver_surface": true,
+    "collision_enabled": false,
+    "casts_shadow": false,
+    "water_sampling_changed": false,
+    "foam_site_generation_changed": false,
+    "d3_changed": false,
+    "d4_changed": false,
+    "buoyancy_flip_wrap_pin_damage_or_rescue_changed": false
+  },
+  "automation": {
+    "native_editor_build": "succeeded",
+    "focused_python_suites": [
+      "physics/tests/test_editor_source_layout.py",
+      "physics/tests/test_m9_release_acceptance_packet.py",
+      "physics/tests/test_flexible_raft_visual_upgrade.py"
+    ],
+    "focused_python_passed": 34,
+    "focused_python_failed": 0,
+    "water_surface_report": "unreal/Saved/Automation/M9B3V48BreakingLipWaterSurfaceExact/index.json",
+    "water_surface_report_sha256": "112e0cfa85fb1f1d99bb2a2e4b2c28047fc1f2f6a1cecb7ab0eb581115849cea",
+    "water_surface_succeeded": 1,
+    "water_surface_succeeded_with_warnings": 0,
+    "water_surface_failed": 0,
+    "m4_report": "unreal/Saved/Automation/M9B3V48BreakingLipM4Exact/index.json",
+    "m4_report_sha256": "6413b1eed908c20ef4ffcfe1d966d549213afb4eca64c32cb35bf70cd9741e3c",
+    "m4_succeeded": 3,
+    "m4_succeeded_with_warnings": 0,
+    "m4_failed": 0,
+    "m5_report": "unreal/Saved/Automation/M9B3V48BreakingLipM5Exact/index.json",
+    "m5_report_sha256": "6f0af8526f279d89919bc3a84293b6eef5d01b2e372ff6a11648383b69b1efa7",
+    "m5_succeeded": 4,
+    "m5_succeeded_with_warnings": 0,
+    "m5_failed": 0
+  },
+  "renderer_evidence": {
+    "hero_capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v48_flow_lace_breaking_lips_hero.png",
+    "hero_capture_sha256": "03d7e5a917ef9176959783398323aed3ccf60282c463e162576d1c3bde3837c7",
+    "breaking_water_capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v48_strongest_flow_lace_breaking_lip_review.png",
+    "breaking_water_capture_sha256": "19b94e3d1ea8c644ba1dacb575d1a675f19c0d7a9b27792e4d418fa19843bed4",
+    "width": 1470,
+    "height": 956,
+    "human_approved": false
+  },
+  "breaking_water_telemetry": {
+    "active_sites": 5,
+    "visible_triangles": 640,
+    "visible": true,
+    "strongest_reviewed_intensity": 0.356,
+    "strongest_reviewed_distance_to_raft_cm": 6619.3,
+    "hero_contacts": 3,
+    "hero_wrapping": 3,
+    "hero_pinned": 1,
+    "hero_recovering": 0,
+    "hero_maximum_indentation_m": 0.22,
+    "hero_wetness": 0.998,
+    "hero_contact_patch_triangles": 96,
+    "hero_instance_counts": {
+      "fine_spray": 91,
+      "mist": 5,
+      "contact_foam": 9,
+      "droplets": 144
+    }
+  },
+  "rejected_iterations": [
+    "v45 used the shared soft-card material; its clear arch read as glass and was rejected as final art.",
+    "v46 first authored the dedicated flow-lace material with an incorrect Linear Color sampler for the Masks texture; Unreal used the checker default, the frame was rejected, and the package was overwritten.",
+    "v47 corrected the sampler and removed the default fallback, but the low-intensity closest-site review remained too transparent to judge.",
+    "v48 retains the corrected Masks sampler, bounded higher aeration opacity, and strongest-site review camera."
+  ],
+  "accepted": [
+    "Solver-detected hydraulic jumps can now render a genuinely multi-valued curling sheet instead of being limited to a single-valued heightfield.",
+    "The complete current Meat Grinder window activates five sites and 640 non-colliding triangles, below the 3,072-triangle hard bound.",
+    "The dedicated project-owned material compiles on Metal SM6 and uses the existing rights-tracked foam-lace and flow-normal textures.",
+    "Exact-current water-surface, M4 and M5 automation pass without warnings, and the raft-centred frame preserves a three-wrap, one-pin D4 state."
+  ],
+  "rejected_or_open": [
+    "The upgrade is retained as technical live-water geometry, not final photoreal water art.",
+    "The strongest-site diagnostic exposes coarse riverbed/terrain seams, hard water-patch boundaries and simplified wave shape that remain below the requested environment standard.",
+    "The lip lacks production-scale entrained-air volume, collapsing crest breakup, turbulent pile interaction and Niagara-quality spray/mist.",
+    "No named guide or art reviewer has approved hydraulic fidelity, scale, motion, material response or the captures.",
+    "The captures are not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "schema": "raftsim.m9.crew_stroke_cadence_review.v1",
+  "reviewed_utc": "2026-07-29T19:17:33Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "helmet_fit_superseded_by": "docs/environment-captures/south_fork_full_reach/m9_helmet_fit_v176_review.json",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "implementation": {
+    "stroke_cycle": "continuous catch_power_recovery",
+    "power_phase_fraction": 0.58,
+    "recovery_blade_lift_cm": 26.0,
+    "power_impulse_phase": 0.29,
+    "crew_stroke_interval_seconds": 0.8,
+    "paddler_normalized_phase_offsets": [
+      -0.026,
+      0.018,
+      0.032,
+      -0.012
+    ],
+    "guide_normalized_phase_offset": 0.045,
+    "maximum_timing_span_milliseconds_at_production_cadence": 56.8,
+    "exact_two_hand_shaft_grip_during_forward_and_back_strokes": true,
+    "resting_hidden_cadence_removed": true,
+    "visual_and_propulsion_power_phase_synchronized": true
+  },
+  "authority_boundary": {
+    "visual_pose_authority_changed": true,
+    "first_propulsion_impulse_timing_changed": true,
+    "per_stroke_impulse_changed": false,
+    "steady_state_cadence_changed": false,
+    "crew_reaction_latency_changed": false,
+    "crew_mass_changed": false,
+    "water_sampling_changed": false,
+    "hydraulic_channels_changed": false,
+    "d3_flip_authority_changed": false,
+    "d4_wrap_pin_contact_authority_changed": false,
+    "collision_changed": false,
+    "raft_mesh_or_material_changed": false,
+    "terrain_or_environment_changed": false,
+    "rescue_or_progression_changed": false,
+    "map_or_package_mutation": false
+  },
+  "source": {
+    "avatar_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+    "avatar_header_sha256": "5114eb9a90b955085aec9c9bba8b75d8465776ff14294c072bb5c831ddba62f7",
+    "avatar_runtime": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+    "avatar_runtime_sha256": "68e56632e393cc64da0840621a270411dc3e8ca20c2f1ac5ae5990943974e8e1",
+    "raft_runtime": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp",
+    "raft_runtime_sha256": "cb248ceb6029ddf3cbff0552c1f9fc51c2478f33dc583ee88e6e8eb76b25b880",
+    "m5_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+    "m5_test_sha256": "3167f67835c88228c4144cde65164cac9a073960ed7d6c4bd4248daff34710dc",
+    "p3_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimCrewCommandTest.cpp",
+    "p3_test_sha256": "9ce16d2f6be83f69902638f7e6682a376146fc7945f15618766ef3af22ce6a09"
+  },
+  "automation": {
+    "focused_source_and_rights_tests": {
+      "passed": 35,
+      "failed": 0,
+      "tests": [
+        "physics/tests/test_editor_source_layout.py",
+        "physics/tests/test_photoreal_rights_reviewed_assets.py"
+      ]
+    },
+    "unreal_editor_build": "succeeded",
+    "m5_renderer_suite": {
+      "suite": "RaftSim.M5",
+      "passed": 5,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v175_crew_cadence_m5.log",
+      "log_sha256": "ecef41bc1ff0be2512b39788922ec71171f299b7f93c44702be5677b7976cf40",
+      "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+    },
+    "p3_renderer_test": {
+      "suite": "RaftSim.P3.CrewRespondsToCommands",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v175_crew_cadence_p3_review_camera.log",
+      "log_sha256": "3db64f32bbf719f4679f78a74abad7f8e6e8d43b430caba122eed463be3081a8",
+      "platform_expectation": "Known UE 5.8 macOS offscreen PIE text-input teardown diagnostic is explicitly expected; the propulsion and active-command assertions pass.",
+      "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+    },
+    "m7_renderer_test": {
+      "suite": "RaftSim.M7.ZFullReachPresentation",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v175_crew_cadence_m7.log",
+      "log_sha256": "41ca7612d835538ac547e0abf642ce2cff58293ef071aa6db87b71342f28ab0c",
+      "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+    }
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_crew_stroke_cadence_v175_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "78509d2e6cd8e61c95457463f7e90fa2bb88b3f1c0e824a3df14ca3cda423b55",
+    "width": 1280,
+    "height": 1888,
+    "camera": "test_tank_front_starboard_technical_review",
+    "production_roster_count": 5,
+    "human_approved": false
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "m5": "current after v175",
+    "p3_crew_command": "current after v175",
+    "m7": "current after v175",
+    "m4": "stale after the v175 runtime-source delta",
+    "m8": "stale after the v175 runtime-source delta",
+    "complete_python_data_source_matrix": "stale after the v175 runtime-source delta",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "accepted": [
+    "Forward and backward strokes now use a continuous catch/power/recovery curve rather than a symmetric sine, and lift the blade during recovery instead of dragging it through a full underwater loop.",
+    "Both solved hands remain on the rendered paddle segment at catch, power finish, and recovery.",
+    "Four paddlers and the guide use five small deterministic timing offsets spanning 56.8 ms at the production cadence, reducing cloned motion without making a trained crew visibly uncoordinated.",
+    "The first reduced-model propulsion impulse now lands at the 0.29 power phase after the visible catch; the existing per-stroke impulse, steady-state 0.8 s cadence, reaction latency, and downstream-motion contract are retained.",
+    "The UE 5.8 target builds, source/rights tests pass 35/35, renderer-backed M5 passes 5/5, P3 crew propulsion passes 1/1, and exact-current M7 passes 1/1."
+  ],
+  "rejected_or_open": [
+    "The dedicated side capture still shows rigid seated posture, tube-like arm deformation, coarse hands, imperfect helmet/head fit, limited gaze/facial performance, and synthetic character/PPE shading; it does not pass photoreal character review.",
+    "A single still verifies rendered integration but cannot substitute for authored production motion capture, per-seat inverse kinematics, paddle/water contact constraints, or qualified guide review of full-cycle biomechanics.",
+    "The empty test tank is technical evidence only and is not representative environment or release media.",
+    "No named guide or art reviewer has approved stroke technique, hand placement, PPE fit, character anatomy, animation, or capture.",
+    "Water, shoreline, terrain, foliage, rock, atmosphere, character, raft, and release-media photoreal gates remain open."
+  ]
+}

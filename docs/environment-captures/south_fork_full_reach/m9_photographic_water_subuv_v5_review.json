@@ -1,0 +1,140 @@
+{
+  "artifact": "M9 particle-scale photographic whitewater SubUV V5 isolated review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "passed": false,
+  "promotion_allowed": false,
+  "decision": "retain_production_atlas_reject_current_photographic_v5_candidate",
+  "authoritative_geography_claim": false,
+  "summary": "V5 fixes the source-scale and mip-boundary defects found in V4: its sixteen project-owned frames are distinct at a 32 px-per-cell review mip, retain black cell boundaries, and represent individual ribbons, droplets, porous mist kernels, and foam crescents rather than complete macro plumes. Native review assets compile, load, and validate in an isolated package. The uncalibrated candidate is effectively invisible at gameplay distance. A V5-only optical-density calibration removes the production atlas's broad smoke puff in the close particle-macro comparison and reveals an irregular, hole-bearing water-film silhouette without rectangular edges, but that silhouette still collapses into a small detached fuzzy mark in the established contact camera and produces no material wrap-view improvement. Expanding only the mist mip footprint does not solve that gameplay-scale read. V5 therefore fails the visual-improvement gate. Production remains selected and byte-identical.",
+  "production": {
+    "selected": true,
+    "source_atlas": "unreal/SourceArt/RaftSim/Water/T_RaftSim_WaterParticle_SubUV.png",
+    "source_atlas_sha256": "c43a78d8d454113230025a2ecef476afb666908626d67ebf1add5b399a492ba1",
+    "runtime_asset_sha256": {
+      "unreal/Content/RaftSim/Materials/M_RaftSim_NiagaraWaterParticle.uasset": "d0e7b1a23f92a987f5b086fa35eb0c147c591729868be7f09aad22247636470a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_AeratedMist.uasset": "4f74fe1d93b3cd83a8dd4c0eb31ae6e976392082b36089fefd727246b241ea98",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_ContactDroplets.uasset": "f1f73e56aadbff61bd03af1fd190b96b20b4f7a918296ba2647e83c49c09d41a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidAerosol.uasset": "bc3835023b6d9f3e97a58abeb252e251b0cdb04c3e11427032cfcba8a62d4556",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidRoller.uasset": "7fd9b6563d4c699031940a02046a133351bac21f22e1193066ee7c00f6bcc0d6",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_SolverSpray.uasset": "9e7cf05cb8404441edc3118affd4b09e0f4a961f8922242e0535c61c6cfa136f",
+      "unreal/Content/RaftSim/VFX/Water/Textures/T_RaftSim_WaterParticle_SubUV.uasset": "0b7b95549cf035b71f8e901709dd360630f5c5b99b60bb4161f6b0b85ae4bbff"
+    }
+  },
+  "candidate_source": {
+    "ownership": "project_owned_first_party_image_generation",
+    "image_generation_mode": "built_in_imagegen",
+    "external_source_input": false,
+    "sources": {
+      "spray_foam": {
+        "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_SprayFoam_Source_v5.png",
+        "sha256": "ef90e6e90f12929c9b5cd90157ba3b2083bdedb6e5417ae6ed28ed52a6d3324b"
+      },
+      "droplets": {
+        "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_Droplets_Source_v5.png",
+        "sha256": "a27be8d61e7bfc285a168af80001c40c6d4fcacdeeffe35b1b71503b57444aaa"
+      },
+      "aerated_foam": {
+        "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_AeratedFoam_Source_v5.png",
+        "sha256": "28e87280530803abf8ec41b8469b022de2af9ece6a33575c78f9da41560d1d8a"
+      }
+    },
+    "derived_review_atlas": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WaterParticle_SubUV_v5_review.png",
+    "derived_review_atlas_sha256": "0f68fd5ecdaf3ed2c9471da7e22863a3cb082885fdcd42568410494520fc8624",
+    "mip32_preview": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WaterParticle_SubUV_v5_mip32_preview.png",
+    "mip32_preview_sha256": "d789edc9710115fc575d8b36057f3ad70821b2da62c63ead3ea7d93ddebc63dd",
+    "provenance": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WaterParticle_SubUV_v5_review.provenance.json",
+    "provenance_sha256": "5e6ca2de24c0297e6704f1ec79c58cb917beda495711a7b279d64c11a93e3b45",
+    "generator": "unreal/Scripts/build_photographic_water_particle_atlas_v5.py",
+    "generator_sha256": "d6f0fe78b7a80824a5cea7f52fd7ce63cb99413cf2dc60a59237de9d6a2f6dec",
+    "grid": [4, 4],
+    "cell_dimensions_px": [512, 512],
+    "minimum_black_padding_px": 93,
+    "minimum_black_padding_fraction": 0.181640625,
+    "mip_review_size_px": 32,
+    "mip_gate": "16/16 nonvanishing, 16/16 unique, 16/16 zero-valued outer borders"
+  },
+  "isolation": {
+    "runtime_switch": "-RaftSimPhotographicWaterAtlasV5Review",
+    "default_switch_state": false,
+    "conflicting_review_switch_behavior": "fail_closed_to_production",
+    "review_asset_root": "/Game/RaftSim/VFX/Water/PhotographicSubUVV5Review",
+    "author_script": "unreal/Scripts/create_photographic_water_vfx_v5_review.py",
+    "author_script_sha256": "1bbb9afc139484907a414c9aee3368439654a88ffd94ac5ac1ef666b965ad2a8",
+    "production_maps_modified_by_review": false,
+    "production_assets_modified_by_review": false,
+    "solver_contact_emission_authority_changed": false,
+    "world_space_sprite_dimensions_changed": false,
+    "current_review_asset_sha256": {
+      "M_RaftSim_NiagaraWaterParticle_V5Review.uasset": "d5ab7b43ffe2b859c35f2acf1af2e100f6659c48f4e62f08f15143c7dbeeacf6",
+      "NS_RaftSim_AeratedMist_V5Review.uasset": "f980851870c14ac79ebbb7680daace24c5c4812b7651e6cca8918f2a8050168d",
+      "NS_RaftSim_ContactDroplets_V5Review.uasset": "7c8e93f6551a6505965e85e15c707cd63df4964e731ee69febc2d0c580dc5bc2",
+      "NS_RaftSim_RapidAerosol_V5Review.uasset": "5f4bb2ca48c054065d385eae072662983a67eeee022e716995ba08f935afc923",
+      "NS_RaftSim_RapidRoller_V5Review.uasset": "2e0bdbbd676cbb7f59f96ccaf665c0de51fd7a933221bfba1cb8bb9f2d7009eb",
+      "NS_RaftSim_SolverSpray_V5Review.uasset": "e8b0268ebef0be88713dea8a9b319d672593ea02b7b5f45e2eb0fd13f368a9c2",
+      "Textures/T_RaftSim_WaterParticleV5Review_SubUV.uasset": "5e64f34d61dd0a6d905d654a90a6dd9f64f8624df72cf5158ed753381312c16b"
+    }
+  },
+  "native_renderer_review": {
+    "initial_contact": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_contact_port.png",
+      "capture_sha256": "56cf23186c28b13a9763ff0ce0e2c2bdf302aae4f30decc12c505fb50259a9f5",
+      "result": "clean but nearly invisible at gameplay distance"
+    },
+    "matched_particle_macro": {
+      "production_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_production_particle_macro.png",
+      "production_capture_sha256": "c3aa41829982a331e938bb3b71b96a78e2a36b76744ce9dea5fa8d5985605e99",
+      "uncalibrated_review_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_particle_macro.png",
+      "uncalibrated_review_capture_sha256": "71f0513ffd6d604e33fc4e657c3e56f5a790a97ad242e5305ab9e33031ee5701",
+      "calibrated_review_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_density_particle_macro.png",
+      "calibrated_review_capture_sha256": "3da2d597ebdca05d6612c0edfb3d9d135f99401e3a29f0c8c3b50327c1a89452",
+      "state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220; production-scale sprites and solver-authorized Niagara emission retained",
+      "result": "calibration reveals an irregular porous film without V4 smoke/checkerboard/rectangle artifacts, but close inspection alone is insufficient for promotion"
+    },
+    "calibrated_gameplay_views": {
+      "contact_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_density_contact_port.png",
+      "contact_capture_sha256": "93cc22e5f0f84f8656458999931ce709e2f06d84479547c8abc18d8f3e266d70",
+      "wrap_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_density_wrap_hero.png",
+      "wrap_capture_sha256": "f3564d787ddf3c147c466cc6c07e58e74345ff36d80b013caeeac35ed602f1ea",
+      "result": "small detached fuzzy contact mark and no material wrap-view improvement"
+    },
+    "expanded_mist_mip_view": {
+      "contact_capture": "docs/environment-captures/south_fork_full_reach/m9_photographic_subuv_v5_review_expanded_mist_contact_port.png",
+      "contact_capture_sha256": "3a690b8048a2106de3f90f7a3629b8c706e5dd777f4f0bf8c4475285788ea114",
+      "result": "still too small and detached to read as a clear gameplay improvement"
+    }
+  },
+  "native_evidence": {
+    "initial_author_log": "/private/tmp/raftsim_m9_v305_photographic_subuv_v5_author.log",
+    "initial_author_log_sha256": "dd3a4079d226254980635e9dcfccdd2ad8a65a50703143b320cf5add73712709",
+    "particle_macro_production_log_sha256": "e04ffd557e358a967f4f33376deb0b3f2cd749b3b1b72d4f1e5b3463d21e9588",
+    "particle_macro_uncalibrated_log_sha256": "5991d36c9dfdd239df8c38b279c0b71b14c288acfacb2d8e4af15295f2b7a974",
+    "calibrated_author_log_sha256": "778dbb2800a474a9dfab31732061efea6e9db1136a1a9979da197340c446d203",
+    "calibrated_particle_macro_log_sha256": "d082a4f1187cfa517fb45f6b00f9266d5ce11dd64e3097a84df3bdd080daa207",
+    "calibrated_contact_log_sha256": "2bc58c749bef194a7e4cdfb928abd6f17fdd5a73e67d4bc8cfde936fc610c424",
+    "calibrated_wrap_log_sha256": "94420852bfa4ba23c1110927a7e3e9658716e081aac20f81b4e6d0eb0960a332",
+    "expanded_mist_build_log_sha256": "5e6ca2de24c0297e6704f1ec79c58cb917beda495711a7b279d64c11a93e3b45",
+    "expanded_mist_author_log_sha256": "56bd0dc3ec0d7a2f05e5a11c6c7fdd2ec6b359f282d800b027c9f4e482c8006d",
+    "expanded_mist_contact_log_sha256": "12f7320fd5d48b8b427fe782e5f9e3bee3fe6e2321f8c1b7fa06a6f680c2d32a",
+    "author_result": "5/5 systems authored; 7/7 isolated assets validated; clean exit"
+  },
+  "post_review_validation": {
+    "focused_python_tests": "19/19 passed after the final V5 evidence update",
+    "m5_result": "5/5 passed: 4 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m5_known_warning": "Engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning",
+    "m5_report": "/private/tmp/raftsim_m9_v316_photographic_subuv_v5_m5/index.json",
+    "m5_report_sha256": "397b91d8581ad151a98d8f98bd723cd0984a0bf7774bc8f1ca51910016a6478f",
+    "m5_log": "/private/tmp/raftsim_m9_v316_photographic_subuv_v5_m5.log",
+    "m5_log_sha256": "372c17b5663928fb528f34821a99e127d3da32e0f10087017693b32a0f52f62b",
+    "m9_result": "5/5 passed: 5 Success, 0 SuccessWithWarnings, 0 Failed, 0 NotRun; release manifest remains intentionally fail-closed",
+    "m9_report": "/private/tmp/raftsim_m9_v317_photographic_subuv_v5_m9/index.json",
+    "m9_report_sha256": "3cda9f0c5beda34c04dc5604973962883892c1299b5964348b744a54edaef897",
+    "m9_log": "/private/tmp/raftsim_m9_v317_photographic_subuv_v5_m9.log",
+    "m9_log_sha256": "439bc0d3ef71ec1c8c86bda20ed2bbc699553729dcb7cc59b02b6aa547d60eab"
+  },
+  "next_iteration_requirements": [
+    "Replace the sprite-only contact presentation with a connected solver-shaped sheet/mesh or ribbon that has temporal continuity and a clear water-surface origin.",
+    "Use photographic masks only as breakup detail within that connected volume rather than as the complete visible event.",
+    "Require an obvious improvement in both particle-macro and normal gameplay views without detached cards, smoke, repeated silhouettes, or rectangular mip artifacts before promotion."
+  ]
+}

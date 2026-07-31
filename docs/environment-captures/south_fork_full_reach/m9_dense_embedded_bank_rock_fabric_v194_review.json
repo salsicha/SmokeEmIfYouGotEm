@@ -1,0 +1,74 @@
+{
+  "schema": "raftsim.release_review.south_fork_dense_embedded_bank_rock_fabric.v194",
+  "generated_on": "2026-07-29",
+  "status": "technically_rendered_but_visually_noop_rejected_for_production",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimEmbeddedBankRockReview -RaftSimExitAfterEnvironmentAutomation",
+  "comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v190_scan_rock_bank_morphology",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v194_dense_embedded_bank_rock_fabric",
+  "implementation": {
+    "shore_candidates": 15702,
+    "visible_dense_instances": 9676,
+    "retention_probability_range": [0.48, 0.96],
+    "physical_longest_dimension_range_m": [0.25, 1.9],
+    "effective_bounds_include_lod0_build_scale": true,
+    "base_z_pivot_compensated": true,
+    "proportional_embed_depth_range": [0.1, 0.24],
+    "collision_authority_changed": false,
+    "hydraulic_authority_changed": false,
+    "navigation_changed": false,
+    "map_or_asset_package_saved": false,
+    "transforms_and_meshes_restored_after_capture": true
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v194_dense_embedded_bank_rock_fabric_build.log",
+    "log_sha256": "6371e38930bf9edaeadc583a78ef25959e877a165dee4954c058977bbbe6fee6",
+    "result": "succeeded",
+    "total_execution_seconds": 10.13
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v194_dense_embedded_bank_rock_fabric_capture.log",
+    "log_sha256": "9adb83f92157f2ce800b675be7993bfce69d49957f7c53116c77176e3ebc0569",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "bb833d53df14e0e48797f96d992d7dc11eb8fab6b89b02aa566773214b23d518",
+    "meat_grinder_guide_eye": "f339d8b75255d8cb437ee0e36999467379dbe3b65faa6df58bf27c839457e042",
+    "troublemaker_approach": "c562d0159cbe04a4a0d21ed860a9047e2d9f1cbaafd98568344615008f64b2e3",
+    "coloma_bridge_context": "07120864cae38110d0d80136edf11951ed228fa7b9ddfeb379bcecbc8e1ee7af",
+    "salmon_falls_takeout": "bc592136782b63fc3e091cffc552af8350318a53998995b29ce775469d1684cb"
+  },
+  "pixel_delta_from_v190": {
+    "chili_bar_launch_downstream_mean_absolute_rgb": 0.0,
+    "meat_grinder_guide_eye_mean_absolute_rgb": 0.0,
+    "troublemaker_approach_mean_absolute_rgb": 0.0,
+    "coloma_bridge_context_mean_absolute_rgb": 0.0,
+    "salmon_falls_takeout_mean_absolute_rgb": 0.000012,
+    "pixels_any_channel_gt_8_percent_all_views": 0.0
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "accepted_corrections": [
+      "The 100x donor LOD0 build scale is included in physical sizing.",
+      "The 41-66 cm negative donor base pivots are compensated before proportional embedding.",
+      "The retained sample count rises from 2,446 in v193 to 9,676 without the v191 occlusion or v192 burial regressions."
+    ],
+    "rejection_reasons": [
+      "Four fixed views are byte-identical to v190 and Salmon Falls changes by only 0.000012 mean RGB with no pixel above an eight-level delta.",
+      "The source shore-cobble sample positions remain mostly hidden, distant, or outside the five guide-eye frusta even after plausible physical sizing and 61.62% retention.",
+      "No view gains a legible cutbank, gravel bar, embedded-rock fabric, root system, undercut, wet edge, or vegetation transition.",
+      "Broad flat water, coarse ground, repetitive foliage, sparse scene dressing, and synthetic lighting remain dominant.",
+      "No named art, guide, geology, geospatial, owner, performance, or rights reviewer approved the candidate."
+    ],
+    "corrective_action": "Stop using the existing shore-cobble samples as the placement authority. Author source-conditioned longitudinal bank-form geometry and camera-legible gravel/rock/root distributions from river edges, terrain elevation, water level, and deterministic procedural gap filling before another five-view comparison.",
+    "candidate_retention": "retain the opt-in reversible review path, captures, and ledger as evidence that corrected unit, pivot, scale, and density policies are insufficient; do not promote the placement authority or any production asset"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

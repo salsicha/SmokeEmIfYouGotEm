@@ -1,0 +1,97 @@
+{
+  "schema": "raftsim.m9.refined_guide_feature_foam_review.v1",
+  "reviewed_utc": "2026-07-29T22:45:00Z",
+  "revision_id": "v184",
+  "status": "best_technical_baseline_retained_photoreal_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "named_geospatial_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "implementation": {
+    "environment_algorithm": "south_fork_photoreal_environment_v29_guide_feature_breaking_relief",
+    "global_aeration_base": "legacy solver Froude threshold",
+    "named_rapid_aeration": "solver surface slope plus acceleration, strain, and convergence",
+    "guide_feature_geometry_authority": "procedural_infill_interpreted_from_guide_inventory_pending_human_review",
+    "overlay_resolution_m": 1.0,
+    "whitewater_foam_actor_count": 24,
+    "whitewater_foam_triangle_count": 396425,
+    "maximum_vertical_displacement_m": 0.56,
+    "presentation_only": true,
+    "hydraulics_collision_navigation_or_gameplay_changed": false
+  },
+  "renderer_evidence": {
+    "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+    "width": 1280,
+    "height": 720,
+    "settled_source_capture": true,
+    "world_partition_actor_references_loaded": 201,
+    "hlod_primitive_components_isolated": 0,
+    "flow_band_components_evaluated": 64,
+    "inactive_flow_band_components_hidden": 41,
+    "active_flow_band": "median_runnable",
+    "views": {
+      "chili_bar_launch_downstream": "250a8015d6d54b8364f3857e40aee922519eae3e2c463b5f83ecde718934f76f",
+      "coloma_bridge_context": "f00a95dbf7ecb1da1042dd5350092d10a3f54e25d1996a6787adfda6b9d59f71",
+      "meat_grinder_guide_eye": "84d397e8eb58cd871e1b7dbdbb8f5c6545f16c42132b5a2ee0c66fa732e7d6c8",
+      "salmon_falls_takeout": "95ae1339b6a53600f53e0e2475ea3111bf9cc07793b48451295d4b81909ed00e",
+      "troublemaker_approach": "c1de4a6ee0d60a82e943b392a20e7c9d6757e00e8309636445ab7ccbd83f2f7a"
+    },
+    "capture_log": "/private/tmp/raftsim_m9_v184_post_roller_rollback_build.log",
+    "capture_log_sha256": "27dfb529376e23c3171745f8186b29b9d9114ad7aa396cf529300bc27ea54a5a"
+  },
+  "validation": {
+    "unreal_editor_build": "succeeded",
+    "authoritative_world_build": "succeeded",
+    "build_log": "/private/tmp/raftsim_m9_v184_post_roller_rollback_build.log",
+    "build_log_sha256": "27dfb529376e23c3171745f8186b29b9d9114ad7aa396cf529300bc27ea54a5a",
+    "hlod_fresh_build": "28 of 28 actors built and saved with zero errors",
+    "hlod_build_log_sha256": "ec2bb1068c876e6b2e9a6f827c16d2934e2707734f2f4a3d10e2d59a02f61c55",
+    "hlod_settling_repeat": "28 of 28 geometry rebuilds rejected; one actor package resaved during setup, requiring a final repeat",
+    "hlod_settling_repeat_log_sha256": "926f7dcf94ac7e2ce54c35627ff5ffff074af6a8e43c617bc57f6f3b088853e3",
+    "hlod_settled_repeat": "28 of 28 actors evaluated with zero modified packages and zero errors",
+    "hlod_repeat_log_sha256": "3e930a4ea66dfc2d69c8be1d5b9627298b9739180b12ca9dc6f1bb65be937310",
+    "m7_renderer_test": "1 of 1 passed",
+    "m7_log_sha256": "9466c2f32d204a4bd497ebaa313f45389d2437b861e2f8161dc4489eec787907",
+    "m8_content_lock_tests": "4 of 4 passed after aligning the stale canopy test with the accepted two-plane crossed-card generator contract",
+    "m8_log_sha256": "a6ca2e1d05f7d2398d1ca1b5db2a12999613dca9613d459199e7abf6f042dc04",
+    "m9_fail_closed_release_tests": "5 of 5 passed; technical checks are green and release promotion remains denied by the explicit human and external qualification gates",
+    "m9_log_sha256": "5e505fdf1dd382e9fdd3aeca833e64038774ed0eb367ea1eb647f3d99f089122",
+    "post_rollback_editor_source_layout": "23 of 23 passed",
+    "post_rollback_hlod_evidence": "6 of 6 passed",
+    "focused_python_data_source_tests": "65 of 65 passed",
+    "full_python_data_source_matrix": "1121 passed, 3 expected installed-dependency-path skips, and 1 intentional fail-closed release-packet source-hash mismatch in 515.03 seconds",
+    "graphify": "165116 nodes, 190482 edges, 13656 communities after v185-v187 rollback evidence"
+  },
+  "validation_currency": {
+    "map_sha256": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e",
+    "build_manifest_sha256": "524fd6d46a0b554d91db170d9e97ebcda9b1b3000ed3a5e9a219fd6a18276bda",
+    "hlod_evidence_sha256": "60590b43c4aa55d3ce50f0d30aeca80cd0a14e5def6c11efdb8f85a7f17580ac",
+    "m7": "current after HLOD finalization",
+    "m9": "5 of 5 technical checks current and fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "decision": {
+    "technical_baseline_retained": true,
+    "guide_interpretation_approved": false,
+    "photoreal_water_accepted": false,
+    "photoreal_environment_accepted": false,
+    "reason": "One-metre refinement improves continuity and makes Meat Grinder legible, but the foam still reads as bright polygonal ribbons over a dark, flat reflective sheet. Troublemaker is underpowered, and coherent breaking lips, entrained-air volume, spray, mist, shoreline transitions, production foliage, terrain, and lighting remain below the requested photoreal bar."
+  },
+  "open_gates": [
+    "Production water surface and volumetric whitewater art",
+    "Final photoreal terrain, rock, foliage, infrastructure, character, raft, animation, and lighting art",
+    "Named owner, guide, art, geospatial, legal, marketing, and release-media review",
+    "External Windows, Proton, macOS fresh-machine, and input-hardware qualification",
+    "Signing, notarization, approved media, authenticated distribution, and release promotion"
+  ],
+  "release_effect": {
+    "technical_water_readability_improved": true,
+    "stale_hlod_gate_closed": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  }
+}

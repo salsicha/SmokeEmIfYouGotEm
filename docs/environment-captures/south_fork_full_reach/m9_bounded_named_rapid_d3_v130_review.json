@@ -1,0 +1,156 @@
+{
+  "schema": "raftsim.m9.bounded_named_rapid_d3_review.v1",
+  "reviewed_utc": "2026-07-29T08:04:21Z",
+  "candidate": "m9_bounded_named_rapid_d3_v130",
+  "parent": "m9_live_segment_water_v129",
+  "status": "retained_technical_physics_calibration",
+  "human_approved": false,
+  "named_guide_reviewer": null,
+  "release_approved": false,
+  "problem": {
+    "discovery": "The first two-second high-flow Meat Grinder run coupled real per-segment water to D3 long enough to expose an angular-velocity feedback failure that static and forced-water tests had missed.",
+    "rejected_probe": {
+      "report": "/private/tmp/raftsim_m9_meat_grinder_line_probe_v130a/index.json",
+      "report_sha256": "d9d15c9751b9fe766a92f33fc4801808a23671217919079635c95f7fab5d66a9",
+      "hazard_retained_water_mass_kg": 508009312.225,
+      "hazard_final_z_m": 6125156.38,
+      "control_retained_water_mass_kg": 50443106.579,
+      "control_final_z_m": 57424811.07,
+      "decision": "rejected as nonphysical; the passing exploratory harness result was not acceptance"
+    },
+    "root_cause": [
+      "Production D3 used the 0.16 m D6 reference overtopping plane even though the shipping tube radius is 0.28 m, placing a normally floating loaded tube below the overtopping plane in moving water.",
+      "Relative point velocity could raise incoming speed without a production envelope.",
+      "Retained volume had no finite self-bailing interior capacity, allowing roll rate, incoming flux, retained load, and torque to amplify each other."
+    ]
+  },
+  "source": {
+    "flex_model_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimFlexibleRaftModel.h",
+      "sha256": "3ef5f2ccaa1a3edc765e7a81765c57a173fb861ec6450e41705b2416aa78f806"
+    },
+    "flex_model_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimFlexibleRaftModel.cpp",
+      "sha256": "459b7a6647bc97f9b557b02be8cd3dafcd13220ea377b8b5d60eedb8552995a0"
+    },
+    "adapter_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimChronoRuntimeAdapter.h",
+      "sha256": "ca5ca87d31d617c4f4205e0c121ce64c20ecd6c8e0727fb5d971d0f99bcb3259"
+    },
+    "adapter_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimChronoRuntimeAdapter.cpp",
+      "sha256": "98920188fb5dcf3fe0981886448348a8826ba3ec0c6683005225022129bdb8cc"
+    },
+    "finite_feedback_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlexibleRaftVisualTest.cpp",
+      "sha256": "dd1cd2e9e9d674f299d2900862e57c6c76c4ffd00f298cd67df6a8fd00980af9"
+    },
+    "named_rapid_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimRiverWindowTest.cpp",
+      "sha256": "844cb038574d66d9fb6712606125a856c0eef44102dadaa002de0782a1232beb"
+    }
+  },
+  "implementation": {
+    "production_tube_top_plane_m": "pressure-scaled current tube radius; 0.28 m at full pressure",
+    "d6_reference_default_tube_top_plane_m": 0.16,
+    "d6_reference_defaults_changed": false,
+    "maximum_production_relative_incoming_speed_mps": 8.0,
+    "maximum_production_overtopping_depth_m": "two current tube radii; 0.56 m at nominal radius",
+    "maximum_retained_volume_per_segment_m3": 0.05,
+    "default_segment_count": 12,
+    "maximum_total_distributed_retained_volume_m3": 0.6,
+    "self_bailing_drainage_rate_per_s": 0.55,
+    "uniform_fixture_precedence_preserved": true,
+    "capsized_open_floor_remains_dry": true,
+    "d4_contact_wrap_pin_law_changed": false,
+    "actor_flip_threshold_or_latch_changed": false,
+    "terrain_geography_scoring_rescue_or_progression_changed": false
+  },
+  "named_rapid_calibration": {
+    "rapid": "Meat Grinder",
+    "flow_band": "high_runnable",
+    "target_discharge_cfs": 3000,
+    "water_source": "full_hydraulics/rapids/meat_grinder/cooked",
+    "water_descriptor_fixture_used": false,
+    "source_authority": "procedural_infill_interpreted_from_guide_inventory",
+    "not_surveyed": true,
+    "not_for_navigation": true,
+    "guide_review_status": "required",
+    "duration_seconds": 2.0,
+    "hazard": {
+      "description": "improper 90-degree broadside entry at the interpreted mid-river hole",
+      "start_station_m": 966.0,
+      "start_lateral_m": 0.4,
+      "tube_samples": 12,
+      "wet_samples": 12,
+      "maximum_sampled_speed_mps": 4.025,
+      "maximum_retained_water_mass_kg": 315.059,
+      "minimum_flip_margin_nm": -280.787,
+      "maximum_consecutive_flip_risk_seconds": 1.242,
+      "maximum_abs_roll_degrees": 77.37,
+      "final_z_m": 444.79,
+      "crosses_actor_latch_seconds": 0.35
+    },
+    "control": {
+      "description": "downstream-facing river-left shoulder with the shipping guide high-side/brace D2 action",
+      "start_station_m": 930.0,
+      "start_lateral_m": 8.0,
+      "tube_samples": 12,
+      "wet_samples": 12,
+      "maximum_sampled_speed_mps": 2.344,
+      "maximum_retained_water_mass_kg": 137.681,
+      "minimum_flip_margin_nm": 1556.578,
+      "maximum_consecutive_flip_risk_seconds": 0.0,
+      "maximum_abs_roll_degrees": 2.198,
+      "final_z_m": 446.74
+    },
+    "report": "/private/tmp/raftsim_m9_meat_grinder_live_d3_v130/index.json",
+    "report_sha256": "f4c47c00196a844c1f7afd77fdd08ffe4c8f82c1d2b57a3e05fe18a4ab7139ff",
+    "succeeded": 1,
+    "succeeded_with_warnings": 0,
+    "failed": 0
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "m1_flexible_d3_d4_capsize_and_five_second_feedback": {
+      "report": "/private/tmp/raftsim_m9_bounded_live_d3_m1_v130/index.json",
+      "report_sha256": "7006c5332f842bbe58eff30ce8cfe1e860be6c5dc91cb0b96fe10292d91e5b69",
+      "succeeded": 4,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p1_float_and_paddle": {
+      "report": "/private/tmp/raftsim_m9_bounded_live_d3_p1_v130/index.json",
+      "report_sha256": "d5cbee76e225875d15fcaeadccdef560e5f49cff6a3b6a33d029fedcd6c287a5",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p2_visible_flip_swimmers_reflip_and_reseat": {
+      "report": "/private/tmp/raftsim_m9_bounded_live_d3_p2_v130/index.json",
+      "report_sha256": "fd5e1d91dd8a25c9865490411c450d70c58bb3bb7d34d1b7b38d84d8120f4d44",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "sampled_transition_roll_degrees": 32.3,
+      "settled_roll_degrees": 180.0,
+      "settled_z_cm": -22.6,
+      "swimmer_count": 5
+    },
+    "m4_river_and_water_vfx": {
+      "report": "/private/tmp/raftsim_m9_bounded_live_d3_m4_v130/index.json",
+      "report_sha256": "b9937fb44d49d81a7b108b43842369f394cebbf1527587752584132bf3cd86b0",
+      "succeeded": 4,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "focused_python_physics_and_source_contracts": "114 passed",
+    "git_diff_check": "passed"
+  },
+  "known_limits": [
+    "The live named-rapid gate exercises the same production water adapter and reduced raft adapter used by the actor, and exceeds the actor's unchanged D3 latch duration; the separate P2 actor test proves the downstream visible capsize loop. It is not a rendered end-to-end Meat Grinder map capture.",
+    "The hazardous and control geometry is procedural infill interpreted from guide inventory and still requires named professional guide review.",
+    "One calibrated rapid does not replace full 20-rapid gameplay tuning or D6 external measured-model/Chaos comparison."
+  ],
+  "decision": "Retain v130. It converts a catastrophic real-field feedback failure into a finite self-bailing model, proves that cooked high-flow Meat Grinder water can sustain the shipping D3 capsize trigger on a hazardous broadside line, and proves a downstream/high-side control remains upright. It is technical physics calibration, not surveyed hydrology, guide approval, D6 promotion, rendered art acceptance, or release approval."
+}

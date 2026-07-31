@@ -1,0 +1,89 @@
+{
+  "schema": "raftsim.m9.water_optics_review.v1",
+  "reviewed_utc": "2026-07-29T09:33:55Z",
+  "candidate": "m9_water_optics_v133",
+  "parent": "m9_canopy_daylight_v132",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "scope": "South Fork material-instance calibration only",
+  "authority_boundaries": {
+    "shared_water_parent_changed": false,
+    "water_mesh_geometry_changed": false,
+    "solver_vertex_channels_changed": false,
+    "water_sampling_changed": false,
+    "collision_changed": false,
+    "d3_changed": false,
+    "d4_changed": false
+  },
+  "retained_parameters": {
+    "shallow_water_color": [0.026, 0.050, 0.058, 0.0],
+    "deep_water_color": [0.010, 0.024, 0.032, 0.0],
+    "reflected_sky_color": [0.100, 0.160, 0.220, 0.0],
+    "water_scattering_per_cm": [0.00018, 0.00023, 0.00028, 0.0],
+    "water_absorption_per_cm": [0.0055, 0.0044, 0.0038, 0.0],
+    "riverbed_color_scale": [0.22, 0.23, 0.23, 0.0],
+    "water_roughness": 0.24,
+    "specular": 0.28,
+    "fresnel_specular": 0.18,
+    "fallback_sky_reflection_strength": 0.28,
+    "calm_surface_color_variation": 0.14,
+    "fallback_sky_reflection_floor": 0.68,
+    "fallback_sky_reflection_variation": 0.32,
+    "calm_ripple_strength": 0.055,
+    "flow_ripple_strength": 0.075,
+    "foam_ripple_strength": 0.110
+  },
+  "rejected_bracket": {
+    "reason": "The stronger 0.22 roughness, 0.30 sky fallback, and 0.090/0.115/0.140 ripple endpoint exposed camera-radial normal streaks in the TroubleMaker and Salmon Falls foregrounds.",
+    "decision": "Retain the softer midpoint while preserving the corrected body colour, volume coefficients, and sky response."
+  },
+  "map_regeneration": {
+    "exit_code": 0,
+    "mesh_policy": "hash-validated existing detailed terrain, water, and far-field meshes reused",
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "deterministic_world_partition_actor_identities": 176,
+    "terrain_tiles": 13,
+    "water_tiles": 39,
+    "fixed_captures_saved": 5
+  },
+  "fixed_capture_sha256": {
+    "chili_bar_launch_downstream.png": "b306e4c38e2ff51a659f2a7654fb4995e026ad74c51e71a5b3d44b605f81f3de",
+    "meat_grinder_guide_eye.png": "0ba3421536375689484e15008ce25904d0482a764c7f9836acd947221fab31a4",
+    "troublemaker_approach.png": "4b00af79b5a53e15e0dba41be3c9a07683d24066911d9ab46a1364a43e7df092",
+    "coloma_bridge_context.png": "817155ae712b995d90e7ddd6235d8c7d83caf9150a2e44aec7b991ec0b749190",
+    "salmon_falls_takeout.png": "6d439bed793860acc8b89113d79b524120ca3572f39530b0c467d49d8e1ae7d9"
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "editor_source_layout": "23/23 passed",
+    "m4": {
+      "report": "/private/tmp/raftsim_m9_water_optics_v133_m4/index.json",
+      "report_sha256": "63fa3cb2403994cdb1544eaf2b649101d12e4d399380c397bbf11f99da97e7c2",
+      "succeeded": 3,
+      "succeeded_with_warnings": 1,
+      "failed": 0
+    },
+    "m7_full_reach_presentation": {
+      "report": "/private/tmp/raftsim_m9_water_optics_v133_m7/index.json",
+      "report_sha256": "00e734d6bb5ca27621b787e670d1f959ada680eda5c88bc2ecc62540d0388c2a",
+      "succeeded": 0,
+      "succeeded_with_warnings": 1,
+      "failed": 0
+    },
+    "known_warning": "UE 5.8 r.MotionVectorSimulation render-thread diagnostic"
+  },
+  "retained_improvements": [
+    "The fixed captures now preserve visible blue-sky reflection and gray-green body colour instead of collapsing broad water into a dark planar card.",
+    "Bounded metre-scale colour and normal variation makes the current legible without inventing foam or modifying solver-authored hydraulics.",
+    "The softened midpoint avoids the first bracket's strongest camera-radial foreground streaks."
+  ],
+  "open_visual_findings": [
+    "The free surface remains a non-overturning heightfield and cannot reproduce real crest folding, plunging jets, boils, or entrained-air volume.",
+    "The repeated normal field remains analytical at hero distance and is not a substitute for rapid-scale geometric turbulence.",
+    "Foam, spray, terrain, shoreline, canopy volume, rocks, raft, characters, equipment, and motion remain below the requested photoreal target.",
+    "No named guide or art reviewer has approved the water scale, colour, motion, or rapid fidelity."
+  ],
+  "decision": "Retain v133 as a bounded South Fork presentation improvement and keep every photoreal, release-art, and external-review gate fail-closed."
+}

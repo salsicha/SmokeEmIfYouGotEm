@@ -1,0 +1,171 @@
+{
+  "artifact": "M9 depth-bearing contact-water V10 project-authored implicit mesh-cache review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "status": "technical_candidate_retained_photoreal_and_named_review_open",
+  "passed": false,
+  "technical_candidate_passed": true,
+  "photoreal_acceptance_passed": false,
+  "promotion_allowed": false,
+  "decision": "retain_opt_in_project_authored_candidate_pending_named_water_vfx_art_and_qualified_guide_review",
+  "authoritative_geography_claim": false,
+  "summary": "V10 replaces the rejected stock Niagara Fluids experiment with a deterministic project-authored six-frame closed implicit-volume cache generated once by marching tetrahedra. It is visibly attached to the same live Meat Grinder D4 wrap/pin contact in normal-water and waterless-isolation captures, exposes 104.89 cm of generated vertical depth, changes topology across forced frames 0/2/4, and selects frame 1 without an override. Collision, navigation, shadowing, water sampling, forces, maps, scoring, rescue, and progression remain unchanged. The candidate is a technical improvement but is not promoted: the full scene remains below the requested photoreal bar and no named water-VFX art reviewer or qualified South Fork guide has approved it.",
+  "production": {
+    "selected": false,
+    "default_off": true,
+    "review_switch": "-RaftSimDepthBearingContactWaterV10Review",
+    "forced_frame_switch": "-RaftSimDepthBearingContactWaterV10Frame=N",
+    "opaque_diagnostic_switch": "-RaftSimDepthBearingContactWaterV10OpaqueDiagnostic",
+    "production_maps_modified_by_review": false,
+    "production_assets_modified_by_review": false,
+    "solver_contact_authority_changed": false,
+    "physics_forces_changed": false,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "map_state_changed": false,
+    "scoring_or_progression_changed": false,
+    "rescue_changed": false
+  },
+  "implementation": {
+    "ownership": "project_owned_first_party_procedural",
+    "external_template_or_vdb_input": false,
+    "cache_build": "six closed implicit-volume frames built once in BeginPlay by marching tetrahedra",
+    "frame_count": 6,
+    "frame_cadence_seconds": 0.12,
+    "frame_triangle_counts": [10704, 10928, 11092, 10748, 10888, 10700],
+    "generated_depth_cm": 104.89,
+    "representative_world_bounds_cm": [225.1, 190.7, 121.54],
+    "material": "/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip",
+    "material_binding": "dynamic instance with V10-only water, foam, roughness, breakup, and color parameters",
+    "visible_surface": "warped rounded hydraulic shoulder whose perimeter sinks beneath the sampled river; only upper water/foam coverage contributes translucent pixels",
+    "closed_volume": true,
+    "collision": false,
+    "navigation": false,
+    "cast_shadow": false,
+    "runtime_geometry_rebuild": false,
+    "runtime_animation": "one cached section visible at a time"
+  },
+  "authority_boundary": {
+    "input": "existing dominant D4 contact point, contact outward direction, live sampled surface height, flow/across frame, impact energy, and contact scale",
+    "output": "presentation transform, dynamic-material parameters, and cached-section visibility only",
+    "feedback_to_d4": false,
+    "feedback_to_live_water": false,
+    "feedback_to_gameplay": false
+  },
+  "native_renderer_review": {
+    "frame_0": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame0_review.png",
+      "capture_sha256": "14d5d3d6aaa67f19caa11226e8d809c27b327b3a36e8096f4e38be3a4f02e6e8",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame0_review.log",
+      "log_sha256": "1a7bf4d98a474fcef586dfa022fce0aba23c4d3f2089e7ba9cc5b2f43880fac1",
+      "forced_frame": 0,
+      "triangles": 10704,
+      "fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=0.999",
+      "visible": true
+    },
+    "frame_2": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame2_review.png",
+      "capture_sha256": "3c32c9c028f51766e0cfb60e5cd56e3828584b51a22450a8a644f4c9a47f9e7f",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame2_review.log",
+      "log_sha256": "db5248781b1b1fbbb61fa1f22dedee83164453a8c11261822f6b42e6a68528b9",
+      "forced_frame": 2,
+      "triangles": 11092,
+      "fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=0.998",
+      "visible": true
+    },
+    "frame_4": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame4_review.png",
+      "capture_sha256": "2ca12bd926933c25d4897a0f86e1dfc1978a4cf736d3270f2b0c749a5fb6bdd2",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_frame4_review.log",
+      "log_sha256": "e15e912e4cb5b5325a5dec3422edda5c963faf98c51f30913698540b432d2758",
+      "forced_frame": 4,
+      "triangles": 10888,
+      "fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=0.999",
+      "visible": true
+    },
+    "runtime_unforced": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_runtime_review.png",
+      "capture_sha256": "0661242619c5f2b45ce48524ee1fed1a8c84148e56862adacc4e340ff366f0d2",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_runtime_review.log",
+      "log_sha256": "4c6152234a20a0a0865b366fb04f43053fdcd1cab875a364fbd0e931869bea61",
+      "selected_frame": 1,
+      "triangles": 10928,
+      "final_fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=0.998",
+      "visible": true
+    },
+    "waterless_isolation": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_waterless_isolation.png",
+      "capture_sha256": "3bafa18464a21097d9aa3684c73c44df20803fd1249f9523e967b9cc7a369062",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_waterless_isolation.log",
+      "log_sha256": "d40ed9b168d624f59227a072532a628aea4630a7bb397f9d76ceb80f95110b60",
+      "isolation": "live procedural water surface and authored static flow-band water hidden; raft, D4 rock, V10, and bounded production spray retained",
+      "result": "The low rounded water/foam shoulder remains perceptible and attached beside the obstacle rather than disappearing like V9 stock FLIP."
+    },
+    "technical_visual_verdict": "pass",
+    "photoreal_visual_verdict": "fail_pending_named_review_and_full_scene_art_upgrade"
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h": "19c9a36c2741fb811723867313589b49c49e10a5c5bfd086e0c5ed6d529faa93",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "c20d0c1897ff45adc401451cd9cc07dc1edff355a25433f201d19843ee9e43f2",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "f27ef944be5a7ee54eeed09947d853014526cba1173a55bb856e4b8d3e402c0a",
+    "physics/tests/test_flexible_raft_visual_upgrade.py": "6947d392e2968f4c163f60bac50253a66ef1bb66be8a856a1c65030a8cf7bf1b"
+  },
+  "exact_current_validation": {
+    "focused_visual_contracts": "23/23 passed",
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded after removing the abandoned custom V10 material source",
+    "m4": {
+      "result": "4/4 passed; render-bearing test contains only the known engine-owned r.MotionVectorSimulation warning",
+      "report": "unreal/Saved/Automation/M9V431DepthV10M4/index.json",
+      "report_sha256": "cb26301b2152cca34320df2e99bb7eb91bbf9d1ad358f16639a75f326a72fe64",
+      "log_sha256": "bb91401089863342323b77cd5b5b54596ab349994d538de47f8ea0231fecba30"
+    },
+    "m5": {
+      "result": "5/5 passed; render-bearing test contains only the known engine-owned r.MotionVectorSimulation warning",
+      "report": "unreal/Saved/Automation/M9V432DepthV10M5/index.json",
+      "report_sha256": "4c4e342dd3a3a92aee2415697910bf4539a00e774a26554596d446ccb8a5a070",
+      "log_sha256": "498ddd96f936ca45a74b653502d0e539e9f0076a935ff00ccff96327a3717c48"
+    },
+    "m7": {
+      "result": "4/4 passed; render-bearing test contains only the known engine-owned r.MotionVectorSimulation warning",
+      "report": "unreal/Saved/Automation/M9V433DepthV10M7/index.json",
+      "report_sha256": "704ec8a69af92f40a776de98671b1b03193f3756673a8e9646e838e3094b203b",
+      "log_sha256": "a34eac7c0fc215dd6275ceffe16203e7a15248538bb71ef48400030e24ca4b9c"
+    },
+    "m8": {
+      "result": "4/4 passed cleanly",
+      "report": "unreal/Saved/Automation/M9V434DepthV10M8/index.json",
+      "report_sha256": "643f5c95f93dc37019ef926f08f9c033d9e5b7e78d2673a1a2c4ab648cb1b8c2",
+      "log_sha256": "acc7e923ffe8eed46b4e42a4973929cedb92277d844505875f1c3ef9baf5d4d2"
+    },
+    "m9": {
+      "result": "5/5 passed cleanly and remained fail-closed",
+      "report": "unreal/Saved/Automation/M9V437DepthV10ReconciledM9/index.json",
+      "report_sha256": "8485da85825665b8db7dd8144be1cdd60a96754792affb85a572567e3223a2cc",
+      "log_sha256": "3ba944b6741c1355ca879da7605921dcc470673df4b450db6f644516ace4a889"
+    },
+    "full_python_data_source_matrix": {
+      "result": "1,146 passed, three expected dependency-path skips, one intentional fail-closed V42 visual-review hash mismatch, zero unexpected failures",
+      "report": "physics/reports/m9/m9_v436_depth_v10_full_matrix.xml",
+      "report_sha256": "e726eab19d8e07c3bb9d5b646e569b4d60f2c3145f9f8632be11ad2171fe420f",
+      "tests": 1150,
+      "passed": 1146,
+      "failed_expected": 1,
+      "failed_unexpected": 0,
+      "skipped_expected": 3,
+      "duration_seconds": 466.945
+    }
+  },
+  "reviewers": {
+    "named_water_vfx_art_reviewer": null,
+    "qualified_south_fork_guide": null,
+    "art_approval": false,
+    "guide_approval": false
+  },
+  "open_gates": [
+    "Named water-VFX art review must approve motion, breakup, translucency, attachment, and the absence of wall/fin/blob/tuft reads in a short sequence.",
+    "A qualified South Fork guide must approve the Meat Grinder hydraulic read and guide-seat visibility.",
+    "The wider M9 character, terrain, canopy, water, animation, and presentation set remains below the requested photoreal bar.",
+    "Keep the exact-current full Python/data/source matrix reconciled after any further candidate, evidence, acceptance-packet, or manifest delta.",
+    "Run fresh clean-source package, performance, soak, archive, keyboard/mouse, gamepad, Windows, Proton, signing, notarization, media, account, and distribution qualification only after an accepted art candidate."
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "candidate": "m9_production_niagara_subuv_v118",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "captures": [
+    {
+      "file": "m9_production_niagara_subuv_v118.png",
+      "camera": "contact_port",
+      "sha256": "4ab37ab4e541eaf4d766c456ff7345220b18f1e4c8ca0f1d47207e47d6787f6b"
+    },
+    {
+      "file": "m9_production_niagara_subuv_action_v118.png",
+      "camera": "river_action",
+      "sha256": "76d2259f4889ac782ee72b005d9435ee3e5e1a8259eeb3a5bc911c8bdd8e80b0"
+    }
+  ],
+  "production_particle_art": {
+    "source": "unreal/SourceArt/RaftSim/Water/T_RaftSim_WaterParticle_SubUV.png",
+    "source_sha256": "c43a78d8d454113230025a2ecef476afb666908626d67ebf1add5b399a492ba1",
+    "ownership": "project_owned_first_party_procedural",
+    "dimensions_px": [2048, 2048],
+    "grid": [4, 4],
+    "cell_dimensions_px": [512, 512],
+    "frame_ranges": {
+      "solver_spray": [0, 5],
+      "contact_droplets": [6, 10],
+      "aerated_mist": [11, 13],
+      "rapid_aerosol": [14, 15]
+    },
+    "generator_version": "raftsim-production-water-particle-subuv-v3",
+    "external_source_input": false,
+    "authoritative_geography_claim": false
+  },
+  "production_material": {
+    "asset": "/Game/RaftSim/Materials/M_RaftSim_NiagaraWaterParticle",
+    "sha256": "64977f116599b4cc3296a89d650059b568cf1dfbb6b30085bbcce82f3fea7d44",
+    "usage": "Niagara sprites only",
+    "atlas_sampling": "ParticleSubUV with randomized direct-set frame ranges",
+    "soft_intersection": "14 cm depth fade",
+    "lighting": "volumetric non-directional translucent default-lit"
+  },
+  "generated_asset_sha256": {
+    "T_RaftSim_WaterParticle_SubUV": "5019325360b596d6cc5753183bcff8f394fc43305260a0467d5d23385209cb90",
+    "NS_RaftSim_SolverSpray": "2cc86ff912d3eb0383301196d0646aa3571b4064c477134ae491921112862c73",
+    "NS_RaftSim_ContactDroplets": "6f4c04aa535c612cb7c95cb3cdebafa0b7fa3c28bba2b9d687254ec06f282f99",
+    "NS_RaftSim_AeratedMist": "3b8a7ef6866e9e3ee77c93f8372a121d83cf23c798d20bb19de5a17c1927dfe0",
+    "NS_RaftSim_RapidAerosol": "852d27f66f446ccc2d843b9350c80c9d6df4df49ab2ba4958f420d2a1b9abfe6"
+  },
+  "retained_tuning": {
+    "solver_spray_spawn_rate_at_full_intensity": 260.0,
+    "contact_droplet_spawn_rate_at_full_intensity": 320.0,
+    "aerated_mist_spawn_rate_at_full_visible_mist": 70.0,
+    "rapid_aerosol_spawn_rate_range": [10.0, 56.0],
+    "runtime_components": 11,
+    "transient_actor_spawning": false,
+    "deterministic_card_fallback_preserved": true,
+    "physics_authority_changed": false
+  },
+  "solver_evidence": {
+    "station_m": 960.0,
+    "depth_m": 0.412,
+    "speed_mps": 1.778,
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999
+  },
+  "iteration_decisions": {
+    "v115": "invalid comparison; the first uncached capture omitted the staged review boulder and was discarded",
+    "v116": "proved the atlas/material/SubUV path but was too sparse",
+    "v117": "rejected because oversized cells read as steam plumes and paint strokes",
+    "v118": "retained compact-burst, high-count, low-opacity technical candidate"
+  },
+  "validation": {
+    "focused_source_asset_and_provenance_contracts": "39/39 passed after inventory regeneration",
+    "native_editor_build": "passed",
+    "asset_authoring": "4/4 Niagara systems updated and saved with atlas and material",
+    "m5_offscreen_metal": "five test cases passed; four clean and RuntimeRescueLoop with only the known motion-vector diagnostic",
+    "m5_report": "/private/tmp/raftsim_m9b3_v118_m5_metal_report/index.json",
+    "runtime_pool_offscreen_metal": "1/1 passed with all eleven Niagara components asset-bound; only the known motion-vector diagnostic",
+    "runtime_report": "/private/tmp/raftsim_m9b3_v118_water_vfx_runtime_metal_report/index.json"
+  },
+  "open_visual_findings": [
+    "The new atlas removes the uniform circular-card silhouette and gives each particle class bounded shape variation.",
+    "Individual compact spray bursts remain visible in the close contact frame and still need final VFX art review.",
+    "Hydraulic collapse, entrained-air body volume, and broad rapid aerosol remain underdeveloped.",
+    "Water, terrain, shoreline, canopy, crew motion, and equipment response remain below the photoreal target."
+  ],
+  "decision": "Retain v118 as the project-owned particle-art and soft-intersection upgrade over v114. Reject it for photoreal, marketing, store, press, and named human art approval."
+}

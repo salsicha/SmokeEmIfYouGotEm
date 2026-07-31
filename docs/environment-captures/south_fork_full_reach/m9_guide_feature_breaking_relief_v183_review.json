@@ -1,0 +1,43 @@
+{
+  "schema": "raftsim.m9.guide_feature_breaking_relief_review.v1",
+  "reviewed_utc": "2026-07-29T21:36:00Z",
+  "revision_id": "v183",
+  "status": "transparent_procedural_infill_accepted_photoreal_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "implementation": {
+    "guide_feature_geometry_authority": "procedural_infill_interpreted_from_guide_inventory_pending_human_review",
+    "feature_kinds": [
+      "hole",
+      "ledge",
+      "wave_train",
+      "lateral",
+      "rock",
+      "eddy_line",
+      "shallow",
+      "strainer"
+    ],
+    "method": "flow-scaled procedural ellipses, clipped by local solver wetness and speed",
+    "presentation_only": true,
+    "hydraulics_collision_navigation_or_gameplay_changed": false
+  },
+  "evidence": {
+    "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v183_guide_feature_breaking_relief",
+    "captured_views": 5,
+    "build_log": "/private/tmp/raftsim_m9_v183_guide_feature_breaking_relief_build.log",
+    "build_log_sha256": "e42a42ba8db2196775788b4d93912305687f3e70e6a9938ea8d0cb4e1e1d4da1"
+  },
+  "decision": {
+    "technical_mechanism_retained": true,
+    "guide_interpretation_approved": false,
+    "photoreal_water_accepted": false,
+    "reason": "Guide-feature anchoring produces denser rapid-specific cues and keeps missing geography explicitly procedural, but the two-metre triangle lattice remains obvious and crest volume is inadequate."
+  },
+  "release_effect": {
+    "photoreal_art_gate_closed": false,
+    "named_guide_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  }
+}

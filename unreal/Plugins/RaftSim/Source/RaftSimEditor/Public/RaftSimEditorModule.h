@@ -34,6 +34,8 @@ private:
     void HandleCapturePhotorealEnvironmentPreviewsCommand(const TArray<FString>& Args);
     void HandleCreateLandscapeImportCandidateMapsCommand(const TArray<FString>& Args);
     void HandleCreateSouthForkFullReachEnvironmentCommand(const TArray<FString>& Args);
+    void HandleCaptureSouthForkFullReachEnvironmentCommand(const TArray<FString>& Args);
+    void HandleRefreshSouthForkGeneratedCanopyAssetsCommand(const TArray<FString>& Args);
     void HandleCaptureZambeziCliffComparisonCommand(const TArray<FString>& Args);
     void HandleCreateZambeziBatokaBasaltFamilyCommand(const TArray<FString>& Args);
     void HandleCaptureZambeziBatokaBasaltCorridorComparisonCommand(const TArray<FString>& Args);
@@ -83,6 +85,8 @@ private:
         FString& OutSummary,
         const FString& RiverIdFilter = FString());
     bool CreateSouthForkFullReachEnvironment(FString& OutSummary);
+    bool CaptureSouthForkFullReachEnvironment(FString& OutSummary);
+    bool RefreshSouthForkGeneratedCanopyAssets(FString& OutSummary);
     bool CaptureZambeziCliffComparison(FString& OutSummary);
     bool CreateZambeziBatokaBasaltFamily(FString& OutSummary);
     bool CaptureZambeziBatokaBasaltCorridorComparison(FString& OutSummary);
@@ -123,6 +127,8 @@ private:
     TUniquePtr<FAutoConsoleCommand> CapturePhotorealEnvironmentPreviewsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateLandscapeImportCandidateMapsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateSouthForkFullReachEnvironmentConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> CaptureSouthForkFullReachEnvironmentConsoleCommand;
+    TUniquePtr<FAutoConsoleCommand> RefreshSouthForkGeneratedCanopyAssetsConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureZambeziCliffComparisonConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CreateZambeziBatokaBasaltFamilyConsoleCommand;
     TUniquePtr<FAutoConsoleCommand> CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand;
@@ -164,7 +170,10 @@ private:
     bool bCreatePhotorealEnvironmentPreviewMapsOnStartup = false;
     bool bCapturePhotorealEnvironmentPreviewsOnStartup = false;
     bool bCreateLandscapeImportCandidateMapsOnStartup = false;
+    bool bCreatePhotorealRiverWaterMaterialOnStartup = false;
+    bool bCreateWaterVfxMaterialOnStartup = false;
     bool bCreateSouthForkFullReachEnvironmentOnStartup = false;
+    bool bCaptureSouthForkFullReachEnvironmentOnStartup = false;
     bool bCreateZambeziBatokaBasaltFamilyOnStartup = false;
     bool bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup = false;
     bool bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup = false;

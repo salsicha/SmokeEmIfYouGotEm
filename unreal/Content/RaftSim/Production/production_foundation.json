@@ -28,6 +28,9 @@
     "AudioGameplay",
     "GeometryScripting",
     "ProceduralMeshComponent",
+    "PythonScriptPlugin",
+    "EditorScriptingUtilities",
+    "MetaHumanCharacter",
     "RaftSim"
   ],
   "module_boundaries": [

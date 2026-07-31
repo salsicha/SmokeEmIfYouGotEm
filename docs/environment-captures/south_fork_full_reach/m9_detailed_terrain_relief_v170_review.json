@@ -1,0 +1,158 @@
+{
+  "schema": "raftsim.m9.detailed_terrain_relief_review.v1",
+  "reviewed_utc": "2026-07-29T17:25:00Z",
+  "candidate": "m9_detailed_terrain_relief_v170",
+  "parent": "m9_volumetric_broadleaf_v169",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "algorithm": "two_metre_bilinear_dem_surface_with_world_space_bank_microrelief_v1",
+    "source_dem_spacing_m": 4.0,
+    "visual_spacing_m": 2.0,
+    "visual_subdivision_factor": 2,
+    "bank_microrelief_hard_cap_cm": 28.0,
+    "observed_maximum_microrelief_cm": 26.0532,
+    "wet_channel_microrelief_cm": 0.0,
+    "source_dem_remained_collision_authority": true,
+    "affected_hydraulics": false,
+    "affected_navigation": false,
+    "terrain_visual_triangles_before": 1467648,
+    "terrain_visual_triangles_candidate": 5870592,
+    "terrain_collision_source_triangles": 1467648,
+    "visual_triangle_multiplier": 4.0
+  },
+  "world_regeneration": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "candidate_map_sha256": "d3898ee9a555fcb19b0939cde2de2a28738f41b4b4f5d6787252cc877ce87b14",
+    "generation_log": "/private/tmp/raftsim_m9_v170_terrain_relief_generate.log",
+    "generation_log_sha256": "a604a0bb11982c144ce534f2454ee2eeef739e6a74ce4e7b63cbcad94bbed462",
+    "candidate_build_manifest_sha256": "25d3e5f3f4ce1f3c2f7fc769b9fa687c8572f9db36a514f4a2f7e34413ac63d0",
+    "deterministic_world_partition_actor_identities": 213,
+    "errors": 0
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimDetailedTerrainReliefReviewCapture",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief",
+    "loaded_world_partition_references": 214,
+    "map_or_actor_mutation": false,
+    "package_save": false,
+    "log": "/private/tmp/raftsim_m9_v170_terrain_relief_photographic.log",
+    "log_sha256": "d3decbeb4e2f35267756a57b897a09c5addb5e2a83e76ac1e058a0d69d6adc41",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief/chili_bar_launch_downstream.png",
+        "sha256": "a5629b1f1a900923bcb6c1de4634ed5ef6521d9499099abf7398ed48b19af1cd",
+        "size_bytes": 1310519,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.9997,
+        "changed_rgb_pixel_percent_from_v169_photographic": 26.8550,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 7.6753
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief/coloma_bridge_context.png",
+        "sha256": "3b782442dbf58bb72821784b58573532f739f49dfe283883d9a92ee349daf24f",
+        "size_bytes": 1307460,
+        "mean_absolute_rgb_delta_from_v169_photographic": 2.3684,
+        "changed_rgb_pixel_percent_from_v169_photographic": 32.6645,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 10.6207
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief/meat_grinder_guide_eye.png",
+        "sha256": "69f97a24879dbd994cae8ebc9873500345a01f61e6f2818a5aadebd1be223615",
+        "size_bytes": 1276045,
+        "mean_absolute_rgb_delta_from_v169_photographic": 2.2608,
+        "changed_rgb_pixel_percent_from_v169_photographic": 31.9926,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 8.4390
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief/salmon_falls_takeout.png",
+        "sha256": "c9f0c730c414398d81412df595a76e55cfa25b06184bc919566c1b22bc2c9a56",
+        "size_bytes": 1214444,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.4983,
+        "changed_rgb_pixel_percent_from_v169_photographic": 10.7127,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 4.0735
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v170_terrain_relief/troublemaker_approach.png",
+        "sha256": "98df00be1d0b6368e5a819a0bdf512af58d9590a67c374a2f07a9fb85a87685d",
+        "size_bytes": 1308935,
+        "mean_absolute_rgb_delta_from_v169_photographic": 2.3945,
+        "changed_rgb_pixel_percent_from_v169_photographic": 26.3381,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 9.5318
+      }
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build": "passed",
+    "focused_python_source_and_hlod_tests": "29/29 passed",
+    "native_test": "RaftSim.M9.DInferredFarFieldTerrainRelief",
+    "native_test_result": "passed",
+    "native_test_log": "/private/tmp/raftsim_m9_v170_terrain_relief_native.log",
+    "native_test_log_sha256": "4b7b98d12353c6f29380397bf9e78a1ae06acdb180fcbf02a8c82a809b61a75e",
+    "capture_manual_review": "five of five inspected at original resolution",
+    "candidate_hlod_build": "not_run_because_candidate_failed_visual_cost_gate"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The implementation preserved the source four-metre DEM as gameplay collision authority.",
+      "The wet channel remained undisplaced and deterministic bank relief stayed below the twenty-eight-centimetre hard cap.",
+      "The candidate generated and captured without fatal errors or map mutation during capture."
+    ],
+    "rejected": [
+      "The five fixed views showed no material terrain or shoreline realism gain at guide-eye distance.",
+      "The small pixel deltas were dominated by foliage and settled-frame variation rather than clearly readable terrain microrelief.",
+      "The candidate multiplied detailed terrain visual triangles by four, from 1,467,648 to 5,870,592, without a commensurate visual improvement.",
+      "The terrain still read as broad, smooth, uniformly surfaced procedural banks and did not close the photoreal art gate."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "rollback": {
+    "completed": true,
+    "runtime_candidate_source_removed": true,
+    "orphaned_candidate_collision_meshes_removed": 13,
+    "candidate_capture_and_review_evidence_preserved": true,
+    "restored_map_sha256": "f1e77eaed532e5edc851db9b36ffe446edbf2268de71f586a15230003291f9b2",
+    "restored_generation_log": "/private/tmp/raftsim_m9_v170_rejected_v169_restore_generate.log",
+    "restored_generation_log_sha256": "c52ef4b65dd6ebc7c87366cabff5bffe32ac636a18cb6f23611111c3551e66f0",
+    "restored_deterministic_world_partition_actor_identities": 200,
+    "restored_terrain_visual_triangles": 1467648,
+    "restored_build_manifest_sha256": "8ff287b94e7a5e0fad714a80e0e10c44af01b1f0d18f9c36e7ba4f4d703a2e15",
+    "restored_hlod": {
+      "fresh_build_log": "/private/tmp/raftsim_m9_v170_rejected_v169_restore_hlod_build.log",
+      "fresh_build_log_sha256": "55f013e4962a3b292a513775a9223f1bb83715a0ea8c0baff9669b3eb9b87d40",
+      "fresh_build_actor_count": 30,
+      "fresh_build_modified_and_saved_actor_count": 30,
+      "first_repeat_log": "/private/tmp/raftsim_m9_v170_rejected_v169_restore_hlod_repeat.log",
+      "first_repeat_log_sha256": "e7a36efe95b328b7739405b78bfbc9381e634845b423780bfa6f5931f55bb261",
+      "first_repeat_modified_and_saved_actor_count": 1,
+      "settled_repeat_log": "/private/tmp/raftsim_m9_v170_rejected_v169_restore_hlod_repeat_2.log",
+      "settled_repeat_log_sha256": "2fed52a885fec38fc81fb83b35b32596431cbc8d69675c89648369da7d274819",
+      "settled_repeat_actor_count": 30,
+      "settled_repeat_modified_and_saved_actor_count": 0,
+      "errors": 0,
+      "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+      "evidence_sha256": "cf6628f1c22fc486381bbbe2a56c84690a89bc299c80eee305582e319d2aa36b"
+    },
+    "restored_renderer_test": {
+      "name": "RaftSim.M7.ZFullReachPresentation",
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v170_rejected_v169_restore_m7.log",
+      "log_sha256": "ae1eaf0b4945a1ae3c864c07c71370c7be3df2c0ed4042aabeca2181fdaca7d6",
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only"
+    }
+  },
+  "decision": "Reject v170 and restore the v169 four-metre detailed terrain. Preserve the candidate captures and review record as negative evidence. Do not spend four times the terrain triangle budget on sub-pixel displacement; prioritize higher-leverage material, shoreline dressing, water-volume, and asset-quality work."
+}

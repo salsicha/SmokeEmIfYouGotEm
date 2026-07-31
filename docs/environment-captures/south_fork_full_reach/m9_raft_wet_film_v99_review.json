@@ -1,0 +1,49 @@
+{
+  "candidate": "m9_raft_wet_film_v99",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_raft_wet_film_v99.png",
+  "camera": "river_action",
+  "implementation": {
+    "presentation_wetness_scale_before": 0.58,
+    "presentation_wetness_scale_after": 0.42,
+    "presentation_wetness_cap_before": 0.65,
+    "presentation_wetness_cap_after": 0.5,
+    "physical_wetness_changed": false,
+    "contact_or_solver_changed": false,
+    "locked_parent_material_changed": false,
+    "authored_textile_maps_changed": false
+  },
+  "matched_bow_tube_metric": {
+    "region_pixels": [760, 410, 1045, 500],
+    "v98_luminance_p99": 165.0344,
+    "v99_luminance_p99": 151.0351,
+    "v98_pixels_over_luminance_180": 25,
+    "v99_pixels_over_luminance_180": 3,
+    "interpretation": "The broad tube highlight is less clipped and more diffuse while the surface still reads wet."
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "The raft retains the full solver wetness value for physical behavior and telemetry.",
+    "The visible film no longer overwhelms the coated-fabric micro-roughness at near-full immersion.",
+    "The accepted project-owned textile maps and locked parent material remain unchanged."
+  ],
+  "open_visual_findings": [
+    "Tube seams, scuffs, inflation wrinkles, and localized water beads remain under-resolved.",
+    "Water, shoreline, terrain, canopy, crew motion, hydraulic collapse, and aerosol remain below the photoreal target."
+  ]
+}

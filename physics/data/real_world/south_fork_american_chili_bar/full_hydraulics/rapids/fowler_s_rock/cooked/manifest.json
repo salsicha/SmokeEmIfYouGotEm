@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/fowler_s_rock/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 6.678537,
+      "solver_runtime_seconds": 1.833904,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -308,7 +308,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/fowler_s_rock/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 7.037098,
+      "solver_runtime_seconds": 2.175408,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -503,7 +503,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/fowler_s_rock/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 7.366012,
+      "solver_runtime_seconds": 2.032182,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -727,6 +727,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 221.62449028320313,
   "station_range_m": [
     25227.6352,
     25627.6352

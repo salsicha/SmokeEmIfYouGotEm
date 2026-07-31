@@ -1,0 +1,63 @@
+{
+  "schema": "raftsim.release_review.south_fork_clustered_embedded_bank_rock.v192",
+  "generated_on": "2026-07-29",
+  "status": "technically_rendered_but_visually_noop_rejected_for_production",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimEmbeddedBankRockReview -RaftSimExitAfterEnvironmentAutomation",
+  "comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v190_scan_rock_bank_morphology",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v192_clustered_embedded_bank_rock_scale_corrected",
+  "implementation": {
+    "shore_candidates": 15702,
+    "visible_clustered_instances_reported": 2446,
+    "scale_policy": "1.80-3.20x the validated v190 instance transforms",
+    "collision_authority_changed": false,
+    "hydraulic_authority_changed": false,
+    "navigation_changed": false,
+    "map_or_asset_package_saved": false,
+    "transforms_and_meshes_restored_after_capture": true
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v192_clustered_embedded_bank_rock_build.log",
+    "log_sha256": "4a7b60e72a535a5ff4fd1b1c121c39f14a97921c64cd079b0beffed092680905",
+    "result": "succeeded",
+    "total_execution_seconds": 10.16
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v192_clustered_embedded_bank_rock_capture.log",
+    "log_sha256": "b6d42b4b11236661267f7fffc74c66e23051f7306df28db945939696ea63d8ef",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "f086b5899847119b388b4379cbe973e596c15e6d0769095d11199d24a1b29a87",
+    "meat_grinder_guide_eye": "f339d8b75255d8cb437ee0e36999467379dbe3b65faa6df58bf27c839457e042",
+    "troublemaker_approach": "c562d0159cbe04a4a0d21ed860a9047e2d9f1cbaafd98568344615008f64b2e3",
+    "coloma_bridge_context": "07120864cae38110d0d80136edf11951ed228fa7b9ddfeb379bcecbc8e1ee7af",
+    "salmon_falls_takeout": "9a8a17797543a6fd2cfeda6f0107da00f921ca3b625225705a6deb685de78cff"
+  },
+  "pixel_delta_from_v190": {
+    "chili_bar_launch_downstream_mean_absolute_rgb": 0.0,
+    "meat_grinder_guide_eye_mean_absolute_rgb": 0.0,
+    "troublemaker_approach_mean_absolute_rgb": 0.0,
+    "coloma_bridge_context_mean_absolute_rgb": 0.0,
+    "salmon_falls_takeout_mean_absolute_rgb": 0.00001,
+    "pixels_any_channel_gt_8_percent_all_views": 0.0
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "rejection_reasons": [
+      "Four captures are byte-identical to v190 and the fifth changes by only 0.000010 mean RGB with no pixel above an eight-level delta.",
+      "The imported scan meshes use a 100x LOD0 build scale and bases 41-66 cm below their pivots; relative instance scaling plus additional downward embedding left the clustered instances beneath the terrain.",
+      "No bank silhouette, embedded-rock fabric, wet edge, cutbank, gravel bar, or vegetation transition improved."
+    ],
+    "corrective_action": "v193 uses effective post-build mesh bounds for physical sizing and lifts each instance by its scaled negative base Z before applying a proportional embed depth",
+    "candidate_retention": "retain captures and ledger as no-op regression evidence; do not retain the buried-placement formula"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

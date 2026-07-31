@@ -1,0 +1,46 @@
+{
+  "candidate": "m9_two_plane_canopy_v100",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_two_plane_canopy_v100.png",
+  "camera": "river_action",
+  "physics_changed": false,
+  "implementation": {
+    "source_silhouettes_changed": false,
+    "source_conditioned_placements_changed": false,
+    "instances": 65363,
+    "planes_before": 3,
+    "planes_after": 2,
+    "plane_angle_degrees": 90.0,
+    "vertices_per_asset_before": 12,
+    "vertices_per_asset_after": 8,
+    "triangles_per_asset_before": 6,
+    "triangles_per_asset_after": 4,
+    "alpha_overdraw_reduction_fraction": 0.3333333333
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "full_reach_regeneration": "passed; six canopy assets are 8 vertices and 4 triangles each",
+    "fixed_captures": "5/5 saved",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "Two orthogonal source silhouettes preserve azimuth coverage without a third coincident source trunk.",
+    "Canopy triangle count and masked alpha overdraw fall by one third at unchanged placement density.",
+    "Randomized instance yaw preserves stand-scale orientation variation."
+  ],
+  "open_visual_findings": [
+    "Broadleaf and far-field crowns still lack true branch and leaf volume.",
+    "Repeated source silhouettes remain visible in dense stands.",
+    "Water, shoreline, terrain, crew motion, hydraulic collapse, and aerosol remain below the photoreal target."
+  ]
+}

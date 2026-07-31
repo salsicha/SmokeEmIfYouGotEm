@@ -289,7 +289,15 @@ def _apply_feature_geometry(
 def _sample_m2_window(
     repo_root: Path,
     rapid: dict[str, Any],
-) -> tuple[GridSpec2_5D, np.ndarray, np.ndarray, np.ndarray, float, float]:
+) -> tuple[
+    GridSpec2_5D,
+    np.ndarray,
+    np.ndarray,
+    np.ndarray,
+    float,
+    float,
+    float,
+]:
     with np.load(repo_root / PROCEDURAL_GEOGRAPHY_GRID_RELATIVE_PATH) as geography:
         source_stations = geography["stations_m"].astype(np.float64)
         source_lateral = geography["lateral_offsets_m"].astype(np.float64)
@@ -338,17 +346,23 @@ def _sample_m2_window(
     outside = bank_distance > 0.0
     conditioned_bank = surface[None, :] + 0.18 + 0.06 * bank_distance
     bed[outside] = np.maximum(bed[outside], conditioned_bank[outside])
-    return grid, bed, surface, half_width, window_start, rapid_x
+    return grid, bed, surface, half_width, window_start, rapid_x, datum
 
 
 def _build_scenario(
     repo_root: Path,
     rapid: dict[str, Any],
     band: dict[str, Any],
-) -> tuple[Scenario2_5D, tuple[Feature2_5D, ...]]:
-    grid, base_bed, surface, half_width, window_start, rapid_x = _sample_m2_window(
-        repo_root, rapid
-    )
+) -> tuple[Scenario2_5D, tuple[Feature2_5D, ...], float]:
+    (
+        grid,
+        base_bed,
+        surface,
+        half_width,
+        window_start,
+        rapid_x,
+        source_elevation_datum_m,
+    ) = _sample_m2_window(repo_root, rapid)
     channel_width = float(
         np.interp(float(rapid["station_m"]), grid.x_coordinates(), half_width)
     )
@@ -438,6 +452,7 @@ def _build_scenario(
                 "rapid_name": rapid["name"],
                 "rapid_order": int(rapid["order"]),
                 "station_m": float(rapid["station_m"]),
+                "source_elevation_datum_m": source_elevation_datum_m,
                 "target_discharge_m3s": discharge,
                 "target_discharge_cfs": float(band["discharge_cfs"]),
                 "terrain_authority": "M2 source_and_procedural_authority_masks",
@@ -459,7 +474,7 @@ def _build_scenario(
         raft=RaftParameters2_5D(),
         roughness=0.039,
     )
-    return scenario, features
+    return scenario, features, source_elevation_datum_m
 
 
 def _load_final_fields(run_dir: Path, scenario: Scenario2_5D) -> dict[str, np.ndarray]:
@@ -938,10 +953,23 @@ def write_south_fork_full_hydraulics(
         bands_payload = []
         band_evaluations = []
         representative_scenario: Scenario2_5D | None = None
+        source_elevation_datum_m: float | None = None
         for band_id in FLOW_BAND_IDS:
             band = flow_bands[band_id]
-            scenario, features = _build_scenario(repo_root, rapid, band)
+            scenario, features, band_source_elevation_datum_m = _build_scenario(
+                repo_root, rapid, band
+            )
             representative_scenario = scenario
+            if source_elevation_datum_m is None:
+                source_elevation_datum_m = band_source_elevation_datum_m
+            elif not math.isclose(
+                source_elevation_datum_m,
+                band_source_elevation_datum_m,
+                abs_tol=1.0e-9,
+            ):
+                raise RuntimeError(
+                    f"{rapid['name']} flow bands disagree on their elevation datum"
+                )
             package_dir = rapid_root / "scenario" / band_id
             scenario.write_package(package_dir)
             config = CppSolverRunConfig(
@@ -1010,6 +1038,7 @@ def write_south_fork_full_hydraulics(
             all_combo_results.append(evaluation["passed"])
 
         assert representative_scenario is not None
+        assert source_elevation_datum_m is not None
         grid = representative_scenario.grid
         cooked_manifest = {
             "schema": COOKED_SCHEMA,
@@ -1019,6 +1048,10 @@ def write_south_fork_full_hydraulics(
             "rapid_order": rapid["order"],
             "window_id": f"south_fork_{slug}_live_window",
             "station_range_m": [grid.origin_x, grid.origin_x + WINDOW_LENGTH_M],
+            # Named-rapid scenarios are solved near z=0 for numerical
+            # precision. Runtime restores this source datum before applying
+            # the single global Unreal river datum.
+            "source_elevation_datum_m": source_elevation_datum_m,
             "grid": {
                 "nx": grid.nx,
                 "ny": grid.ny,

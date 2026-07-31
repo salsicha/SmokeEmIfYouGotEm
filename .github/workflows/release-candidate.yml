@@ -1,0 +1,86 @@
+name: release-candidate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["release/1.0"]
+
+permissions:
+  contents: read
+
+jobs:
+  source-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Verify release source contract
+        run: python3 Scripts/release_candidate.py audit-source
+      - name: Run release-tool tests
+        working-directory: physics
+        run: python3 -m pytest -q tests/test_release_candidate.py
+      - name: Run repository guards
+        run: python3 Scripts/check_repo_guards.py
+
+  macos-arm64:
+    needs: source-audit
+    runs-on: [self-hosted, macOS, ARM64, UE5.8]
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Build and validate signed macOS RC
+        env:
+          RAFTSIM_MAC_SIGN_IDENTITY: ${{ secrets.RAFTSIM_MAC_SIGN_IDENTITY }}
+          RAFTSIM_MAC_SIGNATURE_POLICY: distribution
+          RAFTSIM_NOTARY_PROFILE: ${{ secrets.RAFTSIM_NOTARY_PROFILE }}
+        run: unreal/Scripts/build_mac_rc.sh "$RUNNER_TEMP/RaftSimRC"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RaftSim-1.0.0-rc1-macos-arm64
+          path: ${{ runner.temp }}/RaftSimRC/artifacts
+          if-no-files-found: error
+
+  windows-x64:
+    needs: source-audit
+    runs-on: [self-hosted, Windows, X64, UE5.8, RTX]
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - name: Build and validate Authenticode Windows RC
+        shell: powershell
+        env:
+          RAFTSIM_WINDOWS_SIGNING_THUMBPRINT: ${{ secrets.RAFTSIM_WINDOWS_SIGNING_THUMBPRINT }}
+        run: unreal/Scripts/build_win_rc.ps1 -RcRoot "$env:RUNNER_TEMP\RaftSimRC"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RaftSim-1.0.0-rc1-windows-x64
+          path: ${{ runner.temp }}\RaftSimRC\artifacts
+          if-no-files-found: error
+
+  proton:
+    needs: windows-x64
+    runs-on: [self-hosted, Linux, X64, Steam, Proton]
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: RaftSim-1.0.0-rc1-windows-x64
+          path: ${{ runner.temp }}/RaftSimWindowsRC
+      - name: Verify Proton smoke harness is installed
+        run: test -x Scripts/run_proton_rc_smoke.sh
+      - name: Run Proton startup/input/save smoke
+        run: Scripts/run_proton_rc_smoke.sh "${{ runner.temp }}/RaftSimWindowsRC"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: RaftSim-1.0.0-rc1-proton-qa
+          path: |
+            ${{ runner.temp }}/RaftSimWindowsRC/windows-x64-proton-input-verification.json
+            ${{ runner.temp }}/RaftSimWindowsRC/proton_release_candidate_qa.json
+            ${{ runner.temp }}/RaftSimWindowsRC/proton-smoke.json
+          if-no-files-found: error

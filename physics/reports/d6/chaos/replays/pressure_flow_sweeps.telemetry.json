@@ -1,0 +1,5222 @@
+{
+	"schema": "raftsim.flexible_raft.d6_chaos_fixture_telemetry.v1",
+	"runtime_id": "UnrealEngine5ChaosRigidBody",
+	"fixture_id": "pressure_flow_sweeps",
+	"target_id": "unreal_chaos_rigid_baseline",
+	"engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
+	"fixed_step_s": 0.033333333333333333,
+	"step_index": 18,
+	"raft_pose":
+	{
+		"position_m":
+		{
+			"x": 3,
+			"y": -3.3460230114435183,
+			"z": 1.0757457854726924
+		},
+		"orientation":
+		{
+			"x": -0.70495282589703157,
+			"y": -0,
+			"z": 0,
+			"w": 0.70925419509495291
+		}
+	},
+	"raft_linear_velocity":
+	{
+		"x": 0,
+		"y": -13.630421142578125,
+		"z": -5.7877740478515625
+	},
+	"raft_angular_velocity":
+	{
+		"x": 15.755423545837402,
+		"y": 0,
+		"z": 0
+	},
+	"contact_points": [
+		{
+			"scenario_id": "pressure_14000_velocity_1.2",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_14000_velocity_2.4",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_14000_velocity_3.6",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_1.2",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_2.4",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_3.6",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_1.2",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_2.4",
+			"max_estimated_indentation_m": 1.3999999999999999
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_3.6",
+			"max_estimated_indentation_m": 1.3999999999999999
+		}
+	],
+	"contact_impulses": [
+		638.05023373254949,
+		353.22854080473701,
+		20.006948127607227,
+		638.05023373254949,
+		353.22854080473701,
+		20.006948127607227,
+		638.05023373254949,
+		353.22854080473701,
+		20.006948127607227
+	],
+	"crew_state":
+	{
+		"loaded_crew_mass_kg": 385,
+		"representation": "crew weight/actions converted to external force or torque on one rigid proxy"
+	},
+	"tube_or_rigid_proxy_state":
+	{
+		"representation": "single_rigid_box_proxy",
+		"tube_compliance_supported": false,
+		"wrap_deformation_supported": false,
+		"mass_kg": 805,
+		"length_m": 4.2999999999999998,
+		"width_m": 1.8999999999999999,
+		"half_height_m": 0.28000000000000003
+	},
+	"overwash_state":
+	{
+		"retained_water_supported": false,
+		"rigid_baseline_policy": "uniform flow is applied as force/torque; rigid proxy has no overtopping volume"
+	},
+	"pin_state":
+	{
+		"contact_observed": true,
+		"tube_wrap_supported": false
+	},
+	"release_state":
+	{
+		"measurement": "impulse-derived release margin from fixed-step Chaos velocity response"
+	},
+	"outcome":
+	{
+		"all_physics_actor_handles_valid": true,
+		"all_scenarios_advanced": true,
+		"deterministic_fixed_step_repeat": true,
+		"measured_by_unreal_chaos": true,
+		"d6_complete": false,
+		"production_promoted": false,
+		"runtime_cpu_ms": 11.605661362409592,
+		"combined_determinism_hash": "1e982b5529e314b79c0627509b2f2494d7c64719a839ca6dd08f1f5776d7b6e9"
+	},
+	"runtime_cpu_ms": 11.605661362409592,
+	"determinism_hash": "1e982b5529e314b79c0627509b2f2494d7c64719a839ca6dd08f1f5776d7b6e9",
+	"metrics":
+	{
+		"sweep_case_count": 9,
+		"sweeps": [
+			{
+				"contact_min_release_margin_n": -16974.307011976485,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": -1928.0562241421103,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": 18904.591556171781,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 14000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": -16974.307011976485,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": -1928.0562241421103,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": 18904.591556171781,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 18000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": -16974.307011976485,
+				"incoming_velocity_mps": 1.2,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": -1928.0562241421103,
+				"incoming_velocity_mps": 2.3999999999999999,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			},
+			{
+				"contact_min_release_margin_n": 18904.591556171781,
+				"incoming_velocity_mps": 3.6000000000000001,
+				"nominal_pressure_pa": 22000,
+				"overwash_flux_m3_s": 0,
+				"retained_water_roll_moment_nm": 0
+			}
+		]
+	},
+	"scenarios": [
+		{
+			"scenario_id": "pressure_14000_velocity_1.2",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"verification_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 638.05023373254949,
+			"runtime_cpu_ms": 1.3135410845279694,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6870379774359372,
+						"z": 2.9881348598306903
+					},
+					"orientation":
+					{
+						"x": 0.0056897463809394856,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999838132620551
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.18037044525146484,
+						"z": -0.27104351043701175
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.28468316793441772,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0869879699455276,
+					"estimated_contact_impulse_ns": 638.05023373254949
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3447659061615227,
+						"z": 2.9621180243296616
+					},
+					"orientation":
+					{
+						"x": 0.014776394980691821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99989082311589128
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.26966032028198245,
+						"z": -0.5967140960693359
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.38284945487976074,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.74436932406062251,
+					"estimated_contact_impulse_ns": 1.1296341531109964
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.99951273863537327,
+						"z": 2.9217079364275276
+					},
+					"orientation":
+					{
+						"x": 0.027012068970861801,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963510749168538
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.35879909515380859,
+						"z": -0.92184181213378913
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.48085209727287292,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.39820393930757009,
+					"estimated_contact_impulse_ns": 1.5827769767738673
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.65111985262255856,
+						"z": 2.8679787087000173
+					},
+					"orientation":
+					{
+						"x": 0.040148031560604376,
+						"y": 0,
+						"z": 0,
+						"w": 0.99919374275553219
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.44778976440429691,
+						"z": -1.2464274597167968
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.57869148254394531,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.048099762404939954,
+					"estimated_contact_impulse_ns": 2.0348023929631456
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60465818531709969,
+						"z": 2.821103309739653
+					},
+					"orientation":
+					{
+						"x": 0.061024731191297102,
+						"y": 0,
+						"z": 0,
+						"w": 0.9981362543175305
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.53663288116455077,
+						"z": -1.5704722595214844
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.67636770009994507,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00070522511962707308,
+					"estimated_contact_impulse_ns": 2.4858797151863468
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.58381391563024931,
+						"z": 2.7579707382878862
+					},
+					"orientation":
+					{
+						"x": 0.073892561713289409,
+						"y": 0,
+						"z": 0,
+						"w": 0.99726620785196951
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.62532806396484375,
+						"z": -1.8939770507812501
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.77388119697570801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 2.936464210075719
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.56001806720660496,
+						"z": 2.6840726457222694
+					},
+					"orientation":
+					{
+						"x": 0.088364084991641723,
+						"y": 0,
+						"z": 0,
+						"w": 0.99608824332163959
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.71387542724609376,
+						"z": -2.2169425964355471
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.87123215198516846,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.3864706106667106
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.53327555915152869,
+						"z": 2.599426976939164
+					},
+					"orientation":
+					{
+						"x": 0.10442769687530411,
+						"y": 0,
+						"z": 0,
+						"w": 0.99453248118164528
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.80227516174316404,
+						"z": -2.5393699645996093
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.96842086315155029,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8356322669228788
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50359130422314946,
+						"z": 2.5040516412904261
+					},
+					"orientation":
+					{
+						"x": 0.12206882173187755,
+						"y": 0,
+						"z": 0,
+						"w": 0.99252163843464447
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.89052757263183591,
+						"z": -2.8612600708007814
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.0654475688934326,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.28403345027907
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.47097020502402442,
+						"z": 2.397964517661197
+					},
+					"orientation":
+					{
+						"x": 0.14126932337579662,
+						"y": 0,
+						"z": 0,
+						"w": 0.98997120072906397
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.97863288879394539,
+						"z": -3.1826135253906251
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1623126268386841,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.7319228509735956
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.43541715654003099,
+						"z": 2.2811834646254705
+					},
+					"orientation":
+					{
+						"x": 0.16200682418428725,
+						"y": 0,
+						"z": 0,
+						"w": 0.98678963762177874
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.0665914154052734,
+						"z": -3.5034313964843751
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.2590161561965942,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1789265547361953
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.39693704360147436,
+						"z": 2.1537263052127393
+					},
+					"orientation":
+					{
+						"x": 0.18425398671796023,
+						"y": 0,
+						"z": 0,
+						"w": 0.98287866411807812
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.154403305053711,
+						"z": -3.8237145996093749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.3555585145950317,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.6251944638725311
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.35553474596087364,
+						"z": 2.0156108319857786
+					},
+					"orientation":
+					{
+						"x": 0.20797778462015723,
+						"y": 0,
+						"z": 0,
+						"w": 0.97813354972850797
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.2420688629150392,
+						"z": -4.1434640502929687
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.4519400596618652,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.0706911477660066
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.31121513321517547,
+						"z": 1.8668548070406459
+					},
+					"orientation":
+					{
+						"x": 0.23313866099410521,
+						"y": 0,
+						"z": 0,
+						"w": 0.97244350208630403
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.3295883178710939,
+						"z": -4.4626806640624999
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5481609106063843,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.5154325158742052
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.26398306734464722,
+						"z": 1.7074759620066817
+					},
+					"orientation":
+					{
+						"x": 0.25968972010693525,
+						"y": 0,
+						"z": 0,
+						"w": 0.96569210894093027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.4169619750976563,
+						"z": -4.7813650512695309
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.6442214250564575,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.9596372474903623
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.21384340017398401,
+						"z": 1.5374920082020824
+					},
+					"orientation":
+					{
+						"x": 0.28757583508845885,
+						"y": 0,
+						"z": 0,
+						"w": 0.95775787079677688
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5041899108886718,
+						"z": -5.0995184326171872
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7401218414306641,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4028825990986737
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.16080098098898774,
+						"z": 1.3569206163227545
+					},
+					"orientation":
+					{
+						"x": 0.3167327900652282,
+						"y": 0,
+						"z": 0,
+						"w": 0.948514807315888
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5912724304199219,
+						"z": -5.4171417236328123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.835862398147583,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.8453539350596886
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.10486064891988801,
+						"z": 1.1657794265978876
+					},
+					"orientation":
+					{
+						"x": 0.34708636294459982,
+						"y": 0,
+						"z": 0,
+						"w": 0.93783317101598063
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.6782098388671876,
+						"z": -5.7342352294921879
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9314433336257935,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.2875237632911141
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_14000_velocity_2.4",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"verification_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 353.22854080473701,
+			"runtime_cpu_ms": 1.4136657118797302,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6780464810987346,
+						"z": 2.984892480403734
+					},
+					"orientation":
+					{
+						"x": 0.0057025375555706369,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999837404005264
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.09746038436889648,
+						"z": -0.34293270111083984
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.35960137844085693,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0779601585445426,
+					"estimated_contact_impulse_ns": 353.22854080473701
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3297299644935467,
+						"z": 2.9526696739096701
+					},
+					"orientation":
+					{
+						"x": 0.015660897319997587,
+						"y": 0,
+						"z": 0,
+						"w": 0.99987736062735844
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.45565525054931644,
+						"z": -0.66848335266113279
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.75356507301330566,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.72906698878285969,
+					"estimated_contact_impulse_ns": 1.3180212954365402
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.97020049595436608,
+						"z": 2.9042102954921685
+					},
+					"orientation":
+					{
+						"x": 0.026913994120286985,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963775284874723
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.81325485229492189,
+						"z": -0.99349143981933596
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1468720436096191,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.36798682031245333,
+					"estimated_contact_impulse_ns": 1.9401917279569416
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60601734378831962,
+						"z": 2.8421568073040135
+					},
+					"orientation":
+					{
+						"x": 0.037077921503571094,
+						"y": 0,
+						"z": 0,
+						"w": 0.99931237745610613
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.1702572631835937,
+						"z": -1.3179579162597657
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5395234823226929,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00090275929730552205,
+					"estimated_contact_impulse_ns": 2.5756592162767067
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.55512850465519092,
+						"z": 2.7874273524903272
+					},
+					"orientation":
+					{
+						"x": 0.069211944389146782,
+						"y": 0,
+						"z": 0,
+						"w": 0.99760197812247431
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5266650390625001,
+						"z": -1.6418835449218749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9315207004547119,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.2147495931351524
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.49237920614084857,
+						"z": 2.7219183720285072
+					},
+					"orientation":
+					{
+						"x": 0.10775280196660821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99417771734652394
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.8824787902832032,
+						"z": -1.9652693176269531
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.3228645324707031,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8555756711871036
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.41778921606689151,
+						"z": 2.6456478311260585
+					},
+					"orientation":
+					{
+						"x": 0.15255947231807299,
+						"y": 0,
+						"z": 0,
+						"w": 0.98829429190197748
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.2376995849609376,
+						"z": -2.2881161499023439
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.7135560512542725,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.4968065814205493
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.33137826671041543,
+						"z": 2.5586336645237684
+					},
+					"orientation":
+					{
+						"x": 0.20340864772747164,
+						"y": 0,
+						"z": 0,
+						"w": 0.97909392911491455
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.5923284912109374,
+						"z": -2.6104248046875003
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.1035964488983154,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1379547203327638
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.23316605480401278,
+						"z": 2.4608937815734944
+					},
+					"orientation":
+					{
+						"x": 0.25996785594928334,
+						"y": 0,
+						"z": 0,
+						"w": 0.96561727090661165
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.9463662719726562,
+						"z": -2.9321963500976564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.4929869174957275,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.7786862173815896
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.12317225169134512,
+						"z": 2.3524460560825902
+					},
+					"orientation":
+					{
+						"x": 0.32176626004766096,
+						"y": 0,
+						"z": 0,
+						"w": 0.94681913473215196
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.2998138427734376,
+						"z": -3.2534317016601562
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.8817284107208252,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.4188194320003484
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.0014164982493568878,
+						"z": 2.2333083313916928
+					},
+					"orientation":
+					{
+						"x": 0.38816378310352295,
+						"y": 0,
+						"z": 0,
+						"w": 0.92159040657266023
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.6526724243164064,
+						"z": -3.5741314697265625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.2698221206665039,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.0582387629843213
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.1320816052672969,
+						"z": 2.1034984305302937
+					},
+					"orientation":
+					{
+						"x": 0.45832005734812575,
+						"y": 0,
+						"z": 0,
+						"w": 0.88878722146102584
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.0049429321289063,
+						"z": -3.8942968750000002
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.6572690010070801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.6966785157181938
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.27730248907067828,
+						"z": 1.9630341359055963
+					},
+					"orientation":
+					{
+						"x": 0.53116481980304264,
+						"y": 0,
+						"z": 0,
+						"w": 0.84726851363874089
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.356626281738281,
+						"z": -4.2139285278320315
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.044069766998291,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.334435732224776
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.4342266138395664,
+						"z": 1.8119332096136576
+					},
+					"orientation":
+					{
+						"x": 0.60537160460866601,
+						"y": 0,
+						"z": 0,
+						"w": 0.79594297555385773
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.7077233886718748,
+						"z": -4.5330276489257812
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.4302258491516113,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.9711205462265795
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.6028344707194575,
+						"z": 1.6502133731282465
+					},
+					"orientation":
+					{
+						"x": 0.67933774460012242,
+						"y": 0,
+						"z": 0,
+						"w": 0.73382574822747859
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.0582354736328128,
+						"z": -4.8515948486328124
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.8157386779785156,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.6068793519309637
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.7831065914781371,
+						"z": 1.4778923276119864
+					},
+					"orientation":
+					{
+						"x": 0.75117330637937951,
+						"y": 0,
+						"z": 0,
+						"w": 0.66010503996187664
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.4081634521484379,
+						"z": -5.1696313476562503
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.2006087303161621,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.241515571958502
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.97502353835010813,
+						"z": 1.2949877336052118
+					},
+					"orientation":
+					{
+						"x": 0.81870238365662529,
+						"y": 0,
+						"z": 0,
+						"w": 0.57421808313127864
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7575079345703122,
+						"z": -5.4871374511718747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.5848374366760254,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.875707015353452
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.178565893881018,
+						"z": 1.1015172414926842
+					},
+					"orientation":
+					{
+						"x": 0.87948071165486297,
+						"y": 0,
+						"z": 0,
+						"w": 0.47593453103032546
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.1062701416015628,
+						"z": -5.8041143798828125
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.9684257507324219,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 11.508572648604106
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_14000_velocity_3.6",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"verification_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 20.006948127607227,
+			"runtime_cpu_ms": 1.0761655867099762,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6635736018031191,
+						"z": 2.9794922307437193
+					},
+					"orientation":
+					{
+						"x": 0.0055209864926225047,
+						"y": 0,
+						"z": 0,
+						"w": 0.99998475923793373
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.1074724578857422,
+						"z": -0.32612224578857424
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.88776689767837524,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0634286310263801,
+					"estimated_contact_impulse_ns": 0.72125048848465256
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3027146295378373,
+						"z": 2.9382923770451868
+					},
+					"orientation":
+					{
+						"x": 0.01333217406685294,
+						"y": 0,
+						"z": 0,
+						"w": 0.99991112261773107
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.91359863281249998,
+						"z": -0.65170089721679691
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7740544080734253,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.70167275654354166,
+					"estimated_contact_impulse_ns": 1.678749221263981
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.92146068999257824,
+						"z": 2.8791384046878283
+					},
+					"orientation":
+					{
+						"x": 0.019663622794484938,
+						"y": 0,
+						"z": 0,
+						"w": 0.99980665227762722
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.7183816528320313,
+						"z": -0.97673698425292976
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.6588642597198486,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.31831582332321035,
+					"estimated_contact_impulse_ns": 2.7989235528792586
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.61801438214410787,
+						"z": 2.808676474650265
+					},
+					"orientation":
+					{
+						"x": 0.030091448535923927,
+						"y": 0,
+						"z": 0,
+						"w": 0.99954714982586479
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.521823272705078,
+						"z": -1.3012312316894532
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.5421998500823975,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.010818945854559274,
+					"estimated_contact_impulse_ns": 3.9442996676318742
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50721683071161405,
+						"z": 2.7545036467576365
+					},
+					"orientation":
+					{
+						"x": 0.10351144645701019,
+						"y": 0,
+						"z": 0,
+						"w": 0.99462826244400349
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.3239263916015624,
+						"z": -1.6251847839355469
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.4240632057189941,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.095901508227068
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.36972706854450138,
+						"z": 2.6895503639820033
+					},
+					"orientation":
+					{
+						"x": 0.19070037197791567,
+						"y": 0,
+						"z": 0,
+						"w": 0.98164829146058452
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.124692687988281,
+						"z": -1.9485983276367187
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.3044567108154297,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.249930939809496
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.20558958212749343,
+						"z": 2.6138345966086565
+					},
+					"orientation":
+					{
+						"x": 0.29032784680384199,
+						"y": 0,
+						"z": 0,
+						"w": 0.9569272393292213
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.9241244506835935,
+						"z": -2.2714729309082031
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.1833829879760742,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4039897977722333
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.01484878177852096,
+						"z": 2.5273742793783835
+					},
+					"orientation":
+					{
+						"x": 0.40017827652778271,
+						"y": 0,
+						"z": 0,
+						"w": 0.91643731209246027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7222235107421877,
+						"z": -2.5938095092773437
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.0608444213867188,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.5576265354944532
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.20245098311791945,
+						"z": 2.4301873165652559
+					},
+					"orientation":
+					{
+						"x": 0.51690245447736261,
+						"y": 0,
+						"z": 0,
+						"w": 0.85604430525252495
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.5189923095703124,
+						"z": -2.9156088256835937
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.9368433952331543,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.7100140808744122
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.44626544442191007,
+						"z": 2.3222915870544139
+					},
+					"orientation":
+					{
+						"x": 0.63579852082654109,
+						"y": 0,
+						"z": 0,
+						"w": 0.7718550647076059
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -7.3144335937500005,
+						"z": -3.2368716430664062
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 8.8113822937011719,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.86067301981857
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.71655042539368441,
+						"z": 2.2037049443420655
+					},
+					"orientation":
+					{
+						"x": 0.75066642043537979,
+						"y": 0,
+						"z": 0,
+						"w": 0.66068140978139644
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.1085491943359376,
+						"z": -3.5575991821289064
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 9.6844635009765625,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 12.009957484165726
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.01326181022691,
+						"z": 2.0744452013021313
+					},
+					"orientation":
+					{
+						"x": 0.85379029217168512,
+						"y": 0,
+						"z": 0,
+						"w": 0.5206170732826465
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.9013409423828129,
+						"z": -3.8777920532226564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 10.556089401245117,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 13.157977058628706
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.3363555440486889,
+						"z": 1.9345301504973855
+					},
+					"orientation":
+					{
+						"x": 0.93611183017516886,
+						"y": 0,
+						"z": 0,
+						"w": 0.3517024899060226
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -9.6928112792968744,
+						"z": -4.1974511718750005
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 11.426262855529785,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 14.304113558299841
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.6857876532307015,
+						"z": 1.7839775540238867
+					},
+					"orientation":
+					{
+						"x": 0.98765842516642666,
+						"y": 0,
+						"z": 0,
+						"w": 0.15662322687830837
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -10.482962646484376,
+						"z": -4.5165777587890625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 12.294985771179199,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 15.448217834614223
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.0615142453892075,
+						"z": 1.6228051333554028
+					},
+					"orientation":
+					{
+						"x": -0.99827884977751669,
+						"y": -0,
+						"z": 0,
+						"w": 0.058645870160466317
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -11.271796875,
+						"z": -4.835172424316406
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 13.162261009216309,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 16.59090580589654
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.4634914890739008,
+						"z": 1.4510305896545574
+					},
+					"orientation":
+					{
+						"x": -0.95871283837124888,
+						"y": -0,
+						"z": 0,
+						"w": 0.28437597216034916
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.05931640625,
+						"z": -5.1532360839843747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.028090476989746,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 17.731602522381262
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.8916756340790539,
+						"z": 1.2686715936172577
+					},
+					"orientation":
+					{
+						"x": -0.86197338767688148,
+						"y": -0,
+						"z": 0,
+						"w": 0.50695352739362676
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.845523681640625,
+						"z": -5.4707696533203123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.892477035522461,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 18.870288335384689
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -3.3460230114435183,
+						"z": 1.0757457854726924
+					},
+					"orientation":
+					{
+						"x": -0.70495282589703157,
+						"y": -0,
+						"z": 0,
+						"w": 0.70925419509495291
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -13.630421142578125,
+						"z": -5.7877740478515625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 15.755423545837402,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 20.006948127607227
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_1.2",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"verification_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 638.05023373254949,
+			"runtime_cpu_ms": 1.3396665453910828,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6870379774359372,
+						"z": 2.9881348598306903
+					},
+					"orientation":
+					{
+						"x": 0.0056897463809394856,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999838132620551
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.18037044525146484,
+						"z": -0.27104351043701175
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.28468316793441772,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0869879699455276,
+					"estimated_contact_impulse_ns": 638.05023373254949
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3447659061615227,
+						"z": 2.9621180243296616
+					},
+					"orientation":
+					{
+						"x": 0.014776394980691821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99989082311589128
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.26966032028198245,
+						"z": -0.5967140960693359
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.38284945487976074,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.74436932406062251,
+					"estimated_contact_impulse_ns": 1.1296341531109964
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.99951273863537327,
+						"z": 2.9217079364275276
+					},
+					"orientation":
+					{
+						"x": 0.027012068970861801,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963510749168538
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.35879909515380859,
+						"z": -0.92184181213378913
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.48085209727287292,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.39820393930757009,
+					"estimated_contact_impulse_ns": 1.5827769767738673
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.65111985262255856,
+						"z": 2.8679787087000173
+					},
+					"orientation":
+					{
+						"x": 0.040148031560604376,
+						"y": 0,
+						"z": 0,
+						"w": 0.99919374275553219
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.44778976440429691,
+						"z": -1.2464274597167968
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.57869148254394531,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.048099762404939954,
+					"estimated_contact_impulse_ns": 2.0348023929631456
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60465818531709969,
+						"z": 2.821103309739653
+					},
+					"orientation":
+					{
+						"x": 0.061024731191297102,
+						"y": 0,
+						"z": 0,
+						"w": 0.9981362543175305
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.53663288116455077,
+						"z": -1.5704722595214844
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.67636770009994507,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00070522511962707308,
+					"estimated_contact_impulse_ns": 2.4858797151863468
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.58381391563024931,
+						"z": 2.7579707382878862
+					},
+					"orientation":
+					{
+						"x": 0.073892561713289409,
+						"y": 0,
+						"z": 0,
+						"w": 0.99726620785196951
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.62532806396484375,
+						"z": -1.8939770507812501
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.77388119697570801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 2.936464210075719
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.56001806720660496,
+						"z": 2.6840726457222694
+					},
+					"orientation":
+					{
+						"x": 0.088364084991641723,
+						"y": 0,
+						"z": 0,
+						"w": 0.99608824332163959
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.71387542724609376,
+						"z": -2.2169425964355471
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.87123215198516846,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.3864706106667106
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.53327555915152869,
+						"z": 2.599426976939164
+					},
+					"orientation":
+					{
+						"x": 0.10442769687530411,
+						"y": 0,
+						"z": 0,
+						"w": 0.99453248118164528
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.80227516174316404,
+						"z": -2.5393699645996093
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.96842086315155029,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8356322669228788
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50359130422314946,
+						"z": 2.5040516412904261
+					},
+					"orientation":
+					{
+						"x": 0.12206882173187755,
+						"y": 0,
+						"z": 0,
+						"w": 0.99252163843464447
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.89052757263183591,
+						"z": -2.8612600708007814
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.0654475688934326,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.28403345027907
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.47097020502402442,
+						"z": 2.397964517661197
+					},
+					"orientation":
+					{
+						"x": 0.14126932337579662,
+						"y": 0,
+						"z": 0,
+						"w": 0.98997120072906397
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.97863288879394539,
+						"z": -3.1826135253906251
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1623126268386841,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.7319228509735956
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.43541715654003099,
+						"z": 2.2811834646254705
+					},
+					"orientation":
+					{
+						"x": 0.16200682418428725,
+						"y": 0,
+						"z": 0,
+						"w": 0.98678963762177874
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.0665914154052734,
+						"z": -3.5034313964843751
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.2590161561965942,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1789265547361953
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.39693704360147436,
+						"z": 2.1537263052127393
+					},
+					"orientation":
+					{
+						"x": 0.18425398671796023,
+						"y": 0,
+						"z": 0,
+						"w": 0.98287866411807812
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.154403305053711,
+						"z": -3.8237145996093749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.3555585145950317,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.6251944638725311
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.35553474596087364,
+						"z": 2.0156108319857786
+					},
+					"orientation":
+					{
+						"x": 0.20797778462015723,
+						"y": 0,
+						"z": 0,
+						"w": 0.97813354972850797
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.2420688629150392,
+						"z": -4.1434640502929687
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.4519400596618652,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.0706911477660066
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.31121513321517547,
+						"z": 1.8668548070406459
+					},
+					"orientation":
+					{
+						"x": 0.23313866099410521,
+						"y": 0,
+						"z": 0,
+						"w": 0.97244350208630403
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.3295883178710939,
+						"z": -4.4626806640624999
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5481609106063843,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.5154325158742052
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.26398306734464722,
+						"z": 1.7074759620066817
+					},
+					"orientation":
+					{
+						"x": 0.25968972010693525,
+						"y": 0,
+						"z": 0,
+						"w": 0.96569210894093027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.4169619750976563,
+						"z": -4.7813650512695309
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.6442214250564575,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.9596372474903623
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.21384340017398401,
+						"z": 1.5374920082020824
+					},
+					"orientation":
+					{
+						"x": 0.28757583508845885,
+						"y": 0,
+						"z": 0,
+						"w": 0.95775787079677688
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5041899108886718,
+						"z": -5.0995184326171872
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7401218414306641,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4028825990986737
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.16080098098898774,
+						"z": 1.3569206163227545
+					},
+					"orientation":
+					{
+						"x": 0.3167327900652282,
+						"y": 0,
+						"z": 0,
+						"w": 0.948514807315888
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5912724304199219,
+						"z": -5.4171417236328123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.835862398147583,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.8453539350596886
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.10486064891988801,
+						"z": 1.1657794265978876
+					},
+					"orientation":
+					{
+						"x": 0.34708636294459982,
+						"y": 0,
+						"z": 0,
+						"w": 0.93783317101598063
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.6782098388671876,
+						"z": -5.7342352294921879
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9314433336257935,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.2875237632911141
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_2.4",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"verification_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 353.22854080473701,
+			"runtime_cpu_ms": 1.3997070491313934,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6780464810987346,
+						"z": 2.984892480403734
+					},
+					"orientation":
+					{
+						"x": 0.0057025375555706369,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999837404005264
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.09746038436889648,
+						"z": -0.34293270111083984
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.35960137844085693,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0779601585445426,
+					"estimated_contact_impulse_ns": 353.22854080473701
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3297299644935467,
+						"z": 2.9526696739096701
+					},
+					"orientation":
+					{
+						"x": 0.015660897319997587,
+						"y": 0,
+						"z": 0,
+						"w": 0.99987736062735844
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.45565525054931644,
+						"z": -0.66848335266113279
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.75356507301330566,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.72906698878285969,
+					"estimated_contact_impulse_ns": 1.3180212954365402
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.97020049595436608,
+						"z": 2.9042102954921685
+					},
+					"orientation":
+					{
+						"x": 0.026913994120286985,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963775284874723
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.81325485229492189,
+						"z": -0.99349143981933596
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1468720436096191,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.36798682031245333,
+					"estimated_contact_impulse_ns": 1.9401917279569416
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60601734378831962,
+						"z": 2.8421568073040135
+					},
+					"orientation":
+					{
+						"x": 0.037077921503571094,
+						"y": 0,
+						"z": 0,
+						"w": 0.99931237745610613
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.1702572631835937,
+						"z": -1.3179579162597657
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5395234823226929,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00090275929730552205,
+					"estimated_contact_impulse_ns": 2.5756592162767067
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.55512850465519092,
+						"z": 2.7874273524903272
+					},
+					"orientation":
+					{
+						"x": 0.069211944389146782,
+						"y": 0,
+						"z": 0,
+						"w": 0.99760197812247431
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5266650390625001,
+						"z": -1.6418835449218749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9315207004547119,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.2147495931351524
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.49237920614084857,
+						"z": 2.7219183720285072
+					},
+					"orientation":
+					{
+						"x": 0.10775280196660821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99417771734652394
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.8824787902832032,
+						"z": -1.9652693176269531
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.3228645324707031,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8555756711871036
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.41778921606689151,
+						"z": 2.6456478311260585
+					},
+					"orientation":
+					{
+						"x": 0.15255947231807299,
+						"y": 0,
+						"z": 0,
+						"w": 0.98829429190197748
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.2376995849609376,
+						"z": -2.2881161499023439
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.7135560512542725,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.4968065814205493
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.33137826671041543,
+						"z": 2.5586336645237684
+					},
+					"orientation":
+					{
+						"x": 0.20340864772747164,
+						"y": 0,
+						"z": 0,
+						"w": 0.97909392911491455
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.5923284912109374,
+						"z": -2.6104248046875003
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.1035964488983154,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1379547203327638
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.23316605480401278,
+						"z": 2.4608937815734944
+					},
+					"orientation":
+					{
+						"x": 0.25996785594928334,
+						"y": 0,
+						"z": 0,
+						"w": 0.96561727090661165
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.9463662719726562,
+						"z": -2.9321963500976564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.4929869174957275,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.7786862173815896
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.12317225169134512,
+						"z": 2.3524460560825902
+					},
+					"orientation":
+					{
+						"x": 0.32176626004766096,
+						"y": 0,
+						"z": 0,
+						"w": 0.94681913473215196
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.2998138427734376,
+						"z": -3.2534317016601562
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.8817284107208252,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.4188194320003484
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.0014164982493568878,
+						"z": 2.2333083313916928
+					},
+					"orientation":
+					{
+						"x": 0.38816378310352295,
+						"y": 0,
+						"z": 0,
+						"w": 0.92159040657266023
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.6526724243164064,
+						"z": -3.5741314697265625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.2698221206665039,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.0582387629843213
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.1320816052672969,
+						"z": 2.1034984305302937
+					},
+					"orientation":
+					{
+						"x": 0.45832005734812575,
+						"y": 0,
+						"z": 0,
+						"w": 0.88878722146102584
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.0049429321289063,
+						"z": -3.8942968750000002
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.6572690010070801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.6966785157181938
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.27730248907067828,
+						"z": 1.9630341359055963
+					},
+					"orientation":
+					{
+						"x": 0.53116481980304264,
+						"y": 0,
+						"z": 0,
+						"w": 0.84726851363874089
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.356626281738281,
+						"z": -4.2139285278320315
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.044069766998291,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.334435732224776
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.4342266138395664,
+						"z": 1.8119332096136576
+					},
+					"orientation":
+					{
+						"x": 0.60537160460866601,
+						"y": 0,
+						"z": 0,
+						"w": 0.79594297555385773
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.7077233886718748,
+						"z": -4.5330276489257812
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.4302258491516113,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.9711205462265795
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.6028344707194575,
+						"z": 1.6502133731282465
+					},
+					"orientation":
+					{
+						"x": 0.67933774460012242,
+						"y": 0,
+						"z": 0,
+						"w": 0.73382574822747859
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.0582354736328128,
+						"z": -4.8515948486328124
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.8157386779785156,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.6068793519309637
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.7831065914781371,
+						"z": 1.4778923276119864
+					},
+					"orientation":
+					{
+						"x": 0.75117330637937951,
+						"y": 0,
+						"z": 0,
+						"w": 0.66010503996187664
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.4081634521484379,
+						"z": -5.1696313476562503
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.2006087303161621,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.241515571958502
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.97502353835010813,
+						"z": 1.2949877336052118
+					},
+					"orientation":
+					{
+						"x": 0.81870238365662529,
+						"y": 0,
+						"z": 0,
+						"w": 0.57421808313127864
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7575079345703122,
+						"z": -5.4871374511718747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.5848374366760254,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.875707015353452
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.178565893881018,
+						"z": 1.1015172414926842
+					},
+					"orientation":
+					{
+						"x": 0.87948071165486297,
+						"y": 0,
+						"z": 0,
+						"w": 0.47593453103032546
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.1062701416015628,
+						"z": -5.8041143798828125
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.9684257507324219,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 11.508572648604106
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_18000_velocity_3.6",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"verification_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 20.006948127607227,
+			"runtime_cpu_ms": 1.4043748378753662,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6635736018031191,
+						"z": 2.9794922307437193
+					},
+					"orientation":
+					{
+						"x": 0.0055209864926225047,
+						"y": 0,
+						"z": 0,
+						"w": 0.99998475923793373
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.1074724578857422,
+						"z": -0.32612224578857424
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.88776689767837524,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0634286310263801,
+					"estimated_contact_impulse_ns": 0.72125048848465256
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3027146295378373,
+						"z": 2.9382923770451868
+					},
+					"orientation":
+					{
+						"x": 0.01333217406685294,
+						"y": 0,
+						"z": 0,
+						"w": 0.99991112261773107
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.91359863281249998,
+						"z": -0.65170089721679691
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7740544080734253,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.70167275654354166,
+					"estimated_contact_impulse_ns": 1.678749221263981
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.92146068999257824,
+						"z": 2.8791384046878283
+					},
+					"orientation":
+					{
+						"x": 0.019663622794484938,
+						"y": 0,
+						"z": 0,
+						"w": 0.99980665227762722
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.7183816528320313,
+						"z": -0.97673698425292976
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.6588642597198486,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.31831582332321035,
+					"estimated_contact_impulse_ns": 2.7989235528792586
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.61801438214410787,
+						"z": 2.808676474650265
+					},
+					"orientation":
+					{
+						"x": 0.030091448535923927,
+						"y": 0,
+						"z": 0,
+						"w": 0.99954714982586479
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.521823272705078,
+						"z": -1.3012312316894532
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.5421998500823975,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.010818945854559274,
+					"estimated_contact_impulse_ns": 3.9442996676318742
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50721683071161405,
+						"z": 2.7545036467576365
+					},
+					"orientation":
+					{
+						"x": 0.10351144645701019,
+						"y": 0,
+						"z": 0,
+						"w": 0.99462826244400349
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.3239263916015624,
+						"z": -1.6251847839355469
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.4240632057189941,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.095901508227068
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.36972706854450138,
+						"z": 2.6895503639820033
+					},
+					"orientation":
+					{
+						"x": 0.19070037197791567,
+						"y": 0,
+						"z": 0,
+						"w": 0.98164829146058452
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.124692687988281,
+						"z": -1.9485983276367187
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.3044567108154297,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.249930939809496
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.20558958212749343,
+						"z": 2.6138345966086565
+					},
+					"orientation":
+					{
+						"x": 0.29032784680384199,
+						"y": 0,
+						"z": 0,
+						"w": 0.9569272393292213
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.9241244506835935,
+						"z": -2.2714729309082031
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.1833829879760742,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4039897977722333
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.01484878177852096,
+						"z": 2.5273742793783835
+					},
+					"orientation":
+					{
+						"x": 0.40017827652778271,
+						"y": 0,
+						"z": 0,
+						"w": 0.91643731209246027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7222235107421877,
+						"z": -2.5938095092773437
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.0608444213867188,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.5576265354944532
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.20245098311791945,
+						"z": 2.4301873165652559
+					},
+					"orientation":
+					{
+						"x": 0.51690245447736261,
+						"y": 0,
+						"z": 0,
+						"w": 0.85604430525252495
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.5189923095703124,
+						"z": -2.9156088256835937
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.9368433952331543,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.7100140808744122
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.44626544442191007,
+						"z": 2.3222915870544139
+					},
+					"orientation":
+					{
+						"x": 0.63579852082654109,
+						"y": 0,
+						"z": 0,
+						"w": 0.7718550647076059
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -7.3144335937500005,
+						"z": -3.2368716430664062
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 8.8113822937011719,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.86067301981857
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.71655042539368441,
+						"z": 2.2037049443420655
+					},
+					"orientation":
+					{
+						"x": 0.75066642043537979,
+						"y": 0,
+						"z": 0,
+						"w": 0.66068140978139644
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.1085491943359376,
+						"z": -3.5575991821289064
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 9.6844635009765625,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 12.009957484165726
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.01326181022691,
+						"z": 2.0744452013021313
+					},
+					"orientation":
+					{
+						"x": 0.85379029217168512,
+						"y": 0,
+						"z": 0,
+						"w": 0.5206170732826465
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.9013409423828129,
+						"z": -3.8777920532226564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 10.556089401245117,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 13.157977058628706
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.3363555440486889,
+						"z": 1.9345301504973855
+					},
+					"orientation":
+					{
+						"x": 0.93611183017516886,
+						"y": 0,
+						"z": 0,
+						"w": 0.3517024899060226
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -9.6928112792968744,
+						"z": -4.1974511718750005
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 11.426262855529785,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 14.304113558299841
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.6857876532307015,
+						"z": 1.7839775540238867
+					},
+					"orientation":
+					{
+						"x": 0.98765842516642666,
+						"y": 0,
+						"z": 0,
+						"w": 0.15662322687830837
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -10.482962646484376,
+						"z": -4.5165777587890625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 12.294985771179199,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 15.448217834614223
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.0615142453892075,
+						"z": 1.6228051333554028
+					},
+					"orientation":
+					{
+						"x": -0.99827884977751669,
+						"y": -0,
+						"z": 0,
+						"w": 0.058645870160466317
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -11.271796875,
+						"z": -4.835172424316406
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 13.162261009216309,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 16.59090580589654
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.4634914890739008,
+						"z": 1.4510305896545574
+					},
+					"orientation":
+					{
+						"x": -0.95871283837124888,
+						"y": -0,
+						"z": 0,
+						"w": 0.28437597216034916
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.05931640625,
+						"z": -5.1532360839843747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.028090476989746,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 17.731602522381262
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.8916756340790539,
+						"z": 1.2686715936172577
+					},
+					"orientation":
+					{
+						"x": -0.86197338767688148,
+						"y": -0,
+						"z": 0,
+						"w": 0.50695352739362676
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.845523681640625,
+						"z": -5.4707696533203123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.892477035522461,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 18.870288335384689
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -3.3460230114435183,
+						"z": 1.0757457854726924
+					},
+					"orientation":
+					{
+						"x": -0.70495282589703157,
+						"y": -0,
+						"z": 0,
+						"w": 0.70925419509495291
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -13.630421142578125,
+						"z": -5.7877740478515625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 15.755423545837402,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 20.006948127607227
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_1.2",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"verification_hash": "403d9d566829c5ee26230a03cdd0163896794b6407d1dd6aabecf92aea74f60b",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 638.05023373254949,
+			"runtime_cpu_ms": 1.2724995613098145,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6870379774359372,
+						"z": 2.9881348598306903
+					},
+					"orientation":
+					{
+						"x": 0.0056897463809394856,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999838132620551
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.18037044525146484,
+						"z": -0.27104351043701175
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.28468316793441772,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0869879699455276,
+					"estimated_contact_impulse_ns": 638.05023373254949
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3447659061615227,
+						"z": 2.9621180243296616
+					},
+					"orientation":
+					{
+						"x": 0.014776394980691821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99989082311589128
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.26966032028198245,
+						"z": -0.5967140960693359
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.38284945487976074,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.74436932406062251,
+					"estimated_contact_impulse_ns": 1.1296341531109964
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.99951273863537327,
+						"z": 2.9217079364275276
+					},
+					"orientation":
+					{
+						"x": 0.027012068970861801,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963510749168538
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.35879909515380859,
+						"z": -0.92184181213378913
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.48085209727287292,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.39820393930757009,
+					"estimated_contact_impulse_ns": 1.5827769767738673
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.65111985262255856,
+						"z": 2.8679787087000173
+					},
+					"orientation":
+					{
+						"x": 0.040148031560604376,
+						"y": 0,
+						"z": 0,
+						"w": 0.99919374275553219
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.44778976440429691,
+						"z": -1.2464274597167968
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.57869148254394531,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.048099762404939954,
+					"estimated_contact_impulse_ns": 2.0348023929631456
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60465818531709969,
+						"z": 2.821103309739653
+					},
+					"orientation":
+					{
+						"x": 0.061024731191297102,
+						"y": 0,
+						"z": 0,
+						"w": 0.9981362543175305
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.53663288116455077,
+						"z": -1.5704722595214844
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.67636770009994507,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00070522511962707308,
+					"estimated_contact_impulse_ns": 2.4858797151863468
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.58381391563024931,
+						"z": 2.7579707382878862
+					},
+					"orientation":
+					{
+						"x": 0.073892561713289409,
+						"y": 0,
+						"z": 0,
+						"w": 0.99726620785196951
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.62532806396484375,
+						"z": -1.8939770507812501
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.77388119697570801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 2.936464210075719
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.56001806720660496,
+						"z": 2.6840726457222694
+					},
+					"orientation":
+					{
+						"x": 0.088364084991641723,
+						"y": 0,
+						"z": 0,
+						"w": 0.99608824332163959
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.71387542724609376,
+						"z": -2.2169425964355471
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.87123215198516846,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.3864706106667106
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.53327555915152869,
+						"z": 2.599426976939164
+					},
+					"orientation":
+					{
+						"x": 0.10442769687530411,
+						"y": 0,
+						"z": 0,
+						"w": 0.99453248118164528
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.80227516174316404,
+						"z": -2.5393699645996093
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.96842086315155029,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8356322669228788
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50359130422314946,
+						"z": 2.5040516412904261
+					},
+					"orientation":
+					{
+						"x": 0.12206882173187755,
+						"y": 0,
+						"z": 0,
+						"w": 0.99252163843464447
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.89052757263183591,
+						"z": -2.8612600708007814
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.0654475688934326,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.28403345027907
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.47097020502402442,
+						"z": 2.397964517661197
+					},
+					"orientation":
+					{
+						"x": 0.14126932337579662,
+						"y": 0,
+						"z": 0,
+						"w": 0.98997120072906397
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.97863288879394539,
+						"z": -3.1826135253906251
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1623126268386841,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.7319228509735956
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.43541715654003099,
+						"z": 2.2811834646254705
+					},
+					"orientation":
+					{
+						"x": 0.16200682418428725,
+						"y": 0,
+						"z": 0,
+						"w": 0.98678963762177874
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.0665914154052734,
+						"z": -3.5034313964843751
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.2590161561965942,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1789265547361953
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.39693704360147436,
+						"z": 2.1537263052127393
+					},
+					"orientation":
+					{
+						"x": 0.18425398671796023,
+						"y": 0,
+						"z": 0,
+						"w": 0.98287866411807812
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.154403305053711,
+						"z": -3.8237145996093749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.3555585145950317,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.6251944638725311
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.35553474596087364,
+						"z": 2.0156108319857786
+					},
+					"orientation":
+					{
+						"x": 0.20797778462015723,
+						"y": 0,
+						"z": 0,
+						"w": 0.97813354972850797
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.2420688629150392,
+						"z": -4.1434640502929687
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.4519400596618652,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.0706911477660066
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.31121513321517547,
+						"z": 1.8668548070406459
+					},
+					"orientation":
+					{
+						"x": 0.23313866099410521,
+						"y": 0,
+						"z": 0,
+						"w": 0.97244350208630403
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.3295883178710939,
+						"z": -4.4626806640624999
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5481609106063843,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.5154325158742052
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.26398306734464722,
+						"z": 1.7074759620066817
+					},
+					"orientation":
+					{
+						"x": 0.25968972010693525,
+						"y": 0,
+						"z": 0,
+						"w": 0.96569210894093027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.4169619750976563,
+						"z": -4.7813650512695309
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.6442214250564575,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.9596372474903623
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.21384340017398401,
+						"z": 1.5374920082020824
+					},
+					"orientation":
+					{
+						"x": 0.28757583508845885,
+						"y": 0,
+						"z": 0,
+						"w": 0.95775787079677688
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5041899108886718,
+						"z": -5.0995184326171872
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7401218414306641,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4028825990986737
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.16080098098898774,
+						"z": 1.3569206163227545
+					},
+					"orientation":
+					{
+						"x": 0.3167327900652282,
+						"y": 0,
+						"z": 0,
+						"w": 0.948514807315888
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5912724304199219,
+						"z": -5.4171417236328123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.835862398147583,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.8453539350596886
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.10486064891988801,
+						"z": 1.1657794265978876
+					},
+					"orientation":
+					{
+						"x": 0.34708636294459982,
+						"y": 0,
+						"z": 0,
+						"w": 0.93783317101598063
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.6782098388671876,
+						"z": -5.7342352294921879
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9314433336257935,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.2875237632911141
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_2.4",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"verification_hash": "1976b8014ef2ec566b6d10211abe85b5bdc2537a2cf957a3ea1a9c4b8ea19a48",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 353.22854080473701,
+			"runtime_cpu_ms": 1.0792501270771027,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6780464810987346,
+						"z": 2.984892480403734
+					},
+					"orientation":
+					{
+						"x": 0.0057025375555706369,
+						"y": 0,
+						"z": 0,
+						"w": 0.9999837404005264
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.09746038436889648,
+						"z": -0.34293270111083984
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.35960137844085693,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0779601585445426,
+					"estimated_contact_impulse_ns": 353.22854080473701
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3297299644935467,
+						"z": 2.9526696739096701
+					},
+					"orientation":
+					{
+						"x": 0.015660897319997587,
+						"y": 0,
+						"z": 0,
+						"w": 0.99987736062735844
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.45565525054931644,
+						"z": -0.66848335266113279
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.75356507301330566,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.72906698878285969,
+					"estimated_contact_impulse_ns": 1.3180212954365402
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.97020049595436608,
+						"z": 2.9042102954921685
+					},
+					"orientation":
+					{
+						"x": 0.026913994120286985,
+						"y": 0,
+						"z": 0,
+						"w": 0.99963775284874723
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.81325485229492189,
+						"z": -0.99349143981933596
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.1468720436096191,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.36798682031245333,
+					"estimated_contact_impulse_ns": 1.9401917279569416
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.60601734378831962,
+						"z": 2.8421568073040135
+					},
+					"orientation":
+					{
+						"x": 0.037077921503571094,
+						"y": 0,
+						"z": 0,
+						"w": 0.99931237745610613
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.1702572631835937,
+						"z": -1.3179579162597657
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.5395234823226929,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.00090275929730552205,
+					"estimated_contact_impulse_ns": 2.5756592162767067
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.55512850465519092,
+						"z": 2.7874273524903272
+					},
+					"orientation":
+					{
+						"x": 0.069211944389146782,
+						"y": 0,
+						"z": 0,
+						"w": 0.99760197812247431
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.5266650390625001,
+						"z": -1.6418835449218749
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.9315207004547119,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.2147495931351524
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.49237920614084857,
+						"z": 2.7219183720285072
+					},
+					"orientation":
+					{
+						"x": 0.10775280196660821,
+						"y": 0,
+						"z": 0,
+						"w": 0.99417771734652394
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.8824787902832032,
+						"z": -1.9652693176269531
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.3228645324707031,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 3.8555756711871036
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.41778921606689151,
+						"z": 2.6456478311260585
+					},
+					"orientation":
+					{
+						"x": 0.15255947231807299,
+						"y": 0,
+						"z": 0,
+						"w": 0.98829429190197748
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.2376995849609376,
+						"z": -2.2881161499023439
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.7135560512542725,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 4.4968065814205493
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.33137826671041543,
+						"z": 2.5586336645237684
+					},
+					"orientation":
+					{
+						"x": 0.20340864772747164,
+						"y": 0,
+						"z": 0,
+						"w": 0.97909392911491455
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.5923284912109374,
+						"z": -2.6104248046875003
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.1035964488983154,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.1379547203327638
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.23316605480401278,
+						"z": 2.4608937815734944
+					},
+					"orientation":
+					{
+						"x": 0.25996785594928334,
+						"y": 0,
+						"z": 0,
+						"w": 0.96561727090661165
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.9463662719726562,
+						"z": -2.9321963500976564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.4929869174957275,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.7786862173815896
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.12317225169134512,
+						"z": 2.3524460560825902
+					},
+					"orientation":
+					{
+						"x": 0.32176626004766096,
+						"y": 0,
+						"z": 0,
+						"w": 0.94681913473215196
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.2998138427734376,
+						"z": -3.2534317016601562
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.8817284107208252,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.4188194320003484
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.0014164982493568878,
+						"z": 2.2333083313916928
+					},
+					"orientation":
+					{
+						"x": 0.38816378310352295,
+						"y": 0,
+						"z": 0,
+						"w": 0.92159040657266023
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.6526724243164064,
+						"z": -3.5741314697265625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.2698221206665039,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.0582387629843213
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.1320816052672969,
+						"z": 2.1034984305302937
+					},
+					"orientation":
+					{
+						"x": 0.45832005734812575,
+						"y": 0,
+						"z": 0,
+						"w": 0.88878722146102584
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.0049429321289063,
+						"z": -3.8942968750000002
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.6572690010070801,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.6966785157181938
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.27730248907067828,
+						"z": 1.9630341359055963
+					},
+					"orientation":
+					{
+						"x": 0.53116481980304264,
+						"y": 0,
+						"z": 0,
+						"w": 0.84726851363874089
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.356626281738281,
+						"z": -4.2139285278320315
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.044069766998291,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.334435732224776
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.4342266138395664,
+						"z": 1.8119332096136576
+					},
+					"orientation":
+					{
+						"x": 0.60537160460866601,
+						"y": 0,
+						"z": 0,
+						"w": 0.79594297555385773
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.7077233886718748,
+						"z": -4.5330276489257812
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.4302258491516113,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.9711205462265795
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.6028344707194575,
+						"z": 1.6502133731282465
+					},
+					"orientation":
+					{
+						"x": 0.67933774460012242,
+						"y": 0,
+						"z": 0,
+						"w": 0.73382574822747859
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.0582354736328128,
+						"z": -4.8515948486328124
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.8157386779785156,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.6068793519309637
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.7831065914781371,
+						"z": 1.4778923276119864
+					},
+					"orientation":
+					{
+						"x": 0.75117330637937951,
+						"y": 0,
+						"z": 0,
+						"w": 0.66010503996187664
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.4081634521484379,
+						"z": -5.1696313476562503
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.2006087303161621,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.241515571958502
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.97502353835010813,
+						"z": 1.2949877336052118
+					},
+					"orientation":
+					{
+						"x": 0.81870238365662529,
+						"y": 0,
+						"z": 0,
+						"w": 0.57421808313127864
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7575079345703122,
+						"z": -5.4871374511718747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.5848374366760254,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.875707015353452
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.178565893881018,
+						"z": 1.1015172414926842
+					},
+					"orientation":
+					{
+						"x": 0.87948071165486297,
+						"y": 0,
+						"z": 0,
+						"w": 0.47593453103032546
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.1062701416015628,
+						"z": -5.8041143798828125
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.9684257507324219,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 11.508572648604106
+				}
+			]
+		},
+		{
+			"scenario_id": "pressure_22000_velocity_3.6",
+			"physics_scene_present": true,
+			"physics_actor_handle_valid": true,
+			"rigid_physics_actor": true,
+			"solver_advanced": true,
+			"contact_observed": true,
+			"deterministic_repeat": true,
+			"determinism_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"verification_hash": "ea242f79c98c722a31d872a6f3eaec011f90061b401f0dfe4fc73e2ee9ada77a",
+			"initial_obstacle_indentation_m": 1.3999999999999999,
+			"max_obstacle_indentation_m": 1.3999999999999999,
+			"max_contact_impulse_ns": 20.006948127607227,
+			"runtime_cpu_ms": 1.3067908585071564,
+			"frames": [
+				{
+					"step_index": 1,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.6635736018031191,
+						"z": 2.9794922307437193
+					},
+					"orientation":
+					{
+						"x": 0.0055209864926225047,
+						"y": 0,
+						"z": 0,
+						"w": 0.99998475923793373
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.1074724578857422,
+						"z": -0.32612224578857424
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 0.88776689767837524,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 1.0634286310263801,
+					"estimated_contact_impulse_ns": 0.72125048848465256
+				},
+				{
+					"step_index": 2,
+					"position_m":
+					{
+						"x": 3,
+						"y": 1.3027146295378373,
+						"z": 2.9382923770451868
+					},
+					"orientation":
+					{
+						"x": 0.01333217406685294,
+						"y": 0,
+						"z": 0,
+						"w": 0.99991112261773107
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -0.91359863281249998,
+						"z": -0.65170089721679691
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 1.7740544080734253,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.70167275654354166,
+					"estimated_contact_impulse_ns": 1.678749221263981
+				},
+				{
+					"step_index": 3,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.92146068999257824,
+						"z": 2.8791384046878283
+					},
+					"orientation":
+					{
+						"x": 0.019663622794484938,
+						"y": 0,
+						"z": 0,
+						"w": 0.99980665227762722
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -1.7183816528320313,
+						"z": -0.97673698425292976
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 2.6588642597198486,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.31831582332321035,
+					"estimated_contact_impulse_ns": 2.7989235528792586
+				},
+				{
+					"step_index": 4,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.61801438214410787,
+						"z": 2.808676474650265
+					},
+					"orientation":
+					{
+						"x": 0.030091448535923927,
+						"y": 0,
+						"z": 0,
+						"w": 0.99954714982586479
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -2.521823272705078,
+						"z": -1.3012312316894532
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 3.5421998500823975,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0.010818945854559274,
+					"estimated_contact_impulse_ns": 3.9442996676318742
+				},
+				{
+					"step_index": 5,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.50721683071161405,
+						"z": 2.7545036467576365
+					},
+					"orientation":
+					{
+						"x": 0.10351144645701019,
+						"y": 0,
+						"z": 0,
+						"w": 0.99462826244400349
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -3.3239263916015624,
+						"z": -1.6251847839355469
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 4.4240632057189941,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 5.095901508227068
+				},
+				{
+					"step_index": 6,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.36972706854450138,
+						"z": 2.6895503639820033
+					},
+					"orientation":
+					{
+						"x": 0.19070037197791567,
+						"y": 0,
+						"z": 0,
+						"w": 0.98164829146058452
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.124692687988281,
+						"z": -1.9485983276367187
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 5.3044567108154297,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 6.249930939809496
+				},
+				{
+					"step_index": 7,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.20558958212749343,
+						"z": 2.6138345966086565
+					},
+					"orientation":
+					{
+						"x": 0.29032784680384199,
+						"y": 0,
+						"z": 0,
+						"w": 0.9569272393292213
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -4.9241244506835935,
+						"z": -2.2714729309082031
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 6.1833829879760742,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 7.4039897977722333
+				},
+				{
+					"step_index": 8,
+					"position_m":
+					{
+						"x": 3,
+						"y": 0.01484878177852096,
+						"z": 2.5273742793783835
+					},
+					"orientation":
+					{
+						"x": 0.40017827652778271,
+						"y": 0,
+						"z": 0,
+						"w": 0.91643731209246027
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -5.7222235107421877,
+						"z": -2.5938095092773437
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.0608444213867188,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 8.5576265354944532
+				},
+				{
+					"step_index": 9,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.20245098311791945,
+						"z": 2.4301873165652559
+					},
+					"orientation":
+					{
+						"x": 0.51690245447736261,
+						"y": 0,
+						"z": 0,
+						"w": 0.85604430525252495
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -6.5189923095703124,
+						"z": -2.9156088256835937
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 7.9368433952331543,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 9.7100140808744122
+				},
+				{
+					"step_index": 10,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.44626544442191007,
+						"z": 2.3222915870544139
+					},
+					"orientation":
+					{
+						"x": 0.63579852082654109,
+						"y": 0,
+						"z": 0,
+						"w": 0.7718550647076059
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -7.3144335937500005,
+						"z": -3.2368716430664062
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 8.8113822937011719,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 10.86067301981857
+				},
+				{
+					"step_index": 11,
+					"position_m":
+					{
+						"x": 3,
+						"y": -0.71655042539368441,
+						"z": 2.2037049443420655
+					},
+					"orientation":
+					{
+						"x": 0.75066642043537979,
+						"y": 0,
+						"z": 0,
+						"w": 0.66068140978139644
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.1085491943359376,
+						"z": -3.5575991821289064
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 9.6844635009765625,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 12.009957484165726
+				},
+				{
+					"step_index": 12,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.01326181022691,
+						"z": 2.0744452013021313
+					},
+					"orientation":
+					{
+						"x": 0.85379029217168512,
+						"y": 0,
+						"z": 0,
+						"w": 0.5206170732826465
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -8.9013409423828129,
+						"z": -3.8777920532226564
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 10.556089401245117,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 13.157977058628706
+				},
+				{
+					"step_index": 13,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.3363555440486889,
+						"z": 1.9345301504973855
+					},
+					"orientation":
+					{
+						"x": 0.93611183017516886,
+						"y": 0,
+						"z": 0,
+						"w": 0.3517024899060226
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -9.6928112792968744,
+						"z": -4.1974511718750005
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 11.426262855529785,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 14.304113558299841
+				},
+				{
+					"step_index": 14,
+					"position_m":
+					{
+						"x": 3,
+						"y": -1.6857876532307015,
+						"z": 1.7839775540238867
+					},
+					"orientation":
+					{
+						"x": 0.98765842516642666,
+						"y": 0,
+						"z": 0,
+						"w": 0.15662322687830837
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -10.482962646484376,
+						"z": -4.5165777587890625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 12.294985771179199,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 15.448217834614223
+				},
+				{
+					"step_index": 15,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.0615142453892075,
+						"z": 1.6228051333554028
+					},
+					"orientation":
+					{
+						"x": -0.99827884977751669,
+						"y": -0,
+						"z": 0,
+						"w": 0.058645870160466317
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -11.271796875,
+						"z": -4.835172424316406
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 13.162261009216309,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 16.59090580589654
+				},
+				{
+					"step_index": 16,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.4634914890739008,
+						"z": 1.4510305896545574
+					},
+					"orientation":
+					{
+						"x": -0.95871283837124888,
+						"y": -0,
+						"z": 0,
+						"w": 0.28437597216034916
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.05931640625,
+						"z": -5.1532360839843747
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.028090476989746,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 17.731602522381262
+				},
+				{
+					"step_index": 17,
+					"position_m":
+					{
+						"x": 3,
+						"y": -2.8916756340790539,
+						"z": 1.2686715936172577
+					},
+					"orientation":
+					{
+						"x": -0.86197338767688148,
+						"y": -0,
+						"z": 0,
+						"w": 0.50695352739362676
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -12.845523681640625,
+						"z": -5.4707696533203123
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 14.892477035522461,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 18.870288335384689
+				},
+				{
+					"step_index": 18,
+					"position_m":
+					{
+						"x": 3,
+						"y": -3.3460230114435183,
+						"z": 1.0757457854726924
+					},
+					"orientation":
+					{
+						"x": -0.70495282589703157,
+						"y": -0,
+						"z": 0,
+						"w": 0.70925419509495291
+					},
+					"linear_velocity_mps":
+					{
+						"x": 0,
+						"y": -13.630421142578125,
+						"z": -5.7877740478515625
+					},
+					"angular_velocity_rad_s":
+					{
+						"x": 15.755423545837402,
+						"y": 0,
+						"z": 0
+					},
+					"estimated_obstacle_indentation_m": 0,
+					"estimated_contact_impulse_ns": 20.006948127607227
+				}
+			]
+		}
+	],
+	"runtime_provenance":
+	{
+		"physics_backend": "Unreal Chaos",
+		"physics_interface": "FChaosEngineInterface",
+		"simulated_component": "UBoxComponent",
+		"world_type": "EWorldType::Game transient",
+		"uses_custom_flexible_raft_model": false,
+		"uses_rigid_baseline_mode": false,
+		"uses_real_physics_actor_handle": true
+	}
+}

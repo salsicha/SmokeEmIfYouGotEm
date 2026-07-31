@@ -1,0 +1,104 @@
+{
+  "schema": "raftsim.equipment.generated_textile_pbr.v1",
+  "status": "project_owned_generated_fallback_render_reviewed_not_photoreal",
+  "generator": {
+    "source_tool": "OpenAI built-in image generation",
+    "model": "built-in image generation model; exact identifier not exposed",
+    "seed": "not exposed",
+    "postprocessor": "raftsim.equipment_textures.v1",
+    "deterministic_postprocessing": true
+  },
+  "processing": {
+    "output_size": [
+      1024,
+      1024
+    ],
+    "seam_method": "four_way_mirrored_material_tile",
+    "albedo": "material_specific_bounded_neutral_detail_for_runtime_tint",
+    "normal": "periodic_central_difference_tangent_space",
+    "packed_channels": {
+      "r": "ambient_occlusion",
+      "g": "roughness",
+      "b": "height"
+    }
+  },
+  "render_review": "docs/environment-captures/south_fork_full_reach/m9_equipment_textile_fallback_v280_review.json",
+  "assets": [
+    {
+      "asset_id": "raft_coated_fabric",
+      "raw_source": "Source_RaftCoatedFabric_v1.png",
+      "raw_source_sha256": "8e9ed3c6f64776eb424d826aa4c602a0d438ebd92cfc34eaeb1831755ca2d417",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "physical_width_cm": 18.0,
+      "prompt_summary": "Neutral unbranded commercial Hypalon/PVC raft fabric; orthographic, diffuse, edge-to-edge, with woven scrim and restrained abrasion.",
+      "maps": {
+        "albedo": {
+          "path": "T_RaftSim_RaftCoatedFabric_Albedo.png",
+          "sha256": "a9af3e016da7f8c1b1fbc597f0f3d0135719768b63e3d650afba3dd13e50e057"
+        },
+        "normal": {
+          "path": "T_RaftSim_RaftCoatedFabric_Normal.png",
+          "sha256": "143280da0c62be12388e0858960a253e794b49aa37703f8f0dc54209a32af13b"
+        },
+        "packed": {
+          "path": "T_RaftSim_RaftCoatedFabric_AORoughnessHeight.png",
+          "sha256": "356001314bd8fe88d7bda8ea073fb7b70b549c7e3fd2aedf7f0e560eec94e572"
+        }
+      }
+    },
+    {
+      "asset_id": "pfd_ripstop",
+      "raw_source": "Source_PfdRipstop_v1.png",
+      "raw_source_sha256": "5abd0ea5cf8e5fa6435a4060f25d1b5b9d5faa21218d4c04ca8f5a64bcb3cc6e",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "physical_width_cm": 12.0,
+      "prompt_summary": "Neutral unbranded high-denier Type-V PFD ripstop nylon; orthographic, diffuse, edge-to-edge, with a fine reinforcement grid.",
+      "maps": {
+        "albedo": {
+          "path": "T_RaftSim_PfdRipstop_Albedo.png",
+          "sha256": "98fa3e80ed81cac284f7b69edf8f400838b6cb78a2ac150643d1bfb28918e939"
+        },
+        "normal": {
+          "path": "T_RaftSim_PfdRipstop_Normal.png",
+          "sha256": "07cf4b184a56a2505516b29ba54fcfa37fb8c7ddb9e854079d001b962bb78e06"
+        },
+        "packed": {
+          "path": "T_RaftSim_PfdRipstop_AORoughnessHeight.png",
+          "sha256": "074a225ac823841dd765abfd5a6f14bfc6e2de9894a5578d11e6135839dcf68c"
+        }
+      }
+    },
+    {
+      "asset_id": "wetsuit_neoprene",
+      "raw_source": "Source_WetsuitNeoprene_v1.png",
+      "raw_source_sha256": "5f91c8774a5c6520b5ff117cf477767563eb64c2a0ace0ab4f0fabcaf5c2da85",
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "physical_width_cm": 8.0,
+      "prompt_summary": "Neutral premium rafting wetsuit neoprene with a fine stretch-jersey face; orthographic, diffuse, and edge-to-edge.",
+      "maps": {
+        "albedo": {
+          "path": "T_RaftSim_WetsuitNeoprene_Albedo.png",
+          "sha256": "8020b1e27d8375ce5c2d5b5052b40f3c22aece0607e3ee8fbb1365026bab225c"
+        },
+        "normal": {
+          "path": "T_RaftSim_WetsuitNeoprene_Normal.png",
+          "sha256": "9f887725a1859b7f556f7b2612ac6d367bd70062965616826e597926526e0e38"
+        },
+        "packed": {
+          "path": "T_RaftSim_WetsuitNeoprene_AORoughnessHeight.png",
+          "sha256": "aedb786062541d0e42a181f4847f0983fc6afb53021431c6f42b67a04f8ee59f"
+        }
+      }
+    }
+  ],
+  "claim_boundary": "These project-owned generated textures improve the procedural fallback and are reusable on replacement meshes. They do not by themselves satisfy photoreal character, raft, or art-direction acceptance."
+}

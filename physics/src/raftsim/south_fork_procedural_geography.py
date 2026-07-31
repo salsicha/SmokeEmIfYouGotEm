@@ -48,15 +48,34 @@ PROCEDURAL_OVERVIEW_RELATIVE_PATH = (
     f"{PROCEDURAL_GEOGRAPHY_DIRECTORY_RELATIVE_PATH}/full_reach_overview.png"
 )
 
-ALGORITHM_VERSION = "south_fork_procedural_geography_v4_smooth_frames"
+ALGORITHM_VERSION = "south_fork_procedural_geography_v6_erosion_conditioned_banks"
 DEFAULT_SEED = 0x5FA49E17
 STATION_SPACING_M = 4.0
 LATERAL_SPACING_M = 4.0
 CORRIDOR_HALF_WIDTH_M = 256.0
+UNREAL_DETAILED_TERRAIN_HALF_WIDTH_M = 112.0
 FRAME_SMOOTHING_RADIUS_ROWS = 32
 SEAM_BLEND_M = 64.0
 UNREAL_TILE_ROWS = 1009
 UNREAL_TILE_OVERLAP_ROWS = 1
+
+# The adopted hydrography route can miss the DEM thalweg by roughly 90 m in
+# named-rapid windows. Snapping a synthetic channel back to the unconditioned
+# source over the former 14 m strip made those horizontal registration errors
+# appear as smooth, near-vertical canyon sheets. Keep the source samples and
+# their provenance, but use a wider, explicitly procedural erosion envelope to
+# make the gameplay channel meet the valley without an impossible wall.
+BANK_WET_TRANSITION_M = 14.0
+BANK_CONDITIONING_FULL_M = 88.0
+BANK_CONDITIONING_FADE_M = 224.0
+BANK_PROFILE_BASE_M = 0.35
+BANK_PROFILE_LINEAR_GRADE = 0.09
+BANK_PROFILE_QUADRATIC_GRADE = 0.00032
+BANK_PROFILE_MAXIMUM_RELIEF_M = 5.5
+
+SOURCE_VEGETATION_SCORE_THRESHOLD = 137
+STRONG_SOURCE_VEGETATION_SCORE_THRESHOLD = 142
+MAXIMUM_WOODED_CROSS_SLOPE = 1.25
 
 FEATURE_CHANNEL = 1 << 0
 FEATURE_SHELF = 1 << 1
@@ -580,34 +599,84 @@ def _build_geography_arrays(
     )
     depth = 0.05 + center_depth[:, None] * (1.0 - normalized_channel**2) ** 1.15
     channel_bed = water_surface[:, None] - depth
-    bank_distance = absolute_lateral - half_width
-    bank_blend_width = 14.0
-    bank_t = np.clip(bank_distance / bank_blend_width, 0.0, 1.0)
-    smooth_t = bank_t * bank_t * (3.0 - 2.0 * bank_t)
-    procedural_bank = water_surface[:, None] - 0.05 + 1.45 * bank_t + 0.55 * bank_t**2
-    transition_bed = procedural_bank * (1.0 - smooth_t) + source_dem * smooth_t
+    bank_distance = np.maximum(absolute_lateral - half_width, 0.0)
+    source_t = np.clip(
+        (bank_distance - BANK_CONDITIONING_FULL_M)
+        / (BANK_CONDITIONING_FADE_M - BANK_CONDITIONING_FULL_M),
+        0.0,
+        1.0,
+    )
+    source_blend = source_t * source_t * (3.0 - 2.0 * source_t)
+    local_x_m = (world_x - center_x[0]) * epsg3857_to_ground_scale
+    local_y_m = (world_y - center_y[0]) * epsg3857_to_ground_scale
+    broad_shoulders = (
+        0.58 * np.sin(local_x_m / 310.0 + local_y_m / 470.0 + 0.31)
+        + 0.27 * np.sin(local_x_m / 127.0 - local_y_m / 211.0 - 0.83)
+        + 0.15 * np.cos(local_x_m / 73.0 + local_y_m / 109.0 + 1.17)
+    )
+    drainage = np.abs(
+        0.62 * np.sin(local_x_m / 181.0 - local_y_m / 263.0 + 0.67)
+        + 0.38 * np.sin(local_x_m / 79.0 + local_y_m / 131.0 - 1.09)
+    )
+    relief_t = np.clip(bank_distance / 48.0, 0.0, 1.0)
+    relief_t = relief_t * relief_t * (3.0 - 2.0 * relief_t)
+    erosion_relief_m = BANK_PROFILE_MAXIMUM_RELIEF_M * relief_t * (
+        0.72 * broad_shoulders - 0.28 * drainage
+    )
+    bank_rise_m = (
+        BANK_PROFILE_BASE_M
+        + BANK_PROFILE_LINEAR_GRADE * bank_distance
+        + BANK_PROFILE_QUADRATIC_GRADE * bank_distance**2
+        + erosion_relief_m
+    )
+    bank_floor_m = water_surface[:, None] + 0.10 + 0.012 * bank_distance
+    bank_envelope_m = np.maximum(
+        water_surface[:, None] + bank_rise_m,
+        bank_floor_m,
+    )
+    conditioned_bank = np.maximum(
+        np.minimum(source_dem, bank_envelope_m),
+        bank_floor_m,
+    )
+    transition_bed = (
+        conditioned_bank * (1.0 - source_blend) + source_dem * source_blend
+    )
+    transition_bed = np.where(
+        bank_distance < BANK_CONDITIONING_FADE_M,
+        np.maximum(transition_bed, water_surface[:, None] + 0.10),
+        transition_bed,
+    )
     bed = np.where(
         inside_channel,
         channel_bed,
-        np.where(bank_distance < bank_blend_width, transition_bed, source_dem),
+        np.where(
+            bank_distance < BANK_CONDITIONING_FADE_M,
+            transition_bed,
+            source_dem,
+        ),
     ).astype(np.float32)
 
     source_authority = np.full(bed.shape, 255, dtype=np.uint8)
     source_authority[inside_channel] = 0
-    transition = (~inside_channel) & (bank_distance < bank_blend_width)
-    source_authority[transition] = np.rint(smooth_t[transition] * 255.0).astype(
-        np.uint8
+    conditioned_bank_samples = (~inside_channel) & (
+        np.abs(bed - source_dem) > 0.01
     )
+    source_authority[conditioned_bank_samples] = np.rint(
+        source_blend[conditioned_bank_samples] * 255.0
+    ).astype(np.uint8)
     source_authority[seam_blend, :] = np.minimum(source_authority[seam_blend, :], 192)
     procedural_infill = (255 - source_authority).astype(np.uint8)
     uncertainty = np.full(bed.shape, 45, dtype=np.uint8)
-    uncertainty[transition] = 155
+    uncertainty[conditioned_bank_samples] = 155
     uncertainty[inside_channel] = 220
     uncertainty[seam_blend, :] = np.maximum(uncertainty[seam_blend, :], 96)
 
     feature_mask = np.zeros(bed.shape, dtype=np.uint8)
     feature_mask[inside_channel] |= FEATURE_CHANNEL
-    feature_mask[transition] |= FEATURE_SHORELINE_BREAKUP
+    wet_bank_transition = (~inside_channel) & (
+        bank_distance < BANK_WET_TRANSITION_M
+    )
+    feature_mask[wet_bank_transition] |= FEATURE_SHORELINE_BREAKUP
     shelf_band = inside_channel & (normalized_channel > 0.68)
     feature_mask[shelf_band] |= FEATURE_SHELF
 
@@ -648,10 +717,26 @@ def _build_geography_arrays(
 
     cross_slope = np.abs(np.gradient(source_dem, LATERAL_SPACING_M, axis=1))
     material = np.full(bed.shape, MATERIAL_SOIL, dtype=np.uint8)
-    material[vegetation_score > 137] = MATERIAL_VEGETATION
-    material[cross_slope > 0.42] = MATERIAL_EXPOSED_ROCK
-    material[(vegetation_score <= 137) & (cross_slope <= 0.42)] = MATERIAL_COBBLE_GRAVEL
-    material[transition] = MATERIAL_WET_BANK
+    source_vegetation = vegetation_score > SOURCE_VEGETATION_SCORE_THRESHOLD
+    strong_source_vegetation = (
+        vegetation_score > STRONG_SOURCE_VEGETATION_SCORE_THRESHOLD
+    )
+    material[source_vegetation] = MATERIAL_VEGETATION
+    # A cross-slope-only override previously stripped trees from every bank
+    # steeper than 0.42, even where registered NAIP pixels had a strong green
+    # signal.  At guide-eye range that converted wooded Sierra canyon walls
+    # into broad, uniform exposed-rock sheets.  Preserve strong source-backed
+    # vegetation on physically plausible wooded slopes; only weak/non-green
+    # pixels or genuinely extreme faces become exposed rock.
+    exposed_rock = (cross_slope > 0.42) & (
+        (~strong_source_vegetation)
+        | (cross_slope > MAXIMUM_WOODED_CROSS_SLOPE)
+    )
+    material[exposed_rock] = MATERIAL_EXPOSED_ROCK
+    material[(~source_vegetation) & (cross_slope <= 0.42)] = (
+        MATERIAL_COBBLE_GRAVEL
+    )
+    material[wet_bank_transition] = MATERIAL_WET_BANK
     material[inside_channel] = MATERIAL_CHANNEL_BED
 
     if not np.isfinite(bed).all() or not np.isfinite(source_dem).all():
@@ -670,6 +755,7 @@ def _build_geography_arrays(
             FRAME_SMOOTHING_RADIUS_ROWS * STATION_SPACING_M, dtype=np.float64
         ),
         "source_dem_elevation_m": source_dem,
+        "source_vegetation_score": vegetation_score,
         "bed_elevation_m": bed,
         "conditioned_water_surface_m": water_surface,
         "channel_half_width_m": channel_half_width,
@@ -708,6 +794,56 @@ def _write_overview(arrays: dict[str, np.ndarray], output_path: Path) -> None:
     image = image.resize((2048, 320), Image.Resampling.LANCZOS)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     image.save(output_path)
+
+
+def _corridor_orientation_metrics(
+    arrays: dict[str, np.ndarray], half_width_m: float
+) -> dict[str, float | int]:
+    """Measure planar folds in the curvilinear ribbon consumed by Unreal."""
+
+    lateral = arrays["lateral_offsets_m"].astype(np.float64)
+    cell_lateral = 0.5 * (lateral[:-1] + lateral[1:])
+    selected_columns = np.abs(cell_lateral) <= half_width_m
+    ground_scale = float(arrays["epsg3857_to_ground_scale"])
+    world_x = (
+        arrays["centerline_epsg3857_x_m"][:, None] * ground_scale
+        + arrays["centerline_normal_x"][:, None] * lateral[None, :]
+    )
+    world_y = (
+        arrays["centerline_epsg3857_y_m"][:, None] * ground_scale
+        + arrays["centerline_normal_y"][:, None] * lateral[None, :]
+    )
+    triangle_a = (
+        (world_x[1:, :-1] - world_x[:-1, :-1])
+        * (world_y[:-1, 1:] - world_y[:-1, :-1])
+        - (world_y[1:, :-1] - world_y[:-1, :-1])
+        * (world_x[:-1, 1:] - world_x[:-1, :-1])
+    )[:, selected_columns]
+    triangle_b = (
+        (world_x[1:, 1:] - world_x[1:, :-1])
+        * (world_y[:-1, 1:] - world_y[1:, :-1])
+        - (world_y[1:, 1:] - world_y[1:, :-1])
+        * (world_x[:-1, 1:] - world_x[1:, :-1])
+    )[:, selected_columns]
+    minimum_area_m2 = 1.0e-3
+    inverted = (triangle_a <= minimum_area_m2) | (
+        triangle_b <= minimum_area_m2
+    )
+    return {
+        "half_width_m": float(half_width_m),
+        "cell_count": int(triangle_a.size),
+        "inverted_or_degenerate_triangle_count": int(
+            np.count_nonzero(triangle_a <= minimum_area_m2)
+            + np.count_nonzero(triangle_b <= minimum_area_m2)
+        ),
+        "mixed_orientation_cell_count": int(
+            np.count_nonzero((triangle_a * triangle_b) < 0.0)
+        ),
+        "minimum_signed_triangle_area_m2": float(
+            min(np.min(triangle_a), np.min(triangle_b))
+        ),
+        "affected_row_count": int(np.count_nonzero(np.any(inverted, axis=1))),
+    }
 
 
 def _artifact_record(repo_root: Path, path: Path) -> dict[str, Any]:
@@ -879,6 +1015,24 @@ def write_south_fork_procedural_geography(
             np.max(np.linalg.norm(np.diff(right_edge, axis=0), axis=1)),
         )
     )
+    detailed_ribbon_orientation = _corridor_orientation_metrics(
+        arrays, UNREAL_DETAILED_TERRAIN_HALF_WIDTH_M
+    )
+    lateral_grid_full = np.broadcast_to(lateral_grid, arrays["material"].shape)
+    visible_bank = (lateral_grid_full >= 34.0) & (
+        lateral_grid_full <= UNREAL_DETAILED_TERRAIN_HALF_WIDTH_M
+    )
+    strong_source_vegetation = (
+        arrays["source_vegetation_score"]
+        > STRONG_SOURCE_VEGETATION_SCORE_THRESHOLD
+    )
+    visible_strong_source_vegetation = visible_bank & strong_source_vegetation
+    visible_source_canopy_preserved_fraction = float(
+        np.mean(
+            arrays["material"][visible_strong_source_vegetation]
+            == MATERIAL_VEGETATION
+        )
+    )
     feature_counts = {
         "channel": int(np.count_nonzero(arrays["features"] & FEATURE_CHANNEL)),
         "shelf": int(np.count_nonzero(arrays["features"] & FEATURE_SHELF)),
@@ -914,7 +1068,7 @@ def write_south_fork_procedural_geography(
             "source_terrain": "USGS 3DEP sampled outside the conditioned channel and bank blend",
             "source_imagery": "USDA NAIP conditions material classes",
             "procedural_infill": (
-                "bathymetry, bank blend, source-window seam blend, and "
+            "bathymetry, erosion-conditioned bank transition, source-window seam blend, and "
                 "sub-DEM rapid controls"
             ),
             "route_basis": "adopted NHD directed mainstem axis",
@@ -970,6 +1124,42 @@ def write_south_fork_procedural_geography(
                 "uncertainty": "0 lowest uncertainty, 255 highest uncertainty",
             },
         },
+        "surface_classification": {
+            "source_vegetation_score_threshold": (
+                SOURCE_VEGETATION_SCORE_THRESHOLD
+            ),
+            "strong_source_vegetation_score_threshold": (
+                STRONG_SOURCE_VEGETATION_SCORE_THRESHOLD
+            ),
+            "maximum_wooded_cross_slope": MAXIMUM_WOODED_CROSS_SLOPE,
+            "visible_bank_lateral_range_m": [
+                34.0,
+                UNREAL_DETAILED_TERRAIN_HALF_WIDTH_M,
+            ],
+            "visible_strong_source_canopy_preserved_fraction": round(
+                visible_source_canopy_preserved_fraction, 6
+            ),
+            "policy": (
+                "preserve strong NAIP vegetation on plausible wooded slopes; "
+                "classify weak/non-green or extreme faces as exposed rock"
+            ),
+        },
+        "bank_conditioning": {
+            "algorithm": "world_space_bounded_erosion_envelope_v1",
+            "authority": (
+                "procedural game infill where the adopted route and source DEM "
+                "thalweg are horizontally misregistered; never surveyed"
+            ),
+            "wet_transition_m": BANK_WET_TRANSITION_M,
+            "full_conditioning_distance_from_bank_m": BANK_CONDITIONING_FULL_M,
+            "source_fade_distance_from_bank_m": BANK_CONDITIONING_FADE_M,
+            "profile_base_m": BANK_PROFILE_BASE_M,
+            "profile_linear_grade": BANK_PROFILE_LINEAR_GRADE,
+            "profile_quadratic_grade": BANK_PROFILE_QUADRATIC_GRADE,
+            "maximum_erosion_relief_m": BANK_PROFILE_MAXIMUM_RELIEF_M,
+            "source_samples_retained": True,
+            "provenance_mask_updated_per_changed_sample": True,
+        },
         "hydraulic_features": {
             "feature_bit_encoding": {
                 "channel": FEATURE_CHANNEL,
@@ -993,6 +1183,10 @@ def write_south_fork_procedural_geography(
                 float(np.max(np.abs(np.diff(center_bed)))), 6
             ),
             "maximum_corridor_edge_step_m": round(maximum_corridor_edge_step_m, 6),
+            "unreal_detailed_ribbon_orientation": {
+                key: round(value, 6) if isinstance(value, float) else value
+                for key, value in detailed_ribbon_orientation.items()
+            },
             "no_unbounded_discontinuities": True,
             "near_bank_clearance_m": {
                 "p05": round(float(np.percentile(bank_clearance_m, 5.0)), 6),

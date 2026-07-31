@@ -1,0 +1,159 @@
+{
+  "schema": "raftsim.m9.shoreline_bank_review.v1",
+  "reviewed_utc": "2026-07-29T18:06:00Z",
+  "candidate": "m9_shoreline_bank_v171",
+  "parent": "m9_volumetric_broadleaf_v169",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "algorithm": "median_wet_edge_cutbank_and_gravel_bench_v1",
+    "source_water_spacing_m": 2.0,
+    "source_dem_spacing_m": 4.0,
+    "longitudinal_segment_spacing_m": 4.0,
+    "maximum_outward_width_m": 9.2,
+    "maximum_bank_height_cm": 110.0,
+    "observed_maximum_bank_height_cm": 94.49700927734375,
+    "candidate_actor_count": 13,
+    "candidate_segment_count": 26208,
+    "candidate_triangle_count": 157248,
+    "candidate_mesh_disk_size_approx_mib": 5.2,
+    "terrain_visual_triangles_unchanged": 1467648,
+    "affected_collision": false,
+    "affected_hydraulics": false,
+    "affected_navigation": false
+  },
+  "world_regeneration": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "candidate_map_sha256": "66922d6e8d2e614bd15b7595d1bc0433c3f8d6f586a0937974de7e98a78555b1",
+    "generation_log": "/private/tmp/raftsim_m9_v171_shoreline_bank_generate.log",
+    "generation_log_sha256": "1351144b16ee47666ba9dcaadfb058e0fdf5c54cb1c084a5a68f0815f543d22c",
+    "candidate_build_manifest_sha256": "68c145b263f3904a5d4d515306f3ccf3741b6c0be5dd4e7ead42e26ed5af5283",
+    "deterministic_world_partition_actor_identities": 213,
+    "errors": 0
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimShorelineBankReviewCapture",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank",
+    "loaded_world_partition_references": 214,
+    "map_or_actor_mutation": false,
+    "package_save": false,
+    "log": "/private/tmp/raftsim_m9_v171_shoreline_bank_photographic.log",
+    "log_sha256": "55a99b9e4715d9c49bebb08bafae6cbabd6bfd721f3486e1466464d318bf89ff",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank/chili_bar_launch_downstream.png",
+        "sha256": "3e783d0f323fa9e32a56a343e0a80b800ed1d74a74546739c47b5531f033497f",
+        "size_bytes": 1310274,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.861584,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 3.983724,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.597548
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank/coloma_bridge_context.png",
+        "sha256": "fa23b2bee56be7836a5e20f6676628bb37ea9428f90c9b70bc2db1e8f8c87bd7",
+        "size_bytes": 1313695,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.080071,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 4.405056,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.864692
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank/meat_grinder_guide_eye.png",
+        "sha256": "58a984fcf14b7569e2bd9ce184c3ad819150a7bf8579b31de6979496362afdb4",
+        "size_bytes": 1273770,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.008254,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 4.548828,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.934136
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank/salmon_falls_takeout.png",
+        "sha256": "40e90204ac9126d817c176b24d51417c14ed974bf34742f9a100813b9ba126af",
+        "size_bytes": 1226832,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.732374,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 2.727756,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.680122
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v171_shoreline_bank/troublemaker_approach.png",
+        "sha256": "6cf08422c0b22f4d7e463fa8edee342ab103e48e5a05231d648a9f271cff1c1f",
+        "size_bytes": 1310582,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.147898,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 5.248915,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 2.703016
+      }
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build_with_candidate": "passed",
+    "focused_python_source_layout_tests_with_candidate": "23/23 passed",
+    "native_test": "RaftSim.M9.EShorelinePresentationCompletion",
+    "native_test_result": "passed",
+    "native_test_log": "/private/tmp/raftsim_m9_v171_shoreline_bank_native.log",
+    "native_test_log_sha256": "c1780af03a556946996c48526fa73e8d8a8f548c80f6e8b0f539158fb94c815e",
+    "capture_manual_review": "five of five inspected at original resolution",
+    "candidate_hlod_build": "not_run_because_candidate_failed_visual_benefit_and_shape_gate"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The candidate was deterministic, edge-local, non-colliding, hydraulically inert, and stayed below its 1.10 m height cap.",
+      "The implementation added only 157,248 visual triangles while leaving the accepted 1,467,648-triangle terrain and all gameplay authority unchanged.",
+      "The candidate generated and captured without fatal errors or map mutation during capture."
+    ],
+    "rejected": [
+      "All five guide-eye views showed only a small change: 0.73-1.15 mean RGB levels and 2.73-5.25 percent of pixels above an eight-level delta.",
+      "The visible shoreline change read as a thin, smooth, repeated brown shelf rather than locally varied cutbank, gravel bar, embedded rock, soil, root, or vegetation structure.",
+      "At Meat Grinder and Troublemaker the added bracket increased the layered-plate look of the shallow shoreline instead of making it more natural.",
+      "The candidate did not materially close the smooth-bank, terrain-material, water-volume, vegetation, or overall photoreal art blockers."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "rollback": {
+    "completed": true,
+    "runtime_candidate_source_removed": true,
+    "orphaned_candidate_meshes_removed": 13,
+    "candidate_capture_and_review_evidence_preserved": true,
+    "restored_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "restored_generation_log": "/private/tmp/raftsim_m9_v171_rejected_v169_restore_generate.log",
+    "restored_generation_log_sha256": "72dd258e794ef8c4aef881ce92bca38e0cfb3ac0c875585c8ad839b6e49c27bf",
+    "restored_deterministic_world_partition_actor_identities": 200,
+    "restored_terrain_visual_triangles": 1467648,
+    "restored_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "restored_hlod": {
+      "fresh_build_log": "/private/tmp/raftsim_m9_v171_rejected_v169_restore_hlod_build.log",
+      "fresh_build_log_sha256": "5818c6c498b76d8d626e6640baaf3ab76d4bca7bb72f14011716a941ab5237fc",
+      "fresh_build_actor_count": 30,
+      "fresh_build_modified_and_saved_actor_count": 30,
+      "first_repeat_log": "/private/tmp/raftsim_m9_v171_rejected_v169_restore_hlod_repeat.log",
+      "first_repeat_log_sha256": "747446d2d8c9e88bbb657d90930e247d0d9bd94fc23add026b661d595d121f77",
+      "first_repeat_modified_and_saved_actor_count": 1,
+      "settled_repeat_log": "/private/tmp/raftsim_m9_v171_rejected_v169_restore_hlod_repeat_2.log",
+      "settled_repeat_log_sha256": "ee17ba856615508b4d021c75477d1efa5bd8ba9aef8f3921803e5cf4675fad41",
+      "settled_repeat_actor_count": 30,
+      "settled_repeat_modified_and_saved_actor_count": 0,
+      "errors": 0,
+      "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+      "evidence_sha256": "69386289cd6380dd5b7593ec21e7b819dd7f9a0b7138ead2351082149472903f"
+    },
+    "restored_renderer_test": {
+      "name": "RaftSim.M7.ZFullReachPresentation",
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v171_rejected_v169_restore_m7.log",
+      "log_sha256": "6a1ecda55e6220f91149ec0779ac63ead6afb0343d425f95b5ecb8eb2712fedf",
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only"
+    }
+  },
+  "decision": "Reject v171 and retain the v169 shoreline and terrain. Preserve the five candidate captures and rejection ledger as negative evidence. Do not add a uniform longitudinal bank bracket; future shoreline work must introduce source-conditioned local morphology and material diversity—embedded rock, gravel-size variation, soil, roots, woody debris, and vegetation transitions—without repeating a continuous shelf."
+}

@@ -1,0 +1,147 @@
+{
+  "schema": "raftsim.m9.production_helmet_liner_review.v1",
+  "reviewed_utc": "2026-07-29T19:50:21Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "supersedes_helmet_art_in": "docs/environment-captures/south_fork_full_reach/m9_helmet_fit_v176_review.json",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "implementation": {
+    "generator_version_before": 2,
+    "generator_version_after": 3,
+    "scope": "project-owned production helmet liner geometry only",
+    "crown_liner_recessed": true,
+    "occipital_liner_recessed": true,
+    "ear_pads_recessed": true,
+    "shell_geometry_changed": false,
+    "helmet_bounds_changed": false,
+    "helmet_scale_or_fit_offset_changed": false,
+    "physical_cut_through_vents": 6,
+    "retention_anchor_count": 4,
+    "material_slots": 4,
+    "vertex_count": 12364,
+    "polygon_count": 12296,
+    "authored_lod0_triangles": 24485,
+    "nanite_enabled": true,
+    "nanite_fallback_triangles": 1988
+  },
+  "authority_boundary": {
+    "presentation_only": true,
+    "character_pose_changed": false,
+    "crew_mass_changed": false,
+    "propulsion_or_command_timing_changed": false,
+    "water_sampling_changed": false,
+    "hydraulic_channels_changed": false,
+    "d3_flip_authority_changed": false,
+    "d4_wrap_pin_contact_authority_changed": false,
+    "collision_changed": false,
+    "raft_mesh_or_material_changed": false,
+    "terrain_or_environment_changed": false,
+    "rescue_or_progression_changed": false,
+    "map_or_package_mutation": false
+  },
+  "source": {
+    "generator": "unreal/Scripts/build_production_whitewater_helmet.py",
+    "generator_sha256": "f04242ef4f178faf302dd18b60c1b8703de477d46af3961c0d6b6eee4e9e143b",
+    "importer": "unreal/Scripts/import_production_whitewater_helmet.py",
+    "importer_sha256": "993c43b44af4e03c3fb4af4c809050c71510c2aed3312744ee3b0bae899ffb3f",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/production_whitewater_helmet_manifest.json",
+    "manifest_sha256": "9fb745dade1bcd9fd2eaab1c82ae87e99715effb14680445be4fc81c0a311e14",
+    "fbx_sha256": "f31f205e72d56203a596e496e9ad3999bd95effced530f51261dc317bdfa68e5",
+    "blend_sha256": "fcc5425e5356ceb09524dee9f43c664fd28bf53b2edd4b0b9fe5cbf5be1b05d3",
+    "runtime_asset": "unreal/Content/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterHelmet.uasset",
+    "runtime_asset_sha256": "11856db75144ad3a4878b57afaa77d49c0cc642d72cef8f56f03159d94f7d08f",
+    "import_audit": "unreal/Saved/RaftSimValidation/m9/production-whitewater-helmet.json",
+    "import_audit_sha256": "7bee958cdaf9122b24cb64063b41d5432316606a2947d2d02a1ba2f1d989f687",
+    "review_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimCrewCommandTest.cpp",
+    "review_test_sha256": "49d62f00c1b0c6ccf030c5a6a73b5b11e682a2b292bc5aec20380be880ab488a"
+  },
+  "automation": {
+    "focused_character_source_and_rights_tests": {
+      "passed": 48,
+      "failed": 0,
+      "tests": [
+        "physics/tests/test_cc0_production_characters.py",
+        "physics/tests/test_safety_gear_fallback.py",
+        "physics/tests/test_editor_source_layout.py",
+        "physics/tests/test_photoreal_rights_reviewed_assets.py"
+      ]
+    },
+    "unreal_editor_build": "succeeded",
+    "full_editor_import_audit": {
+      "status": "passed",
+      "log": "/private/tmp/raftsim_m9_v178_helmet_liner_import_editor.log",
+      "log_sha256": "b8c4b902c51c1465f8afcb06d58875599a2b5c1245032d78359f7b333cda7939"
+    },
+    "p3_renderer_test": {
+      "suite": "RaftSim.P3.CrewRespondsToCommands",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v178_helmet_liner_p3_review.log",
+      "log_sha256": "e752d222c608e40bd6b9e0651dc92ff600b2ea40588b3b2a5a2b41ff7e3c28f1"
+    },
+    "m5_renderer_suite": {
+      "suite": "RaftSim.M5",
+      "passed": 5,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v178_helmet_liner_m5.log",
+      "log_sha256": "a09b4d50b3e06400643d2be090ef47d89efb7a81e5b327bb15efc2d74422b064"
+    },
+    "m7_renderer_test": {
+      "suite": "RaftSim.M7.ZFullReachPresentation",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v178_helmet_liner_m7.log",
+      "log_sha256": "b6ae016c53cabb770f07efc686d295885b92ed829a25113d1dd9800aef921692"
+    },
+    "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "renderer_evidence": {
+    "baseline_capture": "docs/environment-captures/south_fork_full_reach/m9_helmet_fit_v176_technical_retained_photoreal_rejected.png",
+    "baseline_capture_sha256": "4fa7e2f983801d50fc773316e18d31ba3eca1924471a211007d0462cffd06df3",
+    "candidate_capture": "docs/environment-captures/south_fork_full_reach/m9_helmet_liner_v178_technical_retained_photoreal_rejected.png",
+    "candidate_capture_sha256": "17ab338cac037b6ff3fb1c2103b3db46141ad8eda413c8d413e0c5f0151ad1b7",
+    "width": 1280,
+    "height": 1888,
+    "camera": "matched_test_tank_front_starboard_technical_review",
+    "production_roster_count": 5,
+    "whole_frame_mean_absolute_rgb_delta": 2.37831245034428,
+    "whole_frame_changed_fraction": 0.643531101032839,
+    "whole_frame_fraction_above_8_rgb_levels": 0.056577727754237285,
+    "whole_frame_maximum_channel_delta": 231,
+    "pixel_comparison_scope": "Whole-frame numbers include ordinary animation, shadow, and renderer timing variation and are not represented as an isolated helmet mask.",
+    "human_approved": false
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "accepted_runtime": "v178",
+    "m5": "current after v178",
+    "p3_crew_command": "current after v178",
+    "m7": "current after v178",
+    "m4": "stale after the v175-v178 runtime and asset deltas",
+    "m8": "stale after the v175-v178 runtime and asset deltas",
+    "complete_python_data_source_matrix": "stale after the v175-v178 runtime and asset deltas",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "accepted": [
+    "The matched v178 frame removes the large black crown and occipital liner shapes that protruded above or behind the colored shells in v176 and read as exposed hair or detached padding.",
+    "All five eye lines remain visible and each shell remains attached across the commanded paddle pose.",
+    "The deterministic project-owned asset retains unchanged bounds, shell geometry, six physical vents, four retention anchors, four material slots, and visual-only authority.",
+    "The UE 5.8 target builds; the import audit passes; focused character/source/rights tests pass 48/48; renderer-backed P3 passes 1/1, M5 passes 5/5, and exact-current M7 passes 1/1."
+  ],
+  "rejected_or_open": [
+    "The remaining small liner/webbing edges, shared helmet fit, simplified shell and retention detail, and generic materials remain visibly synthetic; v178 does not pass photoreal character review.",
+    "Character anatomy, gaze/facial performance, hands, arm deformation, authored paddle contact, PPE/body integration, and motion remain below production quality.",
+    "The test-tank capture is technical evidence only and cannot substitute for action footage, authored motion capture, per-character fit checks, or release media.",
+    "No named guide or art reviewer has approved helmet safety fit, visibility, character art, animation, or capture.",
+    "Environment, water, terrain, foliage, rock, lighting, raft, character, and release-media photoreal gates remain open."
+  ],
+  "rejected_followups": [
+    "v179 transiently replaced fourteen broad-water materials with a DefaultLit parent and was fully removed after a polygonal visual regression. v180 later proved that the polygons were simultaneous source/HLOD capture contamination, not evidence of geometric-normal or tessellation failure; v179 remains unaccepted because it was not reviewed through the corrected exclusive path."
+  ]
+}

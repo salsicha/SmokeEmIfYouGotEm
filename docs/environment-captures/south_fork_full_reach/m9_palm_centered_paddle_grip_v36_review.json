@@ -1,0 +1,111 @@
+{
+  "schema": "raftsim.m9.palm_centered_paddle_grip_review.v1",
+  "reviewed_utc": "2026-07-28T18:11:30Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "supersedes": "docs/environment-captures/south_fork_full_reach/m9_articulated_paddle_grip_v35_review.json",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "replacement_boundary": {
+    "production_adapter": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+    "production_adapter_sha256": "e8db62d4c45eeed6c1be2a88d0ae6d43e6058db82e134c1309a7a404b591edae",
+    "production_adapter_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimMetaHumanCrewVisualActor.h",
+    "production_adapter_header_sha256": "4b586205d7590830fa7ad4e6bc9c6a040b2916bc3a89cb5054f15185e2f00b32",
+    "animation_authority": "Existing FRaftSimCrewAvatarPose hand and paddle points remain authoritative. For visible-paddle production MetaHumans, the adapter interprets each hand point as the visible middle-palm grip target and derives the skeletal wrist pivot from the reference hand-to-palm vector.",
+    "physics_or_gameplay_changes": false,
+    "crew_mass_changes": false,
+    "water_or_raft_changes": false,
+    "collision_changes": false,
+    "rescue_or_progression_changes": false
+  },
+  "implementation": {
+    "production_roster_count": 5,
+    "articulated_hands_per_avatar": 2,
+    "digit_chains_per_hand": 5,
+    "segments_per_digit": 3,
+    "non_thumb_metacarpals_per_hand": 4,
+    "full_reference_skeleton_cached": true,
+    "palm_anchor_bone_pattern": "middle_metacarpal_{side}",
+    "visible_paddle_grip_points_reinterpreted_as_palm_targets": true,
+    "non_paddle_hand_targets_unchanged": true,
+    "maximum_allowed_runtime_palm_anchor_error_cm": 0.25,
+    "firm_grip_alpha": 1.0,
+    "relaxed_no_paddle_alpha": 0.16,
+    "finger_curl_degrees": [
+      30.0,
+      48.0,
+      34.0
+    ],
+    "thumb_curl_degrees": [
+      18.0,
+      28.0,
+      22.0
+    ],
+    "non_thumb_metacarpal_curl_degrees": 4.0
+  },
+  "automation": {
+    "focused_python_contracts": {
+      "passed": 21,
+      "failed": 0,
+      "tests": [
+        "physics/tests/test_cc0_production_characters.py",
+        "physics/tests/test_flexible_raft_visual_upgrade.py"
+      ],
+      "character_contract_sha256": "f980e2318e96cfba18913b39ff1c2ecc2313115c65029ac7ace60d1a1ced6143"
+    },
+    "unreal_editor_build": "succeeded",
+    "m5_test_source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimM5ProductionQualityTest.cpp",
+    "m5_test_source_sha256": "349d9a0ce240e4838fb60ac09f9b114101dd6686155acb8e95d3cd427cc73c85",
+    "suite": "RaftSim.M5",
+    "succeeded": 4,
+    "succeeded_with_warnings": 0,
+    "failed": 0,
+    "not_run": 0,
+    "report": "unreal/Saved/Automation/M9B3V48BreakingLipM5Exact/index.json",
+    "report_sha256": "6f0af8526f279d89919bc3a84293b6eef5d01b2e372ff6a11648383b69b1efa7",
+    "only_warning": null
+  },
+  "renderer_evidence": {
+    "matched_capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v36_palm_centered_paddle_grip_technical_retained_photoreal_rejected.png",
+    "matched_capture_sha256": "8f7d76d30c3062f01a04d500e277392211ab7bb71671ff2c59ce376b6c8be931",
+    "matched_camera": "station_960_upstream_right",
+    "contact_diagnostic": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v36_palm_centered_paddle_grip_contact_diagnostic.png",
+    "contact_diagnostic_sha256": "6551c4492eedbc87b775f57dad842966fcd9ef3c0cbea667b14b37ccb5acc1c1",
+    "contact_camera": "station_960_contact_port",
+    "width": 1470,
+    "height": 956,
+    "human_approved": false
+  },
+  "validation_currency": {
+    "m5": "4/4 passed after the v36 palm-centred visible-paddle grip delta",
+    "water_surface": "content-current because the slice changes no water or environment asset",
+    "hlod": "content-current because the slice changes no saved environment or HLOD asset",
+    "m4": "stale after the v36 character-runtime and automation-source delta",
+    "m7": "stale after the v36 character-runtime and automation-source delta",
+    "m8": "stale after the v36 delta",
+    "python_data_source_matrix": "stale after the v36 delta",
+    "m9": "stale after the v36 delta",
+    "shipping": "historical and not promotable"
+  },
+  "accepted": [
+    "All five production avatars retain the v35 two-hand, five-digit articulation and now centre each visible-paddle middle-palm anchor on its existing solved grip point rather than placing the skeletal wrist pivot there.",
+    "Forearm and wrist targets are solved together from the reference hand-to-palm vector, avoiding a detached palm correction after the arm pose.",
+    "No-paddle rescue and swim states preserve their existing hand targets and relaxed digit articulation.",
+    "Matched and contact-side renderer evidence shows stable wrists, sleeves and digit chains with the shaft crossing the curled palm region more credibly than v35.",
+    "The UE 5.8 build, focused Python contracts and exact M5 production suite are green, including a 0.25 cm maximum palm-anchor error gate on every rendered production avatar."
+  ],
+  "rejected_or_open": [
+    "The hand orientation still uses the shared reference wrist basis rather than a shaft-aligned per-action grip frame.",
+    "The coarse production hand mesh, generic curl profile and residual blade/shaft biomechanics remain visibly synthetic and prevent photoreal character approval.",
+    "The fingers do not yet use inverse kinematics, collision/contact constraints, grip sockets or motion-captured paddle strokes.",
+    "The broad seated posture, shoulder/elbow deformation and torso reaction remain procedural rather than trained synchronized rafting technique.",
+    "Raft, rock, broad water, foam/aerosol, shoreline, terrain, foliage and lighting remain below the requested photoreal bar.",
+    "No named guide or art reviewer has approved grip safety, hand placement, stroke biomechanics or capture, and neither frame is approved for release media."
+  ],
+  "renderer_iterations": [
+    "v37 aligned palm-across anatomy to the shaft or T-grip with a 65-degree swing cap; it was rejected because foreground wrists produced a conspicuous twisted mitten silhouette.",
+    "v38 reduced the same assist to 28 degrees; it removed the worst twist but did not establish a clear two-view improvement over v36, so the orientation branch was fully removed and the exact v36 source hashes were restored."
+  ]
+}

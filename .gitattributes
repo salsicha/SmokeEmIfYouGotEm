@@ -35,6 +35,10 @@ unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/*.png filter=lfs diff=
 unreal/Content/RaftSim/Rendering/ProductionDetailTextures/*.png filter=lfs diff=lfs merge=lfs -text
 unreal/Content/RaftSim/Rendering/ProductionDetailTextures/Sources/*.png filter=lfs diff=lfs merge=lfs -text
 unreal/Content/RaftSim/Rendering/SourceConditionedMaterialMaps/*.png filter=lfs diff=lfs merge=lfs -text
+unreal/SourceArt/RaftSim/Characters/CC0Production/**/*.png filter=lfs diff=lfs merge=lfs -text
+unreal/SourceArt/RaftSim/Characters/CC0Production/**/*.fbx filter=lfs diff=lfs merge=lfs -text
+unreal/SourceArt/RaftSim/Characters/CC0Production/**/*.mhclo filter=lfs diff=lfs merge=lfs -text
+unreal/SourceArt/RaftSim/Characters/CC0Production/**/*.obj filter=lfs diff=lfs merge=lfs -text
 *.uasset filter=lfs diff=lfs merge=lfs -text
 *.umap filter=lfs diff=lfs merge=lfs -text
 *.uexp filter=lfs diff=lfs merge=lfs -text

@@ -1,0 +1,305 @@
+{
+  "schema": "raftsim.m9.current_render_performance_diagnostics.v1",
+  "reviewed_utc": "2026-07-30T09:20:00Z",
+  "status": "engineering_diagnostics_complete_release_performance_and_photoreal_gates_open",
+  "human_approved": false,
+  "scope": {
+    "build": "exact-current macOS arm64 Development cooked package",
+    "map": "L_SouthForkAmerican_FullReach",
+    "resolution": [
+      1920,
+      1080
+    ],
+    "screen_percentage": 60,
+    "performance_protocol": "RenderOffScreen engineering diagnostic",
+    "release_performance_qualified": false,
+    "reason_not_release_qualified": "The established v527 acceptance protocol rejects RenderOffScreen cadence as player-representative. Fresh exact-current normal-window Shipping evidence is still required.",
+    "simulation_authority_changed": false,
+    "production_renderer_default_changed": false,
+    "production_water_material_changed": false
+  },
+  "baseline": {
+    "id": "v220",
+    "anti_aliasing_method": 4,
+    "bloom_quality": 5,
+    "global_illumination_quality": 2,
+    "reflection_quality": 2,
+    "shadow_quality": 2,
+    "volumetric_cloud_enabled": true,
+    "nanite_enabled": true,
+    "mean_gpu_ms": 18.735935,
+    "p95_gpu_ms": 20.709417,
+    "p95_render_thread_ms": 14.043,
+    "p95_workload_ms": 47.900833,
+    "hitches_over_33ms": 144,
+    "profile_gpu_frame_ms": 18.93,
+    "profile_gpu_top_inclusive_ms": {
+      "shadow_depths": 3.258,
+      "deferred_lighting": 2.852,
+      "lumen_diffuse_indirect_ao": 1.703,
+      "post_processing": 1.546,
+      "base_pass": 1.204,
+      "translucency": 0.756,
+      "distance_fields": 0.719,
+      "velocity": 0.681,
+      "single_layer_water": 0.507
+    }
+  },
+  "release_qualification_guard_verification": {
+    "id": "v250",
+    "report_path": "/Users/alexmoran/Library/Containers/com.smokeemifyougotem.raftsim/Data/tmp/RaftSimQA-v250-schema3-offscreen.json",
+    "report_sha256": "2f52d19421635bb15d56dbebf50e44fcc90d7ef5a212f590d2e45015c678e7e5",
+    "schema": "raftsim.m8.full_reach_performance_soak.v3",
+    "build_configuration": "Development",
+    "render_offscreen": true,
+    "performance_protocol": "offscreen_engineering_diagnostic",
+    "raw_engineering_passed": false,
+    "release_performance_qualification_eligible": false,
+    "release_performance_qualified": false,
+    "artifact_finalizer_passed": false,
+    "decision": "accepted_as_runtime_proof_that_a_cooked_development_offscreen_report_cannot_qualify_release"
+  },
+  "exact_current_python_validation": {
+    "id": "v252",
+    "junit_report": "/private/tmp/raftsim_m9_v252_full_python_tests.xml",
+    "junit_sha256": "a84e1411efe02cc3acf84f1ccbfaefd60c73c9464d06ba45aafbec1ae9db88f7",
+    "tests": 1143,
+    "passed": 1139,
+    "skipped": 3,
+    "intentional_fail_closed_failures": 1,
+    "unexpected_failures": 0,
+    "duration_seconds": 623.85,
+    "intentional_failure": "test_m9_release_acceptance_packet_is_current_or_explicitly_stale_and_fail_closed",
+    "reason": "The current post-v317 flexible-raft runtime deformer intentionally differs from the historical v42 reviewed hash, so the stale M9 acceptance packet remains non-promotable."
+  },
+  "exact_current_native_validation": {
+    "id": "v252",
+    "configuration": "Mac Development editor with Metal renderer and RenderOffScreen presentation",
+    "unexpected_failures": 0,
+    "suites": [
+      {
+        "name": "RaftSim.M4",
+        "tests": 4,
+        "succeeded": 3,
+        "succeeded_with_warnings": 1,
+        "failed": 0,
+        "report": "/private/tmp/raftsim_m9_v252_m4/index.json",
+        "report_sha256": "c173020548e5e8d536e6f5c255312ce3ad3bb51fbb93ad8943ecab35bc49594b"
+      },
+      {
+        "name": "RaftSim.M5",
+        "tests": 5,
+        "succeeded": 4,
+        "succeeded_with_warnings": 1,
+        "failed": 0,
+        "report": "/private/tmp/raftsim_m9_v252_m5/index.json",
+        "report_sha256": "4fb8bea92710886772403220525c66a92bd1f8efe0f62cd3c7bfce02c8dd50f8"
+      },
+      {
+        "name": "RaftSim.M7",
+        "tests": 4,
+        "succeeded": 3,
+        "succeeded_with_warnings": 1,
+        "failed": 0,
+        "report": "/private/tmp/raftsim_m9_v252_m7/index.json",
+        "report_sha256": "4583ae89578d121b39e4dd4165c2e6877e1e7e8d82fbbde33477670c1eec6f10"
+      },
+      {
+        "name": "RaftSim.M8",
+        "tests": 4,
+        "succeeded": 4,
+        "succeeded_with_warnings": 0,
+        "failed": 0,
+        "report": "/private/tmp/raftsim_m9_v252_m8/index.json",
+        "report_sha256": "b8858fbe169d46e153749ab8e6e2824458b1f620f8cda1325f57b416b451ba29"
+      },
+      {
+        "name": "RaftSim.M9",
+        "tests": 5,
+        "succeeded": 5,
+        "succeeded_with_warnings": 0,
+        "failed": 0,
+        "report": "/private/tmp/raftsim_m9_v252_m9/index.json",
+        "report_sha256": "0bd8da32cdefa48309c3daa3de3790629fdf03ebd9e5bf976fb56238758800e8"
+      }
+    ],
+    "warning_scope": "One renderer-backed case in each of M4, M5 and M7 retains the Unreal 5.8 engine-owned r.MotionVectorSimulation render-thread diagnostic. Project search is empty and UE 5.8 registers the CVar without ECVF_RenderThreadSafe while TemporalSuperResolution.cpp reads it on the render thread. No test fails.",
+    "runtime_cleanup": "v251 guards construction-only Niagara SetAutoActivate calls after BeginPlay, eliminating the pooled post-construction warning burst without changing assets, spawn rates, culling, simulation or presentation authority.",
+    "cold_texture_gate_repair": "An intermediate v251 M5 run exposed Unreal's documented 32x32 placeholder while texture platform data compiled. v252 explicitly finishes each loaded production texture compilation and blocks its async build before preserving the same 1K/2K dimension assertions; the cold full M5 suite then passes."
+  },
+  "representative_performance_brackets": [
+    {
+      "id": "v221",
+      "change": "Nanite disabled",
+      "mean_gpu_ms": 29.129854,
+      "p95_gpu_ms": 31.948208,
+      "p95_workload_ms": 32.195873,
+      "hitches_over_33ms": 43,
+      "decision": "rejected_catastrophic_gpu_regression"
+    },
+    {
+      "id": "v222",
+      "change": "TAA, bloom disabled, clouds disabled",
+      "mean_gpu_ms": 15.499483,
+      "p95_gpu_ms": 18.828959,
+      "p95_workload_ms": 34.920334,
+      "hitches_over_33ms": 91,
+      "decision": "rejected_as_combined_default_visual_regression_and_still_failing"
+    },
+    {
+      "id": "v224",
+      "change": "v222 plus shadow quality 1 and GI quality 1",
+      "mean_gpu_ms": 14.983537,
+      "p95_gpu_ms": 17.264999,
+      "p95_workload_ms": 43.474541,
+      "hitches_over_33ms": 162,
+      "decision": "rejected_still_failing_and_quality_reduction"
+    },
+    {
+      "id": "v227",
+      "change": "fine VSM LOD and ray-count diagnostic",
+      "mean_gpu_ms": 15.492826,
+      "p95_gpu_ms": 19.051834,
+      "p95_workload_ms": 35.680084,
+      "hitches_over_33ms": 104,
+      "decision": "rejected_no_material_gain"
+    },
+    {
+      "id": "v232",
+      "change": "profiled TAA/bloom-off/cloud-off/shadow1/GI1 candidate",
+      "mean_gpu_ms": 15.310635,
+      "p95_gpu_ms": 17.137083,
+      "p95_workload_ms": 46.317585,
+      "hitches_over_33ms": 159,
+      "profile_gpu_frame_ms": 16.293,
+      "decision": "rejected_still_failing_and_not_visual_equivalent"
+    },
+    {
+      "id": "v233",
+      "change": "body-only production-character virtual shadows",
+      "mean_gpu_ms": 15.05778,
+      "p95_gpu_ms": 17.405293,
+      "p95_workload_ms": 46.855083,
+      "hitches_over_33ms": 256,
+      "decision": "diagnostic_seam_retained_not_promoted_for_approximately_0_25_ms_mean_gpu_gain"
+    },
+    {
+      "id": "v234",
+      "change": "lower Lumen irradiance-cache resolution, occlusion and probe budget",
+      "mean_gpu_ms": 15.166428,
+      "p95_gpu_ms": 17.095875,
+      "p95_workload_ms": 43.316082,
+      "hitches_over_33ms": 229,
+      "decision": "rejected_no_material_gain"
+    },
+    {
+      "id": "v235",
+      "change": "GI disabled control",
+      "mean_gpu_ms": 13.618571,
+      "p95_gpu_ms": 15.758958,
+      "p95_workload_ms": 35.721542,
+      "hitches_over_33ms": 140,
+      "decision": "control_only_rejected_for_release_quality_and_still_offscreen_hitch_failing"
+    },
+    {
+      "id": "v236",
+      "change": "GI and shadows disabled control",
+      "mean_gpu_ms": 12.236868,
+      "p95_gpu_ms": 14.961041,
+      "p95_workload_ms": 34.85746,
+      "hitches_over_33ms": 65,
+      "decision": "control_only_rejected_for_release_quality_and_still_offscreen_hitch_failing"
+    },
+    {
+      "id": "v244",
+      "change": "TSR and bloom retained; only volumetric clouds disabled",
+      "mean_gpu_ms": 18.645887,
+      "p95_gpu_ms": 20.793375,
+      "p95_workload_ms": 45.658791,
+      "hitches_over_33ms": 144,
+      "profile_gpu_frame_ms": 17.05,
+      "decision": "rejected_zero_measurable_gain_in_clear_morning_workload"
+    }
+  ],
+  "renderer_visual_brackets": [
+    {
+      "id": "v237",
+      "change": "source-true TSR/bloom/cloud close wrap baseline",
+      "capture_sha256": "dfdf8cdde969e1ac9ee19d36e3af49ef2c7340d1ba0bc58f74b426c72cdde066",
+      "decision": "technical_baseline_only_photoreal_rejected"
+    },
+    {
+      "id": "v240",
+      "change": "TAA, bloom disabled, clouds disabled close wrap",
+      "capture_sha256": "190814b0bb089a96f4f20e67843f4f82128cbd5fbed29904f46aff17706255cf",
+      "decision": "rejected_sharper_noisier_character_raft_and_helmet_edges"
+    },
+    {
+      "id": "v241",
+      "change": "source-true broad river baseline",
+      "capture_sha256": "bdcff45d34a393b90290dfb71b7e67619a4d90337bdec4193ea24c2c9429b951",
+      "decision": "technical_baseline_only_photoreal_rejected"
+    },
+    {
+      "id": "v243",
+      "change": "broad river with only volumetric clouds disabled",
+      "capture_sha256": "701581436c568a24cbab8fd698d510b1cfac009afaf96e33acf932400bf8f8f6",
+      "decision": "rejected_no_meaningful_visual_benefit_in_clear_morning"
+    },
+    {
+      "id": "v245",
+      "change": "authored hydraulic foam intensity zero",
+      "capture_sha256": "c5afd3913a7e8dc519ab4ba957ea5b0f9bb601910da69db8c7349b9cd0518985",
+      "decision": "rejected_clipped_white_pattern_remains_and_whitewater_cue_is_weakened"
+    },
+    {
+      "id": "v246",
+      "change": "authored-water base specular zero",
+      "capture_sha256": "7ed2d856e7155fd75e4083f815d022791913e8a6317fbc0182498513ea0f506c",
+      "decision": "rejected_no_material_visual_improvement"
+    },
+    {
+      "id": "v247",
+      "change": "moving live-water actor hidden",
+      "capture_sha256": "2ce0f7355fa1a6b76b4ee575c4fd69f3c947f825f92d27b07bb60e937aacda75",
+      "decision": "diagnostic_only_rejected_because_solver_surface_and_breaking_water_are_required"
+    },
+    {
+      "id": "v248",
+      "change": "live-water overlay specular zero",
+      "capture_sha256": "eb4be396bdd23b5171ab0cfd7de7686d24a664bc5a27d8db43e22a8309cd868d",
+      "decision": "rejected_no_material_visual_improvement"
+    },
+    {
+      "id": "v249",
+      "change": "live hydraulic breaking-lip mesh hidden",
+      "capture_sha256": "f6d711153ea13bc6f96db7ffa47ea54bd82cfd45c4d664330f60ea9103520351",
+      "decision": "rejected_no_material_visual_improvement_and_hydraulic_cue_required"
+    }
+  ],
+  "retained_technical_changes": [
+    "Post-world capture diagnostics can safely switch TAA, bloom and volumetric clouds without racing Metal startup.",
+    "Capture diagnostics can bracket authored-water foam, lace, roughness and specular values and live-overlay roughness/specular without modifying simulation authority or saved packages.",
+    "A body-only production-character shadow mode remains opt-in for profiling and retains one articulated grounded caster per paddler.",
+    "Performance report schema v3 distinguishes RenderOffScreen engineering diagnostics from normal-window player presentation and exposes fail-closed release qualification fields.",
+    "The macOS RC workflow defaults to a normal-window performance protocol; offscreen use requires an explicit diagnostic opt-in and cannot qualify release finalization."
+  ],
+  "production_decisions": {
+    "retain_tsr": true,
+    "retain_bloom": true,
+    "retain_volumetric_cloud_support": true,
+    "retain_nanite": true,
+    "promote_body_only_character_shadows": false,
+    "promote_renderer_quality_reduction": false,
+    "promote_water_material_bracket": false,
+    "photoreal_approved": false,
+    "release_performance_approved": false
+  },
+  "open_gates": [
+    "Fresh exact-current Shipping normal-window performance runs on player-representative hardware.",
+    "The scene remains visually synthetic: water highlights and foam read analytically; terrain and banks are smooth; vegetation repeats; rocks, raft, PPE, paddles and characters remain below the photoreal target.",
+    "Named art, guide, ecology/geospatial, product-owner and legal review.",
+    "Windows RTX 3060/4070 and Proton validation.",
+    "Fresh keyboard/gamepad validation, distribution signing/notarization and approved release media."
+  ]
+}

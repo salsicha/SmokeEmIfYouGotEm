@@ -1,0 +1,60 @@
+{
+  "candidate": "m9_contoured_pfd_back_v98",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_contoured_pfd_back_v98.png",
+  "camera": "river_action",
+  "physics_changed": false,
+  "asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "generator_version": 4,
+    "ownership": "project-owned deterministic source art",
+    "source_inputs": [],
+    "authored_lod0_triangles": 22268,
+    "nanite_enabled": true,
+    "nanite_fallback_triangles": 2296,
+    "dimensions_cm": [42.2, 44.8966, 45.75],
+    "material_slots": [
+      "PfdShell",
+      "PfdWebbing",
+      "PfdHardware",
+      "PfdReflective",
+      "PfdLabel"
+    ]
+  },
+  "implementation": {
+    "replaced_geometry": "31.5 x 42 cm rounded-box back panel",
+    "replacement": "twelve-point tapered extruded back panel",
+    "front_cells_changed": false,
+    "side_wings_changed": false,
+    "shoulder_bridges_changed": false,
+    "rescue_belt_or_hardware_changed": false,
+    "torso_attachment_changed": false
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "blender_source_generation": "passed",
+    "unreal_import_audit": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "Rear PFD silhouettes taper at the shoulders and lumbar hem instead of reading as rigid backpacks.",
+    "Placards, rescue belt, webbing, hardware, and crew color variants remain intact.",
+    "The asset remains collisionless and follows the existing shared torso pose."
+  ],
+  "open_visual_findings": [
+    "Close-up shell material and stitching still lack the variation of scanned production gear.",
+    "Crew motion lacks rafting mocap, facial response, and secondary clothing dynamics.",
+    "Water, shoreline, terrain, canopy, raft highlights, foam collapse, and aerosol remain below the photoreal target."
+  ]
+}

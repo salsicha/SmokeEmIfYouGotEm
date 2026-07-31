@@ -1,0 +1,64 @@
+{
+  "schema": "raftsim.production_whitewater_pfd_source.v1",
+  "generator_version": 4,
+  "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+  "source_inputs": [],
+  "reference_only_sources": [
+    {
+      "url": "https://www.nrs.com/nrs-rapid-rescuer-pfd/pvdx",
+      "facts_used": "high profile, four-panel chest, thin back, front zip, two pockets, eight adjustment points, reflective/placard zones and quick-release rescue belt",
+      "asset_content_copied": false
+    },
+    {
+      "url": "https://astraldesigns.com/products/greenjacket",
+      "facts_used": "whitewater/rafting rescue use, contoured layered foam, reinforced shoulders/sides and rescue hardware",
+      "asset_content_copied": false
+    }
+  ],
+  "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+  "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+  "fbx_sha256": "fc3309c049be007baf966602100e8302254880f278b95c5b843a7076ad117b20",
+  "blend_sha256": "97b637446ce0aa5601eda2163ed31a61b62f6c42498eb2e345f9a23b8f2efb86",
+  "material_slots": [
+    "PfdShell",
+    "PfdWebbing",
+    "PfdHardware",
+    "PfdReflective",
+    "PfdLabel"
+  ],
+  "construction": {
+    "front_foam_panels": 4,
+    "back_panels": 1,
+    "side_wings": 2,
+    "shoulder_bridges": 2,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 2,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1,
+    "reflective_chest_zones": 2,
+    "blank_back_placards": 1,
+    "front_lash_tabs": 3
+  },
+  "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native.",
+  "vertex_count": 11580,
+  "polygon_count": 11398,
+  "uv_channel_count": 1,
+  "bounds_min_cm": [
+    -19.5,
+    -22.4483,
+    -18.85
+  ],
+  "bounds_max_cm": [
+    22.7,
+    22.4483,
+    26.9
+  ],
+  "dimensions_cm": [
+    42.2,
+    44.8966,
+    45.75
+  ]
+}

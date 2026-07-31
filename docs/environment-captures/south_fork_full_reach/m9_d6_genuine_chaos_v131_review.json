@@ -1,0 +1,122 @@
+{
+  "schema": "raftsim.m9.d6_genuine_chaos_review.v1",
+  "generated_on": "2026-07-28",
+  "version": "v131",
+  "decision": "retained_genuine_chaos_baseline_d6_remains_fail_closed",
+  "milestone": "M9B.3",
+  "d6_complete": false,
+  "production_promoted": false,
+  "summary": "All seven Unreal Chaos rigid-baseline D6 fixtures now run through real simulated physics actors and produce merge-valid telemetry. The independent compliant-reference target and manual review remain missing.",
+  "correction": {
+    "previous_claim": "The earlier UE measured export was described as closing both D6 targets.",
+    "finding": "Both earlier passes used the same custom C++ D1-D4 implementation, with the second pass selecting its analytical RigidBaseline mode. It was neither a Project Chrono/reviewed compliant model nor an Unreal Chaos simulation.",
+    "action": "Reclassified physics/reports/d6/ue as translation diagnostics and corrected the release plan. No previous diagnostic output is used to satisfy an independent D6 target."
+  },
+  "runner": {
+    "symbol": "RaftSimD6Chaos::RunMeasuredExport",
+    "source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/RaftSimD6ChaosMeasuredRunner.cpp",
+    "runtime_id": "UnrealEngine5ChaosRigidBody",
+    "physics_backend": "Unreal Chaos",
+    "world": "transient EWorldType::Game",
+    "simulated_body": "UBoxComponent with QueryAndPhysics collision and SetSimulatePhysics(true)",
+    "actor_validation": "FPhysicsInterface::IsValid and FPhysicsInterface::IsRigidBody",
+    "fixed_step_seconds": 0.03333333333333333,
+    "steps_per_scenario": 18,
+    "repeat_policy": "Every scenario is rerun from a fresh world and must produce the same quantized trajectory hash.",
+    "custom_model_substitution": false,
+    "analytical_rigid_mode_substitution": false
+  },
+  "fixture_results": {
+    "required_fixture_count": 7,
+    "filled_fixture_count": 7,
+    "invalid_fixture_count": 0,
+    "sidecar_mergeable": true,
+    "completed_external_job_count": 7,
+    "total_external_job_count": 14,
+    "pending_compliant_job_count": 7,
+    "all_physics_actor_handles_valid": true,
+    "all_scenarios_advanced": true,
+    "all_fixed_step_repeats_deterministic": true,
+    "rock_pinch_wrap": {
+      "contact_count": 1,
+      "initial_and_max_indentation_m": 1.4,
+      "max_contact_impulse_ns": 734.764426787804,
+      "wrapping_contact_count": 0,
+      "interpretation": "Chaos resolves a rigid contact but cannot wrap; the zero wrap result is an intentional baseline delta."
+    },
+    "timed_high_side_save": {
+      "neutral_flip_margin_nm": 2355.0975,
+      "high_side_flip_margin_nm": 4054.68,
+      "margin_delta_nm": 1699.5825,
+      "neutral_final_roll_rate_rad_s": 11.549115180969238,
+      "high_side_final_roll_rate_rad_s": 7.735574245452881,
+      "interpretation": "The same force probe produces a smaller rigid-body roll response when the recorded high-side crew torque is applied."
+    },
+    "rigid_capability_deltas": {
+      "tube_sag_supported": false,
+      "tube_wrap_supported": false,
+      "retained_overwash_volume_supported": false,
+      "post_contact_indentation_memory_supported": false,
+      "interpretation": "Required zero-valued metrics record unsupported rigid-proxy capabilities; they are not synthetic compliant answers."
+    }
+  },
+  "verification": {
+    "native_editor_build": "passed",
+    "unreal_d6_namespace": {
+      "report": "/private/tmp/raftsim_m9_d6_genuine_chaos_v131/index.json",
+      "report_sha256": "6c89489eefb41bc6ba93499ae4321dd1fe122137b99aa056d4e6849c49983d3c",
+      "passed": 11,
+      "failed": 0,
+      "warnings": 0
+    },
+    "focused_python_flexible_raft": {
+      "passed": 91,
+      "failed": 0,
+      "ruff": "passed"
+    },
+    "merge_report": {
+      "path": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json",
+      "sha256": "9466e72244fe6bc7faed200f78454ed82fd9020ce1be0fea66bc677d63d5e78d",
+      "status": "chaos_measured_results_valid_ready_for_standard_template_merge",
+      "can_merge": true
+    },
+    "execution_packet": {
+      "path": "physics/data/calibration/flexible_raft_d6_execution_packet.json",
+      "sha256": "d9e556a9feaffd58d7d370fa64adfff8be7725c9def76d24d1fb0ffeaf8627ab",
+      "status": "external_engine_execution_packet_chaos_complete_compliant_measurements_missing"
+    }
+  },
+  "evidence_hashes": {
+    "runner_header": "8a4d4a316036728baf5ca1ffed59dd75d4457a74644bcf237aab6a54fb98648b",
+    "runner_source": "92fb93e828a89911de8794c373f633724f7fd27a2a561cfffad236c4e9498068",
+    "runtime_probe_test": "4b724fc06fcc5f08bd5bc2cbf9590174b703a384d74b0ccadc076733438075f9",
+    "contract_test": "842105972217de5dd17509230d2fd86d6e5e5eb8a7c478384b2c6819d1b80ef1",
+    "fixture_contract": "66305388f84e168f03d984e1745122b9753960510a4de899ccb647caa6e1ed37",
+    "runner_summary": "e2d8d118b0acb49bb77089527e2d0936ae60941c00089f939f10d5a11ed00e63",
+    "measured_sidecar": "dd20f76f3851e9d0d82898a6fa4ee8eb868ff3227df962446c0a80f31d51b0b2",
+    "partial_measured_results": "d32b5ec30102e5f2cd89b9f711baaaba2a62bd1a123a96aa438989316711d3a9",
+    "telemetry": {
+      "static_seat_load_sag": "5fbc51dec9d153453f1d226dad7a7fed61c368d81f33d3f0011bacc72c758f41",
+      "traveling_crew_shift": "567c62b7a8fceb5383606f87423089f8a03fae37e197a444511744cc69a51fba",
+      "rock_pinch_wrap": "5e0bfeaa41da29c50f57c43dda196ec268710557f011ef581d32cb995532d93e",
+      "upstream_tube_overwash_flip": "43f6b7e558c80ab5f2c9cbfc01b5b65b726f3deac692546c0b35be426e0052f1",
+      "timed_high_side_save": "a494edd4d2fc848d2c5b423214bca0a776f9dec7bffa689aa70cc15e8777cab4",
+      "post_contact_recovery": "0fb42a0d7931c81d66b7feb3b89640c52ea4b7b52b21ee345745f7c76b6f39dd",
+      "pressure_flow_sweeps": "23ff58be2ebc4f33600ec1de14309085561723f39697c1192a33a1c534530453"
+    }
+  },
+  "measurement_limits": [
+    "The Chaos target is intentionally a single rigid proxy. It is not a production flexible raft and cannot satisfy the compliant target.",
+    "Contact indentation and impulse fields are fixture-space sphere/box geometry plus velocity-residual estimates around genuine Chaos advancement, not a raw exported Chaos manifold/impulse callback.",
+    "Uniform-water inputs become external force and torque probes because Chaos does not own the custom water or retained-volume model.",
+    "Runtime CPU values are measured in the headless editor and are not a target-platform performance qualification.",
+    "No visual overlay is claimed; the accepted evidence is numerical telemetry and physics-handle provenance."
+  ],
+  "remaining_gates": [
+    "Run all seven fixtures in Project Chrono or another independently reviewed compliant model.",
+    "Validate and merge the compliant sidecar without substituting the custom C++ port or Python reference.",
+    "Regenerate the two-target D6 comparison report.",
+    "Complete manual physics, Unreal integration, deterministic replay, and guide/safety gameplay review.",
+    "Keep scoring-critical runtime authority on CustomReducedRigidBody unless the separate Chaos/Jolt authority suite selects a replacement."
+  ]
+}

@@ -64,6 +64,23 @@ bool FRaftSimAssertRaftSettledCommand::Update()
     Test->TestTrue(
         TEXT("raft vertical velocity settled (< 0.5 m/s)"),
         FMath::Abs(Raft->GetRaftVelocity().Z) < 0.5f);
+    Test->TestTrue(
+        TEXT("test-tank runtime water is bound into live D3"),
+        Raft->IsUsingLiveD3WaterField());
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("live D3 samples every tube segment (%d samples)"),
+            Raft->GetLiveD3WaterSampleCount()),
+        Raft->GetLiveD3WaterSampleCount() >= 12);
+    Test->TestEqual(
+        TEXT("flat tank reports all live D3 samples wet"),
+        Raft->GetLiveD3WetSampleCount(),
+        Raft->GetLiveD3WaterSampleCount());
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("calm zero-speed water retains no D3 load (%.6f kg)"),
+            Raft->GetD3RetainedWaterMassKg()),
+        Raft->GetD3RetainedWaterMassKg() < 0.001f);
 
     // Kick off the paddle phase: record position, stroke, and let it run.
     Raft->Tags.Add(FName(*FString::Printf(TEXT("P1StartX:%f"), Raft->GetActorLocation().X)));

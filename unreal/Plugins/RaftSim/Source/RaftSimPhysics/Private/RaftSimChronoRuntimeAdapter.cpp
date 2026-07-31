@@ -40,6 +40,14 @@ void URaftSimChronoRuntimeAdapter::SetWaterSurfaceSampler(
     WaterSurfaceSampler = MoveTemp(InSampler);
 }
 
+void URaftSimChronoRuntimeAdapter::SetFlexibleWaterFieldSampler(
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        FRaftSimFlexUniformWater& OutWater)> InSampler)
+{
+    FlexibleWaterFieldSampler = MoveTemp(InSampler);
+}
+
 void URaftSimChronoRuntimeAdapter::ConfigureAuthorityIntegrationPolicy(const FRaftSimRaftAuthorityIntegrationPolicy& InPolicy)
 {
     AuthorityIntegrationPolicy = InPolicy;
@@ -58,13 +66,21 @@ void URaftSimChronoRuntimeAdapter::ConfigureFlexibleRaftModel(
 {
     FlexParameters = InParameters;
     FlexSeats = InSeats;
+    FlexCapsizedSeats = FlexSeats;
+    for (FRaftSimFlexCrewSeat& Seat : FlexCapsizedSeats)
+    {
+        Seat.bOccupied = false;
+    }
     FlexLayout = RaftSimFlex::BuildDefaultCompliantTubeLayout(
         FlexParameters,
         /*SegmentCountPerSide=*/4,
         /*SegmentCountPerEnd=*/2,
         NominalPressurePa);
+    LiveWaterBySegmentScratch.Reset();
+    LiveWaterBySegmentScratch.Reserve(FlexLayout.Num());
     FlexActions.Reset();
     FlexObstacles.Reset();
+    bFlexCapsized = false;
     FlexPressureFraction = 1.0f;
     FlexFabricIntegrity = 1.0f;
     ResetFlexiblePersistentState();
@@ -80,7 +96,25 @@ void URaftSimChronoRuntimeAdapter::SetFlexibleUniformWater(
     bool bInEnabled)
 {
     FlexWater = InWater;
-    bFlexWaterEnabled = bInEnabled;
+    bFlexUniformWaterOverrideEnabled = bInEnabled;
+}
+
+void URaftSimChronoRuntimeAdapter::SetFlexibleCapsized(bool bInCapsized)
+{
+    if (bFlexCapsized == bInCapsized)
+    {
+        return;
+    }
+    bFlexCapsized = bInCapsized;
+    if (bFlexCapsized)
+    {
+        // A self-bailing raft cannot retain its upright deck-water reservoir
+        // after rolling over. Crew loads also disappear through the temporary
+        // unoccupied seat view in StepFlexibleRaftDynamics. Do not clear D4
+        // indentation here: an inverted boat can remain wrapped or pinned.
+        RetainedVolumeBySegment.Reset();
+        FlexActions.Reset();
+    }
 }
 
 void URaftSimChronoRuntimeAdapter::SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles)
@@ -139,18 +173,51 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         : RaftSimFlex::EModelMode::RigidBaseline;
 
     // D1+D2: crew/seat loads into compliant tube deformation.
+    const TArray<FRaftSimFlexCrewSeat>& SeatsForStep =
+        bFlexCapsized ? FlexCapsizedSeats : FlexSeats;
     const FRaftSimFlexSeatLoadSolve SeatSolve = RaftSimFlex::SolveSeatLoadCoupledTubeD2(
         State,
         FlexParameters,
-        FlexSeats,
+        SeatsForStep,
         FlexActions,
         FlexLayout,
         Mode);
 
-    // D3: overwash sampling against the depressed tube tops. A disabled water
-    // descriptor still drains retained water deterministically.
-    FRaftSimFlexUniformWater Water = FlexWater;
-    if (!bFlexWaterEnabled)
+    // D3: sample the live water field at every deformed tube segment. The
+    // explicit uniform descriptor remains a deterministic fixture override;
+    // capsized loading is always dry so an open floor cannot retain deck water.
+    FRaftSimFlexUniformWater Water;
+    Water.bWet = false;
+    const TMap<FString, FRaftSimFlexUniformWater>* WaterBySegment = nullptr;
+    int32 LiveWaterSampleCount = 0;
+    int32 LiveWetSampleCount = 0;
+    const bool bUseUniformOverride =
+        bFlexUniformWaterOverrideEnabled && !bFlexCapsized;
+    if (bUseUniformOverride)
+    {
+        Water = FlexWater;
+    }
+    else if (!bFlexCapsized && FlexibleWaterFieldSampler)
+    {
+        LiveWaterBySegmentScratch.Reset();
+        for (const FRaftSimFlexSegmentResponse& Response :
+             SeatSolve.TubeSolve.SegmentResponses)
+        {
+            FRaftSimFlexUniformWater SegmentWater;
+            SegmentWater.bWet = false;
+            const FVector WorldPositionCm =
+                State.WorldPoint(Response.LocalPosition) * 100.0;
+            if (!FlexibleWaterFieldSampler(WorldPositionCm, SegmentWater))
+            {
+                continue;
+            }
+            ++LiveWaterSampleCount;
+            LiveWetSampleCount += SegmentWater.bWet ? 1 : 0;
+            LiveWaterBySegmentScratch.Add(Response.SegmentId, SegmentWater);
+        }
+        WaterBySegment = &LiveWaterBySegmentScratch;
+    }
+    if (bFlexCapsized)
     {
         Water.bWet = false;
     }
@@ -159,7 +226,24 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
         Water,
         FlexLayout,
         &RetainedVolumeBySegment,
-        Dt);
+        Dt,
+        // The production tube top is one current pressure-scaled radius above
+        // its segment center. The 0.16 m reference default remains available
+        // to D6 fixtures, but using it here placed normal loaded equilibrium
+        // below the overtopping plane in any moving current.
+        /*BaseTubeTopFreeboardM=*/FlexParameters.TubeRadiusM *
+            FMath::Lerp(0.82, 1.0, static_cast<double>(FlexPressureFraction)),
+        /*FluxCoefficient=*/0.65,
+        /*DrainageRatePerS=*/0.55,
+        /*WaterDensityKgM3=*/1000.0,
+        /*GravityMps2=*/9.81,
+        WaterBySegment,
+        // Bound reduced-model feedback to the supported South Fork flow
+        // envelope and the finite interior volume of a self-bailing paddle
+        // raft. These are production coupling limits, not D6 fixture changes.
+        /*MaximumIncomingSpeedMps=*/8.0,
+        /*MaximumOvertoppingDepthM=*/2.0 * FlexParameters.TubeRadiusM,
+        /*MaximumRetainedVolumePerSegmentM3=*/0.05);
 
     // D4: rock contact, wrap, pin, release, and shape recovery.
     const FRaftSimFlexRockContactSolve Contacts = RaftSimFlex::EvaluateRockContactWrapPinD4(
@@ -400,6 +484,10 @@ bool URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics(double Dt)
     LastFlexStepTelemetry.ReferenceFlipThresholdNm = Overwash.ReferenceFlipThresholdNm;
     LastFlexStepTelemetry.ReferenceFlipMarginNm = Overwash.ReferenceFlipMarginNm;
     LastFlexStepTelemetry.bReferenceFlipRisk = Overwash.bReferenceFlipRisk;
+    LastFlexStepTelemetry.bUsedLiveWaterField = WaterBySegment != nullptr;
+    LastFlexStepTelemetry.bUsedUniformWaterOverride = bUseUniformOverride;
+    LastFlexStepTelemetry.LiveWaterSampleCount = LiveWaterSampleCount;
+    LastFlexStepTelemetry.LiveWetSampleCount = LiveWetSampleCount;
     LastFlexStepTelemetry.ContactCount = Contacts.Contacts.Num();
     LastFlexStepTelemetry.WrappingContactCount = Contacts.WrappingContactCount;
     LastFlexStepTelemetry.PinnedObstacleCount = Contacts.PinnedObstacleCount;

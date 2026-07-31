@@ -1,0 +1,103 @@
+{
+  "schema": "raftsim.release_review.south_fork_scanned_bank_kit.v199",
+  "generated_on": "2026-07-29",
+  "status": "rights_clear_technically_rendered_but_visually_rejected_for_production",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimScannedBankKitReview -RaftSimExitAfterEnvironmentAutomation",
+  "comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v198_erosion_deposition_bank_modules",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v199_scanned_bank_kit",
+  "source_bundle": {
+    "manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/polyhaven_south_fork_bank_kit_source_manifest.json",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_south_fork_bank_kit_import_report.json",
+    "license": "CC0 1.0 Universal",
+    "publisher": "Poly Haven",
+    "official_api_md5_verified_files": 16,
+    "sha256_verified_files": 16,
+    "payload_bytes": 68002452,
+    "source_bundle_committed": false,
+    "assets": ["Rock Face 01", "Tree Stump 02", "Roots", "Rocky Gravel"]
+  },
+  "import": {
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K",
+    "status": "isolated_review_candidate_imported",
+    "meshes": 2,
+    "textures": 14,
+    "materials": 4,
+    "rock_face_dimensions_cm": [710.823202, 562.430453, 498.043711],
+    "tree_stump_dimensions_cm": [152.160627, 139.203626, 52.209215],
+    "nanite_enabled_meshes": 2,
+    "production_promoted": false
+  },
+  "implementation": {
+    "placement_authority": "median-water UV0 station/lateral coordinates, centerline curvature cutbank classification, deterministic sparse masks, and complex traces against RaftSimFullReachTerrain within 260 m of five fixed review stations",
+    "median_water_actors": 14,
+    "publisher_scale_rock_face_instances": 136,
+    "tree_stump_exposed_root_instances": 66,
+    "roots_surface_patches": 117,
+    "rocky_gravel_surface_patches": 108,
+    "successful_terrain_trace_hits": 427,
+    "collision_authority_changed": false,
+    "hydraulic_authority_changed": false,
+    "navigation_changed": false,
+    "map_saved": false,
+    "review_placement_asset_package_saved": false,
+    "transient_review_actor_destroyed_after_capture": true
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v199_scanned_bank_kit_build.log",
+    "log_sha256": "abf72a059519ef644f4c5f9b28272305c23e8d4f0e97eda22a613d68ec212058",
+    "result": "succeeded_incremental_target_up_to_date",
+    "total_execution_seconds": 2.56
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v199_scanned_bank_kit_capture.log",
+    "log_sha256": "d91c2eef8ca77870c61d6bb6571fb4d519c881baa258bf4d8471dc318986fc3b",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "c2e1954c61493323003ee1617f787084c51db4a19461e7aeca5b2e8324daf64b",
+    "meat_grinder_guide_eye": "b77b05dc6d4b802963b762e91970c3a22cf331a9b806d21de22d336ad5653099",
+    "troublemaker_approach": "f9905a1cc0885b38787ae36d8cf01c688ba271e8d7e0d6a1bfb9851a18fb2df3",
+    "coloma_bridge_context": "61010472a8c60367f17305348565ec6e7439a60da65c031af3549f20665e6e58",
+    "salmon_falls_takeout": "b3c1fbecc681e8207f968339bf465fffadd25ff7ded7e003e4ea035bcdfc1100"
+  },
+  "pixel_delta_from_v198": {
+    "chili_bar_launch_downstream": {"mean_absolute_rgb": 1.216608, "pixels_any_channel_gt_8_percent": 2.073134, "pixels_any_channel_gt_16_percent": 1.692817},
+    "meat_grinder_guide_eye": {"mean_absolute_rgb": 1.875597, "pixels_any_channel_gt_8_percent": 3.647786, "pixels_any_channel_gt_16_percent": 3.059028},
+    "troublemaker_approach": {"mean_absolute_rgb": 0.796929, "pixels_any_channel_gt_8_percent": 1.580729, "pixels_any_channel_gt_16_percent": 1.336806},
+    "coloma_bridge_context": {"mean_absolute_rgb": 0.886727, "pixels_any_channel_gt_8_percent": 1.664062, "pixels_any_channel_gt_16_percent": 1.401259},
+    "salmon_falls_takeout": {"mean_absolute_rgb": 0.008398, "pixels_any_channel_gt_8_percent": 0.017578, "pixels_any_channel_gt_16_percent": 0.014214}
+  },
+  "pixel_delta_from_authoritative_v184": {
+    "chili_bar_launch_downstream": {"mean_absolute_rgb": 11.752616, "pixels_any_channel_gt_8_percent": 35.458876, "pixels_any_channel_gt_16_percent": 9.368056},
+    "meat_grinder_guide_eye": {"mean_absolute_rgb": 11.388551, "pixels_any_channel_gt_8_percent": 29.14605, "pixels_any_channel_gt_16_percent": 9.370551},
+    "troublemaker_approach": {"mean_absolute_rgb": 10.135059, "pixels_any_channel_gt_8_percent": 27.804145, "pixels_any_channel_gt_16_percent": 1.932726},
+    "coloma_bridge_context": {"mean_absolute_rgb": 9.962005, "pixels_any_channel_gt_8_percent": 31.62793, "pixels_any_channel_gt_16_percent": 1.544379},
+    "salmon_falls_takeout": {"mean_absolute_rgb": 12.732347, "pixels_any_channel_gt_8_percent": 33.70638, "pixels_any_channel_gt_16_percent": 19.176107}
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "accepted_corrections": [
+      "The new intake is exact-source auditable: every payload matches the publisher API MD5 and a locally pinned SHA-256.",
+      "The two scans import at publisher physical scale with Nanite and explicit opaque PBR materials.",
+      "Placement is sparse, source-conditioned, limited to fixed-review neighborhoods, and never saves a map or changes collision, navigation, water, hydraulics, buoyancy, raft, rescue, or gameplay authority."
+    ],
+    "rejection_reasons": [
+      "Rock Face 01 is a pale layered formation analog that reads as repeated striped slabs, not South Fork embedded bank fabric.",
+      "Tree Stump 02 resolves as dark rounded masses at guide distance; its root structure, cutbank attachment, and species context are not legible.",
+      "Opaque plane-based Roots and Rocky Gravel patches expose rectangular orange/brown cards and hard material boundaries rather than terrain-integrated sediment.",
+      "The scan modules remain detached props on a broad smooth ribbon; they do not supply authored undercuts, coherent strata, talus hierarchy, wet-edge blending, or vegetation transitions.",
+      "Water, terrain, foliage, and lighting remain visibly synthetic in every view, Salmon Falls barely changes from v198, and no named reviewer approved the result."
+    ],
+    "corrective_action": "Reject this visual composition and do not iterate its plane decals or sandstone-like face donor. Retain the verified importer and isolated assets as reusable intake infrastructure only. The next valid visual step requires a river-specific art-directed scene slice or coherent authored bank/vegetation/water kit whose geometry, material transitions, scale, lighting, and camera composition are built together and reviewed before full-corridor propagation.",
+    "candidate_retention": "retain the importer, provenance, isolated assets, transient placement seam, captures, and ledger as negative evidence; do not promote any v199 placement, mesh, material, capture, or media"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open_pending_named_legal_review_despite_cc0_source",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

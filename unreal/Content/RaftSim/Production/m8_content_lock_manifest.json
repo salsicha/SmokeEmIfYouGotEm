@@ -1,9 +1,9 @@
 {
   "schema": "raftsim.m8.content_lock.v1",
-  "generated_utc": "2026-07-20T01:05:00Z",
+  "generated_utc": "2026-07-26T18:50:41Z",
   "milestone": "M8_validation_optimization_and_content_lock",
   "passed": true,
-  "pass_basis": "All locally executable content-lock gates pass. Hardware and human-review lanes unavailable in this workspace are explicit exceptions carried into M10 acceptance, not represented as completed reviews.",
+  "pass_basis": "All locally executable content-lock gates pass for the current equipment-textile and CC0 production-character-fallback editor state. Both are locked only as technical fallbacks and renderer review rejects final photoreal art acceptance. Exact-current immutable Shipping, external hardware, signing, approved-media, and named human-review lanes remain explicit M9/M10 exceptions rather than completed evidence.",
   "rapid_count": 20,
   "rapid_flow_case_count": 60,
   "packaged_rapid_regression": {
@@ -19,6 +19,10 @@
   },
   "full_reach_performance": {
     "platform": "Mac",
+    "build_configuration": "Development",
+    "running_from_packaged_build": false,
+    "qualification": "Exact-current v292 editor-game diagnostic after the generated equipment-textile and five packaged CC0 character imports. This supersedes v283 for current Development performance but does not qualify immutable Shipping or external target hardware.",
+    "report": "/private/tmp/raftsim_m9_v292_cc0_characters_1080p_performance_20260726.json",
     "cpu": "Apple M5",
     "gpu": "Apple M5",
     "output_resolution": [
@@ -26,23 +30,26 @@
       1080
     ],
     "scalability": "High",
-    "screen_percentage": 75.0,
+    "screen_percentage": 60.0,
     "volumetric_weather_enabled": true,
     "capture_seconds": 30.0,
     "warmup_seconds": 10.0,
-    "sampled_frame_count": 2071,
-    "frame_time_definition": "max(game_thread,render_thread,gpu)",
-    "mean_frame_ms": 14.515609741210938,
-    "p95_frame_ms": 15.3306245803833,
-    "max_frame_ms": 22.096208572387695,
-    "p95_wall_clock_frame_ms": 15.914667129516602,
+    "sampled_frame_count": 2350,
+    "frame_time_definition": "max(game_thread,render_thread,plausible_gpu)",
+    "mean_frame_ms": 12.777918815612793,
+    "p95_frame_ms": 13.037166595458984,
+    "max_frame_ms": 13.525166511535645,
+    "p95_wall_clock_frame_ms": 14.207709312438965,
     "hitches_over_33ms": 0,
-    "p95_game_thread_ms": 2.7803332805633545,
-    "p95_render_thread_ms": 15.310916900634766,
-    "p95_gpu_ms": 15.191916465759277,
-    "average_solver_step_ms": 0.2863904535770416,
-    "max_solver_step_ms": 0.6138347387313843,
-    "peak_used_physical_mb": 6119.58203125,
+    "p95_game_thread_ms": 3.0888750553131104,
+    "p95_render_thread_ms": 13.036749839782715,
+    "p95_gpu_ms": 12.915875434875488,
+    "gpu_timing_sample_count": 2350,
+    "invalid_gpu_timing_sample_count": 0,
+    "invalid_gpu_timing_sample_budget": 3,
+    "average_solver_step_ms": 0.24587230384349823,
+    "max_solver_step_ms": 0.34908205270767212,
+    "peak_used_physical_mb": 7335.47314453125,
     "frame_budget_ms": 16.66666603088379,
     "solver_budget_ms": 1.600000023841858,
     "memory_budget_mb": 8192.0,
@@ -96,6 +103,18 @@
       ],
       "inventory_present": true,
       "automated_checks_passed": true
+    },
+    "equipment_textile_fallback": {
+      "source_manifest": "unreal/SourceArt/RaftSim/Equipment/GeneratedTextiles/generated_textile_pbr_manifest.json",
+      "visual_review": "docs/environment-captures/south_fork_full_reach/m9_equipment_textile_fallback_v280_review.json",
+      "texture_asset_count": 9,
+      "dependent_material_asset_count": 8,
+      "m5_exact_current_run": "v281",
+      "m5_tests_passed": 4,
+      "m7_exact_current_run": "v282",
+      "m7_tests_passed": 4,
+      "technical_fallback_accepted": true,
+      "photoreal_art_accepted": false
     }
   },
   "release_scope": {
@@ -117,6 +136,12 @@
       "status": "not_executed_hardware_unavailable",
       "release_blocking_at": "M10",
       "local_evidence": "Windows packaging and GPU capture require a Windows/RTX runner."
+    },
+    {
+      "id": "exact_current_immutable_shipping_after_equipment_textile_delta",
+      "status": "not_executed_until_m9_acceptance_gates_close",
+      "release_blocking_at": "M9",
+      "local_evidence": "The exact-current v283 Development soak passes after the texture import. Existing Shipping evidence predates these assets and remains historical only."
     },
     {
       "id": "human_guide_geospatial_art_and_legal_signoff",

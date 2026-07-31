@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "reviewed_utc_date": "2026-07-27",
+  "source_pack": {
+    "name": "hair02",
+    "description": "Mostly high-poly MakeHuman hair by Elvaerwyn.",
+    "author": "Elvaerwyn",
+    "license": "CC-BY-4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "catalog_url": "https://static.makehumancommunity.org/assets/assetpacks/hair02.html",
+    "download_url": "https://files.makehumancommunity.org/asset_packs/hair02/hair02_ccby.zip",
+    "download_sha256": "c681e5efd37df4007a52253a8d071aedbfe3b614f199d8dae4ae76d5bd7d95c9",
+    "download_bytes": 72283345,
+    "redistribution_note": "CC BY 4.0 permits redistribution and adaptation with attribution. Game credits and CREDITS.md must retain the author, asset names, license, and source."
+  },
+  "assets": [
+    {
+      "name": "elvs_grump_hair",
+      "source": "http://www.makehumancommunity.org/node/2796",
+      "usage": ["RaftSim_CC0_Guide", "RaftSim_CC0_Crew02"],
+      "files": [
+        {"path": "elvs_grump_hair/elvs_grump_hair.mhclo", "sha256": "269c03cf637e00bf5602964c71661c00ab0cc2cbd036718abb47c68609bda869", "bytes": 601553},
+        {"path": "elvs_grump_hair/elvs_grump_hair.thumb", "sha256": "343c837a82097c252c071eb9848e86b0292f864f176887f16b714b5aacb2e94a", "bytes": 53887},
+        {"path": "elvs_grump_hair/elvs_grumphair.mhmat", "sha256": "361106dcad51c4ffef80c7fea192d66b4d1226ea72f25a27f08b966062bd1701", "bytes": 771},
+        {"path": "elvs_grump_hair/elvs_grumphair.obj", "sha256": "77e1582912e562c753f218dec4c94b5e92a72a77a15f553b9f409a78826b6564", "bytes": 667024},
+        {"path": "elvs_grump_hair/elvs_grumphair.png", "sha256": "2fb446705b13298d5c55c38a6a4dcb089c440c1b00ccab91ddd05dee26aba83a", "bytes": 3550135}
+      ]
+    },
+    {
+      "name": "elvs_braided_rows",
+      "source": "http://www.makehumancommunity.org/node/1659",
+      "usage": ["RaftSim_CC0_Crew01", "RaftSim_CC0_Crew04"],
+      "files": [
+        {"path": "elvs_braided_rows/chrome.png", "sha256": "8ebf296539550e8697b8e28ded284919169248570228af3379f2e51ec7ddc036", "bytes": 681875},
+        {"path": "elvs_braided_rows/cornrowsofelv5.mhmat", "sha256": "85a350cb866bd65b7d3f510b9c47f8ebac895f720a8d9bfbca8f8806e7b1cd96", "bytes": 913},
+        {"path": "elvs_braided_rows/cornrowsofelv5.obj", "sha256": "e2959b6e9b4e263dbf588c4b0308cb5f9843b4fd0be5e67719e338f3133174c0", "bytes": 1854974},
+        {"path": "elvs_braided_rows/elvs_braided_rows.mhclo", "sha256": "67d7125acf45a370709527efce6a61a128e6a0e66416971a33fdbfb8980d41bc", "bytes": 1473152},
+        {"path": "elvs_braided_rows/elvs_braided_rows.thumb", "sha256": "7139549d03c9754a1d76fb41d38383bf016dcab53af970aa5b2bf6905f992664", "bytes": 45292},
+        {"path": "elvs_braided_rows/mh_cornrowstex1.png", "sha256": "f23aea7a2b04c1030319fc6fb5e39f0d9c588d23d6f604526551a4975af3fe8f", "bytes": 886174},
+        {"path": "elvs_braided_rows/normals.png", "sha256": "c166083c581905a4297bb74ee2e6de621c699b488234b69209acbf962e506ac0", "bytes": 1391147}
+      ]
+    },
+    {
+      "name": "elvs_short_side_do",
+      "source": "http://www.makehumancommunity.org/node/1479",
+      "usage": ["RaftSim_CC0_Crew03"],
+      "files": [
+        {"path": "elvs_short_side_do/darkmaggiehair.png", "sha256": "230bebbe9c1ce436ebd210cee4c41c470db9d1c58e4d22aabd7c22dc9dd11d72", "bytes": 789755},
+        {"path": "elvs_short_side_do/elvs_short_side_do.mhclo", "sha256": "ce75c5b326cc945d386901e3a221b69eb83f4597bb731728dd37f10d939e6638", "bytes": 3442160},
+        {"path": "elvs_short_side_do/elvs_short_side_do.thumb", "sha256": "971160131f923a9d8e231ec5fb8b8fa97b81fdb7d8b31d56388a2b3d732ce503", "bytes": 56258},
+        {"path": "elvs_short_side_do/elvs_thejournalist1.mhmat", "sha256": "9260793cbdc22828d094ff9f803e052e9eeeb8ff1c0d954610698185b9344150", "bytes": 912},
+        {"path": "elvs_short_side_do/elvs_thejournalist1.obj", "sha256": "64e8a0ab1002b211ff637b92d1ce2386f31b65b818071e09c6b2a9dc91004de9", "bytes": 4761244}
+      ]
+    },
+    {
+      "name": "elvs_braid_bun",
+      "source": "http://www.makehumancommunity.org/node/2177",
+      "usage": [],
+      "review_status": "source_retained_not_imported_helmet_intersection_rejected",
+      "files": [
+        {"path": "elvs_braid_bun/bunstex12.png", "sha256": "45baac7f508f1d405d51ee22de0d7fa9a37f521331452ee294ddc8fd5695532d", "bytes": 5371697},
+        {"path": "elvs_braid_bun/elvs_braid_bun.mhclo", "sha256": "a7b57641585c9d9fd5d736c7c07468920c434a5c449825c278f87a19e071a15a", "bytes": 634526},
+        {"path": "elvs_braid_bun/elvs_braid_bun.thumb", "sha256": "6ec0f019675711b7fe2b53d0b01e71f172a951e643d7d0f71eba8abfd9c89834", "bytes": 56525},
+        {"path": "elvs_braid_bun/elvs_braid_bun_q1.mhmat", "sha256": "4c78b0da91f3e889c9dbe8aaef67fc2ee46a310dd104afb94b7a3d69f05b06f0", "bytes": 915},
+        {"path": "elvs_braid_bun/elvs_braid_bun_q1.obj", "sha256": "434011dfca75eca5927f803e998544b61294c468cd6bfcec527472bb7fb13424", "bytes": 913293},
+        {"path": "elvs_braid_bun/normalsbuns.png", "sha256": "14a69a0931342f282e64aedd66f21e3421f33bd401fd59592bd37561c7feec91", "bytes": 5719834},
+        {"path": "elvs_braid_bun/specsbun.png", "sha256": "f283733fc9072a729068908206aa438620637385d30c9b3506e1ec4c0ff2c442", "bytes": 2733600}
+      ]
+    }
+  ]
+}

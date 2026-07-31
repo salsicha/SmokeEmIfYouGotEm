@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/lower_haystack_canyon/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 6.388746,
+      "solver_runtime_seconds": 1.494502,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -284,7 +284,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/lower_haystack_canyon/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 6.586605,
+      "solver_runtime_seconds": 1.702439,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -455,7 +455,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/lower_haystack_canyon/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.373606,
+      "solver_runtime_seconds": 1.792964,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -640,6 +640,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 213.50559506835938,
   "station_range_m": [
     28124.4544,
     28524.4544

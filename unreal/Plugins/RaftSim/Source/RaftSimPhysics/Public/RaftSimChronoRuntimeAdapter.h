@@ -121,6 +121,10 @@ struct FRaftSimFlexStepTelemetry
     double ReferenceFlipThresholdNm = 0.0;
     double ReferenceFlipMarginNm = 0.0;
     bool bReferenceFlipRisk = false;
+    bool bUsedLiveWaterField = false;
+    bool bUsedUniformWaterOverride = false;
+    int32 LiveWaterSampleCount = 0;
+    int32 LiveWetSampleCount = 0;
     int32 ContactCount = 0;
     int32 WrappingContactCount = 0;
     int32 PinnedObstacleCount = 0;
@@ -196,6 +200,16 @@ public:
     void SetWaterSurfaceSampler(
         TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> InSampler);
 
+    /**
+     * Bind full live-water samples for D3. The adapter evaluates this at each
+     * deformed tube segment in world centimetres and passes the resulting
+     * surface/velocity field into the authoritative overwash solve.
+     */
+    void SetFlexibleWaterFieldSampler(
+        TFunction<bool(
+            const FVector& WorldPositionCm,
+            FRaftSimFlexUniformWater& OutWater)> InSampler);
+
     // --- Flexible-raft model (D1-D4 port; CustomReducedRigidBody path) ------
 
     // Stand up the quasi-static flexible model behind the adapter. Seats may be
@@ -207,9 +221,18 @@ public:
 
     void SetFlexibleCrewActions(const TArray<FRaftSimFlexCrewAction>& InActions);
 
-    // Uniform water descriptor for D3 overwash sampling. Disabled by default;
-    // when disabled, retained deck water still drains deterministically.
+    // Deterministic uniform D3 override used by fixtures/tests. When disabled,
+    // the live per-segment sampler drives D3 and missing/dry samples drain.
     void SetFlexibleUniformWater(const FRaftSimFlexUniformWater& InWater, bool bInEnabled);
+
+    /**
+     * Switch the flexible solve between crewed-upright and empty-capsized
+     * loading. Capsizing ejects crew and drains open-floor overwash, while D4
+     * rock contact and indentation memory remain authoritative.
+     */
+    void SetFlexibleCapsized(bool bInCapsized);
+
+    bool IsFlexibleCapsized() const { return bFlexCapsized; }
 
     void SetFlexibleRockObstacles(const TArray<FRaftSimFlexRockObstacle>& InObstacles);
 
@@ -256,6 +279,9 @@ private:
 
     // Buoyancy support stage (plain C++ members; deterministic).
     TFunction<bool(const FVector& WorldPositionCm, float& OutWaterSurfaceZCm)> WaterSurfaceSampler;
+    TFunction<bool(
+        const FVector& WorldPositionCm,
+        FRaftSimFlexUniformWater& OutWater)> FlexibleWaterFieldSampler;
     TArray<FVector> TubeSamplePointsM;
     float FlexPressureFraction = 1.0f;
     float FlexFabricIntegrity = 1.0f;
@@ -266,10 +292,15 @@ private:
     FRaftSimFlexParameters FlexParameters;
     TArray<FRaftSimFlexTubeSegment> FlexLayout;
     TArray<FRaftSimFlexCrewSeat> FlexSeats;
+    TArray<FRaftSimFlexCrewSeat> FlexCapsizedSeats;
     TArray<FRaftSimFlexCrewAction> FlexActions;
     TArray<FRaftSimFlexRockObstacle> FlexObstacles;
     FRaftSimFlexUniformWater FlexWater;
-    bool bFlexWaterEnabled = false;
+    bool bFlexUniformWaterOverrideEnabled = false;
+    bool bFlexCapsized = false;
+    // Reused at the 120 Hz physics rate. Keeping this allocation resident
+    // avoids per-substep map churn while preserving SegmentId-keyed D3 input.
+    TMap<FString, FRaftSimFlexUniformWater> LiveWaterBySegmentScratch;
     TMap<FString, double> RetainedVolumeBySegment;
     TMap<FString, double> IndentationBySegment;
     FRaftSimFlexStepTelemetry LastFlexStepTelemetry;

@@ -1,0 +1,89 @@
+{
+  "schema": "raftsim.m9.production_whitewater_helmet_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_helmet.py",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/production_whitewater_helmet_manifest.json",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/SM_RaftSim_WhitewaterHelmet.fbx",
+    "fbx_sha256": "ca06293b13f55a1146b516d1554f5c1a62fbf1cba50b25d374d6de21b26f8d66",
+    "external_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterHelmet",
+    "dimensions_cm": [
+      28.6334,
+      25.7532,
+      26.85
+    ],
+    "authored_lod0_triangles": 24508,
+    "nanite_fallback_triangles": 2126,
+    "nanite_enabled": true,
+    "physical_cut_through_vents": 6,
+    "retention_anchor_count": 4,
+    "material_slot_count": 4,
+    "runtime_boundary": "Visual-only headgear; D3/D4 physics and rescue authority remain native."
+  },
+  "roster_audit": {
+    "report": "unreal/Saved/RaftSimValidation/m9/metahuman-production-captures.json",
+    "report_sha256": "df3a6bec979f431d347ee998057e9cba1dd48021066b45ec8d5fda040b6ed581",
+    "captured_characters": 5,
+    "characters_using_production_helmet": 5,
+    "maximum_runtime_head_error_cm": 1.1537185651278037e-09,
+    "status": "capture_complete"
+  },
+  "automation": {
+    "suite": "RaftSim.M5",
+    "succeeded": 3,
+    "succeeded_with_warnings": 1,
+    "failed": 0,
+    "not_run": 0,
+    "report_sha256": "dc9c1e5601dc11f8696c43e2ff444e33d5940e2fa8bccabc94a1fb5eccdea472",
+    "only_warning": "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation; no Nanite or default-material warning."
+  },
+  "evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v9_production_helmet_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "fa581077fc3d61dd2348eb839eed705fc6d1e84c017d7c9beed7af6a7d8dedf2",
+    "width": 1280,
+    "height": 720,
+    "guide_portrait_sha256": "3fd49826f00efca3e3e6a1a9f2d9aa5a19a2e27fefb686fd3ba7627727e6986e"
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.998,
+    "spray": 0.939,
+    "mist": 0.32,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "visible_contact_patch_triangles": 96,
+    "instance_counts": {
+      "fine_spray": 40,
+      "mist": 1,
+      "contact_foam": 9,
+      "droplets": 68
+    }
+  },
+  "accepted": [
+    "Continuous molded-shell silhouette replaces the smooth open procedural cap.",
+    "Six separated physical vents expose the dark liner without the broken-crown read of the rejected v8 geometry.",
+    "Four-point retention, ear pads, adjusters, fasteners, gasket and buckle are visible production-mesh layers.",
+    "All five production MetaHuman wrappers select the asset atomically and retain the measured solved-head fit through gameplay poses.",
+    "The procedural helmet remains only as a fail-safe when the production asset cannot load."
+  ],
+  "rejected_or_open": [
+    "Shell surfacing remains too smooth and generic for final hero-close-up photoreal approval.",
+    "PFD construction, body and hand deformation, paddle grip, gaze and facial performance remain visibly synthetic.",
+    "Raft, boulder, water, foam and aerosol, shoreline, terrain and lighting still fail the requested photoreal bar.",
+    "No named art reviewer has accepted the asset or capture.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

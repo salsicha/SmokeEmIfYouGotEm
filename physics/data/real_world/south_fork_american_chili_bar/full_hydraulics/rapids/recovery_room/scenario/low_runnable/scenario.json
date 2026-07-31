@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Recovery Room",
       "rapid_order": 19,
+      "source_elevation_datum_m": 208.75881315917968,
       "station_m": 30255.6672,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

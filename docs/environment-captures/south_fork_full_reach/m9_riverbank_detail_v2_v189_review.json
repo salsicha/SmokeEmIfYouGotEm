@@ -1,0 +1,103 @@
+{
+  "schema": "raftsim.release_review.south_fork_terrain_detail.v189",
+  "generated_on": "2026-07-29",
+  "status": "technically_rendered_review_candidate_rejected_for_production_photoreal_acceptance",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimExitAfterEnvironmentAutomation",
+  "baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v189_riverbank_detail_v2",
+  "source_manifest": "unreal/Content/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/south_fork_terrain_detail_v2_manifest.json",
+  "source_asset": {
+    "path": "unreal/SourceArt/RaftSim/Environment/GeneratedTerrain/american_south_fork_terrain_bank_detail_source_v2.png",
+    "sha256": "34a441fe939f86b483a2d4fbc874e400b1768f3b7df3559f87067bfd138afe82",
+    "generator": "OpenAI built-in image generation",
+    "input_or_reference_images_used": false,
+    "rights_state": "project_owned_ai_generated_candidate_pending_named_art_and_rights_review"
+  },
+  "derived_maps": {
+    "albedo_sha256": "704b7972cde19dabf5dcc19515233a7a860d6637005d00483f8ecd27da06b6b7",
+    "normal_sha256": "59a2f35e43eabea205452baf63c148303a0043a31d12bcddee829b14533ae048",
+    "ao_roughness_height_sha256": "28b35d57ded01c9e0205350c07ff01700a542d2e11b2f69dca81a7afbdad5df2",
+    "dimensions": [
+      1024,
+      1024
+    ],
+    "opposite_edge_max_channel_delta": 0
+  },
+  "unreal_review_assets": {
+    "albedo_uasset_sha256": "472ae442135bcb0f874d3c00487b2866eab06d027e0f0955aec4ed1373922e96",
+    "normal_uasset_sha256": "1729387fea23f97ecb790ec05a741b3310f20bd8c8f85524e6f902fdd1ef6aac",
+    "packed_uasset_sha256": "25c759c87866acf949ed8ebb002f17e8a9964d7f620ed9c5e13ab2974a37876f",
+    "platform_data": "validated_1024x1024_11_mips_for_all_three_textures",
+    "binding": "transient GroundAlbedo, GroundNormal, and GroundPacked overrides on exactly 13 RaftSimFullReachTerrain components",
+    "map_or_production_material_saved": false
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v189_riverbank_detail_v2_build.log",
+    "log_sha256": "8aac09118f779ff61cd2d9dfbaa7374f4c084c97d44b0b974334864574df4168",
+    "result": "succeeded"
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v189_riverbank_detail_v2_capture.log",
+    "log_sha256": "37dca5a71f314e9e2818166fe4100b75001cc8bd4bda663ee9d9b946d00e87b4",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "ea2df46a0805c37e3986d1ed711d38715c5177422e4317377c557da45f7667e8",
+    "meat_grinder_guide_eye": "1522c95563b0e95caaab4367ae9f596ee9ab248dd82061c403cdfa9d9f773918",
+    "troublemaker_approach": "8a887d35901c9e46f13b83df0023c29a628fc37e2c971536561ac28f215b9f6d",
+    "coloma_bridge_context": "64a66716405ba9fa1e6cb6b80f36c23e819b08e1e5af732155a80688aacdeabf",
+    "salmon_falls_takeout": "f20766fd106f8918f1e355bd016f83cbf255066ea0611fb11133652df2ac5661"
+  },
+  "baseline_pixel_delta": {
+    "note": "These whole-frame deltas include temporal water and lighting differences and prove material effect only; they are not a quality score.",
+    "chili_bar_launch_downstream": {
+      "mean_absolute_rgb": 11.262037,
+      "pixels_any_channel_gt_8_percent": 52.937174,
+      "pixels_any_channel_gt_16_percent": 39.948568
+    },
+    "meat_grinder_guide_eye": {
+      "mean_absolute_rgb": 10.909555,
+      "pixels_any_channel_gt_8_percent": 51.124349,
+      "pixels_any_channel_gt_16_percent": 34.739475
+    },
+    "troublemaker_approach": {
+      "mean_absolute_rgb": 10.130902,
+      "pixels_any_channel_gt_8_percent": 55.594835,
+      "pixels_any_channel_gt_16_percent": 38.150933
+    },
+    "coloma_bridge_context": {
+      "mean_absolute_rgb": 9.909945,
+      "pixels_any_channel_gt_8_percent": 49.928928,
+      "pixels_any_channel_gt_16_percent": 37.1352
+    },
+    "salmon_falls_takeout": {
+      "mean_absolute_rgb": 12.724393,
+      "pixels_any_channel_gt_8_percent": 56.095052,
+      "pixels_any_channel_gt_16_percent": 38.791341
+    }
+  },
+  "manual_review": {
+    "accepted_improvements": [
+      "Detailed corridor banks shift from the v184 greenish smooth read toward restrained brown gravel and soil.",
+      "The candidate demonstrates a renderable, project-owned, versioned albedo, normal, and packed terrain-detail pipeline without replacing production v1."
+    ],
+    "rejection_reasons": [
+      "Centimeter-scale gravel and litter largely collapse at the fixed guide-eye distances.",
+      "The terrain silhouette remains a smooth ribbon without cutbanks, gravel-bar relief, embedded-rock structure, roots, or a convincing wet-edge transition.",
+      "The prompted two-metre source patch is projected at the locked parent material's current 3.2 m width, so physical scale is not accepted.",
+      "Water, foam, rocks, vegetation, terrain, and lighting remain visibly synthetic in every fixed view.",
+      "No named art, guide, geospatial, owner, or rights reviewer approved the candidate."
+    ],
+    "production_promotion": "rejected",
+    "review_asset_retention": "retain source, deterministic maps, provenance, review Texture2D assets, captures, and opt-in transient capture path for future material and morphology comparisons",
+    "authoritative_runtime_baseline": "v184_refined_guide_feature_foam"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema": "raftsim.south_fork.capture_repeat.v1",
+  "contract": "Independent renderer processes must load the same settled saved map without regeneration. Sparse platform floating-point raster differences may not exceed the locked per-image pixel and channel thresholds.",
+  "baseline_directory": "docs/environment-captures/south_fork_full_reach/repeat_baseline_v269",
+  "repeat_directory": "docs/environment-captures/south_fork_full_reach",
+  "thresholds": {
+    "maximum_changed_pixels": 32,
+    "maximum_changed_fraction": 5e-05,
+    "maximum_mean_absolute_channel_error": 0.0001,
+    "maximum_channel_delta": 8
+  },
+  "captures": [
+    {
+      "capture": "chili_bar_launch_downstream.png",
+      "baseline_sha256": "46a8dd9d9c4a2be315c428aac23aade2ff63baa73b5c1eef6ab1a558d0e5d01e",
+      "repeat_sha256": "46a8dd9d9c4a2be315c428aac23aade2ff63baa73b5c1eef6ab1a558d0e5d01e",
+      "byte_identical": true,
+      "width": 1280,
+      "height": 720,
+      "changed_pixels": 0,
+      "changed_fraction": 0.0,
+      "mean_absolute_channel_error": 0.0,
+      "maximum_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "capture": "meat_grinder_guide_eye.png",
+      "baseline_sha256": "d7d860c04402bad51f5098399ff83567b67b10dc14b831da79aeb10df017d7f0",
+      "repeat_sha256": "d68fcbc2ca3a719f3b9f4c0a807e2959a60f31962e5d1cc5a499af230b8340b2",
+      "byte_identical": false,
+      "width": 1280,
+      "height": 720,
+      "changed_pixels": 3,
+      "changed_fraction": 3.2552083333333335e-06,
+      "mean_absolute_channel_error": 1.0850694444444444e-06,
+      "maximum_channel_delta": 1,
+      "passed": true
+    },
+    {
+      "capture": "troublemaker_approach.png",
+      "baseline_sha256": "c40c3884232abe085492bcde2344b36f275186051435f577554184a8236c774d",
+      "repeat_sha256": "5af2108cabc927a3ff008dcc73d551fb7a2d73cd8cb3cafe7fa9dcaa31f45c5e",
+      "byte_identical": false,
+      "width": 1280,
+      "height": 720,
+      "changed_pixels": 7,
+      "changed_fraction": 7.595486111111111e-06,
+      "mean_absolute_channel_error": 6.148726851851852e-06,
+      "maximum_channel_delta": 4,
+      "passed": true
+    },
+    {
+      "capture": "coloma_bridge_context.png",
+      "baseline_sha256": "534648c68b0fe552fc543e798ba5c384ac0dbee96d351633e1b1ae66b94bd96a",
+      "repeat_sha256": "534648c68b0fe552fc543e798ba5c384ac0dbee96d351633e1b1ae66b94bd96a",
+      "byte_identical": true,
+      "width": 1280,
+      "height": 720,
+      "changed_pixels": 0,
+      "changed_fraction": 0.0,
+      "mean_absolute_channel_error": 0.0,
+      "maximum_channel_delta": 0,
+      "passed": true
+    },
+    {
+      "capture": "salmon_falls_takeout.png",
+      "baseline_sha256": "a781e52c4848b154d35c2e9cd3fd6560f22fb883df3e9999329342edfd6d302d",
+      "repeat_sha256": "a781e52c4848b154d35c2e9cd3fd6560f22fb883df3e9999329342edfd6d302d",
+      "byte_identical": true,
+      "width": 1280,
+      "height": 720,
+      "changed_pixels": 0,
+      "changed_fraction": 0.0,
+      "mean_absolute_channel_error": 0.0,
+      "maximum_channel_delta": 0,
+      "passed": true
+    }
+  ],
+  "all_byte_identical": false,
+  "passed": true
+}

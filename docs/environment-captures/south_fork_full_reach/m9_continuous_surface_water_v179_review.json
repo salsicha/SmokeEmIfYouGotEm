@@ -1,0 +1,119 @@
+{
+  "schema": "raftsim.m9.continuous_surface_water_review.v1",
+  "reviewed_utc": "2026-07-29T20:07:17Z",
+  "status": "visual_regression_rejected_fully_removed",
+  "accepted_runtime_after_review": "v178",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "candidate": {
+    "scope": "transient broad median-water material override only",
+    "base_water_actor_count": 14,
+    "parent": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "global_station_lateral_uvs_preserved": true,
+    "two_phase_normal_sampling": true,
+    "vertex_tint_weight": 0.0,
+    "solver_field_enable": 0.0,
+    "solver_foam_overlays_preserved": true,
+    "map_or_package_mutation": false,
+    "collision_hydraulics_navigation_or_gameplay_changed": false
+  },
+  "candidate_validation": {
+    "unreal_editor_build": "succeeded",
+    "capture_exit_code": 0,
+    "capture_log": "/private/tmp/raftsim_m9_v179_continuous_surface_water_photographic.log",
+    "capture_log_sha256": "28a8b08f0436635c396e787ff11d6afdc9d2b462f50ddd6185e0d62b9646635d",
+    "loaded_world_partition_references": 231,
+    "captured_views": 5,
+    "saved_map_packages": 0,
+    "only_render_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "renderer_evidence": {
+    "baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "candidate_directory": "docs/environment-captures/south_fork_full_reach/photographic_v179_continuous_surface_water",
+    "width": 1280,
+    "height": 720,
+    "views": [
+      {
+        "id": "chili_bar_launch_downstream",
+        "baseline_sha256": "e3be3912d762950e3e5eddc8f67bd4a58b2167c90efe6bd9cfbe325932b1a2b2",
+        "candidate_sha256": "3d1cd18982aee2e9561b78f73c9c8ef1836b184a0bc71501ca08a4270a742e6f",
+        "mean_absolute_rgb_delta": 6.95939,
+        "fraction_above_8_rgb_levels": 0.526986
+      },
+      {
+        "id": "coloma_bridge_context",
+        "baseline_sha256": "1a6c6777dc7907a81aa8317cfbeb8f6d1a246f021d792fa853c187ebcd9fb272",
+        "candidate_sha256": "47c9d360e695b5fbf017e6d743f31fb482b234c4916e0502d6dd0d7989f86771",
+        "mean_absolute_rgb_delta": 8.639971,
+        "fraction_above_8_rgb_levels": 0.500537
+      },
+      {
+        "id": "meat_grinder_guide_eye",
+        "baseline_sha256": "0cd81dc708c74ee808debd4c5bfe8ecd9125feac647ccac9bc01cfab3815cebc",
+        "candidate_sha256": "f39bbe7f8277ff104926324fe4ebe0a846ac3f6ae9689b848433b0347d940d69",
+        "mean_absolute_rgb_delta": 9.415946,
+        "fraction_above_8_rgb_levels": 0.519958
+      },
+      {
+        "id": "salmon_falls_takeout",
+        "baseline_sha256": "bc278264a3c575b46e242ae871b8ec52794c063f18a06375aad447c81ac7b5f4",
+        "candidate_sha256": "0ecff19e8a1e96ce7d69af6ec2e5c2b79598e84bc145d494ab375e000304e147",
+        "mean_absolute_rgb_delta": 18.110303,
+        "fraction_above_8_rgb_levels": 0.587964
+      },
+      {
+        "id": "troublemaker_approach",
+        "baseline_sha256": "a1d470783a67e42eca258152f20d1af433313ea8069118f5b4622e4d75eeb4a4",
+        "candidate_sha256": "47027b75fdd5e56862b1dea5fbbf4eb3073b333116768e61d5e5fb2276b6dd22",
+        "mean_absolute_rgb_delta": 10.285275,
+        "fraction_above_8_rgb_levels": 0.578766
+      }
+    ],
+    "pixel_comparison_scope": "Whole-frame deltas include the deliberate water-material replacement plus ordinary renderer timing variation.",
+    "human_approved": false
+  },
+  "rejection": {
+    "decision": "reject",
+    "reason": "The continuous DefaultLit surface makes the underlying broad-water mesh read as large flat triangular and polygonal plates in every hero view. Meat Grinder and Troublemaker show the strongest foreground faceting; this is materially worse than v169's flatter but visually continuous Single Layer baseline.",
+    "inference": "Superseded by v180. The polygon mosaic came from simultaneous source and instanced-HLOD representations after only the source actors received the transient material. v179 does not establish a geometric-normal or tessellation defect.",
+    "candidate_runtime_retained": false,
+    "candidate_capture_hook_retained": false,
+    "captures_retained_as_negative_evidence": true
+  },
+  "rollback": {
+    "exact_v178_capture_source_restored": true,
+    "south_fork_capture_source_sha256": "5c14d937ad3bfb1eee10492e995cf96852d3e2db4be40c73c0cbf753e4a27f05",
+    "south_fork_full_reach_source_sha256": "6aea3ee12125c2312340f10f8318b73760280af6b85aeae11e30b893f1e71514",
+    "candidate_symbols_remaining": false,
+    "focused_character_source_and_rights_tests": "48/48 passed",
+    "unreal_editor_build": "succeeded",
+    "m7_renderer_test": "1/1 passed",
+    "m7_log": "/private/tmp/raftsim_m9_v179_rejected_v178_restore_m7.log",
+    "m7_log_sha256": "eb5a2c595fe2a402006e621d73f5263856ea70eb214a1fa5ae5b0c0597abb048",
+    "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "later_correction": {
+    "review": "docs/environment-captures/south_fork_full_reach/m9_source_hlod_exclusive_v180_review.json",
+    "finding": "WorldPartition->LoadAllActors loaded both source actors and 185 HLOD primitive components. The editor-world scene capture drew both while the transient material affected only fourteen source actors.",
+    "conclusion": "The candidate remains removed and unaccepted, but the v179 geometric-normal inference is withdrawn. Future material reviews must enforce source-or-HLOD exclusivity and select one flow band at component level."
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "accepted_runtime": "v178",
+    "m7": "current on restored v178",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "open_after_rejection": [
+    "Future water-material candidates must use v180's source/HLOD-exclusive capture path before any visual conclusion is drawn.",
+    "v174 still shows that scalar reflection tuning alone is insufficient; v179 no longer supports a conclusion about geometric normals, tessellation, or the DefaultLit candidate itself.",
+    "Production water still requires coherent non-heightfield crests, entrained-air volume, local shoreline integration, and named guide/art review."
+  ]
+}

@@ -1,0 +1,367 @@
+{
+  "schema": "raftsim.unreal.south_fork_additional_canopy_branch_atlases.v1",
+  "generated_on": "2026-07-29",
+  "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected",
+  "production_promoted": false,
+  "profiles": {
+    "ponderosa_pine": {
+      "key": "ponderosa_pine",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected",
+      "production_promoted": false,
+      "species": {
+        "scientific_name": "Pinus ponderosa",
+        "common_name": "ponderosa pine",
+        "fidelity_boundary": "visual branch-cluster study; not a surveyed individual claim"
+      },
+      "source": {
+        "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_PonderosaPine_BranchAtlas_ChromaV1.png",
+        "sha256": "c67b9743c777d6d5b721568b81ad77d3fbf13d54d18165d5a1c54a54fce8884d",
+        "generator": "OpenAI built-in image generation",
+        "model_identifier": "not_exposed_by_builtin_surface",
+        "seed": "not_exposed_by_builtin_surface",
+        "input_images_used": false,
+        "prompt_intent": "twelve isolated mature Sierra Nevada ponderosa-pine branch sprays in a non-overlapping 4x3 blue-chroma atlas",
+        "source_dimensions": [
+          1448,
+          1086
+        ],
+        "cell_normalization": "independent 4x3 cell extraction and aspect-preserving fit into the top three rows of a 4x4 atlas"
+      },
+      "atlas": {
+        "columns": 4,
+        "rows": 4,
+        "occupied_tiles": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "reserved_transparent_tiles": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "tile_bleed_inset": 0.018,
+        "source_band_opaque_pixel_count": 554197,
+        "reserved_band_opaque_pixel_count": 0
+      },
+      "maps": {
+        "albedo_opacity": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_PonderosaPine_BranchAtlasV1.png",
+          "sha256": "e54434991cd525336fe756ec2f081fde8d308967c34c4806bd82972b51a15612",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGBA",
+          "channels": "RGB base color A=opacity mask",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "normal": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_PonderosaPine_BranchAtlasV1_Normal.png",
+          "sha256": "b739e91f3f56683f39757dcc3bb18af9225cb16a968f96210de7558f6a9ef44e",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "RGB tangent-space normal",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "ao_roughness_subsurface": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_PonderosaPine_BranchAtlasV1_AORoughnessSubsurface.png",
+          "sha256": "2ad6593944a4d92d95835c6c0b103d36070475dcffedccdef34bbb1db124159f",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "R=AO G=roughness B=subsurface transmission",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        }
+      },
+      "derivation": {
+        "alpha": "deterministic blue-dominance matte with bounded edge cleanup",
+        "despill": "cell-bounded nearest-opaque RGB propagation and blue cap",
+        "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+        "mip_padding": {
+          "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+          "padding_pixels": 24,
+          "alpha_threshold_255": 2,
+          "atlas_columns": 4,
+          "atlas_rows": 4,
+          "tile_boundary_crossing_allowed": false,
+          "alpha_preserved_byte_for_byte": true,
+          "nontransparent_rgb_preserved_byte_for_byte": true,
+          "alpha_sha256": "54bc5c3de67c5a1c0d74255969c38c47fe7c4b9fea626bc17d1b57bfaccb59b5",
+          "nontransparent_rgb_sha256": "5fced51c196f2fa665019407f6145fb55d6f3669492851227399a9b8f8ac41eb",
+          "padded_transparent_pixel_count": 889913,
+          "transparent_nonzero_rgb_pixel_count": 889913
+        }
+      },
+      "integration": {
+        "milestone": "M9",
+        "active_candidate": true,
+        "unreal_material": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkPonderosa_BranchAtlasV1",
+        "unreal_meshes": [
+          "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkPonderosaMature_ConnectedCrownV1",
+          "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkPonderosaIntermediate_ConnectedCrownV1",
+          "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkPonderosaYounger_ConnectedCrownV1"
+        ],
+        "core_triangles_per_mesh": 4,
+        "branch_cards_per_mesh": 12,
+        "branch_triangles_per_mesh": 24,
+        "total_triangles_per_mesh": 28,
+        "collision": "disabled",
+        "photoreal_accepted": false,
+        "release_promoted": false
+      }
+    },
+    "white_alder": {
+      "key": "white_alder",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected",
+      "production_promoted": false,
+      "species": {
+        "scientific_name": "Alnus rhombifolia",
+        "common_name": "California white alder",
+        "fidelity_boundary": "visual branch-cluster study; not a surveyed individual claim"
+      },
+      "source": {
+        "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_WhiteAlder_BranchAtlas_ChromaV1.png",
+        "sha256": "cd30119dded256dbfbb3617eb829d95bbc933fedc99634ca53bab833cc9dfe36",
+        "generator": "OpenAI built-in image generation",
+        "model_identifier": "not_exposed_by_builtin_surface",
+        "seed": "not_exposed_by_builtin_surface",
+        "input_images_used": false,
+        "prompt_intent": "twelve isolated California white-alder leafy branch sprays in a non-overlapping 4x3 blue-chroma atlas",
+        "source_dimensions": [
+          1536,
+          1024
+        ],
+        "cell_normalization": "independent 4x3 cell extraction and aspect-preserving fit into the top three rows of a 4x4 atlas"
+      },
+      "atlas": {
+        "columns": 4,
+        "rows": 4,
+        "occupied_tiles": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "reserved_transparent_tiles": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "tile_bleed_inset": 0.018,
+        "source_band_opaque_pixel_count": 295465,
+        "reserved_band_opaque_pixel_count": 0
+      },
+      "maps": {
+        "albedo_opacity": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_WhiteAlder_BranchAtlasV1.png",
+          "sha256": "d6514d6461d3fa67ee22c10f187bce5526b92d2b17e58c299549f4382090c5d5",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGBA",
+          "channels": "RGB base color A=opacity mask",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "normal": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_WhiteAlder_BranchAtlasV1_Normal.png",
+          "sha256": "326f241146119e909f9d6eabbf45c0b1bb8dd799644773d71ebcc572b35e67d1",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "RGB tangent-space normal",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "ao_roughness_subsurface": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_WhiteAlder_BranchAtlasV1_AORoughnessSubsurface.png",
+          "sha256": "567841b2eb5c3a2eed1c88fa2600baadb70d37100b57e10a5ddefc6dafbde7a2",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "R=AO G=roughness B=subsurface transmission",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        }
+      },
+      "derivation": {
+        "alpha": "deterministic blue-dominance matte with bounded edge cleanup",
+        "despill": "cell-bounded nearest-opaque RGB propagation and blue cap",
+        "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+        "mip_padding": {
+          "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+          "padding_pixels": 24,
+          "alpha_threshold_255": 2,
+          "atlas_columns": 4,
+          "atlas_rows": 4,
+          "tile_boundary_crossing_allowed": false,
+          "alpha_preserved_byte_for_byte": true,
+          "nontransparent_rgb_preserved_byte_for_byte": true,
+          "alpha_sha256": "d05df20858ae950846d0918e2aa23ac9f6d2c338decc1a8cccb09dda204d26d0",
+          "nontransparent_rgb_sha256": "662fc7159c47592349d6a30b8839759ee79bb06778faaba8d3de20cc432ea472",
+          "padded_transparent_pixel_count": 752620,
+          "transparent_nonzero_rgb_pixel_count": 752620
+        }
+      },
+      "integration": {
+        "milestone": "M9",
+        "active_candidate": true,
+        "unreal_material": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkWhiteAlder_BranchAtlasV1",
+        "unreal_meshes": [
+          "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkWhiteAlder_ConnectedCrownV2"
+        ],
+        "core_triangles_per_mesh": 2,
+        "branch_cards_per_mesh": 36,
+        "branch_triangles_per_mesh": 72,
+        "total_triangles_per_mesh": 74,
+        "collision": "disabled",
+        "photoreal_accepted": false,
+        "release_promoted": false
+      }
+    },
+    "deerbrush": {
+      "key": "deerbrush",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected",
+      "production_promoted": false,
+      "species": {
+        "scientific_name": "Ceanothus integerrimus",
+        "common_name": "deerbrush",
+        "fidelity_boundary": "visual branch-cluster study; not a surveyed individual claim"
+      },
+      "source": {
+        "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_Deerbrush_BranchAtlas_ChromaV1.png",
+        "sha256": "bdd98c195f6b4903a6fddcabe729279bd61d32a8de71048d663e284b0d13f3bb",
+        "generator": "OpenAI built-in image generation",
+        "model_identifier": "not_exposed_by_builtin_surface",
+        "seed": "not_exposed_by_builtin_surface",
+        "input_images_used": false,
+        "prompt_intent": "twelve isolated Sierra Nevada deerbrush twig sprays in a non-overlapping 4x3 blue-chroma atlas",
+        "source_dimensions": [
+          1448,
+          1086
+        ],
+        "cell_normalization": "independent 4x3 cell extraction and aspect-preserving fit into the top three rows of a 4x4 atlas"
+      },
+      "atlas": {
+        "columns": 4,
+        "rows": 4,
+        "occupied_tiles": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "reserved_transparent_tiles": [
+          12,
+          13,
+          14,
+          15
+        ],
+        "tile_bleed_inset": 0.018,
+        "source_band_opaque_pixel_count": 434116,
+        "reserved_band_opaque_pixel_count": 0
+      },
+      "maps": {
+        "albedo_opacity": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_Deerbrush_BranchAtlasV1.png",
+          "sha256": "c350f6023db544967ce9c0f3d45519f04ae0a4d5db6df7e2c79ba4f9256e492e",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGBA",
+          "channels": "RGB base color A=opacity mask",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "normal": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_Deerbrush_BranchAtlasV1_Normal.png",
+          "sha256": "125af7c57bc3bb4957197207ffcc999c05fd8e170c850f6d53ddb3fb610b0d42",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "RGB tangent-space normal",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        },
+        "ao_roughness_subsurface": {
+          "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_Deerbrush_BranchAtlasV1_AORoughnessSubsurface.png",
+          "sha256": "a3079b8d1c67443bdbbcb0f1824a8adbfea7bcbdec97ce75fe75e2a11589cc43",
+          "width": 2048,
+          "height": 2048,
+          "mode": "RGB",
+          "channels": "R=AO G=roughness B=subsurface transmission",
+          "unreal_address_mode": "clamp",
+          "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+        }
+      },
+      "derivation": {
+        "alpha": "deterministic blue-dominance matte with bounded edge cleanup",
+        "despill": "cell-bounded nearest-opaque RGB propagation and blue cap",
+        "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+        "mip_padding": {
+          "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+          "padding_pixels": 24,
+          "alpha_threshold_255": 2,
+          "atlas_columns": 4,
+          "atlas_rows": 4,
+          "tile_boundary_crossing_allowed": false,
+          "alpha_preserved_byte_for_byte": true,
+          "nontransparent_rgb_preserved_byte_for_byte": true,
+          "alpha_sha256": "6a4c38647537850272df23f30249b6b2eb06b9fbb6c6e961f5e33f36181d8176",
+          "nontransparent_rgb_sha256": "881c4df6ace3fd25d6aaffa3d3c6c02eb5deeadab28b9c64674b9dfd5c75aef1",
+          "padded_transparent_pixel_count": 736888,
+          "transparent_nonzero_rgb_pixel_count": 736888
+        }
+      },
+      "integration": {
+        "milestone": "M9",
+        "active_candidate": true,
+        "unreal_material": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkDeerbrush_BranchAtlasV1",
+        "unreal_meshes": [
+          "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkDeerbrush_ConnectedCrownV1"
+        ],
+        "core_triangles_per_mesh": 4,
+        "branch_cards_per_mesh": 12,
+        "branch_triangles_per_mesh": 24,
+        "total_triangles_per_mesh": 28,
+        "collision": "disabled",
+        "photoreal_accepted": false,
+        "release_promoted": false
+      }
+    }
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false
+  }
+}

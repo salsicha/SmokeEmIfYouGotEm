@@ -1,0 +1,46 @@
+{
+  "candidate": "m9_flow_lace_contact_water_v110",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "captures": [
+    "m9_flow_lace_contact_water_v110.png",
+    "m9_flow_lace_contact_water_action_v110.png"
+  ],
+  "cameras": [
+    "contact_port",
+    "river_action"
+  ],
+  "retained_changes": {
+    "patch_geometry": "unchanged 9 x 7 non-colliding grid with 96 triangles",
+    "patch_material": "project-owned flow-lace breaking-water family instead of the shared crossed-wave spray-card material",
+    "patch_anchor": "55 cm outward presentation-only offset from the contacted raft segment; spray and droplets retain the physical contact origin",
+    "breaking_water_opacity": 0.02,
+    "breaking_foam_opacity": 0.58,
+    "breaking_foam_core_gain": 0.62,
+    "fallback": "shared spray material retained only if the production flow-lace material cannot load"
+  },
+  "rejected_brackets": [
+    "v108 moved the patch and every particle origin 105 cm outward while retaining the card material; it exposed a bright crossed-wave quilt and dotted billboard arcs",
+    "v109 kept particle origins honest and used flow lace, but the full-radius patch offset read as a detached bright wedge"
+  ],
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "contact_patch_visible": true,
+    "breaking_lip_triangles": 512
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "open_visual_findings": [
+    "The retained patch removes the quilt artifact but remains subtle and is not final contact-water art.",
+    "Spray and droplets still use visibly procedural card populations in close diagnostics.",
+    "Water collapse, aerosol, terrain, shoreline, canopy, crew motion, and equipment response remain below the photoreal target."
+  ]
+}

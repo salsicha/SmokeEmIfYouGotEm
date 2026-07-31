@@ -28,7 +28,8 @@ void URaftSimSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
     Super::Initialize(Collection);
 
-    if (UGameplayStatics::DoesSaveGameExist(SlotName, 0))
+    const bool bExistingSlot = UGameplayStatics::DoesSaveGameExist(SlotName, 0);
+    if (bExistingSlot)
     {
         CurrentSave = Cast<URaftSimVerticalSliceSaveGame>(
             UGameplayStatics::LoadGameFromSlot(SlotName, 0));
@@ -38,13 +39,17 @@ void URaftSimSaveSubsystem::Initialize(FSubsystemCollectionBase& Collection)
         CurrentSave = Cast<URaftSimVerticalSliceSaveGame>(
             UGameplayStatics::CreateSaveGameObject(URaftSimVerticalSliceSaveGame::StaticClass()));
     }
-    NormalizeSave(CurrentSave);
-    SaveCurrent();
+    bFreshProfileCreatedThisSession = !bExistingSlot && CurrentSave != nullptr;
+    bCurrentSaveWritable = NormalizeSave(CurrentSave);
+    if (bCurrentSaveWritable)
+    {
+        SaveCurrent();
+    }
 }
 
 bool URaftSimSaveSubsystem::SaveCurrent()
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return false;
     }
@@ -54,7 +59,7 @@ bool URaftSimSaveSubsystem::SaveCurrent()
 void URaftSimSaveSubsystem::MarkScenarioCompleted(
     FName ScenarioId, float SafetyScore, float OverallScore)
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return;
     }
@@ -83,11 +88,18 @@ FRaftSimScenarioProgress& URaftSimSaveSubsystem::FindOrAddProgress(
     return Progress;
 }
 
-void URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
+bool URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
 {
     if (Save == nullptr)
     {
-        return;
+        return false;
+    }
+    // Never downgrade or rewrite data authored by a newer schema. Unreal keeps
+    // unknown reflected fields only while that newer build owns the file, so
+    // saving it here could irreversibly discard progress.
+    if (Save->SaveVersion > CurrentSaveVersion)
+    {
+        return false;
     }
 
     // Version-zero saves only had CompletedScenarioIds and two global bests.
@@ -124,6 +136,7 @@ void URaftSimSaveSubsystem::NormalizeSave(URaftSimVerticalSliceSaveGame* Save)
 
     Save->SaveVersion = CurrentSaveVersion;
     RecalculateLicenseAndUnlocks(Save);
+    return true;
 }
 
 void URaftSimSaveSubsystem::RecalculateLicenseAndUnlocks(URaftSimVerticalSliceSaveGame* Save)
@@ -212,7 +225,7 @@ ERaftSimMedal URaftSimSaveSubsystem::ApplyRunResult(
 
 bool URaftSimSaveSubsystem::BeginSession(ERaftSimGameMode GameMode, FName ScenarioId)
 {
-    if (CurrentSave == nullptr || !IsScenarioUnlocked(ScenarioId, GameMode))
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || !IsScenarioUnlocked(ScenarioId, GameMode))
     {
         return false;
     }
@@ -228,6 +241,10 @@ bool URaftSimSaveSubsystem::BeginSession(ERaftSimGameMode GameMode, FName Scenar
 
 ERaftSimMedal URaftSimSaveSubsystem::RecordRunResult(const FRaftSimRunResult& Result)
 {
+    if (!bCurrentSaveWritable)
+    {
+        return ERaftSimMedal::None;
+    }
     const ERaftSimMedal Medal = ApplyRunResult(CurrentSave, Result);
     SaveCurrent();
     return Medal;
@@ -235,7 +252,7 @@ ERaftSimMedal URaftSimSaveSubsystem::RecordRunResult(const FRaftSimRunResult& Re
 
 void URaftSimSaveSubsystem::RecordTrainingDrillCompleted(FName DrillId)
 {
-    if (CurrentSave == nullptr || DrillId.IsNone())
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || DrillId.IsNone())
     {
         return;
     }
@@ -247,7 +264,7 @@ void URaftSimSaveSubsystem::RecordTrainingDrillCompleted(FName DrillId)
 void URaftSimSaveSubsystem::RecordCareerCheckpoint(
     FName ScenarioId, FName SectionId, float StationM, FTransform Transform)
 {
-    if (CurrentSave == nullptr || ScenarioId.IsNone() || !Transform.IsValid())
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || ScenarioId.IsNone() || !Transform.IsValid())
     {
         return;
     }
@@ -331,7 +348,7 @@ bool URaftSimSaveSubsystem::FindBestCheckpoint(
 
 void URaftSimSaveSubsystem::RestoreDefaultSettings()
 {
-    if (CurrentSave == nullptr)
+    if (CurrentSave == nullptr || !bCurrentSaveWritable)
     {
         return;
     }
@@ -342,7 +359,7 @@ void URaftSimSaveSubsystem::RestoreDefaultSettings()
 
 bool URaftSimSaveSubsystem::RebindAction(FName ActionId, FName KeyName)
 {
-    if (CurrentSave == nullptr || ActionId.IsNone() || KeyName.IsNone())
+    if (CurrentSave == nullptr || !bCurrentSaveWritable || ActionId.IsNone() || KeyName.IsNone())
     {
         return false;
     }

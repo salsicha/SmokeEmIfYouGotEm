@@ -1,0 +1,62 @@
+{
+  "schema": "raftsim.m9.cc0_production_character_fallback_visual_review.v1",
+  "status": "technical_fallback_accepted_photoreal_art_rejected",
+  "review_scope": "Renderer-backed close-range review of five project-packaged, independently morphed, rigged CC0 MakeHuman/MPFB guide and crew bodies with photographed skin/eye atlases and the retained project-owned rafting gear overlay.",
+  "source_manifest": "unreal/SourceArt/RaftSim/Characters/CC0Production/character_source_manifest.json",
+  "license": "CC0-1.0",
+  "unreal_import": {
+    "report": "unreal/Saved/RaftSim/cc0_character_import_report.json",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_cc0_regenerate_skeletons.log",
+    "idempotence_log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_cc0_import_idempotence_v290.log",
+    "unchanged_package_saves": 0,
+    "character_count": 5,
+    "material_slots_per_character": 4,
+    "lod_count_per_character": 3,
+    "minimum_imported_height_cm": 166.589,
+    "maximum_imported_height_cm": 172.990,
+    "minimum_reference_head_height_cm": 145.008,
+    "maximum_reference_head_height_cm": 166.538,
+    "source_hash_metadata_required": true,
+    "passed": true
+  },
+  "renderer_evidence": {
+    "run": "v287",
+    "test": "RaftSim.M5.RuntimeRescueLoop",
+    "result": "Success",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m5_cc0_v22_visible_helmets_20260726.log",
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_cc0_production_character_fallback_v287_rejected.png",
+    "capture_sha256": "98d7316037b98891bcd09511460ad1d3fe528eecf16c2f1d244da4aec149ad7e",
+    "capture_width": 1280,
+    "capture_height": 1765,
+    "camera_qualification": "The guide camera was explicitly activated and assigned as the player-controller view target; the raft and all five rigged production bodies occupy the review frame.",
+    "human_approved": false
+  },
+  "automation_evidence": {
+    "run": "v288",
+    "suite": "RaftSim.M5",
+    "passed": 4,
+    "failed": 0,
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m5_cc0_v288_full_20260726.log",
+    "assertions_include": [
+      "five CC0 rigged bodies loaded with finite poses",
+      "Manny fallback count is zero",
+      "all eight CC0 base materials declare SkeletalMesh usage",
+      "aimed rescue, flexible fabric, and runtime rescue loop remain functional"
+    ]
+  },
+  "accepted_findings": [
+    "Five distinct rights-compatible bodies replace the blank Manny fallback through the existing production-character adapter without transferring GPL build tooling into the project.",
+    "The deterministic source and importer validate SHA-256 provenance, centimeter-scale mesh and reference-skeleton bounds, absence of promoted eye/brow nodes, four material slots, and three skeletal LODs per body.",
+    "Photographed CC0 skin and eye atlases, rigged fingers, authored human anatomy, and variant-specific morphology materially improve the close-range crew read.",
+    "The retained raft-guide action, rescue, PFD, helmet, boot, and paddle systems remain functional and renderer-backed after the character replacement."
+  ],
+  "rejected_findings": [
+    "The MakeHuman bodies and generated material response are a rights-compatible technical fallback, not scanned or MetaHuman-quality photoreal people.",
+    "Hair is omitted under the intended helmet workflow, facial nuance is limited, and the procedural neoprene/PFD/helmet silhouettes still read below final character-art quality.",
+    "The procedural raft and flat test-tank background remain unsuitable for final marketing or store media.",
+    "This diagnostic frame has no named art reviewer, guide reviewer, marketing approval, or release-media approval."
+  ],
+  "decision": "Keep the five packaged CC0 bodies as the deterministic playable fallback and production-adapter proof. Do not close the M9 photoreal character, rafting-gear, raft-art, named-review, or release-media gates. Replace or explicitly approve these assets through named art review, then repeat this close-range renderer test.",
+  "named_art_reviewer": null,
+  "reviewed_utc": "2026-07-26T18:31:27Z"
+}

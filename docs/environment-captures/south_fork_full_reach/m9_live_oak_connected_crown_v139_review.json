@@ -1,0 +1,129 @@
+{
+  "schema": "raftsim.m9.live_oak_connected_crown_review.v1",
+  "reviewed_utc": "2026-07-29T11:59:50Z",
+  "candidate": "m9_live_oak_connected_crown_v139",
+  "parent": "m9_canopy_instance_radiometry_v137",
+  "status": "retained_active_technical_fallback_photoreal_and_release_promotion_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "species": "Quercus wislizeni",
+    "fidelity_boundary": "project-owned visual branch-cluster study; not a surveyed individual-tree claim",
+    "source_atlas": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlas_ChromaV1.png",
+    "source_atlas_sha256": "526ef7376dcb45fc0f793b6630eacf2c17234a7ef36426d43c1d44effe48e5db",
+    "derived_manifest": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/interior_live_oak_branch_atlas_v1_manifest.json",
+    "derived_manifest_sha256": "a77d79c4c5bf6e1be1f57b9f1d6e13f07cc592c3adb7e7530e6f9bcb21bbcc85",
+    "derived_map_sha256": {
+      "albedo_opacity": "7fdf2366ae7a2686d21e6825ead7af09ba3695370166cf1ad0cce1d9c3ed7ea0",
+      "normal": "a1a4384285562b0710c6562303f97c4f049a821bd18b9231076d43cdf647ccba",
+      "ao_roughness_subsurface": "645dad8504c81b22d6cee197e689d03a7c58420032bbd8bc81887163a20f70f9"
+    },
+    "atlas_layout": "4x4 with twelve occupied branch-spray tiles and four reserved transparent tiles",
+    "alpha_derivation": "deterministic blue-dominance matte, bounded despill, and cell-bounded transparent-RGB mip padding",
+    "unreal_mesh": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOak_ConnectedCrownV1",
+    "unreal_material": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkInteriorLiveOak_BranchAtlasV1",
+    "core_planes": 2,
+    "core_triangles": 4,
+    "branch_cards": 12,
+    "branch_triangles": 24,
+    "total_vertices": 56,
+    "total_triangles": 28,
+    "material_slots": 2,
+    "collision": "disabled",
+    "ecology_classification_changed": false,
+    "instance_placement_changed": false,
+    "hydraulics_changed": false
+  },
+  "bracket": {
+    "v138": {
+      "branch_cards": 20,
+      "total_triangles": 44,
+      "decision": "rejected_as_endpoint",
+      "reason": "The extra overlapping sprays created darker, denser, blob-like live-oak masses, especially at Troublemaker and Coloma.",
+      "capture_sha256": {
+        "chili_bar_launch_downstream": "17db1a61aeda8e2af5690cad4a10fdad3e9d7ddec5cd26d75ab58c1d90b5d21a",
+        "meat_grinder_guide_eye": "e3d30cb940e82315e6288e4c82acd0dcd33c44e2ab0fefa1cdbbd3b106f62841",
+        "troublemaker_approach": "0f27e2d39529b07e15dc273a43d6e5cf0c3bcc4d83576faca81ff90cf57da079",
+        "coloma_bridge_context": "ffce7436a817ece5bac3f4c8ee32a82808ea797495b97636d08acab87eb4e994",
+        "salmon_falls_takeout": "1dcfc9c415ebb0997dbef85a9ee8cf7c06d8caf9e65236b6cc4bc2788e14d7e9"
+      },
+      "preserved_representative_captures": {
+        "troublemaker": "docs/environment-captures/south_fork_full_reach/m9_live_oak_connected_crown_v138_troublemaker.png",
+        "coloma": "docs/environment-captures/south_fork_full_reach/m9_live_oak_connected_crown_v138_coloma.png"
+      }
+    },
+    "v139": {
+      "branch_cards": 12,
+      "total_triangles": 28,
+      "decision": "retained_as_active_technical_fallback",
+      "reason": "One card per occupied atlas tile preserves visible three-dimensional crown breakup with less dark massing and no observed chroma fringe or material failure.",
+      "capture_sha256": {
+        "chili_bar_launch_downstream": "5654be0d4ce7f958de4278b10887e94bb0fe0f560a06a870caec2e2b56e5a699",
+        "meat_grinder_guide_eye": "dc2971a837a27209b143226dad99cf4788d62d389f8e5445782b8df84b78d523",
+        "troublemaker_approach": "f5d30f0a4fa80889c6c5f3ed79afd8e9872e2cf7ccf816c34e19ca24b509cc82",
+        "coloma_bridge_context": "149c40ad53ab76af4ff1914a8f68ad00b397860c103728e05b7daecbbf5dde89",
+        "salmon_falls_takeout": "22eef28bc9b1c409b3c9871e57bd31e0afbc058e61819034958db44c82ad1017"
+      },
+      "preserved_representative_captures": {
+        "troublemaker": "docs/environment-captures/south_fork_full_reach/m9_live_oak_connected_crown_v139_troublemaker.png",
+        "coloma": "docs/environment-captures/south_fork_full_reach/m9_live_oak_connected_crown_v139_coloma.png"
+      }
+    }
+  },
+  "native_validation": {
+    "editor_build": "passed",
+    "focused_python": "3 passed, 23 deselected",
+    "asset_regeneration_log": "/private/tmp/raftsim_m9_v139_live_oak_connected_crown_assets.log",
+    "asset_regeneration_log_sha256": "52d6822b34b930fbd7992d2c03a236af9a66b8172f6feae72a51307de1efd60c",
+    "validated_asset_count": 22,
+    "full_reach_regeneration_log": "/private/tmp/raftsim_m9_v139_live_oak_connected_crown_full_reach.log",
+    "full_reach_regeneration_log_sha256": "43eb6bb007d256b9a1df1e75b3eb5a07c8ceed173ee689c947bcf438414ee2bf",
+    "stable_world_partition_actor_identities": 176,
+    "loaded_world_partition_actor_references": 177,
+    "capture_log": "/private/tmp/raftsim_m9_v139_live_oak_connected_crown_capture.log",
+    "capture_log_sha256": "eb1832eb5777a5c82edc230dc47f191853e7209fefa2831778a86c891bf24a13",
+    "fixed_view_count": 5,
+    "capture_resolution": [
+      1280,
+      720
+    ]
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v139_hlod_build.log",
+    "fresh_build_log_sha256": "2397b031addf5ed3162754c645beed24a91701e5fc51f9605270a63890ddbdd3",
+    "fresh_build_actor_count": 24,
+    "fresh_build_modified_and_saved_actor_count": 24,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v139_hlod_repeat_1.log",
+    "settled_repeat_log_sha256": "2677c1a09e6093a8aacb09e34b09fab60f7d5ddf7ecf2ebf068a8cd4e551dc60",
+    "settled_repeat_actor_count": 24,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "errors": 0,
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "6743d7bdbab102f7bc595cdad67a0f4025554a62de5fc77b1b1a8c084d317199",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "0c016d91352395416b3a504d9bccc8b31117c6bba1267ac2b05bf23ff5718a06"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The live-oak proxy now has a bounded connected three-dimensional crown rather than only two full-tree planes.",
+      "The twelve-card endpoint is visibly less opaque and repetitive than the twenty-card bracket while retaining useful branch-scale breakup.",
+      "No blue chroma fringe, bright mip halo, detached card field, material failure, or new collision artifact was observed in the five fixed views."
+    ],
+    "open": [
+      "The retained full-tree core planes and sparse branch cards remain recognizable as impostor geometry at guide-eye distance.",
+      "Ponderosa, white alder, and deerbrush remain two-plane billboards with repetitive stand-scale silhouettes.",
+      "Water, shoreline transitions, broad terrain materials, rocks, raft, characters, equipment, and motion remain below the target photoreal presentation.",
+      "Named art, rafting-guide, geospatial, legal, and product-owner review remains pending."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "live_oak_crown_depth_improved": true,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "decision": "Retain v139's twelve-card connected live-oak crown as an active M9 technical fallback. Reject v138's denser twenty-card endpoint and keep photoreal, named-review, release-media, M9 completion, commit, and push gates fail-closed."
+}

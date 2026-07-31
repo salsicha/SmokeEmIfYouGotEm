@@ -1,0 +1,45 @@
+{
+  "candidate": "m9_water_optical_response_v96",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_water_optical_response_v96.png",
+  "camera": "river_action",
+  "physics_changed": false,
+  "implementation": {
+    "water_roughness": 0.28,
+    "specular": 0.24,
+    "fresnel_specular": 0.15,
+    "fallback_sky_reflection_strength": 0.18,
+    "normal_texture_changed": false,
+    "water_geometry_changed": false,
+    "hydraulic_vertex_channels_changed": false,
+    "solver_changed": false
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_contracts": "37/37 passed",
+    "editor_build": "passed",
+    "full_reach_material_rebuild": "passed",
+    "fixed_full_reach_captures": "5/5 saved",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "Guide-eye water carries more visible short-wave structure.",
+    "Grazing-angle sky and shoreline response is restored without mirror-like glare.",
+    "Foam masks, flow-normal inputs, solver geometry, and gameplay water authority remain unchanged."
+  ],
+  "open_visual_findings": [
+    "The fixed Meat Grinder view still presents as broad, dark, low-information water rather than a legible rapid.",
+    "Shoreline and terrain transitions remain coarse and canopy remains card-based.",
+    "Crew, raft highlights, foam collapse, entrained air, and aerosol remain below the photoreal target."
+  ]
+}

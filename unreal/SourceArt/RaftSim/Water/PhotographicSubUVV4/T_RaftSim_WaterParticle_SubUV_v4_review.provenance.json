@@ -1,0 +1,75 @@
+{
+  "asset": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV4/T_RaftSim_WaterParticle_SubUV_v4_review.png",
+  "authoritative_geography_claim": false,
+  "cell_dimensions_px": [
+    512,
+    512
+  ],
+  "class_gamma": {
+    "aerated_mist": 1.05,
+    "contact_droplets": 0.7,
+    "rapid_aerosol": 0.96,
+    "solver_spray": 0.76
+  },
+  "dimensions_px": [
+    2048,
+    2048
+  ],
+  "external_source_input": false,
+  "format": "8_bit_grayscale_png",
+  "frame_ranges": {
+    "aerated_mist": [
+      11,
+      13
+    ],
+    "contact_droplets": [
+      6,
+      10
+    ],
+    "rapid_aerosol": [
+      14,
+      15
+    ],
+    "solver_spray": [
+      0,
+      5
+    ]
+  },
+  "generator": "unreal/Scripts/build_photographic_water_particle_atlas_v4.py",
+  "generator_version": "raftsim-photographic-water-particle-subuv-review-v4",
+  "grid": [
+    4,
+    4
+  ],
+  "image_generation_mode": "built_in_imagegen",
+  "minimum_black_padding_fraction": 0.150390625,
+  "minimum_black_padding_px": 77,
+  "ownership": "project_owned_first_party_image_generation",
+  "sha256": "b1cb3a91bcfe6a39a616df4258621c02d561359a9418c9209ef787d8676c417b",
+  "source": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV4/T_RaftSim_WhitewaterSubUV_Source_v4.png",
+  "source_dimensions_px": [
+    1254,
+    1254
+  ],
+  "source_frame_for_target": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    8,
+    9,
+    10,
+    11,
+    6,
+    12,
+    13,
+    14,
+    15,
+    7
+  ],
+  "source_prompt": "Use case: photorealistic-natural\nAsset type: source plate for an Unreal Engine Niagara 4x4 SubUV sprite atlas\nPrimary request: Create one square 4-by-4 contact sheet containing sixteen separate photoreal whitewater sprite studies, each centered in its own invisible cell against an absolute pure black (#000000) background.\nSubject order, reading left-to-right then top-to-bottom: cells 0-5 are six distinct ballistic river spray plumes with torn sheets, aerated foam fragments, and fine microdroplets; cells 6-10 are five distinct clusters of suspended water beads and short droplet trails; cells 11-13 are three soft aerated river-mist puffs with porous natural density; cells 14-15 are two dense turbulent rapid-aerosol/foam volumes with lace-like breakup.\nStyle/medium: high-speed macro photography of real cold freshwater whitewater, physically plausible droplet scale, varied organic silhouette, detailed thin foam membranes, crisp beads plus soft aerosol, neutral grayscale/white water only.\nComposition/framing: exact square canvas; regular 4x4 layout; every phenomenon fully contained within its cell with at least 15 percent black padding on every cell edge; no overlap between cells; no visible grid, dividers, labels, text, or borders.\nLighting/mood: neutral directional daylight response with convincing translucent water and bright aeration, no colored lighting.\nConstraints: background must be uniform pure black across the entire image; isolate only the airborne water/foam; keep all cell boundaries black for bilinear sampling; each of the sixteen silhouettes must be visibly different and direction-neutral enough for billboard rotation; no watermark.\nAvoid: river surface, landscape, rocks, raft, people, sky, horizon, reflections on a floor, smoke, clouds, fire, snow, paint splatter, cotton-like blobs, repeated silhouettes, rectangular sprite edges, grid lines, labels, text, watermark.",
+  "source_sha256": "3585d02e5fa08ed1f7a23d461ced2480c961b58cfec5d06c706ac1eba7628b0e",
+  "usage": "Review-only presentation atlas; solver/contact state remains the sole emission authority."
+}

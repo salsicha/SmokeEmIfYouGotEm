@@ -2365,11 +2365,49 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     Material->Modify();
     Material->GetExpressionCollection().Empty();
     Material->SetShadingModel(MSM_DefaultLit);
-    Material->BlendMode = BLEND_Translucent;
+    // Aerated crests are predominantly scattering/opaque. A masked surface is
+    // also deterministic in SceneCapture and packaged rendering, where this
+    // generated candidate's translucent vertex-alpha pass could disappear
+    // even though the same mesh rendered correctly with an opaque material.
+    Material->BlendMode = BLEND_Masked;
+    Material->OpacityMaskClipValue = 0.18f;
     Material->TwoSided = true;
 
     UMaterialExpressionVertexColor* VertexColor = NewObject<UMaterialExpressionVertexColor>(Material);
     Material->GetExpressionCollection().AddExpression(VertexColor);
+    UMaterialExpression* FoamMaskExpression = VertexColor;
+    int32 FoamMaskOutputIndex = 4;
+    UTexture2D* FoamLaceTexture = LoadObject<UTexture2D>(
+        nullptr,
+        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/"
+             "T_RaftSim_SouthForkWater_FoamLace."
+             "T_RaftSim_SouthForkWater_FoamLace"));
+    if (FoamLaceTexture)
+    {
+        UMaterialExpressionTextureCoordinate* FoamCoordinates =
+            NewObject<UMaterialExpressionTextureCoordinate>(Material);
+        // Mesh UV0 encodes station/lateral in three-metre units. One source
+        // tile therefore spans about 7.1 m downstream and 3.2 m across.
+        FoamCoordinates->UTiling = 0.42f;
+        FoamCoordinates->VTiling = 0.93f;
+        Material->GetExpressionCollection().AddExpression(FoamCoordinates);
+        UMaterialExpressionTextureSampleParameter2D* FoamLaceSample =
+            NewObject<UMaterialExpressionTextureSampleParameter2D>(Material);
+        FoamLaceSample->ParameterName = TEXT("SolverOverlayFoamLace");
+        FoamLaceSample->Texture = FoamLaceTexture;
+        FoamLaceSample->SamplerType = SAMPLERTYPE_Masks;
+        FoamLaceSample->Coordinates.Expression = FoamCoordinates;
+        Material->GetExpressionCollection().AddExpression(FoamLaceSample);
+        UMaterialExpressionMultiply* SolverMaskedLace =
+            NewObject<UMaterialExpressionMultiply>(Material);
+        SolverMaskedLace->A.Expression = VertexColor;
+        SolverMaskedLace->A.OutputIndex = 4;
+        SolverMaskedLace->B.Expression = FoamLaceSample;
+        SolverMaskedLace->B.OutputIndex = 1;
+        Material->GetExpressionCollection().AddExpression(SolverMaskedLace);
+        FoamMaskExpression = SolverMaskedLace;
+        FoamMaskOutputIndex = 0;
+    }
     UMaterialExpressionConstant* Roughness = NewObject<UMaterialExpressionConstant>(Material);
     Roughness->R = 0.82f;
     Material->GetExpressionCollection().AddExpression(Roughness);
@@ -2388,17 +2426,26 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateSolverFoamMaterial(FString& Ou
     {
         ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, VertexColor);
         ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveColor);
-        EditorOnlyData->Opacity.Expression = VertexColor;
-        EditorOnlyData->Opacity.OutputIndex = 4;
-        EditorOnlyData->Opacity.Mask = 1;
-        EditorOnlyData->Opacity.MaskR = 0;
-        EditorOnlyData->Opacity.MaskG = 0;
-        EditorOnlyData->Opacity.MaskB = 0;
-        EditorOnlyData->Opacity.MaskA = 1;
+        EditorOnlyData->Opacity.Expression = nullptr;
+        EditorOnlyData->OpacityMask.Expression = FoamMaskExpression;
+        EditorOnlyData->OpacityMask.OutputIndex = FoamMaskOutputIndex;
+        EditorOnlyData->OpacityMask.Mask = FoamMaskOutputIndex == 4 ? 1 : 0;
+        EditorOnlyData->OpacityMask.MaskR = 0;
+        EditorOnlyData->OpacityMask.MaskG = 0;
+        EditorOnlyData->OpacityMask.MaskB = 0;
+        EditorOnlyData->OpacityMask.MaskA = FoamMaskOutputIndex == 4 ? 1 : 0;
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
         ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
     }
 
+    // The solver-foam actors participate in the instanced terminal HLOD layer.
+    // Persist this usage before saving so the HLOD commandlet does not mutate
+    // the material and invalidate its source hash on every process launch.
+    if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
+    {
+        OutSummary += TEXT("Failed to enable instanced-static-mesh usage for the solver-field foam material.\n");
+        return nullptr;
+    }
     Material->PostEditChange();
     Package->MarkPackageDirty();
     const FString Filename =

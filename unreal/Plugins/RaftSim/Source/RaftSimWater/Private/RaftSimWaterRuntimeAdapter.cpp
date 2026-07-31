@@ -11,6 +11,7 @@ URaftSimWaterRuntimeAdapter::~URaftSimWaterRuntimeAdapter() = default;
 #include "Misc/Crc.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -31,6 +32,9 @@ void URaftSimWaterRuntimeAdapter::Configure(const FRaftSimWaterRuntimeConfig& In
     TimedSolverStepCount = 0;
     RiverCoordinatePoints.Reset();
     RiverSpatialHash.Reset();
+    LastWorldToRiverSegment = INDEX_NONE;
+    LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    bHasLastWorldToRiverQuery = false;
     RiverVerticalDatumM = 0.0f;
     RiverCoordinateMapPath.Reset();
 
@@ -287,6 +291,9 @@ bool URaftSimWaterRuntimeAdapter::ConfigureRiverCoordinateMap(
 {
     RiverCoordinatePoints.Reset();
     RiverSpatialHash.Reset();
+    LastWorldToRiverSegment = INDEX_NONE;
+    LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    bHasLastWorldToRiverQuery = false;
     RiverVerticalDatumM = 0.0f;
     RiverCoordinateMapPath.Reset();
 
@@ -398,6 +405,7 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     const FVector& WorldPositionCm, FVector2D& OutStationLateralM,
     FVector& OutWorldTangent, FVector& OutWorldLeftNormal) const
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimWater_WorldToRiverCoordinates);
     if (!HasRiverCoordinateMap())
     {
         OutStationLateralM = FVector2D(WorldPositionCm.X / 100.0, WorldPositionCm.Y / 100.0);
@@ -406,46 +414,24 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
         return true;
     }
     const FVector2D PositionM(WorldPositionCm.X / 100.0, WorldPositionCm.Y / 100.0);
-    const FIntPoint CenterKey = RiverSpatialHashKey(PositionM);
-    TSet<int32> CandidateSegments;
-    constexpr int32 QueryRadiusCells = 3;
-    for (int32 Y = -QueryRadiusCells; Y <= QueryRadiusCells; ++Y)
-    {
-        for (int32 X = -QueryRadiusCells; X <= QueryRadiusCells; ++X)
-        {
-            if (const TArray<int32>* Indices = RiverSpatialHash.Find(CenterKey + FIntPoint(X, Y)))
-            {
-                for (int32 PointIndex : *Indices)
-                {
-                    if (PointIndex > 0)
-                    {
-                        CandidateSegments.Add(PointIndex - 1);
-                    }
-                    if (PointIndex + 1 < RiverCoordinatePoints.Num())
-                    {
-                        CandidateSegments.Add(PointIndex);
-                    }
-                }
-            }
-        }
-    }
-    if (CandidateSegments.IsEmpty())
-    {
-        return false;
-    }
-
     double BestDistanceSquared = TNumericLimits<double>::Max();
     int32 BestSegment = INDEX_NONE;
     double BestAlpha = 0.0;
-    for (int32 SegmentIndex : CandidateSegments)
+    const auto EvaluateSegment =
+        [this, &PositionM, &BestDistanceSquared, &BestSegment, &BestAlpha](
+            int32 SegmentIndex)
     {
+        if (SegmentIndex < 0 || SegmentIndex + 1 >= RiverCoordinatePoints.Num())
+        {
+            return;
+        }
         const FRiverCoordinatePoint& PointA = RiverCoordinatePoints[SegmentIndex];
         const FRiverCoordinatePoint& PointB = RiverCoordinatePoints[SegmentIndex + 1];
         const FVector2D Segment = PointB.LocalPositionM - PointA.LocalPositionM;
         const double LengthSquared = Segment.SquaredLength();
         if (LengthSquared <= UE_DOUBLE_SMALL_NUMBER)
         {
-            continue;
+            return;
         }
 
         // RiverToWorldPosition describes a ruled corridor, not a simple
@@ -489,6 +475,57 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
             BestSegment = SegmentIndex;
             BestAlpha = Alpha;
         }
+    };
+
+    // The 12 D1-D4 tube samples and the center wetness probe form one
+    // continuous, sub-five-metre query chain. Their correct coordinate-map
+    // segments are therefore adjacent to the previous exact solution. This
+    // keeps the same 24-iteration ruled-surface inverse while eliminating the
+    // repeated 7x7-cell candidate-set construction that dominated raft ticks.
+    constexpr double NearbyQueryDistanceM = 8.0;
+    constexpr int32 NearbySegmentRadius = 4;
+    const bool bCanUseNearbySeed =
+        bHasLastWorldToRiverQuery &&
+        LastWorldToRiverSegment != INDEX_NONE &&
+        FVector2D::DistSquared(PositionM, LastWorldToRiverPositionM) <=
+            FMath::Square(NearbyQueryDistanceM);
+    if (bCanUseNearbySeed)
+    {
+        for (int32 Offset = -NearbySegmentRadius; Offset <= NearbySegmentRadius; ++Offset)
+        {
+            EvaluateSegment(LastWorldToRiverSegment + Offset);
+        }
+    }
+    else
+    {
+        const FIntPoint CenterKey = RiverSpatialHashKey(PositionM);
+        TSet<int32> CandidateSegments;
+        constexpr int32 QueryRadiusCells = 3;
+        for (int32 Y = -QueryRadiusCells; Y <= QueryRadiusCells; ++Y)
+        {
+            for (int32 X = -QueryRadiusCells; X <= QueryRadiusCells; ++X)
+            {
+                if (const TArray<int32>* Indices =
+                        RiverSpatialHash.Find(CenterKey + FIntPoint(X, Y)))
+                {
+                    for (int32 PointIndex : *Indices)
+                    {
+                        if (PointIndex > 0)
+                        {
+                            CandidateSegments.Add(PointIndex - 1);
+                        }
+                        if (PointIndex + 1 < RiverCoordinatePoints.Num())
+                        {
+                            CandidateSegments.Add(PointIndex);
+                        }
+                    }
+                }
+            }
+        }
+        for (int32 SegmentIndex : CandidateSegments)
+        {
+            EvaluateSegment(SegmentIndex);
+        }
     }
     if (BestSegment == INDEX_NONE)
     {
@@ -504,6 +541,9 @@ bool URaftSimWaterRuntimeAdapter::WorldToRiverCoordinates(
     OutStationLateralM.Y = FVector2D::DotProduct(PositionM - Center, Left2D);
     OutWorldTangent = FVector(Tangent2D.X, Tangent2D.Y, 0.0);
     OutWorldLeftNormal = FVector(Left2D.X, Left2D.Y, 0.0);
+    LastWorldToRiverSegment = BestSegment;
+    LastWorldToRiverPositionM = PositionM;
+    bHasLastWorldToRiverQuery = true;
     return true;
 }
 
@@ -624,6 +664,20 @@ FString URaftSimWaterRuntimeAdapter::ResolveRuntimeDataPath(const FString& Path)
 {
     if (FPaths::IsRelative(Path))
     {
+#if WITH_EDITOR
+        // Editor automation and PIE must validate the authoritative source
+        // data. A prior packaged build may leave an older RuntimeData copy in
+        // Binaries/Mac; preferring it makes local tests silently exercise
+        // stale hydraulics and manifests. Shipping builds take the packaged
+        // branches below because the repository is not present there.
+        const FString EditorRepoRelative = FPaths::ConvertRelativePathToFull(
+            FPaths::Combine(FPaths::ProjectDir(), TEXT(".."), Path));
+        if (FPaths::FileExists(EditorRepoRelative) || FPaths::DirectoryExists(EditorRepoRelative)
+            || Path.StartsWith(TEXT("physics/")))
+        {
+            return EditorRepoRelative;
+        }
+#endif
         // A self-contained macOS app keeps the project payload under
         // Contents/UE/<Project>/Binaries/Mac while the Mach-O executable is
         // under Contents/MacOS. Windows keeps these locations closer, but the
@@ -680,13 +734,15 @@ bool URaftSimWaterRuntimeAdapter::ConfigureDevTankWindow(
 
 bool URaftSimWaterRuntimeAdapter::ConfigureRiverWindow(
     const FString& CookedFieldsManifestDir, const FString& BandId,
-    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning)
+    FVector2D WindowCenterM, FVector2D WindowExtentM, float RoughnessManning,
+    bool bRecenterHydraulicCrux)
 {
 #if RAFTSIM_HAS_LIVE_SOLVER
     FString Error;
     LiveWindow = FRaftSimLiveWaterWindow::CreateFromCookedFields(
         ResolveRuntimeDataPath(CookedFieldsManifestDir), BandId,
-        WindowCenterM, WindowExtentM, RoughnessManning, Error);
+        WindowCenterM, WindowExtentM, RoughnessManning, Error,
+        bRecenterHydraulicCrux);
     LastHandoffTransferredCellCount = 0;
     bLastHandoffPreservedState = false;
     if (!LiveWindow.IsValid())

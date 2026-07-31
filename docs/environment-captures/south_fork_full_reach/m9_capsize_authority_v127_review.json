@@ -1,0 +1,101 @@
+{
+  "schema": "raftsim.m9.capsize_authority_review.v1",
+  "reviewed_utc": "2026-07-29T06:52:48Z",
+  "candidate": "m9_capsize_authority_v127",
+  "status": "retained_physics_and_gameplay_correction",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "problem": {
+    "original_behavior": "EnterCapsize applied a 160-degree actor-only roll after the bridge publish, so the next authoritative adapter transform could restore an upright visual while RaftMode remained Capsized.",
+    "red_test": "The strengthened P2 test observed a capsized mode with actor roll -0.0 degrees after the 2.5-second capsize interval.",
+    "naive_sync_failure": "Copying the 160-degree pose into the adapter exposed a second state error: D3 retained deck water and all five occupied D2 seats remained active after crew ejection, driving the raft into the 500 m world-depth safety clamp.",
+    "diagnostic_report": "/private/tmp/raftsim_m9_capsize_authority_p2/index.json",
+    "diagnostic_report_sha256": "838c2cd706a10ba0ffb91718fbf7b35a1b0c252f9be460e6202016b40a132749"
+  },
+  "source": {
+    "adapter_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimChronoRuntimeAdapter.h",
+      "sha256": "d870949163841754ad216f84fa8c340fde0f4fc01f13a841a0ad9d64b9f4478e"
+    },
+    "adapter_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimChronoRuntimeAdapter.cpp",
+      "sha256": "a8ac719ed690f75040ab77e4e9c7924d58007a329449ebab9b34994a746c8c38"
+    },
+    "raft_actor": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp",
+      "sha256": "649fc3ee0632c4fe77609ff38cdc45af85f604c7b4fb83d95a9271f251d850a6"
+    },
+    "integration_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlipRecoverTest.cpp",
+      "sha256": "18f96935a82d24711963854c8cd66d884b4665d317c1a935159531fd29273fce"
+    },
+    "physics_contract_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlexibleRaftVisualTest.cpp",
+      "sha256": "ce56cfb1ba5714bb50cbe5d709f1980c347dcb42fa12ebba47bd421e2479e7f0"
+    },
+    "external_asset_inputs": []
+  },
+  "implementation": {
+    "presentation_only": false,
+    "authoritative_adapter_pose": true,
+    "capsized_roll_degrees": 180.0,
+    "capsized_pose_reason": "symmetric sealed-tube buoyancy equilibrium",
+    "capsized_seat_loads": "cached unoccupied copy of configured seats; no per-substep allocation",
+    "capsized_d3_water": "disabled so the open self-bailing floor cannot retain upright deck water",
+    "retained_water_cleared_on_capsize": true,
+    "d4_indentation_cleared_on_capsize": false,
+    "d4_wrap_pin_contact_continues_while_capsized": true,
+    "linear_velocity_preserved_on_capsize": true,
+    "stale_angular_velocity_cleared_on_capsize": true,
+    "normal_loading_restored_on_reflip_or_checkpoint_reset": true,
+    "water_surface_sampler_changed": false,
+    "buoyancy_force_model_changed": false,
+    "rock_contact_model_changed": false,
+    "terrain_or_geography_changed": false,
+    "rescue_scoring_or_progression_changed": false
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "capsized_loading_contract": {
+      "report": "/private/tmp/raftsim_m9_capsize_loading_contract/index.json",
+      "report_sha256": "46b88dadfb0dfbeae61edfe4ee8b52f664c41873c532d8b2de7625c44b304b9f",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "m1_regression": {
+      "report": "/private/tmp/raftsim_m9_capsize_m1_regression/index.json",
+      "report_sha256": "3b5fe04c93f9a91a642ed78ab9e385820926f1ed306b22c515ae79a75cc6e893",
+      "succeeded": 3,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p1_float_and_paddle": {
+      "report": "/private/tmp/raftsim_m9_capsize_p1_regression/index.json",
+      "report_sha256": "9ce6eea0720cf3797559d5adce034c5e42f7e6c6bb4f7c5deb71f6840881ae9b",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p2_flip_and_recover": {
+      "report": "/private/tmp/raftsim_m9_capsize_authority_p2_final/index.json",
+      "report_sha256": "2d02930fd8079808006caebab5f73c0f1ee499dff993e91eabd929f9e22dcddf",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "assertions": [
+        "sustained D3 overwash enters Capsized mode",
+        "crew eject as swimmers",
+        "raft remains visibly inverted beyond 120 degrees",
+        "reflip returns the raft upright",
+        "all swimmers reseat"
+      ]
+    },
+    "focused_python_source_contracts": "69 passed",
+    "git_diff_check": "passed"
+  },
+  "decision": "Retain v127. Capsize is now an authoritative floating state with physically consistent empty-seat and drained-deck loading, while D4 contact memory remains live. This closes a concrete flip-visibility and post-flip sink defect but does not constitute M9 art, guide, marketing, or release approval."
+}

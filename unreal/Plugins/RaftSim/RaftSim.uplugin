@@ -33,6 +33,10 @@
     {
       "Name": "PlanarCut",
       "Enabled": true
+    },
+    {
+      "Name": "HairStrands",
+      "Enabled": true
     }
   ],
   "Modules": [

@@ -197,6 +197,7 @@ def configure_existing_sampler_types(material: unreal.Material) -> None:
         elif (
             "roughness" in texture_name
             or "rough" in texture_name
+            or "_arm_" in texture_name
             or "opacity" in texture_name
             or "alpha" in texture_name
             or "displacement" in texture_name

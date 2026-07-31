@@ -1,0 +1,51 @@
+{
+  "candidate": "m9_canopy_baseline_restored_v94",
+  "status": "rollback_verified_photoreal_rejected",
+  "capture": "m9_canopy_baseline_restored_v94.png",
+  "camera": "river_action",
+  "experiment": {
+    "rejected_candidate": "v93_camera_facing_single_plane_canopy",
+    "rejection_reason": "Camera-facing world normals overlit the cards into a pale wall and reduced depth cues.",
+    "restored_geometry": "three fixed radial photo planes per native-species asset",
+    "restored_asset_geometry": "12 vertices and 6 triangles per canopy mesh",
+    "source_restored": true,
+    "map_rebuilt": true
+  },
+  "map_evidence": {
+    "terrain_tiles": 13,
+    "water_tiles": 39,
+    "completed_shoreline_vertices": 37836,
+    "shoreline_transition_cells": 18207,
+    "foliage_instances": 65363,
+    "boulders": 113,
+    "spray_mist_instances": 255,
+    "infrastructure_actors": 72
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_contracts": "37/37 passed",
+    "editor_build_after_source_restore": "passed",
+    "full_reach_restore_build": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_findings": [
+    "The v93 single-plane camera-facing canopy is fully removed from source, assets, and the saved map.",
+    "The accepted v92 three-plane canopy silhouette and source-conditioned species distribution are restored.",
+    "The rollback changed no terrain, hydraulics, solver, collision, navigation, crew, rescue, or progression authority."
+  ],
+  "open_visual_findings": [
+    "The restored radial photo cards still reveal crossed-plane silhouettes at guide-eye distance.",
+    "Canopy color and trunk/leaf separation remain too pale and uniform.",
+    "Water, shoreline, terrain, crew, raft highlights, foam, and aerosol remain below the photoreal target."
+  ]
+}

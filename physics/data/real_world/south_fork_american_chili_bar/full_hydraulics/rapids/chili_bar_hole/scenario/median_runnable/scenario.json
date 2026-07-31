@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Chili Bar Hole",
       "rapid_order": 1,
+      "source_elevation_datum_m": 463.6930847167969,
       "station_m": 0.0,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,

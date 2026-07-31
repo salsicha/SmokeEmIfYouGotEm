@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/triple_threat/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 7.028617,
+      "solver_runtime_seconds": 1.676848,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -316,7 +316,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/triple_threat/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.286363,
+      "solver_runtime_seconds": 1.866502,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -519,7 +519,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/triple_threat/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.029213,
+      "solver_runtime_seconds": 1.910537,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -751,6 +751,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 359.5226724609375,
   "station_range_m": [
     4788.9664,
     5188.9664

@@ -1,0 +1,113 @@
+{
+  "schema": "raftsim.m9.raw_registered_macro_review.v1",
+  "reviewed_utc": "2026-07-29T23:06:30Z",
+  "candidate": "m9_raw_registered_macro_v188",
+  "parent": "m9_refined_guide_feature_foam_v184",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "scope": "settled-map capture-only material diagnostic",
+    "target_actor_tags": [
+      "RaftSimFullReachTerrain",
+      "RaftSimFullReachFarField"
+    ],
+    "transient_component_count": 21,
+    "source_macro_influence_before": "0.56 detailed / 0.92 far field",
+    "source_macro_influence_after": 1.0,
+    "source_macro_tone_before": "0.72,0.78,0.70 detailed / 0.62,0.68,0.60 far field",
+    "source_macro_tone_after": "1.0,1.0,1.0",
+    "map_or_actor_mutation": false,
+    "package_save": false,
+    "collision_hydraulics_navigation_or_gameplay_changed": false
+  },
+  "source_authority": {
+    "registered_macro": "USDA NAIP where available with explicit deterministic procedural infill outside source coverage",
+    "dem": "USGS 3DEP where available with explicit bounded procedural completion",
+    "source_images_regenerated": false,
+    "manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/manifest.json"
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimRefinedGuideFeatureFoamReview -RaftSimRawSouthForkMacroReview",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v188_raw_registered_macro",
+    "comparison_baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+    "loaded_world_partition_references": 229,
+    "log": "/private/tmp/raftsim_m9_v188_raw_registered_macro_capture.log",
+    "log_sha256": "2f4e279381387eba3ba62da4a8e5f1c3cdaaeba5dd2b64d86f94d8e4ce483ab3",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "sha256": "066941315f789e44a352044b64321afa8d965f987a909f628b49c8916face227",
+        "mean_absolute_rgb_delta_from_v184": 12.456499,
+        "changed_gt8_rgb_pixel_percent": 61.433051,
+        "changed_gt16_rgb_pixel_percent": 45.692817
+      },
+      {
+        "name": "coloma_bridge_context",
+        "sha256": "3b2eeb923e091bcc80a5702c4e92ca5e61ad138d295fa34d2bfbd3ad670fb60b",
+        "mean_absolute_rgb_delta_from_v184": 11.225392,
+        "changed_gt8_rgb_pixel_percent": 59.169596,
+        "changed_gt16_rgb_pixel_percent": 43.694770
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "sha256": "95230e940a5807d0f0fcd0d0e47955238031b91377cf6afc6061b07ad6930d08",
+        "mean_absolute_rgb_delta_from_v184": 12.07201,
+        "changed_gt8_rgb_pixel_percent": 58.440538,
+        "changed_gt16_rgb_pixel_percent": 40.501736
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "sha256": "3079203ea8d99ef84d3f8ef35c338703d88ff56465955187d1bec18abf97093b",
+        "mean_absolute_rgb_delta_from_v184": 13.860927,
+        "changed_gt8_rgb_pixel_percent": 61.362847,
+        "changed_gt16_rgb_pixel_percent": 43.327582
+      },
+      {
+        "name": "troublemaker_approach",
+        "sha256": "685ca34dd90caea47831cc9d7694f94e5bcbc01dfc0e8b6f0ecf289508d4fbcc",
+        "mean_absolute_rgb_delta_from_v184": 11.240158,
+        "changed_gt8_rgb_pixel_percent": 63.101237,
+        "changed_gt16_rgb_pixel_percent": 42.847439
+      }
+    ]
+  },
+  "renderer_findings": {
+    "accepted_diagnostic_findings": [
+      "The registered source texture path and UVs are visibly active across all five fixed views.",
+      "Removing the production tone and micro-material blend produces a large, repeatable image delta, so the retained material is not silently falling back to a flat constant color.",
+      "The diagnostic did not mutate the map, packages, terrain geometry, source products, or gameplay authority."
+    ],
+    "rejected_visual_findings": [
+      "Raw macro dominance makes the near banks saturated green and smoother instead of adding gravel, soil, embedded-rock, root, litter, cutbank, or wet-edge structure.",
+      "Distant slopes remain broad aerial-color regions and still expose the coarse geometry, sparse repeated vegetation, and source/procedural mosaic character.",
+      "The candidate weakens close-range ground-material response and does not materially improve any water, shoreline, foliage, rock, character, raft, lighting, or overall photoreal blocker."
+    ],
+    "root_cause_conclusion": "The retained macro blend and renderer-space tone are not the primary cause of the synthetic terrain. The remaining gap is missing production-scale local bank morphology/material diversity and vegetation/rock integration over the DEM, not hidden NAIP detail that can be recovered by increasing source influence.",
+    "photoreal_acceptance": false
+  },
+  "validation": {
+    "candidate_capture_exit_code": 0,
+    "rollback_ue_5_8_editor_build": "passed",
+    "rollback_build_log": "/private/tmp/raftsim_m9_v188_rejected_v184_restore_build.log",
+    "rollback_build_log_sha256": "7d117a27a2bf9b67ff7abcea67ab49e9a542891f4d131c8a40041540ede3a484",
+    "post_rollback_editor_source_layout": "passed",
+    "json_validation": "passed",
+    "git_diff_check": "passed"
+  },
+  "rollback": {
+    "completed": true,
+    "capture_only_runtime_path_removed": true,
+    "saved_map_unchanged": true,
+    "candidate_captures_and_review_evidence_preserved": true,
+    "restored_baseline": "m9_refined_guide_feature_foam_v184"
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "decision": "Reject v188 and retain v184. Do not increase global source-macro influence or remove the calibrated tone chain. Future terrain work must add source-conditioned local bank morphology and material diversity at documented physical scale; raw orthophoto dominance cannot satisfy the guide-eye photoreal requirement."
+}

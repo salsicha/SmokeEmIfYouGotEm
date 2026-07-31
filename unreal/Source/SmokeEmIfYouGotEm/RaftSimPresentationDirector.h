@@ -79,6 +79,9 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Presentation")
     bool HasBoundEnvironmentActors() const;
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Presentation")
+    bool IsCloudLayerVisible() const;
+
 private:
     static FRaftSimPresentationEnvironmentState MakePreset(ERaftSimWeatherVariant Variant);
     void ResolveEnvironmentActors();

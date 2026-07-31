@@ -1,0 +1,63 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_texture_import.v1",
+  "asset_id": "polyhaven_river_small_rocks_2k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "river_small_rocks_diff_2k.jpg",
+      "sha256": "656a20860f5960cc0f442dd425bfe4607052ab1749efdde35d60c5df9639beac",
+      "bytes": 3908784
+    },
+    {
+      "relative_path": "river_small_rocks_nor_gl_2k.jpg",
+      "sha256": "4468fc6354767fd959b74e4cb7095d061e533268189c2336e03cb0be1bddc250",
+      "bytes": 4999539
+    },
+    {
+      "relative_path": "river_small_rocks_arm_2k.jpg",
+      "sha256": "073109b53a7b909c4eb705546c03b853c7bcaac92c8e6803ed0382f377e4184f",
+      "bytes": 3371627
+    },
+    {
+      "relative_path": "river_small_rocks_disp_2k.png",
+      "sha256": "32216ca0d31a15489cb166afff2756ff90c6cac77bb6af0c30bfdebbe2c676bc",
+      "bytes": 7757746
+    }
+  ],
+  "textures": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K/T_RiverSmallRocks_BaseColor_2K.T_RiverSmallRocks_BaseColor_2K",
+      "width": 2048,
+      "height": 2048,
+      "srgb": true,
+      "compression_settings": "<TextureCompressionSettings.TC_DEFAULT: 0>",
+      "flip_green_channel": false
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K/T_RiverSmallRocks_NormalGL_2K.T_RiverSmallRocks_NormalGL_2K",
+      "width": 2048,
+      "height": 2048,
+      "srgb": false,
+      "compression_settings": "<TextureCompressionSettings.TC_NORMALMAP: 1>",
+      "flip_green_channel": true
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K/T_RiverSmallRocks_ARM_2K.T_RiverSmallRocks_ARM_2K",
+      "width": 2048,
+      "height": 2048,
+      "srgb": false,
+      "compression_settings": "<TextureCompressionSettings.TC_MASKS: 2>",
+      "flip_green_channel": false
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K/T_RiverSmallRocks_Displacement_2K.T_RiverSmallRocks_Displacement_2K",
+      "width": 2048,
+      "height": 2048,
+      "srgb": false,
+      "compression_settings": "<TextureCompressionSettings.TC_GRAYSCALE: 3>",
+      "flip_green_channel": false
+    }
+  ]
+}

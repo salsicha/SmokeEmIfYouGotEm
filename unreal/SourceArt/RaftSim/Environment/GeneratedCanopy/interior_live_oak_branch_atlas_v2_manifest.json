@@ -1,0 +1,125 @@
+{
+  "schema": "raftsim.unreal.south_fork_live_oak_branch_atlas.v2",
+  "generated_on": "2026-07-29",
+  "status": "m9_review_only_visual_promotion_rejected",
+  "production_promoted": false,
+  "species": {
+    "scientific_name": "Quercus wislizeni",
+    "common_name": "interior live oak",
+    "fidelity_boundary": "AI-generated branch-cluster visual study; not a surveyed individual-tree or botanical-measurement claim"
+  },
+  "source": {
+    "chroma_path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2_Chroma.png",
+    "chroma_sha256": "05ba521fbb4bdc10c7b479bf75d0429c24fd8f47c9801da9a47787d6eb7a73bc",
+    "alpha_path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2.png",
+    "alpha_sha256": "7945d057da74872861d12359aacac356557b5763f1e535f02e68197482f5ed43",
+    "generator": "OpenAI built-in image generation",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "referenced_images": [],
+    "prompt": "Use case: photorealistic-natural\nAsset type: Unreal Engine masked foliage branch atlas source texture\nPrimary request: Create one square texture atlas containing exactly 12 separate, photorealistic branch clusters of California interior live oak (Quercus wislizeni), suitable for close and mid-distance real-time game foliage cards.\nSubject: Each cluster must be a naturally forked woody branch with dense but irregular evergreen live-oak leaves; dark leathery narrow-oval leaves with subtly serrated edges; mature gray-brown fissured bark; realistic twig hierarchy; restrained Sierra Nevada summer green with a few sun-aged olive leaves. No flowers, no berries, no acorns.\nComposition/framing: Orthographic/front-facing botanical asset capture. Arrange the 12 clusters in a clean 4-by-3 atlas grid. Every cluster must remain completely inside its own cell, fully separated from every other cluster, with generous empty padding around all silhouettes. Mix upright, left-sweeping, right-sweeping, broad forked, and compact terminal clusters. Show each entire branch from cut stem to leaf tips. No overlap between cells.\nLighting/mood: Neutral overcast studio illumination baked as lightly as possible, no dramatic highlights, no cast shadows, no contact shadows.\nScene/backdrop: Perfectly flat solid #ff00ff chroma-key background for background removal. The background must be one uniform color with no gradients, texture, reflections, floor plane, or lighting variation.\nStyle/medium: High-resolution botanical reference photography, physically believable leaf scale, crisp fine twigs and leaf edges, natural non-repeating structure.\nConstraints: Square image; exactly 12 clusters; subject-only atlas; no labels, grid lines, text, watermark, border, ground, trunk, roots, flowers, fruit, insects, sky, or scenery. Do not use #ff00ff or magenta anywhere in the branches. Keep all foliage opaque and fully separated from the background with crisp edges.\nAvoid: illustration, CGI look, low-poly leaves, blocky leaf masses, repeated clone shapes, smeared leaf edges, depth-of-field blur, transparent or translucent leaves.",
+    "alpha_processing": {
+      "tool": "imagegen skill remove_chroma_key.py",
+      "auto_key": "border",
+      "reported_key_color": "#ea03ee",
+      "soft_matte": true,
+      "transparent_threshold": 12,
+      "opaque_threshold": 220,
+      "despill": true
+    }
+  },
+  "atlas": {
+    "columns": 4,
+    "rows": 4,
+    "occupied_tiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reserved_transparent_tiles": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "tile_bleed_inset": 0.018,
+    "occupied_band_opaque_pixel_count": 555671,
+    "reserved_band_opaque_pixel_count": 0
+  },
+  "maps": {
+    "albedo_opacity": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2_AlbedoOpacity.png",
+      "sha256": "ac8c59e9719af3f016ea086c9b239af81803bd668291b356a7f2d3a838fd4520",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_visual_promotion_rejected"
+    },
+    "normal": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2_Normal.png",
+      "sha256": "967e5d0275b2b81ae5d6146c0b98c08125676afaf0af1c87e6c2548d631de50f",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_visual_promotion_rejected"
+    },
+    "ao_roughness_subsurface": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2_AORoughnessSubsurface.png",
+      "sha256": "caa8653bfbd9f9c9079c735f330a30edbb3fb20f0e550d75842cfbdfc0a01c7a",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_visual_promotion_rejected"
+    }
+  },
+  "derivation": {
+    "layout": "4x3 alpha source resized into the occupied 2048x1536 band of a 4x4 atlas; bottom four tiles remain transparent",
+    "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "c4c1a2899f308367f91b41e20db8383679f642ad6edb6a50c51b480d8325359c",
+      "nontransparent_rgb_sha256": "9edeece9412913ae4d2378089fd0c3fbfbd4a548306c1d48ddb38f5d50197b02",
+      "padded_transparent_pixel_count": 839680,
+      "transparent_nonzero_rgb_pixel_count": 828637
+    }
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false
+  },
+  "integration": {
+    "milestone": "M9",
+    "active_candidate": false,
+    "review_flag": "RaftSimLiveOakBranchAtlasV2Review",
+    "expanded_review_flag": "RaftSimLiveOakBranchAtlasV2ExpandedReview",
+    "unreal_mesh": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakAtlasV2Review_ConnectedCrownV2",
+    "collision": "disabled",
+    "photoreal_accepted": false,
+    "release_promoted": false,
+    "decision": "retain source and isolated review packages as negative evidence; reject v208 as visually ineffective and v209 for pale leaf speckles, thin card silhouettes, and persistent billboard-like crown mass"
+  }
+}

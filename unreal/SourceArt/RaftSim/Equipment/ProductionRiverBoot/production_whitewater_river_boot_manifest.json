@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "generator": "unreal/Scripts/build_production_whitewater_boot.py",
+  "generator_version": 1,
+  "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+  "license": "RaftSim project source license",
+  "source_inputs": [],
+  "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.fbx",
+  "fbx_sha256": "ac5f9a53fd9dd00f14847aaa5e6ef1e0cf9c9fa1b0cdb52160facb68fd375359",
+  "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.blend",
+  "blend_sha256": "eb7b038dd8a23cc9cf8e9f445f37f666f2a61839cadcfbb15df5d9e1b188de62",
+  "object_name": "SM_RaftSim_WhitewaterRiverBoot",
+  "material_slots": [
+    "BootUpper",
+    "BootSole",
+    "BootReinforcement"
+  ],
+  "vertex_count": 4896,
+  "polygon_count": 4842,
+  "bounds_cm": {
+    "min": [
+      -8.34,
+      -6.75,
+      -5.575
+    ],
+    "max": [
+      25.0,
+      6.75,
+      18.0
+    ]
+  },
+  "construction": {
+    "outsole_lugs": 12,
+    "vamp_drain_bands": 3,
+    "pull_tabs": 1
+  },
+  "runtime_boundary": "Visual-only river footwear; crew pose, mass, D3/D4 physics, collision and rescue authority remain native."
+}

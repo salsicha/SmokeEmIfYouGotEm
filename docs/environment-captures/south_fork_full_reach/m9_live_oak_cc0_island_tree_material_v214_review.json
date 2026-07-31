@@ -1,0 +1,168 @@
+{
+  "schema": "raftsim.review.south_fork_live_oak_cc0_material.v214",
+  "reviewed_on": "2026-07-29",
+  "milestone": "M9",
+  "candidate": "poly_haven_island_tree_set_calibrated_leaf_material_v1",
+  "status": "technical_material_override_validated_visual_promotion_rejected_ineffective",
+  "production_promoted": false,
+  "photoreal_accepted": false,
+  "species_identity_approved": false,
+  "baseline": {
+    "review": "docs/environment-captures/south_fork_full_reach/m9_live_oak_cc0_island_tree_morphology_v213_review.json",
+    "candidate_geometry": "three scale-normalized rights-reviewed Poly Haven CC0 island-tree morphology donors",
+    "unchanged_controls": [
+      "donor meshes and Nanite settings",
+      "donor trunk and branch materials",
+      "source textures",
+      "stable actor/component variant selection",
+      "all source instance transforms and placement",
+      "terrain, water, lighting, cameras, rocks, hydraulics, navigation, collision, and gameplay"
+    ]
+  },
+  "authoring": {
+    "authoring_flag": "RaftSimOnlyLiveOakIslandTreeMaterialV1Review",
+    "material_object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkInteriorLiveOakIslandTreeMaterialV1Review_Leaves.M_RaftSim_SouthForkInteriorLiveOakIslandTreeMaterialV1Review_Leaves",
+    "material_sha256": "dcde2fac0b580b6c05208bb795e6f3218087ec09f1c7cd11ac5b5f3d314a737f",
+    "source_textures": {
+      "albedo_sha256": "df0693a24182f61b528d8766837416d1b387ddbd95612466daa1316ae03d0788",
+      "opacity_sha256": "4eb7978c4982176cbfaa3451590f56d469c97ca93ce79549c35650deafb627f4",
+      "normal_sha256": "47db2a679b143796620821e18e0f4bdc49dc5eb4227a20a08968dd3fd8846c80",
+      "roughness_sha256": "6e99c69d190a9e919da65c7717a9440651d6979adb28a42132ef31f0ebefd267",
+      "packages_modified": false,
+      "platform_dimensions": [1024, 1024],
+      "minimum_platform_mips": 10
+    },
+    "material_contract": {
+      "shading_model": "TwoSidedFoliage",
+      "blend_mode": "Masked",
+      "two_sided": true,
+      "dithered_lod_transition": true,
+      "opacity_coverage_scale": 2.0,
+      "opacity_mask_clip": 0.30,
+      "base_color_scale_rgb": [1.18, 1.24, 1.10],
+      "per_instance_energy_range": [1.0, 1.12],
+      "tangent_normal_detail": 0.55,
+      "ambient_occlusion": 0.78,
+      "roughness_range": [0.45, 0.85],
+      "subsurface_rgb": [0.10, 0.20, 0.045],
+      "emissive_compensation": false,
+      "override_slot": 1,
+      "trunk_slot_override": false,
+      "branch_slot_override": false
+    },
+    "source_hashes": {
+      "canopy_authoring_cpp": "c949042d05c32cf0ecfd77c4cac62fef39320b885d4a3b2181679c416271456b",
+      "capture_cpp_at_evidence": "02f6fd7002d6fd6977181e61a05454a3239c1ad2c2343a20584055223abf621d",
+      "post_capture_log_label_compatibility_fix_capture_cpp": "9cdb32bcd7b0dee69c2728038eaccc44a04655fe60da8bb8e303250e1d1be2ad",
+      "review_state_header": "28668ec518768ed08c74ae43ff39df4a2f7adc92f45ddbf5107ca052268650d0"
+    }
+  },
+  "integration": {
+    "capture_flag": "RaftSimLiveOakIslandTreeMaterialV1Review",
+    "population_gate": {
+      "components": 21,
+      "instances": 24830,
+      "exact_match_required": true
+    },
+    "component_level_distribution": {
+      "island_tree_01": {"components": 8, "instances": 8535},
+      "island_tree_02": {"components": 5, "instances": 8421},
+      "island_tree_03": {"components": 8, "instances": 7874},
+      "per_instance_mesh_selection_supported": false,
+      "per_instance_material_energy_supported": true
+    },
+    "override_scope": "leaf material slot 1 only",
+    "all_original_world_transforms_restored": true,
+    "all_original_meshes_restored": true,
+    "all_original_material_override_arrays_restored": true,
+    "saved_map_changed": false,
+    "saved_map_mtime_before_capture": "2026-07-29T15:34:34-0700",
+    "saved_map_mtime_after_capture": "2026-07-29T15:34:34-0700",
+    "saved_map_sha256_before_capture": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e",
+    "saved_map_sha256_after_capture": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e"
+  },
+  "capture": {
+    "directory": "docs/environment-captures/south_fork_full_reach/photographic_v214_live_oak_cc0_island_tree_material_v1",
+    "hashes": {
+      "chili_bar_launch_downstream.png": "58955974c9c409305acd4a89da3d74f13b114547575ca46044519e5d50d1874b",
+      "coloma_bridge_context.png": "47f0c2d99276a7160667adeb5160fd9f427c5e89b8d154cef57d4ca09206fa07",
+      "meat_grinder_guide_eye.png": "9e3f341a2073fe4ad74dd8d938a609514f9d02b2eabb131c1ec825e01d1e2947",
+      "salmon_falls_takeout.png": "199af56ef5b5f2ce7cac4a5258c7491aef4f65c7983994dbf451c0da7bcaf86a",
+      "troublemaker_approach.png": "6ee2d70699ca7198fce9b7790a2b30255d431ad94e5aeb796bb781d089ce968f"
+    },
+    "comparison_to_v213": {
+      "mean_absolute_rgb_average": 0.021596,
+      "percent_pixels_any_channel_gt_8_average": 0.089062,
+      "total_pixels_changed_at_any_level": 6274,
+      "byte_identical_views": [
+        "chili_bar_launch_downstream.png",
+        "meat_grinder_guide_eye.png",
+        "troublemaker_approach.png"
+      ],
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8", "pixels_changed_at_any_level"],
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.0, 0.0, 0],
+        "coloma_bridge_context.png": [0.104468, 0.426432, 5903],
+        "meat_grinder_guide_eye.png": [0.0, 0.0, 0],
+        "salmon_falls_takeout.png": [0.003514, 0.018880, 371],
+        "troublemaker_approach.png": [0.0, 0.0, 0]
+      }
+    },
+    "comparison_to_v212": {
+      "mean_absolute_rgb_average": 1.589807,
+      "percent_pixels_any_channel_gt_8_average": 3.529080
+    },
+    "comparison_to_v202": {
+      "mean_absolute_rgb_average": 1.752314,
+      "percent_pixels_any_channel_gt_8_average": 3.429015
+    }
+  },
+  "validation": {
+    "native_editor_build": "passed_46_actions",
+    "material_shader_gate": "passed_on_running_mac_metal_platform",
+    "unreal_authoring_exit_code": 0,
+    "unreal_capture_exit_code": 0,
+    "capture_count": 5,
+    "population_gate_passed": true,
+    "restoration_gate_passed": true,
+    "map_immutability_gate_passed": true,
+    "focused_python_matrix": "75 passed, 0 failed in 132.04 seconds",
+    "full_python_matrix": "1137 passed, 3 expected skips, 1 intentional fail-closed release-packet failure, 0 unexpected failures in 1062.31 seconds",
+    "full_python_junit_report": "/private/tmp/raftsim_m9_v214_full_python_tests.xml",
+    "full_python_junit_sha256": "133861e50b3475aba344cd3b47c3c1df1dcbe445e0011324ad0e880ea5d92fbd",
+    "intentional_release_packet_failure": "The current post-v317 flexible-raft source intentionally does not match the historical v42 review hash. Existing D6 and M9 evidence requires that release-candidate contract to remain fail-closed until an accepted M9 candidate is assembled."
+  },
+  "manual_review": {
+    "positive_findings": [
+      "The isolated material reads four hash-locked donor textures without modifying any CC0 donor package.",
+      "The shader is lit masked TwoSidedFoliage, retains tangent detail, bounds roughness and AO, supports per-instance energy variation, and uses no emissive or unlit compensation.",
+      "The shared review state now restores original material override arrays as well as meshes and transforms."
+    ],
+    "rejection_reasons": [
+      "Three of five fixed views are byte-identical to v213, and the full set changes only 0.021596 mean RGB with 0.089062 percent of pixels above eight levels.",
+      "The dark narrow crown masses, sparse or bright branch/leaf artifacts, repeated component forms, and unstable far silhouettes remain visually unchanged.",
+      "A leaf-only scalar/material correction cannot turn these generic donor forms into approved California interior live oaks or repair the synthetic terrain, water, lighting, roots, and understory integration."
+    ],
+    "decision": "Reject v214 visual promotion and stop tuning the Island Tree set. Retain the isolated material authoring and exact override-restoration infrastructure only.",
+    "next_required_visual_input": "Acquire or art-author multiple reviewed California interior-live-oak forms with production branch/leaf representations, per-instance age and silhouette variation, explicit distance transitions, roots and understory integration, and named art/ecology approval."
+  },
+  "authority": {
+    "affects_species_classification": false,
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "affects_gameplay": false
+  },
+  "external_gates": {
+    "named_art_review": "missing",
+    "named_ecology_review": "missing"
+  },
+  "milestone_gate": {
+    "m9_passed": false,
+    "authoritative_visual_baseline": "v184",
+    "commit_allowed": false,
+    "push_allowed": false
+  }
+}

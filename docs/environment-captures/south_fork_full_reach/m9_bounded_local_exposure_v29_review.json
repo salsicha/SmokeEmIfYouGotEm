@@ -1,0 +1,118 @@
+{
+  "schema": "raftsim.m9.bounded_local_exposure_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "scope": {
+    "runtime_camera_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCameraPresentation.h",
+    "runtime_camera_source_sha256": "9a8e77da2dce3826852efe0a0d6dd97079391d71cfa4bc92934c55a8b5edf564",
+    "capture_command_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+    "capture_command_source_sha256": "1100bc04314d8bc46e4044470df81bc28b59919edef5fa68b1400f7c86338d95",
+    "m7_camera_contract_source": "unreal/Source/SmokeEmIfYouGotEm/Tests/RaftSimM7PresentationTest.cpp",
+    "m7_camera_contract_source_sha256": "1be29968e888559b235ded89eb59c540f47856ba5cf1a967745e6e7fb857a9ca",
+    "external_asset_inputs": [],
+    "new_asset_packages": [],
+    "simulation_authority": "None. The slice changes camera post-process settings and their automation contract only."
+  },
+  "presentation_contract": {
+    "exposure_method": "AEM_Manual",
+    "physical_camera_exposure_applied": false,
+    "exposure_bias_before_ev": 1.75,
+    "exposure_bias_after_ev": 1.25,
+    "local_exposure_method": "Bilateral",
+    "highlight_contrast_scale": 0.78,
+    "shadow_contrast_scale": 0.72,
+    "detail_strength": 1.0,
+    "blurred_luminance_blend": 0.5,
+    "blurred_luminance_kernel_size_percent": 50.0,
+    "guide_camera_changed": true,
+    "chase_camera_changed": true,
+    "fixed_capture_default_changed": true,
+    "materials_changed": false,
+    "lighting_actors_changed": false,
+    "weather_changed": false,
+    "water_sampling_changed": false,
+    "surface_geometry_changed": false,
+    "d3_changed": false,
+    "d4_changed": false,
+    "collision_changed": false,
+    "raft_changed": false,
+    "rescue_changed": false
+  },
+  "automation": {
+    "focused_source_passed": 33,
+    "m4_suite": "RaftSim.M4",
+    "m4_succeeded": 2,
+    "m4_succeeded_with_warnings": 1,
+    "m4_failed": 0,
+    "m4_report": "unreal/Saved/Automation/M9B3LocalExposureM4ExactV1/index.json",
+    "m4_report_sha256": "8c2bb71bd2cf4b6152b7e9c486de48ace3e1e171c587555ddf14b551d5d20b22",
+    "m5_suite": "RaftSim.M5",
+    "m5_succeeded": 3,
+    "m5_succeeded_with_warnings": 1,
+    "m5_failed": 0,
+    "m5_report": "unreal/Saved/Automation/M9B3LocalExposureM5ExactV1/index.json",
+    "m5_report_sha256": "b0b8ee2afeabf71bad0ec2120fd548e875b84303813a44880581a3235c54754c",
+    "m7_suite": "RaftSim.M7",
+    "m7_succeeded": 3,
+    "m7_succeeded_with_warnings": 1,
+    "m7_failed": 0,
+    "m7_not_run": 0,
+    "m7_report": "unreal/Saved/Automation/M9B3LocalExposureM7ExactV2/index.json",
+    "m7_report_sha256": "dc1056aab3773fae05358c0ee9122efc4a7247aa5efe60e8c755149567fea402",
+    "superseded_m7_v1_report": "unreal/Saved/Automation/M9B3LocalExposureM7ExactV1/index.json",
+    "superseded_m7_v1_failed_stale_contract": 1,
+    "superseded_m7_v1_reason": "The old CameraWeather assertion still required the superseded +1.75 EV value; all other M7 tests passed. The v2 contract asserts +1.25 EV and bounded bilateral highlight/shadow response.",
+    "warnings": [
+      "Headless Mac audio sample-rate query warning.",
+      "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation."
+    ]
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v29_local_exposure_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "d12f48b60090f1d2cf9d2d16938b4dbecfd7dd9735ce806c32b74067c9fb2d32",
+    "width": 1470,
+    "height": 956,
+    "matched_camera": "station_960_upstream_right",
+    "cached_repeat": true,
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "visible_contact_patch_triangles": 96,
+    "deterministic_instance_counts": {
+      "fine_spray": 91,
+      "mist": 5,
+      "contact_foam": 9,
+      "droplets": 144
+    }
+  },
+  "renderer_iterations": [
+    "v26 is a non-mutating +1.00 EV diagnostic and was too dark for consistent face/PFD readability.",
+    "v27 is a non-mutating +1.25 EV diagnostic without the new local-exposure implementation.",
+    "v28 is the first rebuilt local-exposure frame and is retained only as shader-warm-up evidence.",
+    "v29 is the cached repeat retained for the release packet."
+  ],
+  "accepted": [
+    "The cached matched frame reduces the clipped wet-raft highlight band while retaining more tube microtexture.",
+    "Bilateral local exposure improves shadowed face, PFD and wetsuit readability without editing scene lights or material response.",
+    "Guide, chase and fixed-evidence cameras share one deterministic camera-only configuration.",
+    "Exact-current renderer-backed M4, M5 and M7 pass 3/3, 4/4 and 4/4 with zero failures."
+  ],
+  "rejected_or_open": [
+    "Manual non-physical exposure remains a presentation compromise and is not final calibrated cinematography.",
+    "The raft still has a broad synthetic highlight, faces/hands/poses remain visibly game-like, and the water/rock/environment remain below the photoreal bar.",
+    "Local exposure cannot replace production material, lighting, character, animation or environment art.",
+    "No named guide or art reviewer has approved highlight rolloff, shadow recovery, skin response or rapid fidelity.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

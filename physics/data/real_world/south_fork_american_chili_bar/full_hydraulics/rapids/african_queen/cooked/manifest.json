@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/african_queen/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.477602,
+      "solver_runtime_seconds": 1.786142,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -292,7 +292,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/african_queen/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 7.592544,
+      "solver_runtime_seconds": 1.992198,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -471,7 +471,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/african_queen/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 7.779214,
+      "solver_runtime_seconds": 1.78932,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -664,6 +664,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 404.2958154296875,
   "station_range_m": [
     3018.688,
     3418.688

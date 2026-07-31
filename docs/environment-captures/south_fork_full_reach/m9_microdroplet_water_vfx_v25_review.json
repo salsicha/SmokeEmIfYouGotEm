@@ -1,0 +1,112 @@
+{
+  "schema": "raftsim.m9.microdroplet_water_vfx_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "scope": {
+    "runtime_actor": "ARaftSimWaterVfxActor",
+    "runtime_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+    "runtime_source_sha256": "c29dea2583e0c7d2126b613225fc89891a8f661e17ada0bc3f33134241d5a137",
+    "external_asset_inputs": [],
+    "new_asset_packages": [],
+    "authoritative_hydraulic_claim": "None. Existing solver and raft-contact state still classify and place every presentation instance."
+  },
+  "presentation_contract": {
+    "implementation": "Existing bounded instanced-static-mesh soft-card pools with smaller, denser, lower-opacity cards.",
+    "fine_spray_opacity_before": 0.2,
+    "fine_spray_opacity_after": 0.115,
+    "mist_opacity_before": 0.055,
+    "mist_opacity_after": 0.032,
+    "rapid_aerosol_opacity_before": 0.042,
+    "rapid_aerosol_opacity_after": 0.024,
+    "droplet_opacity_before": 0.32,
+    "droplet_opacity_after": 0.18,
+    "fine_spray_population_formula": "round(74 * spray + 22 * impact_sheet)",
+    "mist_population_formula": "round(28 * max(0, (mist - 0.18) / 0.82))",
+    "droplet_population_formula": "round(112 * droplets + 32 * impact_sheet)",
+    "rapid_aerosol_puffs_per_site_formula": "2 + round(5 * rapid_intensity)",
+    "contact_water_patch_changed": false,
+    "contact_foam_changed": false,
+    "vfx_classifier_changed": false,
+    "vfx_trajectories_changed": false,
+    "water_sampling_changed": false,
+    "surface_geometry_changed": false,
+    "d3_changed": false,
+    "d4_changed": false,
+    "collision_changed": false,
+    "raft_changed": false,
+    "rescue_changed": false
+  },
+  "automation": {
+    "focused_source_suites": [
+      "physics/tests/test_flexible_raft_visual_upgrade.py",
+      "physics/tests/test_editor_source_layout.py",
+      "physics/tests/test_m9_release_acceptance_packet.py"
+    ],
+    "focused_source_passed": 32,
+    "m4_suite": "RaftSim.M4",
+    "m4_succeeded": 2,
+    "m4_succeeded_with_warnings": 1,
+    "m4_failed": 0,
+    "m4_not_run": 0,
+    "m4_report": "unreal/Saved/Automation/M9B3MicrodropletVfxM4ExactV1/index.json",
+    "m4_report_sha256": "e849f05774091b580500df86eec11cdfb79a043407af73b8b6edc07e21780ca9",
+    "m5_suite": "RaftSim.M5",
+    "m5_succeeded": 3,
+    "m5_succeeded_with_warnings": 1,
+    "m5_failed": 0,
+    "m5_not_run": 0,
+    "m5_report": "unreal/Saved/Automation/M9B3MicrodropletVfxM5ExactV1/index.json",
+    "m5_report_sha256": "b18f1186ff9774a630ba12a9a5ecc71acd1ff753433f7c93d0af10032ac455b4",
+    "warnings": [
+      "Headless Mac audio sample-rate query warning.",
+      "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation."
+    ]
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v25_microdroplet_vfx_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "51e10209f1c62950c471f00ed222f01fb25b7c7d38894b96dc8427d6d85f0a13",
+    "width": 1470,
+    "height": 956,
+    "matched_camera": "station_960_upstream_right",
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "visible_contact_patch_triangles": 96,
+    "captured_presentation_state": {
+      "spray": 0.932,
+      "mist": 0.318,
+      "impact_sheet": 1.0,
+      "droplets": 1.0
+    },
+    "deterministic_instance_counts": {
+      "fine_spray": 91,
+      "mist": 5,
+      "contact_foam": 9,
+      "droplets": 144
+    }
+  },
+  "accepted": [
+    "The matched v25 frame replaces the prominent large-card necklace beside the wrapped raft with a finer, lower-opacity microdroplet cloud.",
+    "Instance populations remain deterministic functions of the existing solver/contact-derived VFX state.",
+    "The retained 96-triangle contact-water patch, contact foam, D4 telemetry, classifier, trajectories, raft, collision and rescue authority are unchanged.",
+    "Exact-current renderer-backed M4 and M5 suites pass 3/3 and 4/4 with zero failures."
+  ],
+  "rejected_or_open": [
+    "The improvement is subtle and the shared analytic plane-card implementation remains visible at hero distance.",
+    "Rapid aerosol lacks production volumetric breakup, lighting, collision response and scale diversity; final Niagara or equivalent production VFX remains open.",
+    "The broad water remains a non-overturning heightfield and its remaining foam laces are too clean and linear.",
+    "No named guide or art reviewer has approved the spray scale, opacity, motion or rapid fidelity.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

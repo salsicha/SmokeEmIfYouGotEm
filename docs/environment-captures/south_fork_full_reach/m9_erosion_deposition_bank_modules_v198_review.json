@@ -1,0 +1,79 @@
+{
+  "schema": "raftsim.release_review.south_fork_erosion_deposition_bank_modules.v198",
+  "generated_on": "2026-07-29",
+  "status": "technically_rendered_but_visually_rejected_for_production",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimTerrainDetailV2Review -RaftSimDerivedBankMorphologyReview -RaftSimExitAfterEnvironmentAutomation",
+  "comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v197_raised_toe_bank_morphology",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v198_erosion_deposition_bank_modules",
+  "implementation": {
+    "placement_authority": "median-water UV0 station/lateral coordinates, centerline curvature classification, deterministic module masks, and complex traces against RaftSimFullReachTerrain",
+    "median_water_actors": 14,
+    "bank_module_segments": 2220,
+    "bank_module_triangles": 17760,
+    "successful_terrain_trace_hits": 13550,
+    "cutbank_rows": 1606,
+    "gravel_bar_rows": 1824,
+    "scan_rock_instances": 3675,
+    "scan_rock_longest_dimension_range_m": [0.16, 1.18],
+    "cc0_bark_root_segments": 568,
+    "wetness_alpha_corrected_from_uniform_one": true,
+    "collision_authority_changed": false,
+    "hydraulic_authority_changed": false,
+    "navigation_changed": false,
+    "map_saved": false,
+    "derived_bank_asset_package_saved": false,
+    "isolated_terrain_detail_review_texture_packages_refreshed": 3,
+    "transient_review_actor_destroyed_after_capture": true
+  },
+  "build": {
+    "log": "/private/tmp/raftsim_m9_v198_erosion_deposition_bank_modules_build.log",
+    "log_sha256": "ac55ddcd4c99610091ee66e8c745f1633dfb94ef6b1394ab9debed97ce0fa7f1",
+    "result": "succeeded",
+    "total_execution_seconds": 15.11
+  },
+  "capture_run": {
+    "log": "/private/tmp/raftsim_m9_v198_erosion_deposition_bank_modules_capture.log",
+    "log_sha256": "adcba4eb85cdc0c2911af9d430a2ca68901d63037c8c052d7a554e3757e36bda",
+    "world_partition_actor_references_loaded": 229,
+    "exit_code": 0
+  },
+  "captures": {
+    "chili_bar_launch_downstream": "db350ca1e6846a8ee6b764d9b7fd2ba0f97be4fb7b82c546be0058910180f425",
+    "meat_grinder_guide_eye": "b02d19952ac4a827670b1e2c453a8993d24dbed760cf45bd684cd84434a52d34",
+    "troublemaker_approach": "b95c68d844153df2d41273a89c97806b74b6bfb48718b60c3656ef570d79b15f",
+    "coloma_bridge_context": "166582bb22e5be4e991ebd5a09a2515bb057bb09686bd323fd17be64401cd9bd",
+    "salmon_falls_takeout": "98aa22f4464e7f05d5b94a6fcc96f54b591e707d5a16692157e43e0401df645f"
+  },
+  "pixel_delta_from_v197": {
+    "chili_bar_launch_downstream": {"mean_absolute_rgb": 0.765441, "pixels_any_channel_gt_8_percent": 1.384874, "pixels_any_channel_gt_16_percent": 1.365451},
+    "meat_grinder_guide_eye": {"mean_absolute_rgb": 1.598136, "pixels_any_channel_gt_8_percent": 3.361979, "pixels_any_channel_gt_16_percent": 3.290582},
+    "troublemaker_approach": {"mean_absolute_rgb": 0.800476, "pixels_any_channel_gt_8_percent": 1.661675, "pixels_any_channel_gt_16_percent": 1.614692},
+    "coloma_bridge_context": {"mean_absolute_rgb": 0.930033, "pixels_any_channel_gt_8_percent": 1.891168, "pixels_any_channel_gt_16_percent": 1.769857},
+    "salmon_falls_takeout": {"mean_absolute_rgb": 0.000022, "pixels_any_channel_gt_8_percent": 0.0, "pixels_any_channel_gt_16_percent": 0.0}
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "accepted_corrections": [
+      "Vertex alpha now represents a narrow wet toe instead of incorrectly darkening every bank vertex as fully wet.",
+      "Bend classification, discontinuous module masks, multi-attempt rock hierarchy, and bark-clad root segments are deterministic and source-conditioned.",
+      "The derived actor remains transient, non-colliding, non-navigable, and is destroyed after the five captures."
+    ],
+    "rejection_reasons": [
+      "The cutbank profiles read as pale pyramidal berms rather than eroded faces, with hard longitudinal seams at module boundaries.",
+      "Chili Bar and Meat Grinder gain the strongest artifacts; Troublemaker and Coloma remain planar and synthetic; Salmon Falls is effectively unchanged.",
+      "The 568 root segments are not camera-legible and do not create credible exposed root systems or undercuts.",
+      "Scan rocks remain visually isolated from the generated bank surface and lack sediment embedding and South Fork lithologic specificity.",
+      "Water, foliage, terrain, and lighting remain far below the photographic target, and no named reviewer approved the result."
+    ],
+    "corrective_action": "Stop procedural cross-section authoring in this review seam. Replace it with production-quality scanned/authored bank modules whose end caps, material layers, roots, sediment embedding, wetness, and vegetation transitions are created and reviewed as coherent assets before source-conditioned placement.",
+    "candidate_retention": "retain source only as an opt-in non-authoritative integration prototype and retain captures/ledger as negative evidence; do not promote v198 geometry, materials, roots, placement, or media"
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_reviews": "open",
+    "rights_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

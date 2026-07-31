@@ -1,0 +1,96 @@
+{
+  "schema": "raftsim.m9.shipping_stability_confirmation.v2",
+  "candidate": "v527_overwash_stability_lumen_probe_pair",
+  "status": "windowed_player_presentation_repeat_passed_offscreen_tooling_path_variable",
+  "passed": true,
+  "platform": "macos_arm64",
+  "hardware": "Apple M5",
+  "build_configuration": "Shipping",
+  "map_name": "L_SouthForkAmerican_FullReach",
+  "quality": "High",
+  "resolution": "1920x1080",
+  "screen_percentage": 60,
+  "warmup_seconds_per_run": 10,
+  "measurement_seconds_per_run": 60,
+  "qualification_protocol": "normal windowed Metal presentation launched through the packaged application bundle",
+  "qualification_run_count": 2,
+  "qualification_runs_passed": 2,
+  "normal_process_exits": 2,
+  "crashes": 0,
+  "total_sampled_frames": 9807,
+  "total_hitches_over_33ms": 0,
+  "total_invalid_gpu_timing_samples": 2,
+  "first_run": {
+    "report": "docs/release-review/m9-v527-shipping-performance.json",
+    "sha256": "9c1d6b94d3abebd1f9ea563a0aef3ce89e0723437821a28a7e23951db78e290e",
+    "artifact_report_sha256": "6e753371c5389de6b24b28be443cfba0ad6135e783b26b8c0d4fc2e7c6309d0a",
+    "sampled_frames": 5049,
+    "p95_frame_ms": 13.278374671936035,
+    "max_frame_ms": 15.19154167175293,
+    "hitches_over_33ms": 0,
+    "average_solver_step_ms": 0.5113291144371033,
+    "max_solver_step_ms": 0.8154138922691345,
+    "peak_used_physical_mb": 5281.51904296875,
+    "passed": true
+  },
+  "independent_confirmation_run": {
+    "report": "docs/release-review/m9-v527-shipping-performance-confirmation.json",
+    "sha256": "3007bd90bb27348c97c113ea0916ea33240404f7f7c87f01f7144090256edee5",
+    "artifact_report_sha256": "71d80041b9ab893d00dace6949ae5a76011b961edcfdcacfb6be9b34f895114f",
+    "sampled_frames": 4758,
+    "p95_frame_ms": 13.747124671936035,
+    "max_frame_ms": 15.044541358947754,
+    "hitches_over_33ms": 0,
+    "average_solver_step_ms": 0.6337348818778992,
+    "max_solver_step_ms": 1.0256693363189697,
+    "peak_used_physical_mb": 5291.09716796875,
+    "passed": true
+  },
+  "worst_qualified_run": {
+    "p95_frame_ms": 13.747124671936035,
+    "max_frame_ms": 15.19154167175293,
+    "p95_wall_clock_frame_ms": 16.61912727355957,
+    "max_wall_clock_frame_ms": 18.6737060546875,
+    "average_solver_step_ms": 0.6337348818778992,
+    "max_solver_step_ms": 1.0256693363189697,
+    "peak_used_physical_mb": 5291.09716796875
+  },
+  "offscreen_diagnostic": {
+    "protocol": "direct executable launch with -RenderOffScreen",
+    "run_count": 6,
+    "runs_passed": 3,
+    "runs_failed": 3,
+    "crashes": 0,
+    "total_hitches_over_33ms": 108,
+    "p95_frame_ms_range": [
+      12.568916320800781,
+      14.420958518981934
+    ],
+    "passing_run_hitch_counts": [
+      0,
+      0,
+      0
+    ],
+    "failing_run_hitch_counts": [
+      85,
+      19,
+      4
+    ],
+    "failing_run_frame_workload_max_ms": [
+      34.212249755859375,
+      28.663375854492188,
+      21.402584075927734
+    ],
+    "failing_run_wall_clock_max_ms": [
+      57.71608352661133,
+      146.4446258544922,
+      37.3476676940918
+    ],
+    "all_runs_solver_budget_passed": true,
+    "all_runs_memory_budget_passed": true,
+    "all_runs_gpu_timing_measurement_passed": true,
+    "qualified_as_release_performance": false,
+    "qualification": "The offscreen macOS presentation path is not repeatable under the zero-wall-clock-hitch gate. Failures are retained as negative evidence and are not used to qualify release performance. Their wall-clock maxima exceed the corresponding engine workload maxima, but the available aggregate report cannot prove an OS scheduling cause."
+  },
+  "qualification": "Two independently launched and cooled, normal-window packaged Shipping measurements completed normally and met frame, solver, memory, map, and GPU-timing gates with zero hitches. This player-representative Metal presentation protocol qualifies local macOS gameplay performance. The variable offscreen diagnostic path remains explicitly unqualified, and this local evidence does not satisfy external hardware, signing, human-review, approved-media, clean-source, or promotion gates."
+}

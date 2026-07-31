@@ -15,7 +15,7 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorEnvironmentAutomation.cpp",
-      "line_count": 894
+      "line_count": 909
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Commands/RaftSimEditorVerticalSliceBootstrap.cpp",
@@ -35,15 +35,79 @@
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorEnvironmentInternal.h",
-      "line_count": 2109
+      "line_count": 2530
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorNearFieldAndLighting.cpp",
       "line_count": 1884
     },
     {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderMaterial.cpp",
+      "line_count": 369
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBoulderPresentation.cpp",
+      "line_count": 101
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkBuildManifest.cpp",
+      "line_count": 182
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkCanopyAssets.cpp",
+      "line_count": 2578
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkCapture.cpp",
+      "line_count": 1503
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkDerivedBankReview.cpp",
+      "line_count": 737
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkDisplacedGravelReview.cpp",
+      "line_count": 512
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFoliageSelection.cpp",
+      "line_count": 83
+    },
+    {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkFullReach.cpp",
-      "line_count": 2588
+      "line_count": 2996
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkGroundCover.cpp",
+      "line_count": 447
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkMeatGrinderHeroReview.cpp",
+      "line_count": 656
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkMeshAuthoring.cpp",
+      "line_count": 303
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkScannedBankKitReview.cpp",
+      "line_count": 513
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkShoreCobbleDressing.cpp",
+      "line_count": 365
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkTerrainCoverage.cpp",
+      "line_count": 948
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkTerrainRelief.cpp",
+      "line_count": 147
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkWaterPresentation.cpp",
+      "line_count": 134
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSurfaceSampling.cpp",
@@ -102,24 +166,48 @@
       "line_count": 591
     },
     {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp",
+      "line_count": 298
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorConnectedWaterV6Material.cpp",
+      "line_count": 329
+    },
+    {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialInstances.cpp",
       "line_count": 612
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialTextures.cpp",
-      "line_count": 2354
+      "line_count": 2373
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorMaterialsBase.cpp",
-      "line_count": 2630
+      "line_count": 2677
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp",
+      "line_count": 703
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.cpp",
+      "line_count": 475
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorOfflineMetaHumanMaterial.h",
+      "line_count": 21
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealMaterials.cpp",
-      "line_count": 871
+      "line_count": 2999
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorPhotorealTextureAssets.cpp",
+      "line_count": 185
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorModule.cpp",
-      "line_count": 1065
+      "line_count": 1137
     },
     {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/RaftSimEditorToolRegistry.cpp",
@@ -154,13 +242,25 @@
       "line_count": 1793
     },
     {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkGroundCoverTest.cpp",
+      "line_count": 86
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkShorelinePresentationTest.cpp",
+      "line_count": 283
+    },
+    {
+      "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tests/RaftSimEditorSouthForkTerrainReliefTest.cpp",
+      "line_count": 79
+    },
+    {
       "path": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Tools/RaftSimEditorTools.cpp",
       "line_count": 1530
     }
   ],
-  "implementation_file_count": 39,
-  "implementation_line_count": 54480,
-  "registered_console_command_count": 35,
+  "implementation_file_count": 64,
+  "implementation_line_count": 69627,
+  "registered_console_command_count": 37,
   "registered_console_commands": [
     {
       "command": "RaftSim.OpenTool",
@@ -201,6 +301,16 @@
       "command": "RaftSim.CreateSouthForkFullReachEnvironment",
       "member": "CreateSouthForkFullReachEnvironmentConsoleCommand",
       "handler": "HandleCreateSouthForkFullReachEnvironmentCommand"
+    },
+    {
+      "command": "RaftSim.CaptureSouthForkFullReachEnvironment",
+      "member": "CaptureSouthForkFullReachEnvironmentConsoleCommand",
+      "handler": "HandleCaptureSouthForkFullReachEnvironmentCommand"
+    },
+    {
+      "command": "RaftSim.RefreshSouthForkGeneratedCanopyAssets",
+      "member": "RefreshSouthForkGeneratedCanopyAssetsConsoleCommand",
+      "handler": "HandleRefreshSouthForkGeneratedCanopyAssetsCommand"
     },
     {
       "command": "RaftSim.CaptureZambeziCliffComparison",
@@ -343,6 +453,7 @@
     "RaftSimCaptureFutaleufuDenseCanopyComparison",
     "RaftSimCaptureFutaleufuWorldStableCanopyComparison",
     "RaftSimCapturePhotorealEnvironmentPreviews",
+    "RaftSimCaptureSouthForkFullReachEnvironment",
     "RaftSimCaptureZambeziBatokaBasaltCorridorComparison",
     "RaftSimCaptureZambeziBatokaTerrainIntegratedComparison",
     "RaftSimCaptureZambeziBatokaVisualMorphologyComparison",
@@ -353,18 +464,53 @@
     "RaftSimCreateFutaleufuCordilleraCypressVolumetricNearReview",
     "RaftSimCreateLandscapeImportCandidateMaps",
     "RaftSimCreatePhotorealEnvironmentPreviewMaps",
+    "RaftSimCreatePhotorealRiverWaterMaterial",
     "RaftSimCreateSouthForkFullReachEnvironment",
+    "RaftSimCreateWaterVfxMaterial",
     "RaftSimCreateZambeziBatokaBasaltFamily",
+    "RaftSimDerivedBankMorphologyReview",
+    "RaftSimDiagnosticHideSouthForkBaseWater",
+    "RaftSimDiagnosticHideSouthForkDetailedDressing",
+    "RaftSimDiagnosticHideSouthForkDetailedRocks",
     "RaftSimDiagnosticHideSouthForkFarField",
     "RaftSimDiagnosticHideSouthForkWater",
+    "RaftSimDiagnosticOpaqueSouthForkSolverFoam",
+    "RaftSimDisplacedGravelBarReview",
+    "RaftSimEmbeddedBankRockReview",
+    "RaftSimEnableSouthForkClouds",
     "RaftSimExitAfterEnvironmentAutomation",
     "RaftSimExitAfterPveGeneration",
+    "RaftSimGuideFeatureBreakingReliefReview",
+    "RaftSimLiveOakBranchAtlasV2ExpandedReview",
+    "RaftSimLiveOakBranchAtlasV2Review",
+    "RaftSimLiveOakCrownFamilyV3Review",
+    "RaftSimLiveOakDenseWoodyV2Review",
+    "RaftSimLiveOakIslandTreeMaterialV1Review",
+    "RaftSimLiveOakIslandTreeMorphologyReview",
+    "RaftSimLiveOakWoodyCanopyV1Review",
+    "RaftSimMeatGrinderHeroReview",
+    "RaftSimOnlyLiveOakBranchAtlasV2Review",
+    "RaftSimOnlyLiveOakCrownFamilyV3Review",
+    "RaftSimOnlyLiveOakDenseWoodyV2Review",
+    "RaftSimOnlyLiveOakIslandTreeMaterialV1Review",
+    "RaftSimOnlyLiveOakWoodyCanopyV1Review",
+    "RaftSimPhotographicSouthForkCapture",
+    "RaftSimPolyHavenShoreRockReview",
+    "RaftSimRefinedGuideFeatureFoamReview",
     "RaftSimReuseSouthForkDetailedTerrainMeshes",
     "RaftSimReuseSouthForkFarFieldMeshes",
     "RaftSimReuseSouthForkFullReachMeshes",
+    "RaftSimReuseSouthForkMaterials",
     "RaftSimReuseSouthForkWaterMeshes",
+    "RaftSimRiverSmallRocksReview",
+    "RaftSimScannedBankKitReview",
     "RaftSimSkipPhotorealFlowVariantCaptures",
-    "RaftSimUseSouthForkVertexMacro"
+    "RaftSimSolverDerivedAerationReview",
+    "RaftSimSolverGatedBreakingReliefReview",
+    "RaftSimSourceHlodExclusiveWaterReview",
+    "RaftSimTerrainDetailV2Review",
+    "RaftSimUseSouthForkVertexMacro",
+    "RaftSimVolumetricBroadleafReviewCapture"
   ],
   "river_build_targets": [
     {

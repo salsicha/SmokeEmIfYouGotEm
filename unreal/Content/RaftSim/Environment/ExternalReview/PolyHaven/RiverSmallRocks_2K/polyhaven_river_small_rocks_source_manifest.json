@@ -1,0 +1,74 @@
+{
+  "schema": "raftsim.external_review_asset_source.v1",
+  "asset_id": "polyhaven_river_small_rocks_2k",
+  "asset_name": "River Small Rocks",
+  "asset_type": "texture_and_displacement",
+  "authors": ["Rob Tuytel", "Rico Cilliers"],
+  "publisher": "Poly Haven",
+  "product_page": "https://polyhaven.com/a/river_small_rocks",
+  "official_files_api": "https://api.polyhaven.com/files/river_small_rocks",
+  "official_info_api": "https://api.polyhaven.com/info/river_small_rocks",
+  "license": {
+    "name": "CC0 1.0 Universal",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "publisher_label": "CC0 License",
+    "commercial_use": true,
+    "attribution_required": false,
+    "redistribution_allowed": true
+  },
+  "publisher_metadata": {
+    "published_unix": 1648684800,
+    "dimensions_mm": [2900.0000953674316, 2900.0003337860107],
+    "maximum_resolution_px": [16384, 16384],
+    "category": "Ground & Terrain/Gravel & Pebbles/River Pebbles",
+    "description": "Free 16K texture of rough, uneven river pebbles and broken rocks - scattered stones in compacted soil with weathered, muted tones and high micro-detail."
+  },
+  "acquisition": {
+    "date_utc": "2026-07-30",
+    "resolution": "2k",
+    "transport": "official Poly Haven CDN URLs returned by the official Files API",
+    "raw_payloads_committed": false,
+    "temporary_source_root": "/private/tmp/raftsim_river_small_rocks_2k.6Qwdpy"
+  },
+  "files": [
+    {
+      "relative_path": "river_small_rocks_diff_2k.jpg",
+      "bytes": 3908784,
+      "official_md5": "5e92928b04ca9484c3923d40f18777aa",
+      "sha256": "656a20860f5960cc0f442dd425bfe4607052ab1749efdde35d60c5df9639beac",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/river_small_rocks/river_small_rocks_diff_2k.jpg"
+    },
+    {
+      "relative_path": "river_small_rocks_nor_gl_2k.jpg",
+      "bytes": 4999539,
+      "official_md5": "5e9760f36a646b82629f2a69449dd49d",
+      "sha256": "4468fc6354767fd959b74e4cb7095d061e533268189c2336e03cb0be1bddc250",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/river_small_rocks/river_small_rocks_nor_gl_2k.jpg"
+    },
+    {
+      "relative_path": "river_small_rocks_arm_2k.jpg",
+      "bytes": 3371627,
+      "official_md5": "439eb39a6db2b0001d38408d3476f01e",
+      "sha256": "073109b53a7b909c4eb705546c03b853c7bcaac92c8e6803ed0382f377e4184f",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/2k/river_small_rocks/river_small_rocks_arm_2k.jpg"
+    },
+    {
+      "relative_path": "river_small_rocks_disp_2k.png",
+      "bytes": 7757746,
+      "official_md5": "6fe1428e2d0cdfd6a8465dde2e688dc9",
+      "sha256": "32216ca0d31a15489cb166afff2756ff90c6cac77bb6af0c30bfdebbe2c676bc",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Textures/png/2k/river_small_rocks/river_small_rocks_disp_2k.png"
+    }
+  ],
+  "review_boundaries": {
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K",
+    "review_flag": "RaftSimRiverSmallRocksReview",
+    "physical_repeat_m": 2.9,
+    "displacement_geometry_review_only": true,
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "navigation_changed": false,
+    "production_promoted": false,
+    "human_visual_acceptance_required": true
+  }
+}

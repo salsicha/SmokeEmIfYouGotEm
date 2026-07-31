@@ -200,7 +200,8 @@ public:
     bool ConfigureRiverWindow(
         const FString& CookedFieldsManifestDir, const FString& BandId,
         FVector2D WindowCenterM, FVector2D WindowExtentM,
-        float RoughnessManning = 0.041f);
+        float RoughnessManning = 0.041f,
+        bool bRecenterHydraulicCrux = true);
 
     /**
      * Load a globally stationed river crop and, when a live crop already
@@ -340,6 +341,16 @@ private:
 
     TArray<FRiverCoordinatePoint> RiverCoordinatePoints;
     TMap<FIntPoint, TArray<int32>> RiverSpatialHash;
+    /**
+     * Consecutive raft probes are only a few metres apart. Preserve the exact
+     * ruled-corridor inverse, but seed it from the previous segment instead of
+     * rebuilding a several-hundred-segment broad phase for every tube probe.
+     * Mutable is safe here because all runtime water sampling is game-thread
+     * authority; distant queries automatically fall back to the spatial hash.
+     */
+    mutable int32 LastWorldToRiverSegment = INDEX_NONE;
+    mutable FVector2D LastWorldToRiverPositionM = FVector2D::ZeroVector;
+    mutable bool bHasLastWorldToRiverQuery = false;
     float RiverVerticalDatumM = 0.0f;
     FString RiverCoordinateMapPath;
 

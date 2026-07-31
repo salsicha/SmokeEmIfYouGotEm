@@ -48,7 +48,7 @@ physics/
 
 ## Physics Backend
 
-Project Chrono is the selected external backend for long-term raft and moving-water simulation, including the full Unreal Engine runtime, because it combines multibody dynamics, collision/contact, flexible parts, Python bindings, and fluid-solid interaction support. See [Backend Evaluation](docs/backend-evaluation.md).
+Project Chrono is the independent compliant-reference backend for D6 validation and optional FSI research. The shipping Unreal runtime uses the custom reduced water/raft authority described in `docs/chrono-runtime-boundary.md`; PyChrono is not a packaged-game dependency. Chrono remains valuable because it supplies independently executed multibody and compliant-contact systems instead of reusing the Python reference or its custom C++ port. See [Backend Evaluation](docs/backend-evaluation.md).
 
 The integration is optional and lazy:
 
@@ -68,7 +68,18 @@ chrono = create_backend("chrono")
 simulation = chrono.create_simulation()  # raises if PyChrono is not installed
 ```
 
-Install PyChrono from the Project Chrono distribution when using the Python Chrono backend. The pure Python backend remains available without native dependencies. The full Unreal game should use native C++ Chrono integration rather than PyChrono.
+Install PyChrono from the Project Chrono distribution when using the optional backend. The normal Python suite and shipping game do not require it.
+
+Run the seven independent D6 compliant fixtures from an isolated PyChrono environment with:
+
+```bash
+cd ..
+PYTHONPATH=physics/src /path/to/pychrono/bin/python \
+  physics/src/raftsim/examples/run_flexible_raft_d6_project_chrono.py \
+  --repo-root .
+```
+
+The runner consumes only `flexible_raft_d6_fixture_input_package.json`, repeats every fixture, and writes measured sidecar plus hashed replay evidence under `physics/reports/d6/compliant/`. Merge both target sidecars and regenerate the comparison before review; never substitute the D1-D5 Python reference or the custom C++ translation diagnostic for this run.
 
 ## Legacy 2D Examples
 

@@ -1,0 +1,156 @@
+{
+  "schema": "raftsim.m9.all_species_connected_crown_review.v1",
+  "reviewed_utc": "2026-07-29T12:27:53Z",
+  "candidate": "m9_all_species_connected_crown_v140",
+  "parent": "m9_live_oak_connected_crown_v139",
+  "status": "retained_active_technical_fallback_photoreal_and_release_promotion_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "profiles": [
+      {
+        "species": "Pinus ponderosa",
+        "mesh_profiles": 3,
+        "source_atlas": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_PonderosaPine_BranchAtlas_ChromaV1.png",
+        "source_atlas_sha256": "c67b9743c777d6d5b721568b81ad77d3fbf13d54d18165d5a1c54a54fce8884d",
+        "derived_map_sha256": {
+          "albedo_opacity": "e54434991cd525336fe756ec2f081fde8d308967c34c4806bd82972b51a15612",
+          "normal": "b739e91f3f56683f39757dcc3bb18af9225cb16a968f96210de7558f6a9ef44e",
+          "ao_roughness_subsurface": "2ad6593944a4d92d95835c6c0b103d36070475dcffedccdef34bbb1db124159f"
+        }
+      },
+      {
+        "species": "Alnus rhombifolia",
+        "mesh_profiles": 1,
+        "source_atlas": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_WhiteAlder_BranchAtlas_ChromaV1.png",
+        "source_atlas_sha256": "cd30119dded256dbfbb3617eb829d95bbc933fedc99634ca53bab833cc9dfe36",
+        "derived_map_sha256": {
+          "albedo_opacity": "d6514d6461d3fa67ee22c10f187bce5526b92d2b17e58c299549f4382090c5d5",
+          "normal": "326f241146119e909f9d6eabbf45c0b1bb8dd799644773d71ebcc572b35e67d1",
+          "ao_roughness_subsurface": "567841b2eb5c3a2eed1c88fa2600baadb70d37100b57e10a5ddefc6dafbde7a2"
+        }
+      },
+      {
+        "species": "Ceanothus integerrimus",
+        "mesh_profiles": 1,
+        "source_atlas": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_Deerbrush_BranchAtlas_ChromaV1.png",
+        "source_atlas_sha256": "bdd98c195f6b4903a6fddcabe729279bd61d32a8de71048d663e284b0d13f3bb",
+        "derived_map_sha256": {
+          "albedo_opacity": "c350f6023db544967ce9c0f3d45519f04ae0a4d5db6df7e2c79ba4f9256e492e",
+          "normal": "125af7c57bc3bb4957197207ffcc999c05fd8e170c850f6d53ddb3fb610b0d42",
+          "ao_roughness_subsurface": "a3079b8d1c67443bdbbcb0f1824a8adbfea7bcbdec97ce75fe75e2a11589cc43"
+        }
+      }
+    ],
+    "retained_v139_species": "Quercus wislizeni",
+    "fidelity_boundary": "project-owned visual branch-cluster studies; not surveyed individual-tree claims",
+    "derived_manifest": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/additional_canopy_branch_atlases_v1_manifest.json",
+    "derived_manifest_sha256": "3f9f20ebae733e3aa72f2944a90239e7c7ae439819e4b0eacfe8f4ee71cbb275",
+    "atlas_layout": "4x4 with twelve occupied branch-spray tiles and four reserved transparent tiles per species",
+    "alpha_derivation": "deterministic blue-dominance matte, bounded despill, independent 4x3 source-cell normalization, and cell-bounded transparent-RGB mip padding",
+    "connected_crown_profiles": 6,
+    "core_planes_per_mesh": 2,
+    "core_triangles_per_mesh": 4,
+    "branch_cards_per_mesh": 12,
+    "branch_triangles_per_mesh": 24,
+    "total_vertices_per_mesh": 56,
+    "total_triangles_per_mesh": 28,
+    "material_slots_per_mesh": 2,
+    "collision": "disabled",
+    "ecology_classification_changed": false,
+    "instance_placement_changed": false,
+    "hydraulics_changed": false
+  },
+  "native_validation": {
+    "editor_build": "passed",
+    "focused_python": "6 passed, 23 deselected",
+    "asset_regeneration_log": "/private/tmp/raftsim_m9_v140_all_species_connected_crown_assets.log",
+    "asset_regeneration_log_sha256": "f9babd0d27010b4607296e0279c13780c8968ec89988cf7996c1596607d0e6c3",
+    "validated_canopy_asset_count": 34,
+    "full_reach_regeneration_log": "/private/tmp/raftsim_m9_v140_all_species_connected_crown_full_reach.log",
+    "full_reach_regeneration_log_sha256": "00688585f29c4e3ba586dd2fbda8d53f194e0ac658636441163fb11f95c8a543",
+    "validated_full_reach_asset_count": 63,
+    "stable_world_partition_actor_identities": 176,
+    "loaded_world_partition_actor_references": 177,
+    "capture_log": "/private/tmp/raftsim_m9_v140_all_species_connected_crown_capture.log",
+    "capture_log_sha256": "822b380aba635c6ead4a7893d74987f5f9ec4bf6633d243573d6e11a8bff2c09",
+    "fixed_view_count": 5,
+    "capture_resolution": [
+      1280,
+      720
+    ],
+    "capture_sha256": {
+      "chili_bar_launch_downstream": "bc66b228a92a9f04ab3cb22b40703e43a23c63e9d21e09883cd265cadcdbc4d5",
+      "meat_grinder_guide_eye": "cf1922a220d1a8c3762638f9fd6d5d79eabc66b987048baf790aee360041a772",
+      "troublemaker_approach": "dea20fca1bcee410c81599d1f45daa935e04f8f9bae614513ee51e6328963d59",
+      "coloma_bridge_context": "5645fbd0f39202896bb444185822f6c267ce72283a9084233f228a830d7075aa",
+      "salmon_falls_takeout": "f420921156d8a755701fae2506044bf90ab8acf39774ca2eff88c691346a6fc0"
+    },
+    "representative_pixel_delta_from_v139": {
+      "troublemaker_approach": {
+        "changed_pixel_count": 44425,
+        "changed_pixel_fraction": 0.048204,
+        "mean_absolute_rgb": [
+          0.6853,
+          0.7324,
+          0.5318
+        ]
+      },
+      "coloma_bridge_context": {
+        "changed_pixel_count": 31853,
+        "changed_pixel_fraction": 0.034563,
+        "mean_absolute_rgb": [
+          0.6007,
+          0.6542,
+          0.5384
+        ]
+      }
+    },
+    "preserved_representative_captures": {
+      "chili_bar": "docs/environment-captures/south_fork_full_reach/m9_all_species_connected_crown_v140_chili_bar.png",
+      "troublemaker": "docs/environment-captures/south_fork_full_reach/m9_all_species_connected_crown_v140_troublemaker.png",
+      "coloma": "docs/environment-captures/south_fork_full_reach/m9_all_species_connected_crown_v140_coloma.png"
+    }
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v140_hlod_build.log",
+    "fresh_build_log_sha256": "b98a3c28ac5a715e4e5fcf600b8e6fb9b91c2bccf026bca6a66c080600e56526",
+    "fresh_build_actor_count": 24,
+    "fresh_build_modified_and_saved_actor_count": 24,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v140_hlod_repeat_1.log",
+    "settled_repeat_log_sha256": "58d93d3b7f59b914abf900314e9b6b1afa53160293afaf1e78e3b6d5fc3b90b7",
+    "settled_repeat_actor_count": 24,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "errors": 0,
+    "warnings": 2,
+    "warning_scope": "unchanged local Zen sponsor-capacity and engine enum-string warnings",
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "03fcbee0c10ae998890c604a4a2b7c5ad8708ac99d774758e35f8bf0715d92ec",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "77e5fb7e269d4aea7a6d9f1c79e21da596191bfb2688c561ed480856e1164a67"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "All six active canopy profiles now use a bounded connected crown with species-specific broad-tree, columnar-pine, or shrub card placement rather than leaving five profiles as only two full-tree planes.",
+      "No blue chroma fringe, bright mip halo, detached card field, material failure, new collision artifact, or obvious overdraw clutter was observed in the five fixed views.",
+      "The v140 delta remains restrained: representative views changed 3.46 to 4.82 percent of pixels with sub-one-code-value mean absolute RGB change."
+    ],
+    "open": [
+      "The retained full-tree core planes and sparse branch cards remain recognizable as impostor geometry at guide-eye distance.",
+      "Near stands remain dark and repetitive, distant trees remain sparse or card-like, and several generated silhouettes read as blobs rather than botanically credible crowns.",
+      "Water lacks whitewater volume and translucency; shoreline transitions are abrupt; terrain materials remain broad and synthetic.",
+      "Rocks, raft, characters, equipment, motion, and final lighting remain below the target photoreal presentation.",
+      "Named art, rafting-guide, geospatial, legal, and product-owner review remains pending."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "all_canopy_profiles_have_connected_crown_depth": true,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "decision": "Retain v140's twelve-card connected crowns for all six canopy profiles as active M9 technical fallbacks. Keep photoreal, named-review, release-media, M9 completion, commit, and push gates fail-closed."
+}

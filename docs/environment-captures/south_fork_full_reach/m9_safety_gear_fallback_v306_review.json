@@ -1,0 +1,57 @@
+{
+  "schema": "raftsim.m9.safety_gear_fallback_visual_review.v1",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "review_scope": "Renderer-backed close-range review of the project-owned Type-V rescue-PFD and river-helmet upgrade over five packaged CC0 guide and crew bodies.",
+  "source_geometry": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+  "source_textile_manifest": "unreal/SourceArt/RaftSim/Equipment/GeneratedTextiles/generated_textile_pbr_manifest.json",
+  "license": "project_owned_and_cc0_inputs",
+  "material_authoring": {
+    "run": "v302",
+    "utility": "scripts/refresh_pfd_material_parameters.py",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_pfd_parameter_refresh_v302_20260726.log",
+    "material_count": 4,
+    "ripstop_uv_repeats_per_panel": 1.0,
+    "normal_strength": 0.08,
+    "all_expected_parameters_found": true,
+    "all_materials_saved": true
+  },
+  "renderer_evidence": {
+    "run": "v306",
+    "test": "RaftSim.M5.RuntimeRescueLoop",
+    "result": "Success",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m5_safety_gear_full_v306_20260726.log",
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_safety_gear_fallback_v306_rejected.png",
+    "capture_sha256": "bbb1adffc53b6bca8a8d69b53abbf3fec199f65040b6e2eb3450aa59ac1fc790",
+    "capture_width": 1280,
+    "capture_height": 1888,
+    "human_approved": false
+  },
+  "automation_evidence": {
+    "run": "v306",
+    "suite": "RaftSim.M5",
+    "passed": 4,
+    "failed": 0,
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m5_safety_gear_full_v306_20260726.log",
+    "assertions_include": [
+      "substantial foam, webbing, buckle, helmet-shell, rim, and retention geometry exists on every avatar",
+      "five packaged CC0 bodies and zero Manny fallbacks remain active",
+      "aimed rescue paths, flexible fabric condition, and runtime rescue loop remain functional",
+      "all crew visual transforms remain finite"
+    ]
+  },
+  "accepted_findings": [
+    "The PFD now has tapered front flotation cells, a high back, fitted side wings, shoulder foam, a centre closure, two chest-adjustment runs, multiple buckles, and a lash tab instead of two isolated capsule-like pads.",
+    "PFD textile frequency is calibrated to an approximately 3 mm ripstop grid over the 30 cm panel scale, with reduced normal amplitude to remove the rejected sub-millimetre guide-camera shimmer.",
+    "The river helmet now has an open brow-length shell, temple and occipital coverage, an aligned edge rim, chin retention, top vent inserts, and separate charcoal crew versus brown guide material selection.",
+    "The equipment remains deterministic, project-owned, draw-call batched by material layer, compatible with all rescue poses, and independent of the D4-authoritative flexible-raft deformation path."
+  ],
+  "rejected_findings": [
+    "The PFD and helmet are still parametric procedural geometry rather than scanned or artist-authored production PPE, and their close-range silhouette/body integration remains visibly synthetic.",
+    "The CC0 heads, generic wetsuits, omitted hair, and limited facial nuance remain below final photoreal character quality.",
+    "The procedural raft and flat test-tank background remain unsuitable for marketing or store media.",
+    "No named art director, qualified guide, product owner, legal reviewer, or release-media reviewer has approved this frame."
+  ],
+  "decision": "Retain the upgraded safety gear as the deterministic playable fallback and production-body overlay. Do not close the M9 photoreal character, PPE, raft-art, named-review, or release-media gates. Replace or explicitly approve the assets through named review, then repeat this renderer test.",
+  "named_art_reviewer": null,
+  "reviewed_utc": "2026-07-26T19:43:00Z"
+}

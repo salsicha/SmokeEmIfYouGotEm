@@ -1,0 +1,110 @@
+{
+  "schema": "raftsim.m9.production_river_boulder_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "named_geology_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_river_boulder.py",
+    "importer": "unreal/Scripts/import_production_river_boulder.py",
+    "manifest": "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/production_river_boulder_manifest.json",
+    "manifest_sha256": "2a150a77272413d5b04121dfbc70058b845cc0b8a15de9cba864ada71f7c8588",
+    "fbx": "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/SM_RaftSim_ProductionRiverBoulder.fbx",
+    "fbx_sha256": "b1825231cfaeb85854aa6de3d0e9ccf718c1b648a1de71bfcca9bc73c0a537d3",
+    "blend": "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/SM_RaftSim_ProductionRiverBoulder.blend",
+    "blend_sha256": "e6f6a578884dbbee95bbcd0c79bf01e6c4258f0664d3931c9498127ea9c327a9",
+    "external_asset_inputs": [],
+    "geology_claim": "Appearance analog only; not represented as site-specific South Fork geology."
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Environment/Rocks/Production/SM_RaftSim_ProductionRiverBoulder",
+    "uasset_sha256": "67a31daee95b689c37a7f53ea5d4f5fd3f0352294a35850e16d498cb4c811fa7",
+    "dimensions_cm": [
+      235.8206,
+      214.507,
+      141.9449
+    ],
+    "authored_lod0_triangles": 81920,
+    "nanite_fallback_triangles": 1766,
+    "nanite_enabled": true,
+    "material_slot_count": 1,
+    "material": "/Game/RaftSim/Materials/M_RaftSim_ProductionRiverBoulder",
+    "material_uasset_sha256": "ab8cb61cd27fe8929085cd79b70adf179b616f3e1edc684d792c7ce3f63cf1a3",
+    "import_report": "unreal/Saved/RaftSimValidation/m9/production-river-boulder.json",
+    "import_report_sha256": "9bb4427b8044b242ab3d702477d34496ea738c4bdd264c4f420879f0ab4b9e0b",
+    "collision_enabled": false,
+    "runtime_boundary": "Collisionless fitted visual only; D4 obstacle radius, friction, contact, wrap and pin authority remain native."
+  },
+  "construction": {
+    "closed_watertight_shells": 1,
+    "localized_physical_fracture_bands": 3,
+    "water_worn_facet_fields": 2,
+    "contact_envelope_fraction": 0.96,
+    "procedural_fallback_retained": true,
+    "reviewed_scan_diagnostic_remains_quarantined": true
+  },
+  "automation": {
+    "suite": "RaftSim.M5",
+    "succeeded": 4,
+    "succeeded_with_warnings": 0,
+    "failed": 0,
+    "not_run": 0,
+    "report": "unreal/Saved/Automation/M9B3V48BreakingLipM5Exact/index.json",
+    "report_sha256": "6f0af8526f279d89919bc3a84293b6eef5d01b2e372ff6a11648383b69b1efa7",
+    "warnings": []
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v20_production_boulder_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "1e78ccac76d83060bf6f84312f237c82c2265c2cbe0dea271170b6abe53ecdfd",
+    "width": 1470,
+    "height": 956,
+    "production_component_visible": true,
+    "reviewed_scan_component_visible": false,
+    "procedural_fallback_section_visible": false,
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "spray": 0.932,
+    "mist": 0.318,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "visible_contact_patch_triangles": 96,
+    "instance_counts": {
+      "fine_spray": 40,
+      "mist": 1,
+      "contact_foam": 9,
+      "droplets": 68
+    }
+  },
+  "rejected_iterations": [
+    "v14 imported alpha selected an incompatible source branch and rendered chalk-white.",
+    "v15-v17 isolated the source selector but retained crown-spanning fracture petals and uncached white shader fallback frames.",
+    "v18-v19 localized the fractures and darkened the dedicated material but were captured before the new shader permutation was warm.",
+    "v20 is the retained cached-shader technical frame.",
+    "v40 tested bounded rights-reviewed normal/roughness microdetail without source diffuse, rendered as a pale fallback-like surface, and was fully removed; a matched restoration capture and exact M5 rerun verify the retained v36 functional renderer state."
+  ],
+  "accepted": [
+    "A project-owned 81,920-triangle closed shell replaces the 1,632-triangle runtime presentation shell when the cooked production asset is present.",
+    "The static mesh is collisionless, fitted to 96 percent of the existing contact radius and does not change D4 radius, friction, contact, wrap or pin authority.",
+    "The ordinary production path selects its dedicated dark wet-mineral material while the reviewed CC0 scan remains an explicit diagnostic only.",
+    "The previous deterministic procedural shell remains a complete load-failure fallback."
+  ],
+  "rejected_or_open": [
+    "Large-scale mineral mottling and residual broad facets remain visibly procedural at hero distance and are not final photoreal rock art.",
+    "The geometry is an appearance analog, not measured site-specific Meat Grinder geology.",
+    "Water, foam and aerosol, crew, raft highlights, shoreline, terrain, foliage and lighting remain below the requested photoreal bar.",
+    "No named guide, art or geology reviewer has approved the boulder silhouette, material or site fidelity.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

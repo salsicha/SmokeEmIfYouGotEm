@@ -1,0 +1,70 @@
+{
+  "schema": "raftsim.m9.renderer_review.v1",
+  "capture_id": "meat_grinder_d4_wrap_v570",
+  "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v570_head_helmet_alignment_rejected.png",
+  "sha256": "bb3004464979dc1c36fb9e42fc433aa173ef3d6e7d979d1fb023d44fdac8d37a",
+  "width": 1280,
+  "height": 720,
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "station_m": 960.0,
+  "automation_command": "Scalability 2,r.Lumen.Reflections.Allow 1,RaftSim.CaptureRapidWrapTest M9_MeatGrinderD4Wrap_v570_head_helmet_alignment 960 wrap_hero",
+  "source_true_contact": {
+    "live_water_depth_m": 0.412,
+    "live_water_speed_mps": 1.778,
+    "contact_count": 4,
+    "wrapping_contact_count": 3,
+    "pinned_contact_count": 1,
+    "recovering_contact_count": 1,
+    "maximum_tube_indentation_m": 0.220,
+    "runtime_wetness": 0.998,
+    "spray": 0.919,
+    "mist": 0.315,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "spray_instances": 39,
+    "mist_instances": 1,
+    "impact_foam_instances": 9,
+    "droplet_instances": 68,
+    "capture_command_writes_visual_deformation": false,
+    "d4_is_only_collision_authority": true
+  },
+  "coordinated_high_side_pose_baseline": {
+    "shoulders_hips_knees_and_feet_follow_torso": true,
+    "progressive_foot_planting_retained": true,
+    "crew_command_authority_changed": false,
+    "reaction_timing_changed": false,
+    "d4_weight_action_changed": false,
+    "contact_or_rescue_state_changed": false
+  },
+  "production_head_helmet_alignment_upgrade": {
+    "terminal_head_bone_uses_reference_up_axis": true,
+    "head_and_helmet_follow_same_high_side_orientation": true,
+    "production_helmet_outer_shell_scale": 1.18,
+    "production_helmet_center_offset_cm": [
+      3.0,
+      0.0,
+      -3.0
+    ],
+    "procedural_fallback_helmet_scale_changed": false,
+    "procedural_fallback_helmet_center_offset_changed": false,
+    "crew_command_d4_contact_or_rescue_authority_changed": false,
+    "m5_renderer_tests_passed": 4,
+    "m5_renderer_report": "/private/tmp/raftsim_m9_v571_m5.log"
+  },
+  "procedural_boulder_baseline": {
+    "deterministic_multiharmonic_radial_profile": true,
+    "shouldered_crown_profile_exponent": 0.72,
+    "project_owned_procedural_mineral_material_branch": true,
+    "reviewed_scan_selected_by_default": false,
+    "procedural_mesh_collision_enabled": false,
+    "material_asset": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder",
+    "material_asset_sha256": "a9576c6036b5e0bef5275565c09c4b72400bc50e8741e7532e42b3e6a82f1266"
+  },
+  "technical_deformation_evidence_accepted": true,
+  "production_head_helmet_alignment_technical_upgrade_accepted": true,
+  "renderer_preset_accepted": true,
+  "photoreal_art_accepted": false,
+  "marketing_approved": false,
+  "human_approved": false,
+  "decision": "Accept v570 as a bounded production-character adapter correction over v559: a terminal head bone now derives orientation from its reference up axis, so the rendered head follows the same high-side rotation as the project-owned helmet; a CC0-only shell allowance keeps more of the helmet outside the scalp without changing the procedural fallback. D4 contact, wrap, pin, recovery, indentation, wetness, crew command, weight action, and rescue authority remain unchanged. Reject the frame for photoreal, marketing, store, press, and human approval because facial anatomy, hands, helmet/PFD fit, clothing, raft, boulder, broad water, lighting, shoreline, spray, and terrain remain visibly synthetic or unfinished."
+}

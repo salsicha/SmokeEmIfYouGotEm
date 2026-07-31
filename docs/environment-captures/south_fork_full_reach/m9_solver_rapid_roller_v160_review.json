@@ -1,0 +1,130 @@
+{
+  "schema": "raftsim.m9.solver_rapid_roller_review.v1",
+  "reviewed_utc": "2026-07-29T15:21:29Z",
+  "candidate_range": "v148-v160",
+  "status": "particle_roller_visual_rejected_architecture_retained_fallback_restored",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "purpose": "Replace the retained translucent hydraulic-roller dome with a bounded, project-owned Niagara presentation driven only by live solver breaking sites, while preserving a safe non-colliding fallback when particle assets are unavailable.",
+  "authority_contract": {
+    "breaking_site_source": "ARaftSimWaterSurfaceActor::GetBreakingSites",
+    "presentation_consumer": "ARaftSimWaterVfxActor::RefreshRapidAerosol",
+    "collision_enabled": false,
+    "affects_navigation": false,
+    "water_sampling_changed": false,
+    "solver_fields_changed": false,
+    "buoyancy_d3_d4_flip_wrap_pin_damage_rescue_or_progression_changed": false,
+    "bounded_rapid_roller_component_pool": 8,
+    "total_production_niagara_components": 19,
+    "mesh_fallback_disabled_only_when_all_production_niagara_assets_load": true
+  },
+  "retained_changes": {
+    "rapid_roller_asset": "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidRoller.uasset",
+    "rapid_roller_asset_sha256": "7fd9b6563d4c699031940a02046a133351bac21f22e1193066ee7c00f6bcc0d6",
+    "runtime_vfx_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp",
+    "runtime_vfx_source_sha256": "783ee5f5cef5dd9539ab02678081c40566596f03a24a86a29630a3c1c42859e3",
+    "runtime_vfx_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h",
+    "runtime_vfx_header_sha256": "597f4b0f98ea76b0f18555bf1c19b0e09d3c61dfc148f634144b84e80739df2c",
+    "niagara_authoring_source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorNiagaraWaterVfx.cpp",
+    "niagara_authoring_source_sha256": "e507ec1bec820c32d2f218dbc1ba587fee68c9513ea8dc69a97c60fcef0f4d7b",
+    "niagara_authoring_script": "unreal/Scripts/create_niagara_water_vfx.py",
+    "niagara_authoring_script_sha256": "568fb3c09275788a31c8918c6ac421b27d2eee323c17681d727ef1463791461c",
+    "capture_diagnostics": [
+      "nobreakinglip",
+      "nobreakingroller",
+      "norapidaerosol",
+      "norapidroller"
+    ],
+    "capture_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+    "capture_source_sha256": "6a333186931ddf77e7367ebf6313230ea805de3febfd8fb36853b3fef14560ea",
+    "diagnostic_visibility_reapplied_in_exact_screenshot_callback": true
+  },
+  "restored_fallback": {
+    "runtime_surface": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+    "runtime_surface_sha256": "62db0eff0118fbaa9e355c9023ff48cb82c3a63038970b073a84cbf87ba5b805",
+    "runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+    "runtime_header_sha256": "1197323f31164f253767ad17340612bfb75cfd3ffed80429c6bb0e842eb1c1cc",
+    "topology": "three nested alpha-perforated shells",
+    "maximum_triangles_at_24_sites": 36288,
+    "reason": "The v148-v154 disconnected packet topology removed the dome but exposed obvious translucent horizontal cards. The exact bounded v121 topology is therefore retained as the missing-asset fallback, while the ready production path disables its rendering."
+  },
+  "evidence": {
+    "v154_disconnected_packet_combined": {
+      "capture": "m9_breaking_circulation_packets_v154_rejected.png",
+      "capture_sha256": "0f7a094f7a8ceee739c16a42f64b63f78d36b86ff5bebe2a3a36b2d3363b5a99",
+      "log": "/private/tmp/raftsim_m9_v154_breaking_circulation_packets_capture.log",
+      "log_sha256": "d03d6dea14f10ad305494b576042fab16c892b89581f5380b241d995f4fc198b",
+      "decision": "rejected and removed: disconnected shell fragments read as translucent horizontal cards and ghost bands"
+    },
+    "v157_initial_rapid_roller_isolation": {
+      "capture": "m9_rapid_roller_only_v157_rejected.png",
+      "capture_sha256": "c9e086c6e117f0f2844e8499642f3884dd57f843145c574e5f3d41a8a211373e",
+      "log": "/private/tmp/raftsim_m9_v157_rapid_roller_only_capture.log",
+      "log_sha256": "c6a16d18822e04c6ddb6acb2fbcf39e6bda3d784bb09aa8b7acd252bf8a84054",
+      "hidden_rapid_aerosol_components": 8,
+      "hidden_breaking_lip_components": 1,
+      "active_rapid_roller_emitters": 1,
+      "decision": "rejected: sparse isolated flakes do not form readable hydraulic volume"
+    },
+    "v158_rapid_aerosol_isolation": {
+      "capture": "m9_rapid_aerosol_only_v158.png",
+      "capture_sha256": "5ab22b28d810dd6c4dd731f26b41840bcbf62da8642a7b9cf9627fc746c364cc",
+      "log": "/private/tmp/raftsim_m9_v158_rapid_aerosol_only_capture.log",
+      "log_sha256": "05579edb8c8e4521a78150055744b09573f28982ccc6d6d5687a28cfbb204861",
+      "hidden_rapid_roller_components": 8,
+      "hidden_breaking_lip_components": 1,
+      "decision": "diagnostic accepted: proves the broad visible plume is produced by RapidAerosol rather than RapidRoller"
+    },
+    "v159_tuned_rapid_roller_isolation": {
+      "capture": "m9_rapid_roller_tuned_only_v159_rejected.png",
+      "capture_sha256": "03ff7db38dcd06f53db32582443f2c662cab22b15021cbce73ff236abd82baae",
+      "log": "/private/tmp/raftsim_m9_v159_rapid_roller_tuned_only_capture.log",
+      "log_sha256": "b9cf30e9ad4e05cd9164f0e6ae97e07bac556f80c06e731c3cdedcecab2d568d",
+      "production_niagara_components": 19,
+      "active_rapid_roller_emitters": 1,
+      "decision": "rejected: the denser, lower velocity-aligned profile is more readable but remains a collection of sprite flakes"
+    },
+    "v160_tuned_production_combined": {
+      "capture": "m9_niagara_breaking_roller_tuned_v160_rejected.png",
+      "capture_sha256": "c363b68f14dd619b647b445e1a9094a1d2ad10781bddee3927bf5004ba9ef9fb",
+      "log": "/private/tmp/raftsim_m9_v160_niagara_breaking_roller_tuned_capture.log",
+      "log_sha256": "ee211590ee60e2a361c7cf93b377115c3fb5ee9835c27a2697c258f8cd98fdc6",
+      "production_niagara_components": 19,
+      "active_rapid_roller_emitters": 1,
+      "breaking_lip_triangles": 512,
+      "breaking_roller_mesh_triangles": 0,
+      "breaking_roller_mesh_visible": false,
+      "decision": "rejected for M9 photoreal acceptance: removes the retained dome and card artifacts, but the aggregate still reads as sprite spray over a smooth non-overturning heightfield"
+    }
+  },
+  "validation": {
+    "final_native_editor_build": "passed",
+    "focused_python_source_and_visual_contracts": "39 passed",
+    "native_niagara_asset_test": {
+      "result": "passed",
+      "report": "/private/tmp/raftsim_m9_v160_niagara_asset_report/index.json",
+      "report_sha256": "f52ee71c4b82b2438a4d10b18defc90ec24c6c46e037ef3ba85bfcdf9d4fafd5",
+      "log": "/private/tmp/raftsim_m9_v160_niagara_asset_test.log",
+      "log_sha256": "46cc7470d2dfae1c3b4ee3e486d8f5967b779837e3ce91f0321fadc21e6cc982"
+    },
+    "native_water_vfx_runtime_pool_test": {
+      "result": "passed_with_expected_macos_text_input_warning",
+      "report": "/private/tmp/raftsim_m9_v160_water_vfx_runtime_report/index.json",
+      "report_sha256": "d52d58788483c1be9f1df83f9c688cfed41dda65666cfc97b3cc85bf17dbc594",
+      "log": "/private/tmp/raftsim_m9_v160_water_vfx_runtime_test.log",
+      "log_sha256": "171c5ad4f1ced0261c930eae259c1848534eec43c3e285773d5d60bbec78c2f1"
+    },
+    "native_water_surface_test": {
+      "result": "passed",
+      "report": "/private/tmp/raftsim_m9_v160_water_surface_report/index.json",
+      "report_sha256": "0ab1815ec107bd60e855c99fec49df3d7159d4ed8a1ba7281291c465318b06b2",
+      "log": "/private/tmp/raftsim_m9_v160_water_surface_test.log",
+      "log_sha256": "bb9bfe6a21d1d78b202a796f6df4693582ae00b5f8969e360b5e10a7a965c7f6"
+    },
+    "final_diff_check": "passed"
+  },
+  "decision": "Retain the bounded solver-fed RapidRoller Niagara system, its all-assets-ready fallback switch, and race-proof isolation diagnostics as a technical improvement. Reject v160 as M9 photoreal evidence: it removes the analytic dome but still does not depict a coherent overturning hydraulic. Restore the exact bounded v121 nested-shell implementation as the missing-asset fallback. M9 remains open; no milestone commit or push is permitted."
+}

@@ -1,0 +1,108 @@
+{
+  "schema": "raftsim.m9.production_paddle_raft_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_raft.py",
+    "importer": "unreal/Scripts/import_production_whitewater_raft.py",
+    "manifest": "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/production_paddle_raft_manifest.json",
+    "manifest_sha256": "a093edaae97ba65f6ad5ad2df8aa312db1354bea9089e6bd15293245636f9a19",
+    "fbx": "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/SM_RaftSim_ProductionPaddleRaft.fbx",
+    "fbx_sha256": "dc5db2e526493cc9328836b5eecd73ad41980259371366bcebf2d391bd623328",
+    "blend": "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/SM_RaftSim_ProductionPaddleRaft.blend",
+    "blend_sha256": "52c55eaa9a7ccc4d9ddc23b48c7932b50b225f53dd29fb15e27bdcdfa96508fc",
+    "external_asset_inputs": [],
+    "reference_facts_only": [
+      "https://www.nrs.com/nrs-e-140-self-bailing-raft/ppyq",
+      "https://www.aire.com/products/aire-146dd-self-bailing-raft"
+    ]
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft",
+    "uasset_sha256": "ad9ca38179d0bcacd2c315bb4cdb54cb97cc75e35636c453c199dfa50ab366bf",
+    "dimensions_cm": [
+      431.7999,
+      205.7546,
+      72.5
+    ],
+    "authored_lod0_triangles": 38344,
+    "material_slot_count": 5,
+    "nanite_enabled": false,
+    "allow_cpu_access": true,
+    "collision_enabled": false,
+    "runtime_boundary": "Authored CPU-readable rest topology is copied into the collisionless procedural presentation component and moved by the existing D4-derived field. The hidden hull, D3/D4, collision, buoyancy, flip, wrap, pin, damage, and rescue remain native."
+  },
+  "construction": {
+    "nominal_length_m": 4.3,
+    "nominal_width_m": 2.0,
+    "nominal_side_tube_diameter_m": 0.544,
+    "main_chambers": 4,
+    "thwarts": 2,
+    "d_rings": 12,
+    "carry_handles": 4,
+    "tube_valves": 4,
+    "floor_pressure_relief_valves": 1,
+    "self_bailing_drain_recesses": 8
+  },
+  "automation": {
+    "suite": "RaftSim.M5",
+    "succeeded": 3,
+    "succeeded_with_warnings": 1,
+    "failed": 0,
+    "not_run": 0,
+    "report_sha256": "426429970c66daf75a98b8850a493d6339625acabcec4a23c965bc7c0a5413e4",
+    "production_checks": [
+      "five material sections load from the cooked CPU-readable LOD",
+      "authored topology exceeds 30,000 triangles",
+      "D4 deformation preserves every section, index buffer, and finite vertex",
+      "runtime rescue actor selects the production raft"
+    ],
+    "only_warning": "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation."
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v12_production_raft_v2_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "a9842655d33bbf61e99f33d1e7cf615ba8a882a459cd6e50a175fd659ff5b142",
+    "width": 1280,
+    "height": 720,
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "spray": 0.93,
+    "mist": 0.317,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "visible_contact_patch_triangles": 96,
+    "instance_counts": {
+      "fine_spray": 40,
+      "mist": 1,
+      "contact_foam": 9,
+      "droplets": 68
+    }
+  },
+  "accepted": [
+    "The smooth parametric loop is replaced by authored 14-foot-class source geometry calibrated from manufacturer dimensions and construction facts.",
+    "Kicked ends, four chamber seams, two inflatable thwarts, an inflated self-bailing floor, perimeter line, reinforcement pads, valves, D-rings, drain recesses, and quarter handles remain legible in the guide view.",
+    "v2 corrects the oversized D-ring/pad and crossed-handle miniature cues found in v1.",
+    "The authored rest mesh remains flexible: the ordinary D4 contact field moves its chambers, floor, rigging, metal, and bonded details without a rigid replacement actor.",
+    "The production visual has no collision and does not alter authoritative physics, damage, or rescue behavior."
+  ],
+  "rejected_or_open": [
+    "The saturated tube highlight is too broad and plastic for final close-range photoreal approval.",
+    "Crew contact, seating, hands, paddle grip, gaze, and high-side pose integration remain visibly synthetic.",
+    "Boulder, broad water, foam and aerosol, shoreline, terrain, foliage, and lighting remain below the requested photoreal bar.",
+    "No named guide or art reviewer has approved construction fidelity or final appearance.",
+    "The capture is not approved for marketing, store, trailer, press-kit, or release-media use."
+  ]
+}

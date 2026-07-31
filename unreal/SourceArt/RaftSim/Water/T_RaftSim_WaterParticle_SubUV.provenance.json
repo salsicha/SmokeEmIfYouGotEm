@@ -1,0 +1,42 @@
+{
+  "asset": "unreal/SourceArt/RaftSim/Water/T_RaftSim_WaterParticle_SubUV.png",
+  "authoritative_geography_claim": false,
+  "cell_dimensions_px": [
+    512,
+    512
+  ],
+  "dimensions_px": [
+    2048,
+    2048
+  ],
+  "external_source_input": false,
+  "format": "8_bit_grayscale_png",
+  "frame_ranges": {
+    "aerated_mist": [
+      11,
+      13
+    ],
+    "contact_droplets": [
+      6,
+      10
+    ],
+    "rapid_aerosol": [
+      14,
+      15
+    ],
+    "solver_spray": [
+      0,
+      5
+    ]
+  },
+  "generator": "unreal/Scripts/build_production_water_particle_atlas.py",
+  "generator_version": "raftsim-production-water-particle-subuv-v3",
+  "grid": [
+    4,
+    4
+  ],
+  "ownership": "project_owned_first_party_procedural",
+  "random_seed": 20260729,
+  "sha256": "c43a78d8d454113230025a2ecef476afb666908626d67ebf1add5b399a492ba1",
+  "usage": "Presentation-only Niagara SubUV breakup selected within live solver-authorized spray, droplet, mist, and aerosol emitters."
+}

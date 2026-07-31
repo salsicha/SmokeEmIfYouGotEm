@@ -1,0 +1,58 @@
+{
+  "schema": "raftsim.m9.shipping_stability_failure.v1",
+  "candidate": "v517_water_only_high",
+  "status": "superseded_after_reproducibility_failure",
+  "passed": false,
+  "platform": "macos_arm64",
+  "hardware": "Apple M5",
+  "os_version": "macOS 26.5.2 (25F84)",
+  "build_configuration": "Shipping",
+  "map_name": "L_SouthForkAmerican_FullReach",
+  "quality": "High",
+  "resolution": "1920x1080",
+  "screen_percentage": 60,
+  "warmup_seconds_requested": 10,
+  "measurement_seconds_requested": 60,
+  "first_run": {
+    "passed": true,
+    "report": "docs/release-review/m9-v517-shipping-performance.json",
+    "p95_frame_ms": 15.649167060852051,
+    "hitches_over_33ms": 0
+  },
+  "confirmation_run": {
+    "passed": false,
+    "process_exit_code": 139,
+    "signal": "SIGSEGV",
+    "exception": "EXC_BAD_ACCESS",
+    "invalid_address": "0xf8",
+    "process_lifetime_seconds": 55.0571,
+    "validation_report_written": false,
+    "faulting_thread": "GameThread",
+    "symbolicated_stack": [
+      "TSet<TTuple<FString, FRaftSimFlexSegmentResponse const*>>::Rehash",
+      "TSet<TTuple<FString, FRaftSimFlexSegmentResponse const*>>::Emplace",
+      "RaftSimFlex::EvaluateOverwashFlipD3",
+      "URaftSimChronoRuntimeAdapter::StepFlexibleRaftDynamics",
+      "URaftSimPhysicsBridgeSubsystem::RunOneFixedWaterTick",
+      "ARaftSimRaftActor::Tick"
+    ]
+  },
+  "disposition": "A passing performance minute cannot qualify a candidate that crashes on the independent confirmation minute. v517 is superseded and must not be promoted.",
+  "remediation": {
+    "candidate": "v520_overwash_stability",
+    "change": "Replace transient per-substep FString-to-response pointer maps in D3 and D4 with bounded allocation-free SegmentId lookup and reserve D3 output capacity.",
+    "native_regression": "RaftSim.M1.FlexibleRaftOverwashLongRunStability",
+    "native_regression_evaluations": 20000,
+    "native_regression_passed": true,
+    "editor_build_passed": true,
+    "shipping_build_and_full_cook_passed": true,
+    "packaged_rapid_cases_passed": 60,
+    "packaged_rapid_cases_total": 60,
+    "packaged_full_reach_cases_passed": 39,
+    "packaged_full_reach_cases_total": 39,
+    "fresh_profile_passed": true,
+    "repeat_shipping_soaks_pending": false,
+    "repeat_shipping_soaks_passed": true,
+    "repeat_shipping_soak_evidence": "docs/release-review/m9-v520-shipping-stability.json"
+  }
+}

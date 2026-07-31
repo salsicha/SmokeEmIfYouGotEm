@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 from raftsim.flexible_raft_d6_compliant_runner_export import (
@@ -25,14 +26,13 @@ def main(argv: list[str] | None = None) -> int:
         sidecar_path, summary_path = write_flexible_raft_d6_compliant_runner_export(
             args.repo_root
         )
-        sidecar = build_flexible_raft_d6_compliant_runner_sidecar()
-        summary = build_flexible_raft_d6_compliant_runner_summary(sidecar)
+        sidecar = json.loads(sidecar_path.read_text(encoding="utf-8"))
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
     else:
         sidecar = build_flexible_raft_d6_compliant_runner_sidecar()
         summary = build_flexible_raft_d6_compliant_runner_summary(sidecar)
         sidecar_path = args.sidecar_output or (
-            args.repo_root
-            / "physics/reports/d6/compliant/"
+            args.repo_root / "physics/reports/d6/compliant/"
             "flexible_raft_d6_compliant_measured_results.json"
         )
         summary_path = args.summary_output or (

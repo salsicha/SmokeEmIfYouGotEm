@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Pre-Op",
       "rapid_order": 17,
+      "source_elevation_datum_m": 210.01624340820314,
       "station_m": 29611.9296,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

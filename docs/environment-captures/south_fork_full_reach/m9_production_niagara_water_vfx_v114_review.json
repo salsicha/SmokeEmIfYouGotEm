@@ -1,0 +1,82 @@
+{
+  "candidate": "m9_production_niagara_water_vfx_v114",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "captures": [
+    {
+      "file": "m9_production_niagara_water_vfx_v114.png",
+      "camera": "contact_port",
+      "sha256": "bc71966dd6048c7b82c29822907f1f3539e329754ca015cbe8ac75a63926b6df"
+    },
+    {
+      "file": "m9_production_niagara_water_vfx_action_v114.png",
+      "camera": "river_action",
+      "sha256": "747cbfb877fc8e971557819598f65c1d6eb1b364d78174a547cef5c38841573c"
+    }
+  ],
+  "production_systems": {
+    "asset_root": "/Game/RaftSim/VFX/Water",
+    "systems": [
+      "NS_RaftSim_SolverSpray",
+      "NS_RaftSim_ContactDroplets",
+      "NS_RaftSim_AeratedMist",
+      "NS_RaftSim_RapidAerosol"
+    ],
+    "emitter_model": "one bounded infinite stateless emitter per system",
+    "material": "/Game/RaftSim/Materials/M_RaftSim_SprayMist",
+    "material_usage": "Niagara sprites enabled",
+    "solver_binding": "User.SpawnRate",
+    "runtime_components": 11,
+    "runtime_pool": "three contact components plus eight rapid-site aerosol components",
+    "transient_actor_spawning": false,
+    "fallback": "five deterministic card pools keep updating but are hidden whenever all eleven Niagara components are asset-bound"
+  },
+  "retained_tuning": {
+    "v112": "proved project-owned system authoring, runtime loading, solver-bound emission, and deterministic fallback",
+    "v113": "reduced sprite size, raised bounded density, lowered mist optical depth, and moved emission onto the sampled contact shoulder",
+    "v114": "launches spray and droplets from the exposed shoulder edge with a steeper ballistic direction so water clears the production obstacle",
+    "authority": "presentation-only; water sampling, collision, buoyancy, D3/D4 contact, wrap, pin, recovery, scoring, and gameplay forces are unchanged"
+  },
+  "asset_sha256": {
+    "NS_RaftSim_AeratedMist": "f7903eda17926c6e4b30b2623749cd6b0ae76179b0ab0b48cba5cfd7a9c37d04",
+    "NS_RaftSim_ContactDroplets": "290c757bdef08f205273fac83605219f3535fabf2d998b25537346701ef5611d",
+    "NS_RaftSim_RapidAerosol": "f3a329e1f6d45cfd17bbd79fb32a5bb96e7e0b47d80d44ca2c204fc7aa7d4522",
+    "NS_RaftSim_SolverSpray": "d0f94f77b97d609afec9b06116a37d79e7dc638da52da9dd743ca7e68fb54b78"
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "presentation_state": {
+      "spray": 0.908,
+      "mist": 0.312,
+      "impact_sheet": 1.0,
+      "droplets": 1.0
+    },
+    "deterministic_fallback_instances": {
+      "spray": 89,
+      "mist": 5,
+      "impact_foam": 9,
+      "droplets": 144
+    },
+    "contact_patch_triangles": 96,
+    "breaking_lip_triangles": 512
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed after inventory regeneration",
+    "native_editor_build": "passed",
+    "runtime_pool": "1/1 passed; eleven Niagara components asset-bound and production path ready",
+    "m5": "five test cases passed; four clean and RuntimeRescueLoop with the known offscreen audio-device and motion-vector diagnostics",
+    "m5_report": "/private/tmp/raftsim_m9b3_v114_m5_report/index.json",
+    "runtime_report": "/private/tmp/raftsim_m9b3_v114_water_vfx_runtime_report/index.json"
+  },
+  "open_visual_findings": [
+    "The missing Niagara architecture, authored systems, solver binding, and bounded runtime pools are now implemented.",
+    "Individual spray sprites remain readable in the close contact view and need final VFX art/texture review.",
+    "Hydraulic collapse, entrained-air depth, and broad rapid aerosol volume remain underdeveloped.",
+    "Water, terrain, shoreline, canopy, crew motion, and equipment response remain below the photoreal target."
+  ],
+  "decision": "Retain v114 as the production Niagara water-VFX foundation and exact-current technical evidence. Reject it for photoreal, marketing, store, press, and human art approval."
+}

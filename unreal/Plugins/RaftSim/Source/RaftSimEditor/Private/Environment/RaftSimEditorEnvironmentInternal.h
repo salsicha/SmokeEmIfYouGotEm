@@ -2105,5 +2105,426 @@ bool BuildLandscapeImportCandidateMap(
     FRaftSimLandscapeImportCandidateResult& OutResult,
     FString& OutSummary);
 
+float ComputeSouthForkInferredFarFieldReliefM(
+    double WorldXM,
+    double WorldYM,
+    float SourceSlope);
+
+float ComputeSouthForkFarFieldCorridorReliefWeight(
+    const FRaftSimPreviewImage& CorridorExclusionMask,
+    int32 Row,
+    int32 Column);
+
+FLinearColor DecodeSouthForkPreviewSrgbColor(const FLinearColor& Encoded);
+float DecodeSouthForkHeightM(
+    uint16 Encoded,
+    double MinimumM,
+    double MaximumM);
+
+FLinearColor CompleteSouthForkShorelinePresentation(
+    FLinearColor HydraulicPresentation,
+    float ShorelineDepthM,
+    int64& InOutCompletionVertexCount);
+
+bool ConditionSouthForkDryWaterSurfaceRow(
+    const TArray<FLinearColor>& SourceHydraulicPresentation,
+    TArray<float>& InOutSurfaceElevationsM,
+    int32& OutLeftWetColumn,
+    int32& OutRightWetColumn);
+
+bool PrepareSouthForkWaterSurfaceRow(
+    const TArray<uint16>& EncodedSurfaceHeights,
+    const TArray<FLinearColor>& SourceHydraulicPresentation,
+    int32 Width,
+    int32 Row,
+    double MinimumElevationM,
+    double MaximumElevationM,
+    TArray<float>& OutSurfaceElevationsM,
+    TArray<FLinearColor>& OutHydraulicPresentation,
+    int32& OutLeftWetColumn,
+    int32& OutRightWetColumn);
+
+bool ShouldEmitSouthForkShorelineCell(
+    const FLinearColor& I0,
+    const FLinearColor& I1,
+    const FLinearColor& I2,
+    const FLinearColor& I3,
+    float I0ShorelineDepthM,
+    float I1ShorelineDepthM,
+    float I2ShorelineDepthM,
+    float I3ShorelineDepthM,
+    int64& InOutTransitionCellCount);
+
+bool RefineSouthForkWaterPresentationGrid(
+    int32 SubdivisionFactor,
+    int32& InOutWidth,
+    int32& InOutHeight,
+    TArray<FVector>& InOutVertices,
+    TArray<FVector2D>& InOutUvs,
+    TArray<FLinearColor>& InOutColors,
+    TArray<float>& InOutShorelineDepthsM);
+
+bool SmoothSouthForkWaterVisibilityLongitudinally(
+    int32 Radius,
+    int32 Width,
+    int32 Height,
+    TArray<FLinearColor>& InOutHydraulicPresentation);
+
+bool BuildSouthForkTerrainClippedWaterGeometry(
+    const TArray<FVector>& GridVertices,
+    const TArray<FVector2D>& GridUvs,
+    const TArray<FLinearColor>& GridColors,
+    const TArray<float>& GridShorelineDepthsM,
+    int32 GridWidth,
+    int32 GridHeight,
+    TArray<FVector>& OutVertices,
+    TArray<int32>& OutTriangles,
+    TArray<FVector2D>& OutUvs,
+    TArray<FLinearColor>& OutColors,
+    TArray<FVector>& OutNormals,
+    TArray<FProcMeshTangent>& OutTangents,
+    int64& InOutTransitionCellCount);
+
+bool ApplySouthForkWaterPresentationMicroRelief(
+    TArray<FVector>& InOutVertices,
+    const TArray<FVector2D>& Uvs,
+    const TArray<FLinearColor>& HydraulicPresentation,
+    const TArray<float>& ShorelineDepthsM,
+    float& OutMaximumAbsoluteDisplacementCm);
+
+struct FSouthForkAeratedWaterOverlaySample
+{
+    float Opacity = 0.0f;
+    float VerticalDisplacementCm = 0.0f;
+    FLinearColor Color = FLinearColor::Transparent;
+};
+
+FSouthForkAeratedWaterOverlaySample ComputeSouthForkAeratedWaterOverlaySample(
+    const FLinearColor& HydraulicPresentation,
+    float ShorelineDepthM,
+    float StationM,
+    float LateralM);
+
+bool BuildSouthForkRefinedWhitewaterOverlayGeometry(
+    const TArray<FVector>& BaseVertices,
+    const TArray<FVector2D>& BaseUvs,
+    const TArray<FLinearColor>& BaseHydraulicPresentation,
+    const TArray<float>& BaseShorelineDepthsM,
+    int32 BaseWidth,
+    int32 BaseHeight,
+    TArray<FVector>& OutVertices,
+    TArray<int32>& OutTriangles,
+    TArray<FVector2D>& OutUvs,
+    TArray<FLinearColor>& OutColors,
+    int32& OutWidth,
+    int32& OutHeight);
+
+UTexture2D* LoadSouthForkTerrainMacroTextureForReuse(
+    const FString& TileId,
+    FString& OutSummary);
+
+UMaterialInstanceConstant* CreateSouthForkTerrainMaterialInstance(
+    const FString& TileId,
+    UMaterialInterface* Parent,
+    UTexture2D* SourceMacroTexture,
+    bool bUseCorridorEdgeBlend,
+    FString& OutSummary);
+
+bool ConfigureSouthForkFarFieldTerrainActor(AStaticMeshActor* Actor);
+
+bool CreateSouthForkGeneratedCanopyAssets(
+    UWorld* World,
+    UStaticMesh*& OutPonderosaMeshA,
+    UStaticMesh*& OutPonderosaMeshB,
+    UStaticMesh*& OutPonderosaMeshC,
+    UStaticMesh*& OutInteriorLiveOakMesh,
+    UStaticMesh*& OutWhiteAlderMesh,
+    UStaticMesh*& OutDeerbrushMesh,
+    FString& OutSummary);
+
+bool FindSouthForkMedianWaterSurfaceLocalZCm(
+    UWorld* World,
+    const FVector2D& WorldLocationM,
+    float& OutSurfaceLocalZCm);
+
+void ConfigureSouthForkSettledSourceCaptureVisibility(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>>& OutVisibilityStates,
+    FString& OutSummary);
+
+void RestoreSouthForkSettledSourceCaptureVisibility(
+    const TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>>& VisibilityStates);
+
+bool ConfigureSouthForkTerrainDetailV2Review(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        OutMaterialStates,
+    FString& OutSummary);
+
+void RestoreSouthForkTerrainDetailV2Review(
+    const TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        MaterialStates);
+
+struct FSouthForkShoreRockReviewComponentState
+{
+    TWeakObjectPtr<UHierarchicalInstancedStaticMeshComponent> Component;
+    TWeakObjectPtr<UStaticMesh> OriginalMesh;
+    TArray<FTransform> OriginalWorldTransforms;
+    TArray<TWeakObjectPtr<UMaterialInterface>> OriginalOverrideMaterials;
+};
+
+bool ConfigureSouthForkPolyHavenShoreRockReview(
+    UWorld* World,
+    TArray<FSouthForkShoreRockReviewComponentState>& OutStates,
+    FString& OutSummary);
+
+void RestoreSouthForkPolyHavenShoreRockReview(
+    const TArray<FSouthForkShoreRockReviewComponentState>& States);
+
+bool ConfigureSouthForkDerivedBankMorphologyReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkScannedBankKitReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkMeatGrinderHeroReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+bool ConfigureSouthForkDisplacedGravelBarReview(
+    UWorld* World,
+    TArray<TWeakObjectPtr<AActor>>& OutActors,
+    FString& OutSummary);
+
+void RestoreSouthForkDerivedBankMorphologyReview(
+    const TArray<TWeakObjectPtr<AActor>>& Actors);
+
+bool ConfigureSouthForkFullReachReviewLayers(
+    UWorld* World,
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        OutTerrainMaterialStates,
+    TArray<FSouthForkShoreRockReviewComponentState>& OutRockStates,
+    TArray<TWeakObjectPtr<AActor>>& OutDerivedBankActors,
+    FString& OutSummary);
+
+void RestoreSouthForkFullReachReviewLayers(
+    const TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>&
+        TerrainMaterialStates,
+    const TArray<FSouthForkShoreRockReviewComponentState>& RockStates,
+    const TArray<TWeakObjectPtr<AActor>>& DerivedBankActors);
+
+bool CaptureSouthForkView(
+    UWorld* World,
+    const FString& CaptureId,
+    const FVector& CameraLocation,
+    const FRotator& CameraRotation,
+    FString& OutRelativePath,
+    FString& OutSummary);
+
+bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary);
+
+TSharedRef<FJsonObject> BuildSouthForkInferredFarFieldReliefManifest();
+
+struct FSouthForkBoulderPresentationFootprint
+{
+    float StationM = 0.0f;
+    float LateralM = 0.0f;
+    float RadiusM = 0.0f;
+};
+
+UMaterialInterface* BuildSouthForkBoulderDressingMaterial(FString& OutSummary);
+
+bool LoadSouthForkProductionRockPresentation(
+    UStaticMesh*& OutMesh,
+    UMaterialInterface*& OutMaterial,
+    FString& OutSummary);
+
+bool LoadSouthForkProductionWaterPresentation(
+    UMaterialInterface*& InOutMaterial,
+    FString& OutSummary);
+
+bool CreateSouthForkShoreCobbleAssets(
+    UWorld* World,
+    UMaterialInterface* Material,
+    bool bReuseExistingAssets,
+    UStaticMesh* (&OutMeshes)[3],
+    FString& OutSummary);
+
+void CreateSouthForkShoreCobbleComponents(
+    AActor* Owner,
+    USceneComponent* Root,
+    UStaticMesh* const* Meshes,
+    UHierarchicalInstancedStaticMeshComponent* (&OutComponents)[3]);
+
+int32 AddSouthForkShoreCobbleInstances(
+    UHierarchicalInstancedStaticMeshComponent* const* Components,
+    const FVector& GroundLocation,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope);
+
+int32 AddSouthForkBankUnderstoryInstance(
+    UHierarchicalInstancedStaticMeshComponent* Understory,
+    const FVector& GroundLocation,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+struct FSouthForkGroundCoverPlacement
+{
+    bool bAccepted = false;
+    int32 ClusterCount = 0;
+    float BaseScale = 1.0f;
+};
+
+bool CreateSouthForkGroundCoverAssets(
+    UWorld* World,
+    bool bReuseExistingAssets,
+    UStaticMesh*& OutGrassTuftMesh,
+    UMaterialInterface*& OutGrassMaterial,
+    FString& OutSummary);
+
+FSouthForkGroundCoverPlacement ComputeSouthForkGroundCoverPlacement(
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity,
+    const FVector& GroundLocation);
+
+int32 AddSouthForkGroundCoverInstances(
+    UHierarchicalInstancedStaticMeshComponent* GroundCover,
+    const FVector& GroundLocation,
+    const FVector& GroundNormal,
+    const FVector2D& LeftNormal,
+    int32 CoordinateIndex,
+    int32 Column,
+    float BankDistanceM,
+    float LateralSlope,
+    const FLinearColor& SourceDensity);
+
+TArray<FVector> BuildSouthForkSmoothedTerrainPresentationNormals(
+    const TArray<FVector>& Vertices,
+    int32 Width,
+    int32 Height,
+    int32 Radius);
+
+void SelectSouthForkDetailedFoliage(
+    UHierarchicalInstancedStaticMeshComponent* const* Conifers,
+    UHierarchicalInstancedStaticMeshComponent* Broadleaf,
+    UHierarchicalInstancedStaticMeshComponent* Riparian,
+    UHierarchicalInstancedStaticMeshComponent* Understory,
+    const FLinearColor& SourceDensity,
+    float LateralM,
+    int32 CoordinateIndex,
+    int32 Column,
+    UHierarchicalInstancedStaticMeshComponent*& OutTarget,
+    float& OutProbability,
+    float& OutBaseScale);
+
+bool ShouldSuppressSouthForkBoulderPresentation(
+    const TArray<FSouthForkBoulderPresentationFootprint>& AcceptedFootprints,
+    float StationM,
+    float LateralM,
+    float RadiusM);
+
+struct FSouthForkFullReachBuildMetrics
+{
+    int32 TerrainTileCount = 0;
+    int32 WaterTileCount = 0;
+    int32 WhitewaterFoamActorCount = 0;
+    int32 TerminalVisualWaterActorCount = 0;
+    int32 FarFieldPatchCount = 0;
+    int32 FoliageInstanceCount = 0;
+    int32 FarFieldFoliageInstanceCount = 0;
+    int32 FarFieldDetailedPineInstanceCount = 0;
+    int32 FarFieldPineCardInstanceCount = 0;
+    int32 BoulderInstanceCount = 0;
+    int32 BoulderOverlapSuppressedInstanceCount = 0;
+    int32 ScenicRockInstanceCount = 0;
+    int32 ShoreCobbleInstanceCount = 0;
+    int32 GroundCoverInstanceCount = 0;
+    int32 SprayMistInstanceCount = 0;
+    int32 InfrastructureActorCount = 0;
+    int32 ReflectionProbeCount = 0;
+    int32 StableActorIdentityCount = 0;
+    int64 TerrainTriangleCount = 0;
+    int64 WaterTriangleCount = 0;
+    int64 WhitewaterFoamTriangleCount = 0;
+    int64 ProceduralShorelineCompletionVertexCount = 0;
+    int64 ProceduralShorelineTransitionCellCount = 0;
+    int64 TerminalVisualWaterTriangleCount = 0;
+    int64 FarFieldTriangleCount = 0;
+    TArray<float> MedianCenterWaterLocalZCm;
+};
+
+TArray<FProcMeshTangent> BuildSouthForkFlowTangents(
+    const TArray<FVector>& Vertices,
+    int32 Width,
+    int32 Height);
+
+UStaticMesh* CreateSouthForkMeshAsset(
+    UWorld* World,
+    const FString& AssetPackagePath,
+    const FString& Label,
+    const TArray<FVector>& Vertices,
+    const TArray<int32>& Triangles,
+    const TArray<FVector>& Normals,
+    const TArray<FVector2D>& UVs,
+    const TArray<FLinearColor>& VertexColors,
+    const TArray<FProcMeshTangent>& Tangents,
+    UMaterialInterface* Material,
+    bool bEnableNanite,
+    bool bComplexCollision,
+    FString& OutSummary,
+    bool bPreserveNaniteFallbackTopology = false);
+
+AStaticMeshActor* PlaceSouthForkStaticMeshActor(
+    UWorld* World,
+    UStaticMesh* Mesh,
+    UMaterialInterface* Material,
+    const FString& Label,
+    const FTransform& Transform,
+    FName Tag,
+    ECollisionEnabled::Type Collision);
+
+void ConfigureSouthForkSingleLayerWaterActor(AStaticMeshActor* Actor);
+
+UStaticMesh* LoadSouthForkStaticMeshAsset(const FString& AssetPackagePath);
+
+void LogStaticMeshVertexColorSummary(const FString& Label, UStaticMesh* Mesh);
+
+UTexture2D* CreateSouthForkTerrainMacroTexture(
+    const FString& TileId,
+    const FString& SourceRelativePath,
+    FString& OutSummary);
+
+bool WriteSouthForkFullReachBuildManifest(
+    UWorld* World,
+    const FSouthForkFullReachBuildMetrics& Metrics,
+    bool bReuseExistingDetailedMeshes,
+    bool bAllCapturesSaved,
+    const TArray<FString>& CapturePaths,
+    FString& OutSummary);
+
 bool BuildPreviewMapForSpec(const FRaftSimEnvironmentPreviewSpec& Spec, FString& OutSummary);
 } // namespace RaftSimEditorEnvironment
+
+namespace RaftSimPhotorealMaterials
+{
+bool BuildSouthForkWaterTextureAssets();
+bool BuildCrewSkinTextureAssets();
+bool BuildEquipmentTextileTextureAssets();
+bool CreatePhotorealRiverWaterMaterial(FString& OutSummary);
+bool CreateWaterVfxMaterial(FString& OutSummary);
+}

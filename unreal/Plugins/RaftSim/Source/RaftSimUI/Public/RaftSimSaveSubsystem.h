@@ -24,6 +24,16 @@ public:
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Save")
     bool SaveCurrent();
 
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Save")
+    bool IsCurrentSaveWritable() const { return bCurrentSaveWritable; }
+
+    /** True only when startup found no slot and created this profile from defaults. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Save")
+    bool WasFreshProfileCreatedThisSession() const
+    {
+        return bFreshProfileCreatedThisSession;
+    }
+
     UFUNCTION(BlueprintCallable, Category = "RaftSim|Save")
     void MarkScenarioCompleted(FName ScenarioId, float SafetyScore, float OverallScore);
 
@@ -55,7 +65,11 @@ public:
     bool RebindAction(FName ActionId, FName KeyName);
 
     /** Deterministic, disk-free helpers used by migration and automation. */
-    static void NormalizeSave(URaftSimVerticalSliceSaveGame* Save);
+    /**
+     * Migrate an older/current save in place. Returns false for null or a save
+     * written by a newer build; callers must then treat it as read-only.
+     */
+    static bool NormalizeSave(URaftSimVerticalSliceSaveGame* Save);
     static ERaftSimMedal ApplyRunResult(
         URaftSimVerticalSliceSaveGame* Save, const FRaftSimRunResult& Result);
 
@@ -66,4 +80,7 @@ private:
 
     UPROPERTY()
     TObjectPtr<URaftSimVerticalSliceSaveGame> CurrentSave;
+
+    bool bCurrentSaveWritable = true;
+    bool bFreshProfileCreatedThisSession = false;
 };

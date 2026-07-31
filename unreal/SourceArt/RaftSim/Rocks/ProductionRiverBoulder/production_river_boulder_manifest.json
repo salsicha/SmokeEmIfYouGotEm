@@ -1,0 +1,40 @@
+{
+  "schema": "raftsim.production_river_boulder_source.v1",
+  "generator_version": 3,
+  "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+  "source_inputs": [],
+  "geology_claim": "Appearance analog only; not represented as site-specific South Fork geology.",
+  "fbx": "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/SM_RaftSim_ProductionRiverBoulder.fbx",
+  "blend": "unreal/SourceArt/RaftSim/Rocks/ProductionRiverBoulder/SM_RaftSim_ProductionRiverBoulder.blend",
+  "fbx_sha256": "c8d02ba3732ab2f81d2e1a10bfa3575b09db8261e03649b3c73806c32fdbf8fc",
+  "blend_sha256": "46ad23add8fa55995cac87072cc30f009187449553eef0d0efc82095aab0d5c4",
+  "construction": {
+    "closed_watertight_shells": 1,
+    "physical_fracture_bands": 3,
+    "water_worn_facet_fields": 2,
+    "contact_envelope_fraction": 0.96
+  },
+  "runtime_boundary": "Collisionless fitted visual only; D4 obstacle radius, friction, contact, wrap and pin authority remain native.",
+  "vertex_count": 40962,
+  "polygon_count": 81920,
+  "material_slots": [
+    "RiverBoulder"
+  ],
+  "uv_channel_count": 1,
+  "vertex_color_alpha": 0.0,
+  "bounds_min_cm": [
+    -107.4217,
+    -110.5384,
+    -83.3146
+  ],
+  "bounds_max_cm": [
+    124.9727,
+    101.4071,
+    112.3652
+  ],
+  "dimensions_cm": [
+    232.3944,
+    211.9455,
+    195.6798
+  ]
+}

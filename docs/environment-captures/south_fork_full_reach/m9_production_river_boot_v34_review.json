@@ -1,0 +1,138 @@
+{
+  "schema": "raftsim.m9.production_river_boot_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_boot.py",
+    "generator_sha256": "a7536e622435a411c85b7a10cb3b58a33b6d4407381e8a91ca58fe31bac74922",
+    "importer": "unreal/Scripts/import_production_whitewater_boot.py",
+    "importer_sha256": "28f7ba7d1743c44e5330c77786fff26a0a4050a8362ef4b715d160623236ad33",
+    "material_builder": "unreal/Scripts/create_production_whitewater_boot_materials.py",
+    "material_builder_sha256": "3a52690902860eb2b4c98ceaf88581a9a0c6525aae83176da873efbf1db4f7c1",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/production_whitewater_river_boot_manifest.json",
+    "manifest_sha256": "551bbe148be9eea6185478216d74b76fad89f49a5be3d2c9b40bc9c27a4fce7d",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.blend",
+    "blend_sha256": "eb7b038dd8a23cc9cf8e9f445f37f666f2a61839cadcfbb15df5d9e1b188de62",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionRiverBoot/SM_RaftSim_WhitewaterRiverBoot.fbx",
+    "fbx_sha256": "ac5f9a53fd9dd00f14847aaa5e6ef1e0cf9c9fa1b0cdb52160facb68fd375359",
+    "external_inputs": []
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRiverBoot",
+    "uasset_sha256": "0bce60e0f574ba04003d022f7ae8a1acbed0c7912d62aed39bbfaaf4812f4dfb",
+    "dimensions_cm": [
+      33.34,
+      13.5,
+      23.575
+    ],
+    "authored_lod0_triangles": 9708,
+    "nanite_fallback_triangles": 1704,
+    "nanite_enabled": true,
+    "material_slot_count": 3,
+    "outsole_lugs": 12,
+    "vamp_drain_bands": 3,
+    "pull_tabs": 1,
+    "runtime_boundary": "Visual-only river footwear; crew pose, mass, D3/D4 physics, collision and rescue authority remain native."
+  },
+  "materials": {
+    "upper_asset": "/Game/RaftSim/Materials/M_RaftSim_RiverBootUpper",
+    "upper_asset_sha256": "9378ac0b96fa6d4b5d8eec85bc1720575121158ade6438aad1d801fdc7f12422",
+    "upper_project_owned_texture_set": "WetsuitNeoprene",
+    "upper_base_tint_linear": [
+      0.018,
+      0.023,
+      0.028
+    ],
+    "rubber_asset": "/Game/RaftSim/Materials/M_RaftSim_RiverBootRubber",
+    "rubber_asset_sha256": "b4fcbaf69b690bdc7221dba0f473637c0fd123988e3bcb91c248ca5784881fa2",
+    "rubber_base_color_linear": [
+      0.005,
+      0.007,
+      0.009
+    ],
+    "rubber_roughness": 0.62,
+    "report": "unreal/Saved/RaftSimValidation/m9/production-whitewater-river-boot-materials.json",
+    "report_sha256": "f55200718663f84995dc95cf645b50acd6a44996b762d41fe7f10c9259ec710e",
+    "visual_only": true
+  },
+  "integration": {
+    "crew_runtime_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+    "crew_runtime_source_sha256": "a4da90437bf359666f20a42641efbe36a4cca43299bab8ac0195f5ea6be6f58b",
+    "crew_runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimCrewAvatarActor.h",
+    "crew_runtime_header_sha256": "482ac2a0dc8b9f79a9e5cbe0fe353a8280cd9e2e07afecf758c47b8d47ba02a1",
+    "production_roster_count": 5,
+    "production_boot_instances": 10,
+    "solved_foot_positions_remain_authority": true,
+    "production_boot_collision_enabled": false,
+    "procedural_boot_fallback_retained": true,
+    "physics_or_rescue_changes": false
+  },
+  "import_audit": {
+    "report": "unreal/Saved/RaftSimValidation/m9/production-whitewater-river-boot.json",
+    "report_sha256": "11dd31143a9a1a0f362a1473d8810dadf5c06f6803b535cd81fd464ccf849fbd",
+    "status": "production_mesh_imported"
+  },
+  "automation": {
+    "focused_source_passed_before_packet_update": 34,
+    "suite": "RaftSim.M5",
+    "succeeded": 3,
+    "succeeded_with_warnings": 1,
+    "failed": 0,
+    "not_run": 0,
+    "report": "unreal/Saved/Automation/M9B3ProductionRiverBootMaterialsM5ExactV2/index.json",
+    "report_sha256": "0ac4ffd9c510e50801cf488c2ff6bb9d231719e0fa6590bba34dac7e6d0a5c1d",
+    "superseded_report": "unreal/Saved/Automation/M9B3ProductionRiverBootM5ExactV1/index.json",
+    "superseded_failure_reason": "The first runtime contract compared the Nanite fallback triangle count to the authored FBX count. The source/import audit continues to require 9,708 authored triangles; the corrected runtime assertion requires the nontrivial Nanite fallback and Nanite enablement.",
+    "only_warning": "Headless Mac audio sample-rate query warning."
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v34_production_river_boot_dark_pbr_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "b8326ad4e6375ace7f48009a6e5a23b484de8bea5c4d7ada3103e48ed9759d6d",
+    "width": 1470,
+    "height": 956,
+    "matched_camera": "station_960_upstream_right",
+    "human_approved": false
+  },
+  "validation_currency": {
+    "m5": "4/4 passed after the v34 production-river-boot geometry, clean-import and PBR-material delta",
+    "water_surface": "content-current because the slice changes no water or environment asset",
+    "hlod": "content-current because the slice changes no saved environment or HLOD asset",
+    "m4": "stale after the v34 crew-runtime, asset, material and automation-source delta",
+    "m7": "stale after the v34 crew-runtime, asset, material and automation-source delta",
+    "m8": "stale after the v34 delta",
+    "python_data_source_matrix": "stale after the v34 delta",
+    "m9": "stale after the v34 delta",
+    "shipping": "historical and not promotable"
+  },
+  "accepted": [
+    "One ankle-centred lasted mesh replaces each blunt rounded procedural boot overlay on the five-member production roster.",
+    "Toe, cuff, outsole, rand, pull tab, twelve tread lugs and three vamp bands provide a recognizable whitewater-footwear silhouette.",
+    "Both collisionless boots follow the existing solved foot positions and profile scale without becoming animation, mass, D3, D4, collision or rescue authority.",
+    "The deterministic source, import audit, Nanite fallback and exact M5 roster assertions are green.",
+    "Dedicated project-owned textured-neoprene upper and rubber sole/rand materials preserve dark footwear while separating toe, cuff and tread response.",
+    "A clean reimport disables prior Nanite state for the authored-topology audit, then reproducibly restores Nanite and all three dedicated material assignments.",
+    "The procedural rounded boots remain a fail-safe only when the production asset is absent or the procedural body fallback is active."
+  ],
+  "rejected_or_open": [
+    "The generated neoprene texture and simple rubber graph remain substitutes for final scanned or artist-authored wet-footwear materials.",
+    "Rigid yaw-only placement is sufficient for the current planted poses but is not production skeletal ankle/toe deformation.",
+    "Body, hand, paddle-contact and seated-pose deformation remain visibly synthetic and prevent final character approval.",
+    "Raft, rock, broad water, foam/aerosol, shoreline, terrain, foliage and lighting remain below the requested photoreal bar.",
+    "No named guide or art reviewer has approved footwear choice, fit, tread, material response or capture.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+  ,
+  "renderer_iterations": [
+    "v30 accepted the project-owned geometry and rejected the shared near-black wetsuit/rubber material treatment.",
+    "v31 rejected an over-bright first dedicated-material tuning that read gray and plastic.",
+    "v32 was a shadow-biased diagnostic and could not qualify material color by itself.",
+    "v33 cleanly reimported the authored FBX and dedicated slots but confirmed the material remained too gray.",
+    "v34 retains the darker dedicated PBR tuning as the technical baseline; final photoreal art remains rejected."
+  ]
+}

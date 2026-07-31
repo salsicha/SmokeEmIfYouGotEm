@@ -1,0 +1,36 @@
+{
+  "schema": "raftsim.crew.synthetic_skin_textures.v1",
+  "generated_on": "2026-07-20",
+  "status": "first_party_synthetic_skin_microdetail_candidate_pending_render_review",
+  "generator": {
+    "tool": "OpenAI built-in image generation",
+    "model": "built-in image generation model; exact identifier not exposed by the tool",
+    "seed": "not exposed by the tool",
+    "terms": "first-party generated project asset; no external photograph, scan, or identifiable person was used"
+  },
+  "assets": [
+    {
+      "source_path": "unreal/SourceArt/RaftSim/Crew/SyntheticSkin/T_RaftSim_SyntheticSkin_MicroAlbedo.png",
+      "sha256": "ebc0dfc4cad1749af3ae25e89a22ec3fa2352ee5f20726ec7cc86e48a2b18f43",
+      "dimensions": [1024, 1024],
+      "map_kind": "neutral_skin_micro_albedo_variation",
+      "unreal_asset": "/Game/RaftSim/Characters/Textures/T_RaftSim_CrewSkin_MicrodetailAlbedo",
+      "prompt": "Generate a square, perfectly tileable neutral human skin microdetail albedo-variation texture for a real-time Unreal Engine face material: flat edge-to-edge diffuse texture, fine pores, subtle capillary mottling, tiny freckles, realistic millimetre scale, no directional lighting, highlights, shadows, facial features, body parts, hair, text, watermark, border, or identifying content."
+    },
+    {
+      "source_path": "unreal/SourceArt/RaftSim/Crew/SyntheticSkin/T_RaftSim_SyntheticSkin_MicroNormal.png",
+      "sha256": "3bc96b5713c5b769f8cd52f2b62b94cb6947be981189a4d3ab50e73b99fb4dc5",
+      "dimensions": [1024, 1024],
+      "map_kind": "tangent_space_skin_micro_normal",
+      "unreal_asset": "/Game/RaftSim/Characters/Textures/T_RaftSim_CrewSkin_MicrodetailNormal",
+      "prompt": "Convert the matching source skin microdetail into a tileable Unreal-compatible RGB tangent-space normal map with shallow pores and micro-bumps, predominantly lavender-blue, no baked lighting, albedo, face or body features, text, watermark, frame, preview sphere, or exaggerated depth."
+    }
+  ],
+  "postprocessing": {
+    "operation": "uniform resample only",
+    "original_dimensions": [1254, 1254],
+    "final_dimensions": [1024, 1024],
+    "reason": "power-of-two Unreal mip and streaming compatibility"
+  },
+  "runtime_claim_boundary": "These maps improve first-party procedural skin response. They do not constitute a scanned human, an identity asset, or final photoreal character-art acceptance."
+}

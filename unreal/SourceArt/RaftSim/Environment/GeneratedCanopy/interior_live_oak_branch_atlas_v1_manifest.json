@@ -1,0 +1,118 @@
+{
+  "schema": "raftsim.unreal.south_fork_live_oak_branch_atlas.v1",
+  "generated_on": "2026-07-29",
+  "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected",
+  "production_promoted": false,
+  "species": {
+    "scientific_name": "Quercus wislizeni",
+    "common_name": "interior live oak",
+    "fidelity_boundary": "visual branch-cluster study; not a surveyed individual-tree claim"
+  },
+  "source": {
+    "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlas_ChromaV1.png",
+    "sha256": "526ef7376dcb45fc0f793b6630eacf2c17234a7ef36426d43c1d44effe48e5db",
+    "generator": "OpenAI built-in image generation",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "input_images_used_for_initial_generation": false,
+    "corrective_edit_used_generated_reference": true,
+    "prompt_intent": "twelve isolated interior-live-oak branch sprays in a non-overlapping 4x3 blue-chroma atlas"
+  },
+  "atlas": {
+    "columns": 4,
+    "rows": 4,
+    "occupied_tiles": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reserved_transparent_tiles": [
+      12,
+      13,
+      14,
+      15
+    ],
+    "tile_bleed_inset": 0.018,
+    "source_band_opaque_pixel_count": 539245,
+    "reserved_band_opaque_pixel_count": 0
+  },
+  "maps": {
+    "albedo_opacity": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV1.png",
+      "sha256": "7fdf2366ae7a2686d21e6825ead7af09ba3695370166cf1ad0cce1d9c3ed7ea0",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+    },
+    "normal": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV1_Normal.png",
+      "sha256": "a1a4384285562b0710c6562303f97c4f049a821bd18b9231076d43cdf647ccba",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+    },
+    "ao_roughness_subsurface": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV1_AORoughnessSubsurface.png",
+      "sha256": "645dad8504c81b22d6cee197e689d03a7c58420032bbd8bc81887163a20f70f9",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "active_m9_technical_fallback_photoreal_and_release_promotion_rejected"
+    }
+  },
+  "derivation": {
+    "alpha": "deterministic blue-dominance matte with bounded edge cleanup",
+    "despill": "cell-bounded nearest-opaque RGB propagation and blue cap",
+    "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "0cb6bac7e92e31638090e2fdb75d4b77fc96838a9de76a62521cd2a677c467ab",
+      "nontransparent_rgb_sha256": "b7fa0d390ce9cdeb4c990e419840d577c4a294f549aee2e99625c521301f57bf",
+      "padded_transparent_pixel_count": 893328,
+      "transparent_nonzero_rgb_pixel_count": 893328
+    }
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false
+  },
+  "integration": {
+    "milestone": "M9",
+    "active_candidate": true,
+    "unreal_mesh": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOak_ConnectedCrownV2",
+    "unreal_material": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/M_RaftSim_SouthForkInteriorLiveOak_BranchAtlasV1",
+    "core_triangles": 2,
+    "branch_cards": 36,
+    "branch_triangles": 72,
+    "total_triangles": 74,
+    "collision": "disabled",
+    "photoreal_accepted": false,
+    "release_promoted": false
+  }
+}

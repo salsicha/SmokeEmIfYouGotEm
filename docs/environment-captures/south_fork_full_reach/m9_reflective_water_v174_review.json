@@ -1,0 +1,144 @@
+{
+  "schema": "raftsim.m9.reflective_water_review.v1",
+  "reviewed_utc": "2026-07-29T18:59:40Z",
+  "candidate": "m9_reflective_water_v174",
+  "parent": "m9_volumetric_broadleaf_v169",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "scope": "settled-map capture-only dynamic-material bracket",
+    "median_base_water_component_count": 14,
+    "parameters": {
+      "ReflectedSkyColor": [
+        0.145,
+        0.225,
+        0.315
+      ],
+      "FallbackSkyReflectionStrength": 0.44,
+      "FallbackSkyReflectionFloor": 0.58,
+      "FallbackSkyReflectionVariation": 0.42,
+      "CalmSurfaceColorVariation": 0.18,
+      "WaterRoughness": 0.18,
+      "Specular": 0.36,
+      "FresnelSpecular": 0.22,
+      "CalmRippleStrength": 0.045,
+      "FlowRippleStrength": 0.065,
+      "FoamRippleStrength": 0.1
+    },
+    "new_textures_or_assets": false,
+    "affected_solver_meshes_or_vertex_channels": false,
+    "affected_collision": false,
+    "affected_hydraulics": false,
+    "affected_raft_physics": false,
+    "map_or_actor_mutation": false,
+    "package_save": false
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimReflectiveWaterReviewCapture -RaftSimExitAfterEnvironmentAutomation",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water",
+    "comparison_baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "loaded_world_partition_references": 231,
+    "log": "/private/tmp/raftsim_m9_v174_reflective_water_photographic.log",
+    "log_sha256": "e98a0163a75e5a6d9c7e3ffe33b28272d08a3ecb6ff6644cc5dbad581f90a7d1",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water/chili_bar_launch_downstream.png",
+        "sha256": "f9fb68a5bbddf15adf858abfae83fa1c5a7c29ca0805c79d3129f6412238e58c",
+        "size_bytes": 1305177,
+        "mean_absolute_rgb_delta_from_v169_photographic": 8.240345,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 48.598524,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 23.260417,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.804362
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water/coloma_bridge_context.png",
+        "sha256": "c820f43a8f8d95dbc8e66f494895244ca933eb4e71ea77c8d53d6061fa103fe9",
+        "size_bytes": 1324333,
+        "mean_absolute_rgb_delta_from_v169_photographic": 3.413175,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 19.979384,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 8.257053,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.664822
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water/meat_grinder_guide_eye.png",
+        "sha256": "6cd187ef976808c2f3ebee693c77129fd675aeadd589bba53d7ea2a3391f72e0",
+        "size_bytes": 1280889,
+        "mean_absolute_rgb_delta_from_v169_photographic": 3.734136,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 21.900391,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 8.870443,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.758247
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water/salmon_falls_takeout.png",
+        "sha256": "ed48adb5ed82aad169109d61fc73601ae5054b4f60429be59392638f587dd6ed",
+        "size_bytes": 1219397,
+        "mean_absolute_rgb_delta_from_v169_photographic": 8.453448,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 48.814128,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 22.674045,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 2.190104
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v174_reflective_water/troublemaker_approach.png",
+        "sha256": "2697f3927211fa4da49b9fb0ce3e52161e584fb089e5ba78237c656274216fab",
+        "size_bytes": 1323035,
+        "mean_absolute_rgb_delta_from_v169_photographic": 5.539286,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 32.959744,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 15.644640,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 1.060547
+      }
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build_with_candidate": "passed",
+    "focused_editor_source_tests_with_candidate": "23/23 passed",
+    "capture_manual_review": "five of five inspected at original resolution",
+    "candidate_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "candidate_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The bracket used only transient dynamic material parameters on the existing production water instance and added no texture, mesh, or package.",
+      "All five fixed views rendered successfully and changed the water response materially enough for decisive review.",
+      "Chili Bar gained brighter short-wave reflection without changing the saved map or hydraulic authority."
+    ],
+    "rejected": [
+      "Meat Grinder, Troublemaker, Coloma, and Salmon Falls expose large rectangular and polygonal light/dark patches aligned with the underlying water mesh or material interpolation rather than coherent natural reflections.",
+      "The patches become dominant in the guide-eye foreground and make the water read as tiled plates; the artifact is substantially worse than v169's flatter but continuous response.",
+      "The bracket does not add overturning water geometry, coherent reflected scenery, depth-resolved aeration, or improved hydraulic surface structure and therefore cannot close the water or photoreal art gate."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "rollback": {
+    "completed": true,
+    "runtime_candidate_source_removed": true,
+    "candidate_test_contracts_removed": true,
+    "candidate_capture_and_review_evidence_preserved": true,
+    "focused_source_and_rights_tests_after_rollback": "35/35 passed",
+    "ue_5_8_editor_build_after_rollback": "passed",
+    "restored_full_reach_source_line_count": 2995,
+    "restored_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "restored_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "restored_renderer_test": {
+      "name": "RaftSim.M7.ZFullReachPresentation",
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v174_rejected_v169_restore_m7.log",
+      "log_sha256": "291d947c993e8b008920fad69d8a84122b2c9449fa5b730b29cc38464e17b4ae",
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only"
+    }
+  },
+  "decision": "Reject v174 and retain v169. Preserve the five fixed-view captures and this review ledger as negative evidence. Do not pursue stronger scalar reflection or roughness tuning on the current surface: future water work must resolve the mesh/material discontinuity and provide coherent scene reflection and hydraulic surface structure without exposing tiled polygonal plates."
+}

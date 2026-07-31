@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/racehorse_bend/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.16252,
+      "solver_runtime_seconds": 1.971137,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -292,7 +292,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/racehorse_bend/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 8.260327,
+      "solver_runtime_seconds": 1.859315,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -471,7 +471,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/racehorse_bend/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.697141,
+      "solver_runtime_seconds": 2.033128,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -669,6 +669,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 427.5215837890625,
   "station_range_m": [
     1892.1471999999999,
     2292.1472

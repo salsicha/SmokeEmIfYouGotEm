@@ -1,0 +1,50 @@
+"""Rebuild and audit the four packaged generated-mesh PFD materials.
+
+Run with UnrealEditor-Cmd and ``-ExecutePythonScript=<this file>``. The authored
+replacement PFD carries a stable UV/tangent field and therefore uses the full
+project-owned ripstop albedo, normal, and packed AO/roughness set.
+"""
+
+from __future__ import annotations
+
+import unreal
+
+
+MATERIAL_PATHS = (
+    "/Game/RaftSim/Materials/M_RaftSim_CrewPFD",
+    "/Game/RaftSim/Materials/M_RaftSim_PFD_Red",
+    "/Game/RaftSim/Materials/M_RaftSim_PFD_Yellow",
+    "/Game/RaftSim/Materials/M_RaftSim_PFD_Blue",
+)
+EXPECTED_TEXTURE_NAMES = {
+    "T_RaftSim_PfdRipstop_Albedo",
+    "T_RaftSim_PfdRipstop_Normal",
+    "T_RaftSim_PfdRipstop_AORoughnessHeight",
+}
+
+unreal.SystemLibrary.execute_console_command(
+    None,
+    "RaftSim.CreateProductionPfdMaterials",
+)
+unreal.AutomationUtilsBlueprintLibrary.finish_all_asset_compilation()
+
+for asset_path in MATERIAL_PATHS:
+    material = unreal.EditorAssetLibrary.load_asset(asset_path)
+    if not isinstance(material, unreal.Material):
+        raise RuntimeError(f"PFD material did not load: {asset_path}")
+    used_textures = unreal.MaterialEditingLibrary.get_material_used_textures(material)
+    used_texture_names = {texture.get_name() for texture in used_textures}
+    if used_texture_names != EXPECTED_TEXTURE_NAMES:
+        raise RuntimeError(
+            f"{asset_path} does not use the complete PFD ripstop set: "
+            f"{sorted(used_texture_names)}"
+        )
+    if bool(material.get_editor_property("two_sided")):
+        raise RuntimeError(f"{asset_path} retained two-sided self-shadowing")
+    if material.get_editor_property("blend_mode") != unreal.BlendMode.BLEND_OPAQUE:
+        raise RuntimeError(f"{asset_path} is not opaque")
+    if not bool(material.get_editor_property("used_with_nanite")):
+        raise RuntimeError(f"{asset_path} lacks its persisted Nanite usage permutation")
+    unreal.log(f"RaftSim PFD audit: {asset_path} stable matte material")
+
+unreal.log(f"RaftSim PFD rebuild complete: materials={len(MATERIAL_PATHS)}")

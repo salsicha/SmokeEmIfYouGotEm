@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/meat_grinder/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.98095,
+      "solver_runtime_seconds": 1.738307,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -340,7 +340,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/meat_grinder/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.443498,
+      "solver_runtime_seconds": 1.885813,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -567,7 +567,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/meat_grinder/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.600902,
+      "solver_runtime_seconds": 1.962887,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -828,6 +828,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 449.2586520507812,
   "station_range_m": [
     765.6064,
     1165.6064000000001

@@ -1,0 +1,71 @@
+{
+  "schema": "raftsim.m9.arm_ik_review.v1",
+  "reviewed_utc": "2026-07-29T19:37:32Z",
+  "status": "visual_regression_rejected_fully_removed",
+  "accepted_runtime_after_review": "v176",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "candidate": {
+    "scope": "production MetaHuman elbow solve only",
+    "method": "reference-skeleton-length analytic two-bone solve",
+    "upper_and_lower_arm_lengths_from_reference_pose": true,
+    "palm_grip_targets_preserved": true,
+    "outward_downward_bend_hint": true,
+    "water_raft_collision_or_gameplay_changed": false,
+    "map_or_package_mutation": false
+  },
+  "candidate_validation": {
+    "focused_source_and_rights_tests": "35/35 passed",
+    "unreal_editor_build": "succeeded",
+    "p3_renderer_test": "1/1 passed",
+    "p3_log": "/private/tmp/raftsim_m9_v177_arm_ik_p3_review.log",
+    "p3_log_sha256": "51e7b330386aee97f6911fe647642afbab9c249a9480e7288752820909e99bfa"
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_arm_ik_v177_rejected.png",
+    "capture_sha256": "e23a8ac05c01bd4c13b3ed6d9e420553bf6edfb4bb089a1ed3d7c2a804b8c52c",
+    "width": 1280,
+    "height": 1888,
+    "camera": "matched_test_tank_front_starboard_technical_review",
+    "human_approved": false
+  },
+  "rejection": {
+    "decision": "reject",
+    "reason": "Multiple right elbows fold sharply upward and behind the shoulders or helmets, while foreground arms gain hooked, anatomically impossible silhouettes. Preserving reference segment lengths does not compensate for the current component-space bone translation model and shared paddle targets.",
+    "candidate_runtime_retained": false,
+    "candidate_test_hook_retained": false,
+    "capture_retained_as_negative_evidence": true
+  },
+  "rollback": {
+    "exact_v176_metahuman_adapter_restored": true,
+    "metahuman_adapter": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimMetaHumanCrewVisualActor.cpp",
+    "metahuman_adapter_sha256": "e8db62d4c45eeed6c1be2a88d0ae6d43e6058db82e134c1309a7a404b591edae",
+    "exact_v176_review_test_restored": true,
+    "review_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimCrewCommandTest.cpp",
+    "review_test_sha256": "9478aeff841924ce686aa648b4d305890f80eb881a60354bda0ee669963df0fe",
+    "candidate_symbols_remaining": false,
+    "focused_source_and_rights_tests": "35/35 passed",
+    "unreal_editor_build": "succeeded",
+    "m7_renderer_test": "1/1 passed",
+    "m7_log": "/private/tmp/raftsim_m9_v177_rejected_v176_restore_m7.log",
+    "m7_log_sha256": "2f93ccf298a657a633eeb9f511ead532f515a5684fead1d72b7abc3582ebfa04",
+    "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "accepted_runtime": "v176",
+    "m7": "current on restored v176",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "open_after_rejection": [
+    "Production-quality arm deformation requires an authored rig/Control Rig or motion-capture retarget with explicit elbow pole vectors, shoulder mechanics, twist distribution, and paddle-contact constraints.",
+    "The v176 character, PPE, animation, environment, and release-media photoreal blockers remain open.",
+    "No named guide or art reviewer has approved the current stroke biomechanics or character presentation."
+  ]
+}

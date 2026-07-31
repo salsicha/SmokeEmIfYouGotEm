@@ -1,0 +1,144 @@
+{
+  "artifact": "M9 depth-bearing contact-water V9 stock Niagara Fluids feasibility review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "passed": false,
+  "promotion_allowed": false,
+  "decision": "reject_direct_stock_template_reuse_require_project_authored_depth_bearing_system",
+  "authoritative_geography_claim": false,
+  "summary": "The UE 5.8 Niagara Fluids Grid3D FLIP Splash and continuous Hose templates both load, compile warm, activate, remain visible, occupy a bounded solver-contact volume, and coexist with a valid four-contact D4 wrap/pin/recovery state. With both broad live water and authored static water hidden, neither template renders a perceptible liquid body. The only visible white element is the existing production contact spray. Direct stock-template reuse is therefore rejected. The experimental runtime hook and capture-only controls were removed; production keeps the fail-closed V8 baseline.",
+  "production": {
+    "selected": true,
+    "niagara_fluids_enabled_in_uproject": false,
+    "uproject": "unreal/SmokeEmIfYouGotEm.uproject",
+    "uproject_sha256": "c24af55d550b98a0e9f6c41ef57ec7c58ced64538162d1fd01d83b3e35193535",
+    "production_maps_modified_by_review": false,
+    "production_assets_modified_by_review": false,
+    "solver_contact_authority_changed": false,
+    "physics_forces_changed": false,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "map_state_changed": false,
+    "scoring_or_progression_changed": false,
+    "experimental_runtime_hook_retained": false
+  },
+  "engine_template_inventory": {
+    "engine": "Unreal Engine 5.8",
+    "plugin_descriptor": "/Users/Shared/Epic Games/UE_5.8/Engine/Plugins/FX/NiagaraFluids/NiagaraFluids.uplugin",
+    "plugin_descriptor_sha256": "237b08da4787bf5870b6f5ce3a96c5b94a59ff4d6a98d2feedeebe9d2646cbcb",
+    "inspection_tool": "unreal/Scripts/inspect_niagara_fluids_templates.py",
+    "inspection_tool_sha256": "4b0b75fee12cf78635ee6826cadff069cae3c19efddab8875b95aba3b7dc5482",
+    "loaded_templates": [
+      "/NiagaraFluids/Templates/Liquid/3D/Systems/Grid3D_Flip_Splash.Grid3D_Flip_Splash",
+      "/NiagaraFluids/Templates/Liquid/3D/Systems/Grid3D_Flip_Hose.Grid3D_Flip_Hose",
+      "/NiagaraFluids/Templates/Liquid/2D/Systems/Grid2D_FLIP_Splash.Grid2D_FLIP_Splash",
+      "/NiagaraFluids/Templates/Liquid/2D/Systems/ShallowWater/Grid2D_SW_Drop.Grid2D_SW_Drop"
+    ],
+    "review_mount": "-EnablePlugins=NiagaraFluids",
+    "qualification": "Engine-template feasibility only. No engine template is referenced by the production CDO, project descriptor, maps, or packaged dependency graph."
+  },
+  "bounded_runtime_bracket": {
+    "world_grid_extents_cm": [
+      240.0,
+      180.0,
+      150.0
+    ],
+    "num_cells_max_axis": 48,
+    "particles_per_cell": 3,
+    "pressure_iterations": 5,
+    "water_height_cm_range": [
+      26.0,
+      42.0
+    ],
+    "collision_velocity_multiplier": 0.0,
+    "physics_collisions": false,
+    "landscape_collisions": false,
+    "static_mesh_collisions": false,
+    "geometry_collection_collisions": false,
+    "anchor_authority": "existing dominant D4 contact point, surface sample, contact outward direction, and flow/across tangent frame",
+    "presentation_only": true
+  },
+  "native_renderer_review": {
+    "isolation": "Both broad live-water presentation and authored static-water actors are hidden. Existing production contact VFX remains visible, making any rendered depth-bearing body independently legible.",
+    "splash": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_splash_waterless_rejected.png",
+      "capture_sha256": "58d051f5dcb93e7c7e0ecb1d84129a574b548029157ee5e8451a2201fb95fdf1",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_splash_waterless_rejected.log",
+      "log_sha256": "70d037a6b10de8e8cfba07afabbd7c1753a2dd46371144001e1c4e4898bc577d",
+      "warm_compile_seconds": 0.091534,
+      "fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=1.000",
+      "component_state": "ready=1 visible=1 active=1",
+      "world_bounds_extent_cm": [
+        116.89,
+        103.5,
+        60.48
+      ],
+      "result": "No perceptible FLIP liquid body is present inside the reported bounds."
+    },
+    "continuous_hose": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_hose_waterless_rejected.png",
+      "capture_sha256": "898d7b79bbd1ce4b0781e11235f60932de29f5cafcc1f623901f74ebf78e8ed9",
+      "log": "docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_hose_waterless_rejected.log",
+      "log_sha256": "d629b1bf4bd51fd006e564cc6df5cf6f49a292d0f8ac2bb1594c63b3d6a944c2",
+      "warm_compile_seconds": 0.093417,
+      "fixture_state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=1.000",
+      "component_state": "ready=1 visible=1 active=1",
+      "world_bounds_extent_cm": [
+        116.65,
+        103.03,
+        60.48
+      ],
+      "result": "Persistent emission does not produce a perceptible liquid body; the isolated frame shows only the existing production spray puff."
+    },
+    "visual_verdict": "fail"
+  },
+  "post_revert_implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h": "5d0a5f13ee13beff6ee5483460515f0d6da07afd981f85072d33ba0e9f501c8a",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "c9708f398aa9abb4c1a3c57a064bb184a8c8f5866591a378a16934e2e03f809a",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "a41f304a5595ffa31dc3f615feed1fc8b9a4f5b1689dad45980f8a9c673324ab",
+    "physics/tests/test_flexible_raft_visual_upgrade.py": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65"
+  },
+  "post_revert_validation": {
+    "editor_build": "SmokeEmIfYouGotEmEditor Mac Development succeeded",
+    "focused_visual_contracts": "22/22 passed",
+    "m4": {
+      "result": "4/4 passed: 3 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+      "report": "unreal/Saved/Automation/M9V364DepthV9RevertM4/index.json",
+      "report_sha256": "ee1ac026588635fa36ff13c38ed0dfc6f0d0d9983cf6b6d3ca1c634b198a5b1c"
+    },
+    "m5": {
+      "result": "5/5 passed: 4 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+      "report": "unreal/Saved/Automation/M9V365DepthV9RevertM5/index.json",
+      "report_sha256": "0f4c382f8fdf17db914d86222eb2061bfb5a978f5ef193b129a0bd645c1d7472"
+    },
+    "m7": {
+      "result": "4/4 passed: 3 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+      "report": "unreal/Saved/Automation/M9V366DepthV9RevertM7/index.json",
+      "report_sha256": "cef4ed6bef076aa699a1328af8d92ba97c15e37f8185fdf41958e7d5d395aed7"
+    },
+    "known_renderer_warning": "M4, M5, and M7 contain only UE 5.8's engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning is present.",
+    "m8": {
+      "result": "4/4 passed cleanly: 4 Success, 0 SuccessWithWarnings, 0 Failed, 0 NotRun",
+      "report": "unreal/Saved/Automation/M9V367DepthV9RevertM8/index.json",
+      "report_sha256": "9d012d9619c0532ea50dcaa5e19ef96ee2a092b4a89617c0c9128a7e3d44eff0"
+    },
+    "m9": {
+      "result": "5/5 passed cleanly and remained fail-closed",
+      "report": "unreal/Saved/Automation/M9V370DepthV9ReconciledM9/index.json",
+      "report_sha256": "85153cdfe56fe3af40e6f2dc1acf59bcdd49af3284dc15258845e4a7384a23a5"
+    },
+    "full_python_data_source_matrix": {
+      "result": "1,145 passed, 3 expected installed-dependency-path skips, 1 intentional historical-v42 fail-closed hash mismatch, 0 unexpected failures in 525.430 seconds",
+      "report": "physics/reports/m9/m9_v369_depth_v9_revert_full_matrix.xml",
+      "report_sha256": "6e5e6f7c279d29b69a315ea92de80295e6c1bd3f22ec17d920be7f80620c7b87"
+    }
+  },
+  "next_iteration_requirements": [
+    "Duplicate or author a project-owned Niagara Fluids system rather than instancing an engine template directly; explicitly bind a liquid renderer and project-owned physically based water/foam materials.",
+    "Author deterministic warm-up or a baked FLIP/VDB/mesh-cache sequence so the first validated frame and every short-sequence frame contain evolved liquid rather than relying on asynchronous template compilation.",
+    "Expose a bounded contact volume, source/emitter geometry, solver-contact transform, surface attachment, entrained-air density, anisotropic spray, and collision-aware breakup without feeding presentation results back into D4 or live-water gameplay authority.",
+    "Validate at least three time-separated frames in the same persistent D4 event, including waterless isolation and matched normal-water macro/contact/wrap cameras.",
+    "Reject any candidate that reports active bounds without a visible depth body, or that reads as a wall, fin, tooth, smoke puff, detached tuft, or imperceptible overlay.",
+    "Obtain named water-VFX art and qualified South Fork guide approval before promotion, in addition to every remaining platform, input, signing, notarization, media, account, clean-build, and release gate."
+  ]
+}

@@ -13,6 +13,7 @@ authors = [
 ]
 dependencies = [
   "numpy>=1.26",
+  "Pillow>=12.0",
 ]
 
 [project.optional-dependencies]

@@ -4,11 +4,13 @@
 #include "GameFramework/Actor.h"
 #include "RaftSimCrewStateContracts.h"
 #include "RaftSimRaftCondition.h"
+#include "RaftSimRaftMesh.h"
 
 #include "RaftSimRaftActor.generated.h"
 
 class UStaticMeshComponent;
 class USceneComponent;
+class UMaterialInstanceDynamic;
 class ARaftSimCrewAvatarActor;
 class URaftSimChronoRuntimeAdapter;
 class URaftSimPhysicsBridgeSubsystem;
@@ -78,6 +80,10 @@ public:
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     USceneComponent* GetSternSeatAttachPoint() const { return SternSeatAttachPoint; }
 
+    /** True when the authored production rest mesh drives the D4 visual. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
+    bool HasProductionWhitewaterRaft() const { return bUsingProductionRaftRestMesh; }
+
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft")
     FVector GetRaftVelocity() const;
 
@@ -88,6 +94,49 @@ public:
     /** Deepest current tube indentation in meters, used to scale impact sheets. */
     UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
     float GetMaximumWaterContactIndentationM() const;
+
+    /** Current D4 contacts carrying multi-segment wrap support. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetWrappingRockContactCount() const;
+
+    /** Distinct D4 obstacles whose release margin is currently negative. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetPinnedRockObstacleCount() const;
+
+    /** Former contacts relaxing stored tube indentation after separation. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    int32 GetRecoveringRockContactCount() const;
+
+    /** True when the last D3 step consumed segment-keyed runtime water. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    bool IsUsingLiveD3WaterField() const;
+
+    /** Number of deformed tube segments sampled from live water last step. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    int32 GetLiveD3WaterSampleCount() const;
+
+    /** Number of those live D3 samples that were wet. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    int32 GetLiveD3WetSampleCount() const;
+
+    /** Retained D3 deck-water load from the last fixed step, in kilograms. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|Water")
+    float GetD3RetainedWaterMassKg() const;
+
+    /**
+     * Dominant current D4 contact expressed in world centimetres. The point,
+     * normal, and indentation come from the same per-segment solve that drives
+     * tube deformation and contact force; presentation systems may use it to
+     * place impact water without running a second visual collision model.
+     */
+    bool GetDominantWaterContactPresentation(
+        FVector& OutWorldPositionCm,
+        FVector& OutWorldNormal,
+        float& OutIndentationM) const;
+
+    /** Solver/contact-derived saturation applied to the coated raft fabric. */
+    UFUNCTION(BlueprintPure, Category = "RaftSim|Raft|VFX")
+    float GetSurfaceWetness() const { return SurfaceWetness; }
 
     // --- Flip / swim / recover loop (P2) ---------------------------------
 
@@ -255,6 +304,10 @@ protected:
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float CapsizeLatchSeconds = 0.35f;
 
+    /** Duration of the D3-triggered authoritative roll into inverted equilibrium. */
+    UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
+    float CapsizeTransitionSeconds = 0.85f;
+
     /** Reach radius (meters) within which a swimmer can be reseated. */
     UPROPERTY(EditAnywhere, Category = "RaftSim|Raft")
     float SwimmerReseatReachM = 3.0f;
@@ -277,6 +330,7 @@ protected:
 
 private:
     void UpdateCapsizeLoop(float DeltaSeconds);
+    void UpdateCapsizeTransition(float DeltaSeconds);
     void EnterCapsize();
     void DriftSwimmers(float DeltaSeconds);
     void TryReseatSwimmers();
@@ -292,6 +346,7 @@ private:
     void SpawnCrewVisuals();
     void BuildRaftVisual();
     void UpdateFlexibleRaftVisual();
+    void UpdateRaftWetness(float DeltaSeconds);
     void UpdateRockObstacles();
     FVector SampleWaterVelocityMps(const FVector& WorldLocationCm) const;
 
@@ -324,7 +379,16 @@ private:
     /** Raft location at the moment of capsize; re-flip rights the boat here. */
     FVector CapsizeLocation = FVector::ZeroVector;
 
+    /** Symmetric sealed-tube orientation reached after the live flip transition. */
+    FQuat CapsizeTargetRotation = FQuat::Identity;
+
+    FVector CapsizeRollAxisWorld = FVector::ForwardVector;
+    float CapsizeFlipDirection = 1.0f;
+    float CapsizeStartPitchDegrees = 0.0f;
+    float CapsizeStartRollDegrees = 0.0f;
+
     float FlipRiskLatchSeconds = 0.0f;
+    float CapsizeTransitionRemainingSeconds = 0.0f;
     bool bReflipRequested = false;
 
     // Crew state.
@@ -339,6 +403,32 @@ private:
 
     UPROPERTY()
     FRaftSimRaftConditionState RaftCondition;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> TubeMaterialInstance;
+
+    UPROPERTY(Transient)
+    TObjectPtr<UMaterialInstanceDynamic> FloorMaterialInstance;
+
+    /** CPU-readable authored rest topology, split by the five material slots. */
+    TArray<RaftSimRaftMesh::FMeshData> ProductionRaftRestSections;
+
+    /** Persistent dynamic buffers avoid copying immutable topology every frame. */
+    TArray<RaftSimRaftMesh::FMeshData> ProductionRaftDeformedSections;
+
+    /** Precomputed rest-vertex/D1-D4 Gaussian binding; dynamic solve state is not cached. */
+    RaftSimRaftMesh::FProductionRaftDeformationCache ProductionRaftDeformationCache;
+
+    /** Last D1-D4 state actually uploaded; unchanged local shapes need no CPU remesh. */
+    TArray<FRaftSimFlexVisualSegmentState> LastRenderedFlexVisualSegments;
+    RaftSimRaftMesh::FRaftSimRaftVisualCondition LastRenderedRaftVisualCondition;
+    bool bHasRenderedFlexibleRaftState = false;
+
+    /** Production topology is visual-only; the hidden hull and D3/D4 stay authoritative. */
+    bool bUsingProductionRaftRestMesh = false;
+
+    /** Persistent surface saturation; contact wets quickly and dries slowly. */
+    float SurfaceWetness = 0.0f;
 
     float CrewReactionRemaining = 0.0f;
     float CrewStrokeTimer = 0.0f;

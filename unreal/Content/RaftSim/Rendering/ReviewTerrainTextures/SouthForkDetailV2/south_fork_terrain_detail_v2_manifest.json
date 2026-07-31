@@ -1,0 +1,75 @@
+{
+  "schema": "raftsim.unreal.south_fork_terrain_detail_review.v2",
+  "generated_on": "2026-07-29",
+  "status": "project_owned_ai_generated_review_candidate_not_lifelike_or_accepted",
+  "decision": "review_only_do_not_promote_without_visual_scale_rights_and_art_approval",
+  "source": {
+    "path": "unreal/SourceArt/RaftSim/Environment/GeneratedTerrain/american_south_fork_terrain_bank_detail_source_v2.png",
+    "sha256": "34a441fe939f86b483a2d4fbc874e400b1768f3b7df3559f87067bfd138afe82",
+    "generator": "OpenAI built-in image generation",
+    "generation_mode": "built_in_image_generation_without_input_or_reference_images",
+    "model_or_seed": "not_exposed_by_generation_tool",
+    "prompt": "Use case: photorealistic-natural\nAsset type: tileable Unreal Engine riverbank base-color source texture representing a documented 2.0 metre by 2.0 metre ground patch\nPrimary request: create a photorealistic, seamless straight-down surface scan of a dry-to-damp Sierra Nevada foothill riverbank beside the South Fork American River\nScene/backdrop: the entire square is continuous ground surface, edge-to-edge\nSubject: compacted warm gray-brown granitic alluvium with a natural multi-scale mix of angular weathered granite chips, rounded river gravel, coarse sand, sparse pine needles, tiny fragments of dry oak leaf litter, restrained pale lichen, and a few darker damp seams; most stones 1\u20138 cm, occasional stones 10\u201318 cm, no boulders\nStyle/medium: physically plausible high-resolution photogrammetry-style diffuse/base-color scan, not a rendered material ball\nComposition/framing: perfectly orthographic 90-degree top-down view; even density; seamless/tileable opposite edges; no central focal point; no border\nLighting/mood: flat overcast cross-polarized scan lighting with no directional shadows, no ambient occlusion baked into color, no highlights, and neutral white balance\nColor palette: natural Sierra foothill granite, muted gray, warm brown, restrained olive lichen; avoid saturated green\nMaterials/textures: crisp centimeter-scale mineral grains, soil aggregates, gravel edge wear, needle fibers, subtle moisture color variation; realistic stochastic distribution without repeated motifs\nConstraints: square texture; no perspective; no horizon; no plants growing upright; no water; no footprints; no human objects; no text; no watermark; no logos\nAvoid: obvious AI repetition, circular pebble tiling, oversized rocks, smooth mud, fantasy colors, studio shadows, vignetting, depth of field, border seams, mirrored symmetry",
+    "prompted_physical_width_m": 2.0,
+    "source_pixel_dimensions": [
+      1254,
+      1254
+    ]
+  },
+  "derivation": {
+    "implementation": "raftsim.production_detail_textures deterministic periodic-map functions",
+    "output_size": [
+      1024,
+      1024
+    ],
+    "albedo": "opposite-edge feathering, exact outer-edge matching, bounded contrast, and unsharp detail",
+    "normal": "wrapped luma-gradient tangent-space normal",
+    "ao_roughness_height": "wrapped local-relief response packed as R=AO G=roughness B=height",
+    "seam_policy": "opposite_edge_feather_with_exact_matching_outer_edges"
+  },
+  "unreal_review": {
+    "asset_root": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures",
+    "binding_scope": "transient_fixed_camera_capture_only",
+    "material_parameters": {
+      "GroundAlbedo": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Albedo",
+      "GroundNormal": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Normal",
+      "GroundPacked": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Packed"
+    },
+    "current_parent_world_projection_width_m": 3.2,
+    "scale_mismatch": "The generated source was prompted as a 2.0 m patch, while the locked production terrain parent projects Ground* at 3.2 m. This review measures the candidate under that current parent and cannot establish physical-scale acceptance."
+  },
+  "maps": {
+    "albedo": {
+      "path": "unreal/Content/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/american_south_fork_terrain_bank_detail_v2_albedo.png",
+      "sha256": "704b7972cde19dabf5dcc19515233a7a860d6637005d00483f8ecd27da06b6b7",
+      "width": 1024,
+      "height": 1024,
+      "channels": "RGB base color",
+      "unreal_texture_asset": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Albedo"
+    },
+    "normal": {
+      "path": "unreal/Content/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/american_south_fork_terrain_bank_detail_v2_normal.png",
+      "sha256": "59a2f35e43eabea205452baf63c148303a0043a31d12bcddee829b14533ae048",
+      "width": 1024,
+      "height": 1024,
+      "channels": "RGB tangent-space normal",
+      "unreal_texture_asset": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Normal"
+    },
+    "ao_roughness_height": {
+      "path": "unreal/Content/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/american_south_fork_terrain_bank_detail_v2_ao_roughness_height.png",
+      "sha256": "28b35d57ded01c9e0205350c07ff01700a542d2e11b2f69dca81a7afbdad5df2",
+      "width": 1024,
+      "height": 1024,
+      "channels": "R=AO G=roughness B=height",
+      "unreal_texture_asset": "/Game/RaftSim/Rendering/ReviewTerrainTextures/SouthForkDetailV2/Textures/T_RaftSim_SouthForkTerrainDetailV2Review_Packed"
+    }
+  },
+  "policy": {
+    "does_not_replace_production_v1": true,
+    "does_not_drive_hydraulics_collision_or_navigation": true,
+    "not_geospatial_evidence": true,
+    "not_lithology_evidence": true,
+    "not_photoreal_acceptance": true,
+    "named_art_and_rights_review_required": true
+  }
+}

@@ -355,8 +355,9 @@ RAFTSIMPHYSICS_API FRaftSimFlexSeatLoadSolve SolveSeatLoadCoupledTubeD2(
     double BraceDownforceFraction = 0.08,
     double RecoveryDownforceFraction = 0.04);
 
-// evaluate_overwash_flip_d3 (flexible_raft_d3.py) with the synthetic uniform
-// water field used by the D6 fixture inputs.
+// evaluate_overwash_flip_d3 (flexible_raft_d3.py). The uniform descriptor
+// preserves the deterministic D6 fixture contract. Runtime callers may also
+// supply segment-keyed live samples; missing segment samples use Water.
 RAFTSIMPHYSICS_API FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     const FRaftSimFlexSeatLoadSolve& SeatTubeSolve,
     const FRaftSimFlexUniformWater& Water,
@@ -367,7 +368,11 @@ RAFTSIMPHYSICS_API FRaftSimFlexOverwashSolve EvaluateOverwashFlipD3(
     double FluxCoefficient = 0.65,
     double DrainageRatePerS = 0.55,
     double WaterDensityKgM3 = 1000.0,
-    double GravityMps2 = 9.81);
+    double GravityMps2 = 9.81,
+    const TMap<FString, FRaftSimFlexUniformWater>* WaterBySegment = nullptr,
+    double MaximumIncomingSpeedMps = TNumericLimits<double>::Max(),
+    double MaximumOvertoppingDepthM = TNumericLimits<double>::Max(),
+    double MaximumRetainedVolumePerSegmentM3 = TNumericLimits<double>::Max());
 
 // evaluate_rock_contact_wrap_pin_d4 (flexible_raft_d4.py).
 RAFTSIMPHYSICS_API FRaftSimFlexRockContactSolve EvaluateRockContactWrapPinD4(
