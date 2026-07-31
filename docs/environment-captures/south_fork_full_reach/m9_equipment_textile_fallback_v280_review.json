@@ -1,0 +1,40 @@
+{
+  "schema": "raftsim.m9.equipment_textile_fallback_visual_review.v1",
+  "status": "technical_fallback_accepted_photoreal_art_rejected",
+  "review_scope": "Renderer-backed close-range diagnostic of the project-owned generated raft coating, PFD ripstop, and wetsuit neoprene PBR maps on the current procedural raft and Manny crew fallback.",
+  "source_manifest": "unreal/SourceArt/RaftSim/Equipment/GeneratedTextiles/generated_textile_pbr_manifest.json",
+  "unreal_import": {
+    "run": "v279",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m9_v279_equipment_textile_tuning_import_20260726.log",
+    "texture_assets_saved": 9,
+    "dependent_material_assets_saved": 8,
+    "passed": true
+  },
+  "renderer_evidence": {
+    "run": "v280",
+    "test": "RaftSim.M5.RuntimeRescueLoop",
+    "result": "Success",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_m5_v280_equipment_textile_tuned_render_20260726.log",
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_equipment_textile_fallback_v280_rejected.png",
+    "capture_sha256": "1601ba4fba7940c5b78f325776f3c7021dc3c6827d3449d13208caf4a961d29b",
+    "capture_width": 1280,
+    "capture_height": 1765,
+    "camera_qualification": "The guide camera was explicitly activated and assigned as the player-controller view target; the raft and all five crew avatars occupy the review frame.",
+    "human_approved": false
+  },
+  "accepted_findings": [
+    "All three material families use deterministic 1024x1024 albedo, tangent-space normal, and packed ambient-occlusion/roughness/height maps with wrapped addressing.",
+    "The four-way mirrored derivation removes the rejected center-cross seam from the first processing attempt.",
+    "The tuned coated-fabric response adds restrained surface breakup to the raft and is acceptable as a project-owned fallback that can transfer to replacement geometry.",
+    "The renderer-backed rescue scenario remains functionally successful after import and shader changes."
+  ],
+  "rejected_findings": [
+    "The PFD surfaces retain visible high-frequency grain and do not meet a production textile standard.",
+    "The blank Manny anatomy, hood-like head treatment, generic wardrobe, and procedural safety-gear silhouettes remain unmistakably placeholder character art.",
+    "The raft geometry remains procedural and does not match a scanned or artist-authored production craft at close range.",
+    "This diagnostic frame is not approved as photoreal evidence, marketing media, a store screenshot, or final art-direction acceptance."
+  ],
+  "decision": "Keep the maps as an honest project-owned fallback and reusable material foundation. Do not close the M9 photoreal character, raft, PFD, art-direction, or release-media gates. Replace or explicitly approve the geometry and wardrobe through named art review, then repeat the same renderer-backed close-range test.",
+  "named_art_reviewer": null,
+  "reviewed_utc": "2026-07-26T16:19:15Z"
+}

@@ -1,0 +1,36 @@
+{
+  "candidate": "m9_contact_boulder_pbr_v84",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_contact_boulder_pbr_v84.png",
+  "camera": "river_action",
+  "runtime_visual": "ProductionRockVisual",
+  "runtime_material": "/Game/RaftSim/Environment/SouthForkFullReach/Dressing/Materials/MI_RaftSim_SouthForkProductionBoulder",
+  "geometry_authority": "project_owned_closed_production_river_boulder",
+  "appearance_source": "rights_tracked_cc0_poly_haven_rockground_4k_analog",
+  "physics_changed": false,
+  "solver_evidence": {
+    "active_contacts": 3,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.996,
+    "contact_patch_triangles": 96
+  },
+  "validation": {
+    "focused_source_contracts": "36/36 passed",
+    "editor_build": "passed",
+    "map_rebuild": "passed",
+    "m5": "4/4 passed; one known motion-vector warning",
+    "material_fallback_warning": false
+  },
+  "retained_improvements": [
+    "The runtime D4 contact mesh now uses the same two-scale world-aligned PBR family as full-reach boulder dressing.",
+    "A solver-sampled, noise-broken wet/dry boundary preserves local waterline response.",
+    "The optional reviewed scan and procedural fail-safe remain on isolated material paths."
+  ],
+  "open_visual_findings": [
+    "The rock remains an appearance analog and is not represented as site-specific geology.",
+    "Broad water and shoreline transitions remain visibly synthetic.",
+    "Canopy silhouettes, crew biomechanics, raft highlights, and hydraulic aerosol remain below the photoreal target."
+  ]
+}

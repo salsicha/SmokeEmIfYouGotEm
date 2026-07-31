@@ -1,0 +1,186 @@
+{
+  "schema": "raftsim.review.south_fork_live_oak_cc0_morphology.v213",
+  "reviewed_on": "2026-07-29",
+  "milestone": "M9",
+  "candidate": "poly_haven_island_tree_set_as_south_fork_broadleaf_morphology_donor",
+  "status": "technical_trial_validated_visual_promotion_rejected_material_and_distance_instability",
+  "production_promoted": false,
+  "photoreal_accepted": false,
+  "species_identity_approved": false,
+  "inputs": {
+    "species_visual_target": "Quercus wislizeni / California interior live oak",
+    "candidate_disclosure": "Generic wind-sculpted coastal broadleaf morphology donor only; not surveyed Quercus wislizeni, not a California ecology authority, and not a production species claim.",
+    "source_bundle": {
+      "asset_id": "polyhaven_futaleufu_island_tree_set_1k",
+      "publisher": "Poly Haven",
+      "license": "CC0 1.0 Universal",
+      "source_pages": [
+        "https://polyhaven.com/a/island_tree_01",
+        "https://polyhaven.com/a/island_tree_02",
+        "https://polyhaven.com/a/island_tree_03"
+      ],
+      "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/polyhaven_futaleufu_island_tree_set_source_manifest.json",
+      "source_manifest_sha256": "596c6f8430e702843a4c9e53883f26d2bb3db58317b837dfce8874ddbd93ebcf",
+      "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_futaleufu_island_tree_set_import_report.json",
+      "import_report_sha256": "2ee16af1d60b4b1fbf28a35f9ff073e5655e3e1fdef55bbfa44d9fc562b51857",
+      "prior_futaleufu_visual_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/polyhaven_futaleufu_island_tree_set_visual_comparison_review.json",
+      "prior_futaleufu_visual_review_sha256": "0049f3ecad2a950a0353bead7559a04f7f33c8008ff3de7a4bab263d7955da2a",
+      "source_files_verified": 33,
+      "meshes": 3,
+      "textures": 30,
+      "materials": 9
+    }
+  },
+  "donor_contract": {
+    "material_policy": "Preserve all imported source trunk, leaf, and branch materials for the unmodified-material baseline.",
+    "nanite_enabled_for_all_meshes": true,
+    "grounded_pivots_validated": true,
+    "target_proxy_envelope_cm": {
+      "crown_width": 1250.0,
+      "tree_height": 920.0
+    },
+    "forms": {
+      "island_tree_01": {
+        "object_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree01.SM_IslandTree01",
+        "source_width_cm": 1250.0,
+        "source_height_cm": 1304.851148,
+        "horizontal_scale": 1.0,
+        "vertical_scale": 0.705062,
+        "mesh_sha256": "9998c61b296c789dac41a656de3b71ccf1bc226983f772db1365ea1c55b1157d",
+        "material_hashes": {
+          "trunk": "cf917717e8d2aa76e7deb10b6e7bc823af750acaa6b6cb0f538aeed619bcf6e1",
+          "leaves": "8ff5e588894d88f5f72285652d550360a3aaefd5bddce2e76d7567177093fb8c",
+          "branches": "6b17f3e5966f0f9791def2f06fe8a732117d264ee1e0ac3ce70eb2a5ac6f492c"
+        }
+      },
+      "island_tree_02": {
+        "object_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree02.SM_IslandTree02",
+        "source_width_cm": 850.0,
+        "source_height_cm": 686.958523,
+        "horizontal_scale": 1.470588,
+        "vertical_scale": 1.339236,
+        "mesh_sha256": "a289e8e83dffda639e220427cdbc40ef078c8e2e84642bf717b27dae41485c1a",
+        "material_hashes": {
+          "trunk": "8c9fd1e712c2dfd4c0962bb1724be8fdbe1f97e335faf04fe37b72a0328db1f7",
+          "leaves": "7a29d2a5f8917a491f99e11dbfae223fd42c277dcba8692e291ea7a2dce52b30",
+          "branches": "068af3ecdf568ef383a20c4e594f24eed61ae3c8e0a39aa699f8a61700b35711"
+        }
+      },
+      "island_tree_03": {
+        "object_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/FutaleufuIslandTreeSet_1K/SM_IslandTree03.SM_IslandTree03",
+        "source_width_cm": 850.0,
+        "source_height_cm": 789.970568,
+        "horizontal_scale": 1.470588,
+        "vertical_scale": 1.1646,
+        "mesh_sha256": "b58bc0764143335fe499d344c9f768b0c05f456c9073826cf2b0a5e46256d472",
+        "material_hashes": {
+          "trunk": "6a6cbf7fd417007b4734f0af3d4506e4050ddb7b436949e3ef972549871f35d9",
+          "leaves": "199c420a59ac0efecd0b397f1a83dde529691c7cc0d77071d81ff89a1c4ed7ea",
+          "branches": "7e2fe14d8d428e0b4094fb587b6b972908cd23ac292da4d7a574a7d26f1ea00c"
+        }
+      }
+    }
+  },
+  "integration": {
+    "capture_flag": "RaftSimLiveOakIslandTreeMorphologyReview",
+    "source_sha256": "e9b8ae80a9a89f94800faf7928bbdba63ab9ae2fdaed4d48828e6b90b3bf2677",
+    "selection_key": "stable hash of actor path plus HISM component name",
+    "population_gate": {
+      "components": 21,
+      "instances": 24830,
+      "exact_match_required": true
+    },
+    "component_level_distribution": {
+      "island_tree_01": {"components": 8, "instances": 8535},
+      "island_tree_02": {"components": 5, "instances": 8421},
+      "island_tree_03": {"components": 8, "instances": 7874},
+      "per_instance_selection_supported": false
+    },
+    "all_original_world_transforms_restored": true,
+    "all_original_meshes_restored": true,
+    "saved_map_changed": false,
+    "saved_map_mtime_before_capture": "2026-07-29T15:34:34-0700",
+    "saved_map_mtime_after_capture": "2026-07-29T15:34:34-0700",
+    "saved_map_sha256_before_capture": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e",
+    "saved_map_sha256_after_capture": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e"
+  },
+  "capture": {
+    "directory": "docs/environment-captures/south_fork_full_reach/photographic_v213_live_oak_cc0_island_tree_morphology",
+    "hashes": {
+      "chili_bar_launch_downstream.png": "58955974c9c409305acd4a89da3d74f13b114547575ca46044519e5d50d1874b",
+      "coloma_bridge_context.png": "19af06d0e6bcef7dba075ff7894a3e43f72228a93747bc51920510f46ab0480a",
+      "meat_grinder_guide_eye.png": "9e3f341a2073fe4ad74dd8d938a609514f9d02b2eabb131c1ec825e01d1e2947",
+      "salmon_falls_takeout.png": "b076ac5278b9a1454a1b2ce7edb823dfbe20e0b4009aa6fc67d5994646607775",
+      "troublemaker_approach.png": "6ee2d70699ca7198fce9b7790a2b30255d431ad94e5aeb796bb781d089ce968f"
+    },
+    "comparison_to_v212": {
+      "mean_absolute_rgb_average": 1.596496,
+      "percent_pixels_any_channel_gt_8_average": 3.530273,
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"],
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.695839, 2.346137],
+        "coloma_bridge_context.png": [2.927688, 6.037977],
+        "meat_grinder_guide_eye.png": [0.941605, 2.583442],
+        "salmon_falls_takeout.png": [1.041793, 1.542969],
+        "troublemaker_approach.png": [2.375554, 5.140842]
+      }
+    },
+    "comparison_to_v202": {
+      "mean_absolute_rgb_average": 1.764305,
+      "percent_pixels_any_channel_gt_8_average": 3.430686,
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"],
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.788206, 2.446181],
+        "coloma_bridge_context.png": [2.349526, 4.533095],
+        "meat_grinder_guide_eye.png": [1.107832, 2.962240],
+        "salmon_falls_takeout.png": [1.903171, 2.233832],
+        "troublemaker_approach.png": [2.672791, 4.978082]
+      }
+    }
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "unreal_capture_exit_code": 0,
+    "capture_count": 5,
+    "population_gate_passed": true,
+    "restoration_gate_passed": true,
+    "map_immutability_gate_passed": true
+  },
+  "manual_review": {
+    "positive_findings": [
+      "The candidate uses rights-reviewed botanical trunk, branch, twig, and leaf geometry rather than another generated scaffold.",
+      "Three materially and geometrically distinct forms are represented across the exact current source population.",
+      "Envelope normalization makes the imported forms comparable to the production broadleaf proxy without mutating donor packages.",
+      "The source materials, Nanite settings, grounded pivots, provenance, and license chain remain intact for this baseline."
+    ],
+    "rejection_reasons": [
+      "Near and mid-field foliage resolves as very dark, narrow masses instead of the broad, dense, rounded California interior-live-oak crowns required by the reference target.",
+      "Several branch and leaf clusters break into bright, empty, or sparse artifacts, especially at Chili Bar, Meat Grinder, and Coloma.",
+      "Far views still collapse into repeated vertical black marks and do not establish a continuous, distance-stable riparian canopy.",
+      "The donor trees are generic wind-sculpted coastal broadleaf analogs, not reviewed Quercus wislizeni forms or an approved South Fork species set.",
+      "Component-level selection repeats one form inside each HISM batch and does not provide the per-instance age, silhouette, seasonal, root, and understory variation needed for production.",
+      "Terrain, water, other foliage, lighting, and shoreline integration remain synthetic; none of these frames is acceptable release media."
+    ],
+    "decision": "Reject v213 visual promotion. Retain the hash-locked CC0 donor intake and reversible scale-normalized integration seam as technical infrastructure only.",
+    "next_required_visual_input": "Use the real donor geometry only in a distinct material/transition bracket that fixes masked leaf and branch-card behavior, calibrated two-sided foliage lighting, alpha-covered mips, and near/mid/far representation. Promotion still requires multiple reviewed California live-oak age forms, per-instance variation, roots/understory integration, temporal evidence, and named art/ecology approval."
+  },
+  "authority": {
+    "affects_species_classification": false,
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "affects_gameplay": false
+  },
+  "external_gates": {
+    "named_art_review": "missing",
+    "named_ecology_review": "missing"
+  },
+  "milestone_gate": {
+    "m9_passed": false,
+    "authoritative_visual_baseline": "v184",
+    "commit_allowed": false,
+    "push_allowed": false
+  }
+}

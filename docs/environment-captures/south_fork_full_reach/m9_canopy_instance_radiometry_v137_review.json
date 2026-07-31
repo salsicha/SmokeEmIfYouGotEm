@@ -1,0 +1,135 @@
+{
+  "schema": "raftsim.m9.canopy_instance_radiometry_review.v1",
+  "reviewed_utc": "2026-07-29T11:22:01Z",
+  "candidate": "m9_canopy_instance_radiometry_v137",
+  "parent": "m9_domain_warped_macro_infill_v136",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "canopy_topology": "unchanged two orthogonal planes; 8 vertices and 4 triangles per asset",
+    "species_profiles": 6,
+    "source_art_changed": false,
+    "instance_placement_changed": false,
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "per_instance_energy_range": [
+      0.88,
+      1.14
+    ],
+    "per_instance_energy_mean": 1.01,
+    "per_instance_opacity_range": [
+      0.92,
+      1.1
+    ],
+    "ponderosa_base_tint_before": [
+      0.78,
+      0.82,
+      0.7
+    ],
+    "ponderosa_base_tint_after": [
+      0.82,
+      0.86,
+      0.74
+    ],
+    "white_alder_base_tint_before": [
+      0.76,
+      0.82,
+      0.68
+    ],
+    "white_alder_base_tint_after": [
+      0.8,
+      0.86,
+      0.72
+    ],
+    "oak_and_deerbrush_base_tint_before": [
+      0.66,
+      0.74,
+      0.58
+    ],
+    "oak_and_deerbrush_base_tint_after": [
+      0.7,
+      0.78,
+      0.62
+    ]
+  },
+  "asset_regeneration": {
+    "exit_code": 0,
+    "validated_assets": 18,
+    "validated_meshes": 6,
+    "mesh_vertices_each": 8,
+    "mesh_triangles_each": 4,
+    "log": "/private/tmp/raftsim_m9_v137_canopy_radiometry_assets.log",
+    "log_sha256": "df428b911f45196ea1906bebcb2b087b2a572d3a5ba5acc7c43b2626fdf9b0ad"
+  },
+  "renderer_review": {
+    "capture_resolution": [
+      1280,
+      720
+    ],
+    "fixed_view_count": 5,
+    "capture_log": "/private/tmp/raftsim_m9_v137_canopy_radiometry_capture.log",
+    "capture_log_sha256": "2e6a7b085b2a5b5771d380c1107216d06afcf45351d98e751b7744da3c10bac4",
+    "historical_v136_capture_sha256_before_overwrite": {
+      "chili_bar_launch_downstream": "f3c441953721847e19cea3d5d3711c0ed8526decb88410d4c198cf98cc9a2424",
+      "meat_grinder_guide_eye": "8ac266dc8591774c6a97efbcef8233eac10c58313f076dc3d42815f020f1efe5",
+      "troublemaker_approach": "9444c282875a1dd4122ec090b1d5aa55356d12983fcbdd04150f6b7d764c062e",
+      "coloma_bridge_context": "9c2eabb8c9526952020163e900ce9b4158494831b24c43d463839adc42c96452",
+      "salmon_falls_takeout": "e80035c0960e23499e24106d8be93d56a8faa5c412f0771ce64a376c5daa93ac",
+      "retention_note": "The fixed capture slots are updated in place. These hashes identify the inspected v136 parent but do not claim separately versioned bitmap files."
+    },
+    "capture_sha256": {
+      "chili_bar_launch_downstream": "e6d95553b0e15f105fb57013f3544a9af97040781ec80aa2505ce86da570c61d",
+      "meat_grinder_guide_eye": "77ce0f7c72648d36061f6c3756a47a345fb301b944f9d0177d7024f5d1b751d5",
+      "troublemaker_approach": "b489b3b8ca370631c742e9e26cf5f904299a75061c71f25ceea688a821b233a0",
+      "coloma_bridge_context": "cf1fb3b31720e7f371f7fb2c66de0fd9f85ccb072658f02d8459e1d28a2b7983",
+      "salmon_falls_takeout": "f68e3eb1c60c65c3514b091d2083c536d9b8a64c0b852e28e2fb75af3d1d4ed3"
+    },
+    "accepted_findings": [
+      "Near- and mid-field crowns are modestly brighter and no longer converge as uniformly toward black under the retained v132 daylight state.",
+      "Bounded per-instance material variation introduces small radiometric differences without changing ecology, placement, silhouette topology, collision, or hydraulic authority.",
+      "All five fixed views retain controlled masked edges; no pale canopy wall, clipped highlight, or high-frequency opacity-noise regression was observed."
+    ],
+    "photoreal_acceptance": false
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "focused_editor_source_layout": "10 passed, 13 deselected",
+    "asset_regeneration": "passed and exited cleanly",
+    "fixed_capture": "passed and exited cleanly"
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v137_hlod_build.log",
+    "fresh_build_log_sha256": "b76e20d3450ed66ea6caa5e4c9783ab8966cad02b9c0e4650b8158fdb93dea17",
+    "fresh_build_actor_count": 24,
+    "fresh_build_modified_and_saved_actor_count": 19,
+    "intermediate_repeat_log": "/private/tmp/raftsim_m9_v137_hlod_settled_repeat.log",
+    "intermediate_repeat_log_sha256": "a260bf9e8eb1bdea37402f95d544578bebff9c42b33110c581d135a42b3a2469",
+    "intermediate_repeat_actor_count": 24,
+    "intermediate_repeat_modified_and_saved_actor_count": 15,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v137_hlod_settled_repeat_2.log",
+    "settled_repeat_log_sha256": "5b585acfa8257ddb872c3cf5458849990efc94ba4e143d5134c42f6885efef11",
+    "settled_repeat_actor_count": 24,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "errors": 0,
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "4a215c13d576f41c98e1e76d6d8a134d02865ab7b39642a84c76cfab78692c2a",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "6d5d307de10baa46ae5cd82deb7b9cd78d83e850b21f4fb5c25242876562b20f"
+  },
+  "release_effect": {
+    "canopy_readability_improved": true,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "open_findings": [
+    "Two-plane foliage remains obviously card-like at guide-eye distance and lacks connected branch, needle, leaf, and crown volume.",
+    "Stand-scale silhouettes remain repetitive, especially on far hills where card orientation and sparse spacing are exposed.",
+    "Water, shoreline, broad terrain materials, rocks, raft, characters, equipment, and motion remain below the target photoreal presentation.",
+    "Named art, rafting-guide, geospatial, legal, and product-owner review remains pending."
+  ],
+  "decision": "Retain the bounded per-instance canopy radiometry and small species-specific lift as a technical readability improvement. Keep photoreal, named-review, release-media, and M9 completion gates fail-closed."
+}

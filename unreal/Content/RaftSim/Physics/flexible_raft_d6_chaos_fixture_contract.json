@@ -9,7 +9,7 @@
   },
   "d6_complete": false,
   "fixed_step_seconds": 0.03333333333333333,
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-28",
   "job_count": 7,
   "jobs": [
     {
@@ -78,13 +78,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/static_seat_load_sag_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/static_seat_load_sag",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/static_seat_load_sag.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/static_seat_load_sag.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -152,13 +151,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/traveling_crew_shift_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/traveling_crew_shift",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/traveling_crew_shift.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/traveling_crew_shift.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -226,13 +224,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/rock_pinch_wrap_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/rock_pinch_wrap",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/rock_pinch_wrap.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/rock_pinch_wrap.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -299,13 +296,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/upstream_tube_overwash_flip_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/upstream_tube_overwash_flip",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/upstream_tube_overwash_flip.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/upstream_tube_overwash_flip.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -373,13 +369,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/timed_high_side_save_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/timed_high_side_save",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/timed_high_side_save.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/timed_high_side_save.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -445,13 +440,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/post_contact_recovery_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/post_contact_recovery",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/post_contact_recovery.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/post_contact_recovery.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     },
     {
@@ -560,13 +554,12 @@
         "determinism_hash"
       ],
       "runtime": "UnrealChaos",
-      "status": "ready_for_unreal_runner_implementation_pending",
+      "status": "runner_implemented_measurement_recorded_manual_review_pending",
       "unreal_target": {
-        "debug_overlay_capture": "Saved/Automation/RaftSim/D6/Chaos/pressure_flow_sweeps_overlay.png",
-        "fixture_map": "/RaftSim/Physics/D6/Chaos/pressure_flow_sweeps",
-        "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-        "telemetry_stream": "Saved/Automation/RaftSim/D6/Chaos/pressure_flow_sweeps.telemetry.jsonl",
-        "test_type": "EditorContext | EngineFilter"
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "telemetry_stream": "physics/reports/d6/chaos/replays/pressure_flow_sweeps.telemetry.json",
+        "test_type": "EditorContext | EngineFilter",
+        "world_source": "transient_EWorldType_Game_from_committed_fixture_input"
       }
     }
   ],
@@ -576,7 +569,7 @@
     "may_drive_runtime_gameplay": false,
     "may_mark_d6_complete": false,
     "may_substitute_python_reference": false,
-    "reason": "This contract defines the Unreal Chaos baseline runner inputs and expected outputs only. D6 still requires measured Chaos exports, compliant-reference exports, comparison regeneration, and manual review."
+    "reason": "The Unreal Chaos baseline runner and all seven measured exports are implemented. D6 still requires an independent compliant-reference export, comparison regeneration, and manual review."
   },
   "required_fixture_ids": [
     "static_seat_load_sag",
@@ -593,11 +586,15 @@
     "engine_version",
     "metrics"
   ],
+  "runner_automation_test_name": "RaftSim.D6.ChaosRunnerExportBundle",
+  "runner_execution": "Transient EWorldType::Game physics scenes with fixed UWorld ticks, valid FChaosEngineInterface rigid actor handles, and repeated deterministic runs.",
+  "runner_implementation_source": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/RaftSimD6ChaosMeasuredRunner.cpp",
+  "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
   "runtime": "UnrealChaos",
   "schema": "raftsim.flexible_raft.d6_chaos_fixture_contract.v1",
   "source_fixture_input_package": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
   "source_measured_results_template": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
   "source_measurement_manifest": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
   "source_milestone19_runtime_manifest": "unreal/Content/RaftSim/Physics/chaos_automation_fixtures.json",
-  "status": "chaos_fixture_contract_ready_runner_implementation_pending"
+  "status": "chaos_fixture_runner_implemented_measurements_recorded_manual_review_pending"
 }

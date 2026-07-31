@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Bouncing Rock",
       "rapid_order": 16,
+      "source_elevation_datum_m": 211.4106778076172,
       "station_m": 29290.0608,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

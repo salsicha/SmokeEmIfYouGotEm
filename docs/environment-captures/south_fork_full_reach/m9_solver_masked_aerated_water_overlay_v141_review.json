@@ -1,0 +1,116 @@
+{
+  "schema": "raftsim.m9.solver_masked_aerated_water_overlay_review.v1",
+  "reviewed_utc": "2026-07-29T13:55:08Z",
+  "candidate": "m9_solver_masked_aerated_water_overlay_v141",
+  "parent": "m9_all_species_connected_crown_v140",
+  "status": "retained_active_technical_baseline_photoreal_and_release_promotion_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "source_authority": "conditioned live-water solver foam channel, wet mask, and shoreline depth",
+    "flow_presentations": 3,
+    "generated_overlay_actors": 24,
+    "generated_overlay_triangles": 31189,
+    "material": "/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverFieldFoamCandidate",
+    "material_blend_mode": "masked_default_lit",
+    "material_opacity_clip": 0.18,
+    "fine_breakup_texture": "/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/T_RaftSim_SouthForkWater_FoamLace",
+    "fine_breakup_texture_source": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FoamLace.png",
+    "calm_solver_cells_emit_overlay": false,
+    "dry_solver_cells_emit_overlay": false,
+    "shallow_shoreline_cells_emit_overlay": false,
+    "maximum_vertical_displacement_m": 0.48,
+    "collision": "disabled",
+    "hydraulic_authority_changed": false,
+    "gameplay_navigation_changed": false,
+    "actor_identity": "deterministic map/class/label GUID and object name",
+    "hlod_material_usage_persisted": true,
+    "editor_source_split": {
+      "new_file": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkMeshAuthoring.cpp",
+      "full_reach_line_count": 2999,
+      "enforced_maximum_line_count": 3000
+    }
+  },
+  "native_validation": {
+    "editor_build": "passed",
+    "focused_native_test": "RaftSim.M9.EShorelinePresentationCompletion passed",
+    "focused_native_test_log": "/private/tmp/raftsim_m9_v141_solver_foam_post_split_test.log",
+    "focused_native_test_log_sha256": "db0d39af91a71f051c248fe866a64b7a4d3e31b7e6f3f6b2aa5f95ee47321217",
+    "focused_python": "24 passed",
+    "black": "passed",
+    "ruff": "passed",
+    "diff_check": "passed with Git LFS clean filter disabled for read-only inspection",
+    "full_reach_regeneration_log": "/private/tmp/raftsim_m9_v141_solver_foam_final_full_reach.log",
+    "full_reach_regeneration_log_sha256": "aac928528f4ba7d4cdb0d94f7be573e175ec7a9785baaaf667ba83bb29fac22c",
+    "validated_full_reach_asset_count": 122,
+    "stable_world_partition_actor_identities": 200,
+    "map_check_errors": 0,
+    "map_check_warnings": 0,
+    "metal_shader_compile_errors": 0,
+    "capture_log": "/private/tmp/raftsim_m9_v141_solver_foam_final_capture.log",
+    "capture_log_sha256": "6453b3c7a636c94bc0ce3f315b30b19e189a1f6d222fe8559478d8ba296e404e",
+    "loaded_world_partition_actor_references": 231,
+    "fixed_view_count": 5,
+    "capture_resolution": [1280, 720],
+    "capture_sha256": {
+      "chili_bar_launch_downstream": "af8d5e5a6ab634014f24ff4a90982dc117927f6b314ade688a2b97212e61eda2",
+      "meat_grinder_guide_eye": "5a61b94198da8e132dc25918352f2db7dd2d715c355d5b0a1ab80de63b6506d9",
+      "troublemaker_approach": "4360202eff628adc4c6fab3fad4e9b61320283210f0c135ffbc5f5c52f6bfe6d",
+      "coloma_bridge_context": "1e0f0db9309532a4d0969fb7a8d27469e8e8a96d5d1cd52bd801665e8232e8bb",
+      "salmon_falls_takeout": "e15ab0399029e22dd0b2a04d5ec4d9bf76ecf0fdedac7f6adff203f92d1669fb"
+    },
+    "preserved_representative_captures": {
+      "chili_bar": "docs/environment-captures/south_fork_full_reach/m9_solver_masked_aerated_water_overlay_v141_chili_bar.png",
+      "meat_grinder": "docs/environment-captures/south_fork_full_reach/m9_solver_masked_aerated_water_overlay_v141_meat_grinder.png",
+      "troublemaker": "docs/environment-captures/south_fork_full_reach/m9_solver_masked_aerated_water_overlay_v141_troublemaker.png"
+    }
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v141_hlod_final_build.log",
+    "fresh_build_log_sha256": "5e2d6252c2cbafe961cc365008063d9cb27aa852a5854cebf7988623c99cf267",
+    "fresh_build_actor_count": 30,
+    "fresh_build_modified_and_saved_actor_count": 30,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v141_hlod_zero_save_repeat.log",
+    "settled_repeat_log_sha256": "06e1d2ef190a7b9dce39a99ea5218acec82bf6e91942908d905acebe5a802199",
+    "settled_repeat_actor_count": 30,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "settled_repeat_rejected_rebuild_count": 30,
+    "errors": 0,
+    "warnings": 2,
+    "warning_scope": "unchanged local Zen sponsor-capacity and engine enum-string warnings",
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "e2933cee80354391cf3e63b114dfb707d07b1baa080b8671730b8142f9d55a95",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "a9978a91af0c655f030514733b970d0918e1fe379e320fed5b57ab2f5e5a4814"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "Positive solver-foam cells now survive the broad Single Layer Water pass as a separately visible, non-colliding masked crest layer.",
+      "The Meat Grinder guide-eye view shows a restrained solver-aligned broken crest/ripple near the intended rock feature rather than the rejected opaque white slab produced by the earlier shader-compile fallback.",
+      "No white plate, material fallback, detached foam sheet, calm-water foam field, or unintended overlay was observed in the five settled fixed views.",
+      "The generated material compiles for SF_METAL_SM6 and persists instanced-static-mesh usage, allowing the expanded 30-actor HLOD set to reach a zero-save fixed point."
+    ],
+    "rejected_attempt": {
+      "finding": "The first texture-wired graph applied a component mask to an incompatible output; Metal rejected it and Unreal rendered the default white material as large faceted plates.",
+      "disposition": "rejected and replaced with direct vertex-alpha and texture-red scalar output connections",
+      "retained_in_final_asset": false
+    },
+    "open": [
+      "The visible Meat Grinder crest is too small, flat, sparse, and static to read as convincing aerated Class III whitewater.",
+      "The overlay does not yet supply volumetric breaking lips, coherent standing-wave trains, entrained bubbles, downstream foam advection, or impact spray tied to time-varying flow.",
+      "The base river still reads as a broad low-energy surface; bank transitions, terrain, canopy, rocks, raft, characters, equipment, motion, and lighting remain below photoreal target quality.",
+      "Named art, rafting-guide, geospatial, legal, physics, replay, and product-owner review remains pending."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "solver_foam_visible_in_fixed_review": true,
+    "collision_or_hydraulic_authority_changed": false,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "decision": "Retain v141 as the active solver-masked aerated-water technical baseline. Keep photoreal, named-review, release-media, M9 completion, commit, and push gates fail-closed."
+}

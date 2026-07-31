@@ -73,16 +73,16 @@ def build_flexible_raft_d6_chaos_runner_summary(
         record = results.get(fixture_id, {})
         metric_paths = job["required_metric_paths"]
         metrics = record.get("metrics") if isinstance(record, dict) else {}
-        metric_count = len(_flatten_numeric_metrics(metrics)) if isinstance(metrics, dict) else 0
+        metric_count = (
+            len(_flatten_numeric_metrics(metrics)) if isinstance(metrics, dict) else 0
+        )
+        ready_for_merge = bool(merge_report["can_merge"])
         jobs.append(
             {
                 "fixture_id": fixture_id,
                 "automation_test_name": job["automation_test_name"],
                 "job_id": job["job_id"],
                 "expected_telemetry_stream": job["unreal_target"]["telemetry_stream"],
-                "expected_debug_overlay_capture": job["unreal_target"][
-                    "debug_overlay_capture"
-                ],
                 "required_metric_count": len(metric_paths),
                 "required_metric_paths": list(metric_paths),
                 "recorded_metric_count": metric_count,
@@ -91,15 +91,23 @@ def build_flexible_raft_d6_chaos_runner_summary(
                     if isinstance(record, dict)
                     else "missing_result_record"
                 ),
-                "ready_for_sidecar_merge": False,
-                "blocking_reason": "real_unreal_chaos_measurement_not_recorded",
+                "ready_for_sidecar_merge": ready_for_merge,
+                "blocking_reason": (
+                    "manual_review_pending"
+                    if ready_for_merge
+                    else "real_unreal_chaos_measurement_not_recorded"
+                ),
             }
         )
 
     return {
         "schema": D6_CHAOS_RUNNER_SUMMARY_SCHEMA,
         "generated_on": "2026-07-16",
-        "status": "chaos_runner_output_pending_no_measurements_recorded",
+        "status": (
+            "chaos_measurements_recorded_manual_review_pending"
+            if merge_report["can_merge"]
+            else "chaos_runner_output_pending_no_measurements_recorded"
+        ),
         "d6_complete": False,
         "production_promoted": False,
         "runtime": "UnrealChaos",
@@ -120,22 +128,23 @@ def build_flexible_raft_d6_chaos_runner_summary(
         "promotion_gate": {
             "may_mark_d6_complete": False,
             "may_drive_runtime_gameplay": False,
-            "may_merge_into_measured_results_template": False,
+            "may_merge_into_measured_results_template": merge_report["can_merge"],
             "reason": (
-                "The runner output paths are present and schema-compatible, but "
-                "the committed sidecar is an explicit no-measurement placeholder. "
-                "D6 remains blocked until all seven Chaos fixture jobs replace "
-                "the placeholder records with real measured results."
+                "The Chaos sidecar may merge only when all seven fixture records "
+                "are valid. D6 remains fail-closed until the independent compliant "
+                "target, regenerated comparison, and manual review are complete."
             ),
         },
     }
 
 
 def write_flexible_raft_d6_chaos_runner_export(repo_root: Path) -> tuple[Path, Path]:
-    """Write the committed D6 Chaos runner output sidecar and summary."""
+    """Create placeholders only when no genuine runner output is present.
 
-    sidecar = build_flexible_raft_d6_chaos_runner_sidecar()
-    summary = build_flexible_raft_d6_chaos_runner_summary(sidecar)
+    Once Unreal has written a valid measured sidecar, this helper must never
+    replace it with the legacy no-measurement scaffold.
+    """
+
     sidecar_path = repo_root / D6_CHAOS_RUNNER_SIDECAR_RELATIVE_PATH
     summary_path = repo_root / D6_CHAOS_RUNNER_SUMMARY_RELATIVE_PATH
     sidecar_path.parent.mkdir(parents=True, exist_ok=True)
@@ -144,6 +153,16 @@ def write_flexible_raft_d6_chaos_runner_export(repo_root: Path) -> tuple[Path, P
         parents=True,
         exist_ok=True,
     )
+    if sidecar_path.is_file():
+        existing = json.loads(sidecar_path.read_text(encoding="utf-8"))
+        merge_report = build_flexible_raft_d6_chaos_measured_results_merge_report(
+            existing
+        )
+        if merge_report["can_merge"]:
+            return sidecar_path, summary_path
+
+    sidecar = build_flexible_raft_d6_chaos_runner_sidecar()
+    summary = build_flexible_raft_d6_chaos_runner_summary(sidecar)
     _write_json(sidecar_path, sidecar)
     _write_json(summary_path, summary)
     return sidecar_path, summary_path

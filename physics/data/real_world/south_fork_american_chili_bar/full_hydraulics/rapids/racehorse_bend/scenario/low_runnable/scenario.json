@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Racehorse Bend",
       "rapid_order": 3,
+      "source_elevation_datum_m": 427.5215837890625,
       "station_m": 2092.1472,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

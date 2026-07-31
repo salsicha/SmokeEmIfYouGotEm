@@ -1,0 +1,130 @@
+{
+  "schema": "raftsim.m9.production_helmet_fit_review.v1",
+  "reviewed_utc": "2026-07-29T19:29:03Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "helmet_art_superseded_by": "docs/environment-captures/south_fork_full_reach/m9_helmet_liner_v178_review.json",
+  "supersedes_helmet_fit_in": "docs/environment-captures/south_fork_full_reach/m9_crew_stroke_cadence_v175_review.json",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "implementation": {
+    "production_helmet_skull_center_offset_before_cm": [
+      0.0,
+      0.0,
+      8.0
+    ],
+    "production_helmet_skull_center_offset_after_cm": [
+      0.0,
+      0.0,
+      12.0
+    ],
+    "vertical_shell_lift_cm": 4.0,
+    "helmet_scale_changed": false,
+    "helmet_mesh_changed": false,
+    "helmet_materials_changed": false,
+    "head_or_face_skeleton_changed": false,
+    "hair_policy_changed": false,
+    "runtime_alignment_still_tracks_solved_head_every_frame": true
+  },
+  "authority_boundary": {
+    "presentation_only": true,
+    "character_pose_changed": false,
+    "crew_mass_changed": false,
+    "propulsion_or_command_timing_changed": false,
+    "water_sampling_changed": false,
+    "hydraulic_channels_changed": false,
+    "d3_flip_authority_changed": false,
+    "d4_wrap_pin_contact_authority_changed": false,
+    "collision_changed": false,
+    "raft_mesh_or_material_changed": false,
+    "terrain_or_environment_changed": false,
+    "rescue_or_progression_changed": false,
+    "map_or_package_mutation": false
+  },
+  "source": {
+    "avatar_runtime": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCrewAvatarActor.cpp",
+    "avatar_runtime_sha256": "c37372a900de8e53d73b4fdf69361e4a734b9a0e83f137d5a5ec8b74fc3af6d6",
+    "review_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimCrewCommandTest.cpp",
+    "review_test_sha256": "9478aeff841924ce686aa648b4d305890f80eb881a60354bda0ee669963df0fe"
+  },
+  "automation": {
+    "focused_source_and_rights_tests": {
+      "passed": 35,
+      "failed": 0,
+      "tests": [
+        "physics/tests/test_editor_source_layout.py",
+        "physics/tests/test_photoreal_rights_reviewed_assets.py"
+      ]
+    },
+    "unreal_editor_build": "succeeded",
+    "p3_renderer_test": {
+      "suite": "RaftSim.P3.CrewRespondsToCommands",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v176_helmet_fit_p3_review.log",
+      "log_sha256": "355e78ac3de497191a461b2a4aff06488eb0eeaeec33b8d2e46ab4c09847ce99"
+    },
+    "m5_renderer_suite": {
+      "suite": "RaftSim.M5",
+      "passed": 5,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v176_helmet_fit_m5.log",
+      "log_sha256": "dc65126aa5e79d4a046a04a2453f0915b20eb365963939e39ac7053abc68a117"
+    },
+    "m7_renderer_test": {
+      "suite": "RaftSim.M7.ZFullReachPresentation",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v176_helmet_fit_m7.log",
+      "log_sha256": "5ee75fe2c09ac96ffeb5008ed115cfe579700b7f182ba9f12be73ddbb2b09ea1"
+    },
+    "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "renderer_evidence": {
+    "baseline_capture": "docs/environment-captures/south_fork_full_reach/m9_crew_stroke_cadence_v175_technical_retained_photoreal_rejected.png",
+    "baseline_capture_sha256": "78509d2e6cd8e61c95457463f7e90fa2bb88b3f1c0e824a3df14ca3cda423b55",
+    "candidate_capture": "docs/environment-captures/south_fork_full_reach/m9_helmet_fit_v176_technical_retained_photoreal_rejected.png",
+    "candidate_capture_sha256": "4fa7e2f983801d50fc773316e18d31ba3eca1924471a211007d0462cffd06df3",
+    "width": 1280,
+    "height": 1888,
+    "camera": "matched_test_tank_front_starboard_technical_review",
+    "production_roster_count": 5,
+    "whole_frame_mean_absolute_rgb_delta": 2.4920166015625003,
+    "whole_frame_changed_fraction": 0.5829217425847457,
+    "whole_frame_fraction_above_8_rgb_levels": 0.05585606461864407,
+    "whole_frame_maximum_channel_delta": 239,
+    "pixel_comparison_scope": "Whole-frame numbers include ordinary animation, shadow, and renderer timing variation and are not represented as an isolated helmet mask.",
+    "human_approved": false
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "m5": "current after v176",
+    "p3_crew_command": "current after v176",
+    "m7": "current after v176",
+    "m4": "stale after the v175 runtime-source delta",
+    "m8": "stale after the v175-v176 runtime-source deltas",
+    "complete_python_data_source_matrix": "stale after the v175-v176 runtime-source deltas",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "accepted": [
+    "The matched front-starboard frame shows all five eye lines instead of the v175 shells covering the eyes like opaque visors.",
+    "The correction moves only the project-owned production shell and preserves the every-frame solved-head alignment, 0.96 scale, meshes, four material slots, skeletons, hair policy, and all gameplay authority.",
+    "All five helmets remain visibly seated on their heads across the commanded paddle pose; no shell is detached or transformed non-finitely.",
+    "The UE 5.8 target builds, source/rights tests pass 35/35, renderer-backed P3 passes 1/1, M5 passes 5/5, and exact-current M7 passes 1/1."
+  ],
+  "rejected_or_open": [
+    "The production helmets still use one shared fit offset and scale rather than per-head circumference, brow, ear, occipital, and retention-strap landmarks.",
+    "Hair/head edges, shell thickness, retention geometry, character anatomy, gaze/facial performance, arm/hand deformation, and PPE shading remain visibly synthetic; v176 does not pass photoreal character review.",
+    "The test-tank capture is technical evidence only and cannot substitute for action footage, authored motion capture, per-character fit checks, or release media.",
+    "No named guide or art reviewer has approved helmet safety fit, visibility, character art, animation, or capture.",
+    "Environment, water, terrain, foliage, rock, lighting, raft, character, and release-media photoreal gates remain open."
+  ],
+  "rejected_followups": [
+    "v177 replaced the simple elbow midpoint with a reference-length two-bone solve. It was fully removed because several elbows folded upward behind shoulders and helmets, producing broken silhouettes; the exact v176 adapter and review-test hashes were restored."
+  ]
+}

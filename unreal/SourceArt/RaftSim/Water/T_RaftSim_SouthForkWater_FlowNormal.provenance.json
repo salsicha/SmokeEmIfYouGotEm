@@ -1,0 +1,25 @@
+{
+  "schema": "raftsim.first_party.generated_texture_provenance.v1",
+  "asset_id": "south_fork_water_flow_normal_v1",
+  "asset_role": "visual-only tangent-space river surface normal; no hydraulic or collision authority",
+  "generator": "OpenAI image generation",
+  "generation_date_utc": "2026-07-26",
+  "generation_method": "reference-guided generation followed by a seam-repair generation pass",
+  "project_ownership": "first-party generated project asset",
+  "source_reference": "unreal/Content/RaftSim/Rendering/ProceduralTextureAtlases/american_south_fork_first_party_material_texture_atlas_normal.png",
+  "source_reference_role": "negative visual reference used to remove capsule streaks; no pixels copied intentionally",
+  "texture": {
+    "path": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FlowNormal.png",
+    "sha256": "280b7d6048eb9ed39ce5654ddd60ea1ac8f17b616adf2343e5d8e028e1c730a6",
+    "width": 1254,
+    "height": 1254,
+    "encoding": "RGB tangent-space normal candidate",
+    "addressing": "mirror_x_mirror_y",
+    "srgb": false,
+    "compression": "normal_map"
+  },
+  "limitations": [
+    "Opposite source-image borders are not pixel-identical; mirrored GPU addressing is required and content-locked.",
+    "Final in-engine visual acceptance is required before release promotion."
+  ]
+}

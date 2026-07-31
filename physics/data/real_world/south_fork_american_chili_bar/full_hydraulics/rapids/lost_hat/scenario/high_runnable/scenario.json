@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Lost Hat",
       "rapid_order": 11,
+      "source_elevation_datum_m": 218.860905859375,
       "station_m": 26876.0448,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,

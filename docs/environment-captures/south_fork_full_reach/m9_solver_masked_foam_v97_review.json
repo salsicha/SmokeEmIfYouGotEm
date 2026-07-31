@@ -1,0 +1,51 @@
+{
+  "candidate": "m9_solver_masked_foam_v97",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_solver_masked_foam_v97.png",
+  "camera": "river_action",
+  "physics_changed": false,
+  "implementation": {
+    "hydraulic_foam_intensity": 0.88,
+    "hydraulic_foam_coverage_gain": 0.82,
+    "previous_hydraulic_foam_intensity": 0.72,
+    "previous_hydraulic_foam_coverage_gain": 0.72,
+    "foam_source": "solver-authored median-runnable presentation red channel",
+    "zero_source_foam_can_create_rendered_foam": false,
+    "foam_texture_changed": false,
+    "water_geometry_changed": false,
+    "solver_changed": false
+  },
+  "source_window_evidence": {
+    "review_station_range_m": [900, 1100],
+    "source_positive_foam_stations_include_m": [904, 908, 912, 936, 960, 964, 968, 972, 976, 980, 1020, 1024, 1028, 1032, 1036, 1040, 1048, 1068, 1072, 1084],
+    "peak_source_foam_byte_in_range": 228
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_contracts": "37/37 passed",
+    "editor_build": "passed",
+    "full_reach_material_rebuild": "passed",
+    "fixed_full_reach_captures": "5/5 saved without pale foam carpet",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "Source-positive rapid fragments are more legible in the matched action frame.",
+    "Calm zero-mask water remains free of invented foam.",
+    "The five fixed cameras do not reintroduce the previously rejected broad pale rapid carpet."
+  ],
+  "open_visual_findings": [
+    "The fixed Meat Grinder camera begins approximately forty metres upstream of the strongest source cells and under-represents the rapid.",
+    "Foam remains a surface-color breakup rather than volumetric entrained air and collapse.",
+    "Shoreline, terrain, canopy, crew, raft highlights, and aerosol remain below the photoreal target."
+  ]
+}

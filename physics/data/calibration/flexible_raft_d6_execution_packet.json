@@ -17,7 +17,7 @@
       "measured_results_merge_report": "physics/data/calibration/flexible_raft_d6_compliant_measured_results_merge_report.json",
       "measured_results_sidecar_template": "physics/data/calibration/flexible_raft_d6_compliant_measured_results_sidecar_template.json",
       "metric_deltas_are_failures": true,
-      "pending_job_count": 7,
+      "pending_job_count": 0,
       "required_external_runner": true,
       "runner_family": "reviewed_compliant_reference",
       "sidecar_merge_command": "uv run --no-sync python physics/src/raftsim/examples/merge_flexible_raft_d6_compliant_measured_results.py",
@@ -40,7 +40,7 @@
       "measured_results_merge_report": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json",
       "measured_results_sidecar_template": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json",
       "metric_deltas_are_failures": false,
-      "pending_job_count": 7,
+      "pending_job_count": 0,
       "required_external_runner": true,
       "runner_family": "unreal_chaos_rigid_baseline",
       "sidecar_merge_command": "uv run --no-sync python physics/src/raftsim/examples/merge_flexible_raft_d6_chaos_measured_results.py",
@@ -59,9 +59,9 @@
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/static_seat_load_sag.json",
       "fixture_id": "static_seat_load_sag",
@@ -74,6 +74,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__static_seat_load_sag",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -122,15 +123,15 @@
         "starboard_total_freeboard_loss_m"
       ],
       "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/static_seat_load_sag.json",
       "fixture_id": "static_seat_load_sag",
@@ -143,6 +144,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__static_seat_load_sag",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -191,15 +193,15 @@
         "starboard_total_freeboard_loss_m"
       ],
       "source_fixture_objective": "Verify occupied guide/passenger seats create local tube sag without gameplay authority.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/traveling_crew_shift.json",
       "fixture_id": "traveling_crew_shift",
@@ -212,6 +214,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__traveling_crew_shift",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -258,15 +261,15 @@
         "starboard_total_freeboard_delta_m"
       ],
       "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/traveling_crew_shift.json",
       "fixture_id": "traveling_crew_shift",
@@ -279,6 +282,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__traveling_crew_shift",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -325,15 +329,15 @@
         "starboard_total_freeboard_delta_m"
       ],
       "source_fixture_objective": "Verify moving crew load travels across local tube segments and changes side freeboard.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/rock_pinch_wrap.json",
       "fixture_id": "rock_pinch_wrap",
@@ -346,6 +350,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__rock_pinch_wrap",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -392,15 +397,15 @@
         "wrapping_contact_count"
       ],
       "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/rock_pinch_wrap.json",
       "fixture_id": "rock_pinch_wrap",
@@ -413,6 +418,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__rock_pinch_wrap",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -459,15 +465,15 @@
         "wrapping_contact_count"
       ],
       "source_fixture_objective": "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/upstream_tube_overwash_flip.json",
       "fixture_id": "upstream_tube_overwash_flip",
@@ -480,6 +486,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__upstream_tube_overwash_flip",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -524,15 +531,15 @@
         "total_retained_water_mass_kg"
       ],
       "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/upstream_tube_overwash_flip.json",
       "fixture_id": "upstream_tube_overwash_flip",
@@ -545,6 +552,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__upstream_tube_overwash_flip",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -589,15 +597,15 @@
         "total_retained_water_mass_kg"
       ],
       "source_fixture_objective": "Verify depressed upstream tube segments retain water and create roll moment.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/timed_high_side_save.json",
       "fixture_id": "timed_high_side_save",
@@ -610,6 +618,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__timed_high_side_save",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -656,15 +665,15 @@
         "neutral_flip_threshold_nm"
       ],
       "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/timed_high_side_save.json",
       "fixture_id": "timed_high_side_save",
@@ -677,6 +686,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__timed_high_side_save",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -723,15 +733,15 @@
         "neutral_flip_threshold_nm"
       ],
       "source_fixture_objective": "Verify a timed high-side input changes retained-water roll margin and recovery thresholds.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/post_contact_recovery.json",
       "fixture_id": "post_contact_recovery",
@@ -744,6 +754,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__post_contact_recovery",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -786,15 +797,15 @@
         "total_holding_force_n"
       ],
       "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/post_contact_recovery.json",
       "fixture_id": "post_contact_recovery",
@@ -807,6 +818,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__post_contact_recovery",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -849,15 +861,15 @@
         "total_holding_force_n"
       ],
       "source_fixture_objective": "Verify prior tube indentation decays after contact clears.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     },
     {
       "comparison_mode": "bounded_numeric_equivalence",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "passed_numeric_equivalence"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/project_chrono_or_reviewed_compliant_model/pressure_flow_sweeps.json",
       "fixture_id": "pressure_flow_sweeps",
@@ -870,6 +882,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "project_chrono_or_reviewed_compliant_model__pressure_flow_sweeps",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": true,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -998,15 +1011,15 @@
         "sweeps[8].retained_water_roll_moment_nm"
       ],
       "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "project_chrono_or_reviewed_compliant_model"
     },
     {
       "comparison_mode": "baseline_delta_recording",
       "current_comparison_report_state": {
-        "passed": false,
+        "passed": true,
         "report_path": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
-        "status": "missing_measured_result"
+        "status": "recorded_baseline_delta"
       },
       "expected_result_template_path": "physics/data/calibration/d6_measurements/unreal_chaos_rigid_baseline/pressure_flow_sweeps.json",
       "fixture_id": "pressure_flow_sweeps",
@@ -1019,6 +1032,7 @@
         "must_preserve_fixture_input_semantics": true
       },
       "job_id": "unreal_chaos_rigid_baseline__pressure_flow_sweeps",
+      "measurement_recorded": true,
       "metric_deltas_are_failures": false,
       "required_d5_replay_channels": [
         "tube.pressure_pa",
@@ -1147,11 +1161,11 @@
         "sweeps[8].retained_water_roll_moment_nm"
       ],
       "source_fixture_objective": "Verify pressure and flow sweeps expose monotonic risk trends before engine porting.",
-      "status": "pending_external_engine_run",
+      "status": "measured_engine_output_manual_review_pending",
       "target_id": "unreal_chaos_rigid_baseline"
     }
   ],
-  "generated_on": "2026-07-16",
+  "generated_on": "2026-07-28",
   "local_preparation_checks": {
     "can_generate_empty_measured_results_template": true,
     "can_generate_empty_target_sidecar_templates": true,
@@ -1159,7 +1173,7 @@
     "can_regenerate_pending_report": true,
     "can_run_external_measurement_gate_with_python_only": false,
     "can_validate_target_sidecars_before_merge": true,
-    "reason": "The D1-D5 Python reference is the comparison source, not an external measured engine result. D6 needs independent measured outputs from a reviewed compliant runner and Unreal Chaos."
+    "reason": "The D1-D5 Python reference remains only the comparison source. Independent Project Chrono and genuine Unreal Chaos measurements are recognized only after their sidecars pass schema/provenance checks."
   },
   "post_measurement_workflow": [
     {
@@ -1218,13 +1232,14 @@
     "fixture_input_package_status": "fixture_inputs_ready_engine_adapter_runs_pending",
     "may_drive_runtime_gameplay": false,
     "may_mark_d6_complete": false,
-    "reason": "This packet only makes the external run queue executable and auditable. It does not provide the missing external measurements.",
+    "reason": "Both independent target sidecars are complete and the numeric comparison passes; D6 remains fail-closed for required manual review.",
     "requires_all_jobs_present": true,
     "requires_comparison_report_review": true
   },
   "schema": "raftsim.flexible_raft.d6_external_engine_execution_packet.v1",
   "source_artifacts": {
     "behavioral_suite": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
+    "chaos_measured_results": "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json",
     "chaos_measured_results_merge_report": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json",
     "chaos_measured_results_sidecar_template": "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json",
     "comparison_report": "physics/data/calibration/flexible_raft_d6_comparison_report.json",
@@ -1234,16 +1249,23 @@
     "measured_results_template": "physics/data/calibration/flexible_raft_d6_measured_results_template.json",
     "measurement_manifest": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json"
   },
-  "status": "external_engine_execution_packet_ready_measurements_missing",
+  "status": "external_engine_execution_packet_all_measurements_recorded_manual_review_pending",
   "summary": {
-    "all_measurements_present": false,
+    "all_measurements_present": true,
     "can_promote_d6_now": false,
-    "committed_report_missing_target_count": 14,
-    "comparison_passed": false,
+    "chaos_measurements_complete": true,
+    "committed_report_missing_target_count": 0,
+    "comparison_passed": true,
+    "completed_chaos_job_count": 7,
+    "completed_compliant_job_count": 7,
+    "completed_external_job_count": 14,
+    "compliant_measurements_complete": true,
     "execution_job_count": 14,
     "fixture_count": 7,
-    "pending_external_job_count": 14,
+    "pending_compliant_job_count": 0,
+    "pending_external_job_count": 0,
     "python_only_can_satisfy_d6": false,
+    "ready_for_manual_promotion_review": true,
     "target_count": 2
   }
 }

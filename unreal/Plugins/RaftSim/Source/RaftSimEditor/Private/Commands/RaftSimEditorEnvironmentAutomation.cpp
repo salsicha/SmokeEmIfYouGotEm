@@ -53,9 +53,24 @@ bool FRaftSimEditorModule::TickPhotorealEnvironmentAutomationStartup(float)
         bSucceeded &= CreateLandscapeImportCandidateMaps(Summary);
     }
 
+    if (bCreatePhotorealRiverWaterMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreatePhotorealRiverWaterMaterial(Summary);
+    }
+
+    if (bCreateWaterVfxMaterialOnStartup)
+    {
+        bSucceeded &= RaftSimPhotorealMaterials::CreateWaterVfxMaterial(Summary);
+    }
+
     if (bCreateSouthForkFullReachEnvironmentOnStartup)
     {
         bSucceeded &= CreateSouthForkFullReachEnvironment(Summary);
+    }
+
+    if (bCaptureSouthForkFullReachEnvironmentOnStartup)
+    {
+        bSucceeded &= CaptureSouthForkFullReachEnvironment(Summary);
     }
 
     if (bCreateZambeziBatokaBasaltFamilyOnStartup)

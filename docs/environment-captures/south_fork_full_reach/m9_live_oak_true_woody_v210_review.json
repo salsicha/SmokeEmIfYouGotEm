@@ -1,0 +1,128 @@
+{
+  "schema": "raftsim.review.south_fork_live_oak_true_woody.v210",
+  "reviewed_on": "2026-07-29",
+  "milestone": "M9",
+  "candidate": "interior_live_oak_true_woody_v1",
+  "status": "visual_promotion_rejected_technical_scaffold_retained",
+  "production_promoted": false,
+  "photoreal_accepted": false,
+  "source": {
+    "species_visual_target": "Quercus wislizeni / California interior live oak",
+    "bark_source": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BarkV1_Source.png",
+      "sha256": "77fc5019f600fa9f261af20902edab9800118880ce9e18b97582f973c4371012",
+      "generator": "OpenAI built-in image generation",
+      "referenced_images": []
+    },
+    "leaf_source": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_BranchAtlasV2_AlbedoOpacity.png",
+      "sha256": "ac8c59e9719af3f016ea086c9b239af81803bd668291b356a7f2d3a838fd4520",
+      "prior_review": "m9_live_oak_branch_atlas_v2_v209_review.json"
+    },
+    "bark_maps": {
+      "albedo_sha256": "a59ed99e7e058f9e9a18101e58d1b54eb215b1ab7ad2d3d5de3798cbbd1dfa76",
+      "normal_sha256": "39e60dd7960c182f695e9010a9fe6eed1b668253e2fe57e9ccfc97d5eda831ab",
+      "ao_roughness_height_sha256": "83bca1516a3b756fa365a75340ef6680b2aa9d03cdcc5322f9a3d526e4a76622"
+    }
+  },
+  "authoring": {
+    "authoring_flag": "RaftSimOnlyLiveOakWoodyCanopyV1Review",
+    "commandlet_attempts": {
+      "count": 3,
+      "result": "failed_closed",
+      "reason": "Unreal -run=pythonscript commandlet mode reports FApp::CanEverRender false, so each newly saved 2048-square Texture2D correctly failed the strict running-platform gate at 0x0 with zero mips"
+    },
+    "accepted_invocation": {
+      "mode": "normal offscreen editor startup with ExecCmds and QUIT_EDITOR",
+      "result": "passed",
+      "validated_textures": 6,
+      "source_dimensions": [2048, 2048],
+      "platform_dimensions": [2048, 2048],
+      "mips_per_texture": 12
+    },
+    "mesh": {
+      "object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakWoodyV1_OpenGrownMature.SM_RaftSim_SouthForkInteriorLiveOakWoodyV1_OpenGrownMature",
+      "woody_segments": 72,
+      "terminal_branches": 45,
+      "leaf_cards": 90,
+      "billboard_core": 0,
+      "vertices": 1664,
+      "bark_triangles": 1016,
+      "leaf_triangles": 180,
+      "total_triangles": 1196,
+      "materials": 2,
+      "collision": "disabled",
+      "nanite": "disabled"
+    },
+    "asset_hashes": {
+      "bark_albedo_texture": "9d51627f79ff42481c75ca68b2c67b57bc68773aa88d5c53d11ebe3abce6960c",
+      "bark_normal_texture": "f157ae6aeb798a4651f563bee9974ccee3b2ecfe7710871f3f7577bf146292ab",
+      "bark_packed_texture": "7545badaeaa647696d267c51be0ad0c68072ddbee630a8cee20eb0e83b0b0312",
+      "leaf_albedo_opacity_texture": "d5a67b103de4fb7cd29778d06acdfd721ee84cb8889429efd904625118d116d6",
+      "leaf_normal_texture": "713d1c1e64d3759f4be982e3ae6f95b046ef8f8b22ca65d5d68f26f3b7557372",
+      "leaf_packed_texture": "c3321298ef1493af95eae6251690c2e3df934372db040d554f8d11221f898340",
+      "bark_material": "5d7f46d99d43d14390eadd1c847cbef9b098acdc25620eb7ede55fad7868d9c2",
+      "leaf_material": "0b397648607828c2658dfe8b5b586e5c8710b184d1e4f7202341d078b2268482",
+      "mesh": "ed7feb7d12a732b85266168c6b3ecf3a96ee160c20504914857a2ca786eb968e"
+    }
+  },
+  "capture": {
+    "capture_flag": "RaftSimLiveOakWoodyCanopyV1Review",
+    "directory": "docs/environment-captures/south_fork_full_reach/photographic_v210_live_oak_true_woody_v1",
+    "transient_component_swaps": 21,
+    "transient_instance_swaps": 24830,
+    "saved_map_changed": false,
+    "hashes": {
+      "chili_bar_launch_downstream.png": "c8e75fb2db66c315308ef31f83bc1e0905f96c54d31fea14c1f651a285832e75",
+      "coloma_bridge_context.png": "e34a78b1186fb348624d4ff7012a8f460da7ad7a98cd69a3827b0f4afd4f98c8",
+      "meat_grinder_guide_eye.png": "a244ecb549ce37f7e27c1492a1cd3e6f4dd3342eea2830eeb5a7c9d1060f5f04",
+      "salmon_falls_takeout.png": "57df44035601569ea29dd40f74e69862d941bd27790d9eab0968138f16390109",
+      "troublemaker_approach.png": "4e83b8904d32381e601e5994827ea6725e65d184e3cabafeac07f6e33e7c3d1c"
+    },
+    "comparison_to_v202": {
+      "mean_absolute_rgb_average": 1.530299,
+      "percent_pixels_any_channel_gt_8_average": 3.908984,
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.858842, 2.989800],
+        "coloma_bridge_context.png": [2.032188, 5.220595],
+        "meat_grinder_guide_eye.png": [1.159501, 3.662760],
+        "salmon_falls_takeout.png": [1.599076, 2.309679],
+        "troublemaker_approach.png": [2.001889, 5.362088]
+      },
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"]
+    },
+    "comparison_to_v209": {
+      "mean_absolute_rgb_average": 1.514793,
+      "percent_pixels_any_channel_gt_8_average": 3.485634
+    }
+  },
+  "manual_review": {
+    "positive_findings": [
+      "The source-backed bark PBR and separate opaque bark section are technically valid.",
+      "Tapered trunk, scaffold, secondary, and terminal geometry creates a readable open-grown oak silhouette without a billboard core.",
+      "The reversible HISM integration proves that a multi-section true-woody asset can be reviewed at all 24830 production oak proxy instances without changing runtime authority."
+    ],
+    "rejection_reasons": [
+      "Leaf coverage is too sparse and dark, producing black card fragments instead of a continuous evergreen crown.",
+      "Exposed limbs are geometrically repetitive and too cleanly forked at guide-eye distance.",
+      "The branch atlas contains twig-heavy silhouettes and weak leaf mass, so adding cards would amplify the same artifact rather than close the fidelity gap.",
+      "All five frames still read as synthetic terrain, water, foliage, and lighting and cannot serve as release media."
+    ],
+    "decision": "Reject v210 visual promotion. Retain only the bark maps, two-section authoring path, strict render-data gate, tapered woody topology, transient integration seam, and captures as technical evidence.",
+    "next_required_visual_input": "A new dense, leaf-dominant live-oak cluster source with robust opacity coverage, several crown-age/form variants, less regular branch topology, controlled near/mid/far representation transitions, and named art/ecology review."
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "affects_gameplay": false
+  },
+  "milestone_gate": {
+    "m9_passed": false,
+    "authoritative_visual_baseline": "v184",
+    "commit_allowed": false,
+    "push_allowed": false
+  }
+}

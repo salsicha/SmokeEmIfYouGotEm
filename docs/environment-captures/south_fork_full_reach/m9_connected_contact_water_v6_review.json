@@ -1,0 +1,126 @@
+{
+  "artifact": "M9 solver-shaped connected contact water V6 isolated review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "passed": false,
+  "promotion_allowed": false,
+  "decision": "retain_production_water_reject_current_connected_contact_v6_candidate",
+  "authoritative_geography_claim": false,
+  "summary": "V6 implements the connected-water architecture required by the rejected V5 sprite review: an opt-in 11 by 9 procedural sheet is rebuilt from the same solver-sampled D4 contact shoulder and remains continuously attached to sampled live-water heights. The 160-triangle component is presentation-only, noncolliding, nonnavigable, shadowless, and cannot change forces, water samples, collision, map state, scoring, or progression. Native captures prove the geometry is live during a four-contact wrap/pin/recovery state. They also reject the current representation. High optical density exposes a large smooth translucent wall; photographic breakup collapses to a narrow fuzzy tuft; moving the breakup center beyond the boulder and retaining a faint connected body makes the candidate effectively disappear into the base surface. The current single sheet cannot simultaneously pass realism and gameplay-readability gates, so production remains selected and byte-identical.",
+  "production": {
+    "selected": true,
+    "review_switch_default": false,
+    "production_maps_modified_by_review": false,
+    "production_assets_modified_by_review": false,
+    "solver_contact_authority_changed": false,
+    "runtime_asset_sha256": {
+      "unreal/Content/RaftSim/Materials/M_RaftSim_NiagaraWaterParticle.uasset": "d0e7b1a23f92a987f5b086fa35eb0c147c591729868be7f09aad22247636470a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_AeratedMist.uasset": "4f74fe1d93b3cd83a8dd4c0eb31ae6e976392082b36089fefd727246b241ea98",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_ContactDroplets.uasset": "f1f73e56aadbff61bd03af1fd190b96b20b4f7a918296ba2647e83c49c09d41a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidAerosol.uasset": "bc3835023b6d9f3e97a58abeb252e251b0cdb04c3e11427032cfcba8a62d4556",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidRoller.uasset": "7fd9b6563d4c699031940a02046a133351bac21f22e1193066ee7c00f6bcc0d6",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_SolverSpray.uasset": "9e7cf05cb8404441edc3118affd4b09e0f4a961f8922242e0535c61c6cfa136f",
+      "unreal/Content/RaftSim/VFX/Water/Textures/T_RaftSim_WaterParticle_SubUV.uasset": "0b7b95549cf035b71f8e901709dd360630f5c5b99b60bb4161f6b0b85ae4bbff"
+    }
+  },
+  "isolation_and_authority": {
+    "runtime_switch": "-RaftSimConnectedContactWaterV6Review",
+    "default_switch_state": false,
+    "conflicting_review_switch_behavior": "fail_closed_to_production",
+    "review_asset_root": "/Game/RaftSim/VFX/Water/ConnectedContactWaterV6Review",
+    "review_material": "unreal/Content/RaftSim/VFX/Water/ConnectedContactWaterV6Review/M_RaftSim_ConnectedContactWater_V6Review.uasset",
+    "review_material_sha256": "7bafd997bdfcfc4999694ac6971a201563bd2e28c117ec85719b51d34c95be40",
+    "mesh_grid_vertices": [11, 9],
+    "mesh_triangle_count": 160,
+    "geometry_authority": "same solver-sampled D4 contact shoulder and live-water surface samples used by the runtime presentation state",
+    "component_contract": "NoCollision, no cast shadow, cannot affect navigation, hidden unless the explicit review switch is present",
+    "physics_forces_changed": false,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "map_state_changed": false,
+    "scoring_or_progression_changed": false,
+    "photographic_input": "V5 review atlas cells 11 and 12 provide breakup only; existing South Fork foam-lace and flow-normal textures provide lit detail",
+    "final_geometry_bounds_cm": {
+      "half_width": [58.0, 82.0],
+      "crest_height": [38.0, 78.0],
+      "crest_reach": [38.0, 70.0],
+      "outboard_center_offset": 115.0
+    },
+    "final_material_bracket": {
+      "water_opacity": 0.075,
+      "foam_opacity": 0.78,
+      "foam_floor": 0.055,
+      "foam_intensity_gain": 0.5,
+      "primary_lace_gain": 0.42,
+      "detail_lace_gain": 0.0,
+      "foam_core_gain": 0.65
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h": "39e4872b8513cc5526f7e7704b64c89621cafe225f9b992cfe196fa6d7518f17",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "7f0dabd107912b427b446e9bc1c3ba7be9c98cedc1eeb2c61a32925bceaa589f",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "a903d64b94dc80e7c470f2437818c0f733d23f92507c60a1928adfa81ee8b8e0",
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorConnectedWaterV6Material.cpp": "437d787ca0e170d4d51fd890ab21e3ed8b12c81fdae033b5ff73276337a61410",
+    "unreal/Scripts/create_connected_contact_water_v6_review_material.py": "cd6640c7fcca7a8d69d512e251ba8858b7e888191b813a05bad93e3f8038d680"
+  },
+  "native_renderer_review": {
+    "state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness=0.999; connectedV6Triangles=160 connectedV6Visible=1",
+    "initial_particle_macro": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_initial_particle_macro.png",
+      "capture_sha256": "998160ea16cda460cb4b4de3d85af24b7ddaad4df4c907a39904cb2ba3027c7d",
+      "result": "the crest tip is visible, but most of the sheet is occluded by the contact boulder"
+    },
+    "high_density_bracket": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_density_wall_contact_port.png",
+      "capture_sha256": "f0f32d2eb3570a3979589314657faae792f2b188aaab2561e7098cadb52ad2b3",
+      "result": "geometry is unmistakably connected and visible but reads as a large smooth translucent wall"
+    },
+    "photographic_breakup_bracket": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_photographic_tuft_contact_port.png",
+      "capture_sha256": "bbb344a23462f19e5e2e7803e15ad3f694664005bb77af8410a62d2d6cd71fb2",
+      "result": "the wall is removed, but visible coverage collapses to a small fuzzy tuft"
+    },
+    "balanced_bracket": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_balanced_contact_port.png",
+      "capture_sha256": "e9e1d7de31530123eac7197f8ec9c103125362312d74dd9bc37a25d04b9329af",
+      "result": "a narrow vertical fuzzy streak remains and does not read as connected gameplay water"
+    },
+    "final_outboard_bracket": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_final_outboard_contact_port.png",
+      "capture_sha256": "7870f01c854186c0ef2db31145f3eb0e8b869eeecdb5effe22643c47c67344db",
+      "result": "the 160-triangle sheet remains live but is effectively invisible once the breakup center clears the boulder"
+    }
+  },
+  "native_evidence": {
+    "material_author_result": "material saved and serialized referencer validation passed; clean exit",
+    "material_author_log": "/private/tmp/raftsim_m9_v323_connected_v6_material_author.log",
+    "material_author_log_sha256": "a2b9e1e1fdc47f376c978526bc70591ed0d112bc50d2f9577b0e013aab430bb0",
+    "initial_particle_macro_log_sha256": "469441f192f87f75031158814f78c412817f5d34e3b53f5df291866d9503f7d6",
+    "high_density_log_sha256": "0e62c5dcf2bcc428eb8fa749c1f1ac7e14d154c734ece0d4b98526697027427e",
+    "photographic_breakup_log_sha256": "2dda34d84e76618868a6cfb9c06b44039e193072503ff618e2145acdf6d4df99",
+    "balanced_log_sha256": "20331b16fe7621eecf67b84da9b7931e06119ce9cbf542d8a7985ce8e53c9b0d",
+    "final_outboard_log_sha256": "a369e61149af30780be0a7cc8c15950b7634f2db74ed2e3e8a77c97e91b88c45",
+    "editor_build_result": "SmokeEmIfYouGotEmEditor Mac Development succeeded after the final runtime change"
+  },
+  "post_review_validation": {
+    "focused_python_tests": "20/20 passed",
+    "focused_test_source_sha256": "109f2bfdc4a6c3d59ecedc2cd6e44e691c7db6ac8f3c333c87db117b46857a2b",
+    "m5_result": "5/5 passed: 4 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m5_known_warning": "Engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning",
+    "m5_report": "/private/tmp/raftsim_m9_v327_connected_v6_m5/index.json",
+    "m5_report_sha256": "7d66b13d6f85d255861636286cdbedc0dc28a233f2dcb545819a09cfed41183e",
+    "m5_log": "/private/tmp/raftsim_m9_v327_connected_v6_m5.log",
+    "m5_log_sha256": "b5603a7e5d6d0b56826337a38ef004ae7258be75fd9852b0d1d601fa5f81ee0e",
+    "m9_result": "5/5 passed: 5 Success, 0 SuccessWithWarnings, 0 Failed, 0 NotRun; release manifest remains intentionally fail-closed",
+    "m9_report": "/private/tmp/raftsim_m9_v328_connected_v6_m9/index.json",
+    "m9_report_sha256": "5257871f875cacf0c0091fe6d4b1bb998147a873018dde88e2999821d9d927e9",
+    "m9_log": "/private/tmp/raftsim_m9_v328_connected_v6_m9.log",
+    "m9_log_sha256": "a29891750060dbb89e7cf1a1bef57f9c553cc09a0c76324b7ac192c8aed538f0"
+  },
+  "next_iteration_requirements": [
+    "Replace the single translucent sheet with a multi-lobe solver-contoured volume or source-surface spline/ribbon family that preserves a visible connected water body independently of the photographic mask center.",
+    "Separate submerged attachment, translucent water mass, aerated crest, and ballistic breakup into independently bounded layers while keeping all physics and contact authority in the solver.",
+    "Require obvious improvement at particle-macro, contact, and wrap gameplay cameras without a glass wall, smoke, detached tuft, repeated silhouette, or invisible body before promotion.",
+    "Obtain named water-VFX art and whitewater-guide review in addition to the remaining M9 platform, input, signing, notarization, media, account, and release gates."
+  ]
+}

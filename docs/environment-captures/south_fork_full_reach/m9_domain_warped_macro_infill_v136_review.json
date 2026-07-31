@@ -1,0 +1,80 @@
+{
+  "schema": "raftsim.m9.south_fork_domain_warped_macro_infill_review.v1",
+  "generated_on": "2026-07-29",
+  "revision_id": "v136",
+  "decision": "retain_as_incremental_far_field_visual_improvement_not_photoreal_acceptance",
+  "scope": "Deterministic procedural macro-albedo completion where authoritative South Fork aerial imagery is absent, plus widened feathering at authoritative-source boundaries.",
+  "generation": {
+    "algorithm": "south_fork_photoreal_environment_v26_domain_warped_macro_infill",
+    "procedural_topology": "domain_warped_world_space_dry_grass_chaparral_woodland_rock_v2",
+    "source_edge_blend_distance_m": 720.0,
+    "manifest": "physics/data/real_world/south_fork_american_chili_bar/production_corridor/photoreal_environment/manifest.json",
+    "manifest_sha256": "dc4559447b8c7f3513d9329f75109b2b4627752ab773a191db227eab650b89b3",
+    "determinism_signature_sha256": "5c37de711c6d7bd3e3e96a72c71c79a4d4465b0fca8b49090d8aff9b3dffaf53",
+    "independent_generation_count": 2,
+    "independent_generations_byte_identical": true,
+    "macro_albedo_sha256": {
+      "far_field_00": "8358c2fbc32e16f10f730bceb970eedd4a7140f94c7ecdc707ca0ecde17d7d96",
+      "far_field_01": "d5e53d59a90e2600beb2cd7f2cebb40b65279bd42045ae8c6eb0dd8e8355de32",
+      "far_field_02": "09897d2acad2adf2108c2cecee05d7853ddbe330dfdf46f9bfab5000c69732c3",
+      "far_field_03": "aefa503c100efc567a0e065bb63294d11ed5b67a9842312433217b4948e60924",
+      "far_field_04": "bd2e7867f1b0aa22f02063c78508b3fbe763fa0259504536b559b1e7e7525f35",
+      "far_field_05": "563d6682e2a4b7b5109ecd735b1b4ad31ce53818bcc8195b050b2dbffe28dc99",
+      "far_field_06": "b38815886569518d5e75f18ae82146bfd3a8633cc46f4623205da4a968663915",
+      "far_field_07": "51f4e049921c8ef0152b7ff720a03a266374a9ce58f4e7834829e320ac60eb6b"
+    },
+    "authority": "USGS 3DEP and USDA NAIP remain authoritative where available; the new palette is deterministic game-only procedural infill and is not suitable for navigation.",
+    "affects_gameplay_collision": false,
+    "affects_hydraulics": false
+  },
+  "renderer_review": {
+    "capture_resolution": [
+      1280,
+      720
+    ],
+    "capture_sha256": {
+      "chili_bar_launch_downstream": "f3c441953721847e19cea3d5d3711c0ed8526decb88410d4c198cf98cc9a2424",
+      "meat_grinder_guide_eye": "8ac266dc8591774c6a97efbcef8233eac10c58313f076dc3d42815f020f1efe5",
+      "troublemaker_approach": "9444c282875a1dd4122ec090b1d5aa55356d12983fcbdd04150f6b7d764c062e",
+      "coloma_bridge_context": "9c2eabb8c9526952020163e900ce9b4158494831b24c43d463839adc42c96452",
+      "salmon_falls_takeout": "e80035c0960e23499e24106d8be93d56a8faa5c412f0771ce64a376c5daa93ac"
+    },
+    "fixed_view_count": 5,
+    "accepted_findings": [
+      "The former long parallel diagonal bands are no longer the dominant far-field land-cover signal.",
+      "The 720 m authoritative-source feather reduces the hard pale rectangular source boundaries visible in the prior fixed-view set.",
+      "Broad dry-grass, chaparral, woodland and exposed-rock regions now vary irregularly in world space and stay coordinate-stable across tile boundaries."
+    ],
+    "photoreal_acceptance": false
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v136_hlod_build.log",
+    "fresh_build_log_sha256": "0053267ca062f21813bf3d3f09ce166766ec4029d18e716fa62004de13221255",
+    "fresh_build_actor_count": 24,
+    "fresh_build_modified_and_saved_actor_count": 24,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v136_hlod_settled_repeat.log",
+    "settled_repeat_log_sha256": "a7f4368467b769b5d7548fc241ba384e0e1340bc5b68f6e095a04e01bc3bd86b",
+    "settled_repeat_actor_count": 24,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "errors": 0,
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "0320fe358d4ea44f8fc542435d6ad27e9a5ec49105a00711f55f657124ce6d8c",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "fdfb33489d658e5c5735d7fad95e70976a11dc88d22f33c77e4ae4a1d90e593c"
+  },
+  "release_effect": {
+    "procedural_missing_geography_visual_quality_improved": true,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "open_findings": [
+    "Water still reads as a broad synthetic surface and lacks release-quality hydraulic translucency, aeration and breakup.",
+    "Near and mid-field vegetation remains sparse, dark and visibly card-like in several fixed views.",
+    "Shoreline transitions and terrain materials remain abrupt or overly smooth in multiple locations.",
+    "The new procedural macro palette still exposes broad low-frequency regions and must not be mistaken for authoritative aerial photography.",
+    "Named art, rafting-guide, geospatial, legal and product-owner review remains pending."
+  ]
+}

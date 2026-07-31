@@ -40,22 +40,18 @@ D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH = (
 D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH = (
     "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json"
 )
-D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH = (
-    "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json"
-)
+D6_CHAOS_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH = "physics/data/calibration/flexible_raft_d6_chaos_measured_results_sidecar_template.json"
 D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_chaos_measured_results_merge_report.json"
 )
-D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH = (
-    "physics/data/calibration/flexible_raft_d6_compliant_measured_results_sidecar_template.json"
-)
-D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH = (
-    "physics/data/calibration/flexible_raft_d6_compliant_measured_results_merge_report.json"
-)
+D6_COMPLIANT_MEASURED_RESULTS_SIDECAR_TEMPLATE_RELATIVE_PATH = "physics/data/calibration/flexible_raft_d6_compliant_measured_results_sidecar_template.json"
+D6_COMPLIANT_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH = "physics/data/calibration/flexible_raft_d6_compliant_measured_results_merge_report.json"
 D6_BEHAVIORAL_SUITE_SCHEMA = "raftsim.flexible_raft.d6_behavioral_validation_suite.v1"
 D6_COMPARISON_REPORT_SCHEMA = "raftsim.flexible_raft.d6_reference_comparison_report.v1"
 D6_MEASUREMENT_MANIFEST_SCHEMA = "raftsim.flexible_raft.d6_measurement_manifest.v1"
-D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = "raftsim.flexible_raft.d6_measured_results_template.v1"
+D6_MEASURED_RESULTS_TEMPLATE_SCHEMA = (
+    "raftsim.flexible_raft.d6_measured_results_template.v1"
+)
 D6_FIXTURE_INPUT_PACKAGE_SCHEMA = "raftsim.flexible_raft.d6_fixture_input_package.v1"
 D6_CHAOS_FIXTURE_CONTRACT_SCHEMA = "raftsim.flexible_raft.d6_chaos_fixture_contract.v1"
 D6_CHAOS_MEASURED_RESULTS_SIDECAR_SCHEMA = (
@@ -201,7 +197,9 @@ def build_flexible_raft_d6_comparison_report(
             report = _compare_d6_target_fixture(
                 fixture,
                 target["target_id"],
-                measured_by_target.get(target["target_id"], {}).get(fixture["fixture_id"]),
+                measured_by_target.get(target["target_id"], {}).get(
+                    fixture["fixture_id"]
+                ),
             )
             if report["status"] == "missing_measured_result":
                 missing_target_count += 1
@@ -306,7 +304,9 @@ def build_flexible_raft_d6_measurement_manifest(
     comparison_report = build_flexible_raft_d6_comparison_report(parameters=parameters)
     tasks = []
     for fixture in suite["fixtures"]:
-        metric_paths = sorted(_flatten_numeric_metrics(fixture["python_reference_metrics"]))
+        metric_paths = sorted(
+            _flatten_numeric_metrics(fixture["python_reference_metrics"])
+        )
         for target in fixture["comparison_targets"]:
             target_id = target["target_id"]
             tasks.append(
@@ -322,7 +322,9 @@ def build_flexible_raft_d6_measurement_manifest(
                     "source_fixture_objective": fixture["objective"],
                     "required_metric_paths": metric_paths,
                     "required_metric_count": len(metric_paths),
-                    "required_d5_replay_channels": fixture["d5_replay_channels_required"],
+                    "required_d5_replay_channels": fixture[
+                        "d5_replay_channels_required"
+                    ],
                     "required_provenance_fields": list(
                         _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS
                     ),
@@ -359,8 +361,7 @@ def build_flexible_raft_d6_measurement_manifest(
                 for task in tasks
             ),
             "required_chaos_baseline_task_count": sum(
-                task["target_id"] == "unreal_chaos_rigid_baseline"
-                for task in tasks
+                task["target_id"] == "unreal_chaos_rigid_baseline" for task in tasks
             ),
             "can_regenerate_comparison_report_after_template_is_filled": True,
         },
@@ -623,7 +624,9 @@ def merge_flexible_raft_d6_compliant_measured_results_sidecar(
     )
     if not report["can_merge"]:
         details = ", ".join(report["errors"] or ["invalid compliant sidecar"])
-        raise ValueError(f"Cannot merge D6 compliant measured-results sidecar: {details}")
+        raise ValueError(
+            f"Cannot merge D6 compliant measured-results sidecar: {details}"
+        )
 
     merged = deepcopy(
         base_measured_results_payload
@@ -634,7 +637,9 @@ def merge_flexible_raft_d6_compliant_measured_results_sidecar(
     if not isinstance(measured_results, dict):
         raise ValueError("Base measured-results payload must contain measured_results.")
     if _D6_COMPLIANT_TARGET_ID not in measured_results:
-        raise ValueError("Base measured-results payload is missing the compliant target.")
+        raise ValueError(
+            "Base measured-results payload is missing the compliant target."
+        )
 
     template = build_flexible_raft_d6_measured_results_template(parameters)
     compliant_template = template["measured_results"][_D6_COMPLIANT_TARGET_ID]
@@ -655,19 +660,30 @@ def merge_flexible_raft_d6_compliant_measured_results_sidecar(
         )
         measured_results[_D6_COMPLIANT_TARGET_ID][fixture_id] = target_record
 
-    merged["status"] = "measured_results_template_partially_populated_pending_remaining_targets"
-    merged["filled_result_count"] = _count_filled_d6_measured_result_records(
-        measured_results
+    filled_result_count = _count_filled_d6_measured_result_records(measured_results)
+    all_targets_filled = filled_result_count == len(REQUIRED_D6_FIXTURE_IDS) * len(
+        D6_TARGET_POLICIES
     )
+    merged["status"] = (
+        "all_measured_results_populated_comparison_and_manual_review_pending"
+        if all_targets_filled
+        else "measured_results_template_partially_populated_pending_remaining_targets"
+    )
+    merged["filled_result_count"] = filled_result_count
     merged["source_compliant_measured_results_sidecar_schema"] = sidecar_payload[
         "schema"
     ]
-    merged["source_compliant_measurement_manifest_path"] = D6_MEASUREMENT_MANIFEST_RELATIVE_PATH
+    merged["source_compliant_measurement_manifest_path"] = (
+        D6_MEASUREMENT_MANIFEST_RELATIVE_PATH
+    )
     merged["promotion_gate"] = {
         "may_mark_d6_complete": False,
         "may_drive_runtime_gameplay": False,
         "reason": (
-            "This payload contains validated compliant-reference D6 results, "
+            "Both validated D6 target sets are populated; comparison and manual "
+            "review remain required before promotion."
+            if all_targets_filled
+            else "This payload contains validated compliant-reference D6 results, "
             "but D6 remains incomplete until the Unreal Chaos baseline target is "
             "also populated, the comparison report passes, and manual review "
             "approves promotion."
@@ -898,17 +914,28 @@ def merge_flexible_raft_d6_chaos_measured_results_sidecar(
         )
         measured_results[_D6_CHAOS_TARGET_ID][fixture_id] = target_record
 
-    merged["status"] = "measured_results_template_partially_populated_pending_remaining_targets"
-    merged["filled_result_count"] = _count_filled_d6_measured_result_records(
-        measured_results
+    filled_result_count = _count_filled_d6_measured_result_records(measured_results)
+    all_targets_filled = filled_result_count == len(REQUIRED_D6_FIXTURE_IDS) * len(
+        D6_TARGET_POLICIES
     )
+    merged["status"] = (
+        "all_measured_results_populated_comparison_and_manual_review_pending"
+        if all_targets_filled
+        else "measured_results_template_partially_populated_pending_remaining_targets"
+    )
+    merged["filled_result_count"] = filled_result_count
     merged["source_chaos_measured_results_sidecar_schema"] = sidecar_payload["schema"]
-    merged["source_chaos_fixture_contract_path"] = D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH
+    merged["source_chaos_fixture_contract_path"] = (
+        D6_CHAOS_FIXTURE_CONTRACT_RELATIVE_PATH
+    )
     merged["promotion_gate"] = {
         "may_mark_d6_complete": False,
         "may_drive_runtime_gameplay": False,
         "reason": (
-            "This payload contains validated Unreal Chaos D6 baseline results, "
+            "Both validated D6 target sets are populated; comparison and manual "
+            "review remain required before promotion."
+            if all_targets_filled
+            else "This payload contains validated Unreal Chaos D6 baseline results, "
             "but D6 remains incomplete until the compliant reference target is "
             "also populated, the comparison report passes, and manual review "
             "approves promotion."
@@ -922,7 +949,8 @@ def write_flexible_raft_d6_chaos_measured_results_merge_report(
     sidecar_payload: dict[str, Any] | None = None,
 ) -> Path:
     payload = build_flexible_raft_d6_chaos_measured_results_merge_report(
-        sidecar_payload or build_flexible_raft_d6_chaos_measured_results_sidecar_template()
+        sidecar_payload
+        or build_flexible_raft_d6_chaos_measured_results_sidecar_template()
     )
     return write_flexible_raft_d6_chaos_measured_results_merge_payload(
         repo_root / D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH,
@@ -1018,8 +1046,8 @@ def build_flexible_raft_d6_chaos_fixture_contract(
     chaos_jobs = [_d6_chaos_job_payload(fixture) for fixture in package["fixtures"]]
     return {
         "schema": D6_CHAOS_FIXTURE_CONTRACT_SCHEMA,
-        "generated_on": "2026-07-16",
-        "status": "chaos_fixture_contract_ready_runner_implementation_pending",
+        "generated_on": "2026-07-28",
+        "status": "chaos_fixture_runner_implemented_measurements_recorded_manual_review_pending",
         "d6_complete": False,
         "production_promoted": False,
         "runtime": "UnrealChaos",
@@ -1032,6 +1060,16 @@ def build_flexible_raft_d6_chaos_fixture_contract(
         "job_count": len(chaos_jobs),
         "required_fixture_ids": list(REQUIRED_D6_FIXTURE_IDS),
         "fixed_step_seconds": package["common_setup"]["fixed_step_s"],
+        "runner_automation_test_name": "RaftSim.D6.ChaosRunnerExportBundle",
+        "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+        "runner_implementation_source": (
+            "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/"
+            "RaftSimD6ChaosMeasuredRunner.cpp"
+        ),
+        "runner_execution": (
+            "Transient EWorldType::Game physics scenes with fixed UWorld ticks, "
+            "valid FChaosEngineInterface rigid actor handles, and repeated deterministic runs."
+        ),
         "automation_export": {
             "summary": "physics/reports/d6/chaos/summary.json",
             "replay_dir": "physics/reports/d6/chaos/replays",
@@ -1059,10 +1097,9 @@ def build_flexible_raft_d6_chaos_fixture_contract(
             "may_substitute_python_reference": False,
             "manual_review_required_after_run": True,
             "reason": (
-                "This contract defines the Unreal Chaos baseline runner inputs "
-                "and expected outputs only. D6 still requires measured Chaos "
-                "exports, compliant-reference exports, comparison regeneration, "
-                "and manual review."
+                "The Unreal Chaos baseline runner and all seven measured exports "
+                "are implemented. D6 still requires an independent compliant-reference "
+                "export, comparison regeneration, and manual review."
             ),
         },
     }
@@ -1120,9 +1157,7 @@ def _d6_common_setup_payload(context: dict[str, Any]) -> dict[str, Any]:
         "mass_properties": {
             "total_mass_kg": properties.total_mass_kg,
             "inverse_mass_kg": properties.inverse_mass,
-            "inertia_diagonal_kg_m2": _vec3_payload(
-                properties.inertia_diagonal_kg_m2
-            ),
+            "inertia_diagonal_kg_m2": _vec3_payload(properties.inertia_diagonal_kg_m2),
             "gravity": _vec3_payload(properties.gravity),
             "guide_offset": _vec3_payload(properties.guide_offset),
             "passenger_offsets": [
@@ -1130,18 +1165,14 @@ def _d6_common_setup_payload(context: dict[str, Any]) -> dict[str, Any]:
             ],
             "sample_patch_count": len(properties.sample_patches),
             "sample_patches": [
-                _sample_patch_payload(patch)
-                for patch in properties.sample_patches
+                _sample_patch_payload(patch) for patch in properties.sample_patches
             ],
         },
         "crew_seat_count": len(context["seats"]),
         "crew_seats": [_seat_payload(seat) for seat in context["seats"]],
         "default_tube_layout": {
             "segment_count": len(default_layout),
-            "segments": [
-                _tube_segment_payload(segment)
-                for segment in default_layout
-            ],
+            "segments": [_tube_segment_payload(segment) for segment in default_layout],
         },
         "reference_evaluator_defaults": {
             "d3_water_sampler": {
@@ -1226,7 +1257,9 @@ def _d6_fixture_specific_input(
             "phases": [
                 _crew_phase_payload("neutral_occupied_seats", ()),
             ],
-            "water": _water_payload(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)),
+            "water": _water_payload(
+                surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)
+            ),
             "expected_engine_setup": "Sample the uniform upstream flow against depressed upstream tube segments.",
         }
     if fixture_id == "timed_high_side_save":
@@ -1239,7 +1272,9 @@ def _d6_fixture_specific_input(
                     _starboard_high_side_actions(context),
                 ),
             ],
-            "water": _water_payload(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)),
+            "water": _water_payload(
+                surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0)
+            ),
             "previous_retained_volume_by_segment": _neutral_retained_volume_by_segment(
                 context
             ),
@@ -1301,8 +1336,7 @@ def _d6_target_fixture_input_payload(target_id: str, fixture_id: str) -> dict[st
         "metric_deltas_are_failures": policy["metric_deltas_are_failures"],
         "adapter_contract": _d6_target_adapter_contract(target_id),
         "expected_result_template_path": (
-            f"physics/data/calibration/d6_measurements/{target_id}/"
-            f"{fixture_id}.json"
+            f"physics/data/calibration/d6_measurements/{target_id}/{fixture_id}.json"
         ),
         "required_provenance_fields": list(_REQUIRED_MEASUREMENT_PROVENANCE_FIELDS),
         "can_promote_fixture": False,
@@ -1314,7 +1348,7 @@ def _d6_chaos_job_payload(fixture: dict[str, Any]) -> dict[str, Any]:
     return {
         "job_id": f"unreal_chaos_rigid_baseline__{fixture_id}",
         "fixture_id": fixture_id,
-        "status": "ready_for_unreal_runner_implementation_pending",
+        "status": "runner_implemented_measurement_recorded_manual_review_pending",
         "runtime": "UnrealChaos",
         "comparison_mode": D6_TARGET_POLICIES["unreal_chaos_rigid_baseline"][
             "comparison_mode"
@@ -1359,14 +1393,11 @@ def _d6_chaos_job_payload(fixture: dict[str, Any]) -> dict[str, Any]:
             "metrics",
         ],
         "unreal_target": {
-            "functional_test_actor": "BP_RaftSimD6ChaosFixtureRunner",
-            "fixture_map": f"/RaftSim/Physics/D6/Chaos/{fixture_id}",
+            "runner_symbol": "RaftSimD6Chaos::RunMeasuredExport",
+            "world_source": "transient_EWorldType_Game_from_committed_fixture_input",
             "test_type": "EditorContext | EngineFilter",
-            "debug_overlay_capture": (
-                f"Saved/Automation/RaftSim/D6/Chaos/{fixture_id}_overlay.png"
-            ),
             "telemetry_stream": (
-                f"Saved/Automation/RaftSim/D6/Chaos/{fixture_id}.telemetry.jsonl"
+                f"physics/reports/d6/chaos/replays/{fixture_id}.telemetry.json"
             ),
         },
         "guardrails": {
@@ -1406,14 +1437,15 @@ def _port_lean_actions(context: dict[str, Any]) -> tuple[CrewAction2_5D, ...]:
 
 def _starboard_high_side_actions(context: dict[str, Any]) -> tuple[CrewAction2_5D, ...]:
     return tuple(
-        CrewAction2_5D(seat.seat_id, high_side_direction=1)
-        for seat in context["seats"]
+        CrewAction2_5D(seat.seat_id, high_side_direction=1) for seat in context["seats"]
     )
 
 
 def _neutral_retained_volume_by_segment(context: dict[str, Any]) -> dict[str, float]:
     water = _synthetic_water_field(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0))
-    neutral = evaluate_overwash_flip_d3(_tube(context), water, parameters=context["params"])
+    neutral = evaluate_overwash_flip_d3(
+        _tube(context), water, parameters=context["params"]
+    )
     return {
         segment.segment_id: segment.retained_water_volume_m3
         for segment in neutral.segment_overwash
@@ -1516,8 +1548,7 @@ def _quaternion_payload(value: Any) -> dict[str, float]:
 def _null_metric_tree_from_reference(value: Any) -> Any:
     if isinstance(value, dict):
         return {
-            key: _null_metric_tree_from_reference(value[key])
-            for key in sorted(value)
+            key: _null_metric_tree_from_reference(value[key]) for key in sorted(value)
         }
     if isinstance(value, list):
         return [_null_metric_tree_from_reference(item) for item in value]
@@ -1529,7 +1560,9 @@ def _null_metric_tree_from_reference(value: Any) -> Any:
 def _build_context(params: RaftParameters2_5D) -> dict[str, Any]:
     properties = build_default_raft_mass_properties(params)
     seats = build_default_crew_seats2_5d(params)
-    state = RaftState6DoF(position=Vec3(3.0, 2.0, 0.0), linear_velocity=Vec3(0.0, 0.7, 0.0))
+    state = RaftState6DoF(
+        position=Vec3(3.0, 2.0, 0.0), linear_velocity=Vec3(0.0, 0.7, 0.0)
+    )
     return {
         "params": params,
         "properties": properties,
@@ -1561,8 +1594,20 @@ def _static_seat_load_sag(context: dict[str, Any]) -> dict[str, Any]:
 
 def _traveling_crew_shift(context: dict[str, Any]) -> dict[str, Any]:
     neutral = _tube(context)
-    port = _tube(context, tuple(CrewAction2_5D(seat.seat_id, lean_offset=Vec3(0.0, -1.5, 0.0)) for seat in context["seats"]))
-    starboard = _tube(context, tuple(CrewAction2_5D(seat.seat_id, high_side_direction=1) for seat in context["seats"]))
+    port = _tube(
+        context,
+        tuple(
+            CrewAction2_5D(seat.seat_id, lean_offset=Vec3(0.0, -1.5, 0.0))
+            for seat in context["seats"]
+        ),
+    )
+    starboard = _tube(
+        context,
+        tuple(
+            CrewAction2_5D(seat.seat_id, high_side_direction=1)
+            for seat in context["seats"]
+        ),
+    )
     return _fixture_payload(
         "traveling_crew_shift",
         "Verify moving crew load travels across local tube segments and changes side freeboard.",
@@ -1570,8 +1615,10 @@ def _traveling_crew_shift(context: dict[str, Any]) -> dict[str, Any]:
             "neutral_roll_load_bias_nm": neutral.tube_solve.tube_solve.roll_load_bias_nm,
             "port_roll_load_bias_nm": port.tube_solve.tube_solve.roll_load_bias_nm,
             "starboard_roll_load_bias_nm": starboard.tube_solve.tube_solve.roll_load_bias_nm,
-            "port_total_freeboard_delta_m": port.port_total_freeboard_loss_m - neutral.port_total_freeboard_loss_m,
-            "starboard_total_freeboard_delta_m": starboard.starboard_total_freeboard_loss_m - neutral.starboard_total_freeboard_loss_m,
+            "port_total_freeboard_delta_m": port.port_total_freeboard_loss_m
+            - neutral.port_total_freeboard_loss_m,
+            "starboard_total_freeboard_delta_m": starboard.starboard_total_freeboard_loss_m
+            - neutral.starboard_total_freeboard_loss_m,
         },
         {
             "compliant_reference": "tube depression peak follows the crew shift direction over time",
@@ -1582,8 +1629,12 @@ def _traveling_crew_shift(context: dict[str, Any]) -> dict[str, Any]:
 
 def _rock_pinch_wrap(context: dict[str, Any]) -> dict[str, Any]:
     tube = _tube(context)
-    obstacle = (RockObstacleD4("wrap_starboard_pillow", Vec3(0.0, 1.0, 0.0), 1.45, 0.82),)
-    contact = evaluate_rock_contact_wrap_pin_d4(tube, obstacle, parameters=context["params"])
+    obstacle = (
+        RockObstacleD4("wrap_starboard_pillow", Vec3(0.0, 1.0, 0.0), 1.45, 0.82),
+    )
+    contact = evaluate_rock_contact_wrap_pin_d4(
+        tube, obstacle, parameters=context["params"]
+    )
     return _fixture_payload(
         "rock_pinch_wrap",
         "Verify a wide boulder wraps multiple tube segments and records pin/release margins.",
@@ -1624,9 +1675,17 @@ def _upstream_tube_overwash_flip(context: dict[str, Any]) -> dict[str, Any]:
 
 def _timed_high_side_save(context: dict[str, Any]) -> dict[str, Any]:
     water = _synthetic_water_field(surface_height_m=0.24, velocity=Vec3(0.0, -3.0, 0.0))
-    neutral = evaluate_overwash_flip_d3(_tube(context), water, parameters=context["params"])
+    neutral = evaluate_overwash_flip_d3(
+        _tube(context), water, parameters=context["params"]
+    )
     high_side = evaluate_overwash_flip_d3(
-        _tube(context, tuple(CrewAction2_5D(seat.seat_id, high_side_direction=1) for seat in context["seats"])),
+        _tube(
+            context,
+            tuple(
+                CrewAction2_5D(seat.seat_id, high_side_direction=1)
+                for seat in context["seats"]
+            ),
+        ),
         water,
         parameters=context["params"],
         previous_retained_volume_by_segment={
@@ -1642,7 +1701,8 @@ def _timed_high_side_save(context: dict[str, Any]) -> dict[str, Any]:
             "high_side_flip_threshold_nm": high_side.reference_flip_threshold_nm,
             "neutral_flip_margin_nm": neutral.reference_flip_margin_nm,
             "high_side_flip_margin_nm": high_side.reference_flip_margin_nm,
-            "margin_delta_nm": high_side.reference_flip_margin_nm - neutral.reference_flip_margin_nm,
+            "margin_delta_nm": high_side.reference_flip_margin_nm
+            - neutral.reference_flip_margin_nm,
         },
         {
             "compliant_reference": "reviewed save case must improve or explain flip margin under same flow",
@@ -1678,14 +1738,24 @@ def _pressure_flow_sweeps(context: dict[str, Any]) -> dict[str, Any]:
     params = context["params"]
     sweeps = []
     for nominal_pressure in (14_000.0, 18_000.0, 22_000.0):
-        layout = build_default_compliant_tube_layout_d1(params, nominal_pressure_pa=nominal_pressure)
+        layout = build_default_compliant_tube_layout_d1(
+            params, nominal_pressure_pa=nominal_pressure
+        )
         tube = _tube(context, layout=layout)
         for velocity in (1.2, 2.4, 3.6):
-            water = _synthetic_water_field(surface_height_m=0.22, velocity=Vec3(0.0, -velocity, 0.0))
-            overwash = evaluate_overwash_flip_d3(tube, water, parameters=params, layout=layout)
+            water = _synthetic_water_field(
+                surface_height_m=0.22, velocity=Vec3(0.0, -velocity, 0.0)
+            )
+            overwash = evaluate_overwash_flip_d3(
+                tube, water, parameters=params, layout=layout
+            )
             contact = evaluate_rock_contact_wrap_pin_d4(
                 tube,
-                (RockObstacleD4("pressure_sweep_wrap", Vec3(0.0, 1.0, 0.0), 1.45, 0.82),),
+                (
+                    RockObstacleD4(
+                        "pressure_sweep_wrap", Vec3(0.0, 1.0, 0.0), 1.45, 0.82
+                    ),
+                ),
                 parameters=params,
                 layout=layout,
             )
@@ -1794,7 +1864,9 @@ def _compare_d6_target_fixture(
         }
 
     missing_provenance = [
-        field for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS if not measured_result.get(field)
+        field
+        for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS
+        if not measured_result.get(field)
     ]
     invalid_provenance = _invalid_measurement_provenance_fields(measured_result)
     comparison = _compare_metric_trees(
@@ -1833,7 +1905,9 @@ def _compare_d6_target_fixture(
         "metric_summary": {
             "compared_metric_count": comparison["compared_metric_count"],
             "failed_metric_count": comparison["failed_metric_count"],
-            "missing_reference_metric_count": comparison["missing_reference_metric_count"],
+            "missing_reference_metric_count": comparison[
+                "missing_reference_metric_count"
+            ],
             "extra_measured_metric_count": comparison["extra_measured_metric_count"],
         },
         "metric_comparisons": comparison["metric_comparisons"],
@@ -1858,7 +1932,9 @@ def _validate_d6_measured_result_record(
     target_id: str,
 ) -> dict[str, Any]:
     fixture_id = fixture["fixture_id"]
-    required_metric_paths = set(_flatten_numeric_metrics(fixture["python_reference_metrics"]))
+    required_metric_paths = set(
+        _flatten_numeric_metrics(fixture["python_reference_metrics"])
+    )
     errors = []
     missing_provenance: list[str] = []
     invalid_provenance: list[str] = []
@@ -1877,7 +1953,9 @@ def _validate_d6_measured_result_record(
             errors.append("result_status_not_measured")
 
         missing_provenance = [
-            field for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS if not record.get(field)
+            field
+            for field in _REQUIRED_MEASUREMENT_PROVENANCE_FIELDS
+            if not record.get(field)
         ]
         invalid_provenance = _invalid_measurement_provenance_fields(record)
         if missing_provenance:
@@ -1941,7 +2019,9 @@ def _count_filled_d6_measured_result_records(
 
 
 def _is_sha256_hex(value: str) -> bool:
-    return len(value) == 64 and all(character in "0123456789abcdefABCDEF" for character in value)
+    return len(value) == 64 and all(
+        character in "0123456789abcdefABCDEF" for character in value
+    )
 
 
 def _compare_metric_trees(
@@ -1964,7 +2044,8 @@ def _compare_metric_trees(
         measured_value = measured[path]
         abs_delta = abs(measured_value - reference_value)
         tolerance = D6_METRIC_ABSOLUTE_TOLERANCE + (
-            D6_METRIC_RELATIVE_TOLERANCE * max(abs(reference_value), abs(measured_value))
+            D6_METRIC_RELATIVE_TOLERANCE
+            * max(abs(reference_value), abs(measured_value))
         )
         within_tolerance = abs_delta <= tolerance
         if not within_tolerance:

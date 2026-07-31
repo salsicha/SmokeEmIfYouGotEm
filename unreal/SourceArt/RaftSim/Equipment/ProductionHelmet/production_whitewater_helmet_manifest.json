@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "generator": "unreal/Scripts/build_production_whitewater_helmet.py",
+  "generator_version": 3,
+  "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+  "license": "RaftSim project source license",
+  "source_inputs": [],
+  "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/SM_RaftSim_WhitewaterHelmet.fbx",
+  "fbx_sha256": "f31f205e72d56203a596e496e9ad3999bd95effced530f51261dc317bdfa68e5",
+  "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionHelmet/SM_RaftSim_WhitewaterHelmet.blend",
+  "blend_sha256": "fcc5425e5356ceb09524dee9f43c664fd28bf53b2edd4b0b9fe5cbf5be1b05d3",
+  "object_name": "SM_RaftSim_WhitewaterHelmet",
+  "material_slots": [
+    "HelmetShell",
+    "HelmetLiner",
+    "HelmetWebbing",
+    "HelmetHardware"
+  ],
+  "physical_cut_through_vents": 6,
+  "retention_anchor_count": 4,
+  "vertex_count": 12364,
+  "polygon_count": 12296,
+  "bounds_cm": {
+    "min": [
+      -12.47,
+      -12.8766,
+      -12.4
+    ],
+    "max": [
+      16.1635,
+      12.8766,
+      14.45
+    ]
+  },
+  "runtime_boundary": "Visual-only headgear; D3/D4 physics and rescue authority remain native."
+}

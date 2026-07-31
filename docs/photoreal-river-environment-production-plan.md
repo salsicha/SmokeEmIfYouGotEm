@@ -412,3 +412,149 @@ Initial source slice:
 - V41 rules out light direction as the explanation for that weak tint response. The same loaded physical-corridor world and fixed 24.5 m camera rotate only `RaftSim_Sun_LumenPreview` between camera-to-tree frontlight and tree-to-camera backlight, capture source/black-transmission/source-tint representations with independent TAA history, then restore the original sun transform without saving the map or changing gameplay authority. Front/back images differ by 39.33-39.91 mean channel levels, proving a strong bracket, but source tint improves HLOD luminance only 0.003 percent frontlit and 0.251 percent backlit. The better backlit result reaches 0.677 of source fixed-overlap luminance, 0.487 silhouette IoU, and a 1.444x silhouette area ratio. Retain the bracket and corrected layer graph, then replace the nearest-view plane with a source-matched depth-aware, interpolated-view, or geometry representation that preserves foliage orientation before rerunning V41, V35, and V37 or considering profiling and corridor substitution.
 - V42 tests the expensive endpoint before choosing that replacement. The exact V32 source assembly is collapsed into a transient 1,354,592-vertex/1,213,857-triangle/two-material static mesh and compared with the source and V41 flat control in the same physical-corridor world, camera, and front/back light bracket. It uses source bark/foliage materials, no collision, no saved-map or gameplay change, and no cast shadows because one merged component cannot reproduce source trunk-on/foliage-off shadows. Generated cypress source textures now clear stale running-platform data, rebuild synchronously, and fail closed unless Unreal produces a correctly sized mip chain; the accepted run validates 21/21 at 2048x2048 with 12 mips and zero source-canopy no-miplevel warnings. Frontlit silhouette IoU improves from 0.597 to 0.901, area reaches 1.012x, and fixed-overlap luminance reaches 1.013x, proving source-matched geometry can close that shape bracket. Backlit agreement still fails at 0.717 IoU, 0.815x silhouette area, and 1.752x fixed-overlap luminance. Retain the merged mesh only as a bounded fidelity upper bound; next isolate split material/shadow state, derive a reduced geometry representation, add inverse temporal ownership, and rerun V41/V35/V37. Source-card cleanup, named-hazard framing, packaged desktop/VR performance, corridor substitution, and all-form regeneration remain closed.
 - V43 isolates that state before triangle reduction. In the same physical-corridor world, fixed 24.5 m camera, and front/back light bracket, it compares V42's exact mesh as one no-shadow static component, as material-ID-split no-shadow dynamic bark/foliage components, and as the same split with bark-only shadowing. All controls use the same source parent materials and source-coverage temporal parameters. The no-shadow split matches the single component within a documented independent-TAA tolerance: front/back IoU is 0.9972/0.9870, silhouette area is 0.99983x/0.99996x, fixed-overlap luminance is 0.99994x/0.99977x, and mean channel delta is 0.149/0.546. Material-ID bark shadowing worsens IoU, area error, overlap luminance error, and channel delta in both directions. This rejects material ID as a substitute for source component shadow provenance: foliage-instance geometry can carry bark material while source shadow ownership belongs to the originating trunk or foliage component. Retain the material partition for shading, keep the exact mesh diagnostic-only, and next build an exact source-provenance trunk/foliage split before reducing geometry. V43 does not pass source parity, temporal handoff, source-card cleanup, named-hazard framing, performance, corridor substitution, family regeneration, or photoreal art review.
+
+## July 19, 2026 — M9 full-reach integration status
+
+- The playable South Fork full-reach map now uses source-conditioned/procedurally
+  completed terrain, deterministic World Partition identities, and 20/20 rebuilt HLOD
+  cells. Licensed terrain microdetail uses its true 150 cm rock-ground and 200 cm
+  forest-ground widths; the water material wraps moving UVs before isolating the South
+  Fork normal-atlas tile. Single Layer Water volume coefficients are now expressed in
+  Unreal's inverse-centimetre units and calibrated away from the former opaque cyan
+  result toward darker olive/neutral South Fork reference water. Corridor/far-field
+  terrain uses 0.66/0.78 source-macro influence. Shading does not create hydraulic
+  features: the live solver mesh remains authoritative for water shape and motion.
+- Far-field vegetation uses six deterministic HISM groups with terrain-slope correction,
+  river exclusion, nonuniform transform variation, and up to 0.46 DEM-cell XY jitter.
+  The performance-bounded Shipping mix is 90 percent generated three-plane conifer cards
+  and 92 percent broadleaf cards, with a small reviewed full-geometry minority. A denser
+  geometry mix failed the Development editor frame and memory budgets; the optimized
+  mix reduced peak editor memory to 7,038.2 MB, while its 17.228 ms Development p95 is
+  retained as diagnostic evidence rather than substituted for the release gate.
+- The current dirty-worktree v3 Mac Shipping RC includes these changes plus the latest
+  synthetic-skin/head/open-helmet pass. Its unsandboxed diagnostic clone passes the
+  canonical 1920x1080 High/60% packaged soak at 16.305 ms p95 across 3,748 frames with
+  zero hitches above 33 ms and 5,275.8 MB peak memory. The correctly sandbox-signed v3
+  app and the previously qualified v2 app currently reproduce a host App Sandbox service
+  stall before Unreal `main`, so sandboxed startup and fresh-machine acceptance remain
+  open. Functional capture automation passes, and the
+  gameplay water is materially less saturated, but human review still
+  rejects the smooth gold distant terrain, recurring conifer silhouettes, broadleaf
+  alpha treatment, and procedural water/raft/crew presentation as photoreal marketing
+  material. M9 therefore remains open for final art, representative-media, rights,
+  guide/geospatial/art/legal, platform, clean-build, distribution-signing, and
+  notarization acceptance.
+
+## July 26, 2026 — settled-map evidence status
+
+- Fixed-camera authoring and evidence capture are now distinct operations. The evidence
+  command loads the saved full-reach World Partition map without regeneration or resave,
+  hard-loads its actors, derives camera elevation from the saved centerline median-water
+  mesh, and captures the five locked compositions. Independent v269/v270 processes pass
+  the strict sparse-renderer-drift contract: three images are byte-identical, Meat
+  Grinder changes 3 pixels with maximum channel delta 1, and Troublemaker changes 7
+  pixels with maximum delta 4. The durable JSON correctly records
+  `all_byte_identical: false` and closes the capture-repeatability engineering gate.
+- This does not change the art verdict. The v270 views still show smooth under-authored
+  terrain, sparse/repeated card vegetation, synthetic water and foam, a procedural raft,
+  and generic Manny/procedural-PFD crew. Licensed production environment, character,
+  wardrobe, raft, water/VFX, and animation assets remain the critical photoreal gap;
+  named art/guide/geospatial/legal approval, rights-cleared media, external hardware,
+  distribution signing/notarization, and clean immutable Shipping promotion also remain
+  open.
+
+## July 30, 2026 — particle-scale photographic water review
+
+- The isolated V5 SubUV review corrects V4's source-scale and mip-boundary defects: sixteen
+  project-owned particle-scale cells remain distinct and bounded at a 32 px review mip, and the
+  opt-in Unreal material, texture, and five Niagara systems leave production assets byte-identical.
+  A close fixed camera resolves an irregular porous film after review-only opacity calibration,
+  but the established contact and wrap views still show a detached fuzzy mark rather than
+  connected water volume. A bounded larger mist footprint does not improve that read, so V5 is
+  rejected and production remains selected. The next whitewater pass must derive a temporally
+  connected sheet, ribbon, or mesh from solver-authorized contact geometry, using photographic
+  masks only for edge and entrained-air breakup. It must visibly beat production in both macro and
+  normal gameplay views before any asset or map promotion. Full evidence is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_photographic_water_subuv_v5_review.json`.
+
+## July 30, 2026 — connected contact water review
+
+- V6 supplies the connected solver-shaped geometry that V5 identified as missing: an opt-in,
+  noncolliding 160-triangle sheet follows the D4 contact shoulder and samples the live-water surface
+  at every vertex while leaving simulation, map, scoring, and progression authority unchanged. Its
+  isolated material uses the V5 atlas only for edge/aeration breakup. The geometry path is proven,
+  but the art result fails both bounded endpoints: sufficient optical density exposes a smooth
+  translucent wall, while photographic breakup and lower opacity collapse into a tuft or disappear
+  at gameplay scale. Production water therefore remains selected and byte-identical. The next pass
+  must separate attachment, water mass, aerated crest, and ballistic breakup into a solver-contoured
+  multi-lobe volume or spline/ribbon family whose body remains visible independently of mask
+  placement. Promotion still requires clear particle-macro, contact, and wrap-view improvement plus
+  named water-VFX art and whitewater-guide approval. Evidence is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v6_review.json`.
+
+## July 30, 2026 — three-layer connected contact water review
+
+- V7 separates the solver-shaped contact presentation into a sampled horizontal attachment, aerated
+  crest, and two-lobe breakup layer, totaling 296 noncolliding triangles with independent optical
+  budgets. Native diagnostic rendering found and corrected a presentation-vector sign error that put
+  the first arrangement behind the contact boulder; all three corrected layers visibly bridge the
+  raft-rock pin. The photoreal result still fails. At the corrected anchor the lit shader reads as a
+  tall translucent sail, and a final lower/wider geometry plus stronger foam bracket remains a smooth
+  polygonal sheet rather than irregular turbulent water. The temporary diagnostic path has been removed,
+  V7 remains isolated behind `-RaftSimConnectedContactWaterV7Review`, and production water remains
+  selected and byte-identical. The next candidate must use a low closed or depth-layered flow volume
+  with several short pressure/contact-derived lobes and physically plausible subsurface aeration;
+  photographic masks may supply only fine breakup. It must pass macro, contact, and wrap cameras plus
+  named water-VFX-art and whitewater-guide review before promotion. Evidence is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v7_review.json`.
+
+## July 30, 2026 — closed-lobe connected contact water review
+
+- V8 replaces V7's shared vertical crest sheet with one sampled horizontal attachment and six short,
+  sealed, independently phased and flow-aligned lobes. The 736-triangle component remains opt-in,
+  noncolliding, shadowless, navigation-inert, and physically non-authoritative. Native rendering proves
+  that all six bodies attach to the D4 raft-rock pin, but the first bracket reads as repeated white
+  teeth. Widening and flattening the lobes, reducing their lift, and roughly halving foam density
+  removes the teeth while making the bodies effectively invisible in the base surface. V8 is rejected,
+  production water stays selected and byte-identical, and V6-V8 now bound the useful range of the
+  current analytic translucent-mesh approach. The next candidate must be a temporally evolving,
+  depth-bearing artist-authored FLIP/VDB/mesh cache or bounded Niagara Fluids volume warped and
+  emission-gated by the existing solver, with advected entrained air, anisotropic spray,
+  collision-aware breakup, and short-sequence validation. Promotion still requires clear macro,
+  contact and wrap-view improvement plus named water-VFX-art and whitewater-guide approval. Evidence
+  is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_review.json`.
+
+## July 30, 2026 — stock Niagara Fluids depth-bearing feasibility review
+
+- V9 tests the two relevant UE 5.8 stock 3D FLIP templates without adding Niagara Fluids to the
+  project or package dependency graph. Both Splash and continuous Hose load, compile warm, report
+  active and visible, and occupy a bounded roughly 2.3 x 2.1 x 1.2 m world-space envelope anchored
+  to the existing D4 contact. Both decisive frames retain four contacts, three wrapping segments,
+  one pinned segment, one recovering segment, 0.220 m indentation, and full wetness. With the broad
+  live surface and authored static water hidden, neither system renders a perceptible liquid body;
+  only the existing production contact spray remains. Direct stock-template reuse is rejected and
+  the experimental runtime/capture hooks are removed. The next pass must duplicate or author a
+  project-owned Niagara Fluids system (or an artist-authored FLIP/VDB/mesh cache) with an explicit
+  renderer, project-owned materials, deterministic warm-up/cache, contact-volume controls,
+  advected entrained air, and collision-aware breakup. It must pass a persistent three-frame
+  sequence plus waterless and matched normal-water macro/contact/wrap review before named art and
+  guide approval. Evidence is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v9_review.json`.
+
+## July 30, 2026 — project-authored depth-bearing contact water review
+
+- V10 implements the requested project-owned temporal/depth alternative without extending the
+  dependency graph. It deterministically builds six closed implicit-volume meshes once with
+  marching tetrahedra, exposes 104.89 cm of generated depth, and displays one 10,700-11,092
+  triangle frame at a fixed 0.12-second cadence. D4 contact and live-water samples drive only its
+  presentation transform and material parameters; collision, forces, water authority, maps,
+  rescue, scoring, and progression remain unchanged. Forced frames 0/2/4, an unforced runtime
+  frame, and waterless isolation prove visible attachment and temporal change. That is a technical
+  improvement over V9, but the full scene is still below the requested photoreal bar and lacks
+  named water-VFX art and qualified-guide approval. The candidate therefore remains default-off
+  and unpromoted behind `-RaftSimDepthBearingContactWaterV10Review`. Exact-current validation is
+  M4 4/4, M5 5/5, M7 4/4, M8 4/4, M9 5/5, plus 1,146 Python/data/source passes, three expected
+  skips, one intentional fail-closed historical mismatch, and zero unexpected failures. Evidence
+  is recorded in
+  `docs/environment-captures/south_fork_full_reach/m9_depth_bearing_contact_water_v10_review.json`.

@@ -17,6 +17,8 @@ from .flexible_raft_d6 import (
     D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH,
     D6_MEASUREMENT_MANIFEST_RELATIVE_PATH,
     D6_TARGET_POLICIES,
+    build_flexible_raft_d6_chaos_measured_results_merge_report,
+    build_flexible_raft_d6_compliant_measured_results_merge_report,
     build_flexible_raft_d6_comparison_report,
     build_flexible_raft_d6_fixture_input_package,
     build_flexible_raft_d6_measurement_manifest,
@@ -27,36 +29,93 @@ from .scenario2_5d import RaftParameters2_5D
 D6_EXECUTION_PACKET_RELATIVE_PATH = (
     "physics/data/calibration/flexible_raft_d6_execution_packet.json"
 )
-D6_EXECUTION_PACKET_SCHEMA = "raftsim.flexible_raft.d6_external_engine_execution_packet.v1"
+D6_EXECUTION_PACKET_SCHEMA = (
+    "raftsim.flexible_raft.d6_external_engine_execution_packet.v1"
+)
+D6_CHAOS_MEASURED_RESULTS_RELATIVE_PATH = (
+    "physics/reports/d6/chaos/flexible_raft_d6_chaos_measured_results.json"
+)
 
 
 def build_flexible_raft_d6_execution_packet(
     parameters: RaftParameters2_5D | None = None,
+    chaos_sidecar_payload: dict[str, Any] | None = None,
+    compliant_sidecar_payload: dict[str, Any] | None = None,
+    measured_results_payload: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build the fail-closed execution packet for external D6 engine runs."""
 
     manifest = build_flexible_raft_d6_measurement_manifest(parameters)
     fixture_package = build_flexible_raft_d6_fixture_input_package(parameters)
-    report = build_flexible_raft_d6_comparison_report(parameters=parameters)
+    measured_results = (
+        measured_results_payload.get("measured_results", {})
+        if isinstance(measured_results_payload, dict)
+        else {}
+    )
+    report = build_flexible_raft_d6_comparison_report(
+        measured_results=measured_results,
+        parameters=parameters,
+    )
     target_statuses = _target_status_lookup(report)
+    chaos_merge_report = (
+        build_flexible_raft_d6_chaos_measured_results_merge_report(
+            chaos_sidecar_payload
+        )
+        if chaos_sidecar_payload is not None
+        else None
+    )
+    completed_chaos_fixture_ids = {
+        report["fixture_id"]
+        for report in (
+            chaos_merge_report["fixture_reports"] if chaos_merge_report else []
+        )
+        if report["valid"]
+    }
+    compliant_merge_report = (
+        build_flexible_raft_d6_compliant_measured_results_merge_report(
+            compliant_sidecar_payload
+        )
+        if compliant_sidecar_payload is not None
+        else None
+    )
+    completed_compliant_fixture_ids = {
+        report["fixture_id"]
+        for report in (
+            compliant_merge_report["fixture_reports"] if compliant_merge_report else []
+        )
+        if report["valid"]
+    }
     jobs = [
-        _execution_job(task, target_statuses[(task["target_id"], task["fixture_id"])])
+        _execution_job(
+            task,
+            target_statuses[(task["target_id"], task["fixture_id"])],
+            completed_chaos_fixture_ids,
+            completed_compliant_fixture_ids,
+        )
         for task in manifest["tasks"]
     ]
     adapter_groups = [
-        _adapter_group(target_id, jobs)
-        for target_id in manifest["required_targets"]
+        _adapter_group(target_id, jobs) for target_id in manifest["required_targets"]
     ]
-    pending_jobs = [
-        job
-        for job in jobs
-        if job["current_comparison_report_state"]["status"]
-        == "missing_measured_result"
-    ]
+    completed_jobs = [job for job in jobs if job["measurement_recorded"]]
+    pending_jobs = [job for job in jobs if not job["measurement_recorded"]]
+    chaos_complete = len(completed_chaos_fixture_ids) == manifest["fixture_count"]
+    compliant_complete = (
+        len(completed_compliant_fixture_ids) == manifest["fixture_count"]
+    )
+    all_measurements_recorded = chaos_complete and compliant_complete
     return {
         "schema": D6_EXECUTION_PACKET_SCHEMA,
-        "generated_on": "2026-07-16",
-        "status": "external_engine_execution_packet_ready_measurements_missing",
+        "generated_on": "2026-07-28",
+        "status": (
+            "external_engine_execution_packet_all_measurements_recorded_manual_review_pending"
+            if all_measurements_recorded
+            else (
+                "external_engine_execution_packet_chaos_complete_compliant_measurements_missing"
+                if chaos_complete
+                else "external_engine_execution_packet_ready_measurements_missing"
+            )
+        ),
         "d6_complete": False,
         "production_promoted": False,
         "source_artifacts": {
@@ -76,6 +135,7 @@ def build_flexible_raft_d6_execution_packet(
             "chaos_measured_results_merge_report": (
                 D6_CHAOS_MEASURED_RESULTS_MERGE_REPORT_RELATIVE_PATH
             ),
+            "chaos_measured_results": D6_CHAOS_MEASURED_RESULTS_RELATIVE_PATH,
             "comparison_report": D6_COMPARISON_REPORT_RELATIVE_PATH,
         },
         "summary": {
@@ -83,10 +143,23 @@ def build_flexible_raft_d6_execution_packet(
             "target_count": manifest["target_count"],
             "execution_job_count": len(jobs),
             "pending_external_job_count": len(pending_jobs),
+            "completed_external_job_count": len(completed_jobs),
+            "completed_chaos_job_count": len(completed_chaos_fixture_ids),
+            "completed_compliant_job_count": len(completed_compliant_fixture_ids),
+            "pending_compliant_job_count": sum(
+                1
+                for job in pending_jobs
+                if job["target_id"] == "project_chrono_or_reviewed_compliant_model"
+            ),
+            "chaos_measurements_complete": chaos_complete,
+            "compliant_measurements_complete": compliant_complete,
             "committed_report_missing_target_count": report["missing_target_count"],
             "all_measurements_present": report["all_measurements_present"],
             "comparison_passed": report["comparison_passed"],
             "python_only_can_satisfy_d6": False,
+            "ready_for_manual_promotion_review": bool(
+                all_measurements_recorded and report["comparison_passed"]
+            ),
             "can_promote_d6_now": False,
         },
         "local_preparation_checks": {
@@ -97,9 +170,9 @@ def build_flexible_raft_d6_execution_packet(
             "can_regenerate_pending_report": True,
             "can_run_external_measurement_gate_with_python_only": False,
             "reason": (
-                "The D1-D5 Python reference is the comparison source, not an "
-                "external measured engine result. D6 needs independent measured "
-                "outputs from a reviewed compliant runner and Unreal Chaos."
+                "The D1-D5 Python reference remains only the comparison source. "
+                "Independent Project Chrono and genuine Unreal Chaos measurements "
+                "are recognized only after their sidecars pass schema/provenance checks."
             ),
         },
         "adapter_groups": adapter_groups,
@@ -198,8 +271,11 @@ def build_flexible_raft_d6_execution_packet(
             "requires_comparison_report_review": True,
             "fixture_input_package_status": fixture_package["status"],
             "reason": (
-                "This packet only makes the external run queue executable and "
-                "auditable. It does not provide the missing external measurements."
+                "Both independent target sidecars are complete and the numeric "
+                "comparison passes; D6 remains fail-closed for required manual review."
+                if all_measurements_recorded and report["comparison_passed"]
+                else "D6 remains fail-closed until all independent sidecars are complete, "
+                "the numeric comparison passes, and required manual review is recorded."
             ),
         },
     }
@@ -208,7 +284,32 @@ def build_flexible_raft_d6_execution_packet(
 def write_flexible_raft_d6_execution_packet(repo_root: Path) -> Path:
     """Write the committed D6 external-engine execution packet."""
 
-    payload = build_flexible_raft_d6_execution_packet()
+    chaos_sidecar_path = repo_root / D6_CHAOS_MEASURED_RESULTS_RELATIVE_PATH
+    chaos_sidecar = (
+        json.loads(chaos_sidecar_path.read_text(encoding="utf-8"))
+        if chaos_sidecar_path.is_file()
+        else None
+    )
+    compliant_sidecar_path = (
+        repo_root / "physics/reports/d6/compliant/"
+        "flexible_raft_d6_compliant_measured_results.json"
+    )
+    compliant_sidecar = (
+        json.loads(compliant_sidecar_path.read_text(encoding="utf-8"))
+        if compliant_sidecar_path.is_file()
+        else None
+    )
+    measured_results_path = repo_root / D6_MEASURED_RESULTS_TEMPLATE_RELATIVE_PATH
+    measured_results = (
+        json.loads(measured_results_path.read_text(encoding="utf-8"))
+        if measured_results_path.is_file()
+        else None
+    )
+    payload = build_flexible_raft_d6_execution_packet(
+        chaos_sidecar_payload=chaos_sidecar,
+        compliant_sidecar_payload=compliant_sidecar,
+        measured_results_payload=measured_results,
+    )
     path = repo_root / D6_EXECUTION_PACKET_RELATIVE_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -218,7 +319,9 @@ def write_flexible_raft_d6_execution_packet(repo_root: Path) -> Path:
     return path
 
 
-def _target_status_lookup(report: dict[str, Any]) -> dict[tuple[str, str], dict[str, Any]]:
+def _target_status_lookup(
+    report: dict[str, Any],
+) -> dict[tuple[str, str], dict[str, Any]]:
     statuses: dict[tuple[str, str], dict[str, Any]] = {}
     for fixture in report["fixtures"]:
         for target in fixture["targets"]:
@@ -229,12 +332,26 @@ def _target_status_lookup(report: dict[str, Any]) -> dict[tuple[str, str], dict[
 def _execution_job(
     task: dict[str, Any],
     target_status: dict[str, Any],
+    completed_chaos_fixture_ids: set[str],
+    completed_compliant_fixture_ids: set[str],
 ) -> dict[str, Any]:
+    measurement_recorded = (
+        task["target_id"] == "unreal_chaos_rigid_baseline"
+        and task["fixture_id"] in completed_chaos_fixture_ids
+    ) or (
+        task["target_id"] == "project_chrono_or_reviewed_compliant_model"
+        and task["fixture_id"] in completed_compliant_fixture_ids
+    )
     return {
         "job_id": task["task_id"],
         "target_id": task["target_id"],
         "fixture_id": task["fixture_id"],
-        "status": "pending_external_engine_run",
+        "status": (
+            "measured_engine_output_manual_review_pending"
+            if measurement_recorded
+            else "pending_external_engine_run"
+        ),
+        "measurement_recorded": measurement_recorded,
         "comparison_mode": task["comparison_mode"],
         "metric_deltas_are_failures": task["metric_deltas_are_failures"],
         "fixture_input_package": D6_FIXTURE_INPUT_PACKAGE_RELATIVE_PATH,
@@ -314,9 +431,7 @@ def _adapter_group(target_id: str, jobs: list[dict[str, Any]]) -> dict[str, Any]
         "comparison_mode": policy["comparison_mode"],
         "metric_deltas_are_failures": policy["metric_deltas_are_failures"],
         "pending_job_count": sum(
-            job["current_comparison_report_state"]["status"]
-            == "missing_measured_result"
-            for job in target_jobs
+            not job["measurement_recorded"] for job in target_jobs
         ),
         "adapter_must_not_substitute_python_reference": True,
         "required_external_runner": True,

@@ -518,7 +518,15 @@ def test_rights_reviewed_futaleufu_island_tree_set_is_isolated_and_visually_reje
         if capture.exists():
             assert _sha256(capture) == visual_review["reviewed_candidate"][hash_key]
 
-    assert "FutaleufuIslandTreeSet_1K" not in editor_source
+    assert "FutaleufuIslandTreeSet_1K" in editor_source
+    assert "RaftSimLiveOakIslandTreeMorphologyReview" in editor_source
+    assert "RaftSimLiveOakIslandTreeMaterialV1Review" in editor_source
+    south_fork_production_source = (
+        REPO_ROOT
+        / "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/"
+        "RaftSimEditorSouthForkFullReach.cpp"
+    ).read_text(encoding="utf-8")
+    assert "FutaleufuIslandTreeSet_1K" not in south_fork_production_source
     assert "futaleufu_island_tree" not in active_manifest.lower()
 
 

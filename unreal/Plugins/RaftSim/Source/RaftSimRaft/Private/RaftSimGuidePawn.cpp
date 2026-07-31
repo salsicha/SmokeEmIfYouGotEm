@@ -14,6 +14,7 @@
 #include "InputCoreTypes.h"
 #include "Kismet/GameplayStatics.h"
 #include "RaftSimInputActions.h"
+#include "RaftSimCameraPresentation.h"
 #include "RaftSimPhysicsBridgeSubsystem.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimWaterRuntimeAdapter.h"
@@ -146,6 +147,7 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     GuideCamera->SetRelativeLocation(FVector::ZeroVector);
     GuideCamera->bUsePawnControlRotation = true;
     GuideCamera->SetFieldOfView(90.0f);
+    RaftSimCameraPresentation::Configure(GuideCamera);
 
     ChaseCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FreeRunChaseCamera"));
     ChaseCamera->SetupAttachment(Root);
@@ -155,7 +157,8 @@ ARaftSimGuidePawn::ARaftSimGuidePawn()
     ChaseCamera->SetUsingAbsoluteLocation(true);
     ChaseCamera->SetUsingAbsoluteRotation(true);
     ChaseCamera->bUsePawnControlRotation = false;
-    ChaseCamera->SetFieldOfView(86.0f);
+    ChaseCamera->SetFieldOfView(78.0f);
+    RaftSimCameraPresentation::Configure(ChaseCamera);
     ChaseCamera->SetActive(false);
 }
 
@@ -229,7 +232,7 @@ void ARaftSimGuidePawn::UpdateChaseCamera()
         }
     }
 
-    FVector CameraLocation = SubjectLocation - PlanarForward * 680.0f;
+    FVector CameraLocation = SubjectLocation - PlanarForward * 560.0f;
     if (Water != nullptr)
     {
         FRaftSimWaterSample CameraSample;
@@ -238,10 +241,10 @@ void ARaftSimGuidePawn::UpdateChaseCamera()
             CameraSurfaceZCm = CameraSample.SurfaceHeightMeters * 100.0f;
         }
     }
-    CameraLocation.Z = FMath::Max(SubjectLocation.Z + 380.0f, CameraSurfaceZCm + 340.0f);
+    CameraLocation.Z = FMath::Max(SubjectLocation.Z + 350.0f, CameraSurfaceZCm + 330.0f);
     const FVector LookTarget(
-        SubjectLocation.X + PlanarForward.X * 1400.0f,
-        SubjectLocation.Y + PlanarForward.Y * 1400.0f,
+        SubjectLocation.X + PlanarForward.X * 1050.0f,
+        SubjectLocation.Y + PlanarForward.Y * 1050.0f,
         FMath::Max(SubjectLocation.Z + 80.0f, SubjectSurfaceZCm + 90.0f));
     FRotator CameraRotation = (LookTarget - CameraLocation).Rotation();
     CameraRotation.Roll = 0.0f;

@@ -1,0 +1,60 @@
+{
+  "schema": "raftsim.production_paddle_raft_source.v1",
+  "generator_version": 2,
+  "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+  "source_inputs": [],
+  "reference_only_sources": [
+    {
+      "url": "https://www.nrs.com/nrs-e-140-self-bailing-raft/ppyq",
+      "facts_used": "14 ft length, 7 ft width, 20 in tubes, two thwarts, four main chambers, reinforced side/floor, drain holes, valves, D-rings and handles",
+      "asset_content_copied": false
+    },
+    {
+      "url": "https://www.aire.com/products/aire-146dd-self-bailing-raft",
+      "facts_used": "14-foot-class dimensional cross-check, diminished ends, self-bailing construction, valves, handles and D-rings",
+      "asset_content_copied": false
+    }
+  ],
+  "fbx": "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/SM_RaftSim_ProductionPaddleRaft.fbx",
+  "blend": "unreal/SourceArt/RaftSim/Rafts/ProductionPaddleRaft/SM_RaftSim_ProductionPaddleRaft.blend",
+  "fbx_sha256": "dc5db2e526493cc9328836b5eecd73ad41980259371366bcebf2d391bd623328",
+  "blend_sha256": "52c55eaa9a7ccc4d9ddc23b48c7932b50b225f53dd29fb15e27bdcdfa96508fc",
+  "material_slots": [
+    "RaftTube",
+    "RaftFloor",
+    "RaftRigging",
+    "RaftMetal",
+    "RaftRubber"
+  ],
+  "construction": {
+    "nominal_length_m": 4.3,
+    "nominal_width_m": 2.0,
+    "nominal_side_tube_diameter_m": 0.544,
+    "main_chambers": 4,
+    "thwarts": 2,
+    "d_rings": 12,
+    "carry_handles": 4,
+    "tube_valves": 4,
+    "floor_pressure_relief_valves": 1,
+    "self_bailing_drain_recesses": 8
+  },
+  "runtime_boundary": "Collisionless deformable presentation rest mesh; D3/D4 physics, hidden hull collision, buoyancy, flip, wrap, pin, damage and rescue remain native.",
+  "vertex_count": 19362,
+  "polygon_count": 19868,
+  "uv_channel_count": 1,
+  "bounds_min_cm": [
+    -215.9,
+    -102.8773,
+    -0.8
+  ],
+  "bounds_max_cm": [
+    215.9,
+    102.8773,
+    71.7
+  ],
+  "dimensions_cm": [
+    431.7999,
+    205.7546,
+    72.5
+  ]
+}

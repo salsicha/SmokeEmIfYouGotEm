@@ -1,0 +1,115 @@
+{
+  "schema": "raftsim.m9.capsize_transition_review.v1",
+  "reviewed_utc": "2026-07-29T07:18:15Z",
+  "candidate": "m9_capsize_transition_v128",
+  "parent": "m9_capsize_authority_v127",
+  "status": "retained_authoritative_hybrid_physics_transition",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "problem": {
+    "v127_behavior": "The corrected raft stayed authoritatively inverted and afloat, but entered the 180-degree pose in one frame after D3 latched.",
+    "release_relevance": "An instantaneous roll did not provide a readable water-driven overturning event despite correct Capsized mode, swimmer, reflip, and loading behavior."
+  },
+  "source": {
+    "adapter_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimChronoRuntimeAdapter.h",
+      "sha256": "d870949163841754ad216f84fa8c340fde0f4fc01f13a841a0ad9d64b9f4478e"
+    },
+    "adapter_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimChronoRuntimeAdapter.cpp",
+      "sha256": "a8ac719ed690f75040ab77e4e9c7924d58007a329449ebab9b34994a746c8c38"
+    },
+    "raft_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimRaftActor.h",
+      "sha256": "ed26159f1e13bcdea95bc0b8e40fd9fddc7a7bbea594c91adbcfce88565c3b13"
+    },
+    "raft_actor": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp",
+      "sha256": "1eae3448cab25ccbd3260301dbc9d7b7972860d199ef5aa114088c5e4cf14fe5"
+    },
+    "integration_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlipRecoverTest.cpp",
+      "sha256": "b32ca6445155afa9c48b1e920afdca397ad54df20ae05cd8ec555d9fa92e3193"
+    },
+    "physics_contract_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlexibleRaftVisualTest.cpp",
+      "sha256": "ce56cfb1ba5714bb50cbe5d709f1980c347dcb42fa12ebba47bd421e2479e7f0"
+    },
+    "external_asset_inputs": []
+  },
+  "implementation": {
+    "authority": "D3 sustained negative flip margin or hard-roll latch in ARaftSimRaftActor",
+    "transition_duration_seconds": 0.85,
+    "transition_curve": "cubic smoothstep",
+    "transition_start": "authoritative adapter pitch, yaw, and roll at the D3 latch",
+    "transition_direction": "sign of D3 retained-water roll moment with current-roll fallback",
+    "transition_end": "exact +180 or -180 degree roll, zero pitch, live yaw",
+    "adapter_pose_written_each_transition_tick": true,
+    "matching_angular_velocity_written_each_transition_tick": true,
+    "translation_integrated_by_fixed_step_solver": true,
+    "buoyancy_drag_and_d4_contacts_remain_live": true,
+    "capsized_empty_seat_and_drained_d3_loading_from_v127_preserved": true,
+    "presentation_only": false,
+    "hybrid_constraint": true,
+    "hybrid_constraint_reason": "The reduced rigid-body solver does not resolve the transient air/water volume that carries a real inflatable raft through the unstable side-on phase; D3 selects the event and direction, while the bounded pose constraint supplies that unresolved rotational phase.",
+    "water_sampler_changed": false,
+    "d3_flip_threshold_or_latch_changed": false,
+    "d4_contact_wrap_pin_law_changed": false,
+    "buoyancy_force_law_changed": false,
+    "terrain_geography_scoring_rescue_or_progression_changed": false
+  },
+  "iteration_decisions": {
+    "v128_impulse_a": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_p2_v128/index.json",
+      "report_sha256": "0d39f5a9ef3c10c41a5e91014a71da6462400c15ee597e901b59a5bd372c234f",
+      "decision": "rejected because the one-shot 5.4 rad/s seed reached only 18.6 degrees at the first sample"
+    },
+    "v128_impulse_b": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_p2_v128b/index.json",
+      "report_sha256": "f391f2cb38cd58c1edbf2f26a5e3741482d2cba23c2d2b4bd5e1dac16184a05e",
+      "decision": "rejected because live buoyancy righted the raft from the 18.6-degree peak back to 12.0 degrees; increasing the impulse risked uncontrolled barrel rolls"
+    },
+    "v128_constraint_c": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_p2_v128c/index.json",
+      "report_sha256": "68edf99c74a88fc3f29a5fadabab3da13f38e6ec56337662131af7a9da30956d",
+      "decision": "rejected because adding 180 degrees to an already tilted latch quaternion produced a non-symmetric endpoint that buoyancy righted to 33.3 degrees"
+    },
+    "v128_final": "retained after interpolating latch pitch/roll to exact zero-pitch and signed-180-roll equilibrium while preserving live yaw"
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "p2_flip_and_recover": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_p2_v128_final2/index.json",
+      "report_sha256": "6ae84cbbdeb6a1095a3856140f016f6d61cf944ff3a4179f0afa0c9a8a16e211",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "measured_mid_flip_roll_degrees": 127.6,
+      "measured_settled_roll_degrees": 180.0,
+      "measured_settled_z_cm": -13.6,
+      "settled_swimmer_count": 5,
+      "reflip_returned_upright": true,
+      "all_swimmers_reseated": true
+    },
+    "m1_regression": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_m1_v128/index.json",
+      "report_sha256": "ae37d0fa851078b813480b54170133d604480e91cd8ff2e6a4eefe6d4541697d",
+      "succeeded": 3,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p1_float_and_paddle": {
+      "report": "/private/tmp/raftsim_m9_capsize_transition_p1_v128/index.json",
+      "report_sha256": "5dd10e579e38e8131bf32f2992ea05285d198238a6c3b30e13784000d30fbc4d",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "focused_python_source_contracts": "69 passed",
+    "git_diff_check": "passed"
+  },
+  "decision": "Retain v128 as an authoritative hybrid capsize transition. It removes the one-frame flip, preserves v127 floating/loading correctness and D4 authority, and records its unresolved free-surface rotational phase honestly. It is not named guide, art, marketing, press, store, or release approval."
+}

@@ -5,7 +5,7 @@ public class RaftSimRaft : ModuleRules
     public RaftSimRaft(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "RaftSimCore", "RaftSimPhysics", "RaftSimInput", "RaftSimWater", "RaftSimCrew", "ProceduralMeshComponent" });
-        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore" });
+        PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "EnhancedInput", "Niagara", "RaftSimCore", "RaftSimPhysics", "RaftSimInput", "RaftSimWater", "RaftSimCrew", "ProceduralMeshComponent" });
+        PrivateDependencyModuleNames.AddRange(new[] { "Json", "InputCore", "HairStrandsCore" });
     }
 }

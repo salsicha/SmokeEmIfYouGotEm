@@ -1,0 +1,69 @@
+{
+  "schema": "raftsim.m9.flexible_raft_visual_upgrade_review.v1",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "review_scope": "Renderer-backed isolated construction review of the project-owned D4-authoritative flexible raft after adding deformation-following commercial workboat detail.",
+  "implementation": {
+    "runtime_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftMesh.cpp",
+    "physics_authority": "D4 flexible segment state",
+    "surface_projection": "multi-segment tube-conforming ribbons and three-ring bonded patches",
+    "new_construction": [
+      "lower outside bonded chafe strips",
+      "D-ring reinforcement pads",
+      "grab-line keeper pads",
+      "thwart attachment collars",
+      "five-crown self-bailing I-beam floor relief",
+      "smooth normals derived from the deformed floor surface"
+    ],
+    "rigid_replacement_mesh_used": false
+  },
+  "renderer_evidence": {
+    "run": "v317",
+    "test": "RaftSim.M5.RuntimeRescueLoop -RaftSimRaftArtReview",
+    "result": "Success",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_raft_upgrade_art_v317.log",
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_flexible_raft_upgrade_v317_rejected.png",
+    "capture_sha256": "e1adced1a8085b28f1f844e485caba0c310a3d8f6738546bf89dcb7d15342f11",
+    "capture_width": 1280,
+    "capture_height": 1888,
+    "camera_qualification": "The command-line-only evidence mode hides crew occlusion, preserves the live rescue scenario and runtime raft actor, and frames the exterior tube, floor, rigging, valves, fittings, seams, and bonded detail without changing gameplay.",
+    "human_approved": false
+  },
+  "in_river_renderer_evidence": {
+    "run": "v318",
+    "test": "RaftSim.M7.ZFullReachPresentation",
+    "result": "Success",
+    "log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_raft_upgrade_m7_full_reach_v318.log",
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_flexible_raft_in_river_v318_rejected.png",
+    "capture_sha256": "1a3a39ab7a687c2f4ab7c20334bf4ba0cbca369c0bd7714a632208978f0bb9d4",
+    "capture_width": 1280,
+    "capture_height": 1888,
+    "station_m": 120.0,
+    "camera_qualification": "The normal Free Run chase camera renders the live raft, five crew, river surface, bank terrain, and full-reach World Partition environment at the Chili Bar start without the isolated-review hiding mode.",
+    "human_approved": false
+  },
+  "automation_evidence": {
+    "native_build_passed": true,
+    "focused_flexible_fabric_run": "v316",
+    "focused_flexible_fabric_result": "Success",
+    "focused_flexible_fabric_log": "/Users/alexmoran/Library/Logs/Unreal Engine/SmokeEmIfYouGotEmEditor/private/tmp/raftsim_raft_upgrade_flexible_v316.log",
+    "d4_contact_wrap_regression_passed": true,
+    "stable_topology_required": true
+  },
+  "accepted_findings": [
+    "The lower wear layer, reinforcement pads, and collars remain bonded to the cylindrical tube surface instead of clipping through it, including under the same D4 deformation field as the chamber fabric.",
+    "The self-bailing floor has visible inflated longitudinal structure and lighting normals derived from its actual dished and ribbed surface.",
+    "The commercial construction cues materially reduce the uninterrupted parametric tube read while preserving wrap, pin, flip, condition, pressure-loss, and shape-recovery authority.",
+    "The dedicated review mode is evidence-only and leaves the normal renderer-backed M5 rescue path unchanged.",
+    "A separate normal chase-camera frame proves that the same raft and crew render inside the authored full-reach South Fork world."
+  ],
+  "rejected_findings": [
+    "The craft remains deterministic procedural geometry rather than a scanned or production-artist-authored flexible raft and still lacks the nuanced asymmetry, fastening, wear history, drainage construction, and brand-specific chamber shaping expected from final photoreal art.",
+    "Large fabric regions and simplified hardware still read synthetic at close range, and the flat test-tank background is unsuitable for marketing or store media.",
+    "The in-river frame is a calm Chili Bar start view and does not demonstrate visible rapid-scale wrap, pin, flip, spray, or convincing dynamic wetness conditions.",
+    "No named art director, qualified rafting guide, product owner, legal reviewer, or release-media reviewer has approved the asset or frame."
+  ],
+  "decision": "Retain v317 as the strongest deformation-preserving project-owned raft fallback and continue to use it for gameplay. Do not close the M9 photoreal raft-art, in-river representative-media, named-review, or release-media gates. Replace or explicitly approve the visual asset through named review, then repeat isolated and in-river renderer evidence plus the full release qualification chain.",
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "reviewed_utc": "2026-07-26T20:50:00Z"
+}

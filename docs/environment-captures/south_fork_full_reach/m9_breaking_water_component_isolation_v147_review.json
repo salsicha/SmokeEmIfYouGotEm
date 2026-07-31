@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.m9.breaking_water_component_isolation_review.v1",
+  "reviewed_utc": "2026-07-29T14:33:24Z",
+  "candidate_range": "v142-v147",
+  "status": "masked_volume_rejected_retained_v121_restored_diagnostics_accepted",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "purpose": "Isolate the live solver-driven breaking lip from the nested hydraulic roller, test whether an animated masked foam-volume material can remove the retained v121 translucent dome, and reject any candidate that weakens the combined hydraulic read.",
+  "retained_changes": {
+    "capture_diagnostics": [
+      "nobreakinglip",
+      "nobreakingroller"
+    ],
+    "capture_source": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+    "capture_source_sha256": "ab7196268c202beb0b9003ee28dcad10cfc99a3e21d56191ca2afa8996acd129",
+    "source_contract": "physics/tests/test_editor_source_layout.py",
+    "source_contract_sha256": "8809dfcc35281a9c871939ebb77bcf595048955fc10839de9ed118c3f22cdacd",
+    "effect_on_gameplay": "none; the diagnostics only hide one named procedural presentation component immediately before an evidence capture"
+  },
+  "restored_baseline": {
+    "candidate": "m9_hydraulic_roller_volume_v121",
+    "runtime_surface": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+    "runtime_surface_sha256": "1947614d7690841e62e2bd393dfea14dfc24b761d3594284c2b1d3425562b9be",
+    "runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+    "runtime_header_sha256": "745e0c671ba5928791ed98d452bce5674f85d582106c57f5b5e41e57eff1d9b0",
+    "material_authoring": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Materials/RaftSimEditorBreakingWaterMaterial.cpp",
+    "material_authoring_sha256": "2dff1a545886517c97dbeea38dee6febbeab837cbe1eedb891fcb3aabf898c86",
+    "material_authoring_script": "unreal/Scripts/create_breaking_water_lip_material.py",
+    "material_authoring_script_sha256": "4a00ffaa5df994d7ea44f229e59446eb1eba8dd9ce66ad77d12bcd0d6fe743d5",
+    "material_asset": "unreal/Content/RaftSim/Materials/M_RaftSim_BreakingWaterLip.uasset",
+    "material_asset_sha256": "683709fcb0774e3629c0df3dac8b3e3e9151d2bcd14dba24bf78ec8eb6824d1b",
+    "separate_masked_volume_asset_present": false,
+    "collision_enabled": false,
+    "affects_navigation": false,
+    "water_sampling_changed": false,
+    "solver_fields_changed": false,
+    "buoyancy_d3_d4_flip_wrap_pin_damage_rescue_or_progression_changed": false
+  },
+  "evidence": {
+    "v142_masked_combined": {
+      "capture": "m9_masked_breaking_foam_volume_v142_rejected.png",
+      "capture_sha256": "306e5233c8cbd66536978e6852d1aa5608ba076a639c157a14b2bfa3a8ba2013",
+      "log": "/private/tmp/raftsim_m9_v142_masked_breaking_foam_volume_capture.log",
+      "log_sha256": "b9e4aa239190dd798edc73df35d2afd47918fb7c96c713691f248ddbfaf6d462",
+      "breaking_lip_triangles": 512,
+      "breaking_roller_triangles": 1512,
+      "decision": "rejected: the masked nested shells became a black and tan analytic cap"
+    },
+    "v143_lip_isolation": {
+      "capture": "m9_breaking_lip_isolation_v143.png",
+      "capture_sha256": "27d208a00e229ac9d44e7ca21a85b4f42d2f132174be0775c4ff0f206fd168e6",
+      "log": "/private/tmp/raftsim_m9_v143_breaking_lip_isolation_capture.log",
+      "log_sha256": "07afeab019d8d846d7e2b3a1641c94bd867228400a61065efabc7bbe7c3647e8",
+      "hidden_component": "BreakingRollerVolumeMesh",
+      "decision": "diagnostic accepted: proves the retained translucent lip is not the source of the black and tan cap"
+    },
+    "v146_over_pruned_roller": {
+      "capture": "m9_structurally_perforated_roller_v146_rejected.png",
+      "capture_sha256": "9e3013cb83a2ebbc1e275b2e9887b91cf083a492b1522acd2ec2930d661c4fee",
+      "log": "/private/tmp/raftsim_m9_v146_structurally_perforated_roller_capture.log",
+      "log_sha256": "38e4cc78d84b5bf23af555ced148b4376fb3d7950efdcde151a71658dd570f8c",
+      "breaking_roller_triangles": 92,
+      "decision": "rejected: structural perforation removed the dome but also removed readable hydraulic volume"
+    },
+    "v147_relaxed_combined": {
+      "capture": "m9_structurally_perforated_breaking_water_v147_rejected.png",
+      "capture_sha256": "77ac30dbc455da9e2d7623612ac4339dad5800a3a5caff3bce0d021191f28667",
+      "log": "/private/tmp/raftsim_m9_v147_structurally_perforated_breaking_water_capture.log",
+      "log_sha256": "c2f823c6d1765225d6b614b31858974ba245ff1bf4455ee299b2b4128aaa6405",
+      "breaking_lip_triangles": 512,
+      "breaking_roller_triangles": 208,
+      "decision": "rejected: the masked depth pass still suppresses the lip and the combined result reads as aerosol specks rather than collapsing whitewater"
+    }
+  },
+  "validation": {
+    "final_native_editor_build": "passed",
+    "focused_python_source_and_visual_contracts": "39 passed",
+    "native_water_surface_test": {
+      "result": "passed",
+      "report": "/private/tmp/raftsim_m9_v147_restored_water_surface_report/index.json",
+      "report_sha256": "7bafedb855eb57de013fe4be3a6c364afd2ff8dc0dfb6c09f5db2934c8e9f2d5",
+      "log": "/private/tmp/raftsim_m9_v147_restored_water_surface_test.log",
+      "log_sha256": "33bf0bd67e0d7b7748e161381d40c398c303edefef855bfb76d6532e835e6ae7"
+    },
+    "final_diff_check": "passed",
+    "material_asset_regeneration_after_revert": "passed",
+    "rejected_masked_asset_removed": true
+  },
+  "decision": "Retain the independent lip/roller evidence switches. Reject and remove the masked roller material and structurally perforated topology. Restore the exact v121 runtime water-surface source. M9 remains open because the retained roller, broad water, terrain, shoreline, canopy, rocks, characters, raft and lighting are still below the photoreal target and no named guide or art reviewer has approved them."
+}

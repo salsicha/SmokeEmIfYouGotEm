@@ -9,119 +9,159 @@
   },
   "actor_packages": [
     {
-      "byte_count": 395023,
+      "byte_count": 2938162,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/0/4U/EQTMXW8PFGGLYUOS3WQIED.uasset",
-      "sha256": "74e2077f31a6a6daf7155ebd978412997bc1500e4abb446d5d1bccdfa77fb6c9"
+      "sha256": "21d11be1c2249fa483311c60354930ccd9c09b404df0bd2e091d92dd14b16bec"
     },
     {
-      "byte_count": 3067553,
-      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/0/KW/EEL7MQTOBBGU70Q5KN0N1D.uasset",
-      "sha256": "f18ad59f0b8313c5b36348cd7f4b4ffa37dc02734101bf58b247c36b5c88ac8b"
+      "byte_count": 2260377,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/1/0R/A1IDJL5FSV9HRM2PGGZXMV.uasset",
+      "sha256": "cd5533dcdfd0d9b4aadca8d1d23f2f303919c76b4805c2f1bf3cf182bd3c5972"
     },
     {
-      "byte_count": 21882,
+      "byte_count": 19007,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/1/E8/HJJEZHU156RMZ73UZP0VFI.uasset",
+      "sha256": "39add395f066fd7742403cfb5a5d4fe229f5662496f091b57c9498237978f6c6"
+    },
+    {
+      "byte_count": 22175,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/1/OD/VE9FGMKJGPDV99XQ4YOPVH.uasset",
-      "sha256": "c81f3a844c020cfc9fb42a6217d838db12361a98f8f5cebebdfaab92b6ecf18c"
+      "sha256": "7028ca31a5df99c4c32349284355f8a63481fe92e23e293ed50ababb37465411"
     },
     {
-      "byte_count": 1719201,
-      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/2/V3/0T8R144Q46YG6A958OBSO1.uasset",
-      "sha256": "5b9aa8b987e89395753709be98a31e3c3d66cfb78c602d7ecb0e748b68e149ed"
+      "byte_count": 2166298,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/2/EQ/MJIT2LB9TS9BB75R2I6YU8.uasset",
+      "sha256": "66e417d165ce70f45917372b4cc0b2541bcfadef8c9ed48ad62656dd01d35e19"
     },
     {
-      "byte_count": 199414,
+      "byte_count": 2116135,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/3/XY/JSKGCUJQEP0Z9RVL5NQV57.uasset",
-      "sha256": "866dbf43cbb44b36bbbf17a4fa010073c61bab47873f270b6d72309953fee49a"
+      "sha256": "f357928122d5f88e91d0392409877c2f096ed561bc1312ca4073963d7cc47427"
     },
     {
-      "byte_count": 404702,
+      "byte_count": 2146342,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/4/3B/06KCAO8SAQBM0Y9ZGRIYY8.uasset",
+      "sha256": "19930d072f07092a1342a078f1144d497801e2419aae69ba7323b05f3d24c536"
+    },
+    {
+      "byte_count": 2745132,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/4/7W/QZ07E4KWYAPISKTPWYME62.uasset",
-      "sha256": "002d05acd31efde52d8389c0941a9f7c1f48d516ec8e124511c0d688890bb325"
+      "sha256": "ac18552ad3d961eed172260ae7d14bc295f1e09607b8a8870c7149d691a90530"
     },
     {
-      "byte_count": 290710,
+      "byte_count": 2429362,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/5/5V/JPDZHYNN52OT28PXBWSQLH.uasset",
-      "sha256": "e3da1d74f0763179b805aa0f2098f2c12e2b30b8c8518e4a378a77e0eb4d4d8f"
+      "sha256": "822e4a1929766760fa461c506d54bc515f99247b08d916991adbcb9130b753da"
     },
     {
-      "byte_count": 2910751,
+      "byte_count": 2210969,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/5/M8/NAWA5K32G0OSE86ZY41SFN.uasset",
-      "sha256": "a781ea5b6db41140718b6c01fc8c93357c538bfb6f2a995de1743924312a0bf9"
+      "sha256": "56dd4812f894d2869823377598aa76e781c24b38989b8abd5f96c7f05fe4e44e"
     },
     {
-      "byte_count": 375060,
+      "byte_count": 3155991,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/6/19/0OVZTXJVA4NT0L0USJD9HS.uasset",
-      "sha256": "60426573eeeb40fd78e16d8fd307cf1bb3eb056b008a290aff95dda3f5f9115c"
+      "sha256": "3e76d5445476148f0030a4963c7fa6d2fe8648352a3018ffbef934e4c0b3c520"
     },
     {
-      "byte_count": 331360,
+      "byte_count": 19256,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/7/TP/G8QVSIXNJG82QFJQRKOHEH.uasset",
+      "sha256": "ccf5812bfa087be6d18fc0c720a502ec5d4d89fadb866cff4804bb45f49d88e1"
+    },
+    {
+      "byte_count": 3117479,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/9/45/3SP2MQON15AUBZPPAU1T1P.uasset",
-      "sha256": "bdf22f489457aeac0e15e3d0a16cfae0ea6751a7fbaad923c8cb08263772a743"
+      "sha256": "2cb2ab2854067824e906d671ea1c02e4b15389e94b7e97f160cc624277b0c19a"
     },
     {
-      "byte_count": 288589,
+      "byte_count": 2933724,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/9/KM/XEPYPX41GKVCNLPZ5RFJCE.uasset",
-      "sha256": "35afb730bbe9670cb1d0c935b461c6c7de0b511808ef7e4643aeb735dde6dec1"
+      "sha256": "5cc52a2be82f3bb678d961a4ad95da1deb0f815c906a5b5c692f02654abe6dc4"
     },
     {
-      "byte_count": 425048,
+      "byte_count": 4036393,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/A/BA/8M6YASY85M3NL4B7BQIY42.uasset",
-      "sha256": "af85c720d9c63cde827454b39f91c6ea322eb7208dcc0a30639ac4c090548993"
+      "sha256": "444ed9023eaab9b1f2c95138d7aa93ee1787a570ffc8fc4c1bb1d8b7b1633767"
     },
     {
-      "byte_count": 37399,
+      "byte_count": 38632,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/A/D1/YLTPSY0LS7GJ5HNK7H34HI.uasset",
-      "sha256": "45942603df7a797f35f66d0c2e648f36854c19aaba72d89cd2df1825d20fe5c4"
+      "sha256": "3f92f12150f89c1addb2a59ecc393496b00ffd69f227142d744e34682bc12ef7"
     },
     {
-      "byte_count": 21917,
+      "byte_count": 2283423,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/A/OJ/198VXRVLBU0S5S7UNTO48B.uasset",
+      "sha256": "e852524053d082517dd9ce13ec64f2040a945c798967114efa42d78a4bff2b23"
+    },
+    {
+      "byte_count": 19005,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/C/KH/KUVFHJHOT8UBJSI92HCQDH.uasset",
+      "sha256": "9071422e9f231ddd0b814c69ff9416c172577cef51ceeb9f3f35d2e2b91ccc3b"
+    },
+    {
+      "byte_count": 22210,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/C/P0/JT7CLBY1IZZH3AGJHGJZUJ.uasset",
-      "sha256": "5d3ab12690d38631b356eb4c89d7ef27a47c9a7eba30209c54ed4493ec8b3832"
+      "sha256": "f943ac958c12e70223fc50cd17be65234910328800e69315a306e7151b57a4c8"
     },
     {
-      "byte_count": 3311401,
+      "byte_count": 2896688,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/5L/DB41U7K8YSRQJ62IAGHWYI.uasset",
-      "sha256": "832a8e5907eb7129dc489d9b8e277c4f17047ed78e9c47e36f2bd35015504238"
+      "sha256": "916983f8184ab5f7ec09f41959ec98cd61ac183b29fb216c833575807b85cc6b"
     },
     {
-      "byte_count": 3360854,
+      "byte_count": 2605748,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/9W/ZXAYTDWMV6NZ5YU5BYU4H9.uasset",
-      "sha256": "a99eabea3c4a645903382360a27cbe903e1bbebb4d1a99d3c9fa2f94e02e49ac"
+      "sha256": "33daecd827416684874af28a025d43ae1aecafe4a5c8e12d1039c7d6de1cff70"
     },
     {
-      "byte_count": 3540639,
+      "byte_count": 2992213,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/G3/J9QB4DDYUVOO2VO635A16D.uasset",
-      "sha256": "64885be75be4b93c850247ee49fc8ef335068f073cb700f405fff63cfed815b1"
+      "sha256": "169f4515f1361f99782d1e05037531e2b554cbdc602fc9c09d8156493d74dcf1"
     },
     {
-      "byte_count": 3096614,
+      "byte_count": 2127005,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/JA/944I0IFAHGMVQTFI773KIO.uasset",
-      "sha256": "35b9c34f08b01b42992a1430dfdebcf2cf0c4d198d2ddb8805d8609cc11b7697"
+      "sha256": "de41caf869a72d5df39a73f8ee8df5ee3d8bb179401f46520db6234abba95cbd"
     },
     {
-      "byte_count": 129450,
+      "byte_count": 137381,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/PG/CEVDV72RCW9HIYUP2464DD.uasset",
-      "sha256": "25310527879b585e8733788c64f39107ec6a9b6ba1ef2d8d05c4a3b22d21038a"
+      "sha256": "ed8d8e4522ae4275e78df9b0e2e1f070d4f4a17316d29ee22ed21689cbc061a7"
     },
     {
-      "byte_count": 3211300,
+      "byte_count": 2225048,
       "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/D/XK/5YD0K1SLTT6BJRR29BSYBL.uasset",
-      "sha256": "cf578261cbf11fc321f382b8bbc8ff49f802a8d864c9fe07c7fc5589ceb2387e"
+      "sha256": "7faf8e6614154950648c0ec72300af4f99cf0a3b3a1f8009224d8647c14be3f3"
+    },
+    {
+      "byte_count": 19007,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/E/I4/6SJKRRNP5GXHC89E4HYPRU.uasset",
+      "sha256": "c704eae87b1b6c2db5e42fcd45ae45417f5520f45141ed293dfbed22caf15f67"
+    },
+    {
+      "byte_count": 2196625,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/E/Q9/6K78NMAKTMVC3O4NAQOXIO.uasset",
+      "sha256": "37a9d8371c68d6ea6494f555a6560ea84232ffc4eb2e3a473d7cfb92b19a8cf7"
+    },
+    {
+      "byte_count": 19003,
+      "path": "unreal/Content/__ExternalActors__/RaftSim/Maps/L_SouthForkAmerican_FullReach/F/1E/7FWE1D507BFFS1LPA84JP6.uasset",
+      "sha256": "79eda75645d1770256e9dd2acb4cf2ac905d506fe702b1f36c8c9e227e4960a0"
     }
   ],
   "commandlet_log": {
-    "byte_count": 271873,
-    "filename": "raftsim_m4_hlod_final.log",
-    "sha256": "84596ac0cad71b9764e4981e2d5ff02f9664031b5cb3b9586e2dbadd7211b92b"
+    "byte_count": 313260,
+    "filename": "raftsim_m9_organic_ground_hlod_20260730.log",
+    "sha256": "5ff8ebd2441d1eb9213c3b84ac4f673a24c5b91d30c5195a154f65a54489d182"
   },
   "commandlet_result": {
-    "built_actor_count": 20,
+    "built_actor_count": 28,
     "invalid_layer_assignments": false,
-    "modified_and_saved_actor_count": 20,
-    "world_actor_count": 20,
+    "modified_and_saved_actor_count": 28,
+    "world_actor_count": 28,
     "zero_error_success": true
   },
-  "generated_on": "2026-07-19",
+  "generated_on": "2026-07-31",
   "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
   "schema": "raftsim.unreal.south_fork_hlod_evidence.v1",
   "strategy": "terminal_instancing_with_nanite_source_geometry_and_no_merged_atlas_parent"

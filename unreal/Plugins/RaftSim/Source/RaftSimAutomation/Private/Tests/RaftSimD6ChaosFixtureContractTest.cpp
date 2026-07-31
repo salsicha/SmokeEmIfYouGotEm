@@ -5,6 +5,7 @@
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
 #include "Dom/JsonObject.h"
+#include "RaftSimD6ChaosMeasuredRunner.h"
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 
@@ -175,7 +176,7 @@ bool ValidateD6ChaosFixtureJob(
     Test.TestEqual(
         FString::Printf(TEXT("%s status"), *FixtureId),
         Job->GetStringField(TEXT("status")),
-        FString(TEXT("ready_for_unreal_runner_implementation_pending"))
+        FString(TEXT("runner_implemented_measurement_recorded_manual_review_pending"))
     );
     Test.TestEqual(
         FString::Printf(TEXT("%s runtime"), *FixtureId),
@@ -270,7 +271,7 @@ bool FRaftSimD6ChaosFixtureContractTest::RunTest(const FString& Parameters)
     TestEqual(
         TEXT("status"),
         Root->GetStringField(TEXT("status")),
-        FString(TEXT("chaos_fixture_contract_ready_runner_implementation_pending"))
+        FString(TEXT("chaos_fixture_runner_implemented_measurements_recorded_manual_review_pending"))
     );
     TestFalse(TEXT("d6_complete"), Root->GetBoolField(TEXT("d6_complete")));
     TestFalse(TEXT("production_promoted"), Root->GetBoolField(TEXT("production_promoted")));
@@ -330,7 +331,7 @@ bool FRaftSimD6ChaosFixtureContractTest::RunTest(const FString& Parameters)
         TestEqual(
             FString::Printf(TEXT("%s status"), *FixtureId),
             Job->GetStringField(TEXT("status")),
-            FString(TEXT("ready_for_unreal_runner_implementation_pending"))
+            FString(TEXT("runner_implemented_measurement_recorded_manual_review_pending"))
         );
         TestEqual(
             FString::Printf(TEXT("%s runtime"), *FixtureId),
@@ -413,6 +414,25 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
     }
 
     const FString RepoRoot = D6RepoRootPath();
+    const FRaftSimD6ChaosMeasuredRunResult MeasuredRun =
+        RaftSimD6Chaos::RunMeasuredExport(RepoRoot);
+    if (!MeasuredRun.bSuccess)
+    {
+        AddError(FString::Printf(
+            TEXT("D6 genuine Chaos measured export failed: %s"),
+            *MeasuredRun.ErrorMessage));
+        return false;
+    }
+    TestEqual(
+        TEXT("measured fixture count"),
+        MeasuredRun.FixtureCount,
+        RequiredD6FixtureIds.Num());
+    TestEqual(
+        TEXT("measured filled fixture count"),
+        MeasuredRun.FilledFixtureCount,
+        RequiredD6FixtureIds.Num());
+    TestEqual(TEXT("measured invalid fixture count"), MeasuredRun.InvalidFixtureCount, 0);
+
     const FString SummaryPath = FPaths::Combine(
         RepoRoot,
         (*AutomationExport)->GetStringField(TEXT("summary"))
@@ -441,7 +461,7 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
     TestEqual(
         TEXT("runner summary status"),
         SummaryRoot->GetStringField(TEXT("status")),
-        FString(TEXT("chaos_runner_output_pending_no_measurements_recorded"))
+        FString(TEXT("chaos_measurements_recorded_manual_review_pending"))
     );
     TestFalse(TEXT("runner summary d6_complete"), SummaryRoot->GetBoolField(TEXT("d6_complete")));
     TestFalse(
@@ -461,14 +481,14 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
     TestEqual(
         TEXT("runner summary filled_fixture_count"),
         static_cast<int32>(SummaryRoot->GetIntegerField(TEXT("filled_fixture_count"))),
-        0
+        RequiredD6FixtureIds.Num()
     );
     TestEqual(
         TEXT("runner summary invalid_fixture_count"),
         static_cast<int32>(SummaryRoot->GetIntegerField(TEXT("invalid_fixture_count"))),
-        RequiredD6FixtureIds.Num()
+        0
     );
-    TestFalse(
+    TestTrue(
         TEXT("runner can_merge_sidecar"),
         SummaryRoot->GetBoolField(TEXT("can_merge_sidecar"))
     );
@@ -486,7 +506,7 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
         TEXT("runner may_mark_d6_complete"),
         (*SummaryPromotionGate)->GetBoolField(TEXT("may_mark_d6_complete"))
     );
-    TestFalse(
+    TestTrue(
         TEXT("runner may_merge_into_measured_results_template"),
         (*SummaryPromotionGate)->GetBoolField(TEXT("may_merge_into_measured_results_template"))
     );
@@ -511,19 +531,30 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
 
         const FString FixtureId = Job->GetStringField(TEXT("fixture_id"));
         SeenFixtureIds.Add(FixtureId);
-        TestFalse(
+        TestTrue(
             FString::Printf(TEXT("%s ready_for_sidecar_merge"), *FixtureId),
             Job->GetBoolField(TEXT("ready_for_sidecar_merge"))
         );
         TestEqual(
             FString::Printf(TEXT("%s blocking_reason"), *FixtureId),
             Job->GetStringField(TEXT("blocking_reason")),
-            FString(TEXT("real_unreal_chaos_measurement_not_recorded"))
+            FString(TEXT("manual_review_pending"))
         );
-        TestEqual(
-            FString::Printf(TEXT("%s recorded_metric_count"), *FixtureId),
-            static_cast<int32>(Job->GetIntegerField(TEXT("recorded_metric_count"))),
-            0
+        TestTrue(
+            FString::Printf(TEXT("%s recorded metrics"), *FixtureId),
+            Job->GetIntegerField(TEXT("recorded_metric_count")) > 0
+        );
+        TestTrue(
+            FString::Printf(TEXT("%s measured by Unreal Chaos"), *FixtureId),
+            Job->GetBoolField(TEXT("measured_by_unreal_chaos"))
+        );
+        TestTrue(
+            FString::Printf(TEXT("%s deterministic fixed-step repeat"), *FixtureId),
+            Job->GetBoolField(TEXT("deterministic_fixed_step_repeat"))
+        );
+        TestTrue(
+            FString::Printf(TEXT("%s telemetry hash is 64 chars"), *FixtureId),
+            Job->GetStringField(TEXT("telemetry_sha256")).Len() == 64
         );
     }
 
@@ -543,12 +574,12 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
     TestEqual(
         TEXT("sidecar status"),
         SidecarRoot->GetStringField(TEXT("status")),
-        FString(TEXT("chaos_runner_output_pending_no_measurements_recorded"))
+        FString(TEXT("chaos_measured_results_recorded_manual_review_pending"))
     );
     TestEqual(
         TEXT("sidecar filled_result_count"),
         static_cast<int32>(SidecarRoot->GetIntegerField(TEXT("filled_result_count"))),
-        0
+        RequiredD6FixtureIds.Num()
     );
 
     const TSharedPtr<FJsonObject>* Results = nullptr;
@@ -568,22 +599,24 @@ bool FRaftSimD6ChaosRunnerExportBundleTest::RunTest(const FString& Parameters)
         TestEqual(
             FString::Printf(TEXT("%s sidecar result status"), *FixtureId),
             (*Result)->GetStringField(TEXT("status")),
-            FString(TEXT("not_measured"))
+            FString(TEXT("measured_engine_output"))
+        );
+        TestFalse(
+            FString::Printf(TEXT("%s source_report recorded"), *FixtureId),
+            (*Result)->GetStringField(TEXT("source_report")).IsEmpty()
+        );
+        TestTrue(
+            FString::Printf(TEXT("%s telemetry_sha256 recorded"), *FixtureId),
+            (*Result)->GetStringField(TEXT("telemetry_sha256")).Len() == 64
+        );
+        TestFalse(
+            FString::Printf(TEXT("%s engine_version recorded"), *FixtureId),
+            (*Result)->GetStringField(TEXT("engine_version")).IsEmpty()
         );
         TestEqual(
-            FString::Printf(TEXT("%s source_report"), *FixtureId),
-            (*Result)->GetStringField(TEXT("source_report")),
-            FString()
-        );
-        TestEqual(
-            FString::Printf(TEXT("%s telemetry_sha256"), *FixtureId),
-            (*Result)->GetStringField(TEXT("telemetry_sha256")),
-            FString()
-        );
-        TestEqual(
-            FString::Printf(TEXT("%s engine_version"), *FixtureId),
-            (*Result)->GetStringField(TEXT("engine_version")),
-            FString()
+            FString::Printf(TEXT("%s runtime_id"), *FixtureId),
+            (*Result)->GetStringField(TEXT("runtime_id")),
+            FString(TEXT("UnrealEngine5ChaosRigidBody"))
         );
     }
 

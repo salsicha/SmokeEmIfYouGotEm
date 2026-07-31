@@ -1,0 +1,118 @@
+{
+  "schema": "raftsim.m9.production_whitewater_pfd_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic source art; no external mesh or texture input.",
+    "generator": "unreal/Scripts/build_production_whitewater_pfd.py",
+    "importer": "unreal/Scripts/import_production_whitewater_pfd.py",
+    "manifest": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/production_whitewater_pfd_manifest.json",
+    "manifest_sha256": "61138d648fb619ac975c337d05bb9bab8cdab8bc92ad05ab1fd66eb2bc1aa3a0",
+    "fbx": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.fbx",
+    "fbx_sha256": "f204fd0f5d3c8442657bdd3b0b25c005d76d0b550853332fb8e1e2ae195ee629",
+    "blend": "unreal/SourceArt/RaftSim/Equipment/ProductionPfd/SM_RaftSim_WhitewaterRescuePfd.blend",
+    "blend_sha256": "620ca0fd68c4c56f5097fe95224f37aa6f4936cbe8b3614e1f8a1c1f48f8b5a9",
+    "external_asset_inputs": [],
+    "reference_facts_only": [
+      "https://www.nrs.com/nrs-rapid-rescuer-pfd/pvdx",
+      "https://astraldesigns.com/products/greenjacket"
+    ]
+  },
+  "runtime_asset": {
+    "path": "/Game/RaftSim/Equipment/Production/SM_RaftSim_WhitewaterRescuePfd",
+    "uasset_sha256": "cf6936eae44d13481b0f3da8984c25ed76d780bbbb72db1c8f2cfb199a065dbc",
+    "dimensions_cm": [
+      42.2,
+      44.8966,
+      44.9
+    ],
+    "authored_lod0_triangles": 21180,
+    "nanite_fallback_triangles": 2168,
+    "nanite_enabled": true,
+    "material_slot_count": 5,
+    "runtime_boundary": "Collisionless torso-following safety-gear visual; body animation, seat mass, D3/D4, rescue and swimmer authority remain native."
+  },
+  "construction": {
+    "front_foam_panels": 4,
+    "back_panels": 1,
+    "side_wings": 2,
+    "shoulder_bridges": 2,
+    "front_pockets": 2,
+    "front_zip": 1,
+    "backup_buckles": 2,
+    "front_backup_webbing_runs": 2,
+    "adjustment_points": 8,
+    "quick_release_rescue_belts": 1,
+    "rescue_tether_rings": 1,
+    "reflective_chest_zones": 2,
+    "blank_back_placards": 1,
+    "front_lash_tabs": 3
+  },
+  "roster_audit": {
+    "report": "unreal/Saved/RaftSimValidation/m9/metahuman-production-captures.json",
+    "report_sha256": "80bfdf169a9ba12dba350b8f7b4b12870083ab0d07c18d470f143b92e6bb2283",
+    "captured_characters": 5,
+    "characters_using_production_pfd": 5,
+    "maximum_runtime_torso_error_cm": 0.0,
+    "status": "capture_complete"
+  },
+  "automation": {
+    "suite": "RaftSim.M5",
+    "succeeded": 3,
+    "succeeded_with_warnings": 1,
+    "failed": 0,
+    "not_run": 0,
+    "report_sha256": "86f21ce6792398ae344a38561032f0e689c9fe2408b1d05eca530dc39d148740",
+    "warnings": [
+      "Headless Mac audio sample-rate query warning.",
+      "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation."
+    ],
+    "material_result": "No Nanite usage or default-material warning."
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v13_production_pfd_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "bd5e4f66c958e65240d1af20e45e3f8300b3fc5e41811d573186f906277e6e74",
+    "width": 1470,
+    "height": 956,
+    "guide_portrait_sha256": "cac3e52e0fc9006c700a2fcd70625a05a611c6a2eb26ca2290635f59afa6cef3",
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "spray": 0.93,
+    "mist": 0.317,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "visible_contact_patch_triangles": 96,
+    "instance_counts": {
+      "fine_spray": 40,
+      "mist": 1,
+      "contact_foam": 9,
+      "droplets": 68
+    }
+  },
+  "accepted": [
+    "One authored rescue-PFD asset atomically replaces all four procedural vest layers on the guide and four crew avatars.",
+    "A four-panel front, thin back, fitted side wings, continuous shoulder bands, pockets, front entry, webbing, buckles, eight adjustment points, quick-release rescue belt and tether ring are represented as separate source-art construction.",
+    "Project-owned 1K ripstop albedo, normal and AO/roughness maps replace flat shell colors; all five material slots persist their Nanite permutations.",
+    "All five production MetaHuman wrappers select the asset and keep its origin exactly on the solved torso through the audited roster pose.",
+    "The PFD is collisionless and does not alter body animation, seat mass, D3/D4 deformation, rescue, swimmer or progression authority."
+  ],
+  "rejected_or_open": [
+    "The swept shoulder transition and broad front-panel surfacing remain visibly procedural at portrait distance and are not final hero photoreal art.",
+    "Crew seating, hand and paddle contact, gaze, facial performance and wetsuit/body deformation remain visibly synthetic.",
+    "Raft highlights, boulder, water, foam and aerosol, shoreline, terrain, foliage and lighting remain below the requested photoreal bar.",
+    "No named guide or art reviewer has approved rescue construction fidelity or final appearance.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

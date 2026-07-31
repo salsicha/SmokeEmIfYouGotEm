@@ -113,7 +113,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/satan_s_cesspool/scenario/low_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 6.157249,
+      "solver_runtime_seconds": 1.687595,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,
       "validation": {
@@ -324,7 +324,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/satan_s_cesspool/scenario/median_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.003289,
+      "solver_runtime_seconds": 1.786269,
       "target_discharge_cfs": 1600.0,
       "target_discharge_m3s": 45.3069545472,
       "validation": {
@@ -535,7 +535,7 @@
       ],
       "scenario_package": "physics/data/real_world/south_fork_american_chili_bar/full_hydraulics/rapids/satan_s_cesspool/scenario/high_runnable",
       "solver_return_code": 0,
-      "solver_runtime_seconds": 9.640083,
+      "solver_runtime_seconds": 1.868735,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,
       "validation": {
@@ -775,6 +775,7 @@
     "spatial_order": 2,
     "steps": 480
   },
+  "source_elevation_datum_m": 217.59137514648438,
   "station_range_m": [
     26997.9136,
     27397.9136

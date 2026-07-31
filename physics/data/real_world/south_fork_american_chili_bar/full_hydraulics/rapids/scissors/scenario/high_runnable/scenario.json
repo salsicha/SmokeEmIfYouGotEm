@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Scissors",
       "rapid_order": 14,
+      "source_elevation_datum_m": 214.43934018554688,
       "station_m": 28002.5856,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,

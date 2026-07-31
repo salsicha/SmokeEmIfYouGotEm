@@ -7,7 +7,9 @@
 #include "Engine/DirectionalLight.h"
 #include "Engine/ExponentialHeightFog.h"
 #include "Engine/SkyLight.h"
+#include "Engine/World.h"
 #include "EngineUtils.h"
+#include "HAL/IConsoleManager.h"
 #include "RaftSimSaveSubsystem.h"
 
 namespace
@@ -140,7 +142,11 @@ void ARaftSimPresentationDirector::ResolveEnvironmentActors()
         if (UVolumetricCloudComponent* Cloud =
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
-            Cloud->SetViewSampleCountScale(0.083333f);
+            // One-twelfth sampling resolves as a stippled screen-space pattern
+            // in the shipping chase camera. Clear weather disables the layer
+            // below; active overcast/storm layers retain a bounded but coherent
+            // half-resolution ray-march budget.
+            Cloud->SetViewSampleCountScale(0.5f);
             Cloud->SetReflectionViewSampleCountScale(0.4f);
             Cloud->SetShadowViewSampleCountScale(0.4f);
             Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
@@ -235,7 +241,10 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
     }
     if (SkyLight != nullptr && SkyLight->GetLightComponent() != nullptr)
     {
-        const float SkyIntensity = FMath::Lerp(0.9f, 0.48f, CurrentState.WeatherWetness);
+        // Preserve the captured-scene fill authored for the South Fork map.
+        // The former 0.9 clear-weather ceiling crushed backlit faces, PPE,
+        // and wet rock into black silhouettes in normal gameplay cameras.
+        const float SkyIntensity = FMath::Lerp(1.25f, 0.62f, CurrentState.WeatherWetness);
         SkyLight->GetLightComponent()->SetIntensity(SkyIntensity);
     }
     if (HeightFog != nullptr && HeightFog->GetComponent() != nullptr)
@@ -252,6 +261,9 @@ void ARaftSimPresentationDirector::ApplyEnvironmentState()
         if (UVolumetricCloudComponent* Cloud =
                 VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>())
         {
+            Cloud->SetVisibility(
+                CurrentState.Weather != ERaftSimWeatherVariant::ClearMorning,
+                true);
             Cloud->SetLayerBottomAltitude(
                 FMath::Max(0.5f, CurrentState.CloudLayerHeightKm - 2.0f));
             Cloud->SetLayerHeight(CurrentState.CloudLayerHeightKm);
@@ -275,4 +287,47 @@ FText ARaftSimPresentationDirector::GetWeatherDisplayName() const
 bool ARaftSimPresentationDirector::HasBoundEnvironmentActors() const
 {
     return Sun != nullptr && SkyLight != nullptr && HeightFog != nullptr && VolumetricCloud != nullptr;
+}
+
+bool ARaftSimPresentationDirector::IsCloudLayerVisible() const
+{
+    const UVolumetricCloudComponent* Cloud = VolumetricCloud
+        ? VolumetricCloud->FindComponentByClass<UVolumetricCloudComponent>()
+        : nullptr;
+    return Cloud != nullptr && Cloud->IsVisible();
+}
+
+namespace
+{
+void HandleSetRaftSimWeather(const TArray<FString>& Args, UWorld* World)
+{
+    ARaftSimPresentationDirector* Director = FindFirst<ARaftSimPresentationDirector>(World);
+    if (Director == nullptr)
+    {
+        UE_LOG(LogTemp, Error, TEXT("RaftSim.SetWeather: presentation director unavailable"));
+        return;
+    }
+    const FString Requested = Args.Num() > 0 ? Args[0].ToLower() : TEXT("clear_morning");
+    ERaftSimWeatherVariant Variant = ERaftSimWeatherVariant::ClearMorning;
+    if (Requested == TEXT("overcast") || Requested == TEXT("overcast_afternoon"))
+    {
+        Variant = ERaftSimWeatherVariant::OvercastAfternoon;
+    }
+    else if (Requested == TEXT("storm") || Requested == TEXT("storm_dusk"))
+    {
+        Variant = ERaftSimWeatherVariant::StormDusk;
+    }
+    Director->SetWeatherVariant(Variant, true);
+    UE_LOG(
+        LogTemp,
+        Display,
+        TEXT("RaftSim.SetWeather: %s"),
+        *Director->GetWeatherDisplayName().ToString());
+}
+
+static FAutoConsoleCommandWithWorldAndArgs GSetRaftSimWeatherCommand(
+    TEXT("RaftSim.SetWeather"),
+    TEXT("Select a production weather preset immediately: clear_morning, "
+         "overcast_afternoon, or storm_dusk."),
+    FConsoleCommandWithWorldAndArgsDelegate::CreateStatic(&HandleSetRaftSimWeather));
 }

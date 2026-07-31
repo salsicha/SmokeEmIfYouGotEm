@@ -54,6 +54,11 @@ The B1 per-asset-set command contract is
   stay local-only by default under `RAFTSIM_REVIEWED_*_SOURCE_ROOT`; commit only
   URLs, license snapshots, hashes, import reports, and procedural fallbacks
   unless item-level terms prove redistribution is allowed.
+- MetaHuman downloaded/generated characters are Epic Licensed Content. They may
+  be cooked into the released game as inseparable object-code content, but the
+  editable authoring and optimized `.uasset` trees stay local-only and ignored
+  in this public repository. Commit the reproducible authoring/capture scripts,
+  license URLs, sanitized manifests, hashes, and rendered review evidence only.
 - Every new external importer must classify alpha/opacity textures as masks,
   disable Nanite for masked foliage unless a measured review says otherwise,
   use `PreserveArea` only for reviewed opaque woody/rock geometry, and preserve

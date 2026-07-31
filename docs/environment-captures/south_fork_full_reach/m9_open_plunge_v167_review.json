@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "reviewed_at_utc": "2026-07-29T16:02:00Z",
+  "milestone": "M9_photoreal_environment_character_and_water_presentation",
+  "experiment_range": "v161-v167",
+  "status": "open_plunge_and_masked_cutout_rejected_v160_restored",
+  "objective": "Determine whether the existing solver-fed BreakingLipMesh can depict a coherent open hydraulic crest and falling plunge without changing water, collision, buoyancy, or raft-physics authority.",
+  "evidence": {
+    "v161_open_plunge_lip_only": {
+      "capture": "m9_open_plunge_lip_only_v161_rejected.png",
+      "capture_sha256": "588224b0c64174a4cee0d546a251d4927cd3449786efefbdee29f02ed645918a",
+      "decision": "rejected: the elongated open profile reads as a broad translucent rectangular card rather than an overturning sheet"
+    },
+    "v164_surface_only_control": {
+      "capture": "m9_breaking_surface_only_v164_diagnostic.png",
+      "capture_sha256": "23995951ff3e239deb7d6d607781cb3b1fe32621eca532a942b3f12888a14d9a",
+      "decision": "diagnostic control: hiding the lip and both particle systems removes the broad patch, localizing the artifact to BreakingLipMesh"
+    },
+    "v165_transparent_carrier_lace": {
+      "capture": "m9_lace_plunge_lip_only_v165_rejected.png",
+      "capture_sha256": "2bc29756cf437a949f8b5f8c7248e058a8fe0ba4004838cd19c51f8bad0aa6e9",
+      "decision": "rejected: suppressing the translucent carrier removes the card but leaves the hydraulic nearly invisible"
+    },
+    "v167_masked_cutout_threshold": {
+      "capture": "m9_masked_open_plunge_threshold_v167_rejected.png",
+      "capture_sha256": "991da40ec90e7f0a474a82ec28e0fc48730f03f994919a04ae5f0e1308a06200",
+      "decision": "rejected: the masked two-sided variant renders as an opaque beige faceted slab and is materially worse than the translucent fallback"
+    }
+  },
+  "restoration": {
+    "retained_runtime_changes_from_v161_v167": false,
+    "restored_baseline": "validated v160 attached moderate arch, strong-jump curl blend, sparse translucent lace, and bounded v121 nested-shell fallback",
+    "rejected_asset_removed": "/Game/RaftSim/Materials/M_RaftSim_BreakingWaterPlunge",
+    "rejected_asset_absent_after_validation": true,
+    "restored_translucent_asset": "/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip",
+    "restored_translucent_asset_sha256": "b98fb5e85d6eec0af66848101621821084e2134cc369d0ada825ec3e58e41b62",
+    "source_sha256": {
+      "water_surface_actor_cpp": "c15b1597854df974867088728dd547e6a9f59c2b59c229d8ab57007b7fad99d4",
+      "water_surface_actor_header": "1197323f31164f253767ad17340612bfb75cfd3ffed80429c6bb0e842eb1c1cc",
+      "water_surface_native_test": "ef3061b4ca2fb26ee125b0182c770bcf03f8b6e2cd6b7b91f81893b0f6fca2e2",
+      "breaking_water_material_author": "2dff1a545886517c97dbeea38dee6febbeab837cbe1eedb891fcb3aabf898c86",
+      "breaking_water_material_script": "4a00ffaa5df994d7ea44f229e59446eb1eba8dd9ce66ad77d12bcd0d6fe743d5"
+    }
+  },
+  "validation": {
+    "editor_build": "passed",
+    "focused_python_source_asset_and_provenance_contracts": "39 passed",
+    "material_reauthor": {
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v167_revert_reauthor_material.log",
+      "log_sha256": "5e73536d99f9b44c7456a475ea37d98b7f955d9d8778c94739fa7ef1cf2a84ca"
+    },
+    "native_water_surface_test": {
+      "result": "passed",
+      "report": "/private/tmp/raftsim_m9_v167_revert_water_surface_report/index.json",
+      "report_sha256": "31433f3c15b30ace50f92d7644ca5ad2363db6d46e98debf1de6cc6846db6e99",
+      "log": "/private/tmp/raftsim_m9_v167_revert_water_surface_test.log",
+      "log_sha256": "ef16ff93dc7b769d292cac423947f9abf941e4f1c871de1dac623bdcac67560e"
+    },
+    "diff_check": "passed"
+  },
+  "decision": "Do not retain the open-plunge geometry or masked-material approach. BreakingLipMesh cannot produce the required coherent live hydraulic with the tested connected-sheet materials. Preserve the v160 technical baseline and its isolation diagnostics, but reject all v161-v167 imagery for M9 acceptance. M9 remains open and no milestone commit or push is permitted."
+}

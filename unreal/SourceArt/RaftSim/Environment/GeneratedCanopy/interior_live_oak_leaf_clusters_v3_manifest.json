@@ -1,0 +1,125 @@
+{
+  "schema": "raftsim.unreal.south_fork_live_oak_leaf_clusters.v3",
+  "generated_on": "2026-07-29",
+  "status": "m9_review_only_dense_leaf_clusters_v3_visual_promotion_rejected",
+  "production_promoted": false,
+  "species": {
+    "scientific_name": "Quercus wislizeni",
+    "common_name": "California interior live oak",
+    "fidelity_boundary": "AI-generated dense terminal-spray visual study; not a surveyed individual-tree or botanical-measurement claim"
+  },
+  "source": {
+    "chroma_path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3_Chroma.png",
+    "chroma_sha256": "29c9bf2239cf67e2cc5ac5e185d676f38c24c4687b0abb00f90670865b9d61bc",
+    "alpha_path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3.png",
+    "alpha_sha256": "ba0a5930c0f7aa4a0afe077f319c4b2a1b99ec83fe40e4ecf925d6c793a1cdfb",
+    "generator": "OpenAI built-in image generation",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "referenced_images": [],
+    "prompt": "Use case: photorealistic-natural\nAsset type: Unreal Engine masked foliage cluster atlas source texture\nPrimary request: Create one square texture atlas containing exactly four separate, very dense, leaf-dominant branch sprays of California interior live oak (Quercus wislizeni), designed for crossed real-time foliage cards on a true 3D trunk and branch scaffold.\nSubject: Each spray must form a broad continuous evergreen mass with hundreds of overlapping, physically believable dark-green narrow-oval live-oak leaves, subtle serrated edges, small olive-green variation, and only a few thin gray-brown twigs visible inside the foliage. These are terminal leafy sprays, not miniature whole trees. No thick trunks. No flowers, berries, or acorns.\nComposition/framing: Orthographic front-facing botanical asset capture arranged in an exact 2-by-2 grid. One complete spray centered in each quadrant. Every silhouette must stay fully inside its quadrant with generous clean padding and must not touch any other spray. Vary the four forms: broad horizontal, upright oval, left-sweeping fork, and compact rounded terminal cluster. Each spray should fill roughly 70 percent of its quadrant width and height. Make the foliage silhouette dense and continuous, with only small natural internal gaps; prioritize leaf mass over visible twigs.\nLighting/mood: Neutral bright overcast studio illumination, lightly baked, no dramatic highlights, no crushed shadows, no cast shadow, no contact shadow.\nScene/backdrop: Perfectly flat solid #ff00ff chroma-key background, one uniform color across the entire square with no gradient, texture, reflection, floor plane, shadow, or lighting variation.\nStyle/medium: High-resolution botanical reference photography; crisp leaf edges; true leaf scale; natural irregular non-repeating structure; restrained Sierra Nevada summer green.\nConstraints: Square image; exactly four isolated sprays; exact 2-by-2 layout; no labels, grid lines, text, watermark, border, ground, trunk, roots, scenery, sky, insects, flowers, fruit, or cutout checkerboard. Do not use magenta anywhere in the foliage or branches. Keep all foliage fully opaque against the key.\nAvoid: sparse bare twigs, twig-dominant clusters, miniature full-tree silhouettes, black foliage, crushed blacks, neon green, pale speckles, repeated clone shapes, flat painted blobs, low-poly leaves, illustration, CGI look, smeared edges, depth-of-field blur, transparency, translucent leaves.",
+    "alpha_processing": {
+      "tool": "imagegen skill remove_chroma_key.py",
+      "auto_key": "border",
+      "reported_key_color": "#fa02f9",
+      "soft_matte": true,
+      "transparent_threshold": 12,
+      "opaque_threshold": 220,
+      "despill": true
+    }
+  },
+  "atlas": {
+    "columns": 4,
+    "rows": 4,
+    "occupied_tiles": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "reserved_transparent_tiles": [
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "tile_bleed_inset": 0.012,
+    "occupied_band_opaque_pixel_count": 399118,
+    "reserved_band_opaque_pixel_count": 0
+  },
+  "maps": {
+    "albedo_opacity": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3_AlbedoOpacity.png",
+      "sha256": "6f5db19fa3e9bad386da4c29c5f2633b804fa0aba0bb7555e784086a87fe042e",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGBA",
+      "channels": "RGB base color A=opacity mask",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_dense_leaf_clusters_v3_visual_promotion_rejected"
+    },
+    "normal": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3_Normal.png",
+      "sha256": "0b085fcb5e46e10e84b8749b5d89152eda4f1cdd896c3e0f8f8ea272064d600e",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "RGB tangent-space normal",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_dense_leaf_clusters_v3_visual_promotion_rejected"
+    },
+    "ao_roughness_subsurface": {
+      "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/T_InteriorLiveOak_LeafClustersV3_AORoughnessSubsurface.png",
+      "sha256": "5e03edc813904d14f885745d43c2dea2ce797d6aa2d6a609be40fd3502d4efb7",
+      "width": 2048,
+      "height": 2048,
+      "mode": "RGB",
+      "channels": "R=AO G=roughness B=subsurface transmission",
+      "unreal_address_mode": "clamp",
+      "status": "m9_review_only_dense_leaf_clusters_v3_visual_promotion_rejected"
+    }
+  },
+  "derivation": {
+    "layout": "four 2x2 alpha-source quadrants resized independently into the top row of a 2048-square 4x4 atlas; remaining twelve tiles stay transparent",
+    "surface_maps": "deterministic alpha-aware normal, AO, roughness, and subsurface estimates",
+    "mip_padding": {
+      "method": "eight-neighbor frontier propagation bounded independently to each atlas tile",
+      "padding_pixels": 24,
+      "alpha_threshold_255": 2,
+      "atlas_columns": 4,
+      "atlas_rows": 4,
+      "tile_boundary_crossing_allowed": false,
+      "alpha_preserved_byte_for_byte": true,
+      "nontransparent_rgb_preserved_byte_for_byte": true,
+      "alpha_sha256": "b38f5a8321adca251b402344a995435f87ebe17416f4df7b6152cac29093a7c7",
+      "nontransparent_rgb_sha256": "0afe4d540a0ade10dc013ed4841436d1e2ec69a510f90daf759a89590bcd4981",
+      "padded_transparent_pixel_count": 229010,
+      "transparent_nonzero_rgb_pixel_count": 228342
+    }
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false
+  },
+  "integration": {
+    "milestone": "M9",
+    "active_candidate": false,
+    "authoring_flag": "RaftSimOnlyLiveOakDenseWoodyV2Review",
+    "capture_flag": "RaftSimLiveOakDenseWoodyV2Review",
+    "photoreal_accepted": false,
+    "release_promoted": false,
+    "review_evidence": "docs/environment-captures/south_fork_full_reach/m9_live_oak_dense_woody_v211_review.json",
+    "decision": "retain the dense leaf-dominant V3 atlas as a materially stronger technical source; reject v211 visual promotion because a single repeated scaffold and four cluster shapes form dark rounded clumps rather than varied photoreal crowns"
+  }
+}

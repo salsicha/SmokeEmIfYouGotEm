@@ -1,0 +1,60 @@
+{
+  "candidate": "m9_crew_biomechanics_v92",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_crew_biomechanics_v92.png",
+  "camera": "river_action",
+  "production_roster_count": 5,
+  "pose_authority": "shared_FRaftSimCrewAvatarPose_output",
+  "physics_changed": false,
+  "implementation": {
+    "pivot": "existing torso/PFD centre",
+    "articulated_landmarks": [
+      "left_shoulder",
+      "right_shoulder",
+      "head"
+    ],
+    "unchanged_targets": [
+      "left_hand",
+      "right_hand",
+      "paddle",
+      "left_hip",
+      "right_hip",
+      "left_knee",
+      "right_knee",
+      "left_foot",
+      "right_foot"
+    ],
+    "whole_body_pose_exclusions": [
+      "falling",
+      "swimming",
+      "reentry"
+    ]
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96
+  },
+  "validation": {
+    "focused_source_contracts": "37/37 passed",
+    "editor_build": "passed",
+    "focused_pose_automation": "1/1 passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics",
+    "material_fallback_warning": false
+  },
+  "retained_improvements": [
+    "Shoulder and head landmarks now visibly follow the shared torso rotation.",
+    "Hands and paddle targets remain fixed while arms bend toward the grip.",
+    "Hips, knees, and boots remain planted during the high-side command.",
+    "Backstroke mirrors forward cadence without recursively articulating twice."
+  ],
+  "open_visual_findings": [
+    "Crew motion remains procedural rather than captured from whitewater-guide mocap.",
+    "Grip orientation, facial response, secondary clothing motion, and individual reaction timing remain synthetic.",
+    "Water, shoreline, terrain, canopy, raft highlights, foam, and aerosol remain below the photoreal target."
+  ]
+}

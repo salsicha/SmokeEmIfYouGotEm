@@ -470,6 +470,11 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
         OutError = FString::Printf(TEXT("unsupported cooked manifest schema '%s'"), *Schema);
         return nullptr;
     }
+    // Full-reach transit fields carry absolute DEM elevations. Named-rapid
+    // cooks deliberately subtract their entry elevation before solving and
+    // record that source datum here. Older/absolute manifests omit the field.
+    double SourceElevationDatumM = 0.0;
+    Root->TryGetNumberField(TEXT("source_elevation_datum_m"), SourceElevationDatumM);
 
     const TSharedPtr<FJsonObject>* Grid = nullptr;
     const TSharedPtr<FJsonObject>* Solver = nullptr;
@@ -743,6 +748,7 @@ TUniquePtr<FRaftSimLiveWaterWindow> FRaftSimLiveWaterWindow::CreateFromCookedFie
               -static_cast<double>(CruxRow) * Dy)
         : FVector2D(Scenario.grid.origin_x, Scenario.grid.origin_y);
     TUniquePtr<FRaftSimLiveWaterWindow> Window(new FRaftSimLiveWaterWindow());
+    Window->ElevationDatumM = VerticalDatum + SourceElevationDatumM;
     try
     {
         Window->Solver = MakePimpl<raftsim::ReducedShallowWaterSolver>(
@@ -940,8 +946,14 @@ FRaftSimLiveWaterSampleResult FRaftSimLiveWaterWindow::Sample(
     const double Bed = Bilinear(Scenario.bed);
     Result.bValid = true;
     Result.DepthM = static_cast<float>(FMath::Max(Depth, 0.0));
-    Result.BedHeightM = static_cast<float>(Bed);
-    Result.SurfaceHeightM = static_cast<float>(Bed + FMath::Max(Depth, 0.0));
+    // Cooked river fields are shifted near zero before entering the solver to
+    // preserve floating-point precision. Restore that private solver datum at
+    // this boundary so every caller receives the source-data elevation. The
+    // runtime adapter is then solely responsible for applying the Unreal
+    // world's global river datum exactly once.
+    Result.BedHeightM = static_cast<float>(Bed + ElevationDatumM);
+    Result.SurfaceHeightM = static_cast<float>(
+        Bed + FMath::Max(Depth, 0.0) + ElevationDatumM);
     Result.bWet = Depth > 1.0e-4;
     Result.VelocityMps = FVector2D(
         static_cast<float>(Bilinear(State.u)), static_cast<float>(Bilinear(State.v)));

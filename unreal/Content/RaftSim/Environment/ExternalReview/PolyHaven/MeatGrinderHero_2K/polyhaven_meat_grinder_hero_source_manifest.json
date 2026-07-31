@@ -1,0 +1,93 @@
+{
+  "schema": "raftsim.external_review_asset_source.v1",
+  "asset_id": "polyhaven_boulder_01_meat_grinder_hero_2k",
+  "asset_name": "Boulder 01",
+  "asset_type": "model",
+  "author": "Rico Cilliers",
+  "publisher": "Poly Haven",
+  "product_page": "https://polyhaven.com/a/boulder_01",
+  "official_files_api": "https://api.polyhaven.com/files/boulder_01",
+  "official_info_api": "https://api.polyhaven.com/info/boulder_01",
+  "license": {
+    "name": "CC0 1.0 Universal",
+    "url": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "publisher_label": "CC0 License",
+    "commercial_use": true,
+    "attribution_required": false,
+    "redistribution_allowed": true
+  },
+  "publisher_metadata": {
+    "published_unix": 1707177600,
+    "dimensions_mm": [
+      1272.6830840110779,
+      1830.7338953018188,
+      1003.8918256759644
+    ],
+    "source_triangle_count": 123976,
+    "maximum_resolution_px": [8192, 8192],
+    "description": "Free 8K photoreal boulder model with weathered, jagged surfaces, subtle lichen and rusty mineral streaks, and rugged, cliff-like rock face detail."
+  },
+  "acquisition": {
+    "date_utc": "2026-07-29",
+    "resolution": "2k",
+    "transport": "official Poly Haven glTF/CDN URLs returned by the official Files API",
+    "raw_payloads_committed": false,
+    "temporary_source_root": "/private/tmp/raftsim_meat_grinder_hero_2k"
+  },
+  "files": [
+    {
+      "relative_path": "boulder_01_2k.gltf",
+      "bytes": 2773,
+      "official_md5": "3ef4b3c88c898e12b096eeb40f1edbb9",
+      "sha256": "52d118b56748a18509e4ec0075d07b254d72a0401793f22363c0bb3a682e7361",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/2k/boulder_01/boulder_01_2k.gltf"
+    },
+    {
+      "relative_path": "boulder_01.bin",
+      "bytes": 2938808,
+      "official_md5": "27a19fa031d8b4c3a09261f19c444dc5",
+      "sha256": "7f5b06503d62bd95bfe9c6b8a354a5cc8ff04a4d271a8cf87a3e3125db4232d7",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/gltf/8k/boulder_01/boulder_01.bin"
+    },
+    {
+      "relative_path": "textures/boulder_01_diff_2k.jpg",
+      "bytes": 3672483,
+      "official_md5": "63571077317c9a2d1db95894e0268a07",
+      "sha256": "90bbaa17c1fe0254d2b0b6e5148264fa834953a72724d566f14af029eebe3ca3",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/boulder_01/boulder_01_diff_2k.jpg"
+    },
+    {
+      "relative_path": "textures/boulder_01_nor_gl_2k.jpg",
+      "bytes": 4649207,
+      "official_md5": "73ee1783fca7605fd454f0af3e5b85fa",
+      "sha256": "5174b318712ac7725cbcb55d422607f9c66d7f8d035c5412ab897b5939e2db6b",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/boulder_01/boulder_01_nor_gl_2k.jpg"
+    },
+    {
+      "relative_path": "textures/boulder_01_arm_2k.jpg",
+      "bytes": 2273068,
+      "official_md5": "94c796dfd73f72b11e557cb2c05ff51e",
+      "sha256": "ab52859dde519b4822111aa60916b6d21f8a6966c67b6cec44d1cd0775b8a86a",
+      "official_url": "https://dl.polyhaven.org/file/ph-assets/Models/jpg/2k/boulder_01/boulder_01_arm_2k.jpg"
+    }
+  ],
+  "review_boundaries": {
+    "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K",
+    "review_flag": "RaftSimMeatGrinderHeroReview",
+    "station_range_m": [620.0, 1320.0],
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "navigation_changed": false,
+    "production_promoted": false,
+    "human_visual_acceptance_required": true
+  },
+  "review_material_dependencies": [
+    {
+      "asset": "Rocky Gravel",
+      "publisher": "Poly Haven",
+      "product_page": "https://polyhaven.com/a/rocky_gravel",
+      "rights_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/polyhaven_south_fork_bank_kit_source_manifest.json",
+      "use": "legacy v200-v201 presentation-only bank surface retained as rejected evidence; not bound by the v202 DEM-aligned rock-garden review"
+    }
+  ]
+}

@@ -175,7 +175,7 @@ The initial rigid-body sampler is a baseline, not the final inflatable model. Th
 
 A passenger seated on a tube or executing a high-side must produce local deformation as well as a center-of-mass shift. Deformed upstream tubes receive two-way water load; overtopping contributes explicit water mass and roll moment. Rock contacts must report indentation, contact patch, friction, wrap/pinch depth, release margin, and shape recovery. The model must keep these authoritative channels identical across platform scalability profiles while permitting lower render-mesh subdivision, wrinkle detail, spray, and telemetry drawing.
 
-Current authority remains `CustomReducedRigidBody` until the existing Chaos/Jolt evaluation and the new compliant fixtures produce measured evidence. Jolt remains the candidate portable raft/contact island, Chaos owns visual ragdolls and non-authoritative effects, and Project Chrono or another reviewed offline compliant model supplies high-fidelity comparison evidence. No flexible outcome is scoring-authoritative merely because it looks plausible in Unreal.
+Current authority remains `CustomReducedRigidBody`. The D6 compliant fixtures now have measured Project Chrono and Chaos evidence with a passing numeric comparison, but they do not replace the separate Chaos/Jolt authority evaluation or its manual review. Jolt remains the candidate portable raft/contact island, Chaos owns visual ragdolls and non-authoritative effects, and Project Chrono supplies high-fidelity comparison evidence. No flexible outcome is scoring-authoritative merely because it looks plausible in Unreal.
 
 ## Comparison And Tuning
 
@@ -199,7 +199,7 @@ Acceptance metrics should include L1/L2/Linf field errors, probe errors, feature
 
 ## Chrono And Unreal Path
 
-Project Chrono remains the planned raft/contact/compliance runtime, but the water solver plan is now:
+Project Chrono remains the independent raft/contact/compliance reference and optional research runtime, while the shipping water/raft plan is now:
 
 - GeoClaw is offline reference.
 - Custom C++ reduced shallow-water / height-field solver is the runtime water candidate.

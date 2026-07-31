@@ -1,0 +1,181 @@
+{
+  "schema": "raftsim.review.south_fork_live_oak_crown_family.v212",
+  "reviewed_on": "2026-07-29",
+  "milestone": "M9",
+  "candidate": "interior_live_oak_crown_family_v3",
+  "status": "visual_promotion_rejected_variant_lod_infrastructure_retained",
+  "production_promoted": false,
+  "photoreal_accepted": false,
+  "inputs": {
+    "species_visual_target": "Quercus wislizeni / California interior live oak",
+    "bark_maps": {
+      "albedo_sha256": "a59ed99e7e058f9e9a18101e58d1b54eb215b1ab7ad2d3d5de3798cbbd1dfa76",
+      "normal_sha256": "39e60dd7960c182f695e9010a9fe6eed1b668253e2fe57e9ccfc97d5eda831ab",
+      "ao_roughness_height_sha256": "83bca1516a3b756fa365a75340ef6680b2aa9d03cdcc5322f9a3d526e4a76622"
+    },
+    "leaf_cluster_maps": {
+      "source_manifest": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/interior_live_oak_leaf_clusters_v3_manifest.json",
+      "albedo_opacity_sha256": "6f5db19fa3e9bad386da4c29c5f2633b804fa0aba0bb7555e784086a87fe042e",
+      "normal_sha256": "0b085fcb5e46e10e84b8749b5d89152eda4f1cdd896c3e0f8f8ea272064d600e",
+      "ao_roughness_subsurface_sha256": "5e03edc813904d14f885745d43c2dea2ce797d6aa2d6a609be40fd3502d4efb7"
+    }
+  },
+  "authoring": {
+    "authoring_flag": "RaftSimOnlyLiveOakCrownFamilyV3Review",
+    "mode": "normal offscreen editor startup with ExecCmds and QUIT_EDITOR",
+    "validated_textures": 6,
+    "source_dimensions": [2048, 2048],
+    "platform_dimensions": [2048, 2048],
+    "mips_per_texture": 12,
+    "shared_material_contract": {
+      "shading_model": "TwoSidedFoliage",
+      "blend_mode": "Masked",
+      "opacity_mask_clip": 0.28,
+      "instance_energy_range": [0.98, 1.14],
+      "tangent_normal_detail": 0.64,
+      "ambient_occlusion_floor": 0.62,
+      "emissive_compensation": false,
+      "dithered_lod_transition": true
+    },
+    "forms": {
+      "spreading_mature": {
+        "object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_SpreadingMature.SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_SpreadingMature",
+        "morphology_seed": 17,
+        "scaffold_count": 6,
+        "crown_width_scale": 1.06,
+        "crown_height_scale": 1.02,
+        "directional_asymmetry": 0.06,
+        "woody_segments": 86,
+        "terminal_branches": 54,
+        "leaf_cards": 108,
+        "vertices": 1986,
+        "lod_triangles": [1426, 828, 457]
+      },
+      "compact_river_edge": {
+        "object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_CompactRiverEdge.SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_CompactRiverEdge",
+        "morphology_seed": 29,
+        "scaffold_count": 4,
+        "crown_width_scale": 0.78,
+        "crown_height_scale": 0.84,
+        "directional_asymmetry": 0.04,
+        "woody_segments": 58,
+        "terminal_branches": 36,
+        "leaf_cards": 72,
+        "vertices": 1342,
+        "lod_triangles": [966, 561, 310]
+      },
+      "asymmetric_competition": {
+        "object_path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_AsymmetricCompetition.SM_RaftSim_SouthForkInteriorLiveOakCrownFamilyV3_AsymmetricCompetition",
+        "morphology_seed": 43,
+        "scaffold_count": 5,
+        "crown_width_scale": 0.98,
+        "crown_height_scale": 0.94,
+        "directional_asymmetry": 0.24,
+        "woody_segments": 72,
+        "terminal_branches": 45,
+        "leaf_cards": 90,
+        "vertices": 1664,
+        "lod_triangles": [1196, 694, 383]
+      }
+    },
+    "lod_screen_sizes": [1.0, 0.34, 0.12],
+    "billboard_core": 0,
+    "collision": "disabled",
+    "nanite": "disabled",
+    "asset_hashes": {
+      "bark_albedo_texture": "12450971dd2d653ab85e6c69a9d7929130c4e78c3791ab337a678d8021dfd4a8",
+      "bark_normal_texture": "49c3542f40250e8e6bc5033a2a8bd74ed6d6e7f57626bc1791f2a83781d9b5b7",
+      "bark_packed_texture": "e655636495ef47f4ee6c83c477f9779a0876ec82dcb9a41ff94e872658958575",
+      "leaf_albedo_opacity_texture": "cc0be3885bc03ec85f01ac629e56341a4c061c53490d9aa864889e765c03f344",
+      "leaf_normal_texture": "7be4f8ea90645bfc161929be1da5a4d184c7ab359e91834a810c13baf98c79d0",
+      "leaf_packed_texture": "5dad68005c5f732319594efa5086786afdcdd8d9ef49e17c0e522b2155126aa6",
+      "bark_material": "681b70470bcf0e15b6aa423ccb2991c124ac1f10c84d8e68fed472c7672b4f1b",
+      "leaf_material": "a39a0204133d79adcf832019a07c9709516789d0e5fd1c895d8d5adc63097936",
+      "spreading_mature_mesh": "a37157cb4b86fd8698033a6a82201f0811b4829caa035d550cea0dbdb1004361",
+      "compact_river_edge_mesh": "3ba0e9c9c58757146a87bc0f1834a6f44440d5192c09e9065f25089432132ecb",
+      "asymmetric_competition_mesh": "cedafafc561f74a3029df06bb5fddcde45f9287b01e476b653b162a4c6e19a34"
+    }
+  },
+  "capture": {
+    "capture_flag": "RaftSimLiveOakCrownFamilyV3Review",
+    "directory": "docs/environment-captures/south_fork_full_reach/photographic_v212_live_oak_crown_family_v3",
+    "transient_component_swaps": 21,
+    "transient_instance_swaps": 24830,
+    "component_level_distribution": {
+      "selection_key": "stable hash of actor path plus HISM component name",
+      "per_instance_selection_supported": false,
+      "spreading_mature": {"components": 8, "instances": 8535},
+      "compact_river_edge": {"components": 5, "instances": 8421},
+      "asymmetric_competition": {"components": 8, "instances": 7874}
+    },
+    "saved_map_changed": false,
+    "saved_map_mtime_before_capture": "2026-07-29T15:34:34",
+    "saved_map_sha256_after_capture": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e",
+    "hashes": {
+      "chili_bar_launch_downstream.png": "bb6c14fd378f7888e0d0348f8dc2c38eaff052adc2dfa0f89a5a42c136ed9879",
+      "coloma_bridge_context.png": "b1fb565b977d6c4081225786dba9ac7330828669dcf78d0f5df3bac6d413c64b",
+      "meat_grinder_guide_eye.png": "c79fbd995d6f3f25dee572d86b3ee73b0d8b4a00c3edb247435a87cc00d61ae6",
+      "salmon_falls_takeout.png": "8a6afbc4f4f6ea96a16065acb08297a0e5cdd09d2fcf5717c089a9671d457573",
+      "troublemaker_approach.png": "b459f2a037aed2c257c3d31d00ebc1fbc6d55ac15606ee8954954ffbb9cb7899"
+    },
+    "comparison_to_v202": {
+      "mean_absolute_rgb_average": 1.505974,
+      "percent_pixels_any_channel_gt_8_average": 4.055143,
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.861910, 3.001411],
+        "coloma_bridge_context.png": [2.386561, 6.140842],
+        "meat_grinder_guide_eye.png": [1.128128, 3.637587],
+        "salmon_falls_takeout.png": [1.187233, 1.960720],
+        "troublemaker_approach.png": [1.966037, 5.535156]
+      },
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"]
+    },
+    "comparison_to_v211": {
+      "mean_absolute_rgb_average": 1.145999,
+      "percent_pixels_any_channel_gt_8_average": 3.281207,
+      "per_view": {
+        "chili_bar_launch_downstream.png": [0.658950, 2.403429],
+        "coloma_bridge_context.png": [1.779460, 5.025065],
+        "meat_grinder_guide_eye.png": [0.706740, 2.392904],
+        "salmon_falls_takeout.png": [1.093864, 1.914605],
+        "troublemaker_approach.png": [1.490982, 4.670030]
+      },
+      "per_view_values": ["mean_absolute_rgb", "percent_pixels_any_channel_gt_8"]
+    }
+  },
+  "manual_review": {
+    "positive_findings": [
+      "Three genuinely different deterministic crown forms replace the single repeated scaffold.",
+      "All three variants are represented across the existing source HISM components without changing source transforms or production ecology authority.",
+      "Each mesh has validated descending near, mid, and far render LODs with masked dither transitions.",
+      "Bounded AO and normal response reduce uniform black crushing without emissive or unlit compensation."
+    ],
+    "rejection_reasons": [
+      "Sparse planar leaf clusters remain visibly separate from exposed procedural limbs rather than reading as continuous interior-live-oak foliage volume.",
+      "Troublemaker and Coloma still expose geometric fork patterns and broad card silhouettes despite the morphology variation.",
+      "Far Salmon Falls silhouettes fragment into isolated dark bars and clumps; fixed frames do not establish a temporally stable moving-camera transition.",
+      "Component-level selection cannot break repetition inside each large HISM batch.",
+      "Terrain, water, other foliage, lighting, and material integration remain synthetic, so no frame is acceptable release media."
+    ],
+    "decision": "Reject v212 visual promotion. Retain the deterministic crown-family generator, stable review distribution, calibrated lit-material option, alpha-coverage import fix, explicit LOD authoring, and pinned captures as technical infrastructure only.",
+    "next_required_visual_input": "Stop tuning this procedural scaffold. Intake rights-reviewed production tree geometry or an art-authored botanical trunk, branch, twig, and volumetric shoot set with multiple age forms; support per-instance variation, root and understory integration, temporal transition review, and named art plus ecology approval."
+  },
+  "authority": {
+    "affects_ecology_classification": false,
+    "affects_instance_placement": false,
+    "affects_collision": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "affects_gameplay": false
+  },
+  "external_gates": {
+    "named_art_review": "missing",
+    "named_ecology_review": "missing"
+  },
+  "milestone_gate": {
+    "m9_passed": false,
+    "authoritative_visual_baseline": "v184",
+    "commit_allowed": false,
+    "push_allowed": false
+  }
+}

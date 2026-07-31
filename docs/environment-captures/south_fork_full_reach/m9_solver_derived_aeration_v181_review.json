@@ -1,0 +1,36 @@
+{
+  "schema": "raftsim.m9.solver_derived_aeration_review.v1",
+  "reviewed_utc": "2026-07-29T21:36:00Z",
+  "revision_id": "v181",
+  "status": "technical_aeration_authority_accepted_photoreal_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "implementation": {
+    "global_base": "legacy solver Froude threshold",
+    "named_rapid_supplement": "solver surface slope plus acceleration, strain, and convergence",
+    "scope": "smooth named-rapid handoff envelopes only",
+    "shoreline_guard": "three-to-four adjacent wet solver cells",
+    "presentation_only": true,
+    "hydraulics_collision_navigation_or_gameplay_changed": false
+  },
+  "evidence": {
+    "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v181_solver_derived_aeration",
+    "captured_views": 5,
+    "build_log": "/private/tmp/raftsim_m9_v181_solver_derived_aeration_build.log",
+    "build_log_sha256": "07d792e60f163980363f194b5701ef39b0dd547b991d388a09d517db76da0840",
+    "settled_capture_log": "/private/tmp/raftsim_m9_v181_solver_derived_aeration_capture.log",
+    "settled_capture_log_sha256": "c6c51d6632f9398e375c5543dc16c3bae0e5d28499f203f79c5089cc4dfd692b"
+  },
+  "decision": {
+    "technical_mechanism_retained": true,
+    "photoreal_water_accepted": false,
+    "reason": "The classifier adds physically traceable aeration cues at named rapids, but Meat Grinder shows only thin bright fragments and Troublemaker remains visually calm. The broad surface still lacks coherent breaking volume, entrained air, spray, and shoreline integration."
+  },
+  "release_effect": {
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  }
+}

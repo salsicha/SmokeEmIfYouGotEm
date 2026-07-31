@@ -1,0 +1,46 @@
+{
+  "candidate": "m9_aerated_hydraulic_roller_v107",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "captures": [
+    "m9_aerated_hydraulic_roller_v107.png",
+    "m9_aerated_hydraulic_roller_action_v107.png"
+  ],
+  "cameras": [
+    "breaking_water",
+    "river_action"
+  ],
+  "retained_changes": {
+    "profile": "compact moderate hydraulic arch; approximately 2.8-3.8 m travel and 0.3-1.05 m height before intensity scaling",
+    "presentation_only": true,
+    "foam_response": "squared project-owned lace coverage with a narrowed, laterally fragmented solver crest core",
+    "breaking_water_opacity": 0.035,
+    "breaking_foam_opacity": 0.86,
+    "breaking_foam_core_gain": 1.25,
+    "maximum_sheet_width_m": 8.0
+  },
+  "rejected_brackets": [
+    "v105 used the compact geometry with a saturated crest core and still read as a translucent white slab",
+    "v106 removed the slab but made the distinct live roller nearly disappear"
+  ],
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "breaking_lip_triangles": 512,
+    "breaking_lip_visible": true
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "material_asset_regeneration": "passed and saved",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "open_visual_findings": [
+    "The retained crest is bounded and no longer a solid slab, but it still lacks convincing collapse volume, entrained-air depth, and turbulent aerosol.",
+    "The authored broad-water foam remains repetitive in the dedicated strongest-cell camera.",
+    "Water, shoreline, terrain, canopy, crew motion, and equipment response remain below the photoreal target."
+  ]
+}

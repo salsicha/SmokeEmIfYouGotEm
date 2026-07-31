@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Son of Satan",
       "rapid_order": 13,
+      "source_elevation_datum_m": 216.52396032714844,
       "station_m": 27358.848,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

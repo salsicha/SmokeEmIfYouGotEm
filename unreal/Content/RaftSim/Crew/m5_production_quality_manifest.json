@@ -8,6 +8,40 @@
     "runtime_class": "ARaftSimCrewAvatarActor",
     "primitive_engine_meshes_used": false,
     "organic_mesh_recipe": "10 latitude rings by 14 radial sides with rounded ellipsoid parts",
+    "head_mesh_recipe": "20 anatomically conditioned profile rings by 28 radial sides",
+    "safety_panel_mesh_recipe": "8 latitude rings by 12 radial sides with a rounded superellipsoid foam profile",
+    "helmet_shell_recipe": "10 polar rings by 24 radial sides with a front-cut open face and extended occipital coverage",
+    "procedural_part_count_per_avatar": 25,
+    "geometry_batching": {
+      "pfd_component_submeshes": 6,
+      "helmet_retention_component_submeshes": 2,
+      "head_component_submeshes": 17,
+      "purpose": "retain layered safety-gear silhouettes at the accepted full-reach draw-call budget"
+    },
+    "skin_microdetail": {
+      "source": "first_party_synthetic_bitmap_generation",
+      "maps": [
+        "T_RaftSim_CrewSkin_MicrodetailAlbedo",
+        "T_RaftSim_CrewSkin_MicrodetailNormal"
+      ],
+      "resolution": "1024x1024",
+      "mip_count": 11,
+      "albedo_compression": "DXT1",
+      "normal_compression": "BC5",
+      "material_application": "vertex-alpha-masked skin only; authored hard-feature colours remain authoritative"
+    },
+    "deterministic_body_profile_count": 4,
+    "deterministic_skin_tone_count": 4,
+    "facial_features": [
+      "vertex_colored_skin",
+      "nose_and_ears",
+      "sclera_and_irises",
+      "upper_and_lower_eyelids",
+      "eyebrows",
+      "mouth",
+      "paired_nostrils",
+      "subsurface_skin_shading"
+    ],
     "appearance_variants": [
       "blue_green_pfd",
       "red_pfd",
@@ -16,9 +50,35 @@
     ],
     "protective_equipment": [
       "splash_wetsuit",
-      "pfd",
-      "helmet"
+      "front_back_and_side_pfd_foam_panels",
+      "pfd_shoulder_straps_belt_buckle_and_rear_webbing",
+      "front_cut_open_helmet_shell_rim_and_bilateral_retention_straps",
+      "river_boots"
     ]
+  },
+  "equipment_textile_fallback": {
+    "source": "project_owned_generated_raw_studies_with_deterministic_postprocessing",
+    "source_manifest": "unreal/SourceArt/RaftSim/Equipment/GeneratedTextiles/generated_textile_pbr_manifest.json",
+    "families": [
+      "raft_coated_fabric",
+      "pfd_ripstop",
+      "wetsuit_neoprene"
+    ],
+    "maps_per_family": [
+      "albedo",
+      "tangent_space_normal",
+      "packed_ambient_occlusion_roughness_height"
+    ],
+    "resolution": "1024x1024",
+    "tile_method": "four_way_mirrored_material_tile",
+    "unreal_texture_asset_count": 9,
+    "dependent_material_asset_count": 8,
+    "render_test": "RaftSim.M5.RuntimeRescueLoop",
+    "render_test_run": "v280",
+    "render_test_passed": true,
+    "visual_review": "docs/environment-captures/south_fork_full_reach/m9_equipment_textile_fallback_v280_review.json",
+    "technical_fallback_accepted": true,
+    "photoreal_art_accepted": false
   },
   "animation_authority": {
     "source": "deterministic_first_party_joint_rig",
@@ -94,7 +154,18 @@
       "punctured",
       "critical"
     ],
-    "physics_coupling": "pressure and integrity reduce effective tube contact radius and buoyancy support"
+    "physics_coupling": "pressure and integrity reduce effective tube contact radius and buoyancy support",
+    "commercial_construction_fallback": [
+      "lower outside bonded chafe strips",
+      "D-ring and grab-line keeper pads",
+      "thwart attachment collars",
+      "five-crown inflated self-bailing floor relief",
+      "deformed floor-derived smooth normals"
+    ],
+    "construction_deformation_authority": "all bonded detail is rebuilt from the same D4 visual segment state as the chamber fabric",
+    "visual_review": "docs/environment-captures/south_fork_full_reach/m9_flexible_raft_upgrade_v317_review.json",
+    "technical_upgrade_accepted": true,
+    "photoreal_art_accepted": false
   },
   "automation": [
     "RaftSim.M5.CrewAvatarPoseProduction",
@@ -102,5 +173,5 @@
     "RaftSim.M5.FlexibleFabricCondition",
     "RaftSim.M5.RuntimeRescueLoop"
   ],
-  "claim_boundary": "This manifest records implemented gameplay and first-party procedural presentation. It does not claim photogrammetric humans or surveyed rescue training validity."
+  "claim_boundary": "This manifest records implemented gameplay and first-party procedural presentation. The denser parametric heads, synthetic skin microdetail, facial submeshes, open helmet shells, project-owned generated equipment textiles, and v317 surface-projected flexible-raft construction improve close-range readability but remain fallback art. Renderer-backed v317 review accepts the D4-preserving chafe, bonded pads, collars, and inflated floor relief as a technical upgrade while explicitly rejecting the remaining character, wardrobe, environment, and procedural-raft presentation as final photoreal production art. This does not claim final photoreal art acceptance or surveyed rescue training validity."
 }

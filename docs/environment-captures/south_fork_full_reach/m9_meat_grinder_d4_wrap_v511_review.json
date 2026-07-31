@@ -1,0 +1,113 @@
+{
+  "schema": "raftsim.m9.renderer_review.v1",
+  "capture_id": "meat_grinder_d4_wrap_v511",
+  "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v511_rejected.png",
+  "sha256": "65621e860a667cb8c1791725aff1160a8108a3d55a82dcee0df45bb748a7955b",
+  "width": 1280,
+  "height": 720,
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "station_m": 960.0,
+  "automation_command": "RaftSim.CaptureRapidWrapTest M9_MeatGrinderD4Wrap_v511 960 wrap_hero",
+  "source_true_contact": {
+    "live_water_depth_m": 0.412,
+    "live_water_speed_mps": 1.778,
+    "contact_count": 4,
+    "wrapping_contact_count": 3,
+    "pinned_contact_count": 1,
+    "recovering_contact_count": 1,
+    "maximum_tube_indentation_m": 0.220,
+    "runtime_wetness": 1.000,
+    "spray": 0.957,
+    "mist": 0.324,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "spray_instances": 41,
+    "mist_instances": 1,
+    "impact_foam_instances": 9,
+    "droplet_instances": 68,
+    "dominant_contact_local_cm": [
+      -53.75,
+      -100.0
+    ],
+    "capture_command_writes_visual_deformation": false,
+    "d4_is_only_collision_authority": true
+  },
+  "shoreline_presentation_upgrade": {
+    "algorithm": "solver_mask_shallow_completion_plus_bounded_terrain_clipped_bank_skirt",
+    "presentation_alpha_completion_depth_range_m": [
+      0.03,
+      0.25
+    ],
+    "terrain_clipped_bank_skirt_height_m": 0.05,
+    "completed_water_vertices": 38389,
+    "terrain_clipped_transition_cells": 14980,
+    "authored_water_triangles": 988032,
+    "previous_v510_authored_water_triangles": 1379312,
+    "triangle_reduction_fraction": 0.283678,
+    "casts_shadow": false,
+    "collision_enabled": false,
+    "affects_hydraulics": false,
+    "affects_navigation": false,
+    "solver_wet_mask_remains_authoritative": true,
+    "deep_dry_solver_gaps_omitted": true,
+    "terrain_authority": "the decoded canonical terrain surface remains the depth and occlusion boundary",
+    "water_authority": "the decoded three-flow authored water remains the free-surface height and material-data authority",
+    "material": "/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater.M_RaftSim_PhotorealRiverWater",
+    "material_sha256": "812b1c11122175cb3d2b6bddfdce3b8e2ba62e6267c5f82cf85d48e9f28c1d89",
+    "diagnosed_pixel_xy": [
+      80,
+      40
+    ],
+    "diagnosed_pixel_rgb": [
+      34,
+      55,
+      73
+    ],
+    "technical_improvement": "The source wet mask now permits only 0.03-0.25 m shallow presentation completion and a five-centimetre terrain-clipped partial-cell skirt. The diagnosed review pixel remains covered by water while deep dry-solver gaps and tall-bank quads are omitted, reducing authored water geometry by 28.4 percent without changing collision, navigation, hydraulics, or solver inputs.",
+    "visual_limit": "The former geometry hole remains filled, but shallow-water transmission, a jagged coarse-grid edge, and low-detail terrain still form a broad dark band in this camera. These remain material, source-resolution, and art limitations rather than evidence of missing solver-authorized interior water."
+  },
+  "contact_water_patch": {
+    "runtime_component": "bounded_non_colliding_procedural_mesh",
+    "visible": true,
+    "vertex_grid": [
+      9,
+      7
+    ],
+    "vertex_count": 63,
+    "triangle_count": 96,
+    "collision_enabled": false,
+    "casts_shadow": false,
+    "affects_navigation": false,
+    "material": "/Game/RaftSim/Materials/M_RaftSim_SprayMist.M_RaftSim_SprayMist",
+    "material_sha256": "55cbeb875ec3f0aa3ae815b2f24c4ca4e876939e143740cec22c6956c347be23"
+  },
+  "camera_presentation": {
+    "preset": "wrap_hero",
+    "review_only": true,
+    "camera_offset_cm": [
+      360.0,
+      -350.0,
+      275.0
+    ],
+    "look_at_offset_cm": [
+      15.0,
+      -20.0,
+      35.0
+    ],
+    "shared_runtime_renderer": true,
+    "simulation_state_unchanged": true
+  },
+  "visual_obstacle": {
+    "kind": "project_owned_deterministic_closed_procedural_boulder",
+    "collision_enabled": false,
+    "reviewed_scan_used": false,
+    "material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder"
+  },
+  "technical_deformation_evidence_accepted": true,
+  "runtime_camera_presentation_accepted": true,
+  "shoreline_geometry_fix_accepted": true,
+  "photoreal_art_accepted": false,
+  "marketing_approved": false,
+  "human_approved": false,
+  "decision": "Retain v511 as exact-source technical evidence for D4 wrap/pin deformation and the solver-authoritative bounded shoreline presentation. The frame is rejected for photoreal, marketing, store, press, and human art approval because character anatomy and poses, the procedural boulder, raft hardware and fabric, card-like spray, flat surrounding water, coarse shoreline, shallow-water shading band, terrain detail, and environment remain visibly synthetic."
+}

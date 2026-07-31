@@ -1,0 +1,218 @@
+{
+  "schema": "raftsim.release_review.river_small_rocks.v207",
+  "generated_on": "2026-07-30",
+  "status": "rights_reviewed_texture_and_displacement_intake_retained_but_visual_promotion_rejected",
+  "automation_commands": {
+    "v204_v205": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimMeatGrinderHeroReview -RaftSimRiverSmallRocksReview -RaftSimExitAfterEnvironmentAutomation",
+    "v206_v207": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimMeatGrinderHeroReview -RaftSimDisplacedGravelBarReview -RaftSimExitAfterEnvironmentAutomation"
+  },
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "source_bundle": {
+    "manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/RiverSmallRocks_2K/polyhaven_river_small_rocks_source_manifest.json",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_river_small_rocks_import_report.json",
+    "asset": "River Small Rocks",
+    "authors": [
+      "Rob Tuytel",
+      "Rico Cilliers"
+    ],
+    "publisher": "Poly Haven",
+    "product_page": "https://polyhaven.com/a/river_small_rocks",
+    "license": "CC0 1.0 Universal",
+    "physical_repeat_m": 2.9,
+    "official_api_md5_verified_files": 4,
+    "sha256_verified_files": 4,
+    "raw_payloads_committed": false,
+    "production_promoted": false
+  },
+  "source_sha256": {
+    "importer": "f08bea8262654c7d5c80542cd5c91d740256a0c81fdb47dacdde03a3da999ccb",
+    "capture_review_seam": "0653a1324e769b5d8ae30e2e7dded6aeaf28ce812a5bdb284dc029dee62a76e8",
+    "displaced_gravel_review": "ba5c5ac6f0309b359a0452ce4ee6addbde4d3ee759067146e7cfc2056df27d3b",
+    "unreal_arm": "f0e6a6fde9becc097ae02a43f9cd402b221ee17b85b1de35d3c37b3f3223972b",
+    "unreal_base_color": "dd31607911313efb5eeee1e69c43a3c89d529dde29a4a505282d8b4ca49827af",
+    "unreal_displacement": "acfafcd14a322d60fdf6dd0eff744e58ac4d4645cef63e772b213241447d88f8",
+    "unreal_normal_gl": "c0836a4c844187ad073887b638092e5a44268e640fc19a98ec31dcd992106368"
+  },
+  "publisher_mesh_feasibility": {
+    "official_gltf_md5": "19f2f50271f549363fcc97d600e34419",
+    "official_binary_md5": "f8aebaba974ec97e60e116b775b06ea2",
+    "positions": 53924,
+    "triangles": 107390,
+    "bounds_m": [
+      2.9868308305740356,
+      2.9859139919281006,
+      2.9505722522735595
+    ],
+    "node_name": "sphere_gltf",
+    "result": "rejected_before_import",
+    "reason": "The publisher glTF is a spherical material-preview object, not a terrain or bank module."
+  },
+  "experiments": [
+    {
+      "version": 204,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v204_meat_grinder_river_small_rocks",
+      "implementation": "transiently replace GroundAlbedo, GroundNormal, and GroundPacked on thirteen detailed terrain components while preserving the production 0.64 aerial-macro influence and corridor-edge override",
+      "initial_gate_correction": "validate editor source dimensions rather than runtime platform dimensions so freshly loaded 2048x2048 packages fail closed accurately before streaming",
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 0.304393,
+        "coloma_bridge_context": 0.578015,
+        "meat_grinder_guide_eye": 0.361779,
+        "salmon_falls_takeout": 0.034504,
+        "troublemaker_approach": 0.25389
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 3.037652,
+        "coloma_bridge_context": 5.772352,
+        "meat_grinder_guide_eye": 3.814887,
+        "salmon_falls_takeout": 0.004123,
+        "troublemaker_approach": 2.301541
+      },
+      "manual_result": "rejected_as_visually_ineffective",
+      "rejection": "The rights-reviewed scan is almost entirely hidden by the source macro and edge blend. Meat Grinder remains visually indistinguishable from v202 at guide distance, so the candidate supplies no reviewable pebble-scale bank or bed improvement."
+    },
+    {
+      "version": 205,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v205_meat_grinder_river_small_rocks_exposed",
+      "implementation": "transiently expose the 2.9 m scan with SourceMacroInfluence 0.30 and UseCorridorEdgeBlend 0.0; no material or map package is saved",
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 1.876401,
+        "coloma_bridge_context": 2.681315,
+        "meat_grinder_guide_eye": 2.256977,
+        "salmon_falls_takeout": 0.879023,
+        "troublemaker_approach": 1.791449
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 6.762912,
+        "coloma_bridge_context": 10.573893,
+        "meat_grinder_guide_eye": 7.907878,
+        "salmon_falls_takeout": 3.507378,
+        "troublemaker_approach": 5.93099
+      },
+      "manual_result": "rejected",
+      "rejection": "The exposed scan turns the corridor into a broad beige sheet while pebble-scale relief still does not resolve at guide-eye distance. It weakens source-conditioned geography and does not solve smooth bank geometry, shoreline transitions, vegetation volume, turbulent water volume, or lighting."
+    },
+    {
+      "version": 206,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v206_meat_grinder_displaced_gravel_bar",
+      "implementation": "decode the official 2K displacement source and build a transient 6 m terrain-traced band on both median-water boundaries from station 768-1164 m; feather the band below the underlying DEM at its edges",
+      "coverage": {
+        "displacement_driven_rows": 1672,
+        "dem_terrain_trace_hits": 21736,
+        "non_colliding_triangles": 39648,
+        "physical_repeat_m": 2.9
+      },
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 0.00011,
+        "coloma_bridge_context": 0.000588,
+        "meat_grinder_guide_eye": 0.407878,
+        "salmon_falls_takeout": 0.000001,
+        "troublemaker_approach": 0.000003
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 0.000543,
+        "coloma_bridge_context": 0.001845,
+        "meat_grinder_guide_eye": 0.898763,
+        "salmon_falls_takeout": 0.0,
+        "troublemaker_approach": 0.0
+      },
+      "manual_result": "rejected",
+      "rejection": "Low displacement values fall behind the underlying DEM surface, leaving pale contour-like ribbons and broken shoreline fragments rather than one coherent deposited gravel bar."
+    },
+    {
+      "version": 207,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v207_meat_grinder_displaced_gravel_bar_corrected",
+      "implementation": "narrow the band to 4.2 m, lift its fully weighted interior 10-22 cm above the traced DEM, darken the review-only source tone, and retain submerged feathered boundaries",
+      "coverage": {
+        "displacement_driven_rows": 1672,
+        "dem_terrain_trace_hits": 21736,
+        "non_colliding_triangles": 39648,
+        "physical_repeat_m": 2.9
+      },
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 0.000111,
+        "coloma_bridge_context": 0.000588,
+        "meat_grinder_guide_eye": 0.264261,
+        "salmon_falls_takeout": 0.000025,
+        "troublemaker_approach": 0.000003
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 0.000543,
+        "coloma_bridge_context": 0.001845,
+        "meat_grinder_guide_eye": 0.759332,
+        "salmon_falls_takeout": 0.0,
+        "troublemaker_approach": 0.0
+      },
+      "manual_result": "rejected_and_geometry_tuning_stopped",
+      "rejection": "The correction reduces bright breakup but still presents narrow artificial shoreline ribbons and visible seams. It is not a credible gravel bar, and more scalar/profile tuning would repeat the rejected procedural-strip path."
+    }
+  ],
+  "capture_sha256": {
+    "v204": {
+      "chili_bar_launch_downstream": "9baa56994253c05621e55dc13fb1a328c0211de591b01a41c1bdeb7e4cd820ac",
+      "coloma_bridge_context": "017600f78c2b1b5296f3e7e555e8f305108d98deb9f2ebca44ef5c4b3e2f1865",
+      "meat_grinder_guide_eye": "0cabac84a840fab4e0a4096f82bb04afb497a2cd465d5459c1f6a071f145cd24",
+      "salmon_falls_takeout": "2c2cfede517fff157af9d63bfe67e905f7deba4c8ca08c25eef94ff96c771ca",
+      "troublemaker_approach": "10c3b1075015d75367745c893e25359d640b366a04fc4616ea4b3ef39dbbf55c"
+    },
+    "v205": {
+      "chili_bar_launch_downstream": "9df23dad40736097582b37de8006c0493193cf7b835c7ef1254b10890d4d1261",
+      "coloma_bridge_context": "1faf9744d0fe323a14d181a160c98246ad323e70a7d1671e8f557716e5597de2",
+      "meat_grinder_guide_eye": "cde4300422505cf4bdd6e6f58d3f7315d63454c0959ae31fca49b4b9180ef976",
+      "salmon_falls_takeout": "69f0e566a7f5956deda3c2d3554f9b2330e63bfe844a91a78554ee9c69f390e7",
+      "troublemaker_approach": "d3bdbd803744db8b3c97bf8b1f8502fe2e7a46113949c9273d274ca05e84dd04"
+    },
+    "v206": {
+      "chili_bar_launch_downstream": "5c0e51fc54e039278c799405e79c7d3d17158e4098b2ed094621084d2c240791",
+      "coloma_bridge_context": "f38d6e3f517bcbfb62619dd352542d91120ca7dab680332a04e0f58cf4fb81e9",
+      "meat_grinder_guide_eye": "eeb846a5e987dffb94a04d6c21e5edf0d42d973b9b481efd0cf1af0e877bc09d",
+      "salmon_falls_takeout": "1abbbf5865bf9ed1d404bb1a8cef8ddcceaa1dcf6836842ef22dd512c47da460",
+      "troublemaker_approach": "174273aafaeb3867a12ef8b797b8fb0a1b1404207742163cc66cc77b1b001e89"
+    },
+    "v207": {
+      "chili_bar_launch_downstream": "489998103c8b0c6b75d8a7c799a2ead815016656a34a923ee8dc4904c092f9fc",
+      "coloma_bridge_context": "f38d6e3f517bcbfb62619dd352542d91120ca7dab680332a04e0f58cf4fb81e9",
+      "meat_grinder_guide_eye": "bf5c8a7b6b192bd248b236cfda2d155b01c9ca77cbc41413b698949ae700c2ec",
+      "salmon_falls_takeout": "1d6b3ca8e36ccf3b457d2f778516af947a26c27555f18a3a510e05cbd5458e35",
+      "troublemaker_approach": "174273aafaeb3867a12ef8b797b8fb0a1b1404207742163cc66cc77b1b001e89"
+    }
+  },
+  "validation": {
+    "source_hashes_verified": true,
+    "texture_dimensions": [
+      2048,
+      2048
+    ],
+    "normal_map_flip_green": true,
+    "editor_target_build": "succeeded",
+    "v204_capture": "succeeded_after_source_dimension_gate_correction",
+    "v205_capture": "succeeded",
+    "v206_capture": "succeeded",
+    "v207_capture": "succeeded"
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "technical_retention": "retain hash-gated importer, exact provenance, four isolated Texture2D packages, source-derived non-authoritative displacement seam, terrain/water coverage gates, fixed-camera captures, and this ledger",
+    "corrective_action": "Do not promote a corridor-wide texture substitution or continue procedural ribbon tuning. The next production attempt requires coherent authored/scanned bank modules with integrated end caps and strata, embedded rock and sediment hierarchy, wet-edge transitions, vegetation roots and understory, turbulent water volume, art-directed lighting, and named art/guide/geospatial review.",
+    "media_policy": "not approved for trailer, store, press, marketing, or navigational use"
+  },
+  "authority": {
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "water_sampling_changed": false,
+    "buoyancy_changed": false,
+    "raft_physics_changed": false,
+    "navigation_changed": false,
+    "map_saved": false,
+    "material_package_saved_by_review": false,
+    "runtime_package_promoted": false
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_guide_review": "open",
+    "named_art_review": "open",
+    "named_geospatial_review": "open",
+    "named_legal_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

@@ -1,0 +1,175 @@
+{
+  "schema": "raftsim.m9.volumetric_broadleaf_review.v1",
+  "reviewed_utc": "2026-07-29T16:50:00Z",
+  "candidate": "m9_volumetric_broadleaf_v169",
+  "parent": "m9_photographic_full_reach_v168",
+  "status": "retained_technical_canopy_topology_photoreal_and_release_promotion_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "scope": [
+      "South Fork interior live oak connected-crown proxy",
+      "South Fork white alder connected-crown proxy"
+    ],
+    "fidelity_boundary": "project-owned visual branch-cluster study; not a surveyed individual-tree claim",
+    "core_planes": 1,
+    "core_triangles": 2,
+    "branch_cards": 36,
+    "branch_triangles": 72,
+    "total_vertices": 148,
+    "total_triangles": 74,
+    "material_slots": 2,
+    "collision": "disabled",
+    "volumetric_layout": "six crown layers with deterministic radial, height, width, yaw, pitch, and roll variation around one coherent full-tree core plane",
+    "interior_live_oak_mesh": {
+      "path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkInteriorLiveOak_ConnectedCrownV2",
+      "sha256": "993cc9d02b39aa3b4fd82b1652d8d66dc4440e777ecfa999bd6a13d24cf94843"
+    },
+    "white_alder_mesh": {
+      "path": "/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/SM_RaftSim_SouthForkWhiteAlder_ConnectedCrownV2",
+      "sha256": "a721ce2c0ab8482f1638f655b89b8202bcb37edef0ea27f66c4089f3308d07c7"
+    },
+    "source_manifests": [
+      {
+        "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/interior_live_oak_branch_atlas_v1_manifest.json",
+        "sha256": "940ac4b5ec0df44e8e0c5693cbe61bd5f23d7d20df11b44907c97418d432c6da"
+      },
+      {
+        "path": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/additional_canopy_branch_atlases_v1_manifest.json",
+        "sha256": "ddbae511445b32a73d060e7534992e599da44aafe2c748069c42ece99ef05f90"
+      }
+    ],
+    "unchanged_v1_species": {
+      "ponderosa_profiles": 3,
+      "deerbrush_profiles": 1,
+      "core_planes_each": 2,
+      "branch_cards_each": 12,
+      "total_triangles_each": 28
+    },
+    "ecology_classification_changed": false,
+    "instance_placement_changed": false,
+    "hydraulics_changed": false
+  },
+  "world_regeneration": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "map_sha256": "600574b70ff40e4e348ea5bdfab5aad9d87c21505774bbc1a8077f478a047de0",
+    "generation_log": "/private/tmp/raftsim_m9_v169_volumetric_broadleaf_generate.log",
+    "generation_log_sha256": "526c6db348cf612ccf86558c6cad23e7e16d96ea96be4f428a0cd569769c6819",
+    "deterministic_world_partition_actor_identities": 200,
+    "deterministic_capture_sha256": {
+      "chili_bar_launch_downstream": "a5cfb36b571ddfb05babd0d6d1a90921397fd3a5eec82701d12ba14f5dd10da0",
+      "coloma_bridge_context": "3dcc03d5a782bfeeab29c4832ab60ef8dffcd2b844204d6ae8ac2aee13967e71",
+      "meat_grinder_guide_eye": "267537c0123500e2c81c5aaa36f6229258588981845f67a819fde4221db14824",
+      "salmon_falls_takeout": "9292742537d9070104eaf6d5275f0a1c7f3f11dbddd0456d87d7fcace90f4d38",
+      "troublemaker_approach": "fb42930980bc3767cffc4a15759700e32327d812cc3df53aa76cc9dacef9585e"
+    }
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimVolumetricBroadleafReviewCapture",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "loaded_world_partition_references": 201,
+    "map_or_actor_mutation": false,
+    "package_save": false,
+    "log": "/private/tmp/raftsim_m9_v169_volumetric_broadleaf_photographic.log",
+    "log_sha256": "9c711bfbc5d2f20fed4888c78c3f23dffa610b7f3c2e2f2376b6fe04f40173b4",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf/chili_bar_launch_downstream.png",
+        "sha256": "e3be3912d762950e3e5eddc8f67bd4a58b2167c90efe6bd9cfbe325932b1a2b2",
+        "size_bytes": 1310161,
+        "mean_absolute_rgb_delta_from_v168_photographic": 1.9761,
+        "changed_rgb_pixel_percent_from_v168_photographic": 22.4978
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf/coloma_bridge_context.png",
+        "sha256": "1a6c6777dc7907a81aa8317cfbeb8f6d1a246f021d792fa853c187ebcd9fb272",
+        "size_bytes": 1312276,
+        "mean_absolute_rgb_delta_from_v168_photographic": 1.7657,
+        "changed_rgb_pixel_percent_from_v168_photographic": 30.3751
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf/meat_grinder_guide_eye.png",
+        "sha256": "0cd81dc708c74ee808debd4c5bfe8ecd9125feac647ccac9bc01cfab3815cebc",
+        "size_bytes": 1276449,
+        "mean_absolute_rgb_delta_from_v168_photographic": 1.9966,
+        "changed_rgb_pixel_percent_from_v168_photographic": 20.7677
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf/salmon_falls_takeout.png",
+        "sha256": "bc278264a3c575b46e242ae871b8ec52794c063f18a06375aad447c81ac7b5f4",
+        "size_bytes": 1226354,
+        "mean_absolute_rgb_delta_from_v168_photographic": 0.9312,
+        "changed_rgb_pixel_percent_from_v168_photographic": 9.5164
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf/troublemaker_approach.png",
+        "sha256": "a1d470783a67e42eca258152f20d1af433313ea8069118f5b4622e4d75eeb4a4",
+        "size_bytes": 1310608,
+        "mean_absolute_rgb_delta_from_v168_photographic": 2.2283,
+        "changed_rgb_pixel_percent_from_v168_photographic": 24.8024
+      }
+    ]
+  },
+  "hlod": {
+    "fresh_build_log": "/private/tmp/raftsim_m9_v169_hlod_build.log",
+    "fresh_build_log_sha256": "4065f83944e48306b60a277c0c23ac68b6ccda2b83266ca02a633fbf75dab3d5",
+    "fresh_build_actor_count": 30,
+    "fresh_build_modified_and_saved_actor_count": 30,
+    "first_repeat_log": "/private/tmp/raftsim_m9_v169_hlod_settled_repeat.log",
+    "first_repeat_log_sha256": "c7942a6ac48192a8a2f0f26ecf5a74587ea47048f737c1f544c47b41469c7cbd",
+    "first_repeat_modified_and_saved_actor_count": 1,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v169_hlod_settled_repeat_2.log",
+    "settled_repeat_log_sha256": "d0061c1391caac74202f00038d0c2276623675e6835d79a1846474ddc0d3aaff",
+    "settled_repeat_actor_count": 30,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "errors": 0,
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "5b2fe35bb70a7450246cea000ea771db01ca3221a19d789ca5d7026b8fc5fd0b",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "9092e81ad8062d2048d1811e3316b9dfbf7bed62fa906881935566dfe697ded6"
+  },
+  "validation": {
+    "ue_5_8_editor_builds_succeeded": 2,
+    "focused_canopy_and_capture_tests_before_hlod": "45/45 passed",
+    "focused_canopy_hlod_and_source_contract_tests_after_hlod": "35/35 passed",
+    "renderer_test": "RaftSim.M7.ZFullReachPresentation",
+    "renderer_test_result": "passed",
+    "renderer_test_log": "/private/tmp/raftsim_m9_v169_volumetric_broadleaf_m7.log",
+    "renderer_test_log_sha256": "610ec91fb95c1a28ebdbfff343223e2c438c6edd2d9c4dc86bd4f567d47c3ace",
+    "renderer_warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only",
+    "git_diff_check": "passed"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "Interior live oak and white alder now use a single coherent full-tree core plus a six-layer volume of thirty-six smaller branch sprays instead of two orthogonal full-tree planes plus twelve cards.",
+      "The five fixed views show a modest reduction in obvious crossed full-tree silhouettes and slightly rounder, less planar broadleaf crowns.",
+      "No blue chroma fringe, detached card field, material failure, collision change, or hydraulic change was observed.",
+      "All thirty HLOD actors were freshly rebuilt and a subsequent repeat saved zero packages."
+    ],
+    "open": [
+      "Broadleaf crowns remain dark, repetitive, and visibly card-based at guide-eye distance.",
+      "Ponderosa and deerbrush remain the retained sparse V1 connected-crown proxies.",
+      "Terrain banks remain smooth and uniformly surfaced, with insufficient erosion, root, litter, wet-edge, and cobble detail.",
+      "Broad water remains visually flat and lacks convincing volume, turbulent surface breakup, refraction, and entrained air at these fixed views.",
+      "Distant terrain and stand-scale vegetation composition remain recognizably procedural.",
+      "The five fixed environment views contain no raft or crew and cannot approve gameplay presentation.",
+      "Named art, rafting-guide, geospatial, legal, product-owner, and release-media review remains pending."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "broadleaf_crown_depth_improved": true,
+    "current_hlod_evidence_restored": true,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "decision": "Retain v169 as a bounded technical canopy-topology improvement. Reject the five v169 photographic images for photoreal and release-media acceptance; the small image deltas and manual review show that water, shoreline, terrain, vegetation density, distant scenery, and gameplay presentation remain limiting. Keep M9, commit, push, and release promotion fail-closed."
+}

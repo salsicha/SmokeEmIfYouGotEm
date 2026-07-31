@@ -1,0 +1,99 @@
+{
+  "schema": "raftsim.m9.renderer_review.v1",
+  "capture_id": "m9_photographic_full_reach_v168",
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture",
+  "capture_mode": {
+    "purpose": "Renderer-backed visual review separated from byte-repeat deterministic evidence.",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic",
+    "temporal_aa": true,
+    "ambient_occlusion": true,
+    "global_illumination": true,
+    "lumen_global_illumination": true,
+    "lumen_reflections": true,
+    "screen_space_reflections": true,
+    "reflection_environment": true,
+    "eye_adaptation": false,
+    "motion_blur": false,
+    "settle_frames": 12,
+    "deterministic_default_preserved": true,
+    "map_or_actor_mutation": false,
+    "package_save": false,
+    "loaded_world_partition_references": 231
+  },
+  "captures": [
+    {
+      "name": "chili_bar_launch_downstream",
+      "path": "docs/environment-captures/south_fork_full_reach/photographic/chili_bar_launch_downstream.png",
+      "sha256": "265550c8ad0fc672056ebcf99bf4d688585e86b955d62539b00fbcbdd653e122",
+      "size_bytes": 1310720,
+      "width": 1280,
+      "height": 720,
+      "mean_absolute_rgb_delta_from_deterministic_baseline": 2.3867
+    },
+    {
+      "name": "coloma_bridge_context",
+      "path": "docs/environment-captures/south_fork_full_reach/photographic/coloma_bridge_context.png",
+      "sha256": "f7ca8be36717bb9b4285a0ac0392744bfef3d8ec5b3506758d87dac640e58d73",
+      "size_bytes": 1308922,
+      "width": 1280,
+      "height": 720,
+      "mean_absolute_rgb_delta_from_deterministic_baseline": 2.3902
+    },
+    {
+      "name": "meat_grinder_guide_eye",
+      "path": "docs/environment-captures/south_fork_full_reach/photographic/meat_grinder_guide_eye.png",
+      "sha256": "0d3623b8dde6bac8ff22c6142562450404a5b696fb25d60bd9438a75cbf70767",
+      "size_bytes": 1273152,
+      "width": 1280,
+      "height": 720,
+      "mean_absolute_rgb_delta_from_deterministic_baseline": 2.2097
+    },
+    {
+      "name": "salmon_falls_takeout",
+      "path": "docs/environment-captures/south_fork_full_reach/photographic/salmon_falls_takeout.png",
+      "sha256": "201aab6cda018153dc4b8d6e4ca9ee8ab29a5a4b5fc29ea80dfde5f44c903890",
+      "size_bytes": 1221565,
+      "width": 1280,
+      "height": 720,
+      "mean_absolute_rgb_delta_from_deterministic_baseline": 1.9225
+    },
+    {
+      "name": "troublemaker_approach",
+      "path": "docs/environment-captures/south_fork_full_reach/photographic/troublemaker_approach.png",
+      "sha256": "98a53e8ed951cb75641359ee1f87e91a3d96f0749cb8dd74b12e2fe220544fcb",
+      "size_bytes": 1308308,
+      "width": 1280,
+      "height": 720,
+      "mean_absolute_rgb_delta_from_deterministic_baseline": 2.3457
+    }
+  ],
+  "visual_review": {
+    "renderer_representative_capture_path_accepted": true,
+    "photoreal_environment_accepted": false,
+    "photoreal_water_accepted": false,
+    "photoreal_vegetation_accepted": false,
+    "photoreal_terrain_accepted": false,
+    "photoreal_lighting_accepted": false,
+    "release_media_accepted": false,
+    "reject_reasons": [
+      "The photographic renderer switches change most pixels slightly but do not materially improve the scene.",
+      "Water remains a flat blue heightfield without convincing volume, refraction, depth, or natural surface breakup at these fixed views.",
+      "Banks remain smooth and uniformly surfaced with insufficient cobble, root, litter, erosion, and wet-edge detail.",
+      "Repeated generated broadleaf silhouettes and sparse foreground rocks still dominate the vegetation and shoreline read.",
+      "The five fixed views contain no raft or crew and cannot prove gameplay presentation quality."
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build_succeeded": true,
+    "focused_tests": "39/39 passed",
+    "git_diff_check": "passed",
+    "capture_log_sha256": "9fc60c89bec6312af266eb11ce310b73c2a48131cb67461c93a9d80571a115e3",
+    "capture_completed_before_manual_editor_shutdown": true
+  },
+  "technical_capture_path_accepted": true,
+  "photoreal_art_accepted": false,
+  "marketing_approved": false,
+  "human_approved": false,
+  "decision": "Retain the opt-in photographic capture mode as non-mutating review infrastructure while preserving the deterministic default. Reject all five v168 images for photoreal and release-media acceptance. The small renderer-only deltas demonstrate that content and presentation are the limiting factors; M9 remains fail-closed."
+}

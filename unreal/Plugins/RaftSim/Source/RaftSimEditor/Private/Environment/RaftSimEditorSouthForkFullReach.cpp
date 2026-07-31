@@ -1,11 +1,13 @@
 #include "Environment/RaftSimEditorEnvironmentInternal.h"
-
 #include "Engine/PostProcessVolume.h"
+#include "Engine/SphereReflectionCapture.h"
+#include "Components/DirectionalLightComponent.h"
+#include "Components/ReflectionCaptureComponent.h"
+#include "Components/SphereReflectionCaptureComponent.h"
 #include "Components/VolumetricCloudComponent.h"
-#include "ContentStreaming.h"
 #include "GameFramework/GameModeBase.h"
 #include "GameFramework/WorldSettings.h"
-#include "PhysicsEngine/BodySetup.h"
+#include "HAL/IConsoleManager.h"
 #include "RaftSimRaftActor.h"
 #include "RaftSimRiverWaterConfig.h"
 #include "RenderingThread.h"
@@ -16,78 +18,98 @@
 #include "UObject/SavePackage.h"
 #include "WorldPartition/HLOD/HLODLayer.h"
 #include "WorldPartition/WorldPartition.h"
+#include "WorldPartition/WorldPartitionMiniMap.h"
 #include "WorldPartition/WorldPartitionRuntimeHash.h"
-
-namespace RaftSimEditorEnvironment
-{
-namespace
-{
-constexpr TCHAR EnvironmentManifestRelativePath[] =
-    TEXT("physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
+namespace RaftSimEditorEnvironment { namespace {
+constexpr TCHAR EnvironmentManifestRelativePath[] = TEXT(
+    "physics/data/real_world/south_fork_american_chili_bar/production_corridor/"
          "photoreal_environment/manifest.json");
-constexpr TCHAR FullReachMapPackagePath[] =
-    TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach");
+constexpr TCHAR FullReachMapPackagePath[] = TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach");
 constexpr TCHAR FullReachInstancedHlodLayerPackagePath[] =
     TEXT("/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach_HLODLayer_Instanced");
-constexpr TCHAR BuildManifestRelativePath[] =
-    TEXT("unreal/Content/RaftSim/Environment/SouthForkFullReach/"
-         "full_reach_environment_build_manifest.json");
 constexpr TCHAR CaptureDirectoryRelativePath[] =
     TEXT("docs/environment-captures/south_fork_full_reach");
-constexpr TCHAR PonderosaBillboardSourceRelativePath[] =
-    TEXT("unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/"
-         "T_PonderosaPine_Billboard.png");
-constexpr TCHAR InteriorLiveOakBillboardSourceRelativePath[] =
-    TEXT("unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/"
-         "T_InteriorLiveOak_Billboard.png");
-constexpr float DetailedTerrainHalfWidthM = 64.0f;
-
+constexpr float DetailedTerrainHalfWidthM = 112.0f;
+constexpr float DetailedPineAnalogRiverDistanceM = 1100.0f;
+void SetSpatiallyLoadedIfAllowed(AActor* Actor, bool bSpatiallyLoaded);
 struct FSouthForkCoordinatePoint
 {
     double StationM = 0.0;
     FVector2D CenterM = FVector2D::ZeroVector;
     FVector2D LeftNormal = FVector2D::UnitY();
 };
-
 struct FSouthForkGray16Image
 {
     int32 Width = 0;
     int32 Height = 0;
     TArray<uint16> Values;
 };
-
-struct FSouthForkBuildMetrics
-{
-    int32 TerrainTileCount = 0;
-    int32 WaterTileCount = 0;
-    int32 FarFieldPatchCount = 0;
-    int32 FoliageInstanceCount = 0;
-    int32 FarFieldFoliageInstanceCount = 0;
-    int32 BoulderInstanceCount = 0;
-    int32 ScenicRockInstanceCount = 0;
-    int32 SprayMistInstanceCount = 0;
-    int32 InfrastructureActorCount = 0;
-    int64 TerrainTriangleCount = 0;
-    int64 WaterTriangleCount = 0;
-    int64 FarFieldTriangleCount = 0;
-    TArray<float> MedianCenterWaterLocalZCm;
-};
-
 FString AbsoluteRepoPath(const FString& RelativePath)
 {
     return FPaths::ConvertRelativePathToFull(FPaths::Combine(GetRepoRoot(), RelativePath));
 }
-
-FLinearColor DecodePreviewSrgbColor(const FLinearColor& Encoded)
+FGuid SouthForkActorGuid(UClass* ActorClass, const FString& Label)
 {
-    const FColor Srgb(
-        FMath::RoundToInt(FMath::Clamp(Encoded.R, 0.0f, 1.0f) * 255.0f),
-        FMath::RoundToInt(FMath::Clamp(Encoded.G, 0.0f, 1.0f) * 255.0f),
-        FMath::RoundToInt(FMath::Clamp(Encoded.B, 0.0f, 1.0f) * 255.0f),
-        FMath::RoundToInt(FMath::Clamp(Encoded.A, 0.0f, 1.0f) * 255.0f));
-    return FLinearColor::FromSRGBColor(Srgb);
+    const FString StableKey = FString::Printf(
+        TEXT("%s|%s|%s"),
+        FullReachMapPackagePath,
+        ActorClass ? *ActorClass->GetPathName() : TEXT("None"),
+        *Label);
+    return FGuid::NewDeterministicGuid(StableKey);
 }
+FName SouthForkActorObjectName(UClass* ActorClass, const FString& Label)
+{
+    return FName(*FString::Printf(
+        TEXT("RaftSim_%s"),
+        *SouthForkActorGuid(ActorClass, Label).ToString(EGuidFormats::Digits)));
+}
+template <typename T>
+T* SpawnStableSouthForkActor(
+    UWorld* World, const FTransform& Transform, const FString& Label)
+{
+    if (!World)
+    {
+        return nullptr;
+    }
+    FActorSpawnParameters SpawnParameters;
+    SpawnParameters.InitialActorLabel = Label;
+    SpawnParameters.OverrideActorGuid = SouthForkActorGuid(T::StaticClass(), Label);
+    // External actor package paths are derived from the actor object path, not
+    // from ActorGuid. Give every generated actor a cross-process-stable object
+    // name as well as a stable GUID so repeated builds reuse the same packages.
+    SpawnParameters.Name = SouthForkActorObjectName(T::StaticClass(), Label);
+    return World->SpawnActor<T>(T::StaticClass(), Transform, SpawnParameters);
+}
+bool ReplaceWorldPartitionMiniMapWithStableActor(UWorld* World, FString& OutSummary)
+{
+    TArray<AWorldPartitionMiniMap*> ExistingMiniMaps;
+    for (TActorIterator<AWorldPartitionMiniMap> It(World); It; ++It)
+    {
+        ExistingMiniMaps.Add(*It);
+    }
+    for (AWorldPartitionMiniMap* MiniMap : ExistingMiniMaps)
+    {
+        if (!World->DestroyActor(MiniMap))
+        {
+            OutSummary += TEXT("Failed to remove the editor-created World Partition minimap.\n");
+            return false;
+        }
+    }
 
+    AWorldPartitionMiniMap* MiniMap =
+        SpawnStableSouthForkActor<AWorldPartitionMiniMap>(
+            World,
+            FTransform::Identity,
+            TEXT("RaftSim_SouthFork_WorldPartitionMiniMap"));
+    if (!MiniMap)
+    {
+        OutSummary += TEXT("Failed to create the deterministic World Partition minimap.\n");
+        return false;
+    }
+    MiniMap->SetActorLabel(TEXT("RaftSim_SouthFork_WorldPartitionMiniMap"));
+    SetSpatiallyLoadedIfAllowed(MiniMap, false);
+    return true;
+}
 bool LoadJsonObject(const FString& RelativePath, TSharedPtr<FJsonObject>& OutRoot)
 {
     FString Text;
@@ -98,7 +120,6 @@ bool LoadJsonObject(const FString& RelativePath, TSharedPtr<FJsonObject>& OutRoo
     const TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(Text);
     return FJsonSerializer::Deserialize(Reader, OutRoot) && OutRoot.IsValid();
 }
-
 bool LoadGray16Png(const FString& RelativePath, FSouthForkGray16Image& OutImage)
 {
     OutImage = FSouthForkGray16Image();
@@ -170,13 +191,6 @@ bool LoadGray16Png(const FString& RelativePath, FSouthForkGray16Image& OutImage)
     }
     return true;
 }
-
-float DecodeHeightM(uint16 Encoded, double MinimumM, double MaximumM)
-{
-    return static_cast<float>(
-        MinimumM + (MaximumM - MinimumM) * static_cast<double>(Encoded) / 65535.0);
-}
-
 bool ParseCoordinateMap(
     const TSharedPtr<FJsonObject>& EnvironmentRoot,
     TArray<FSouthForkCoordinatePoint>& OutPoints,
@@ -317,7 +331,6 @@ FVector CoordinateTangent(const TArray<FSouthForkCoordinatePoint>& Points, int32
     const FVector2D Tangent(Normal.Y, -Normal.X);
     return FVector(Tangent.X, Tangent.Y, 0.0f);
 }
-
 void SetSpatiallyLoadedIfAllowed(AActor* Actor, bool bSpatiallyLoaded)
 {
     if (Actor && Actor->CanChangeIsSpatiallyLoadedFlag())
@@ -325,551 +338,64 @@ void SetSpatiallyLoadedIfAllowed(AActor* Actor, bool bSpatiallyLoaded)
         Actor->SetIsSpatiallyLoaded(bSpatiallyLoaded);
     }
 }
-
-TArray<FProcMeshTangent> BuildFlowTangents(
-    const TArray<FVector>& Vertices, int32 Width, int32 Height)
+bool CreateTerminalVisualWater(
+    UWorld* World, const TArray<FSouthForkCoordinatePoint>& Points, float WaterZCm,
+    UMaterialInterface* Material, bool bReuseMesh,
+    FSouthForkFullReachBuildMetrics& Metrics, FString& OutSummary)
 {
-    TArray<FProcMeshTangent> Tangents;
-    Tangents.SetNum(Vertices.Num());
-    for (int32 Row = 0; Row < Height; ++Row)
+    constexpr int32 Rows = 37, Columns = 11;
+    constexpr float LengthM = 1800.0f;
+    if (!World || Points.IsEmpty() || !FMath::IsFinite(WaterZCm)) return false;
+    const FSouthForkCoordinatePoint& End = Points.Last();
+    const FVector2D Normal = End.LeftNormal.GetSafeNormal();
+    const FVector2D Tangent(Normal.Y, -Normal.X);
+    TArray<FVector> Vertices;
+    TArray<FVector2D> UVs;
+    TArray<FLinearColor> Colors;
+    Vertices.Reserve(Rows * Columns); UVs.Reserve(Rows * Columns);
+    Colors.Reserve(Rows * Columns);
+    for (int32 Row = 0; Row < Rows; ++Row)
     {
-        const int32 PreviousRow = FMath::Max(Row - 1, 0);
-        const int32 NextRow = FMath::Min(Row + 1, Height - 1);
-        for (int32 Column = 0; Column < Width; ++Column)
+        const float DistanceM = LengthM * Row / (Rows - 1);
+        const float Widen = FMath::SmoothStep(
+            0.0f, 1.0f, FMath::Min(DistanceM / 520.0f, 1.0f));
+        const float HalfWidthM = FMath::Lerp(40.0f, 92.0f, Widen);
+        for (int32 Column = 0; Column < Columns; ++Column)
         {
-            const FVector Direction =
-                (Vertices[NextRow * Width + Column] -
-                 Vertices[PreviousRow * Width + Column]).GetSafeNormal();
-            Tangents[Row * Width + Column] = FProcMeshTangent(Direction, false);
+            const float LateralM = FMath::Lerp(
+                -HalfWidthM, HalfWidthM, static_cast<float>(Column) / (Columns - 1));
+            Vertices.Add(FVector(
+                (Tangent.X * DistanceM + Normal.X * LateralM) * 100.0f,
+                (Tangent.Y * DistanceM + Normal.Y * LateralM) * 100.0f, WaterZCm));
+            UVs.Add(FVector2D((End.StationM + DistanceM) / 3.0f, LateralM / 3.0f));
+            Colors.Add(FLinearColor(0.0f, 0.52f, 0.035f, 1.0f));
         }
     }
-    return Tangents;
-}
-
-UStaticMesh* CreateMeshAsset(
-    UWorld* World,
-    const FString& AssetPackagePath,
-    const FString& Label,
-    const TArray<FVector>& Vertices,
-    const TArray<int32>& Triangles,
-    const TArray<FVector>& Normals,
-    const TArray<FVector2D>& UVs,
-    const TArray<FLinearColor>& VertexColors,
-    const TArray<FProcMeshTangent>& Tangents,
-    UMaterialInterface* Material,
-    bool bEnableNanite,
-    bool bComplexCollision,
-    FString& OutSummary)
-{
-    AActor* TemporaryActor = World->SpawnActor<AActor>(
-        AActor::StaticClass(), FTransform::Identity);
-    if (!TemporaryActor)
-    {
-        return nullptr;
-    }
-    TemporaryActor->SetActorLabel(Label + TEXT("_BuildSource"));
-    USceneComponent* Root = NewObject<USceneComponent>(TemporaryActor, TEXT("Root"));
-    TemporaryActor->AddInstanceComponent(Root);
-    Root->RegisterComponent();
-    TemporaryActor->SetRootComponent(Root);
-    UProceduralMeshComponent* Procedural =
-        NewObject<UProceduralMeshComponent>(TemporaryActor, TEXT("SourceMesh"));
-    TemporaryActor->AddInstanceComponent(Procedural);
-    Procedural->SetupAttachment(Root);
-    Procedural->RegisterComponent();
-    Procedural->CreateMeshSection_LinearColor(
-        0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents,
-        bComplexCollision);
-    Procedural->SetCollisionEnabled(
-        bComplexCollision
-            ? ECollisionEnabled::QueryAndPhysics
-            : ECollisionEnabled::NoCollision);
-    Procedural->SetMaterial(0, Material);
-
-    UStaticMesh* Mesh = ConvertNativeCanopyProceduralActorToStaticMesh(
-        TemporaryActor, AssetPackagePath, Material,
-        bEnableNanite,
-        ENaniteShapePreservation::None,
-        OutSummary);
-    TemporaryActor->Destroy();
+    TArray<int32> Triangles;
+    for (int32 Row = 0; Row < Rows - 1; ++Row)
+        for (int32 Column = 0; Column < Columns - 1; ++Column)
+        {
+            const int32 I0 = Row * Columns + Column, I2 = I0 + Columns;
+            Triangles.Append({I0, I0 + 1, I2, I0 + 1, I2 + 1, I2});
+        }
+    const FString AssetPath = TEXT(
+        "/Game/RaftSim/Environment/SouthForkFullReach/Water/SM_SalmonFalls_VisualContinuation");
+    UStaticMesh* Mesh = bReuseMesh ? LoadSouthForkStaticMeshAsset(AssetPath) : nullptr;
     if (!Mesh)
-    {
-        return nullptr;
-    }
-    if (bComplexCollision)
-    {
-        Mesh->CreateBodySetup();
-        if (UBodySetup* BodySetup = Mesh->GetBodySetup())
-        {
-            BodySetup->CollisionTraceFlag = CTF_UseComplexAsSimple;
-            BodySetup->InvalidatePhysicsData();
-            BodySetup->CreatePhysicsMeshes();
-        }
-        Mesh->MarkPackageDirty();
-        const FString Filename = FPackageName::LongPackageNameToFilename(
-            AssetPackagePath, FPackageName::GetAssetPackageExtension());
-        FSavePackageArgs SaveArgs;
-        SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-        SaveArgs.SaveFlags = SAVE_NoError;
-        if (!UPackage::SavePackage(Mesh->GetOutermost(), Mesh, *Filename, SaveArgs))
-        {
-            return nullptr;
-        }
-    }
-    return Mesh;
-}
-
-UTexture2D* CreateSouthForkCanopyTexture(
-    const FString& SpeciesAssetName,
-    const FString& SourceRelativePath,
-    FString& OutSummary)
-{
-    FRaftSimFirstPartyMaterialTextureAssetSpec Spec;
-    Spec.RiverId = TEXT("south_fork_generated_canopy");
-    Spec.RiverAssetName = SpeciesAssetName;
-    Spec.MapKey = TEXT("BillboardAlbedoOpacity");
-    Spec.MapKind = TEXT("generated_canopy_albedo_opacity");
-    Spec.SourceRelativePath = SourceRelativePath;
-    Spec.TextureAssetRootPackagePath =
-        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Textures");
-    Spec.CompressionSettings = TC_Default;
-    Spec.bSRGB = true;
-    Spec.LODGroup = TEXTUREGROUP_Impostor;
-    Spec.AddressX = TA_Clamp;
-    Spec.AddressY = TA_Clamp;
-    Spec.bCompressionNoAlpha = false;
-    bool bSaved = false;
-    UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(
-        Spec, OutSummary, bSaved);
-    if (!Texture || !bSaved ||
-        !RebuildAndValidateFirstPartyTexturePlatformData(Texture, Spec, OutSummary))
-    {
-        OutSummary += FString::Printf(
-            TEXT("Failed to build generated South Fork canopy texture %s.\n"),
-            *SourceRelativePath);
-        return nullptr;
-    }
-    return Texture;
-}
-
-UTexture2D* CreateSouthForkTerrainMacroTexture(
-    const FString& TileId,
-    const FString& SourceRelativePath,
-    FString& OutSummary)
-{
-    FRaftSimFirstPartyMaterialTextureAssetSpec Spec;
-    Spec.RiverId = TEXT("south_fork_full_reach");
-    Spec.RiverAssetName = TileId;
-    Spec.MapKey = TEXT("MacroAlbedo");
-    Spec.MapKind = TEXT("source_conditioned_naip_macro_albedo");
-    Spec.SourceRelativePath = SourceRelativePath;
-    Spec.TextureAssetRootPackagePath =
-        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/MacroTextures");
-    Spec.CompressionSettings = TC_Default;
-    Spec.bSRGB = true;
-    Spec.LODGroup = TEXTUREGROUP_World;
-    Spec.AddressX = TA_Clamp;
-    Spec.AddressY = TA_Clamp;
-    Spec.bCompressionNoAlpha = true;
-    bool bSaved = false;
-    UTexture2D* Texture = CreateOrUpdateFirstPartyMaterialTextureAsset(
-        Spec, OutSummary, bSaved);
-    if (!Texture || !bSaved ||
-        !RebuildAndValidateFirstPartyTexturePlatformData(Texture, Spec, OutSummary))
-    {
-        OutSummary += FString::Printf(
-            TEXT("Failed to build South Fork macro-albedo texture for %s.\n"),
-            *TileId);
-        return nullptr;
-    }
-    return Texture;
-}
-
-UMaterialInstanceConstant* CreateSouthForkTerrainMaterialInstance(
-    const FString& TileId,
-    UMaterialInterface* Parent,
-    UTexture2D* SourceMacroTexture,
-    bool bUseCorridorEdgeBlend,
-    FString& OutSummary)
-{
-    if (!Parent || !SourceMacroTexture)
-    {
-        return nullptr;
-    }
-    const FString AssetName = TEXT("MI_RaftSim_") + TileId + TEXT("_Terrain");
-    const FString PackagePath =
-        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/Materials/") +
-        AssetName;
-    const FString ObjectPath = PackagePath + TEXT(".") + AssetName;
-    UPackage* Package = CreatePackage(*PackagePath);
-    if (!Package)
-    {
-        return nullptr;
-    }
-    UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
-        nullptr, *ObjectPath);
-    if (!Instance)
-    {
-        Instance = NewObject<UMaterialInstanceConstant>(
-            Package, *AssetName,
-            RF_Public | RF_Standalone | RF_Transactional);
-        if (Instance)
-        {
-            FAssetRegistryModule::AssetCreated(Instance);
-        }
-    }
-    if (!Instance)
-    {
-        return nullptr;
-    }
-    Instance->Modify();
-    Instance->SetParentEditorOnly(Parent);
-    Instance->SetTextureParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("SourceMacroTexture")), SourceMacroTexture);
-    const bool bForceVertexMacro = bUseCorridorEdgeBlend && FParse::Param(
-        FCommandLine::Get(), TEXT("RaftSimUseSouthForkVertexMacro"));
-    Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("UseSourceMacroTexture")),
-        bForceVertexMacro ? 0.0f : 1.0f);
-    Instance->SetScalarParameterValueEditorOnly(
-        FMaterialParameterInfo(TEXT("UseCorridorEdgeBlend")),
-        bUseCorridorEdgeBlend ? 1.0f : 0.0f);
-    Instance->PostEditChange();
-    FAssetCompilingManager::Get().FinishAllCompilation();
-    Package->MarkPackageDirty();
-    const FString Filename = FPackageName::LongPackageNameToFilename(
-        PackagePath, FPackageName::GetAssetPackageExtension());
-    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
-    FSavePackageArgs SaveArgs;
-    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-    SaveArgs.SaveFlags = SAVE_NoError;
-    if (!UPackage::SavePackage(Package, Instance, *Filename, SaveArgs))
-    {
-        return nullptr;
-    }
-    return Instance;
-}
-
-UMaterial* CreateSouthForkCanopyMaterial(
-    const FString& SpeciesAssetName,
-    UTexture2D* AlbedoOpacity,
-    FString& OutSummary)
-{
-    if (!AlbedoOpacity)
-    {
-        return nullptr;
-    }
-    const FString PackagePath = FString::Printf(
-        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Materials/"
-             "M_RaftSim_%s_Billboard"),
-        *SpeciesAssetName);
-    const FString AssetName = FPackageName::GetLongPackageAssetName(PackagePath);
-    const FString ObjectPath = FString::Printf(
-        TEXT("%s.%s"), *PackagePath, *AssetName);
-    UMaterial* Material = LoadObject<UMaterial>(nullptr, *ObjectPath);
-    UPackage* Package = Material ? Material->GetOutermost() : CreatePackage(*PackagePath);
-    if (!Package)
-    {
-        return nullptr;
-    }
-    if (!Material)
-    {
-        Material = NewObject<UMaterial>(
-            Package, *AssetName,
-            RF_Public | RF_Standalone | RF_Transactional);
-        if (Material)
-        {
-            FAssetRegistryModule::AssetCreated(Material);
-        }
-    }
-    if (!Material)
-    {
-        return nullptr;
-    }
-
-    Material->Modify();
-    Material->GetExpressionCollection().Empty();
-    // Keep a small photographic fill term, but let the Two Sided Foliage model
-    // respond to canyon light and shadow. Fully unlit cards preserved source
-    // colour at the cost of reading as flat cut-outs in the guide-eye views.
-    Material->SetShadingModel(MSM_TwoSidedFoliage);
-    Material->BlendMode = BLEND_Masked;
-    Material->TwoSided = true;
-    Material->DitheredLODTransition = true;
-    Material->OpacityMaskClipValue = 0.42f;
-
-    auto AddExpression = [Material](auto* Expression, int32 EditorX, int32 EditorY)
-    {
-        Expression->MaterialExpressionEditorX = EditorX;
-        Expression->MaterialExpressionEditorY = EditorY;
-        Material->GetExpressionCollection().AddExpression(Expression);
-        return Expression;
-    };
-    UMaterialExpressionTextureSampleParameter2D* CanopySample = AddExpression(
-        NewObject<UMaterialExpressionTextureSampleParameter2D>(Material), -520, -140);
-    CanopySample->ParameterName = TEXT("CanopyAlbedoOpacity");
-    CanopySample->Texture = AlbedoOpacity;
-    CanopySample->SamplerType = SAMPLERTYPE_Color;
-    UMaterialExpressionConstant* Roughness = AddExpression(
-        NewObject<UMaterialExpressionConstant>(Material), -260, 150);
-    Roughness->R = 0.84f;
-    UMaterialExpressionConstant* Specular = AddExpression(
-        NewObject<UMaterialExpressionConstant>(Material), -260, 240);
-    Specular->R = 0.08f;
-    UMaterialExpressionConstant* AmbientOcclusion = AddExpression(
-        NewObject<UMaterialExpressionConstant>(Material), -260, 330);
-    AmbientOcclusion->R = 1.0f;
-    UMaterialExpressionConstant3Vector* CanopyTint = AddExpression(
-        NewObject<UMaterialExpressionConstant3Vector>(Material), -260, -230);
-    CanopyTint->Constant = SpeciesAssetName.Contains(TEXT("InteriorLiveOak"))
-        ? FLinearColor(0.72f, 1.08f, 0.70f, 1.0f)
-        : FLinearColor(0.82f, 1.02f, 0.78f, 1.0f);
-    UMaterialExpressionMultiply* Fill = AddExpression(
-        NewObject<UMaterialExpressionMultiply>(Material), 0, -200);
-    Fill->A.Expression = CanopySample;
-    Fill->B.Expression = CanopyTint;
-    UMaterialExpressionConstant* EmissiveFillScale = AddExpression(
-        NewObject<UMaterialExpressionConstant>(Material), -260, -320);
-    // The source photo already contains branch self-shadow. Retain enough fill
-    // to avoid black side-card silhouettes while Two Sided Foliage supplies
-    // large-scale canyon lighting and cast-shadow response.
-    EmissiveFillScale->R = 0.30f;
-    UMaterialExpressionMultiply* EmissiveFill = AddExpression(
-        NewObject<UMaterialExpressionMultiply>(Material), 0, -300);
-    EmissiveFill->A.Expression = CanopySample;
-    EmissiveFill->B.Expression = EmissiveFillScale;
-    UMaterialExpressionConstant* SubsurfaceScale = AddExpression(
-        NewObject<UMaterialExpressionConstant>(Material), -260, 420);
-    SubsurfaceScale->R = 0.34f;
-    UMaterialExpressionMultiply* Subsurface = AddExpression(
-        NewObject<UMaterialExpressionMultiply>(Material), 0, 410);
-    Subsurface->A.Expression = CanopySample;
-    Subsurface->B.Expression = SubsurfaceScale;
-
-    UMaterialEditorOnlyData* EditorOnlyData = Material->GetEditorOnlyData();
-    ConnectPreviewMaterialColorInput(EditorOnlyData->BaseColor, Fill);
-    ConnectPreviewMaterialColorInput(EditorOnlyData->EmissiveColor, EmissiveFill);
-    ConnectPreviewMaterialColorInput(EditorOnlyData->SubsurfaceColor, Subsurface);
-    EditorOnlyData->OpacityMask.Connect(/*OutputIndex=*/4, CanopySample);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Roughness, Roughness);
-    ConnectPreviewMaterialScalarInput(EditorOnlyData->Specular, Specular);
-    ConnectPreviewMaterialScalarInput(
-        EditorOnlyData->AmbientOcclusion, AmbientOcclusion);
-
-    Material->PostEditChange();
-    FAssetCompilingManager::Get().FinishAllCompilation();
-    if (!Material->SetMaterialUsage(MATUSAGE_InstancedStaticMeshes))
-    {
-        OutSummary += FString::Printf(
-            TEXT("Failed to enable HISM usage for canopy material %s.\n"),
-            *ObjectPath);
-        return nullptr;
-    }
-    Material->PostEditChange();
-    Material->ForceRecompileForRendering();
-    FAssetCompilingManager::Get().FinishAllCompilation();
-    if (GShaderCompilingManager)
-    {
-        GShaderCompilingManager->FinishAllCompilation();
-        GShaderCompilingManager->ProcessAsyncResults(false, true);
-    }
-    const FMaterialResource* Resource =
-        Material->GetMaterialResource(GMaxRHIShaderPlatform);
-    if (!Resource ||
-        Material->IsCompilingOrHadCompileError(GMaxRHIShaderPlatform) ||
-        !Resource->GetCompileErrors().IsEmpty())
-    {
-        OutSummary += FString::Printf(
-            TEXT("Generated canopy material shader gate failed for %s.\n"),
-            *ObjectPath);
-        return nullptr;
-    }
-    Material->MarkPackageDirty();
-    Package->MarkPackageDirty();
-    const FString Filename = FPackageName::LongPackageNameToFilename(
-        PackagePath, FPackageName::GetAssetPackageExtension());
-    IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
-    FSavePackageArgs SaveArgs;
-    SaveArgs.TopLevelFlags = RF_Public | RF_Standalone;
-    SaveArgs.SaveFlags = SAVE_NoError;
-    if (!UPackage::SavePackage(Package, Material, *Filename, SaveArgs))
-    {
-        return nullptr;
-    }
-    OutSummary += FString::Printf(
-        TEXT("Saved generated South Fork canopy material %s.\n"), *ObjectPath);
-    return Material;
-}
-
-UStaticMesh* CreateSouthForkCanopyCrossCardMesh(
-    UWorld* World,
-    const FString& SpeciesAssetName,
-    float WidthCm,
-    float HeightCm,
-    UMaterialInterface* Material,
-    FString& OutSummary)
-{
-    if (!World || !Material || WidthCm <= 0.0f || HeightCm <= 0.0f)
-    {
-        return nullptr;
-    }
-    const float HalfWidthCm = WidthCm * 0.5f;
-    TArray<FVector> Vertices = {
-        FVector(-HalfWidthCm, 0.0f, 0.0f),
-        FVector(HalfWidthCm, 0.0f, 0.0f),
-        FVector(-HalfWidthCm, 0.0f, HeightCm),
-        FVector(HalfWidthCm, 0.0f, HeightCm),
-        FVector(0.0f, -HalfWidthCm, 0.0f),
-        FVector(0.0f, HalfWidthCm, 0.0f),
-        FVector(0.0f, -HalfWidthCm, HeightCm),
-        FVector(0.0f, HalfWidthCm, HeightCm)};
-    const TArray<int32> Triangles = {
-        0, 1, 2, 1, 3, 2,
-        4, 5, 6, 5, 7, 6};
-    TArray<FVector> Normals = {
-        FVector::YAxisVector, FVector::YAxisVector,
-        FVector::YAxisVector, FVector::YAxisVector,
-        FVector::XAxisVector, FVector::XAxisVector,
-        FVector::XAxisVector, FVector::XAxisVector};
-    TArray<FVector2D> Uvs = {
-        FVector2D(0.0f, 1.0f), FVector2D(1.0f, 1.0f),
-        FVector2D(0.0f, 0.0f), FVector2D(1.0f, 0.0f),
-        FVector2D(0.0f, 1.0f), FVector2D(1.0f, 1.0f),
-        FVector2D(0.0f, 0.0f), FVector2D(1.0f, 0.0f)};
-    TArray<FLinearColor> VertexColors;
-    VertexColors.Init(FLinearColor::White, Vertices.Num());
-    TArray<FProcMeshTangent> Tangents = {
-        FProcMeshTangent(FVector::XAxisVector, false),
-        FProcMeshTangent(FVector::XAxisVector, false),
-        FProcMeshTangent(FVector::XAxisVector, false),
-        FProcMeshTangent(FVector::XAxisVector, false),
-        FProcMeshTangent(FVector::YAxisVector, false),
-        FProcMeshTangent(FVector::YAxisVector, false),
-        FProcMeshTangent(FVector::YAxisVector, false),
-        FProcMeshTangent(FVector::YAxisVector, false)};
-    const FString PackagePath = FString::Printf(
-        TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Canopy/Meshes/"
-             "SM_RaftSim_%s_Billboard"),
-        *SpeciesAssetName);
-    return CreateMeshAsset(
-        World, PackagePath, SpeciesAssetName + TEXT("_Billboard"),
-        Vertices, Triangles, Normals, Uvs, VertexColors, Tangents, Material,
-        /*bEnableNanite=*/false,
-        /*bComplexCollision=*/false, OutSummary);
-}
-
-bool CreateSouthForkGeneratedCanopyAssets(
-    UWorld* World,
-    UStaticMesh*& OutPonderosaMesh,
-    UStaticMesh*& OutInteriorLiveOakMesh,
-    FString& OutSummary)
-{
-    OutPonderosaMesh = nullptr;
-    OutInteriorLiveOakMesh = nullptr;
-    UTexture2D* PonderosaTexture = CreateSouthForkCanopyTexture(
-        TEXT("SouthForkPonderosaPine"), PonderosaBillboardSourceRelativePath,
-        OutSummary);
-    UTexture2D* OakTexture = CreateSouthForkCanopyTexture(
-        TEXT("SouthForkInteriorLiveOak"), InteriorLiveOakBillboardSourceRelativePath,
-        OutSummary);
-    UMaterial* PonderosaMaterial = CreateSouthForkCanopyMaterial(
-        TEXT("SouthForkPonderosaPine"), PonderosaTexture, OutSummary);
-    UMaterial* OakMaterial = CreateSouthForkCanopyMaterial(
-        TEXT("SouthForkInteriorLiveOak"), OakTexture, OutSummary);
-    if (!PonderosaMaterial || !OakMaterial)
-    {
-        return false;
-    }
-    OutPonderosaMesh = CreateSouthForkCanopyCrossCardMesh(
-        World, TEXT("SouthForkPonderosaPine"),
-        /*WidthCm=*/800.0f, /*HeightCm=*/1200.0f,
-        PonderosaMaterial, OutSummary);
-    OutInteriorLiveOakMesh = CreateSouthForkCanopyCrossCardMesh(
-        World, TEXT("SouthForkInteriorLiveOak"),
-        /*WidthCm=*/1275.0f, /*HeightCm=*/850.0f,
-        OakMaterial, OutSummary);
-    const bool bCreated = OutPonderosaMesh && OutInteriorLiveOakMesh;
-    OutSummary += bCreated
-        ? TEXT("Created project-owned photoreal South Fork pine and live-oak canopy assets.\n")
-        : TEXT("Failed to create project-owned South Fork canopy assets.\n");
-    return bCreated;
-}
-
-AStaticMeshActor* PlaceStaticMeshActor(
-    UWorld* World,
-    UStaticMesh* Mesh,
-    UMaterialInterface* Material,
-    const FString& Label,
-    const FTransform& Transform,
-    FName Tag,
-    ECollisionEnabled::Type Collision)
-{
-    AStaticMeshActor* Actor = World->SpawnActor<AStaticMeshActor>(
-        AStaticMeshActor::StaticClass(), Transform);
-    if (!Actor)
-    {
-        return nullptr;
-    }
-    Actor->SetActorLabel(Label);
-    Actor->Tags.AddUnique(Tag);
-    SetSpatiallyLoadedIfAllowed(Actor, true);
-    UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
-    Component->SetMobility(EComponentMobility::Static);
-    Component->SetStaticMesh(Mesh);
-    Component->SetCollisionEnabled(Collision);
-    if (Material)
-    {
-        Component->SetMaterial(0, Material);
-    }
-    return Actor;
-}
-
-UStaticMesh* LoadStaticMeshAsset(const FString& AssetPackagePath)
-{
-    const FString AssetName = FPackageName::GetLongPackageAssetName(AssetPackagePath);
-    return LoadObject<UStaticMesh>(
-        nullptr,
-        *FString::Printf(TEXT("%s.%s"), *AssetPackagePath, *AssetName));
-}
-
-void LogStaticMeshVertexColorSummary(const FString& Label, UStaticMesh* Mesh)
-{
-    const FStaticMeshRenderData* RenderData = Mesh ? Mesh->GetRenderData() : nullptr;
-    if (!RenderData || RenderData->LODResources.IsEmpty())
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RaftSim color audit %s: no render data"), *Label);
-        return;
-    }
-    const FColorVertexBuffer& Buffer =
-        RenderData->LODResources[0].VertexBuffers.ColorVertexBuffer;
-    const uint32 Count = Buffer.GetNumVertices();
-    if (Count == 0)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("RaftSim color audit %s: no vertex colors"), *Label);
-        return;
-    }
-    uint64 Red = 0;
-    uint64 Green = 0;
-    uint64 Blue = 0;
-    uint64 Alpha = 0;
-    const uint32 Step = FMath::Max<uint32>(Count / 1024, 1);
-    uint32 Samples = 0;
-    for (uint32 Index = 0; Index < Count; Index += Step)
-    {
-        const FColor Color = Buffer.VertexColor(Index);
-        Red += Color.R;
-        Green += Color.G;
-        Blue += Color.B;
-        Alpha += Color.A;
-        ++Samples;
-    }
-    UE_LOG(LogTemp, Display,
-        TEXT("RaftSim color audit %s: vertices=%u sampled=%u mean_rgba=(%.1f,%.1f,%.1f,%.1f)"),
-        *Label, Count, Samples,
-        static_cast<double>(Red) / Samples,
-        static_cast<double>(Green) / Samples,
-        static_cast<double>(Blue) / Samples,
-        static_cast<double>(Alpha) / Samples);
+        Mesh = CreateSouthForkMeshAsset(
+            World, AssetPath, TEXT("SalmonFalls_VisualContinuation"), Vertices,
+            Triangles, ComputePreviewMeshNormals(Vertices, Triangles), UVs, Colors,
+            BuildSouthForkFlowTangents(Vertices, Columns, Rows), Material, false, false, OutSummary);
+    AStaticMeshActor* Actor = Mesh ? PlaceSouthForkStaticMeshActor(
+        World, Mesh, Material, TEXT("RaftSim_SalmonFalls_VisualWaterContinuation"),
+        FTransform(FVector(End.CenterM.X * 100.0f, End.CenterM.Y * 100.0f, 0.0f)),
+        FName(TEXT("RaftSimFlowBand_median_runnable")), ECollisionEnabled::NoCollision) : nullptr;
+    if (!Actor) return false;
+    ConfigureSouthForkSingleLayerWaterActor(Actor);
+    Actor->Tags.AddUnique(FName(TEXT("RaftSimVisualOnlyNotForNavigation")));
+    Metrics.TerminalVisualWaterActorCount = 1;
+    Metrics.TerminalVisualWaterTriangleCount = Triangles.Num() / 3;
+    return true;
 }
 
 UHierarchicalInstancedStaticMeshComponent* AddHism(
@@ -880,7 +406,9 @@ UHierarchicalInstancedStaticMeshComponent* AddHism(
     UMaterialInterface* OverrideMaterial,
     int32 CullStartCm,
     int32 CullEndCm,
-    ECollisionEnabled::Type Collision)
+    ECollisionEnabled::Type Collision,
+    bool bEnableDensityScaling = false,
+    bool bCastShadow = true)
 {
     if (!Owner || !Mesh)
     {
@@ -894,6 +422,8 @@ UHierarchicalInstancedStaticMeshComponent* AddHism(
     Component->SetMobility(EComponentMobility::Static);
     Component->SetCollisionEnabled(Collision);
     Component->SetCullDistances(CullStartCm, CullEndCm);
+    Component->bEnableDensityScaling = bEnableDensityScaling;
+    Component->SetCastShadow(bCastShadow);
     if (OverrideMaterial)
     {
         Component->SetMaterial(0, OverrideMaterial);
@@ -904,10 +434,31 @@ UHierarchicalInstancedStaticMeshComponent* AddHism(
 
 AActor* CreateInstancingActor(UWorld* World, const FString& Label, FName Tag)
 {
-    AActor* Actor = World->SpawnActor<AActor>(AActor::StaticClass(), FTransform::Identity);
+    AActor* Actor = SpawnStableSouthForkActor<AActor>(
+        World, FTransform::Identity, Label);
     if (!Actor)
     {
         return nullptr;
+    }
+    // Generated actors are deliberately stable across commandlet runs so their
+    // World Partition packages and GUIDs do not churn. Rebuild their component
+    // graph from scratch, however: Unreal preserves removed named subobjects in
+    // an existing external-actor package unless the authoring pass explicitly
+    // destroys them. Clearing here prevents retired scatter layers (and old
+    // instance populations) from surviving a deterministic content rebuild.
+    TInlineComponentArray<UActorComponent*> ExistingComponents(Actor);
+    USceneComponent* ExistingRoot = Actor->GetRootComponent();
+    for (UActorComponent* Component : ExistingComponents)
+    {
+        if (Component && Component != ExistingRoot)
+        {
+            Component->DestroyComponent();
+        }
+    }
+    if (ExistingRoot)
+    {
+        Actor->SetRootComponent(nullptr);
+        ExistingRoot->DestroyComponent();
     }
     Actor->SetActorLabel(Label);
     Actor->Tags.AddUnique(Tag);
@@ -933,67 +484,100 @@ float StableUnitRandom(int32 A, int32 B, int32 C)
 
 void AddSouthForkLighting(UWorld* World)
 {
-    ADirectionalLight* Sun = World->SpawnActor<ADirectionalLight>(
-        ADirectionalLight::StaticClass(),
-        FTransform(FRotator(-42.0f, -128.0f, 0.0f)));
+    ADirectionalLight* Sun = SpawnStableSouthForkActor<ADirectionalLight>(
+        World,
+        FTransform(FRotator(-42.0f, -128.0f, 0.0f)),
+        TEXT("RaftSim_SouthFork_Sun"));
     if (Sun)
     {
         Sun->SetActorLabel(TEXT("RaftSim_SouthFork_Sun"));
-        Sun->GetLightComponent()->SetIntensity(6.5f);
-        Sun->GetLightComponent()->SetLightColor(FLinearColor(1.0f, 0.93f, 0.82f));
+        // Bright, clear Sierra summer daylight with enough direct energy to
+        // retain terrain relief after the deterministic capture path disables
+        // eye adaptation and Lumen. Keep this below the earlier blown-out
+        // review bracket while lifting the retained V2 canopy out of silhouette.
+        Sun->GetLightComponent()->SetIntensity(8.2f);
+        Sun->GetLightComponent()->SetLightColor(FLinearColor(1.0f, 0.97f, 0.91f));
         Sun->GetLightComponent()->SetCastShadows(true);
+        if (UDirectionalLightComponent* SunComponent = Sun->GetComponent())
+        {
+            SunComponent->SetAtmosphereSunLight(true);
+            SunComponent->SetAtmosphereSunLightIndex(0);
+        }
         SetSpatiallyLoadedIfAllowed(Sun, false);
     }
-    ASkyLight* Sky = World->SpawnActor<ASkyLight>(
-        ASkyLight::StaticClass(), FTransform::Identity);
+    ASkyLight* Sky = SpawnStableSouthForkActor<ASkyLight>(
+        World, FTransform::Identity, TEXT("RaftSim_SouthFork_SkyLight"));
     if (Sky)
     {
         Sky->SetActorLabel(TEXT("RaftSim_SouthFork_SkyLight"));
-        Sky->GetLightComponent()->SetIntensity(0.82f);
+        // Open canyon sky contributes strong diffuse fill. This value is
+        // intentionally lower than the direct sun, but high enough to keep
+        // shaded riparian trunks and leaf masses readable from guide height.
+        Sky->GetLightComponent()->SetIntensity(1.45f);
         Sky->GetLightComponent()->SetMobility(EComponentMobility::Movable);
         Sky->GetLightComponent()->SetRealTimeCaptureEnabled(false);
         SetSpatiallyLoadedIfAllowed(Sky, false);
     }
-    ASkyAtmosphere* Atmosphere = World->SpawnActor<ASkyAtmosphere>(
-        ASkyAtmosphere::StaticClass(), FTransform::Identity);
+    ASkyAtmosphere* Atmosphere = SpawnStableSouthForkActor<ASkyAtmosphere>(
+        World, FTransform::Identity, TEXT("RaftSim_SouthFork_SkyAtmosphere"));
     if (Atmosphere)
     {
         Atmosphere->SetActorLabel(TEXT("RaftSim_SouthFork_SkyAtmosphere"));
         SetSpatiallyLoadedIfAllowed(Atmosphere, false);
     }
-    AExponentialHeightFog* Fog = World->SpawnActor<AExponentialHeightFog>(
-        AExponentialHeightFog::StaticClass(), FTransform::Identity);
+    AExponentialHeightFog* Fog = SpawnStableSouthForkActor<AExponentialHeightFog>(
+        World, FTransform::Identity, TEXT("RaftSim_SouthFork_RiverMist"));
     if (Fog)
     {
         Fog->SetActorLabel(TEXT("RaftSim_SouthFork_RiverMist"));
-        Fog->GetComponent()->SetFogDensity(0.009f);
+        Fog->GetComponent()->SetFogDensity(0.006f);
         Fog->GetComponent()->SetFogHeightFalloff(0.18f);
         Fog->GetComponent()->SetVolumetricFog(true);
         SetSpatiallyLoadedIfAllowed(Fog, false);
     }
-    AVolumetricCloud* Clouds = World->SpawnActor<AVolumetricCloud>(
-        AVolumetricCloud::StaticClass(), FTransform::Identity);
+    // The default engine cloud volume requires temporal accumulation that is
+    // unavailable in the deterministic commandlet capture path. Keep the
+    // production South Fork condition as a plausible clear summer sky; an
+    // explicit review flag can still enable cloud experiments without letting
+    // their checker-pattern fallback enter release evidence.
+    AVolumetricCloud* Clouds = FParse::Param(
+            FCommandLine::Get(), TEXT("RaftSimEnableSouthForkClouds"))
+        ? SpawnStableSouthForkActor<AVolumetricCloud>(
+            World, FTransform::Identity, TEXT("RaftSim_SouthFork_SeasonalClouds"))
+        : nullptr;
     if (Clouds)
     {
         Clouds->SetActorLabel(TEXT("RaftSim_SouthFork_SeasonalClouds"));
         if (UVolumetricCloudComponent* Cloud =
                 Clouds->FindComponentByClass<UVolumetricCloudComponent>())
         {
-            Cloud->SetViewSampleCountScale(0.083333f);
-            Cloud->SetReflectionViewSampleCountScale(0.4f);
-            Cloud->SetShadowViewSampleCountScale(0.4f);
-            Cloud->SetShadowReflectionViewSampleCountScale(0.2f);
+            // One-twelfth of the normal ray-march budget produced a visible
+            // checker/stipple pattern in every release camera. Preserve a
+            // bounded half-resolution volumetric budget, including reflection
+            // and shadow paths, so the sky reads as cloud volume rather than
+            // sparse screen-space particles.
+            Cloud->SetViewSampleCountScale(0.5f);
+            Cloud->SetReflectionViewSampleCountScale(0.5f);
+            Cloud->SetShadowViewSampleCountScale(0.5f);
+            Cloud->SetShadowReflectionViewSampleCountScale(0.5f);
         }
         SetSpatiallyLoadedIfAllowed(Clouds, false);
     }
-    APostProcessVolume* Post = World->SpawnActor<APostProcessVolume>(
-        APostProcessVolume::StaticClass(), FTransform::Identity);
+    // Capture after atmosphere and clouds exist. The previous creation order
+    // left the non-realtime skylight with an incomplete environment, flattening
+    // terrain values and starving SingleLayerWater of coherent sky lighting.
+    if (Sky && Sky->GetLightComponent())
+    {
+        Sky->GetLightComponent()->RecaptureSky();
+    }
+    APostProcessVolume* Post = SpawnStableSouthForkActor<APostProcessVolume>(
+        World, FTransform::Identity, TEXT("RaftSim_SouthFork_LumenColorGrade"));
     if (Post)
     {
         Post->SetActorLabel(TEXT("RaftSim_SouthFork_LumenColorGrade"));
         Post->bUnbound = true;
         Post->Settings.bOverride_AutoExposureBias = true;
-        Post->Settings.AutoExposureBias = -0.25f;
+        Post->Settings.AutoExposureBias = 0.30f;
         Post->Settings.bOverride_BloomIntensity = true;
         Post->Settings.BloomIntensity = 0.24f;
         Post->Settings.bOverride_LumenReflectionQuality = true;
@@ -1010,6 +594,46 @@ bool SaveFullReachWorld(UWorld* World)
         FullReachMapPackagePath, FPackageName::GetMapPackageExtension());
     IFileManager::Get().MakeDirectory(*FPaths::GetPath(Filename), true);
     return FEditorFileUtils::SaveMap(World, Filename);
+}
+
+bool ValidateStableSouthForkActorIdentities(
+    UWorld* World, FSouthForkFullReachBuildMetrics& Metrics, FString& OutSummary)
+{
+    if (!World)
+    {
+        return false;
+    }
+
+    TSet<FGuid> AssignedGuids;
+    for (TActorIterator<AActor> It(World); It; ++It)
+    {
+        AActor* Actor = *It;
+        if (!Actor || Actor->IsActorBeingDestroyed())
+        {
+            continue;
+        }
+        const FString Label = Actor->GetActorLabel();
+        if (!Label.StartsWith(TEXT("RaftSim_")))
+        {
+            continue;
+        }
+        const FGuid StableGuid = SouthForkActorGuid(Actor->GetClass(), Label);
+        const FName StableObjectName = SouthForkActorObjectName(Actor->GetClass(), Label);
+        if (!StableGuid.IsValid() || AssignedGuids.Contains(StableGuid) ||
+            Actor->GetActorGuid() != StableGuid || Actor->GetFName() != StableObjectName)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Missing, duplicate, or unstable deterministic actor identity for %s.\n"),
+                *Label);
+            return false;
+        }
+        AssignedGuids.Add(StableGuid);
+    }
+    Metrics.StableActorIdentityCount = AssignedGuids.Num();
+    OutSummary += FString::Printf(
+        TEXT("Validated %d deterministic World Partition actor identities.\n"),
+        Metrics.StableActorIdentityCount);
+    return Metrics.StableActorIdentityCount > 0;
 }
 
 UHLODLayer* ConfigureSouthForkInstancedHlodLayer(FString& OutSummary)
@@ -1053,99 +677,6 @@ UHLODLayer* ConfigureSouthForkInstancedHlodLayer(FString& OutSummary)
         "Configured the South Fork terminal instanced HLOD layer with no merged-atlas parent.\n");
     return Layer;
 }
-
-bool CaptureSouthForkView(
-    UWorld* World,
-    const FString& CaptureId,
-    const FVector& CameraLocation,
-    const FRotator& CameraRotation,
-    FString& OutRelativePath,
-    FString& OutSummary)
-{
-    FlushAsyncLoading();
-    FAssetCompilingManager::Get().FinishAllCompilation();
-    if (GShaderCompilingManager)
-    {
-        GShaderCompilingManager->FinishAllCompilation();
-    }
-    IStreamingManager::Get().StreamAllResources(12.0f);
-    World->SendAllEndOfFrameUpdates();
-    FlushRenderingCommands();
-    UTextureRenderTarget2D* RenderTarget = NewObject<UTextureRenderTarget2D>(
-        GetTransientPackage(), NAME_None, RF_Transient);
-    if (!RenderTarget)
-    {
-        return false;
-    }
-    constexpr int32 Width = 1280;
-    constexpr int32 Height = 720;
-    RenderTarget->RenderTargetFormat = RTF_RGBA8_SRGB;
-    RenderTarget->ClearColor = FLinearColor::Black;
-    RenderTarget->InitAutoFormat(Width, Height);
-    RenderTarget->UpdateResourceImmediate(true);
-
-    ASceneCapture2D* Capture = World->SpawnActor<ASceneCapture2D>(
-        ASceneCapture2D::StaticClass(), CameraLocation, CameraRotation);
-    USceneCaptureComponent2D* Component =
-        Capture ? Capture->GetCaptureComponent2D() : nullptr;
-    if (!Component)
-    {
-        RenderTarget->ReleaseResource();
-        return false;
-    }
-    Component->TextureTarget = RenderTarget;
-    Component->CaptureSource = SCS_FinalColorLDR;
-    Component->FOVAngle = 82.0f;
-    Component->bCaptureEveryFrame = false;
-    Component->bCaptureOnMovement = false;
-    Component->bAlwaysPersistRenderingState = true;
-    Component->ShowFlags.SetSelection(false);
-    Component->ShowFlags.SetModeWidgets(false);
-    Component->ShowFlags.SetCompositeEditorPrimitives(false);
-    Component->CaptureScene();
-    FlushRenderingCommands();
-    FAssetCompilingManager::Get().FinishAllCompilation();
-    if (GShaderCompilingManager)
-    {
-        GShaderCompilingManager->FinishAllCompilation();
-    }
-    World->SendAllEndOfFrameUpdates();
-    FlushRenderingCommands();
-    FPlatformProcess::Sleep(0.03f);
-    Component->CaptureScene();
-    FlushRenderingCommands();
-
-    TArray<FColor> Pixels;
-    FTextureRenderTargetResource* Resource =
-        RenderTarget->GameThread_GetRenderTargetResource();
-    const bool bRead = Resource && Resource->ReadPixels(Pixels) &&
-        Pixels.Num() == Width * Height;
-    if (!bRead)
-    {
-        Capture->Destroy();
-        RenderTarget->ReleaseResource();
-        return false;
-    }
-    for (FColor& Pixel : Pixels)
-    {
-        Pixel.A = 255;
-    }
-    TArray64<uint8> Compressed;
-    FImageUtils::PNGCompressImageArray(
-        Width, Height, MakeArrayView(Pixels), Compressed);
-    OutRelativePath = FString::Printf(
-        TEXT("%s/%s.png"), CaptureDirectoryRelativePath, *CaptureId);
-    const FString AbsolutePath = AbsoluteRepoPath(OutRelativePath);
-    IFileManager::Get().MakeDirectory(*FPaths::GetPath(AbsolutePath), true);
-    const bool bSaved = FFileHelper::SaveArrayToFile(Compressed, *AbsolutePath);
-    Capture->Destroy();
-    RenderTarget->ReleaseResource();
-    OutSummary += FString::Printf(
-        TEXT("%s full-reach capture %s -> %s\n"),
-        bSaved ? TEXT("Saved") : TEXT("Failed"), *CaptureId, *AbsolutePath);
-    return bSaved;
-}
-
 } // namespace
 
 bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
@@ -1183,6 +714,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         FCommandLine::Get(), TEXT("RaftSimReuseSouthForkWaterMeshes"));
     const bool bReuseExistingFarFieldMeshes = bReuseExistingDetailedMeshes || FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimReuseSouthForkFarFieldMeshes"));
+    const bool bReuseExistingMaterials = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimReuseSouthForkMaterials"));
     if (bReuseExistingDetailedMeshes)
     {
         OutSummary += TEXT(
@@ -1200,8 +733,16 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         return false;
     }
 
-    IConsoleManager::Get().ProcessUserConsoleInput(
-        TEXT("RaftSim.CreatePhotorealMaterials"), *GLog, nullptr);
+    if (bReuseExistingMaterials)
+    {
+        OutSummary += TEXT(
+            "Reusing existing validated South Fork materials without regeneration.\n");
+    }
+    else
+    {
+        IConsoleManager::Get().ProcessUserConsoleInput(
+            TEXT("RaftSim.CreatePhotorealMaterials"), *GLog, nullptr);
+    }
     UMaterialInterface* TerrainMaterial = LoadObject<UMaterialInterface>(
         nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverTerrain."
@@ -1210,9 +751,30 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater."
              "M_RaftSim_PhotorealRiverWater"));
-    if (!TerrainMaterial || !WaterMaterial)
+    if (!TerrainMaterial || !WaterMaterial || !LoadSouthForkProductionWaterPresentation(WaterMaterial, OutSummary))
     {
         OutSummary += TEXT("Photoreal terrain or water material is unavailable.\n");
+        return false;
+    }
+    // This is generated source-of-truth, not a hand-authored material. Rebuild
+    // it on non-reuse passes so an older candidate asset cannot silently keep
+    // a stale blend mode or disconnected vertex-alpha opacity graph.
+    UMaterialInterface* WhitewaterFoamMaterial = bReuseExistingMaterials
+        ? LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/LandscapeCandidates/"
+                 "M_RaftSim_SolverFieldFoamCandidate."
+                 "M_RaftSim_SolverFieldFoamCandidate"))
+        : LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+    if (!WhitewaterFoamMaterial)
+    {
+        WhitewaterFoamMaterial =
+            LoadOrCreateLandscapeCandidateSolverFoamMaterial(OutSummary);
+    }
+    if (!WhitewaterFoamMaterial)
+    {
+        OutSummary += TEXT(
+            "The solver-masked whitewater overlay material is unavailable.\n");
         return false;
     }
 
@@ -1220,6 +782,10 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     if (!World || !World->GetWorldPartition())
     {
         OutSummary += TEXT("Failed to create a World Partition map.\n");
+        return false;
+    }
+    if (!ReplaceWorldPartitionMiniMapWithStableActor(World, OutSummary))
+    {
         return false;
     }
 
@@ -1272,118 +838,84 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         nullptr, TEXT("/Script/SmokeEmIfYouGotEm.RaftSimVerticalSliceGameMode"));
     AddSouthForkLighting(World);
 
-    FSouthForkBuildMetrics Metrics;
+    FSouthForkFullReachBuildMetrics Metrics;
     Metrics.MedianCenterWaterLocalZCm.Init(-BIG_NUMBER, CoordinatePoints.Num());
 
-    // The far-field terrain is intentionally a continuous underlay beneath the
-    // detailed corridor, so its visibility mask cannot also be used as an
-    // ecology mask. Index the conditioned river frame in world-space buckets
-    // and keep far-field trees out of the navigable water/near-bank ribbon.
-    constexpr float RiverEcologyBucketSizeM = 128.0f;
-    // Detailed foliage reaches the fold-safe +/-64 m ribbon. Keep the
-    // source-window dressing outside the water, but let it overlap that
-    // ribbon slightly so canyon bends do not expose a conspicuous bare band.
-    constexpr float FarFieldRiverExclusionM = 58.0f;
-    TMap<FIntPoint, TArray<FVector2D>> RiverEcologyBuckets;
-    auto RiverBucketKey = [](const FVector2D& PointM)
-    {
-        return FIntPoint(
-            FMath::FloorToInt(PointM.X / RiverEcologyBucketSizeM),
-            FMath::FloorToInt(PointM.Y / RiverEcologyBucketSizeM));
-    };
-    for (int32 CoordinateIndex = 0;
-         CoordinateIndex < CoordinatePoints.Num();
-         CoordinateIndex += 4)
-    {
-        const FVector2D& CenterM = CoordinatePoints[CoordinateIndex].CenterM;
-        RiverEcologyBuckets.FindOrAdd(RiverBucketKey(CenterM)).Add(CenterM);
-    }
-    auto IsInsideFarFieldRiverExclusion =
-        [&RiverEcologyBuckets, &RiverBucketKey](const FVector2D& PointM)
-    {
-        const FIntPoint CenterKey = RiverBucketKey(PointM);
-        const float ExclusionSquared = FMath::Square(FarFieldRiverExclusionM);
-        for (int32 DeltaY = -1; DeltaY <= 1; ++DeltaY)
-        {
-            for (int32 DeltaX = -1; DeltaX <= 1; ++DeltaX)
-            {
-                const TArray<FVector2D>* Bucket = RiverEcologyBuckets.Find(
-                    CenterKey + FIntPoint(DeltaX, DeltaY));
-                if (!Bucket)
-                {
-                    continue;
-                }
-                for (const FVector2D& RiverCenterM : *Bucket)
-                {
-                    if (FVector2D::DistSquared(PointM, RiverCenterM) < ExclusionSquared)
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    };
-
-    UStaticMesh* ReviewedTreeMesh = LoadObject<UStaticMesh>(nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/TreeSmall02_1K/"
-             "SM_TreeSmall02.SM_TreeSmall02"));
-    UStaticMesh* GeneratedPonderosaMesh = nullptr;
+    // Detailed foliage reaches the fold-safe +/-112 m ribbon. Keep the
+    // far-field dressing outside the water while retaining a slight overlap.
+    // Every far-field patch carries the generator's exact route-distance
+    // raster, including its non-navigational endpoint continuation.
+    constexpr float FarFieldRiverExclusionM = 106.0f;
+    UStaticMesh* PineMeshes[3] = {};
     UStaticMesh* GeneratedInteriorLiveOakMesh = nullptr;
+    UStaticMesh* GeneratedWhiteAlderMesh = nullptr;
+    UStaticMesh* GeneratedDeerbrushMesh = nullptr;
     const bool bGeneratedCanopyReady = CreateSouthForkGeneratedCanopyAssets(
-        World, GeneratedPonderosaMesh, GeneratedInteriorLiveOakMesh, OutSummary);
+        World, PineMeshes[0], PineMeshes[1], PineMeshes[2],
+        GeneratedInteriorLiveOakMesh, GeneratedWhiteAlderMesh,
+        GeneratedDeerbrushMesh, OutSummary);
     if (!bGeneratedCanopyReady)
     {
         OutSummary += TEXT(
-            "Generated canopy authoring failed; retaining the reviewed tree as a visible fallback.\n");
+            "Generated canopy authoring failed; refusing to promote a rejected review asset as a visible fallback.\n");
+        return false;
     }
-    // Use the reviewed full-geometry Poly Haven canopy in the playable ribbon.
-    // The project-owned generated cross cards remain valuable HLOD/far-field
-    // assets, but selecting them for guide-eye distances made every trunk and
-    // crown collapse to the same two intersecting planes.
-    UStaticMesh* PineMeshes[3] = {};
-    for (int32 PineIndex = 0; PineIndex < 3; ++PineIndex)
+    UStaticMesh* DetailedPineMeshes[3] = {
+        LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+                 "SM_PineTree01_pine_tree_01_a_LOD0."
+                 "SM_PineTree01_pine_tree_01_a_LOD0")),
+        LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+                 "SM_PineTree01_pine_tree_01_b_LOD0."
+                 "SM_PineTree01_pine_tree_01_b_LOD0")),
+        LoadObject<UStaticMesh>(nullptr,
+            TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/"
+                 "SM_PineTree01_pine_tree_01_c_LOD0."
+                 "SM_PineTree01_pine_tree_01_c_LOD0"))};
+    const bool bDetailedPineAnalogReady = DetailedPineMeshes[0] &&
+        DetailedPineMeshes[1] && DetailedPineMeshes[2];
+    if (!bDetailedPineAnalogReady)
     {
-        const TCHAR Variant = static_cast<TCHAR>('a' + PineIndex);
-        const FString Name = FString::Printf(
-            TEXT("SM_PineTree01_pine_tree_01_%c_LOD0"), Variant);
-        PineMeshes[PineIndex] = LoadObject<UStaticMesh>(
-            nullptr,
-            *FString::Printf(
-                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/"
-                     "PineTree01_1K/%s.%s"), *Name, *Name));
-        if (!PineMeshes[PineIndex])
-        {
-            PineMeshes[PineIndex] = ReviewedTreeMesh;
-        }
+        DetailedPineMeshes[0] = PineMeshes[0];
+        DetailedPineMeshes[1] = PineMeshes[1];
+        DetailedPineMeshes[2] = PineMeshes[2];
     }
-    UStaticMesh* BroadleafMesh = GeneratedInteriorLiveOakMesh
-        ? GeneratedInteriorLiveOakMesh
-        : ReviewedTreeMesh;
-    UStaticMesh* FarPineMesh = GeneratedPonderosaMesh
-        ? GeneratedPonderosaMesh
-        : PineMeshes[0];
+    OutSummary += bDetailedPineAnalogReady
+        ? TEXT("Using rights-reviewed three-variant 3D pine analogs in the detailed corridor; ecology and guide promotion remain pending.\n")
+        : TEXT("Detailed 3D pine analog unavailable; retained project-owned Ponderosa cards.\n");
+    // Project-owned Ponderosa cards remain the far-field representation; the
+    // registered aerial macro already carries most distant canopy detail.
+    UStaticMesh* BroadleafMesh = GeneratedInteriorLiveOakMesh;
+    UStaticMesh* RiparianMesh = GeneratedWhiteAlderMesh;
     UStaticMesh* FarBroadleafMesh = GeneratedInteriorLiveOakMesh
         ? GeneratedInteriorLiveOakMesh
         : BroadleafMesh;
-    const float ConiferBaseScale = 1.0f;
-    const float BroadleafBaseScale = 1.10f;
-    const float RiparianBaseScale = 0.92f;
-    UStaticMesh* ShrubMesh = LoadObject<UStaticMesh>(nullptr,
-        TEXT("/Game/RaftSim/Environment/BiomeSpecies/"
-             "SM_RaftSim_PVE_DeciduousShrub01_Static."
-             "SM_RaftSim_PVE_DeciduousShrub01_Static"));
-    UStaticMesh* RockMeshes[6] = {};
-    UMaterialInterface* ReviewedRockMaterial = LoadObject<UMaterialInterface>(
-        nullptr,
-        TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/RockMossSet01_1K/"
-             "M_RockMossSet01_ReviewLit.M_RockMossSet01_ReviewLit"));
-    if (!ReviewedRockMaterial)
+    UStaticMesh* ShrubMesh = GeneratedDeerbrushMesh;
+    UStaticMesh* ProductionRockMesh = nullptr;
+    UMaterialInterface* ProductionRockMaterial = nullptr;
+    if (!LoadSouthForkProductionRockPresentation(
+            ProductionRockMesh, ProductionRockMaterial, OutSummary))
     {
-        ReviewedRockMaterial = LoadObject<UMaterialInterface>(
-            nullptr,
-            TEXT("/Game/RaftSim/Materials/M_RaftSim_RiverBoulder."
-                 "M_RaftSim_RiverBoulder"));
+        return false;
+    }
+    UStaticMesh* RockMeshes[6] = {ProductionRockMesh, ProductionRockMesh, ProductionRockMesh,
+        ProductionRockMesh, ProductionRockMesh, ProductionRockMesh};
+    UMaterialInterface* ReviewedRockMaterial = ProductionRockMaterial;
+    UStaticMesh* ShoreCobbleMeshes[3] = {};
+    if (!CreateSouthForkShoreCobbleAssets(World, ReviewedRockMaterial,
+            bReuseExistingDetailedMeshes, ShoreCobbleMeshes, OutSummary)) return false;
+    UStaticMesh* GroundCoverMesh = nullptr;
+    UMaterialInterface* GroundCoverMaterial = nullptr;
+    if (!CreateSouthForkGroundCoverAssets(
+            // This tiny first-party asset is the visible ground-cover source
+            // of truth. Re-author it even when the expensive terrain meshes
+            // are reused so an organic-ground iteration cannot retain a stale
+            // tuft silhouette or material.
+            World, /*bReuseExistingAssets=*/false,
+            GroundCoverMesh, GroundCoverMaterial, OutSummary))
+    {
+        return false;
     }
     UStaticMesh* SprayMesh = LoadObject<UStaticMesh>(
         nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere"));
@@ -1391,16 +923,6 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         nullptr,
         TEXT("/Game/RaftSim/Materials/M_RaftSim_SprayMist."
              "M_RaftSim_SprayMist"));
-    for (int32 RockIndex = 0; RockIndex < 6; ++RockIndex)
-    {
-        const FString Name = FString::Printf(
-            TEXT("SM_RockMossSet01_rock_moss_set_01_rock%02d"), RockIndex + 1);
-        RockMeshes[RockIndex] = LoadObject<UStaticMesh>(
-            nullptr,
-            *FString::Printf(
-                TEXT("/Game/RaftSim/Environment/ExternalReview/PolyHaven/"
-                     "RockMossSet01_1K/%s.%s"), *Name, *Name));
-    }
     TSharedPtr<FJsonObject> BoulderRoot;
     TArray<TSharedPtr<FJsonValue>> EmptyBoulders;
     const TArray<TSharedPtr<FJsonValue>>* BoulderValues = &EmptyBoulders;
@@ -1413,7 +935,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     {
         BoulderRoot->TryGetArrayField(TEXT("boulders"), BoulderValues);
     }
-
+    TArray<FSouthForkBoulderPresentationFootprint> AcceptedBoulderPresentationFootprints;
     for (int32 TileOrdinal = 0; TileOrdinal < TileValues->Num(); ++TileOrdinal)
     {
         const TSharedPtr<FJsonObject>* Tile = nullptr;
@@ -1462,8 +984,9 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             OutSummary += FString::Printf(TEXT("Failed to decode tile %s.\n"), *TileId);
             return false;
         }
-        UTexture2D* TileMacroTexture = CreateSouthForkTerrainMacroTexture(
-            TileId, MacroPath, OutSummary);
+        UTexture2D* TileMacroTexture = bReuseExistingDetailedTerrainMeshes
+            ? LoadSouthForkTerrainMacroTextureForReuse(TileId, OutSummary)
+            : CreateSouthForkTerrainMacroTexture(TileId, MacroPath, OutSummary);
         UMaterialInstanceConstant* TileTerrainMaterial =
             CreateSouthForkTerrainMaterialInstance(
                 TileId, TerrainMaterial, TileMacroTexture,
@@ -1497,7 +1020,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 const int32 Index = Row * Width + Column;
                 const float LateralM = -256.0f + 4.0f * Column;
                 const FVector2D WorldM = CoordinateWorldM(Point, LateralM);
-                const float ElevationM = DecodeHeightM(
+                const float ElevationM = DecodeSouthForkHeightM(
                     TerrainHeight.Values[Index], TerrainMinimumM, TerrainMaximumM);
                 TerrainVertices[Index] = FVector(
                     (WorldM.X - TileOriginM.X) * 100.0f,
@@ -1506,7 +1029,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 TerrainUvs[Index] = FVector2D(
                     static_cast<float>(Column) / FMath::Max(Width - 1, 1),
                     static_cast<float>(Row) / FMath::Max(Height - 1, 1));
-                TerrainColors[Index] = DecodePreviewSrgbColor(MacroImage.Pixels[Index]);
+                TerrainColors[Index] = DecodeSouthForkPreviewSrgbColor(MacroImage.Pixels[Index]);
                 TerrainColors[Index].A = VfxImage.Pixels[Index].R;
             }
         }
@@ -1516,8 +1039,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         {
             for (int32 Column = 0; Column < Width - 1; ++Column)
             {
-                const float CellCenterLateralM =
-                    -256.0f + (static_cast<float>(Column) + 0.5f) * 4.0f;
+                const float CellCenterLateralM = -256.0f + (Column + 0.5f) * 4.0f;
                 if (FMath::Abs(CellCenterLateralM) > DetailedTerrainHalfWidthM)
                 {
                     continue;
@@ -1526,47 +1048,54 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 const int32 I1 = I0 + 1;
                 const int32 I2 = I0 + Width;
                 const int32 I3 = I2 + 1;
-                // Unreal's procedural-mesh conversion treats clockwise index
-                // order as the front face.  The prior counter-clockwise order
-                // left the river corridor visible only through backfaces.
                 TerrainTriangles.Append({I0, I1, I2, I1, I3, I2});
             }
         }
-        const TArray<FVector> TerrainNormals =
-            ComputePreviewMeshNormals(TerrainVertices, TerrainTriangles);
+        // A four-metre DEM grid needs a wider presentation derivative than a
+        // triangle face normal. Preserve the source elevations and collision,
+        // but remove visible diagonal facets from lighting and material blend.
+        TArray<FVector> TerrainNormals =
+            BuildSouthForkSmoothedTerrainPresentationNormals(
+                TerrainVertices, Width, Height, /*Radius=*/2);
+        if (TerrainNormals.Num() != TerrainVertices.Num())
+        {
+            TerrainNormals = ComputePreviewMeshNormals(
+                TerrainVertices, TerrainTriangles);
+        }
         const TArray<FProcMeshTangent> TerrainTangents =
-            BuildFlowTangents(TerrainVertices, Width, Height);
-        const FString TerrainAssetPath = FString::Printf(
-            TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/SM_%s_Terrain"),
-            *TileId);
+            BuildSouthForkFlowTangents(TerrainVertices, Width, Height);
+        const FString TerrainAssetPath = FString::Printf(TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Terrain/SM_%s_Terrain"), *TileId);
         UStaticMesh* TerrainMesh = bReuseExistingDetailedTerrainMeshes
-            ? LoadStaticMeshAsset(TerrainAssetPath)
+            ? LoadSouthForkStaticMeshAsset(TerrainAssetPath)
             : nullptr;
         if (!TerrainMesh)
         {
-            TerrainMesh = CreateMeshAsset(
+            TerrainMesh = CreateSouthForkMeshAsset(
                 World, TerrainAssetPath, TileId + TEXT("_Terrain"),
-                TerrainVertices, TerrainTriangles, TerrainNormals, TerrainUvs,
-                TerrainColors, TerrainTangents, TileTerrainMaterial,
+                TerrainVertices, TerrainTriangles, TerrainNormals,
+                TerrainUvs, TerrainColors, TerrainTangents,
+                TileTerrainMaterial,
                 /*bEnableNanite=*/true,
                 /*bComplexCollision=*/true, OutSummary);
         }
-        if (TileOrdinal == 0)
-        {
-            LogStaticMeshVertexColorSummary(TEXT("detailed_terrain_00"), TerrainMesh);
-        }
-        if (!TerrainMesh || !PlaceStaticMeshActor(
+        if (!TerrainMesh || !PlaceSouthForkStaticMeshActor(
                 World, TerrainMesh, TileTerrainMaterial,
                 TEXT("RaftSim_SouthFork_Terrain_") + TileId,
-                FTransform(FVector(TileOriginM.X * 100.0f, TileOriginM.Y * 100.0f, 0.0f)),
+                FTransform(FVector(
+                    TileOriginM.X * 100.0f,
+                    TileOriginM.Y * 100.0f,
+                    0.0f)),
                 TEXT("RaftSimFullReachTerrain"),
                 ECollisionEnabled::QueryAndPhysics))
         {
             return false;
         }
+        if (TileOrdinal == 0)
+        {
+            LogStaticMeshVertexColorSummary(TEXT("detailed_terrain_00"), TerrainMesh);
+        }
         ++Metrics.TerrainTileCount;
         Metrics.TerrainTriangleCount += TerrainTriangles.Num() / 3;
-
         // Source-masked CC0/project-owned ecology, boulders, and aeration are
         // stored per tile as HISM clusters so World Partition can stream them.
         AActor* DressingActor = CreateInstancingActor(
@@ -1574,21 +1103,28 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             TEXT("RaftSimFullReachDressing"));
         USceneComponent* DressingRoot = DressingActor ? DressingActor->GetRootComponent() : nullptr;
         UHierarchicalInstancedStaticMeshComponent* Conifers[3] = {
-            AddHism(DressingActor, DressingRoot, TEXT("ConiferA"), PineMeshes[0], nullptr,
+            AddHism(DressingActor, DressingRoot, TEXT("ConiferA"), DetailedPineMeshes[0], nullptr,
                 250000, 650000, ECollisionEnabled::QueryAndPhysics),
-            AddHism(DressingActor, DressingRoot, TEXT("ConiferB"), PineMeshes[1], nullptr,
+            AddHism(DressingActor, DressingRoot, TEXT("ConiferB"), DetailedPineMeshes[1], nullptr,
                 250000, 650000, ECollisionEnabled::QueryAndPhysics),
-            AddHism(DressingActor, DressingRoot, TEXT("ConiferC"), PineMeshes[2], nullptr,
+            AddHism(DressingActor, DressingRoot, TEXT("ConiferC"), DetailedPineMeshes[2], nullptr,
                 250000, 650000, ECollisionEnabled::QueryAndPhysics)};
         UHierarchicalInstancedStaticMeshComponent* Broadleaf = AddHism(
             DressingActor, DressingRoot, TEXT("OakBroadleafProxy"), BroadleafMesh, nullptr,
             220000, 550000, ECollisionEnabled::QueryAndPhysics);
         UHierarchicalInstancedStaticMeshComponent* Riparian = AddHism(
-            DressingActor, DressingRoot, TEXT("WillowAlderProxy"), BroadleafMesh, nullptr,
-            160000, 420000, ECollisionEnabled::QueryAndPhysics);
+            DressingActor, DressingRoot, TEXT("WhiteAlderRiparian"), RiparianMesh, nullptr,
+            160000, 420000, ECollisionEnabled::QueryAndPhysics,
+            /*bEnableDensityScaling=*/false, /*bCastShadow=*/true);
         UHierarchicalInstancedStaticMeshComponent* Understory = AddHism(
             DressingActor, DressingRoot, TEXT("Understory"), ShrubMesh, nullptr,
             90000, 250000, ECollisionEnabled::NoCollision);
+        UHierarchicalInstancedStaticMeshComponent* GroundCover = AddHism(
+            DressingActor, DressingRoot, TEXT("DryGrassGroundCover"),
+            GroundCoverMesh, GroundCoverMaterial,
+            /*CullStartCm=*/0, /*CullEndCm=*/140000,
+            ECollisionEnabled::NoCollision,
+            /*bEnableDensityScaling=*/false, /*bCastShadow=*/false);
         UHierarchicalInstancedStaticMeshComponent* Spray = AddHism(
             DressingActor, DressingRoot, TEXT("SolverAuthoredSprayMist"),
             SprayMesh, SprayMaterial, 90000, 260000,
@@ -1601,14 +1137,18 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 DressingActor, DressingRoot,
                 *FString::Printf(TEXT("Boulder%02d"), RockIndex + 1),
                 RockMeshes[RockIndex], ReviewedRockMaterial, 180000, 500000,
-                ECollisionEnabled::QueryAndPhysics);
+                ECollisionEnabled::QueryAndPhysics,
+                /*bEnableDensityScaling=*/false,
+                /*bCastShadow=*/true);
             ScenicRockComponents[RockIndex] = AddHism(
                 DressingActor, DressingRoot,
                 *FString::Printf(TEXT("ScenicBankRock%02d"), RockIndex + 1),
                 RockMeshes[RockIndex], ReviewedRockMaterial, 140000, 420000,
                 ECollisionEnabled::NoCollision);
         }
-
+        UHierarchicalInstancedStaticMeshComponent* ShoreCobbleComponents[3] = {};
+        CreateSouthForkShoreCobbleComponents(DressingActor, DressingRoot,
+            ShoreCobbleMeshes, ShoreCobbleComponents);
         const TSharedPtr<FJsonObject>* VegetationArtifact = nullptr;
         FString VegetationPath;
         FRaftSimPreviewImage VegetationImage;
@@ -1633,7 +1173,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             {
                 const int32 Index = Row * Width + Column;
                 const float LateralM = -256.0f + 4.0f * Column;
-                if (FMath::Abs(LateralM) < 34.0f ||
+                if (FMath::Abs(LateralM) < 24.0f ||
                     FMath::Abs(LateralM) > DetailedTerrainHalfWidthM ||
                     VfxImage.Pixels[Index].A > 0.1f)
                 {
@@ -1641,7 +1181,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 }
                 const FLinearColor Density = VegetationImage.Pixels[Index];
                 const FVector2D WorldM = CoordinateWorldM(Point, LateralM);
-                const float ElevationM = DecodeHeightM(
+                const float ElevationM = DecodeSouthForkHeightM(
                     TerrainHeight.Values[Index], TerrainMinimumM, TerrainMaximumM);
                 FVector Location(
                     WorldM.X * 100.0f, WorldM.Y * 100.0f,
@@ -1653,9 +1193,25 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 const int32 LeftHeightIndex = Row * Width + FMath::Max(Column - 1, 0);
                 const int32 RightHeightIndex = Row * Width + FMath::Min(Column + 1, Width - 1);
                 const float LateralSlope = FMath::Abs(
-                    DecodeHeightM(TerrainHeight.Values[RightHeightIndex], TerrainMinimumM, TerrainMaximumM) -
-                    DecodeHeightM(TerrainHeight.Values[LeftHeightIndex], TerrainMinimumM, TerrainMaximumM)) / 8.0f;
+                    DecodeSouthForkHeightM(TerrainHeight.Values[RightHeightIndex], TerrainMinimumM, TerrainMaximumM) -
+                    DecodeSouthForkHeightM(TerrainHeight.Values[LeftHeightIndex], TerrainMinimumM, TerrainMaximumM)) / 8.0f;
                 const float BankDistanceM = FMath::Abs(LateralM);
+                Metrics.GroundCoverInstanceCount +=
+                    AddSouthForkGroundCoverInstances(
+                        GroundCover, Location, TerrainNormals[Index],
+                        Point.LeftNormal, CoordinateIndex, Column,
+                        BankDistanceM, LateralSlope, Density);
+                // Preserve the reviewed minimum distance for trees, shrubs,
+                // cobble, and larger rocks. Only low grass extends into the
+                // 24--34 m transition bench.
+                if (BankDistanceM < 34.0f)
+                {
+                    continue;
+                }
+                Metrics.ShoreCobbleInstanceCount += AddSouthForkShoreCobbleInstances(
+                    ShoreCobbleComponents, Location, Point.LeftNormal, CoordinateIndex, Column, BankDistanceM, LateralSlope);
+                Metrics.FoliageInstanceCount += AddSouthForkBankUnderstoryInstance(Understory,
+                    Location, Point.LeftNormal, CoordinateIndex, Column, BankDistanceM, LateralSlope, Density);
                 const float ScenicRockProbability =
                     (BankDistanceM >= 36.0f && BankDistanceM <= 92.0f)
                     ? FMath::Clamp(0.035f + LateralSlope * 0.18f, 0.035f, 0.22f)
@@ -1667,7 +1223,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     if (ScenicRockComponents[RockIndex])
                     {
                         const float RockScale = FMath::Lerp(
-                            0.28f, 1.05f,
+                            0.48f, 1.62f,
                             StableUnitRandom(CoordinateIndex, Column, 53));
                         ScenicRockComponents[RockIndex]->AddInstance(
                             FTransform(
@@ -1675,7 +1231,11 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                     StableUnitRandom(CoordinateIndex, Column, 59) * 22.0f - 11.0f,
                                     StableUnitRandom(CoordinateIndex, Column, 61) * 360.0f,
                                     StableUnitRandom(CoordinateIndex, Column, 67) * 18.0f - 9.0f),
-                                Location + FVector(0.0f, 0.0f, RockScale * 22.0f),
+                                // The reviewed meshes have an imported base
+                                // roughly 0.65 m below their pivot.  The old
+                                // 0.22 m lift buried most scenic instances and
+                                // left the intended talus invisible.
+                                Location + FVector(0.0f, 0.0f, RockScale * 64.0f),
                                 FVector(RockScale)),
                             /*bWorldSpace=*/true);
                         ++Metrics.ScenicRockInstanceCount;
@@ -1685,49 +1245,62 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 UHierarchicalInstancedStaticMeshComponent* Target = nullptr;
                 float Probability = 0.0f;
                 float BaseScale = 1.0f;
-                if (Density.B > 0.12f && FMath::Abs(LateralM) < 105.0f)
+                SelectSouthForkDetailedFoliage(Conifers, Broadleaf, Riparian, Understory,
+                    Density, LateralM, CoordinateIndex, Column, Target, Probability, BaseScale);
+                if (Target == Understory && LateralSlope > 0.38f)
                 {
-                    Target = Riparian;
-                    Probability = FMath::Clamp(0.12f + Density.B * 1.05f, 0.0f, 0.88f);
-                    BaseScale = RiparianBaseScale;
+                    // Upright chaparral cards are not credible on cliff faces
+                    // and can silhouette above a coarse DEM ridge. Reserve
+                    // this ecology for benches and moderate dry banks.
+                    continue;
                 }
-                else if (Density.R >= Density.G && Density.R > 0.12f)
-                {
-                    Target = Conifers[(CoordinateIndex + Column) % 3];
-                    Probability = FMath::Clamp(0.10f + Density.R * 0.96f, 0.0f, 0.82f);
-                    BaseScale = ConiferBaseScale;
-                }
-                else if (Density.G > 0.12f)
-                {
-                    Target = Broadleaf;
-                    Probability = FMath::Clamp(0.10f + Density.G * 0.98f, 0.0f, 0.84f);
-                    BaseScale = BroadleafBaseScale;
-                }
-                else if (Density.A > 0.15f)
-                {
-                    Target = Understory;
-                    Probability = FMath::Clamp(0.08f + Density.A * 0.78f, 0.0f, 0.74f);
-                    BaseScale = 0.75f;
-                }
-                else
-                {
-                    // Aerial species masks become sparse on shadowed, steep
-                    // banks. Deterministic low understory prevents a bare
-                    // procedural ribbon while retaining a much lower density
-                    // than source-confirmed oak and pine pixels.
-                    Target = Understory;
-                    Probability = 0.17f;
-                    BaseScale = 0.64f;
-                }
+                // Aerial density is authoritative at the corridor scale, but
+                // individual stems are unresolved. Modulate its point sample
+                // with a continuous, deterministic patch field so the 8 m
+                // candidate lattice forms natural groves and openings instead
+                // of evenly spaced rows along both banks.
+                const float DetailedFoliagePatchNoise = 0.5f + 0.5f *
+                    FMath::PerlinNoise2D(FVector2D(Location.X, Location.Y) / 36000.0f);
+                Probability = FMath::Clamp(
+                    Probability * FMath::Lerp(0.58f, 1.36f, DetailedFoliagePatchNoise),
+                    0.0f, 0.92f);
                 if (Target && Selection < Probability)
                 {
                     const float Scale = BaseScale *
                         FMath::Lerp(0.78f, 1.22f,
                             StableUnitRandom(CoordinateIndex, Column, 23));
                     const float Yaw = StableUnitRandom(CoordinateIndex, Column, 29) * 360.0f;
+                    FVector InstanceScale(Scale);
+                    if (Target == Broadleaf || Target == Riparian)
+                    {
+                        InstanceScale.X *= FMath::Lerp(
+                            0.82f, 1.16f,
+                            StableUnitRandom(CoordinateIndex, Column, 31));
+                        InstanceScale.Y *= FMath::Lerp(
+                            0.84f, 1.14f,
+                            StableUnitRandom(CoordinateIndex, Column, 37));
+                        InstanceScale.Z *= FMath::Lerp(
+                            0.86f, 1.18f,
+                            StableUnitRandom(CoordinateIndex, Column, 43));
+                    }
+                    const FVector GroundedLocation = Target == Understory
+                        ? Location - FVector(0.0f, 0.0f, Scale * 24.0f)
+                        : Location;
+                    const FVector AlongRiver = CoordinateTangent(
+                        CoordinatePoints, CoordinateIndex);
+                    const FVector AcrossRiver(
+                        Point.LeftNormal.X, Point.LeftNormal.Y, 0.0f);
+                    const float AlongJitterCm = FMath::Lerp(
+                        -280.0f, 280.0f,
+                        StableUnitRandom(CoordinateIndex, Column, 109));
+                    const float AcrossJitterCm = FMath::Lerp(
+                        -250.0f, 250.0f,
+                        StableUnitRandom(CoordinateIndex, Column, 113));
+                    const FVector NaturalizedLocation = GroundedLocation +
+                        AlongRiver * AlongJitterCm + AcrossRiver * AcrossJitterCm;
                     Target->AddInstance(
-                        FTransform(FRotator(0.0f, Yaw, 0.0f), Location,
-                            FVector(Scale)),
+                        FTransform(FRotator(0.0f, Yaw, 0.0f), NaturalizedLocation,
+                            InstanceScale),
                         /*bWorldSpace=*/true);
                     ++Metrics.FoliageInstanceCount;
                 }
@@ -1763,7 +1336,19 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     FMath::RoundToInt((static_cast<float>(LateralM) + 256.0f) / 4.0f),
                     0, Width - 1);
                 const int32 HeightIndex = LocalRow * Width + Column;
-                const float BedM = DecodeHeightM(
+                const float PresentationStationM = static_cast<float>(StationM);
+                const float PresentationLateralM = static_cast<float>(LateralM);
+                const float PresentationRadiusM = static_cast<float>(RadiusM);
+                const bool bOverlapsAcceptedPresentation =
+                    ShouldSuppressSouthForkBoulderPresentation(
+                        AcceptedBoulderPresentationFootprints, PresentationStationM,
+                        PresentationLateralM, PresentationRadiusM);
+                if (bOverlapsAcceptedPresentation)
+                {
+                    ++Metrics.BoulderOverlapSuppressedInstanceCount;
+                    continue;
+                }
+                const float BedM = DecodeSouthForkHeightM(
                     TerrainHeight.Values[HeightIndex], TerrainMinimumM, TerrainMaximumM);
                 const FVector2D WorldM = CoordinateWorldM(
                     CoordinatePoints[CoordinateIndex], static_cast<float>(LateralM));
@@ -1771,8 +1356,9 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     FMath::Abs(CoordinateIndex + Column * 7) % 6;
                 if (RockComponents[RockIndex])
                 {
-                    const float ScaleXY = static_cast<float>(RadiusM) * 0.58f;
-                    const float ScaleZ = static_cast<float>(HeightM) * 0.72f;
+                    // Fit source bounds to the catalog and embed the watertight base by 12%.
+                    const float ScaleXY = PresentationRadiusM * 0.8481f;
+                    const float ScaleZ = static_cast<float>(HeightM) * 0.7045f;
                     RockComponents[RockIndex]->AddInstance(
                         FTransform(
                             FRotator(
@@ -1781,9 +1367,14 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                 StableUnitRandom(CoordinateIndex, Column, 41) * 14.0f - 7.0f),
                             FVector(
                                 WorldM.X * 100.0f, WorldM.Y * 100.0f,
-                                (BedM - VerticalDatumM + static_cast<float>(HeightM) * 0.80f) * 100.0f),
+                                (BedM - VerticalDatumM +
+                                    static_cast<float>(HeightM) * 0.386f) * 100.0f),
                             FVector(ScaleXY, ScaleXY, ScaleZ)),
                         /*bWorldSpace=*/true);
+                    AcceptedBoulderPresentationFootprints.Add(
+                        FSouthForkBoulderPresentationFootprint{
+                            PresentationStationM, PresentationLateralM,
+                            PresentationRadiusM});
                     ++Metrics.BoulderInstanceCount;
                 }
             }
@@ -1836,23 +1427,46 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             TArray<FVector> WaterVertices;
             TArray<FVector2D> WaterUvs;
             TArray<FLinearColor> WaterColors;
+            TArray<float> WaterShorelineDepthsM;
             WaterVertices.SetNum(WaterWidth * Height);
             WaterUvs.SetNum(WaterWidth * Height);
             WaterColors.SetNum(WaterWidth * Height);
+            WaterShorelineDepthsM.SetNum(WaterWidth * Height);
             for (int32 Row = 0; Row < Height; ++Row)
             {
                 const int32 CoordinateIndex = FMath::Clamp(
                     GlobalRowStart + Row, 0, CoordinatePoints.Num() - 1);
                 const FSouthForkCoordinatePoint& Point = CoordinatePoints[CoordinateIndex];
+                TArray<float> RowSurfaceElevationsM;
+                TArray<FLinearColor> RowHydraulicPresentation;
+                int32 LeftWetColumn = INDEX_NONE;
+                int32 RightWetColumn = INDEX_NONE;
+                if (!PrepareSouthForkWaterSurfaceRow(
+                        WaterHeight.Values, Presentation.Pixels, WaterWidth, Row,
+                        WaterMinimumM, WaterMaximumM, RowSurfaceElevationsM,
+                        RowHydraulicPresentation, LeftWetColumn, RightWetColumn)) return false;
                 for (int32 Column = 0; Column < WaterWidth; ++Column)
                 {
                     const int32 Index = Row * WaterWidth + Column;
                     const float LateralM = -40.0f + 4.0f * Column;
                     const FVector2D WorldM = CoordinateWorldM(Point, LateralM);
-                    const float ElevationM = DecodeHeightM(
-                        WaterHeight.Values[Index], WaterMinimumM, WaterMaximumM);
-                    const FLinearColor HydraulicPresentation =
-                        Presentation.Pixels[Index];
+                    const float ElevationM = RowSurfaceElevationsM[Column];
+                    const int32 TerrainColumn = FMath::Clamp(
+                        FMath::RoundToInt((LateralM + 256.0f) / 4.0f), 0, TerrainHeight.Width - 1);
+                    const float TerrainElevationM = DecodeSouthForkHeightM(
+                        TerrainHeight.Values[Row * TerrainHeight.Width + TerrainColumn], TerrainMinimumM, TerrainMaximumM);
+                    const float ShorelineDepthM = ElevationM - TerrainElevationM;
+                    FLinearColor HydraulicPresentation =
+                        RowHydraulicPresentation[Column];
+                    const bool bTouchesSolverWetChannel =
+                        Column == LeftWetColumn - 1 ||
+                        Column == RightWetColumn + 1;
+                    if (bTouchesSolverWetChannel)
+                    {
+                        HydraulicPresentation = CompleteSouthForkShorelinePresentation(
+                            HydraulicPresentation, ShorelineDepthM,
+                            Metrics.ProceduralShorelineCompletionVertexCount);
+                    }
                     const float HydraulicEnergy = FMath::Clamp(
                         HydraulicPresentation.R * 0.72f +
                         HydraulicPresentation.B * 0.48f,
@@ -1866,10 +1480,10 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     const float WavePhaseB =
                         Point.StationM * 0.071f - LateralM * 0.37f;
                     const float VisualDisplacementM =
-                        0.012f * FMath::Sin(WavePhaseA) +
+                        0.018f * FMath::Sin(WavePhaseA) +
                         HydraulicEnergy *
-                            (0.11f * FMath::Sin(WavePhaseA) +
-                             0.065f * FMath::Sin(WavePhaseB));
+                            (0.16f * FMath::Sin(WavePhaseA) +
+                             0.09f * FMath::Sin(WavePhaseB));
                     WaterVertices[Index] = FVector(
                         (WorldM.X - TileOriginM.X) * 100.0f,
                         (WorldM.Y - TileOriginM.Y) * 100.0f,
@@ -1877,7 +1491,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     WaterUvs[Index] = FVector2D(
                         Point.StationM / 3.0f,
                         LateralM / 3.0f);
-                    WaterColors[Index] = Presentation.Pixels[Index];
+                    WaterColors[Index] = HydraulicPresentation;
+                    WaterShorelineDepthsM[Index] = ShorelineDepthM;
                 }
                 if (FCString::Strcmp(FlowBand, TEXT("median_runnable")) == 0)
                 {
@@ -1885,43 +1500,59 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                         WaterVertices[Row * WaterWidth + WaterWidth / 2].Z;
                 }
             }
-            TArray<int32> WaterTriangles;
-            for (int32 Row = 0; Row < Height - 1; ++Row)
+            if (!SmoothSouthForkWaterVisibilityLongitudinally(
+                    4, WaterWidth, Height, WaterColors)) return false;
+            int32 WaterPresentationWidth = WaterWidth, WaterPresentationHeight = Height;
+            if (!RefineSouthForkWaterPresentationGrid(2, WaterPresentationWidth, WaterPresentationHeight,
+                    WaterVertices, WaterUvs, WaterColors,
+                    WaterShorelineDepthsM)) return false;
+            float MaximumMicroReliefCm = 0.0f;
+            if (!ApplySouthForkWaterPresentationMicroRelief(
+                    WaterVertices, WaterUvs, WaterColors,
+                    WaterShorelineDepthsM, MaximumMicroReliefCm))
             {
-                for (int32 Column = 0; Column < WaterWidth - 1; ++Column)
-                {
-                    const int32 I0 = Row * WaterWidth + Column;
-                    const int32 I1 = I0 + 1;
-                    const int32 I2 = I0 + WaterWidth;
-                    const int32 I3 = I2 + 1;
-                    if (WaterColors[I0].A > 0.5f && WaterColors[I1].A > 0.5f &&
-                        WaterColors[I2].A > 0.5f && WaterColors[I3].A > 0.5f)
-                    {
-                        WaterTriangles.Append({I0, I1, I2, I1, I3, I2});
-                    }
-                }
+                OutSummary += FString::Printf(
+                    TEXT("Failed to apply visual water micro-relief for %s %s.\n"),
+                    *TileId, FlowBand);
+                return false;
             }
-            const TArray<FVector> WaterNormals =
-                ComputePreviewMeshNormals(WaterVertices, WaterTriangles);
-            const TArray<FProcMeshTangent> WaterTangents =
-                BuildFlowTangents(WaterVertices, WaterWidth, Height);
+            TArray<FVector> TerrainClippedWaterVertices;
+            TArray<int32> WaterTriangles;
+            TArray<FVector2D> TerrainClippedWaterUvs;
+            TArray<FLinearColor> TerrainClippedWaterColors;
+            TArray<FVector> WaterNormals;
+            TArray<FProcMeshTangent> WaterTangents;
+            if (!BuildSouthForkTerrainClippedWaterGeometry(
+                    WaterVertices, WaterUvs, WaterColors,
+                    WaterShorelineDepthsM,
+                    WaterPresentationWidth, WaterPresentationHeight,
+                    TerrainClippedWaterVertices, WaterTriangles,
+                    TerrainClippedWaterUvs, TerrainClippedWaterColors,
+                    WaterNormals, WaterTangents,
+                    Metrics.ProceduralShorelineTransitionCellCount))
+            {
+                OutSummary += FString::Printf(
+                    TEXT("Failed to terrain-clip water geometry for %s %s.\n"),
+                    *TileId, FlowBand);
+                return false;
+            }
             const FString WaterAssetPath = FString::Printf(
-                TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/SM_%s_Water_%s"),
-                *TileId, FlowBand);
+                TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/SM_%s_Water_%s"), *TileId, FlowBand);
             UStaticMesh* WaterMesh = bReuseExistingWaterMeshes
-                ? LoadStaticMeshAsset(WaterAssetPath)
+                ? LoadSouthForkStaticMeshAsset(WaterAssetPath)
                 : nullptr;
             if (!WaterMesh)
             {
-                WaterMesh = CreateMeshAsset(
+                WaterMesh = CreateSouthForkMeshAsset(
                     World, WaterAssetPath,
                     FString::Printf(TEXT("%s_Water_%s"), *TileId, FlowBand),
-                    WaterVertices, WaterTriangles, WaterNormals, WaterUvs,
-                    WaterColors, WaterTangents, WaterMaterial,
+                    TerrainClippedWaterVertices, WaterTriangles, WaterNormals,
+                    TerrainClippedWaterUvs, TerrainClippedWaterColors,
+                    WaterTangents, WaterMaterial,
                     /*bEnableNanite=*/false,
                     /*bComplexCollision=*/false, OutSummary);
             }
-            AStaticMeshActor* WaterActor = WaterMesh ? PlaceStaticMeshActor(
+            AStaticMeshActor* WaterActor = WaterMesh ? PlaceSouthForkStaticMeshActor(
                 World, WaterMesh, WaterMaterial,
                 FString::Printf(TEXT("RaftSim_SouthFork_Water_%s_%s"), *TileId, FlowBand),
                 FTransform(FVector(TileOriginM.X * 100.0f, TileOriginM.Y * 100.0f, 0.0f)),
@@ -1931,10 +1562,100 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             {
                 return false;
             }
+            ConfigureSouthForkSingleLayerWaterActor(WaterActor);
             const bool bMedian = FCString::Strcmp(FlowBand, TEXT("median_runnable")) == 0;
             WaterActor->SetActorHiddenInGame(!bMedian);
             ++Metrics.WaterTileCount;
             Metrics.WaterTriangleCount += WaterTriangles.Num() / 3;
+
+            // The broad Single Layer Water material retains the solver foam
+            // channel, but a grazing guide-eye view can flatten its strongest
+            // cells into the base surface. Author a second, non-colliding
+            // one-metre aerated sheet only over positive solver-derived or
+            // review-gated guide-feature-conditioned triangles. This
+            // gives those cells bounded geometric volume while calm water,
+            // collision, hydraulic state, and gameplay remain unchanged.
+            TArray<FVector> WhitewaterVertices;
+            TArray<int32> WhitewaterTriangles;
+            TArray<FVector2D> WhitewaterUvs;
+            TArray<FLinearColor> WhitewaterColors;
+            int32 WhitewaterPresentationWidth = 0;
+            int32 WhitewaterPresentationHeight = 0;
+            if (!BuildSouthForkRefinedWhitewaterOverlayGeometry(
+                    WaterVertices, WaterUvs, WaterColors,
+                    WaterShorelineDepthsM,
+                    WaterPresentationWidth, WaterPresentationHeight,
+                    WhitewaterVertices, WhitewaterTriangles, WhitewaterUvs,
+                    WhitewaterColors, WhitewaterPresentationWidth,
+                    WhitewaterPresentationHeight))
+            {
+                return false;
+            }
+            if (!WhitewaterTriangles.IsEmpty())
+            {
+                const FString WhitewaterAssetPath = FString::Printf(
+                    TEXT("/Game/RaftSim/Environment/SouthForkFullReach/Water/"
+                         "SM_%s_WhitewaterFoam_%s"),
+                    *TileId,
+                    FlowBand);
+                UStaticMesh* WhitewaterMesh = bReuseExistingWaterMeshes
+                    ? LoadSouthForkStaticMeshAsset(WhitewaterAssetPath)
+                    : nullptr;
+                if (!WhitewaterMesh)
+                {
+                    const TArray<FVector> WhitewaterNormals =
+                        ComputePreviewMeshNormals(
+                            WhitewaterVertices, WhitewaterTriangles);
+                    WhitewaterMesh = CreateSouthForkMeshAsset(
+                        World,
+                        WhitewaterAssetPath,
+                        FString::Printf(
+                            TEXT("%s_WhitewaterFoam_%s"), *TileId, FlowBand),
+                        WhitewaterVertices,
+                        WhitewaterTriangles,
+                        WhitewaterNormals,
+                        WhitewaterUvs,
+                        WhitewaterColors,
+                        BuildSouthForkFlowTangents(
+                            WhitewaterVertices,
+                            WhitewaterPresentationWidth,
+                            WhitewaterPresentationHeight),
+                        WhitewaterFoamMaterial,
+                        /*bEnableNanite=*/false,
+                        /*bComplexCollision=*/false,
+                        OutSummary);
+                }
+                AStaticMeshActor* WhitewaterActor = WhitewaterMesh
+                    ? PlaceSouthForkStaticMeshActor(
+                        World,
+                        WhitewaterMesh,
+                        WhitewaterFoamMaterial,
+                        FString::Printf(
+                            TEXT("RaftSim_SouthFork_WhitewaterFoam_%s_%s"),
+                            *TileId,
+                            FlowBand),
+                        FTransform(FVector(
+                            TileOriginM.X * 100.0f,
+                            TileOriginM.Y * 100.0f,
+                            0.0f)),
+                        *FString::Printf(TEXT("RaftSimFlowBand_%s"), FlowBand),
+                        ECollisionEnabled::NoCollision)
+                    : nullptr;
+                if (!WhitewaterActor)
+                {
+                    return false;
+                }
+                WhitewaterActor->Tags.AddUnique(
+                    FName(TEXT("RaftSimSolverFoamOverlay")));
+                WhitewaterActor->SetActorHiddenInGame(!bMedian);
+                UStaticMeshComponent* WhitewaterComponent =
+                    WhitewaterActor->GetStaticMeshComponent();
+                WhitewaterComponent->SetCastShadow(false);
+                WhitewaterComponent->TranslucencySortPriority = 2;
+                ++Metrics.WhitewaterFoamActorCount;
+                Metrics.WhitewaterFoamTriangleCount +=
+                    WhitewaterTriangles.Num() / 3;
+            }
         }
 
         if (Spray)
@@ -1980,6 +1701,14 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         }
     }
 
+    if (!CreateTerminalVisualWater(
+            World, CoordinatePoints, Metrics.MedianCenterWaterLocalZCm.Last(),
+            WaterMaterial, bReuseExistingWaterMeshes, Metrics, OutSummary))
+    {
+        OutSummary += TEXT("Failed to create the Salmon Falls visual water continuation.\n");
+        return false;
+    }
+
     const TSharedPtr<FJsonObject>* FarFieldRoot = nullptr;
     const TArray<TSharedPtr<FJsonValue>>* FarFieldPatchValues = nullptr;
     if (!EnvironmentRoot->TryGetObjectField(TEXT("far_field"), FarFieldRoot) ||
@@ -1999,11 +1728,13 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         const TSharedPtr<FJsonObject>* MacroArtifact = nullptr;
         const TSharedPtr<FJsonObject>* MaskArtifact = nullptr;
         const TSharedPtr<FJsonObject>* OwnershipArtifact = nullptr;
+        const TSharedPtr<FJsonObject>* RiverDistanceArtifact = nullptr;
         FString PatchId;
         FString HeightPath;
         FString MacroPath;
         FString MaskPath;
         FString OwnershipPath;
+        FString RiverDistancePath;
         if (!(*FarFieldPatchValues)[PatchOrdinal]->TryGetObject(Patch) || Patch == nullptr ||
             !(*Patch)->TryGetStringField(TEXT("patch_id"), PatchId) ||
             !(*Patch)->TryGetArrayField(TEXT("bounds_local_m"), Bounds) ||
@@ -2014,10 +1745,14 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             !(*Patch)->TryGetObjectField(TEXT("corridor_exclusion_mask"), MaskArtifact) ||
             !(*Patch)->TryGetObjectField(
                 TEXT("source_window_ownership_mask"), OwnershipArtifact) ||
+            !(*Patch)->TryGetObjectField(
+                TEXT("river_distance_to_route"), RiverDistanceArtifact) ||
             !(*HeightArtifact)->TryGetStringField(TEXT("path"), HeightPath) ||
             !(*MacroArtifact)->TryGetStringField(TEXT("path"), MacroPath) ||
             !(*MaskArtifact)->TryGetStringField(TEXT("path"), MaskPath) ||
-            !(*OwnershipArtifact)->TryGetStringField(TEXT("path"), OwnershipPath))
+            !(*OwnershipArtifact)->TryGetStringField(TEXT("path"), OwnershipPath) ||
+            !(*RiverDistanceArtifact)->TryGetStringField(
+                TEXT("path"), RiverDistancePath))
         {
             return false;
         }
@@ -2031,23 +1766,27 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         FRaftSimPreviewImage MacroImage;
         FRaftSimPreviewImage MaskImage;
         FRaftSimPreviewImage OwnershipImage;
+        FSouthForkGray16Image RiverDistanceImage;
         if (!LoadGray16Png(HeightPath, HeightImage) ||
             !LoadPreviewPngImage(MacroPath, MacroImage) ||
             !LoadPreviewPngImage(MaskPath, MaskImage) ||
             !LoadPreviewPngImage(OwnershipPath, OwnershipImage) ||
-            HeightImage.Width != MacroImage.Width ||
-            HeightImage.Height != MacroImage.Height ||
+            !LoadGray16Png(RiverDistancePath, RiverDistanceImage) ||
+            MacroImage.Width <= 0 || MacroImage.Height <= 0 ||
             MaskImage.Width != HeightImage.Width ||
             MaskImage.Height != HeightImage.Height ||
             OwnershipImage.Width != HeightImage.Width ||
-            OwnershipImage.Height != HeightImage.Height)
+            OwnershipImage.Height != HeightImage.Height ||
+            RiverDistanceImage.Width != HeightImage.Width ||
+            RiverDistanceImage.Height != HeightImage.Height)
         {
             OutSummary += FString::Printf(
                 TEXT("Failed to decode far-field patch %s.\n"), *PatchId);
             return false;
         }
-        UTexture2D* PatchMacroTexture = CreateSouthForkTerrainMacroTexture(
-            PatchId, MacroPath, OutSummary);
+        UTexture2D* PatchMacroTexture = bReuseExistingFarFieldMeshes
+            ? LoadSouthForkTerrainMacroTextureForReuse(PatchId, OutSummary)
+            : CreateSouthForkTerrainMacroTexture(PatchId, MacroPath, OutSummary);
         UMaterialInstanceConstant* PatchTerrainMaterial =
             CreateSouthForkTerrainMaterialInstance(
                 PatchId, TerrainMaterial, PatchMacroTexture,
@@ -2067,12 +1806,33 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             0.5 * (MinimumX + MaximumX), 0.5 * (MinimumY + MaximumY));
         const int32 Width = HeightImage.Width;
         const int32 Height = HeightImage.Height;
+        const double HeightCellWidthM =
+            (MaximumX - MinimumX) / FMath::Max(Width - 1, 1);
+        const double HeightCellHeightM =
+            (MaximumY - MinimumY) / FMath::Max(Height - 1, 1);
+        const auto SampleMacroAtUv = [&MacroImage](double U, double V)
+        {
+            const int32 MacroColumn = FMath::Clamp(
+                FMath::RoundToInt(U * FMath::Max(MacroImage.Width - 1, 0)),
+                0, MacroImage.Width - 1);
+            const int32 MacroRow = FMath::Clamp(
+                FMath::RoundToInt(V * FMath::Max(MacroImage.Height - 1, 0)),
+                0, MacroImage.Height - 1);
+            return MacroImage.Pixels[MacroRow * MacroImage.Width + MacroColumn];
+        };
         TArray<FVector> Vertices;
         TArray<FVector2D> Uvs;
         TArray<FLinearColor> Colors;
+        TArray<float> SourceElevationsM;
         Vertices.SetNum(Width * Height);
         Uvs.SetNum(Width * Height);
         Colors.SetNum(Width * Height);
+        SourceElevationsM.SetNumUninitialized(Width * Height);
+        for (int32 Index = 0; Index < SourceElevationsM.Num(); ++Index)
+        {
+            SourceElevationsM[Index] = DecodeSouthForkHeightM(
+                HeightImage.Values[Index], MinimumElevationM, MaximumElevationM);
+        }
         for (int32 Row = 0; Row < Height; ++Row)
         {
             const double RowT = static_cast<double>(Row) / FMath::Max(Height - 1, 1);
@@ -2083,14 +1843,36 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                     static_cast<double>(Column) / FMath::Max(Width - 1, 1);
                 const double WorldX = FMath::Lerp(MinimumX, MaximumX, ColumnT);
                 const int32 Index = Row * Width + Column;
-                const float ElevationM = DecodeHeightM(
-                    HeightImage.Values[Index], MinimumElevationM, MaximumElevationM);
+                const int32 LeftColumn = FMath::Max(Column - 1, 0);
+                const int32 RightColumn = FMath::Min(Column + 1, Width - 1);
+                const int32 NorthRow = FMath::Max(Row - 1, 0);
+                const int32 SouthRow = FMath::Min(Row + 1, Height - 1);
+                const float GradientX =
+                    (SourceElevationsM[Row * Width + RightColumn] -
+                     SourceElevationsM[Row * Width + LeftColumn]) /
+                    FMath::Max(
+                        static_cast<float>((RightColumn - LeftColumn) * HeightCellWidthM),
+                        0.01f);
+                const float GradientY =
+                    (SourceElevationsM[NorthRow * Width + Column] -
+                     SourceElevationsM[SouthRow * Width + Column]) /
+                    FMath::Max(
+                        static_cast<float>((SouthRow - NorthRow) * HeightCellHeightM),
+                        0.01f);
+                const float SourceSlope = FMath::Sqrt(
+                    GradientX * GradientX + GradientY * GradientY);
+                const float ElevationM = SourceElevationsM[Index] +
+                    ComputeSouthForkFarFieldCorridorReliefWeight(
+                        MaskImage, Row, Column) * ComputeSouthForkInferredFarFieldReliefM(
+                            WorldX, WorldY, SourceSlope);
                 Vertices[Index] = FVector(
                     (WorldX - PatchOriginM.X) * 100.0,
                     (WorldY - PatchOriginM.Y) * 100.0,
                     (ElevationM - VerticalDatumM) * 100.0f - 75.0f);
                 Uvs[Index] = FVector2D(ColumnT, RowT);
-                Colors[Index] = DecodePreviewSrgbColor(MacroImage.Pixels[Index]);
+                Colors[Index] = DecodeSouthForkPreviewSrgbColor(
+                    SampleMacroAtUv(ColumnT, RowT));
+                Colors[Index].A = 0.0f;
             }
         }
         TArray<int32> Triangles;
@@ -2102,54 +1884,57 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 const int32 I1 = I0 + 1;
                 const int32 I2 = I0 + Width;
                 const int32 I3 = I2 + 1;
-                // Adjacent source-window DEM rectangles overlap around river
-                // bends. Render only the deterministic nearest-station owner;
-                // otherwise nearly coplanar source surfaces z-fight and form
-                // kilometre-scale wedges. The ownership masks partition the
-                // reach and each owned mesh remains a lowered underlay beneath
-                // the detailed +/-64 m corridor.
-                const int32 OwnedCornerCount =
-                    (OwnershipImage.Pixels[I0].R > 0.5f ? 1 : 0) +
-                    (OwnershipImage.Pixels[I1].R > 0.5f ? 1 : 0) +
-                    (OwnershipImage.Pixels[I2].R > 0.5f ? 1 : 0) +
-                    (OwnershipImage.Pixels[I3].R > 0.5f ? 1 : 0);
-                const int32 VisibleCornerCount =
-                    (MaskImage.Pixels[I0].R > 0.5f ? 1 : 0) +
-                    (MaskImage.Pixels[I1].R > 0.5f ? 1 : 0) +
-                    (MaskImage.Pixels[I2].R > 0.5f ? 1 : 0) +
-                    (MaskImage.Pixels[I3].R > 0.5f ? 1 : 0);
-                if (OwnedCornerCount >= 2 && VisibleCornerCount >= 2)
+                // Clip each triangle independently. The former two-of-four
+                // cell rule emitted both triangles when only two corners were
+                // visible, so masked corridor vertices could remain connected
+                // to high valley vertices. Those long sloping faces appeared
+                // as suspended terrain shelves above the guide-eye camera.
+                const auto IsOwnedAndVisible =
+                    [&OwnershipImage, &MaskImage](int32 VertexIndex)
                 {
-                    Triangles.Append({I0, I1, I2, I1, I3, I2});
+                    return OwnershipImage.Pixels[VertexIndex].R > 0.5f &&
+                        MaskImage.Pixels[VertexIndex].R > 0.5f;
+                };
+                if (IsOwnedAndVisible(I0) && IsOwnedAndVisible(I1) &&
+                    IsOwnedAndVisible(I2))
+                {
+                    Triangles.Append({I0, I1, I2});
+                }
+                if (IsOwnedAndVisible(I1) && IsOwnedAndVisible(I3) &&
+                    IsOwnedAndVisible(I2))
+                {
+                    Triangles.Append({I1, I3, I2});
                 }
             }
         }
+
         const FString AssetPath = FString::Printf(
             TEXT("/Game/RaftSim/Environment/SouthForkFullReach/FarField/SM_%s"),
             *PatchId);
         const TArray<FVector> Normals = ComputePreviewMeshNormals(Vertices, Triangles);
         const TArray<FProcMeshTangent> Tangents =
-            BuildFlowTangents(Vertices, Width, Height);
+            BuildSouthForkFlowTangents(Vertices, Width, Height);
         UStaticMesh* Mesh = bReuseExistingFarFieldMeshes
-            ? LoadStaticMeshAsset(AssetPath)
+            ? LoadSouthForkStaticMeshAsset(AssetPath)
             : nullptr;
         if (!Mesh)
         {
-            Mesh = CreateMeshAsset(
+            Mesh = CreateSouthForkMeshAsset(
                 World, AssetPath, PatchId, Vertices, Triangles, Normals, Uvs,
                 Colors, Tangents, PatchTerrainMaterial,
-                /*bEnableNanite=*/false,
-                /*bComplexCollision=*/false, OutSummary);
+                /*bEnableNanite=*/true,
+                /*bComplexCollision=*/false, OutSummary,
+                /*bPreserveNaniteFallbackTopology=*/true);
         }
         if (PatchOrdinal == 0)
         {
             LogStaticMeshVertexColorSummary(TEXT("far_field_00"), Mesh);
         }
-        if (!Mesh || !PlaceStaticMeshActor(
+        if (!Mesh || !ConfigureSouthForkFarFieldTerrainActor(PlaceSouthForkStaticMeshActor(
                 World, Mesh, PatchTerrainMaterial,
                 TEXT("RaftSim_SouthFork_FarField_") + PatchId,
                 FTransform(FVector(PatchOriginM.X * 100.0, PatchOriginM.Y * 100.0, 0.0)),
-                TEXT("RaftSimFullReachFarField"), ECollisionEnabled::NoCollision))
+                TEXT("RaftSimFullReachFarField"), ECollisionEnabled::NoCollision)))
         {
             return false;
         }
@@ -2160,17 +1945,90 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             World, TEXT("RaftSim_SouthFork_FarFieldDressing_") + PatchId,
             TEXT("RaftSimFullReachFarFieldDressing"));
         USceneComponent* FarRoot = FarDressing ? FarDressing->GetRootComponent() : nullptr;
-        UHierarchicalInstancedStaticMeshComponent* FarConifer = AddHism(
-            FarDressing, FarRoot, TEXT("FarConifer"), FarPineMesh,
-            nullptr, 300000, 900000, ECollisionEnabled::NoCollision);
-        UHierarchicalInstancedStaticMeshComponent* FarBroadleaf = AddHism(
-            FarDressing, FarRoot, TEXT("FarBroadleaf"), FarBroadleafMesh,
-            nullptr, 250000, 750000, ECollisionEnabled::NoCollision);
-        for (int32 Row = 1; Row < Height - 1; ++Row)
+        // A single repeated full-tree card on every far-field sample produced an
+        // unmistakable plantation/grid silhouette. Use the three actual
+        // project-owned Ponderosa crown/height profiles directly; the former
+        // FarConiferCard component duplicated profile A and left 93.3% of the
+        // visible population on one silhouette. The current cards retain each
+        // full source photograph on two crossed planes; imported broadleaf
+        // comparison assets remain isolated because they exposed pale
+        // silhouettes in this rig.
+        // At the High/60% production baseline, a twelve-metre crown reaches
+        // roughly one output pixel at six kilometres. Fade generated clusters at
+        // that screen-space limit instead of rasterizing masked planes out to
+        // nine kilometres. Their NAIP source macro already contains canopy
+        // colour and sun shadows, so suppressing a second dynamic card shadow
+        // avoids dark repeated stamps rather than removing geographic detail.
+        // Far-field HISMs also opt into the existing High=0.75/Epic=1.0
+        // foliage policy; detailed corridor foliage remains full density.
+        UHierarchicalInstancedStaticMeshComponent* FarConifers[3] = {
+            AddHism(FarDressing, FarRoot, TEXT("FarConiferA"), PineMeshes[0],
+                nullptr, 360000, 600000, ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/false),
+            AddHism(FarDressing, FarRoot, TEXT("FarConiferB"), PineMeshes[1],
+                nullptr, 300000, 520000, ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/false),
+            AddHism(FarDressing, FarRoot, TEXT("FarConiferC"), PineMeshes[2],
+                nullptr, 300000, 520000, ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/false)};
+        // The project-owned radial cards are appropriate once a crown is a
+        // a few pixels high, but their intersecting planes are conspicuous on
+        // the first canyon walls where a mature tree still projects at
+        // double-digit pixel height. Reuse
+        // the same rights-reviewed 3D pine analogs already assigned to the
+        // detailed corridor for the immediate, non-colliding far-field bank.
+        // Placement below switches between these and the cards by measured
+        // river distance, so no source-tree sample is duplicated.
+        UHierarchicalInstancedStaticMeshComponent* NearBankConifers[3] = {
+            AddHism(FarDressing, FarRoot, TEXT("NearBankConiferA"),
+                DetailedPineMeshes[0], nullptr, 300000, 520000,
+                ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/true),
+            AddHism(FarDressing, FarRoot, TEXT("NearBankConiferB"),
+                DetailedPineMeshes[1], nullptr, 300000, 520000,
+                ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/true),
+            AddHism(FarDressing, FarRoot, TEXT("NearBankConiferC"),
+                DetailedPineMeshes[2], nullptr, 300000, 520000,
+                ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/true)};
+        UHierarchicalInstancedStaticMeshComponent* FarBroadleaves[1] = {
+            AddHism(FarDressing, FarRoot, TEXT("FarBroadleafCard"), FarBroadleafMesh,
+                nullptr, 320000, 540000, ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/false)};
+        UHierarchicalInstancedStaticMeshComponent* FarUnderstory = AddHism(
+            FarDressing, FarRoot, TEXT("FarDryBankUnderstory"), ShrubMesh,
+            nullptr, 80000, 240000, ECollisionEnabled::NoCollision,
+            /*bEnableDensityScaling=*/true, /*bCastShadow=*/false);
+        UHierarchicalInstancedStaticMeshComponent* FarScenicRocks[6] = {};
+        for (int32 RockIndex = 0; RockIndex < 6; ++RockIndex)
+        {
+            FarScenicRocks[RockIndex] = AddHism(
+                FarDressing, FarRoot,
+                *FString::Printf(TEXT("FarScenicBankRock%02d"), RockIndex + 1),
+                RockMeshes[RockIndex], ReviewedRockMaterial,
+                120000, 360000, ECollisionEnabled::NoCollision,
+                /*bEnableDensityScaling=*/true, /*bCastShadow=*/true);
+        }
+        // The stitched path uses a 20 m global grid. Keep foliage on a 40 m
+        // candidate lattice regardless of streaming-tile width: width-based
+        // selection made these smaller tiles four times denser than the
+        // accepted population and nearly doubled total HISM count. The macro
+        // terrain already carries intervening canopy colour and shadows.
+        const int32 FarFoliageStride = 2;
+        const double FarCellWidthM = FarFoliageStride *
+            (MaximumX - MinimumX) / FMath::Max(Width - 1, 1);
+        const double FarCellHeightM = FarFoliageStride *
+            (MaximumY - MinimumY) / FMath::Max(Height - 1, 1);
+        for (int32 Row = FarFoliageStride;
+             Row < Height - FarFoliageStride;
+             Row += FarFoliageStride)
         {
             const double RowT = static_cast<double>(Row) / FMath::Max(Height - 1, 1);
             const double WorldY = FMath::Lerp(MaximumY, MinimumY, RowT);
-            for (int32 Column = 1; Column < Width - 1; ++Column)
+            for (int32 Column = FarFoliageStride;
+                 Column < Width - FarFoliageStride;
+                 Column += FarFoliageStride)
             {
                 const int32 Index = Row * Width + Column;
                 if (MaskImage.Pixels[Index].R <= 0.5f ||
@@ -2178,50 +2036,339 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 {
                     continue;
                 }
-                const FLinearColor Color = MacroImage.Pixels[Index];
+                const double ColumnT =
+                    static_cast<double>(Column) / FMath::Max(Width - 1, 1);
+                const double GridWorldX =
+                    FMath::Lerp(MinimumX, MaximumX, ColumnT);
+                const FLinearColor Color = SampleMacroAtUv(ColumnT, RowT);
                 const float Greenness = Color.G - 0.5f * (Color.R + Color.B);
                 const float Probability = FMath::Clamp(
                     0.36f + Greenness * 1.6f, 0.12f, 0.86f);
-                if (StableUnitRandom(PatchOrdinal * 997 + Row, Column, 71) > Probability)
+                const float FarFoliagePatchNoise = 0.5f + 0.5f *
+                    FMath::PerlinNoise2D(
+                        FVector2D(
+                            static_cast<float>(GridWorldX),
+                            static_cast<float>(WorldY)) /
+                            420.0f +
+                        FVector2D(
+                            static_cast<float>(PatchOrdinal) * 7.13f,
+                            static_cast<float>(PatchOrdinal) * -5.71f));
+                const float ClusteredProbability = FMath::Clamp(
+                    Probability * FMath::Lerp(0.42f, 1.58f, FarFoliagePatchNoise),
+                    0.04f, 0.94f);
+                // The aerial macro represents broad land cover but cannot
+                // supply guide-eye parallax. Add a sparse, deterministic layer
+                // of low dry-bank understory and non-colliding stones on the
+                // same world-space lattice. Their short cull ranges keep them
+                // out of the distant macro and break up only otherwise-bare
+                // immediate canyon walls.
+                const double GroundJitterX = FMath::Lerp(
+                    -0.38 * FarCellWidthM, 0.38 * FarCellWidthM,
+                    StableUnitRandom(Row, Column, PatchOrdinal + 131));
+                const double GroundJitterY = FMath::Lerp(
+                    -0.38 * FarCellHeightM, 0.38 * FarCellHeightM,
+                    StableUnitRandom(Row, Column, PatchOrdinal + 137));
+                const double GroundWorldX = GridWorldX + GroundJitterX;
+                const double GroundWorldY = WorldY + GroundJitterY;
+                const float CenterElevationM = SourceElevationsM[Index];
+                const float ElevationLeftM =
+                    SourceElevationsM[Index - FarFoliageStride];
+                const float ElevationRightM =
+                    SourceElevationsM[Index + FarFoliageStride];
+                const float ElevationNorthM =
+                    SourceElevationsM[Index - Width * FarFoliageStride];
+                const float ElevationSouthM =
+                    SourceElevationsM[Index + Width * FarFoliageStride];
+                const double CenterGradientX =
+                    (ElevationRightM - ElevationLeftM) /
+                    FMath::Max(2.0 * FarCellWidthM, 0.01);
+                const double CenterGradientY =
+                    (ElevationNorthM - ElevationSouthM) /
+                    FMath::Max(2.0 * FarCellHeightM, 0.01);
+                const float CenterSourceSlope = FMath::Sqrt(
+                    static_cast<float>(
+                        CenterGradientX * CenterGradientX +
+                        CenterGradientY * CenterGradientY));
+                const float GroundElevationM = CenterElevationM +
+                    static_cast<float>(
+                        CenterGradientX * GroundJitterX +
+                        CenterGradientY * GroundJitterY) +
+                    ComputeSouthForkFarFieldCorridorReliefWeight(
+                        MaskImage, Row, Column) *
+                        ComputeSouthForkInferredFarFieldReliefM(
+                            GroundWorldX, GroundWorldY, CenterSourceSlope);
+                const float GroundRiverDistanceM =
+                    RiverDistanceImage.Values[Index] * 0.1f;
+                if (GroundRiverDistanceM >= FarFieldRiverExclusionM)
                 {
-                    continue;
+                    float NearBankAlpha = FMath::Clamp(
+                        (320.0f - GroundRiverDistanceM) /
+                            (320.0f - FarFieldRiverExclusionM),
+                        0.0f, 1.0f);
+                    NearBankAlpha = NearBankAlpha * NearBankAlpha *
+                        (3.0f - 2.0f * NearBankAlpha);
+                    const float UnderstoryProbability = FMath::Clamp(
+                        0.055f - Greenness * 0.22f +
+                            NearBankAlpha * 0.30f,
+                        0.03f, 0.40f);
+                    if (FarUnderstory && CenterSourceSlope <= 0.38f && StableUnitRandom(
+                            PatchOrdinal * 911 + Row, Column, 139) <
+                        UnderstoryProbability)
+                    {
+                        const float Scale = FMath::Lerp(
+                            0.42f, 1.05f,
+                            StableUnitRandom(Row, Column, PatchOrdinal + 149));
+                        FarUnderstory->AddInstance(
+                            FTransform(
+                                FRotator(
+                                    0.0f,
+                                    StableUnitRandom(
+                                        Row, Column, PatchOrdinal + 151) * 360.0f,
+                                    0.0f),
+                                FVector(
+                                    GroundWorldX * 100.0,
+                                    GroundWorldY * 100.0,
+                                    (GroundElevationM - VerticalDatumM) * 100.0f -
+                                        Scale * 24.0f),
+                                FVector(
+                                    Scale * FMath::Lerp(
+                                        0.78f, 1.24f,
+                                        StableUnitRandom(
+                                            Row, Column, PatchOrdinal + 157)),
+                                    Scale,
+                                    Scale * FMath::Lerp(
+                                        0.72f, 1.18f,
+                                        StableUnitRandom(
+                                            Row, Column, PatchOrdinal + 163)))),
+                            /*bWorldSpace=*/true);
+                        ++Metrics.FarFieldFoliageInstanceCount;
+                    }
+                    const float ScenicRockProbability = FMath::Clamp(
+                        0.014f + CenterSourceSlope * 0.08f -
+                            Greenness * 0.03f + NearBankAlpha * 0.22f,
+                        0.01f, 0.34f);
+                    if (StableUnitRandom(
+                            PatchOrdinal * 919 + Row, Column, 167) <
+                        ScenicRockProbability)
+                    {
+                        const int32 RockIndex =
+                            FMath::Abs(PatchOrdinal * 17 + Row * 5 + Column) % 6;
+                        if (FarScenicRocks[RockIndex])
+                        {
+                            const float RockScale = FMath::Lerp(
+                                0.28f,
+                                FMath::Lerp(0.76f, 1.70f, NearBankAlpha),
+                                StableUnitRandom(
+                                    Row, Column, PatchOrdinal + 173));
+                            FarScenicRocks[RockIndex]->AddInstance(
+                                FTransform(
+                                    FRotator(
+                                        StableUnitRandom(
+                                            Row, Column, PatchOrdinal + 179) * 18.0f - 9.0f,
+                                        StableUnitRandom(
+                                            Row, Column, PatchOrdinal + 181) * 360.0f,
+                                        StableUnitRandom(
+                                            Row, Column, PatchOrdinal + 191) * 14.0f - 7.0f),
+                                    FVector(
+                                        GroundWorldX * 100.0,
+                                        GroundWorldY * 100.0,
+                                        (GroundElevationM - VerticalDatumM) * 100.0f +
+                                            RockScale * 64.0f),
+                                    FVector(RockScale)),
+                                /*bWorldSpace=*/true);
+                            ++Metrics.ScenicRockInstanceCount;
+                        }
+                    }
                 }
-                const double ColumnT =
-                    static_cast<double>(Column) / FMath::Max(Width - 1, 1);
-                const double WorldX = FMath::Lerp(MinimumX, MaximumX, ColumnT);
-                if (IsInsideFarFieldRiverExclusion(
-                        FVector2D(WorldX, WorldY)))
+                // Two half-probability candidates preserve the expected V13
+                // population while allowing deterministic gaps and pairs.
+                // The previous one-candidate rule approached one tree per
+                // raster cell in dense source cover and exposed the sampling
+                // lattice as a plantation on distant hills.
+                for (int32 FoliageCandidate = 0; FoliageCandidate < 2;
+                     ++FoliageCandidate)
                 {
-                    continue;
+                    const int32 CandidateColumn = Column + FoliageCandidate * 4093;
+                    if (StableUnitRandom(
+                            PatchOrdinal * 997 + Row, CandidateColumn, 71) >
+                        ClusteredProbability * 0.5f)
+                    {
+                        continue;
+                    }
+                    const double JitterX = FMath::Lerp(
+                        -0.46 * FarCellWidthM, 0.46 * FarCellWidthM,
+                        StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 73));
+                    const double JitterY = FMath::Lerp(
+                        -0.46 * FarCellHeightM, 0.46 * FarCellHeightM,
+                        StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 79));
+                    const double WorldX = GridWorldX + JitterX;
+                    const double JitteredWorldY = WorldY + JitterY;
+                    const float TreeRiverDistanceM =
+                        RiverDistanceImage.Values[Index] * 0.1f;
+                    if (TreeRiverDistanceM < FarFieldRiverExclusionM)
+                    {
+                        continue;
+                    }
+                    const double GradientX =
+                        (ElevationRightM - ElevationLeftM) /
+                        FMath::Max(2.0 * FarCellWidthM, 0.01);
+                    // Raster rows progress from maximum Y toward minimum Y.
+                    const double GradientY =
+                        (ElevationNorthM - ElevationSouthM) /
+                        FMath::Max(2.0 * FarCellHeightM, 0.01);
+                    const float BaseElevationM = CenterElevationM +
+                        static_cast<float>(GradientX * JitterX + GradientY * JitterY);
+                    const float SourceSlope = FMath::Sqrt(
+                        static_cast<float>(GradientX * GradientX + GradientY * GradientY));
+                    // The shared-grid generator emits route distance at every
+                    // far-field vertex. Sampling the same candidate vertex is
+                    // deterministic across tile seams and avoids the old
+                    // authoring-only bucket query, whose +/-3-bucket search
+                    // silently returned infinity beyond roughly 500 m.
+                    const float ElevationM = BaseElevationM +
+                        ComputeSouthForkFarFieldCorridorReliefWeight(
+                            MaskImage, Row, Column) *
+                            ComputeSouthForkInferredFarFieldReliefM(
+                                WorldX, JitteredWorldY, SourceSlope);
+                    const bool bChooseConifer = Greenness > 0.025f;
+                    const float VariantSelection =
+                        StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 97);
+                    int32 VariantIndex = 0;
+                    UHierarchicalInstancedStaticMeshComponent* Target = nullptr;
+                    bool bUsesDetailedPineAnalog = false;
+                    if (bChooseConifer)
+                    {
+                        // Balance mature, intermediate, and younger Ponderosa
+                        // age/profile classes while retaining a mature-tree
+                        // plurality. All three are project-owned radial-card
+                        // meshes derived from independent sources.
+                        VariantIndex = VariantSelection < 0.44f
+                            ? 0
+                            : (VariantSelection < 0.74f ? 1 : 2);
+                        Target = FarConifers[VariantIndex];
+                    }
+                    else
+                    {
+                        // Tree Small 02 remains useful import-pipeline evidence,
+                        // but its human review explicitly rejected its pale,
+                        // sparse canopy and regular repetition for production.
+                        // Keep all broadleaves on the source-backed live-oak
+                        // volume and vary the crown profile per instance below.
+                        Target = FarBroadleaves[0];
+                    }
+                    if (bChooseConifer &&
+                        TreeRiverDistanceM <= DetailedPineAnalogRiverDistanceM &&
+                        NearBankConifers[VariantIndex])
+                    {
+                        Target = NearBankConifers[VariantIndex];
+                        bUsesDetailedPineAnalog = true;
+                    }
+                    if (!Target)
+                    {
+                        continue;
+                    }
+                    const float Yaw = StableUnitRandom(
+                        Row, CandidateColumn, PatchOrdinal + 83) * 360.0f;
+                    float MinimumScale = 0.74f;
+                    float MaximumScale = 1.38f;
+                    if (bChooseConifer)
+                    {
+                        if (VariantIndex == 0)
+                        {
+                            MinimumScale = 0.78f;
+                            MaximumScale = 1.34f;
+                        }
+                        else if (VariantIndex == 1)
+                        {
+                            MinimumScale = 0.68f;
+                            MaximumScale = 1.18f;
+                        }
+                        else
+                        {
+                            MinimumScale = 0.58f;
+                            MaximumScale = 1.04f;
+                        }
+                    }
+                    const float Scale = FMath::Lerp(
+                        MinimumScale, MaximumScale,
+                        StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 89));
+                    FVector CrownProfileScale = FVector::OneVector;
+                    if (bChooseConifer)
+                    {
+                        if (VariantIndex == 0)
+                        {
+                            CrownProfileScale = FVector(0.94f, 1.04f, 1.08f);
+                        }
+                        else if (VariantIndex == 1)
+                        {
+                            CrownProfileScale = FVector(1.05f, 0.96f, 1.00f);
+                        }
+                        else
+                        {
+                            CrownProfileScale = FVector(1.10f, 1.02f, 0.92f);
+                        }
+                    }
+                    else
+                    {
+                        const float CrownProfile = StableUnitRandom(
+                            Row, CandidateColumn, PatchOrdinal + 127);
+                        if (CrownProfile < 0.333333f)
+                        {
+                            CrownProfileScale = FVector(1.14f, 0.94f, 0.88f);
+                        }
+                        else if (CrownProfile < 0.666667f)
+                        {
+                            CrownProfileScale = FVector(0.92f, 1.10f, 0.93f);
+                        }
+                        else
+                        {
+                            CrownProfileScale = FVector(0.86f, 0.92f, 1.13f);
+                        }
+                    }
+                    const FVector InstanceScale(
+                        Scale * FMath::Lerp(
+                            0.82f, 1.18f,
+                            StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 101)) *
+                            CrownProfileScale.X,
+                        Scale * FMath::Lerp(
+                            0.84f, 1.16f,
+                            StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 103)) *
+                            CrownProfileScale.Y,
+                        Scale * FMath::Lerp(
+                            0.88f, 1.16f,
+                            StableUnitRandom(Row, CandidateColumn, PatchOrdinal + 107)) *
+                            CrownProfileScale.Z);
+                    const float LeanDegrees = bChooseConifer ? 2.5f : 4.0f;
+                    Target->AddInstance(
+                        FTransform(
+                            FRotator(
+                                FMath::Lerp(
+                                    -LeanDegrees, LeanDegrees,
+                                    StableUnitRandom(
+                                        Row, CandidateColumn, PatchOrdinal + 109)),
+                                Yaw,
+                                FMath::Lerp(
+                                    -LeanDegrees, LeanDegrees,
+                                    StableUnitRandom(
+                                        Row, CandidateColumn, PatchOrdinal + 113))),
+                            FVector(
+                                WorldX * 100.0, JitteredWorldY * 100.0,
+                                (ElevationM - VerticalDatumM) * 100.0f),
+                            InstanceScale),
+                        /*bWorldSpace=*/true);
+                    if (bChooseConifer)
+                    {
+                        if (bUsesDetailedPineAnalog)
+                        {
+                            ++Metrics.FarFieldDetailedPineInstanceCount;
+                        }
+                        else
+                        {
+                            ++Metrics.FarFieldPineCardInstanceCount;
+                        }
+                    }
+                    ++Metrics.FarFieldFoliageInstanceCount;
                 }
-                const float ElevationM = DecodeHeightM(
-                    HeightImage.Values[Index], MinimumElevationM, MaximumElevationM);
-                const bool bChooseConifer = Greenness > 0.025f;
-                UHierarchicalInstancedStaticMeshComponent* Target =
-                    bChooseConifer ? FarConifer : FarBroadleaf;
-                if (!Target)
-                {
-                    continue;
-                }
-                const float Yaw = StableUnitRandom(Row, Column, PatchOrdinal + 83) * 360.0f;
-                const float MinimumScale = bChooseConifer
-                    ? (GeneratedPonderosaMesh ? 0.70f : 0.95f)
-                    : (GeneratedInteriorLiveOakMesh ? 0.74f : 0.95f);
-                const float MaximumScale = bChooseConifer
-                    ? (GeneratedPonderosaMesh ? 1.32f : 1.80f)
-                    : (GeneratedInteriorLiveOakMesh ? 1.38f : 1.80f);
-                const float Scale = FMath::Lerp(
-                    MinimumScale, MaximumScale,
-                    StableUnitRandom(Row, Column, PatchOrdinal + 89));
-                Target->AddInstance(
-                    FTransform(
-                        FRotator(0.0f, Yaw, 0.0f),
-                        FVector(
-                            WorldX * 100.0, WorldY * 100.0,
-                            (ElevationM - VerticalDatumM) * 100.0f),
-                        FVector(Scale)),
-                    /*bWorldSpace=*/true);
-                ++Metrics.FarFieldFoliageInstanceCount;
             }
         }
     }
@@ -2235,8 +2382,10 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     const float StartWaterZCm = Metrics.MedianCenterWaterLocalZCm[StartIndex] > -BIG_NUMBER * 0.5f
         ? Metrics.MedianCenterWaterLocalZCm[StartIndex]
         : 52000.0f;
-    ARaftSimRiverWaterConfig* WaterConfig = World->SpawnActor<ARaftSimRiverWaterConfig>(
-        ARaftSimRiverWaterConfig::StaticClass(), FTransform::Identity);
+    ARaftSimRiverWaterConfig* WaterConfig =
+        SpawnStableSouthForkActor<ARaftSimRiverWaterConfig>(
+            World, FTransform::Identity,
+            TEXT("RaftSim_SouthFork_FullReachWaterConfig"));
     if (!WaterConfig)
     {
         return false;
@@ -2259,22 +2408,29 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
     SetSpatiallyLoadedIfAllowed(WaterConfig, false);
 
     const FRotator StartRotation = StartTangent.Rotation();
-    ARaftSimRaftActor* Raft = World->SpawnActor<ARaftSimRaftActor>(
-        ARaftSimRaftActor::StaticClass(),
-        FVector(StartWorldM.X * 100.0f, StartWorldM.Y * 100.0f, StartWaterZCm + 58.0f),
-        StartRotation);
+    ARaftSimRaftActor* Raft = SpawnStableSouthForkActor<ARaftSimRaftActor>(
+        World,
+        FTransform(
+            StartRotation,
+            FVector(
+                StartWorldM.X * 100.0f,
+                StartWorldM.Y * 100.0f,
+                StartWaterZCm + 58.0f)),
+        TEXT("RaftSim_SouthFork_PlayerRaft"));
     if (Raft)
     {
         Raft->SetActorLabel(TEXT("RaftSim_SouthFork_PlayerRaft"));
         SetSpatiallyLoadedIfAllowed(Raft, false);
     }
-    APlayerStart* PlayerStart = World->SpawnActor<APlayerStart>(
-        APlayerStart::StaticClass(),
-        FVector(
-            (StartWorldM.X - StartTangent.X * 4.0f) * 100.0f,
-            (StartWorldM.Y - StartTangent.Y * 4.0f) * 100.0f,
-            StartWaterZCm + 170.0f),
-        StartRotation);
+    APlayerStart* PlayerStart = SpawnStableSouthForkActor<APlayerStart>(
+        World,
+        FTransform(
+            StartRotation,
+            FVector(
+                (StartWorldM.X - StartTangent.X * 4.0f) * 100.0f,
+                (StartWorldM.Y - StartTangent.Y * 4.0f) * 100.0f,
+                StartWaterZCm + 170.0f)),
+        TEXT("RaftSim_SouthFork_PlayerStart"));
     if (PlayerStart)
     {
         PlayerStart->SetActorLabel(TEXT("RaftSim_SouthFork_PlayerStart"));
@@ -2301,7 +2457,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                                      const FRotator& Rotation, const FVector& Scale,
                                      UMaterialInterface* Material)
     {
-        AStaticMeshActor* Actor = PlaceStaticMeshActor(
+        AStaticMeshActor* Actor = PlaceSouthForkStaticMeshActor(
             World, CubeMesh, Material, Label,
             FTransform(Rotation, Location, Scale),
             TEXT("RaftSimProceduralInfrastructureNotForNavigation"),
@@ -2431,6 +2587,69 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             SiteTangent.Rotation(), FVector(0.14f, 0.14f, 3.2f), Timber);
     }
 
+    // Single Layer Water normally receives the canyon through the temporal
+    // reflection history of the player's view. Deterministic captures and a
+    // freshly loaded packaged map do not have that history yet, so a bare
+    // skylight makes calm reaches read as a flat blue-gray card. Cover the
+    // 49 km reach with overlapping, static local probes whose cubemaps are
+    // baked after all source-backed and procedural environment actors exist.
+    // These affect reflected radiance only; solver water vertices, collision,
+    // flow fields, and gameplay forces remain unchanged.
+    constexpr int32 ReflectionProbeCount = 13;
+    const float LastStationM = CoordinatePoints.Last().StationM;
+    for (int32 ProbeIndex = 0; ProbeIndex < ReflectionProbeCount; ++ProbeIndex)
+    {
+        const float ProbeStationM = LastStationM *
+            (static_cast<float>(ProbeIndex) + 0.5f) /
+            static_cast<float>(ReflectionProbeCount);
+        const int32 CoordinateIndex = ClosestCoordinateIndex(
+            CoordinatePoints, ProbeStationM);
+        const FVector2D ProbeWorldM = CoordinateWorldM(
+            CoordinatePoints[CoordinateIndex], 0.0f);
+        const float ProbeWaterZCm =
+            Metrics.MedianCenterWaterLocalZCm[CoordinateIndex] > -BIG_NUMBER * 0.5f
+            ? Metrics.MedianCenterWaterLocalZCm[CoordinateIndex]
+            : 500.0f;
+        const FString ProbeLabel = FString::Printf(
+            TEXT("RaftSim_SouthFork_ReflectionProbe_%02d"), ProbeIndex + 1);
+        ASphereReflectionCapture* Probe =
+            SpawnStableSouthForkActor<ASphereReflectionCapture>(
+                World,
+                FTransform(FVector(
+                    ProbeWorldM.X * 100.0f,
+                    ProbeWorldM.Y * 100.0f,
+                    ProbeWaterZCm + 180.0f)),
+                ProbeLabel);
+        USphereReflectionCaptureComponent* ProbeComponent = Probe
+            ? Cast<USphereReflectionCaptureComponent>(Probe->GetCaptureComponent())
+            : nullptr;
+        if (!Probe || !ProbeComponent)
+        {
+            OutSummary += FString::Printf(
+                TEXT("Failed to create river reflection probe %d.\n"),
+                ProbeIndex + 1);
+            return false;
+        }
+        Probe->SetActorLabel(ProbeLabel);
+        ProbeComponent->InfluenceRadius = 230000.0f;
+        ProbeComponent->Brightness = 0.92f;
+        ProbeComponent->MarkDirtyForRecapture();
+        SetSpatiallyLoadedIfAllowed(Probe, false);
+        ++Metrics.ReflectionProbeCount;
+    }
+    UReflectionCaptureComponent::UpdateReflectionCaptureContents(
+        World, TEXT("RaftSim South Fork full-reach environment build"));
+    FlushRenderingCommands();
+    OutSummary += FString::Printf(
+        TEXT("Captured %d overlapping South Fork local reflection probes.\n"),
+        Metrics.ReflectionProbeCount);
+
+    if (!ValidateStableSouthForkActorIdentities(World, Metrics, OutSummary))
+    {
+        OutSummary += TEXT("Failed to assign stable full-reach actor identities.\n");
+        return false;
+    }
+
     if (!SaveFullReachWorld(World))
     {
         OutSummary += TEXT("Failed to save the full-reach gameplay map.\n");
@@ -2444,11 +2663,25 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkFarField"));
     const bool bDiagnosticHideWater = FParse::Param(
         FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkWater"));
+    const bool bDiagnosticHideDetailedDressing = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkDetailedDressing"));
+    const bool bDiagnosticHideDetailedRocks = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkDetailedRocks"));
+    int32 DiagnosticHideDetailedRockVariant = 0;
+    FParse::Value(
+        FCommandLine::Get(),
+        TEXT("RaftSimDiagnosticHideSouthForkDetailedRockVariant="),
+        DiagnosticHideDetailedRockVariant);
     TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenActors;
-    if (bDiagnosticHideFarField || bDiagnosticHideWater)
+    TArray<TWeakObjectPtr<UHierarchicalInstancedStaticMeshComponent>>
+        DiagnosticHiddenComponents;
+    if (bDiagnosticHideFarField || bDiagnosticHideWater ||
+        bDiagnosticHideDetailedDressing || bDiagnosticHideDetailedRocks ||
+        DiagnosticHideDetailedRockVariant > 0)
     {
         const FName FarFieldTag(TEXT("RaftSimFullReachFarField"));
         const FName FarFieldDressingTag(TEXT("RaftSimFullReachFarFieldDressing"));
+        const FName DetailedDressingTag(TEXT("RaftSimFullReachDressing"));
         const FName MedianWaterTag(TEXT("RaftSimFlowBand_median_runnable"));
         for (TActorIterator<AActor> It(World); It; ++It)
         {
@@ -2457,18 +2690,50 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
                 (bDiagnosticHideFarField &&
                     (Actor->ActorHasTag(FarFieldTag) ||
                      Actor->ActorHasTag(FarFieldDressingTag))) ||
-                (bDiagnosticHideWater && Actor->ActorHasTag(MedianWaterTag)));
+                (bDiagnosticHideWater && Actor->ActorHasTag(MedianWaterTag)) ||
+                (bDiagnosticHideDetailedDressing &&
+                    Actor->ActorHasTag(DetailedDressingTag)));
             if (bHideActor)
             {
                 Actor->SetActorHiddenInGame(true);
                 DiagnosticHiddenActors.Add(Actor);
             }
+            if (Actor &&
+                (bDiagnosticHideDetailedRocks ||
+                 DiagnosticHideDetailedRockVariant > 0) &&
+                Actor->ActorHasTag(DetailedDressingTag))
+            {
+                TInlineComponentArray<UHierarchicalInstancedStaticMeshComponent*>
+                    Components(Actor);
+                for (UHierarchicalInstancedStaticMeshComponent* Component : Components)
+                {
+                    const FString Name = Component ? Component->GetName() : FString();
+                    const bool bIsRock =
+                        Name.StartsWith(TEXT("Boulder")) ||
+                        Name.StartsWith(TEXT("ScenicBankRock"));
+                    const FString VariantSuffix = FString::Printf(
+                        TEXT("%02d"), DiagnosticHideDetailedRockVariant);
+                    const bool bMatchesVariant =
+                        DiagnosticHideDetailedRockVariant > 0 &&
+                        Name.EndsWith(VariantSuffix);
+                    if (Component && bIsRock &&
+                        (bDiagnosticHideDetailedRocks || bMatchesVariant))
+                    {
+                        Component->SetVisibility(false, true);
+                        DiagnosticHiddenComponents.Add(Component);
+                    }
+                }
+            }
         }
         OutSummary += FString::Printf(
-            TEXT("Capture diagnostic hid %d actors after map save (far field %s, water %s).\n"),
+            TEXT("Capture diagnostic hid %d actors and %d components after map save (far field %s, water %s, detailed dressing %s, detailed rocks %s, rock variant %d).\n"),
             DiagnosticHiddenActors.Num(),
+            DiagnosticHiddenComponents.Num(),
             bDiagnosticHideFarField ? TEXT("yes") : TEXT("no"),
-            bDiagnosticHideWater ? TEXT("yes") : TEXT("no"));
+            bDiagnosticHideWater ? TEXT("yes") : TEXT("no"),
+            bDiagnosticHideDetailedDressing ? TEXT("yes") : TEXT("no"),
+            bDiagnosticHideDetailedRocks ? TEXT("yes") : TEXT("no"),
+            DiagnosticHideDetailedRockVariant);
     }
 
     const struct FCaptureSpec
@@ -2477,12 +2742,13 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         float StationM;
         float LateralM;
         float HeightM;
+        bool bLookUpstream;
     } CaptureSpecs[] = {
-        {TEXT("chili_bar_launch_downstream"), 120.0f, -4.0f, 2.4f},
-        {TEXT("meat_grinder_guide_eye"), 920.0f, 1.0f, 2.0f},
-        {TEXT("troublemaker_approach"), 8280.0f, -2.0f, 2.2f},
-        {TEXT("coloma_bridge_context"), 5100.0f, 8.0f, 3.0f},
-        {TEXT("salmon_falls_takeout"), 48940.0f, 2.0f, 2.5f}};
+        {TEXT("chili_bar_launch_downstream"), 120.0f, -4.0f, 2.4f, false},
+        {TEXT("meat_grinder_guide_eye"), 944.0f, 1.0f, 2.0f, false},
+        {TEXT("troublemaker_approach"), 8328.0f, -2.0f, 2.2f, false},
+        {TEXT("coloma_bridge_context"), 5100.0f, 8.0f, 3.0f, false},
+        {TEXT("salmon_falls_takeout"), 48940.0f, 2.0f, 2.5f, true}};
     TArray<FString> CapturePaths;
     bool bAllCapturesSaved = true;
     for (const FCaptureSpec& Spec : CaptureSpecs)
@@ -2490,6 +2756,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
         const int32 Index = ClosestCoordinateIndex(CoordinatePoints, Spec.StationM);
         const FVector2D WorldM = CoordinateWorldM(CoordinatePoints[Index], Spec.LateralM);
         const FVector Tangent = CoordinateTangent(CoordinatePoints, Index);
+        const FVector CaptureTangent = Spec.bLookUpstream ? -Tangent : Tangent;
         const float SurfaceZCm = Metrics.MedianCenterWaterLocalZCm[Index] > -BIG_NUMBER * 0.5f
             ? Metrics.MedianCenterWaterLocalZCm[Index]
             : 500.0f;
@@ -2504,7 +2771,7 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             World, Spec.Id,
             FVector(WorldM.X * 100.0f, WorldM.Y * 100.0f,
                 SurfaceZCm + Spec.HeightM * 100.0f),
-            FRotator(-5.0f, Tangent.Rotation().Yaw, 0.0f),
+            FRotator(-5.0f, CaptureTangent.Rotation().Yaw, 0.0f),
             CapturePath, OutSummary);
         CapturePaths.Add(CapturePath);
     }
@@ -2515,69 +2782,206 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
             Actor->SetActorHiddenInGame(false);
         }
     }
-
-    TSharedRef<FJsonObject> BuildRoot = MakeShared<FJsonObject>();
-    BuildRoot->SetStringField(
-        TEXT("schema"), TEXT("raftsim.unreal.south_fork_full_reach_build.v1"));
-    BuildRoot->SetStringField(TEXT("generated_on"), TEXT("2026-07-19"));
-    BuildRoot->SetStringField(TEXT("map"), FullReachMapPackagePath);
-    BuildRoot->SetBoolField(TEXT("world_partition"), World->GetWorldPartition() != nullptr);
-    BuildRoot->SetBoolField(TEXT("nanite_terrain"), Metrics.TerrainTileCount == 13);
-    BuildRoot->SetBoolField(TEXT("spatial_streaming_actors"), true);
-    BuildRoot->SetBoolField(TEXT("moving_live_water_configured"), true);
-    BuildRoot->SetBoolField(TEXT("source_conditioned_vertex_materials"), true);
-    BuildRoot->SetBoolField(TEXT("wet_bank_material_response"), true);
-    BuildRoot->SetBoolField(TEXT("three_flow_presentations"), Metrics.WaterTileCount == 39);
-    BuildRoot->SetBoolField(TEXT("far_field_geography_complete"),
-        Metrics.FarFieldPatchCount == 8);
-    BuildRoot->SetBoolField(TEXT("detailed_mesh_reuse_requested"),
-        bReuseExistingDetailedMeshes);
-    BuildRoot->SetBoolField(TEXT("capture_set_complete"), bAllCapturesSaved);
-    BuildRoot->SetBoolField(TEXT("hlod_generation_complete"), false);
-    BuildRoot->SetStringField(
-        TEXT("hlod_status"), TEXT("ready_for_WorldPartitionHLODsBuilder_commandlet"));
-    BuildRoot->SetBoolField(TEXT("owner_art_and_readability_review_passed"), false);
-    BuildRoot->SetStringField(
-        TEXT("authority"),
-        TEXT("authoritative sources where present; deterministic procedural infill explicitly labelled; not for navigation"));
-    TSharedRef<FJsonObject> MetricRoot = MakeShared<FJsonObject>();
-    MetricRoot->SetNumberField(TEXT("terrain_tiles"), Metrics.TerrainTileCount);
-    MetricRoot->SetNumberField(TEXT("water_tiles"), Metrics.WaterTileCount);
-    MetricRoot->SetNumberField(TEXT("far_field_patches"), Metrics.FarFieldPatchCount);
-    MetricRoot->SetNumberField(TEXT("terrain_triangles"), Metrics.TerrainTriangleCount);
-    MetricRoot->SetNumberField(TEXT("water_triangles"), Metrics.WaterTriangleCount);
-    MetricRoot->SetNumberField(TEXT("far_field_triangles"), Metrics.FarFieldTriangleCount);
-    MetricRoot->SetNumberField(TEXT("foliage_instances"), Metrics.FoliageInstanceCount);
-    MetricRoot->SetNumberField(
-        TEXT("far_field_foliage_instances"), Metrics.FarFieldFoliageInstanceCount);
-    MetricRoot->SetNumberField(TEXT("boulder_instances"), Metrics.BoulderInstanceCount);
-    MetricRoot->SetNumberField(
-        TEXT("scenic_noncolliding_bank_rock_instances"),
-        Metrics.ScenicRockInstanceCount);
-    MetricRoot->SetNumberField(TEXT("spray_mist_instances"), Metrics.SprayMistInstanceCount);
-    MetricRoot->SetNumberField(TEXT("infrastructure_actors"), Metrics.InfrastructureActorCount);
-    BuildRoot->SetObjectField(TEXT("metrics"), MetricRoot);
-    TArray<TSharedPtr<FJsonValue>> CaptureJson;
-    for (const FString& Path : CapturePaths)
+    for (const TWeakObjectPtr<UHierarchicalInstancedStaticMeshComponent>& Component :
+         DiagnosticHiddenComponents)
     {
-        CaptureJson.Add(MakeShared<FJsonValueString>(Path));
+        if (Component.IsValid())
+        {
+            Component->SetVisibility(true, true);
+        }
     }
-    BuildRoot->SetArrayField(TEXT("captures"), CaptureJson);
-    FString BuildText;
-    const TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&BuildText);
-    FJsonSerializer::Serialize(BuildRoot, Writer);
-    BuildText += TEXT("\n");
-    const FString BuildManifestAbsolute = AbsoluteRepoPath(BuildManifestRelativePath);
-    IFileManager::Get().MakeDirectory(*FPaths::GetPath(BuildManifestAbsolute), true);
-    const bool bBuildManifestSaved = FFileHelper::SaveStringToFile(
-        BuildText, *BuildManifestAbsolute, FFileHelper::EEncodingOptions::ForceUTF8WithoutBOM);
+
+    return WriteSouthForkFullReachBuildManifest(
+        World, Metrics, bReuseExistingDetailedMeshes, bAllCapturesSaved,
+        CapturePaths, OutSummary);
+}
+
+bool CaptureSettledSouthForkFullReachEnvironment(FString& OutSummary)
+{
+    TSharedPtr<FJsonObject> EnvironmentRoot;
+    TArray<FSouthForkCoordinatePoint> CoordinatePoints;
+    float VerticalDatumM = 0.0f;
+    FString CoordinateMapPath;
+    if (!LoadJsonObject(EnvironmentManifestRelativePath, EnvironmentRoot) ||
+        !ParseCoordinateMap(
+            EnvironmentRoot, CoordinatePoints, VerticalDatumM, CoordinateMapPath))
+    {
+        OutSummary += TEXT("Could not parse the fixed South Fork capture coordinates.\n");
+        return false;
+    }
+
+    const FString MapFilename = FPackageName::LongPackageNameToFilename(
+        FullReachMapPackagePath, FPackageName::GetMapPackageExtension());
+    UWorld* World = UEditorLoadingAndSavingUtils::LoadMap(MapFilename);
+    UWorldPartition* WorldPartition = World ? World->GetWorldPartition() : nullptr;
+    if (!World || !WorldPartition || !WorldPartition->IsInitialized())
+    {
+        OutSummary += TEXT("Could not load the settled South Fork World Partition map.\n");
+        return false;
+    }
+
+    // Keep hard references alive for the complete evidence set. This loads
+    // the immutable saved map exactly once and avoids generator/package-order
+    // changes between nominal capture repeats.
+    TArray<FWorldPartitionReference> LoadedActorReferences;
+    WorldPartition->LoadAllActors(LoadedActorReferences);
+    FlushAsyncLoading();
+    World->FlushLevelStreaming(EFlushLevelStreamingType::Full);
+    World->SendAllEndOfFrameUpdates();
+    FlushRenderingCommands();
+    TArray<TPair<TWeakObjectPtr<UPrimitiveComponent>, bool>> SourceCaptureVisibilityStates;
+    ConfigureSouthForkSettledSourceCaptureVisibility(World, SourceCaptureVisibilityStates, OutSummary);
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>
+        TerrainDetailV2ReviewMaterialStates;
+    TArray<FSouthForkShoreRockReviewComponentState>
+        PolyHavenShoreRockReviewStates;
+    TArray<TWeakObjectPtr<AActor>> DerivedBankMorphologyReviewActors;
+    if (!ConfigureSouthForkFullReachReviewLayers(
+            World, TerrainDetailV2ReviewMaterialStates,
+            PolyHavenShoreRockReviewStates,
+            DerivedBankMorphologyReviewActors, OutSummary))
+    {
+        RestoreSouthForkSettledSourceCaptureVisibility(
+            SourceCaptureVisibilityStates);
+        return false;
+    }
+    // Review-only isolation switch: hide the broad Single Layer Water actors
+    // while retaining the solver-foam actors. This never mutates the saved
+    // map and makes placement/coverage failures distinguishable from
+    // translucency-compositing failures in offscreen evidence captures.
+    TArray<TWeakObjectPtr<AActor>> DiagnosticHiddenBaseWaterActors;
+    TArray<TPair<TWeakObjectPtr<UStaticMeshComponent>, TWeakObjectPtr<UMaterialInterface>>>
+        DiagnosticOpaqueFoamMaterials;
+    if (FParse::Param(
+            FCommandLine::Get(), TEXT("RaftSimDiagnosticHideSouthForkBaseWater")))
+    {
+        const FName MedianWaterTag(TEXT("RaftSimFlowBand_median_runnable"));
+        const FName SolverFoamTag(TEXT("RaftSimSolverFoamOverlay"));
+        for (TActorIterator<AStaticMeshActor> It(World); It; ++It)
+        {
+            AStaticMeshActor* Actor = *It;
+            if (Actor && Actor->ActorHasTag(MedianWaterTag) &&
+                !Actor->ActorHasTag(SolverFoamTag))
+            {
+                Actor->SetActorHiddenInGame(true);
+                DiagnosticHiddenBaseWaterActors.Add(Actor);
+            }
+        }
+        for (TActorIterator<AStaticMeshActor> It(World); It; ++It)
+        {
+            AStaticMeshActor* Actor = *It;
+            if (!Actor || !Actor->ActorHasTag(MedianWaterTag) ||
+                !Actor->ActorHasTag(SolverFoamTag))
+            {
+                continue;
+            }
+            UStaticMeshComponent* Component = Actor->GetStaticMeshComponent();
+            UStaticMesh* Mesh = Component ? Component->GetStaticMesh() : nullptr;
+            UMaterialInterface* Material = Component ? Component->GetMaterial(0) : nullptr;
+            if (Component && FParse::Param(
+                    FCommandLine::Get(),
+                    TEXT("RaftSimDiagnosticOpaqueSouthForkSolverFoam")))
+            {
+                DiagnosticOpaqueFoamMaterials.Emplace(Component, Material);
+                Component->SetMaterial(0, UMaterial::GetDefaultMaterial(MD_Surface));
+            }
+            const FBoxSphereBounds Bounds = Component
+                ? Component->Bounds
+                : FBoxSphereBounds(EForceInit::ForceInit);
+            UE_LOG(
+                LogRaftSimEditorEnvironment,
+                Display,
+                TEXT("Solver-foam render audit %s: actor_hidden=%s component_visible=%s "
+                     "mesh=%s material=%s bounds_origin=(%.1f,%.1f,%.1f) "
+                     "bounds_extent=(%.1f,%.1f,%.1f)"),
+                *Actor->GetActorLabel(),
+                Actor->IsHidden() ? TEXT("true") : TEXT("false"),
+                Component && Component->IsVisible() ? TEXT("true") : TEXT("false"),
+                Mesh ? *Mesh->GetPathName() : TEXT("none"),
+                Material ? *Material->GetPathName() : TEXT("none"),
+                Bounds.Origin.X,
+                Bounds.Origin.Y,
+                Bounds.Origin.Z,
+                Bounds.BoxExtent.X,
+                Bounds.BoxExtent.Y,
+                Bounds.BoxExtent.Z);
+            LogStaticMeshVertexColorSummary(Actor->GetActorLabel(), Mesh);
+        }
+        OutSummary += FString::Printf(
+            TEXT("Settled-map diagnostic hid %d base-water actors while retaining "
+                 "solver-foam overlays.\n"),
+            DiagnosticHiddenBaseWaterActors.Num());
+    }
+
+    const struct FCaptureSpec
+    {
+        const TCHAR* Id;
+        float StationM;
+        float LateralM;
+        float HeightM;
+        bool bLookUpstream;
+    } CaptureSpecs[] = {
+        {TEXT("chili_bar_launch_downstream"), 120.0f, -4.0f, 2.4f, false},
+        {TEXT("meat_grinder_guide_eye"), 944.0f, 1.0f, 2.0f, false},
+        {TEXT("troublemaker_approach"), 8328.0f, -2.0f, 2.2f, false},
+        {TEXT("coloma_bridge_context"), 5100.0f, 8.0f, 3.0f, false},
+        {TEXT("salmon_falls_takeout"), 48940.0f, 2.0f, 2.5f, true}};
+    bool bAllCapturesSaved = true;
+    for (const FCaptureSpec& Spec : CaptureSpecs)
+    {
+        const int32 Index = ClosestCoordinateIndex(CoordinatePoints, Spec.StationM);
+        const FVector2D WorldM = CoordinateWorldM(CoordinatePoints[Index], Spec.LateralM);
+        const FVector2D CenterlineWorldM = CoordinateWorldM(CoordinatePoints[Index], 0.0f);
+        const FVector Tangent = CoordinateTangent(CoordinatePoints, Index);
+        float SurfaceZCm = 0.0f;
+        if (!FindSouthForkMedianWaterSurfaceLocalZCm(World, CenterlineWorldM, SurfaceZCm))
+        {
+            OutSummary += FString::Printf(
+                TEXT("Could not resolve settled median water beneath capture %s.\n"),
+                Spec.Id);
+            RestoreSouthForkSettledSourceCaptureVisibility(
+                SourceCaptureVisibilityStates);
+            RestoreSouthForkFullReachReviewLayers(
+                TerrainDetailV2ReviewMaterialStates,
+                PolyHavenShoreRockReviewStates,
+                DerivedBankMorphologyReviewActors);
+            return false;
+        }
+        const FVector CaptureTangent = Spec.bLookUpstream ? -Tangent : Tangent;
+        FString CapturePath;
+        bAllCapturesSaved &= CaptureSouthForkView(
+            World, Spec.Id,
+            FVector(
+                WorldM.X * 100.0f, WorldM.Y * 100.0f,
+                SurfaceZCm + Spec.HeightM * 100.0f),
+            FRotator(-5.0f, CaptureTangent.Rotation().Yaw, 0.0f),
+            CapturePath, OutSummary);
+    }
+    for (const TWeakObjectPtr<AActor>& Actor : DiagnosticHiddenBaseWaterActors)
+    {
+        if (Actor.IsValid())
+        {
+            Actor->SetActorHiddenInGame(false);
+        }
+    }
+    for (const TPair<TWeakObjectPtr<UStaticMeshComponent>,
+                     TWeakObjectPtr<UMaterialInterface>>& Pair :
+         DiagnosticOpaqueFoamMaterials)
+    {
+        if (Pair.Key.IsValid())
+        {
+            Pair.Key->SetMaterial(0, Pair.Value.Get());
+        }
+    }
+    RestoreSouthForkSettledSourceCaptureVisibility(SourceCaptureVisibilityStates);
+    RestoreSouthForkFullReachReviewLayers(
+        TerrainDetailV2ReviewMaterialStates,
+        PolyHavenShoreRockReviewStates,
+        DerivedBankMorphologyReviewActors);
     OutSummary += FString::Printf(
-        TEXT("Full reach: %d terrain tiles, %d water tiles, %d foliage, %d boulders, "
-             "%d spray/mist instances, %d infrastructure actors.\n"),
-        Metrics.TerrainTileCount, Metrics.WaterTileCount,
-        Metrics.FoliageInstanceCount, Metrics.BoulderInstanceCount,
-        Metrics.SprayMistInstanceCount, Metrics.InfrastructureActorCount);
-    return bAllCapturesSaved && bBuildManifestSaved;
+        TEXT("Settled-map capture loaded %d World Partition actor references without regeneration.\n"),
+        LoadedActorReferences.Num());
+    return bAllCapturesSaved;
 }
 
 } // namespace RaftSimEditorEnvironment
@@ -2585,4 +2989,8 @@ bool BuildSouthForkFullReachEnvironment(FString& OutSummary)
 bool FRaftSimEditorModule::CreateSouthForkFullReachEnvironment(FString& OutSummary)
 {
     return RaftSimEditorEnvironment::BuildSouthForkFullReachEnvironment(OutSummary);
+}
+bool FRaftSimEditorModule::CaptureSouthForkFullReachEnvironment(FString& OutSummary)
+{
+    return RaftSimEditorEnvironment::CaptureSettledSouthForkFullReachEnvironment(OutSummary);
 }

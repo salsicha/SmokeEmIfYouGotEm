@@ -1,0 +1,26 @@
+{
+  "schema": "raftsim.generated_surface_texture_provenance.v1",
+  "asset_id": "raftsim_sierra_granodiorite_base_color_v1",
+  "path": "unreal/SourceArt/RaftSim/Rocks/Generated/T_RaftSim_SierraGranodiorite_BaseColor_v1.png",
+  "sha256": "a95431e5f11343724021c42138bad6bf892ded504296c738f25b1fb9206e03ac",
+  "dimensions": [1254, 1254],
+  "generator": "OpenAI built-in image generation",
+  "generated_utc": "2026-07-27T15:20:00Z",
+  "intended_use": "Candidate source art for an offline-authored South Fork river-boulder presentation asset; not referenced by the current runtime material.",
+  "geology_authority": false,
+  "collision_or_hydraulic_authority": false,
+  "source_photo_claimed": false,
+  "prompt_summary": "Seamless flat-lit neutral gray Sierra granodiorite macro texture with quartz, feldspar, biotite, restrained lichen, water-rounded micro-pitting, and no baked shadow or specular response.",
+  "addressing_policy": "mirror_x_y_if_reused",
+  "renderer_attempts": [
+    {
+      "version": "v599",
+      "method": "world_aligned_runtime_base_color_on_procedural_contact_shell",
+      "accepted": false,
+      "reason": "Rendered nearly black and emphasized the coarse faceted shell."
+    }
+  ],
+  "runtime_material_reference_present": false,
+  "production_promoted": false,
+  "review_status": "v599_runtime_branch_rejected_source_retained_unpromoted"
+}

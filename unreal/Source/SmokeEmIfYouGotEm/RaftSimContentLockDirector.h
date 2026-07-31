@@ -22,10 +22,23 @@ public:
     virtual void Tick(float DeltaSeconds) override;
 
     static bool IsPackagedRegressionRequested();
+    static bool IsReleaseCandidateQARequested();
+    static bool IsFreshProfileQARequested();
     static bool IsPerformanceCaptureRequested();
+
+    /** Reject stale/uninitialized RHI timing values without suppressing real wall-clock stalls. */
+    static bool IsGpuTimingSamplePlausible(
+        float GpuMilliseconds, float WallClockMilliseconds);
 
     /** Run the complete 20-rapid x 3-flow matrix without requiring a world. */
     static bool RunRapidMatrixRegression(FString& OutReportJson);
+
+    /** Run the disk-free logical RC gates; packaged invocation also requires Shipping/cooked data. */
+    static bool RunReleaseCandidateQA(FString& OutReportJson);
+
+    /** Validate real first-start creation and disk persistence in an isolated user dir. */
+    static bool RunFreshProfileFirstRunQA(
+        UGameInstance* GameInstance, FString& OutReportJson);
 
     void StartPerformanceCapture(
         float DurationSeconds, float WarmupSeconds,
@@ -59,6 +72,7 @@ private:
     float LastGameDeltaMilliseconds = 0.0f;
     double LastPerformanceTickSeconds = 0.0;
     int32 PerformanceHitchCount = 0;
+    int32 InvalidGpuTimingSampleCount = 0;
     FString PerformanceOutputPath;
     TArray<float> CapturedWorkloadFrameMilliseconds;
     TArray<float> CapturedWallClockFrameMilliseconds;

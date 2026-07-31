@@ -1,0 +1,49 @@
+{
+  "candidate": "m9_water_microrelief_v91",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_water_microrelief_v91.png",
+  "camera": "river_action",
+  "source_authority": "registered_4m_hydraulic_surface_height_presentation_and_wet_mask",
+  "render_grid": "existing_2m_refined_non_colliding_authored_water_mesh",
+  "physics_changed": false,
+  "visual_relief": {
+    "maximum_calm_amplitude_cm": 9.0,
+    "maximum_hydraulic_amplitude_cm": 15.0,
+    "maximum_combined_amplitude_cm": 24.0,
+    "shoreline_faded": true,
+    "deterministic": true
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96
+  },
+  "validation": {
+    "focused_source_contracts": "36/36 passed",
+    "editor_build": "passed",
+    "focused_shoreline_water_automation": "1/1 passed",
+    "water_only_full_reach_rebuild": "passed; 13 terrain tiles and 39 water tiles",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics",
+    "material_fallback_warning": false
+  },
+  "rejected_brackets": [
+    "v85 shore-cobble over-density",
+    "v86-v87 terrain source-macro reductions",
+    "v88-v89 authored-water normal-strength amplification",
+    "v90 underpowered 13.2 cm combined micro-relief"
+  ],
+  "retained_improvements": [
+    "Broad authored water now produces geometry-derived surface-normal variation at the refined visual grid.",
+    "Hydraulic energy strengthens standing-wave shoulders while calm reaches remain bounded.",
+    "Solver wetness and decoded shoreline depth remove relief at dry and shallow bank transitions."
+  ],
+  "open_visual_findings": [
+    "Broad water remains too uniform and does not yet meet the photoreal target.",
+    "Shoreline and terrain transitions remain coarse.",
+    "Canopy silhouettes, crew biomechanics, raft highlights, foam, and aerosol remain visibly synthetic."
+  ]
+}

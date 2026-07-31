@@ -2,6 +2,9 @@
 
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/SpectatorPawn.h"
+#include "Kismet/GameplayStatics.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
 #include "RaftSimContentLockDirector.h"
 #include "RaftSimMainMenuWidget.h"
 
@@ -9,7 +12,10 @@ void ARaftSimFrontendPlayerController::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested())
+    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested() ||
+        ARaftSimContentLockDirector::IsReleaseCandidateQARequested() ||
+        ARaftSimContentLockDirector::IsFreshProfileQARequested() ||
+        ARaftSimContentLockDirector::IsPerformanceCaptureRequested())
     {
         return;
     }
@@ -37,7 +43,21 @@ ARaftSimBootGameMode::ARaftSimBootGameMode()
 void ARaftSimBootGameMode::BeginPlay()
 {
     Super::BeginPlay();
-    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested())
+    if (ARaftSimContentLockDirector::IsPerformanceCaptureRequested())
+    {
+        FString TravelMap;
+        if (FParse::Value(
+                FCommandLine::Get(), TEXT("RaftSimPerformanceTravelMap="), TravelMap) &&
+            !TravelMap.IsEmpty())
+        {
+            UGameplayStatics::OpenLevel(this, FName(*TravelMap));
+            return;
+        }
+    }
+    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested() ||
+        ARaftSimContentLockDirector::IsReleaseCandidateQARequested() ||
+        ARaftSimContentLockDirector::IsFreshProfileQARequested() ||
+        ARaftSimContentLockDirector::IsPerformanceCaptureRequested())
     {
         GetWorld()->SpawnActor<ARaftSimContentLockDirector>(
             ARaftSimContentLockDirector::StaticClass(), FTransform::Identity);

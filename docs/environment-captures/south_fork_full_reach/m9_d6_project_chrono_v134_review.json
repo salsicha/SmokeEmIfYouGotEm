@@ -1,0 +1,104 @@
+{
+  "schema": "raftsim.m9.d6_project_chrono_review.v1",
+  "generated_on": "2026-07-28",
+  "revision_id": "v134",
+  "decision": "retain_independent_measurements_and_pass_numeric_comparison_keep_promotion_fail_closed",
+  "scope": "Independent Project Chrono execution of all seven D6 compliant fixtures and regeneration of the two-target comparison.",
+  "runtime": {
+    "engine": "Project Chrono/PyChrono 10.0.0",
+    "conda_build": "py312h8821d3a_677",
+    "platform": "osx-arm64",
+    "package_channel": "https://conda.anaconda.org/projectchrono/osx-arm64",
+    "package_url": "https://conda.anaconda.org/projectchrono/osx-arm64/pychrono-10.0.0-py312h8821d3a_677.conda",
+    "package_sha256": "f05d87d61a785c75db4f2d44991be0200b16e4fadc5ab9ab4a9b0ab3b416c4da",
+    "isolated_environment": "/private/tmp/raftsim-pychrono",
+    "repository_dependency_added": false,
+    "shipping_runtime_dependency_added": false
+  },
+  "independence_contract": {
+    "runner_path": "physics/src/raftsim/flexible_raft_d6_project_chrono_runner.py",
+    "runner_version": "raftsim_project_chrono_d6_runner_v1",
+    "fixture_input_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
+    "fixture_input_only": true,
+    "imports_python_d1_d5_reference": false,
+    "uses_custom_cpp_port": false,
+    "uses_unreal_analytical_diagnostic": false,
+    "project_chrono_system": "chrono::ChSystemSMC",
+    "tube_and_contact_elements": "chrono::ChLinkTSDA",
+    "fea_module_verified_available": true,
+    "note": "The runner creates real Chrono systems and measures tube/contact spring state. Its overwash, retained-water, threshold and recovery adapters consume only fixture-recorded constants and the measured Chrono node response."
+  },
+  "execution": {
+    "fixture_count": 7,
+    "target_count": 2,
+    "required_record_count": 14,
+    "completed_record_count": 14,
+    "pending_record_count": 0,
+    "project_chrono_fixed_input_repeat": "byte_identical",
+    "project_chrono_replay_count": 7,
+    "required_d5_channel_count_per_scenario": 10,
+    "compliant_sidecar_mergeable": true,
+    "chaos_sidecar_mergeable": true
+  },
+  "comparison": {
+    "status": "measured_comparisons_passed_manual_promotion_required",
+    "all_measurements_present": true,
+    "comparison_passed": true,
+    "missing_target_count": 0,
+    "failed_target_count": 0,
+    "compliant_compared_metric_count": 74,
+    "compliant_failed_metric_count": 0,
+    "largest_compliant_absolute_delta": {
+      "path": "pressure_flow_sweeps.sweeps[8].contact_min_release_margin_n",
+      "reference_value": -8832.222529332537,
+      "project_chrono_value": -8832.212463611644,
+      "absolute_delta": 0.010065720893180696,
+      "allowed_tolerance": 441.6111274666269
+    },
+    "chaos_policy": "baseline_delta_recording",
+    "chaos_metric_deltas_are_failures": false
+  },
+  "artifact_sha256": {
+    "physics/reports/d6/compliant/flexible_raft_d6_compliant_measured_results.json": "2249ee079b8fdbd3d1b67d0666653689946acb4d0edbd6a537af7bcc0c6da2a0",
+    "physics/reports/d6/compliant/summary.json": "0818d6882388bc26903d50494887d974376a148771349cdd37fc15165c847dcf",
+    "physics/data/calibration/flexible_raft_d6_comparison_report.json": "14217500f04d9c8b400823d4ad795c7036e119758b7c9ac9e78d96242e75bd66",
+    "physics/data/calibration/flexible_raft_d6_execution_packet.json": "c2a141f67dba3c8054ac0eba96f4ea7e373795e591ea82acdc24bc6b2ffe517f"
+  },
+  "replay_sha256": {
+    "post_contact_recovery": "73f0cbc0ad13a3376bcddd77be05faa2f5a367d1deedb22f4b8b584f2380c4d4",
+    "pressure_flow_sweeps": "3ea3472d3d9a57b97bda2f1e8a4818aff9780c38ba07f1616aedd58e083d2441",
+    "rock_pinch_wrap": "b2297b3b88a15aede9679e01f6d079a183ddadd863e9378882c1652cd672e700",
+    "static_seat_load_sag": "2af214365e97a36fd3e69bce4a6bfa7706d83917c931045317537fd1022a5189",
+    "timed_high_side_save": "7d88769fd5389a70bed346fb15302e249fdf4f8839eb04df1c94421ad78be15a",
+    "traveling_crew_shift": "460e1ae6f0ad0e3cfb64721237bc35807e891fecfb5d8be99c6f3d0609759a34",
+    "upstream_tube_overwash_flip": "4e918f0474862c84286173760b6d57c2d8a521787d4cbe1cc2e0ea7095c05725"
+  },
+  "verification": {
+    "focused_d6_tests": "44 passed",
+    "json_schema_and_provenance_merge": "passed",
+    "numeric_equivalence": "passed",
+    "deterministic_replay_hash_check": "passed",
+    "full_project_matrix": "1112 passed, 3 skipped, 1 intentional fail-closed release-candidate assertion in 383.17 seconds",
+    "full_project_matrix_report": "/private/tmp/raftsim_m9_v135_full_python.xml",
+    "full_project_matrix_report_sha256": "fcc2d7cd88584c936ed5e8ba117f72438f84bf52cc7b551c21c725b4f305e754",
+    "intentional_failure": "The release-candidate contract still compares the current post-v317 RaftSimRaftMesh.cpp against the historical v42 review hash. It is deliberately not reconciled before an accepted M9 candidate.",
+    "graph_update": "passed_after_v135_evidence_docs"
+  },
+  "manual_review": {
+    "local_implementation_and_evidence_audit": "passed",
+    "named_physics_reviewer": "pending",
+    "named_unreal_integration_reviewer": "pending",
+    "named_deterministic_replay_reviewer": "pending",
+    "named_professional_guide_safety_reviewer": "pending",
+    "may_mark_d6_complete": false,
+    "may_drive_runtime_gameplay_from_d6_alone": false
+  },
+  "release_effect": {
+    "technical_external_measurement_gap_closed": true,
+    "numeric_d6_comparison_gate_closed": true,
+    "manual_d6_promotion_gate_closed": false,
+    "photoreal_art_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  }
+}

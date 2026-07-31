@@ -1,0 +1,54 @@
+{
+  "schema": "raftsim.m9.south_fork_hlod_regeneration_review.v1",
+  "generated_on": "2026-07-29",
+  "revision_id": "v135",
+  "decision": "retain_fresh_hlod_packages_and_settled_repeat_evidence",
+  "scope": "World Partition HLOD regeneration after the v132 authoritative full-reach world rebuild and v133 retained water-optics presentation.",
+  "build": {
+    "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+    "builder": "WorldPartitionHLODsBuilder",
+    "strategy": "terminal_instancing_with_nanite_source_geometry_and_no_merged_atlas_parent",
+    "fresh_build_log": "/private/tmp/raftsim_m9_v134_hlod_build.log",
+    "fresh_build_log_sha256": "f77df395999bfce7b34593ed2e28ba7ac59594ecf2ac7705f4e801453cc150b7",
+    "fresh_build_world_actor_count": 24,
+    "fresh_build_built_actor_count": 24,
+    "fresh_build_modified_and_saved_actor_count": 24,
+    "fresh_build_errors": 0,
+    "settled_repeat_log": "/private/tmp/raftsim_m9_v134_hlod_settled_repeat.log",
+    "settled_repeat_log_sha256": "8e6f8d549db4aa6e1f1fe1928a76667685ea59639a0329e6fe8cbca8900573d5",
+    "settled_repeat_world_actor_count": 24,
+    "settled_repeat_built_actor_count": 24,
+    "settled_repeat_modified_and_saved_actor_count": 0,
+    "settled_repeat_errors": 0
+  },
+  "durable_evidence": {
+    "evidence": "docs/environment-captures/south_fork_full_reach/hlod_build_evidence.json",
+    "evidence_sha256": "1359a275f8560e5cde5c330c24899468b61fd810932be510786563bb98b84a8b",
+    "build_manifest": "unreal/Content/RaftSim/Environment/SouthForkFullReach/full_reach_environment_build_manifest.json",
+    "build_manifest_sha256": "3afef3e5a5e48b02be43f3306946ba2e8ade8bbbbb2205ffcf3f1c96d7d9451a",
+    "hashed_actor_package_count": 24,
+    "hlod_generation_complete": true,
+    "all_acceptance_fields_passed": true
+  },
+  "verification": {
+    "focused_hlod_contract": "passed",
+    "focused_d6_hlod_release_set": "51 passed, 1 intentional fail-closed release-candidate assertion",
+    "qualified_full_python_matrix": "1112 passed, 3 skipped, 1 intentional fail-closed release-candidate assertion in 383.17 seconds",
+    "qualified_full_python_matrix_report": "/private/tmp/raftsim_m9_v135_full_python.xml",
+    "qualified_full_python_matrix_report_sha256": "fcc2d7cd88584c936ed5e8ba117f72438f84bf52cc7b551c21c725b4f305e754"
+  },
+  "release_effect": {
+    "stale_hlod_gate_closed": true,
+    "settled_hlod_repeat_proved": true,
+    "historical_v42_release_packet_hash_reconciled": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "open_findings": [
+    "The HLOD rebuild proves current terminal packages and deterministic settled output; it does not approve the world as photoreal art.",
+    "The current M9 release packet remains deliberately stale and fail-closed until a candidate passes the remaining visual, performance, packaging, platform, signing, media, and named-review gates.",
+    "No named art director, rafting guide, geospatial reviewer, legal reviewer, product owner, or release-media reviewer has approved this candidate."
+  ]
+}

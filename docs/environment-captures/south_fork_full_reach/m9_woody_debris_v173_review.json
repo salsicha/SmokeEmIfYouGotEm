@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.m9.woody_debris_review.v1",
+  "reviewed_utc": "2026-07-29T18:47:27Z",
+  "candidate": "m9_woody_debris_v173",
+  "parent": "m9_volumetric_broadleaf_v169",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "scope": "settled-map capture-only procedural woody-debris bracket",
+    "source_conditioning": "existing RaftSimFullReachDressing ShoreCobble HISM instance locations",
+    "placement_refinement": "each fixed camera selected source-conditioned bank samples 25 to 180 metres forward of the camera",
+    "clusters_per_camera": 3,
+    "log_count_per_camera": 3,
+    "root_branch_count_per_camera": 15,
+    "root_branches_per_cluster": 5,
+    "log_mesh": "/Engine/BasicShapes/Cylinder",
+    "bark_material_source": "Poly Haven Pine Tree 01 bark",
+    "log_length_m_range": [
+      6.5,
+      11.0
+    ],
+    "log_radius_m_range": [
+      0.24,
+      0.42
+    ],
+    "affected_collision": false,
+    "affected_hydraulics": false,
+    "affected_navigation": false,
+    "map_or_actor_mutation": false,
+    "package_save": false
+  },
+  "provenance": {
+    "asset_id": "polyhaven_pine_tree_01_1k",
+    "title": "Pine Tree 01",
+    "publisher": "Poly Haven",
+    "asset_url": "https://polyhaven.com/a/pine_tree_01",
+    "license": "CC0 1.0",
+    "license_url": "https://polyhaven.com/license",
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/PineTree01_1K/polyhaven_pine_tree_01_source_manifest.json",
+    "source_manifest_sha256": "c6455ac8ec06e8db185725e4f6306008972a91e10217880950f28481672f7096",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_pine_tree_01_import_report.json",
+    "import_report_sha256": "9d79d17cb4668a65ba9513283f1b6a9cd9648e60a9797d1dc950a3d31e35ffd9"
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimWoodyDebrisReviewCapture -RaftSimExitAfterEnvironmentAutomation",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris",
+    "comparison_baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "loaded_world_partition_references": 231,
+    "log": "/private/tmp/raftsim_m9_v173_woody_debris_forward_photographic.log",
+    "log_sha256": "7503f7f077a72d10ef0dff8ec1b252d43669c1eeeab0c5f4151434e5329d90db",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris/chili_bar_launch_downstream.png",
+        "sha256": "0bf48afa93fce6e92688ae352b7d8a1f6d1ec1ae3a854d3d8c35f9edf970fd64",
+        "size_bytes": 1311100,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.879247,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 3.972439,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.543945,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.553711
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris/coloma_bridge_context.png",
+        "sha256": "86b10f32f3010be7ee9fb708debaddc42e60ae1c446ae499e3fbe267922181f2",
+        "size_bytes": 1312133,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.934405,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 3.910916,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.454102,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.663303
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris/meat_grinder_guide_eye.png",
+        "sha256": "50bba3b258556ef69a00dee9bcc367c36eb9718372d0a83559050533d5571bb5",
+        "size_bytes": 1273338,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.029011,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 4.506836,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.906576,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.799588
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris/salmon_falls_takeout.png",
+        "sha256": "f4927b4b98f4b32270614b3b02b7c7c1b6e38534e3bc5e67d45547eb64ad56bd",
+        "size_bytes": 1227488,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.799699,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 2.828885,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.789605,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.892470
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v173_woody_debris/troublemaker_approach.png",
+        "sha256": "127ec857fca5384b56ddf1860342a7919e309042080b52e55f617750e2ecb471",
+        "size_bytes": 1311502,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.210038,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 5.223741,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 2.725911,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 1.061849
+      }
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build_with_candidate": "passed",
+    "focused_source_and_rights_tests_with_candidate": "36/36 passed",
+    "capture_manual_review": "five of five inspected at original resolution",
+    "candidate_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "candidate_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The bracket used an existing rights-reviewed CC0 bark source and deterministic source-conditioned bank samples.",
+      "The corrected placement made exactly three log/root-wad clusters visible in front of each fixed camera without changing or saving map, collision, hydraulics, navigation, or gameplay authority.",
+      "All five fixed photographic views rendered successfully against the exact v169 photographic baseline."
+    ],
+    "rejected": [
+      "The straight cylinder logs read as oversized poles rather than weathered, tapered, broken, or irregular river wood.",
+      "The five-branch root fans read as synthetic radial prongs instead of eroded root wads.",
+      "Several pieces visibly floated above or intersected the coarse bank, most clearly at Troublemaker, Coloma, and Salmon Falls.",
+      "The isolated props did not create credible cutbanks, gravel bars, embedded rock, root-soil transitions, or terrain-conforming shoreline structure and therefore did not materially close the terrain or shoreline photoreal blocker."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "rollback": {
+    "completed": true,
+    "runtime_candidate_source_removed": true,
+    "candidate_test_contracts_removed": true,
+    "candidate_capture_and_review_evidence_preserved": true,
+    "focused_source_and_rights_tests_after_rollback": "35/35 passed",
+    "ue_5_8_editor_build_after_rollback": "passed",
+    "restored_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "restored_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "restored_renderer_test": {
+      "name": "RaftSim.M7.ZFullReachPresentation",
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v173_rejected_v169_restore_m7.log",
+      "log_sha256": "3fdbd536806ddfbf0a713522ad77447f1b348d1993b28e572199b96ee71d3ae4",
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only"
+    }
+  },
+  "decision": "Reject v173, remove the procedural cylinders and pronged root fans, and retain the accepted v169 runtime state. Preserve the fixed-view captures and review ledger as negative evidence. Future bank debris must use artist-quality irregular meshes with taper, breakage, bark and exposed-wood variation, credible root morphology, and terrain-conforming placement; do not iterate further on primitive cylinders."
+}

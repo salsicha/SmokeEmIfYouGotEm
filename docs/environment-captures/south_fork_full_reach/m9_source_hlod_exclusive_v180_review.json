@@ -1,0 +1,138 @@
+{
+  "schema": "raftsim.m9.source_hlod_exclusive_capture_review.v1",
+  "reviewed_utc": "2026-07-29T20:41:36Z",
+  "status": "technical_capture_correctness_accepted_photoreal_unchanged",
+  "accepted_working_baseline_after_review": "v180",
+  "runtime_content_baseline": "v178",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "implementation": {
+    "scope": "settled editor-world evidence capture only",
+    "world_partition_source_actors_loaded": 231,
+    "hlod_primitive_components_isolated": 185,
+    "flow_band_components_evaluated": 64,
+    "inactive_flow_band_components_hidden": 41,
+    "active_flow_band": "median_runnable",
+    "active_flow_band_components": 23,
+    "source_or_hlod_exclusivity_enforced": true,
+    "runtime_flow_band_selection_mirrored_at_component_level": true,
+    "visibility_restored_after_capture": true,
+    "map_or_package_mutation": false,
+    "material_mesh_hydraulics_collision_navigation_or_gameplay_changed": false
+  },
+  "diagnosis": {
+    "original_question": "Whether v179's giant water polygons came from mesh coverage, geometric normals, or the capture renderer.",
+    "unlit_control_directory": "docs/environment-captures/south_fork_full_reach/diagnostic_v180_unlit_water_coverage",
+    "unlit_control_result": "With HLOD proxies present, the uniform source-water material alternated against stale proxy/terrain representations. Isolating all HLOD primitives produced a continuous median-water silhouette.",
+    "root_cause": "WorldPartition->LoadAllActors loaded source actors and their instanced HLOD proxies together. The raw editor-world scene capture could draw both, unlike runtime World Partition. A transient source-only material override therefore produced a mixed-material polygon mosaic.",
+    "v179_inference_corrected": true,
+    "corrected_inference": "v179 does not prove discontinuous geometric normals or inadequate water tessellation. Its visible polygons were capture contamination from simultaneous source and HLOD representations; the removed material candidate remains unaccepted because it was never reviewed through a valid exclusive capture path."
+  },
+  "automation": {
+    "focused_character_source_and_rights_tests": {
+      "passed": 48,
+      "failed": 0,
+      "tests": [
+        "physics/tests/test_cc0_production_characters.py",
+        "physics/tests/test_safety_gear_fallback.py",
+        "physics/tests/test_editor_source_layout.py",
+        "physics/tests/test_photoreal_rights_reviewed_assets.py"
+      ]
+    },
+    "editor_source_line_limit": "RaftSimEditorSouthForkFullReach.cpp is 2999 lines and within the 3000-line guard",
+    "editor_source_inventory_regenerated": true,
+    "unreal_editor_build": "succeeded",
+    "capture_exit_code": 0,
+    "capture_log": "/private/tmp/raftsim_m9_v180_source_hlod_exclusive_capture.log",
+    "capture_log_sha256": "b8d3c4bd8e13fcf882f7b4f01324680def073e06508eb27a47ee8169e85fa0f1",
+    "captured_views": 5,
+    "m7_renderer_test": {
+      "suite": "RaftSim.M7.ZFullReachPresentation",
+      "passed": 1,
+      "failed": 0,
+      "log": "/private/tmp/raftsim_m9_v180_source_hlod_exclusive_m7.log",
+      "log_sha256": "85eef8c2930e83be0fb16373a500b509aabb76bf121777d1ea1aea2691da55c2"
+    },
+    "only_test_warning": "Known UE 5.8 r.MotionVectorSimulation render-thread diagnostic."
+  },
+  "renderer_evidence": {
+    "baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "candidate_directory": "docs/environment-captures/south_fork_full_reach/photographic_v180_source_hlod_exclusive",
+    "width": 1280,
+    "height": 720,
+    "views": [
+      {
+        "id": "chili_bar_launch_downstream",
+        "baseline_sha256": "e3be3912d762950e3e5eddc8f67bd4a58b2167c90efe6bd9cfbe325932b1a2b2",
+        "candidate_sha256": "ea91f6b852c21a9a8d3735d0c162f7ac29f91fe8b2feeb4f03b5528fb31c7aac",
+        "mean_absolute_rgb_delta": 0.829400318,
+        "changed_fraction": 0.139068649,
+        "fraction_above_8_rgb_levels": 0.028139829,
+        "maximum_channel_delta": 181
+      },
+      {
+        "id": "coloma_bridge_context",
+        "baseline_sha256": "1a6c6777dc7907a81aa8317cfbeb8f6d1a246f021d792fa853c187ebcd9fb272",
+        "candidate_sha256": "515cca499fb43fb24577f8ec51a1da60eca8e41dc58b10f3f8adcf24a57f852a",
+        "mean_absolute_rgb_delta": 0.913569878,
+        "changed_fraction": 0.150908203,
+        "fraction_above_8_rgb_levels": 0.02822338,
+        "maximum_channel_delta": 174
+      },
+      {
+        "id": "meat_grinder_guide_eye",
+        "baseline_sha256": "0cd81dc708c74ee808debd4c5bfe8ecd9125feac647ccac9bc01cfab3815cebc",
+        "candidate_sha256": "1443f8dfb641f9e738263688bf61ae7d011e2def6fea2f7785432217883b616e",
+        "mean_absolute_rgb_delta": 0.98919307,
+        "changed_fraction": 0.133462818,
+        "fraction_above_8_rgb_levels": 0.03366428,
+        "maximum_channel_delta": 151
+      },
+      {
+        "id": "salmon_falls_takeout",
+        "baseline_sha256": "bc278264a3c575b46e242ae871b8ec52794c063f18a06375aad447c81ac7b5f4",
+        "candidate_sha256": "397fe71888f7d97efa78250c6ff3f705e6af421c2820d34fe4b245edebba8277",
+        "mean_absolute_rgb_delta": 0.725339265,
+        "changed_fraction": 0.064052373,
+        "fraction_above_8_rgb_levels": 0.022345197,
+        "maximum_channel_delta": 134
+      },
+      {
+        "id": "troublemaker_approach",
+        "baseline_sha256": "a1d470783a67e42eca258152f20d1af433313ea8069118f5b4622e4d75eeb4a4",
+        "candidate_sha256": "68a9bf5706dcf0a3e3f8d2d91184937dc87b6aa09e5a65621f7c99fcec6108a5",
+        "mean_absolute_rgb_delta": 1.14008572,
+        "changed_fraction": 0.151261936,
+        "fraction_above_8_rgb_levels": 0.039402127,
+        "maximum_channel_delta": 164
+      }
+    ],
+    "pixel_comparison_scope": "No runtime art changed. Small whole-frame deltas reflect removal of duplicate HLOD/source rendering plus ordinary temporal renderer variation.",
+    "visual_decision": "technical capture correction accepted; photoreal acceptance unchanged",
+    "human_approved": false
+  },
+  "validation_currency": {
+    "map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "map_and_manifest_unchanged": true,
+    "runtime_content": "unchanged from v178",
+    "m7": "current after v180",
+    "m9": "fail_closed",
+    "shipping": "historical_and_not_promotable"
+  },
+  "accepted": [
+    "Settled source captures now enforce the same source-or-HLOD exclusivity that runtime World Partition applies.",
+    "The configured median flow band is selected at component level, so editor-world capture no longer depends on HiddenInGame semantics.",
+    "All 185 HLOD primitives and 41 inactive flow-band components are restored after capture; no package, map, material, mesh, hydraulic field, collision, navigation, or gameplay authority changes.",
+    "The corrected five-view evidence shows a continuous water surface and invalidates v179's geometric-normal conclusion."
+  ],
+  "rejected_or_open": [
+    "v180 is an evidence-correctness improvement, not a photoreal water upgrade; the visual output remains essentially the accepted v169 baseline.",
+    "Water remains too dark, uniform, low-volume, and procedurally rippled, with insufficient breaking crests, entrained-air volume, turbulence, spray, and shoreline integration at named rapids.",
+    "Terrain, vegetation, rock, infrastructure, characters, raft presentation, animation, lighting, and release media remain below final photoreal acceptance.",
+    "No named guide, art, geospatial, legal, marketing, or release-media reviewer has approved this evidence."
+  ]
+}

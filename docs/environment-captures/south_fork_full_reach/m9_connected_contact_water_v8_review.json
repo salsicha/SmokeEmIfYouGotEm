@@ -1,0 +1,132 @@
+{
+  "artifact": "M9 solver-shaped connected contact water V8 closed-lobe isolated review",
+  "recorded_local_date": "2026-07-30",
+  "milestone": "M9",
+  "passed": false,
+  "promotion_allowed": false,
+  "decision": "retain_production_water_reject_current_connected_contact_v8_candidate",
+  "authoritative_geography_claim": false,
+  "summary": "V8 removes V7's shared vertical crest sheet and replaces it with one live-water-sampled horizontal attachment plus six short, sealed, independently phased and flow-aligned entrained-air lobes. The first native frame proves all 736 triangles are live at the D4 raft-rock pin, but the narrow closed bodies read as six white teeth. A bounded final bracket widens and flattens the bodies, reduces arch lift, and roughly halves their foam density. It removes the teeth but also makes the lobes disappear into the base river, producing no perceptible gameplay-distance improvement. V8 remains opt-in and review-only, production assets remain selected and byte-identical, and promotion is rejected.",
+  "production": {
+    "selected": true,
+    "review_switch_default": false,
+    "production_maps_modified_by_review": false,
+    "production_assets_modified_by_review": false,
+    "solver_contact_authority_changed": false,
+    "runtime_asset_sha256": {
+      "unreal/Content/RaftSim/Materials/M_RaftSim_NiagaraWaterParticle.uasset": "d0e7b1a23f92a987f5b086fa35eb0c147c591729868be7f09aad22247636470a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_AeratedMist.uasset": "4f74fe1d93b3cd83a8dd4c0eb31ae6e976392082b36089fefd727246b241ea98",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_ContactDroplets.uasset": "f1f73e56aadbff61bd03af1fd190b96b20b4f7a918296ba2647e83c49c09d41a",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidAerosol.uasset": "bc3835023b6d9f3e97a58abeb252e251b0cdb04c3e11427032cfcba8a62d4556",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_RapidRoller.uasset": "7fd9b6563d4c699031940a02046a133351bac21f22e1193066ee7c00f6bcc0d6",
+      "unreal/Content/RaftSim/VFX/Water/NS_RaftSim_SolverSpray.uasset": "9e7cf05cb8404441edc3118affd4b09e0f4a961f8922242e0535c61c6cfa136f",
+      "unreal/Content/RaftSim/VFX/Water/Textures/T_RaftSim_WaterParticle_SubUV.uasset": "0b7b95549cf035b71f8e901709dd360630f5c5b99b60bb4161f6b0b85ae4bbff"
+    }
+  },
+  "isolation_and_authority": {
+    "runtime_switch": "-RaftSimConnectedContactWaterV8Review",
+    "default_switch_state": false,
+    "conflicting_review_switch_behavior": "V4, V5, V6, V7, and V8 review selections are mutually exclusive and fail closed to production",
+    "review_material": "unreal/Content/RaftSim/VFX/Water/ConnectedContactWaterV6Review/M_RaftSim_ConnectedContactWater_V6Review.uasset",
+    "review_material_sha256": "7bafd997bdfcfc4999694ac6971a201563bd2e28c117ec85719b51d34c95be40",
+    "material_reuse_reason": "V8 isolates the closed-lobe geometry hypothesis while reusing the already isolated lit breakup shader; no production material is an authoring target",
+    "mesh_sections": {
+      "sampled_attachment": {"grid_vertices": [9, 5], "triangle_count": 64},
+      "closed_lobes": {"count": 6, "along_segments": 8, "radial_segments": 8, "triangle_count_each": 112, "triangle_count_total": 672},
+      "total_triangle_count": 736
+    },
+    "geometry_authority": "same solver-sampled D4 contact shoulder and live-water samples used by the runtime presentation state",
+    "component_contract": "NoCollision, no cast shadow, cannot affect navigation, hidden unless the explicit V8 review switch is present",
+    "physics_forces_changed": false,
+    "collision_changed": false,
+    "water_samples_changed": false,
+    "map_state_changed": false,
+    "scoring_or_progression_changed": false,
+    "final_shape_bracket": {
+      "lobe_length_cm_before_per_lobe_scale": [62.0, 94.0],
+      "across_radius_cm_before_per_lobe_scale": [18.0, 28.0],
+      "vertical_to_across_radius": [0.26, 0.36],
+      "centerline_arch_lift_cm_before_per_lobe_scale": [2.0, 5.0],
+      "independent_lateral_offsets": 6,
+      "independent_phase_offsets": 6
+    },
+    "final_material_brackets": {
+      "attachment": {"water_opacity": 0.10, "foam_opacity": 0.13, "foam_floor": 0.04, "photographic_breakup_gain": 0.0, "primary_lace_gain": 0.20, "foam_core_gain": 0.12},
+      "each_closed_lobe": {"water_opacity": 0.028, "foam_opacity": 0.38, "foam_floor": 0.015, "photographic_breakup_gain": 0.22, "primary_lace_gain": 0.30, "foam_core_gain": 0.42}
+    }
+  },
+  "implementation_sha256": {
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterVfxActor.h": "5d0a5f13ee13beff6ee5483460515f0d6da07afd981f85072d33ba0e9f501c8a",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterVfxActor.cpp": "6be5f4b85685f11a34b8a61d0e6380132c513218659dd768d714ba85d7ebe9e2",
+    "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp": "b0fa7dc07a7e201bb4aa0f95dd00ffb554bbd98ab075293919c0bd660d6da2e3",
+    "physics/tests/test_flexible_raft_visual_upgrade.py": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65"
+  },
+  "native_renderer_review": {
+    "state": "contacts=4 wrapping=3 pinned=1 recovering=1 indentation=0.220 wetness approximately 0.999; connectedV8Triangles=736 connectedV8Visible=1; V6/V7 zero",
+    "initial_closed_lobes": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_initial_teeth.png",
+      "capture_sha256": "535aaab1071ce0980b1fbcffd22cca85cab209eb7d5a9e88e16ea3aa8fa080dc",
+      "result": "the six narrow sealed bodies are attached and readable but present as repeated white teeth or fins behind the contact boulder"
+    },
+    "final_flattened_lobes": {
+      "capture": "docs/environment-captures/south_fork_full_reach/m9_connected_contact_water_v8_final_flattened.png",
+      "capture_sha256": "c54615ad46bfc993c4383a2881813aaf005f4221d929c56fb3ba8f3b318f5e40",
+      "result": "wider flatter lobes and lower foam density remove the teeth but become effectively invisible in the base surface and do not improve the contact read"
+    }
+  },
+  "native_evidence": {
+    "initial_capture_log": "/private/tmp/raftsim_m9_v344_connected_contact_water_v8_initial.log",
+    "initial_capture_log_sha256": "88d46f0e13adf251fb92fcdc76f0efffaf5715dc8e7d023596fe27d9c5830545",
+    "final_capture_log": "/private/tmp/raftsim_m9_v345_connected_contact_water_v8_flattened.log",
+    "final_capture_log_sha256": "b93290f253d770abc5b27ef164c33bc857ef11eee7e6c3e0c2e75e3fc74c090e",
+    "editor_build_result": "SmokeEmIfYouGotEmEditor Mac Development succeeded before both native captures and after the final bounded shape/material bracket"
+  },
+  "post_review_validation": {
+    "focused_python_tests": "22/22 passed",
+    "focused_test_source_sha256": "71b62ffb45308423ab8809c233556d7ca031bbd00a8b0b385d15988cc9dbab65",
+    "m4_result": "4/4 passed: 3 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m4_known_warning": "Engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning",
+    "m4_report": "unreal/Saved/Automation/M9V348ConnectedV8M4/index.json",
+    "m4_report_sha256": "0c33423a3351adf32081efaae704662a5eec4c97692b950c32798818d6b13a61",
+    "m4_log": "/private/tmp/raftsim_m9_v348_connected_v8_m4.log",
+    "m4_log_sha256": "7c6567e4d06bbd67233bac1dc06ba399d9457bad4c28381efc1bfbf623f77f81",
+    "m5_result": "5/5 passed: 4 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m5_known_warning": "Engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning",
+    "m5_report": "unreal/Saved/Automation/M9V346ConnectedV8M5/index.json",
+    "m5_report_sha256": "bb936ca1aeaf5e27b6ac451941168e621f20a65d9444531f282600a672d44c33",
+    "m5_log": "/private/tmp/raftsim_m9_v346_connected_v8_m5.log",
+    "m5_log_sha256": "ae856cd30480a3a8f725f3bf130110b6e30f5e023f9a2f4f8e7d481d88eee332",
+    "m7_result": "4/4 passed: 3 Success, 1 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m7_known_warning": "Engine-owned r.MotionVectorSimulation render-thread-safety warning; no RaftSim assertion or asset-validation warning",
+    "m7_report": "unreal/Saved/Automation/M9V349ConnectedV8M7/index.json",
+    "m7_report_sha256": "b3bf787f1510f309a5877464ee4ed674128633dedbf8759ae9e6fc45ee4065ed",
+    "m7_log": "/private/tmp/raftsim_m9_v349_connected_v8_m7.log",
+    "m7_log_sha256": "e49789afa0b3b35129d8b3b368d768c25f4edbfcfb87096378a063db496c26c0",
+    "m8_result": "4/4 passed cleanly: 4 Success, 0 SuccessWithWarnings, 0 Failed, 0 NotRun",
+    "m8_report": "unreal/Saved/Automation/M9V350ConnectedV8M8/index.json",
+    "m8_report_sha256": "ecdacfac4668b23229e5e1374e20499446862f7e0303cdff67e4469cb348acb3",
+    "m8_log": "/private/tmp/raftsim_m9_v350_connected_v8_m8.log",
+    "m8_log_sha256": "bf66c185b73ebbb5edee708715cfc978ddae2f506066e968e9f95723452949ef",
+    "initial_m9_result": "5/5 passed cleanly before acceptance-evidence reconciliation",
+    "initial_m9_report": "unreal/Saved/Automation/M9V347ConnectedV8M9/index.json",
+    "initial_m9_report_sha256": "92f40c3d4c29157de084b5266c54174e99ba05b77ffc52eb05cf92d2245bae0a",
+    "initial_m9_log": "/private/tmp/raftsim_m9_v347_connected_v8_m9.log",
+    "initial_m9_log_sha256": "a72dfb03824b2e78b3b3d05d9e1a9c85630849b94a981a3049c63951bb2cb1e9",
+    "m9_result": "Final post-reconciliation 5/5 passed cleanly; release manifest remains intentionally fail-closed",
+    "m9_report": "unreal/Saved/Automation/M9V351ConnectedV8M9/index.json",
+    "m9_report_sha256": "e9312b3c8788e63a363a83f5e177a1411a5909f19e556bcdc03342b99f082dde",
+    "m9_log": "/private/tmp/raftsim_m9_v351_connected_v8_m9.log",
+    "m9_log_sha256": "cbb479f52c05977e36f1efe457b917cd4d2d93be42b454d91fd4a235b61056ce",
+    "full_python_data_source_matrix": "1,145 passed, 3 expected installed-dependency-path skips, 1 intentional fail-closed historical-v42 source-hash mismatch, 0 unexpected failures in 439.568 seconds",
+    "full_python_data_source_matrix_report": "physics/reports/m9/m9_v352_connected_v8_full_matrix.xml",
+    "full_python_data_source_matrix_report_sha256": "3a51e1a058c15e56568146237cdbaeb745c9aae457205541d55b3ed807cacbc7",
+    "focused_release_acceptance_suite": "38 passed plus exactly 1 intentional fail-closed historical-v42 source-hash mismatch; zero unexpected failures",
+    "diff_check": "passed"
+  },
+  "next_iteration_requirements": [
+    "Stop tuning broad analytic sheets or isolated sealed lobes with the current translucent review shader: V6, V7, and V8 now bound that family between visible walls/fins and imperceptible geometry.",
+    "Use a temporally evolving, depth-bearing representation such as an artist-authored FLIP/VDB/mesh cache or a bounded Niagara Fluids volume warped and emission-gated by the existing solver contact, with the D4 and live-water systems remaining sole gameplay authority.",
+    "Pair the depth-bearing body with advected entrained-air density, anisotropic spray and collision-aware breakup; validate motion across a short sequence rather than a single still so static geometric silhouettes cannot pass.",
+    "Obtain named water-VFX art and whitewater-guide approval in addition to every remaining M9 platform, input, signing, notarization, media, account, clean-build and promotion gate."
+  ]
+}

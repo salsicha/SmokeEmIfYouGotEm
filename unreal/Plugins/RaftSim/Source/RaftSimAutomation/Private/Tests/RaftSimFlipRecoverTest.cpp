@@ -69,7 +69,33 @@ bool FRaftSimForceOverwashCommand::Update()
     return true;
 }
 
-// Step 2: assert capsize + swimmers, then clear overwash and re-flip.
+// Step 2: assert the fixed-step solver is visibly rotating the raft rather
+// than snapping directly from upright to the settled inverted pose.
+DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
+    FRaftSimAssertCapsizeTransitionCommand, FAutomationTestBase*, Test);
+bool FRaftSimAssertCapsizeTransitionCommand::Update()
+{
+    ARaftSimRaftActor* Raft = FindRaft();
+    if (Raft == nullptr)
+    {
+        Test->AddError(TEXT("Raft disappeared during capsize transition"));
+        return true;
+    }
+    const float RollDegrees =
+        FMath::Abs(FMath::UnwindDegrees(Raft->GetActorRotation().Roll));
+    Test->TestEqual(
+        TEXT("raft entered capsized mode before settling"),
+        static_cast<int32>(Raft->GetRaftMode()),
+        static_cast<int32>(ERaftSimRaftMode::Capsized));
+    Test->TestTrue(
+        FString::Printf(TEXT("raft is visibly mid-flip (roll %.1f deg)"), RollDegrees),
+        RollDegrees > 20.0f && RollDegrees < 170.0f);
+    Test->AddInfo(FString::Printf(
+        TEXT("capsize transition measured roll=%.1f deg"), RollDegrees));
+    return true;
+}
+
+// Step 3: assert capsize + swimmers, then clear overwash and re-flip.
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimAssertCapsizeAndReflipCommand, FAutomationTestBase*, Test);
 bool FRaftSimAssertCapsizeAndReflipCommand::Update()
@@ -87,6 +113,16 @@ bool FRaftSimAssertCapsizeAndReflipCommand::Update()
     Test->TestTrue(
         FString::Printf(TEXT("crew ejected as swimmers (%d)"), Raft->GetSwimmerCount()),
         Raft->GetSwimmerCount() > 0);
+    Test->TestTrue(
+        FString::Printf(
+            TEXT("capsized raft remains visibly inverted (roll %.1f deg)"),
+            Raft->GetActorRotation().Roll),
+        FMath::Abs(FMath::UnwindDegrees(Raft->GetActorRotation().Roll)) > 120.0f);
+    Test->AddInfo(FString::Printf(
+        TEXT("settled capsize measured roll=%.1f deg z=%.1f cm swimmers=%d"),
+        Raft->GetActorRotation().Roll,
+        Raft->GetActorLocation().Z,
+        Raft->GetSwimmerCount()));
 
     // Clear the overwash and re-right the raft.
     Raft->ForceOverwashForTesting(-1.0f, FVector::ZeroVector);
@@ -94,7 +130,7 @@ bool FRaftSimAssertCapsizeAndReflipCommand::Update()
     return true;
 }
 
-// Step 3: assert recovery completes — swimmers reseated, raft upright.
+// Step 4: assert recovery completes — swimmers reseated, raft upright.
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(
     FRaftSimAssertRecoveredCommand, FAutomationTestBase*, Test);
 bool FRaftSimAssertRecoveredCommand::Update()
@@ -124,7 +160,9 @@ bool FRaftSimRaftFlipsAndRecoversTest::RunTest(const FString&)
     AutomationOpenMap(TEXT("/Game/RaftSim/Maps/L_RaftSimTestTank"));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));    // settle
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimForceOverwashCommand(this));
-    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.5f));    // accumulate → flip
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(0.50f));   // latch + partial roll
+    ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertCapsizeTransitionCommand(this));
+    ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(2.00f));   // settle inverted
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertCapsizeAndReflipCommand(this));
     ADD_LATENT_AUTOMATION_COMMAND(FWaitLatentCommand(3.0f));    // drift + reseat
     ADD_LATENT_AUTOMATION_COMMAND(FRaftSimAssertRecoveredCommand(this));

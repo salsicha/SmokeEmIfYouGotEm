@@ -50,6 +50,7 @@ def test_all_named_rapid_fields_are_finite_hash_locked_and_feature_complete():
         assert rapid["all_bands_passed"] is True
         assert rapid["authority"]["not_surveyed"] is True
         assert rapid["authority"]["not_for_navigation"] is True
+        assert 120.0 < rapid["source_elevation_datum_m"] < 500.0
         assert [band["band_id"] for band in rapid["bands"]] == list(FLOW_BAND_IDS)
         feature_count += rapid_entry["catalog_feature_count"]
         for band in rapid["bands"]:

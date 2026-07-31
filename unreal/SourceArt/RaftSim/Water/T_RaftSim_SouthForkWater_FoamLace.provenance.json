@@ -1,0 +1,19 @@
+{
+  "asset": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FoamLace.png",
+  "authored_polyline_count": 0,
+  "authoritative_geography_claim": false,
+  "dimensions_px": [
+    1024,
+    1024
+  ],
+  "external_source_input": false,
+  "format": "8_bit_grayscale_png",
+  "generator": "unreal/Scripts/build_production_whitewater_foam_texture.py",
+  "generator_version": "raftsim-production-whitewater-foam-lace-v4",
+  "multiscale_octaves": 5,
+  "ownership": "project_owned_first_party_procedural",
+  "random_seed": 20260728,
+  "sha256": "b6ef6328b52bcc12ddde239e58bd2466f8818242be69dae23c8037ab44e6ce15",
+  "tile_contract": "multiscale_fields_with_mirrored_runtime_addressing",
+  "usage": "Presentation-only flow-aligned breakup multiplied by solver-authored foam; it cannot generate or authorize hydraulic features."
+}

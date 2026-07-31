@@ -1,0 +1,152 @@
+{
+  "schema": "raftsim.m9.forest_ground_review.v1",
+  "reviewed_utc": "2026-07-29T18:25:16Z",
+  "candidate": "m9_forest_ground_v172",
+  "parent": "m9_volumetric_broadleaf_v169",
+  "status": "rejected_and_rolled_back",
+  "human_approved": false,
+  "physics_changed": false,
+  "implementation": {
+    "scope": "settled-map capture-only material bracket",
+    "target_actor_tag": "RaftSimFullReachTerrain",
+    "transient_terrain_component_count": 13,
+    "base_color": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_BaseColor_4K",
+    "normal": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_NormalGL_4K",
+    "roughness": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/T_ForestGround03_Roughness_4K",
+    "affected_collision": false,
+    "affected_hydraulics": false,
+    "affected_navigation": false,
+    "map_or_actor_mutation": false,
+    "package_save": false
+  },
+  "provenance": {
+    "asset_id": "polyhaven_forrest_ground_03_4k",
+    "title": "Forest Ground 03",
+    "publisher": "Poly Haven",
+    "asset_url": "https://polyhaven.com/a/forrest_ground_03",
+    "license": "CC0 1.0",
+    "license_url": "https://polyhaven.com/license",
+    "publisher_width_m": 2.0,
+    "source_manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/ForestGround03_4K/polyhaven_forest_ground_03_source_manifest.json",
+    "source_manifest_sha256": "77190fc225e41a7af6eedd456644b55d90af9d151a201f9364040d2c22a25dc4",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_forest_ground_03_import_report.json",
+    "import_report_sha256": "42271d6f7024ae08e3e3934d85d37bb5d65d94be55aa1ecd6938ed8f005dfd5c",
+    "downloaded_source_sha256": {
+      "forrest_ground_03_diff_4k.png": "5e3abfb2403767a0abf5fc7d30b9f4b3be28dce2494df22401a7c92fc904a170",
+      "forrest_ground_03_nor_gl_4k.png": "09ad2277c51ae876113bbaae2e569fd5c80389bf454054696a08476fe7ee0813",
+      "forrest_ground_03_rough_4k.png": "3a0586ecd529ffd1a92e4357e9aa6a771c26f9980205bed1781849c1295553a3"
+    },
+    "imported_uasset_sha256": {
+      "T_ForestGround03_BaseColor_4K.uasset": "c92093c4240fb5c273237bb1a7b8fa45767519ed79204fd065e8afa2b909e39f",
+      "T_ForestGround03_NormalGL_4K.uasset": "5ed10888d1edb74921420e157db8d4fd1f8d5efa42c8e9a86ec8127bc9d8b8e5",
+      "T_ForestGround03_Roughness_4K.uasset": "0bdf28297e3d957d7d1e4db19fa21dc7f58e7eec1a82962bc9f17f46947a5940"
+    }
+  },
+  "photographic_capture": {
+    "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimForestGroundReviewCapture",
+    "output_directory": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground",
+    "comparison_baseline_directory": "docs/environment-captures/south_fork_full_reach/photographic_v169_broadleaf",
+    "loaded_world_partition_references": 231,
+    "log": "/private/tmp/raftsim_m9_v172_forest_ground_photographic.log",
+    "log_sha256": "7ea0ac9583f1c92002d0242477cc99bbb53085579b2fe18f1aeb7edf50d656a8",
+    "captures": [
+      {
+        "name": "chili_bar_launch_downstream",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground/chili_bar_launch_downstream.png",
+        "sha256": "0df9736c210b06c7783b3cb1d7678651d8d8c0846575e89266460659dbab1850",
+        "size_bytes": 1310659,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.845811,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 3.911133,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.480794,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.504774
+      },
+      {
+        "name": "coloma_bridge_context",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground/coloma_bridge_context.png",
+        "sha256": "415798af3aad0f03a3ba277c0b6f20f72c3e4e279a8b2399d45ec238fe8f98de",
+        "size_bytes": 1309909,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.884645,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 8.672852,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 7.059028,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 3.908746
+      },
+      {
+        "name": "meat_grinder_guide_eye",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground/meat_grinder_guide_eye.png",
+        "sha256": "3c8b463c1cce427eef52ee5e9c9db42fa0606699ffcdb20db8582e4c5429165d",
+        "size_bytes": 1272552,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.056343,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 4.539388,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.948025,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.789171
+      },
+      {
+        "name": "salmon_falls_takeout",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground/salmon_falls_takeout.png",
+        "sha256": "b9692da75dcaf535dbd15113ad289ee5bc955810f559156c6f12990e09647c75",
+        "size_bytes": 1226694,
+        "mean_absolute_rgb_delta_from_v169_photographic": 0.682105,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 2.555230,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 1.470161,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 0.697591
+      },
+      {
+        "name": "troublemaker_approach",
+        "path": "docs/environment-captures/south_fork_full_reach/photographic_v172_forest_ground/troublemaker_approach.png",
+        "sha256": "88a8adf37d017a9f7949597de6dc30ebb21e412665dfb4b6b20729a46330b4cc",
+        "size_bytes": 1309243,
+        "mean_absolute_rgb_delta_from_v169_photographic": 1.745867,
+        "changed_gt8_rgb_pixel_percent_from_v169_photographic": 6.755642,
+        "changed_gt16_rgb_pixel_percent_from_v169_photographic": 4.870443,
+        "changed_gt32_rgb_pixel_percent_from_v169_photographic": 3.223958
+      }
+    ]
+  },
+  "validation": {
+    "ue_5_8_editor_build_with_candidate": "passed",
+    "focused_source_and_rights_tests_with_candidate": "36/36 passed",
+    "capture_manual_review": "five of five inspected at original resolution",
+    "candidate_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "candidate_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d"
+  },
+  "renderer_findings": {
+    "accepted": [
+      "The existing asset has a complete CC0 rights record, publisher scale, deterministic source hashes, import report, and imported-package hashes.",
+      "The bracket affected only 13 transient terrain material instances and did not save or alter the map, collision, hydraulics, navigation, or gameplay authority.",
+      "All five fixed photographic views rendered successfully against the exact v169 photographic baseline."
+    ],
+    "rejected": [
+      "Only a few bank regions visibly changed; the broad terrain and shoreline remained materially unchanged in all five guide-eye views.",
+      "Coloma and Troublemaker gained brighter tan material islands and sharper discontinuities without visible gravel, root, cutbank, embedded-rock, or vegetation-transition structure.",
+      "The locked terrain parent projects its detail maps over 3.2 metres while the source manifest specifies a 2.0-metre physical width, so this direct swap violates the asset's scale contract.",
+      "The candidate did not materially close the terrain, shoreline, water-volume, foliage, character, equipment, lighting, or overall photoreal art blockers."
+    ],
+    "photoreal_acceptance": false
+  },
+  "release_effect": {
+    "candidate_retained": false,
+    "photoreal_art_gate_closed": false,
+    "named_review_gate_closed": false,
+    "release_media_gate_closed": false,
+    "m9_complete": false,
+    "release_promoted": false
+  },
+  "rollback": {
+    "completed": true,
+    "runtime_candidate_source_removed": true,
+    "candidate_test_contracts_removed": true,
+    "candidate_capture_and_review_evidence_preserved": true,
+    "focused_source_and_rights_tests_after_rollback": "35/35 passed",
+    "ue_5_8_editor_build_after_rollback": "passed",
+    "restored_map_sha256": "b167b9dd2548ac2dcf93255f06833ac61080ff1d1bfbe4fff2219e2f6a562a7e",
+    "restored_build_manifest_sha256": "366c46ff86d62d86683f1edaca0459514ffb4bd42328159d9516fd3032fe804d",
+    "restored_renderer_test": {
+      "name": "RaftSim.M7.ZFullReachPresentation",
+      "result": "passed",
+      "log": "/private/tmp/raftsim_m9_v172_rejected_v169_restore_m7.log",
+      "log_sha256": "50209a1ea2f3a146b97bbeb9698454c58e3b2eb37b0f2dd066b8548a37e7e68d",
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread warning only"
+    }
+  },
+  "decision": "Reject v172 and retain the v169 terrain material. Preserve the candidate captures and review ledger as negative evidence. Do not promote a global Forest Ground 03 substitution through the locked 3.2-metre projection; future bank work must use source-conditioned local morphology and material diversity at documented physical scale."
+}

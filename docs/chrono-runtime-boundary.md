@@ -25,11 +25,10 @@ The detailed coupling strategy is captured in [Chrono Water And Raft Coupling Pl
 
 Project Chrono remains useful for high-fidelity reference, compliant-contact experiments, and optional FSI exploration, but it is no longer the only candidate for the shipping raft/contact runtime.
 
-## Near-Term Runtime Work
+## Current Runtime Work
 
-1. Complete the Milestone 18 custom-water validation closure, or label any Chaos/Jolt runs as snapshot-only comparisons while live water remains blocked.
-2. Build the Chaos automation fixtures and Jolt smoke fixtures from `chaos_jolt_runtime_evaluation.json`.
-3. Feed a frozen validation snapshot into both runtime targets as buoyancy/contact samples; switch to live custom C++ water only after a future solver-parity gate approves it.
-4. Add distinct material presets for elastic rock impacts and inelastic bed grounding in both targets.
-5. Compare Chaos/Jolt telemetry, determinism, contact outcomes, and runtime cost against the same fixture summaries.
-6. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.
+1. The seven-fixture D6 Unreal Chaos rigid baseline now runs in transient game-world physics scenes with valid `FChaosEngineInterface` rigid actors, fixed-step repeats, and hashed telemetry. Keep it baseline-only and fail-closed.
+2. The same inputs now run through isolated Project Chrono/PyChrono 10.0.0 `ChSystemSMC` systems with `ChLinkTSDA` tube/contact compliance. The fixture-input-only runner imports neither the Python D1-D5 reference nor the custom C++ port, repeats byte-identically, and records seven hashed replay payloads.
+3. Both target sidecars now validate at 7/7. The regenerated 14-record comparison has zero missing targets and zero failures across 74 compliant numeric metrics. D6 remains unpromoted until named physics, Unreal-integration, replay, and professional guide/safety reviewers approve the evidence.
+4. Complete the separate Chaos/Jolt authority fixtures from `chaos_jolt_runtime_evaluation.json` before considering a scoring-authority change.
+5. Keep Chrono::FSI isolated behind an experiment flag and out of required build/test paths.

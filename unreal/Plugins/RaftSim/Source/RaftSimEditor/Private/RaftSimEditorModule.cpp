@@ -195,6 +195,16 @@ void FRaftSimEditorModule::StartupModule()
         TEXT("Build and capture the World Partition South Fork full-reach gameplay environment."),
         FConsoleCommandWithArgsDelegate::CreateRaw(
             this, &FRaftSimEditorModule::HandleCreateSouthForkFullReachEnvironmentCommand));
+    CaptureSouthForkFullReachEnvironmentConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.CaptureSouthForkFullReachEnvironment"),
+        TEXT("Capture the saved South Fork full-reach map without regenerating or resaving it."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this, &FRaftSimEditorModule::HandleCaptureSouthForkFullReachEnvironmentCommand));
+    RefreshSouthForkGeneratedCanopyAssetsConsoleCommand = MakeUnique<FAutoConsoleCommand>(
+        TEXT("RaftSim.RefreshSouthForkGeneratedCanopyAssets"),
+        TEXT("Regenerate only the project-owned South Fork native-species canopy meshes and materials."),
+        FConsoleCommandWithArgsDelegate::CreateRaw(
+            this, &FRaftSimEditorModule::HandleRefreshSouthForkGeneratedCanopyAssetsCommand));
     CaptureZambeziCliffComparisonConsoleCommand = MakeUnique<FAutoConsoleCommand>(
         TEXT("RaftSim.CaptureZambeziCliffComparison"),
         TEXT("Capture paired baseline and transient Namaqualand cliff analog views in the Zambezi candidate map."),
@@ -380,8 +390,14 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCapturePhotorealEnvironmentPreviews"));
     bCreateLandscapeImportCandidateMapsOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateLandscapeImportCandidateMaps"));
+    bCreatePhotorealRiverWaterMaterialOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreatePhotorealRiverWaterMaterial"));
+    bCreateWaterVfxMaterialOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateWaterVfxMaterial"));
     bCreateSouthForkFullReachEnvironmentOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateSouthForkFullReachEnvironment"));
+    bCaptureSouthForkFullReachEnvironmentOnStartup =
+        FParse::Param(FCommandLine::Get(), TEXT("RaftSimCaptureSouthForkFullReachEnvironment"));
     bCreateZambeziBatokaBasaltFamilyOnStartup =
         FParse::Param(FCommandLine::Get(), TEXT("RaftSimCreateZambeziBatokaBasaltFamily"));
     bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup =
@@ -426,13 +442,14 @@ void FRaftSimEditorModule::StartupModule()
         FParse::Param(
             FCommandLine::Get(),
             TEXT("RaftSimCreateFutaleufuCordilleraCypressDonorReview"));
-    bExitAfterPhotorealEnvironmentAutomation =
-        FParse::Param(FCommandLine::Get(), TEXT("RaftSimExitAfterEnvironmentAutomation"));
-
-    if (bCreatePhotorealEnvironmentPreviewMapsOnStartup ||
+    const bool bPhotorealEnvironmentAutomationRequested =
+        bCreatePhotorealEnvironmentPreviewMapsOnStartup ||
         bCapturePhotorealEnvironmentPreviewsOnStartup ||
         bCreateLandscapeImportCandidateMapsOnStartup ||
+        bCreatePhotorealRiverWaterMaterialOnStartup ||
+        bCreateWaterVfxMaterialOnStartup ||
         bCreateSouthForkFullReachEnvironmentOnStartup ||
+        bCaptureSouthForkFullReachEnvironmentOnStartup ||
         bCreateZambeziBatokaBasaltFamilyOnStartup ||
         bCaptureZambeziBatokaBasaltCorridorComparisonOnStartup ||
         bCaptureZambeziBatokaTerrainIntegratedComparisonOnStartup ||
@@ -444,7 +461,20 @@ void FRaftSimEditorModule::StartupModule()
         bCreateFutaleufuCordilleraCypressFamilyOnStartup ||
         bCreateFutaleufuCordilleraCypressOpaqueNearReviewOnStartup ||
         bCreateFutaleufuCordilleraCypressVolumetricNearReviewOnStartup ||
-        bCreateFutaleufuCordilleraCypressDonorReviewOnStartup)
+        bCreateFutaleufuCordilleraCypressDonorReviewOnStartup;
+    const bool bExplicitExitAfterAutomation = FParse::Param(
+        FCommandLine::Get(), TEXT("RaftSimExitAfterEnvironmentAutomation"));
+    const bool bUnattendedAutomation = FParse::Param(
+        FCommandLine::Get(), TEXT("unattended"));
+    // A command-line capture in unattended mode has no operator who can close
+    // the editor after its one-shot ticker finishes. Treat unattended startup
+    // automation as self-terminating even when an older invocation omitted the
+    // explicit exit flag; interactive editor tooling remains open as before.
+    bExitAfterPhotorealEnvironmentAutomation =
+        bExplicitExitAfterAutomation ||
+        (bUnattendedAutomation && bPhotorealEnvironmentAutomationRequested);
+
+    if (bPhotorealEnvironmentAutomationRequested)
     {
         PhotorealEnvironmentAutomationPostEngineInitHandle =
             FCoreDelegates::GetOnPostEngineInit().AddRaw(this, &FRaftSimEditorModule::HandlePhotorealEnvironmentAutomationStartup);
@@ -475,6 +505,8 @@ void FRaftSimEditorModule::ShutdownModule()
     CapturePhotorealEnvironmentPreviewsConsoleCommand.Reset();
     CreateLandscapeImportCandidateMapsConsoleCommand.Reset();
     CreateSouthForkFullReachEnvironmentConsoleCommand.Reset();
+    CaptureSouthForkFullReachEnvironmentConsoleCommand.Reset();
+    RefreshSouthForkGeneratedCanopyAssetsConsoleCommand.Reset();
     CaptureZambeziCliffComparisonConsoleCommand.Reset();
     CreateZambeziBatokaBasaltFamilyConsoleCommand.Reset();
     CaptureZambeziBatokaBasaltCorridorComparisonConsoleCommand.Reset();
@@ -562,6 +594,46 @@ void FRaftSimEditorModule::HandleCreateSouthForkFullReachEnvironmentCommand(
         UE_LOG(
             LogRaftSimEditor, Error,
             TEXT("South Fork full-reach environment build failed.\n%s"),
+            *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleCaptureSouthForkFullReachEnvironmentCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = CaptureSouthForkFullReachEnvironment(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor, Display,
+            TEXT("South Fork settled-map capture completed.\n%s"), *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor, Error,
+            TEXT("South Fork settled-map capture failed.\n%s"), *Summary);
+    }
+}
+
+void FRaftSimEditorModule::HandleRefreshSouthForkGeneratedCanopyAssetsCommand(
+    const TArray<FString>&)
+{
+    FString Summary;
+    const bool bSucceeded = RefreshSouthForkGeneratedCanopyAssets(Summary);
+    if (bSucceeded)
+    {
+        UE_LOG(
+            LogRaftSimEditor, Display,
+            TEXT("South Fork generated-canopy refresh completed.\n%s"),
+            *Summary);
+    }
+    else
+    {
+        UE_LOG(
+            LogRaftSimEditor, Error,
+            TEXT("South Fork generated-canopy refresh failed.\n%s"),
             *Summary);
     }
 }

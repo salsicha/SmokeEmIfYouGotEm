@@ -1,0 +1,26 @@
+{
+  "candidate": "m9_canopy_branch_volume_rejected_v101",
+  "status": "rejected_and_fully_rolled_back",
+  "capture": "m9_canopy_branch_volume_rejected_v101.png",
+  "camera": "river_action",
+  "experiment": {
+    "description": "Added a low-density opaque trunk and species-shaped primary-stem section inside each retained two-plane source silhouette.",
+    "asset_triangle_range": [40, 48],
+    "material": "M_RaftSim_SouthForkCanopyBranch",
+    "physics_or_collision_changed": false
+  },
+  "rejection_reasons": [
+    "The opaque trunks read as repeated telephone poles through dense masked crowns.",
+    "The sparse branch geometry did not align closely enough with every source silhouette.",
+    "The extra darkness increased stand repetition instead of creating convincing leaf volume."
+  ],
+  "rollback": {
+    "source_removed": true,
+    "generated_material_removed": true,
+    "retained_v100_source_restored": true,
+    "six_assets_restored_to_vertices": 8,
+    "six_assets_restored_to_triangles": 4,
+    "full_reach_instances": 65363,
+    "confirmation_capture": "m9_canopy_v100_restored_v102.png"
+  }
+}

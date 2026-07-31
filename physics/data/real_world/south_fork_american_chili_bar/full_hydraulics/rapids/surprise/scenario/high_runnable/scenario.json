@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Surprise",
       "rapid_order": 20,
+      "source_elevation_datum_m": 205.92834807128907,
       "station_m": 31060.3392,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,

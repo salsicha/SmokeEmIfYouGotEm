@@ -1,0 +1,39 @@
+{
+  "schema": "raftsim.m9.renderer_review.v1",
+  "capture_id": "meat_grinder_d4_wrap_v418",
+  "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v418_rejected.png",
+  "sha256": "e0fcd5e1fe9f6470b486de1904d0f71dd995bfc2c666214568eae68a702e267d",
+  "width": 1280,
+  "height": 720,
+  "map": "/Game/RaftSim/Maps/L_SouthForkAmerican_FullReach",
+  "station_m": 960.0,
+  "automation_command": "RaftSim.CaptureRapidWrapTest M9_MeatGrinderD4Wrap_v418 960",
+  "source_true_contact": {
+    "live_water_depth_m": 0.412,
+    "live_water_speed_mps": 1.778,
+    "contact_count": 4,
+    "wrapping_contact_count": 3,
+    "pinned_contact_count": 1,
+    "recovering_contact_count": 1,
+    "maximum_tube_indentation_m": 0.220,
+    "runtime_wetness": 0.998,
+    "spray": 0.940,
+    "mist": 0.320,
+    "sheet": 1.0,
+    "droplets": 1.0,
+    "capture_command_writes_visual_deformation": false,
+    "d4_is_only_collision_authority": true
+  },
+  "visual_obstacle": {
+    "kind": "project_owned_deterministic_closed_procedural_boulder",
+    "collision_enabled": false,
+    "reviewed_scan_used": false,
+    "material": "/Game/RaftSim/Materials/M_RaftSim_RiverBoulder.M_RaftSim_RiverBoulder",
+    "clean_shipping_shader_compile_passed_metal_sm5_sm6": true
+  },
+  "technical_deformation_evidence_accepted": true,
+  "photoreal_art_accepted": false,
+  "marketing_approved": false,
+  "human_approved": false,
+  "decision": "Retain as source-true engineering evidence only. The visible wrap/pin contact, segmented tube indentation, wetness, and water-conditioned VFX are technically representative, but the procedural crew, boulder, raft, and over-bright flat water remain below the requested photoreal production-art bar."
+}

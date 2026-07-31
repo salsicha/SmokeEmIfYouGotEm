@@ -33,6 +33,11 @@ unreal/Saved/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuEuropeanBeech/
 unreal/Content/RaftSim/Environment/GeneratedLocalReview/PVEFutaleufuCordilleraCypress*/
 
+# Epic-licensed MetaHuman source/optimized assets may ship only inside cooked builds.
+# The public repository retains the deterministic builders, hashes, and review reports.
+unreal/Content/RaftSim/Characters/Authoring/MetaHumans/
+unreal/Content/RaftSim/Characters/Production/MetaHumans/
+
 graphify-out/
 
 .DS_Store

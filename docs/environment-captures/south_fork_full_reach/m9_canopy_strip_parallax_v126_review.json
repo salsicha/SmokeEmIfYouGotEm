@@ -1,0 +1,54 @@
+{
+  "schema": "raftsim.m9.canopy_strip_parallax_review.v1",
+  "reviewed_utc": "2026-07-29T06:20:00Z",
+  "candidate": "m9_canopy_strip_parallax_v126",
+  "status": "rejected_reverted",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "captures": {
+    "matched_card_baseline": {
+      "file": "m9_canopy_volume_baseline_v123.png",
+      "camera": "troublemaker_approach",
+      "sha256": "f1c16ae4d8d10ebc7e95450b03253f9093854eb46f43524df984fedceb0e708a"
+    },
+    "rejected_candidate": {
+      "file": "m9_canopy_strip_parallax_v126_rejected.png",
+      "camera": "troublemaker_approach",
+      "sha256": "89fc9cefb9fc966c9333a0c2fefd335e96e935ab9f7e2b69952efaa81aa58253"
+    }
+  },
+  "rejected_generator": {
+    "source": "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private/Environment/RaftSimEditorSouthForkCanopyAssets.cpp",
+    "source_sha256_before_revert": "a46a74587caa0101210dc7336d56b4cfb1c396375220210f612851deffdc46b7",
+    "oak_asset_sha256": "47d99c3fc28ffcb7c4abfe3a5b527775df98e48e53a5d4d7b690cb6ccee21d5d",
+    "alder_asset_sha256": "456c95af195c73f80f74c67a250b42c740eb37109957e717f33ca3b16cc0a7a1"
+  },
+  "implementation": {
+    "presentation_only": true,
+    "source_photos_changed": false,
+    "placements_changed": false,
+    "far_field_cards_changed": false,
+    "orientation_count": 4,
+    "oak_strip_count_per_orientation": 8,
+    "alder_strip_count_per_orientation": 7,
+    "oak_triangles": 234,
+    "alder_triangles": 292,
+    "material_slots": 2,
+    "collision_enabled": false,
+    "solver_or_gameplay_changed": false
+  },
+  "iteration_decisions": {
+    "v124": "rejected because independently rotated photo tiles fragmented the source crown and exposed an oversized dark scaffold",
+    "v125": "rejected because two coherent strip directions still exposed narrow seams at oblique views",
+    "v126": "rejected because four shallow-overlap directions remained only visually equivalent to the cleaner two-plane baseline and did not justify extra overdraw or authoring complexity"
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "world_partition_actor_identity_validation": "176/176 passed",
+    "map_check": "0 errors, 0 warnings",
+    "fixed_captures": "5/5 saved for baseline and candidate",
+    "foliage_instances": 65363
+  },
+  "decision": "Reject and revert the strip-parallax canopy. Keep the matched two-plane card baseline until a rights-cleared native multi-species 3D set or a demonstrably superior connected-crown generator passes visual and performance review."
+}

@@ -1,0 +1,115 @@
+{
+  "schema": "raftsim.m9.flow_aligned_whitewater_foam_review.v1",
+  "reviewed_utc": "2026-07-28T00:00:00Z",
+  "status": "technical_upgrade_accepted_photoreal_art_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "source": {
+    "ownership": "Project-owned deterministic procedural source art; no external image input.",
+    "generator": "unreal/Scripts/build_production_whitewater_foam_texture.py",
+    "generator_sha256": "45906ead5c3b5198e52ca725385ff04a45ee83ea0bab77869533553bade9948a",
+    "generator_version": "raftsim-production-whitewater-foam-lace-v3",
+    "source_texture": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FoamLace.png",
+    "source_texture_sha256": "2ccbac6e4b28afb0062d203da5227b7f884318517918ecdb5468188cd2a27462",
+    "provenance": "unreal/SourceArt/RaftSim/Water/T_RaftSim_SouthForkWater_FoamLace.provenance.json",
+    "provenance_sha256": "67c0441d29588716312b5bb37a52ddfc68e9ae99affe514ce65bb70b74f5e722",
+    "external_asset_inputs": [],
+    "authoritative_hydraulic_claim": "None. The texture is multiplied by solver-authored foam and cannot generate whitewater where the conditioned solver mask is zero."
+  },
+  "runtime_assets": {
+    "foam_lace_texture": "/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/T_RaftSim_SouthForkWater_FoamLace",
+    "foam_lace_texture_uasset_sha256": "db10a9136dd5a686fed55d99c99eb06aab29391dbcb8827826afc0443590f75d",
+    "flow_normal_texture": "/Game/RaftSim/Environment/SouthForkFullReach/Water/Textures/T_RaftSim_SouthForkWater_FlowNormal",
+    "flow_normal_texture_uasset_sha256": "a5ff964ee607b05934192f3483a1f1abdac9ce9e73b4e69332ddd079dbd4ee84",
+    "broad_water_material": "/Game/RaftSim/Materials/M_RaftSim_PhotorealRiverWater",
+    "broad_water_material_uasset_sha256": "ac164ce664bf44c5c343dd41ec8b95a924ba554a8ba3c4023c7c1132e0e97f5c",
+    "material_source_sha256": "7967fc43713edf2c4560638f4466ade2eb19a091ccfe03816fa902fa7f16ad80",
+    "texture_asset_source_sha256": "fe456265c6af828c44a75dfb0ec147ccc5a85884fed892a77d23262db08beadb"
+  },
+  "presentation_contract": {
+    "source_dimensions_px": [
+      1024,
+      1024
+    ],
+    "random_seed": 20260728,
+    "maximum_authored_wisp_length_px": 108,
+    "river_uv_repeat_m": 3.0,
+    "foam_u_tiling": 0.42,
+    "foam_v_tiling": 0.93,
+    "foam_pan_u_per_second": 0.018,
+    "color_breakup_bias": 0.0,
+    "color_breakup_gain": 0.78,
+    "roughness_uses_broken_foam_not_full_mask": true,
+    "foam_generation_authority_changed": false,
+    "water_sampling_changed": false,
+    "surface_geometry_changed": false,
+    "d3_changed": false,
+    "d4_changed": false
+  },
+  "automation": {
+    "source_layout_suite": "physics/tests/test_editor_source_layout.py",
+    "source_layout_passed": 20,
+    "water_surface_suite": "RaftSim.P2.WaterSurfaceRenders",
+    "water_surface_succeeded": 0,
+    "water_surface_succeeded_with_warnings": 1,
+    "water_surface_failed": 0,
+    "water_surface_report": "unreal/Saved/Automation/M9B3FlowAlignedWaterP2ExactV1/index.json",
+    "water_surface_report_sha256": "5686bda5627e2646d2b42bb7a228eed1a40de6823fb42b583cf03eaa9c7ad5ca",
+    "m5_suite": "RaftSim.M5",
+    "m5_succeeded": 3,
+    "m5_succeeded_with_warnings": 1,
+    "m5_failed": 0,
+    "m5_not_run": 0,
+    "m5_report": "unreal/Saved/Automation/M9B3FlowAlignedWaterM5ExactV1/index.json",
+    "m5_report_sha256": "962be97cee03601a7e1060db6d44723a3df550bbf8033781c9a5b4fe649bbe1c",
+    "warnings": [
+      "Headless Mac audio sample-rate query warning.",
+      "Unreal 5.8 render-thread safety warning for r.MotionVectorSimulation."
+    ]
+  },
+  "renderer_evidence": {
+    "capture": "docs/environment-captures/south_fork_full_reach/m9_meat_grinder_d4_wrap_v24_flow_aligned_foam_technical_retained_photoreal_rejected.png",
+    "capture_sha256": "48daecb89156a1c72d438d52b6f29f939733e2e0893bad7dc63a8f6ab0604c8d",
+    "width": 1470,
+    "height": 956,
+    "cached_shader_repeat": true,
+    "human_approved": false
+  },
+  "d4_telemetry": {
+    "contacts": 4,
+    "wrapping": 3,
+    "pinned": 1,
+    "recovering": 1,
+    "maximum_indentation_m": 0.22,
+    "wetness": 0.999,
+    "visible_contact_patch_triangles": 96,
+    "instance_counts": {
+      "fine_spray": 40,
+      "mist": 1,
+      "contact_foam": 9,
+      "droplets": 68
+    }
+  },
+  "rejected_iterations": [
+    "v21 replaced cellular cracks with dense continuous ruler bands and was rejected.",
+    "v22 shortened individual wisps but neighboring fragments still merged into parallel speed lines and was rejected.",
+    "v23 is the v3 warm-up frame and is not retained as final evidence.",
+    "v24 is the byte-retained cached-shader technical frame."
+  ],
+  "accepted": [
+    "A deterministic project-owned 1K mask replaces generic cellular world-space noise in the broad-water foam color and roughness breakup.",
+    "Sparse curved foam patches remain aligned to river coordinates and move downstream without changing the solver foam field.",
+    "The texture is evaluated only inside conditioned solver foam; calm or unmasked water cannot gain invented whitewater.",
+    "Using broken foam rather than the full foam mask for roughness removes the broad cracked-sheet response while preserving hydraulic authority."
+  ],
+  "rejected_or_open": [
+    "Remaining sparse laces are still too clean and linear at hero distance and are not final photoreal whitewater art.",
+    "The broad water remains a non-overturning heightfield with insufficient crest, hole, pile and wave-train volume.",
+    "Spray and mist remain visibly card-like and require production Niagara/VFX replacement.",
+    "No named guide or art reviewer has approved the foam scale, motion, water shape or rapid fidelity.",
+    "The capture is not approved for marketing, store, trailer, press-kit or release-media use."
+  ]
+}

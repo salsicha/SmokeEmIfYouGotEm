@@ -1,0 +1,40 @@
+{
+  "candidate": "m9_true_facing_spray_v111",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "captures": [
+    "m9_true_facing_spray_v111.png",
+    "m9_true_facing_spray_action_v111.png"
+  ],
+  "cameras": [
+    "contact_port",
+    "river_action"
+  ],
+  "retained_change": {
+    "orientation": "water cards use the full three-dimensional camera direction as their plane normal while retaining a projected vertical local streak axis",
+    "former_failure": "the former two-dimensional yaw-only normal presented cards nearly edge-on to elevated cameras",
+    "particle_counts_changed": false,
+    "particle_trajectories_changed": false,
+    "particle_opacity_changed": false,
+    "solver_or_contact_authority_changed": false
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "breaking_lip_triangles": 512
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "open_visual_findings": [
+    "Correct facing prevents elevated-view edge collapse, but the bounded card populations remain procedural rather than production Niagara water volumes.",
+    "The low-opacity action frame remains clean but does not yet show convincing entrained-air or splash volume.",
+    "Water, terrain, shoreline, canopy, crew motion, and equipment response remain below the photoreal target."
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "candidate": "m9_canopy_v100_restored_v102",
+  "status": "rollback_confirmed_retained_v100_photoreal_rejected",
+  "capture": "m9_canopy_v100_restored_v102.png",
+  "camera": "river_action",
+  "restored_assets": {
+    "count": 6,
+    "planes": 2,
+    "plane_angle_degrees": 90.0,
+    "vertices_each": 8,
+    "triangles_each": 4,
+    "branch_material_present": false,
+    "instances": 65363
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.998,
+    "breaking_lip_triangles": 512
+  },
+  "validation": {
+    "focused_source_and_asset_contracts": "38/38 passed",
+    "native_editor_build": "passed",
+    "full_reach_regeneration": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "open_visual_findings": [
+    "Two-plane crowns remain an efficient project-owned fallback, not true branch-and-leaf volume.",
+    "Water, shoreline, terrain, crew motion, hydraulic collapse, and aerosol remain below the photoreal target."
+  ]
+}

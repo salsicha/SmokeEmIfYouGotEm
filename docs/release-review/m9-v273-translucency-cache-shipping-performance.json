@@ -1,0 +1,184 @@
+{
+  "schema": "raftsim.m9.renderer_optimization_qualification.v1",
+  "status": "exact_current_macos_shipping_performance_qualified",
+  "observed_at_local": "2026-07-30T04:50:31-07:00",
+  "host_timezone": "America/Los_Angeles",
+  "source_baseline_head": "54cca9df711edde4150a5bd30183f717857606b6e",
+  "candidate_change": {
+    "quality_profile": "High",
+    "console_variable": "r.Lumen.TranslucencyReflections.RadianceCache",
+    "retained_value": 0,
+    "scope": "ReflectionQuality@2",
+    "opaque_lumen_reflections_retained": true,
+    "single_layer_water_reflection_capture_retained": true,
+    "translucency_lighting_volume_retained": true,
+    "reason": "The South Fork water uses Single Layer Water reflection captures and volumetric whitewater uses the translucency lighting volume. Disabling the separate translucent-reflection radiance-cache mark removes a redundant GPU pass without disabling opaque Lumen reflections, water reflections, foam, spray, or mist."
+  },
+  "matched_visual_review": {
+    "resolution": [1280, 720],
+    "camera": "breaking_water",
+    "river_station_m": 960.0,
+    "cache_on": {
+      "screenshot": "/private/tmp/raftsim_m9_v269_translucency_cache_on_capture_user/Saved/Screenshots/m9_v269_translucency_cache_on_breaking_water.png",
+      "screenshot_sha256": "c8ab732f35fc86330d7863163839d996805621628da9878013fe93c51b766163",
+      "log": "/private/tmp/raftsim_m9_v269_translucency_cache_on_capture.log",
+      "log_sha256": "b6769f5fef5a4f756e63de6a4625a4fb049471ef47b082f15550a226ea7b6bc5",
+      "live_value": 1
+    },
+    "cache_off": {
+      "screenshot": "/private/tmp/raftsim_m9_v270_translucency_cache_off_capture_user/Saved/Screenshots/m9_v270_translucency_cache_off_breaking_water.png",
+      "screenshot_sha256": "cfaa55105bd889100faf0e940f8abcb8a72f88ef9f2b3f44a931e00ee8a0489f",
+      "log": "/private/tmp/raftsim_m9_v270_translucency_cache_off_capture.log",
+      "log_sha256": "0eee0d69ebc14abed3daf226f0d2d012282ece396425be54eb6b9691bf475240",
+      "live_value": 0
+    },
+    "comparison": {
+      "mean_absolute_rgb_difference_0_to_255": 4.972159649884259,
+      "global_structural_similarity": 0.973612,
+      "breaking_water_structural_similarity": 0.973789,
+      "water_left_structural_similarity": 0.969426,
+      "foreground_rock_structural_similarity": 0.976937,
+      "camera_position_delta_cm": 0.1737814719719462,
+      "matching_geometry": {
+        "authored_water_actor_count": 2,
+        "production_niagara_component_count": 19,
+        "breaking_lip_triangles": 512,
+        "contact_patch_triangles": 96,
+        "production_boulder_present": true
+      },
+      "interpretation": "Full-resolution side-by-side inspection found no material loss in water reflections, breaking foam, mist, shoreline, foliage, or boulder presentation. Pixel differences are consistent with the recorded one-to-two-frame variation in animated water, particles, vegetation, and raft state between separate runs.",
+      "passed": true
+    }
+  },
+  "shipping_package": {
+    "path": "/private/tmp/RaftSim-1.0.0-m9-v273-shipping-perf/Mac/SmokeEmIfYouGotEm-Mac-Shipping.app",
+    "executable_sha256": "9f512df57bf4447b4902b229ad7b727bd341f095fce9aebd26fbda6eeb0e5f42",
+    "configuration": "Shipping",
+    "platform": "Mac",
+    "codesign_deep_strict_verified": true
+  },
+  "shipping_performance": {
+    "report": "/private/tmp/raftsim_m9_v273_shipping_high60_soak.json",
+    "report_sha256": "98bd777e70555a97bb590c3666f8cddf9c85d9720f76ad909e2d17e1c62a4cc3",
+    "log": "/private/tmp/raftsim_m9_v273_shipping_high60_soak.log",
+    "log_sha256": "b6ea3913043ab1e229d7ebc2b132bad122344de282b2707202255ad3ed4ff4ff",
+    "protocol": "normal_windowed_player_presentation",
+    "resolution": [1920, 1080],
+    "screen_percentage": 60,
+    "soak_seconds": 30,
+    "warmup_seconds": 10,
+    "sampled_frames": 2338,
+    "p95_frame_ms": 13.093667030334473,
+    "p95_gpu_ms": 13.093667030334473,
+    "p95_wall_clock_frame_ms": 13.547122955322266,
+    "p95_game_thread_ms": 3.173208236694336,
+    "p95_render_thread_ms": 1.652666687965393,
+    "max_wall_clock_frame_ms": 14.537166595458984,
+    "hitches_over_33ms": 0,
+    "average_solver_step_ms": 0.2751878499984741,
+    "max_solver_step_ms": 0.48791617155075073,
+    "peak_used_physical_mb": 5560.45703125,
+    "frame_budget_ms": 16.66666603088379,
+    "solver_budget_ms": 1.600000023841858,
+    "memory_budget_mb": 8192,
+    "profile_requirement_passed": true,
+    "running_from_packaged_build": true,
+    "release_performance_qualification_eligible": true,
+    "release_performance_qualified": true,
+    "passed": true
+  },
+  "packaged_validation": {
+    "rapid_regression": {
+      "report": "/private/tmp/raftsim_m9_v273_shipping_rapid_regression.json",
+      "report_sha256": "b81af3910b70cc97fea0916ec4c473d977995ae9a41ce1b05383b03825e36022",
+      "rapid_count": 20,
+      "case_count": 60,
+      "passed_case_count": 60,
+      "passed": true
+    },
+    "release_candidate_qa": {
+      "report": "/private/tmp/raftsim_m9_v273_shipping_rc_qa.json",
+      "report_sha256": "f246ba65559139a44a55c2fb30ca18d92e2f6b1ec722a57c89b3f04de981ec33",
+      "project_version": "1.0.0-rc1",
+      "keyboard_gamepad_action_count": 14,
+      "full_reach_flow_case_count": 39,
+      "rapid_case_count": 60,
+      "passed": true
+    },
+    "fresh_profile_first_run": {
+      "report": "/private/tmp/raftsim_m9_v273_shipping_fresh_profile.json",
+      "report_sha256": "4bbc160e37eac50535d0c5ea480a370ee8e3d8a50454bd71f1954a32c4b43076",
+      "save_version": 3,
+      "default_binding_count": 9,
+      "disk_round_trip_persisted": true,
+      "passed": true
+    },
+    "passed": true
+  },
+  "post_change_native_automation": {
+    "m4": {
+      "report": "/private/tmp/raftsim_m9_v274_m4/index.json",
+      "report_sha256": "95487a29e13f4f985255d3ddd6555e4155192504ab47c2006164588c94f54979",
+      "succeeded": 3,
+      "succeeded_with_warnings": 1,
+      "failed": 0
+    },
+    "m5": {
+      "report": "/private/tmp/raftsim_m9_v275_m5/index.json",
+      "report_sha256": "63e39e66fb3d1259f5491a8302422a3566da3791dafc12a8d603d225cf6ef773",
+      "succeeded": 4,
+      "succeeded_with_warnings": 1,
+      "failed": 0
+    },
+    "m7": {
+      "report": "/private/tmp/raftsim_m9_v276_m7/index.json",
+      "report_sha256": "40a31924e2da9ce8f15268c35ff04aac860e26195fcfc85204858a7c568d9e2e",
+      "succeeded": 3,
+      "succeeded_with_warnings": 1,
+      "failed": 0
+    },
+    "m8": {
+      "report": "/private/tmp/raftsim_m9_v277_m8/index.json",
+      "report_sha256": "c34a29a4198720e62b6f7d07153ef1fb0847eaa9f89d63875772d2377deb1b99",
+      "succeeded": 4,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "m9": {
+      "report": "/private/tmp/raftsim_m9_v278_m9/index.json",
+      "report_sha256": "b39c26089c46d19eb93b2c91dbb3b77bfec2ee130ed41766feb8d1ca6ea602b1",
+      "succeeded": 5,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "known_engine_warning": "M4, M5, and M7 each contain one UE 5.8 engine-owned r.MotionVectorSimulation render-thread warning; the project does not reference that console variable.",
+    "passed": true
+  },
+  "post_change_python_data_source_matrix": {
+    "junit": "/private/tmp/raftsim_m9_v279_full_python_tests.xml",
+    "junit_sha256": "be5e767599f6c0c6d671ee9e4c28ab9e684a046549399a2b9f2f3b379c79f6cb",
+    "passed": 1140,
+    "skipped_expected": 3,
+    "failed_intentional_fail_closed": 1,
+    "failed_unexpected": 0,
+    "duration_seconds": 421.41,
+    "intentional_failure": "The current post-v317 flexible-raft runtime deformer does not match the historical v42 visual-review hash, so the release packet cannot imply that the old photoreal-art review approved the current source.",
+    "technical_matrix_passed": true,
+    "release_packet_remains_fail_closed": true
+  },
+  "qualification_scope": {
+    "technical_local_performance_gate_closed": true,
+    "canonical_release_workflow_completed": false,
+    "canonical_isolation_preflight_passed": false,
+    "isolation_note": "The protected pre-existing UnrealEditor-Cmd helmet import remained in sleeping state at 0.0% CPU and 0.0% memory during this work. It did not render or consume measurable resources, but the canonical fail-closed RC workflow correctly treats any Unreal process as a conflict, so this manually exercised package cannot close the canonical isolation gate.",
+    "milestone_promotion_allowed": false,
+    "remaining_requirements": [
+      "Run the exact-current canonical macOS RC workflow after the protected import exits naturally.",
+      "Complete named product-owner, guide, art, geospatial, and legal approvals.",
+      "Complete fresh-device keyboard and gamepad approval.",
+      "Complete Windows RTX 3060 and RTX 4070 packaging, performance, Authenticode, and Proton checks.",
+      "Complete Developer ID signing, notarization, stapling, Gatekeeper validation, approved media, and distribution-account checks."
+    ]
+  },
+  "promotion_allowed": false
+}

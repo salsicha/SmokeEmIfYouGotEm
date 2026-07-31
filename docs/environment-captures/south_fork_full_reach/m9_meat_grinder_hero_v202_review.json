@@ -1,0 +1,159 @@
+{
+  "schema": "raftsim.release_review.meat_grinder_hero.v202",
+  "generated_on": "2026-07-29",
+  "status": "source_grounded_technical_review_retained_but_visually_rejected_for_production",
+  "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimMeatGrinderHeroReview -RaftSimExitAfterEnvironmentAutomation",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "source_bundle": {
+    "manifest": "unreal/Content/RaftSim/Environment/ExternalReview/PolyHaven/MeatGrinderHero_2K/polyhaven_meat_grinder_hero_source_manifest.json",
+    "import_report": "docs/environment-captures/photoreal_river_previews/polyhaven_meat_grinder_hero_import_report.json",
+    "asset": "Boulder 01",
+    "author": "Rico Cilliers",
+    "publisher": "Poly Haven",
+    "license": "CC0 1.0 Universal",
+    "official_api_md5_verified_files": 5,
+    "sha256_verified_files": 5,
+    "raw_payloads_committed": false,
+    "production_promoted": false
+  },
+  "guide_basis": {
+    "rapid": "Meat Grinder",
+    "station_window_m": [620.0, 1320.0],
+    "route_interpretation": "right-of-center line through two offset holes, a near-right-bank flat-wrap hazard benchmark, right-bank boulder pressure, and an exit wave train",
+    "classification": "guide-informed visual interpretation pending named guide review",
+    "sources": [
+      "https://www.whitewaterguidebook.com/california/south-fork-american-river/",
+      "https://gorafting.com/united-states/california/south-fork-american/meat-grinder/",
+      "https://www.aorafting.com/blog/video-top-5-rapids-on-the-south-fork-american-river/",
+      "https://www.american-rivers.com/sf-rio-descr.htm"
+    ]
+  },
+  "experiments": [
+    {
+      "version": 200,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v200_meat_grinder_hero_slice",
+      "implementation": "ten-column bank ribbons using an averaged DEM cross-section fallback, reviewed rocky-gravel material, publisher-scale boulders, guide-line channel hazards, and detailed pines",
+      "terrain_trace_hits": 0,
+      "procedural_fallback_height_samples": 1760,
+      "bank_segments": 174,
+      "bank_triangles": 3132,
+      "bank_boulders": 74,
+      "channel_boulders": 5,
+      "pines": 57,
+      "build_log": "/private/tmp/raftsim_m9_v200_hero_build_v2.log",
+      "build_log_sha256": "58aa3d3b6bbb6bbafebd72521cab85e956d60189f22c2963e9c863f01d968d32",
+      "capture_log": "/private/tmp/raftsim_m9_v200_meat_grinder_hero_capture_v2.log",
+      "capture_log_sha256": "887bb381db6abb15bcc2aaa776ffa614c3364fb24937d79df78ddc6b6003eb8b",
+      "manual_result": "rejected",
+      "rejection": "Bright orange ribbons form elevated arches and detached longitudinal ridges over the source floodplain. The generated surface is not a coherent Sierra bank."
+    },
+    {
+      "version": 201,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v201_meat_grinder_monotonic_bank",
+      "implementation": "monotonic bank-rise profiles converging to measured 110 m DEM relief with a dedicated darkened bank material",
+      "terrain_trace_hits": 0,
+      "procedural_fallback_height_samples": 1760,
+      "bank_segments": 174,
+      "bank_triangles": 3132,
+      "bank_boulders": 74,
+      "channel_boulders": 5,
+      "pines": 57,
+      "build_log": "/private/tmp/raftsim_m9_v201_hero_build.log",
+      "build_log_sha256": "e725ca2e5716f35f4e268caa8e21cbff9f2932a9a7126cc1deba416f4c43641a",
+      "capture_log": "/private/tmp/raftsim_m9_v201_meat_grinder_monotonic_bank_capture.log",
+      "capture_log_sha256": "e713cdb143b51f95cae9566d45727d7bf70e0fa76bfccc09e50c2109cc3f3912",
+      "manual_result": "rejected",
+      "rejection": "The monotonic profile removes the arches, but the dedicated material renders nearly black and the ribbons remain broad artificial shelves that conceal authoritative terrain."
+    },
+    {
+      "version": 202,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v202_meat_grinder_dem_aligned_rock_garden",
+      "implementation": "read-only spatial index over settled DEM-derived terrain mesh vertices; no generated bank surface; transient non-colliding boulder, hazard, and pine dressing grounded to source Z",
+      "settled_dem_terrain_actors": 13,
+      "indexed_local_vertices": 14311,
+      "direct_source_height_samples": 1760,
+      "procedural_fallback_height_samples": 0,
+      "procedural_bank_triangles": 0,
+      "bank_boulders": 90,
+      "channel_boulders": 5,
+      "pines": 57,
+      "build_log": "/private/tmp/raftsim_m9_v202_dem_aligned_build.log",
+      "build_log_sha256": "3aea526195eef54530381505df80ffbb32ed1c891dc55dac813126ac6930c5a8",
+      "build_result": "succeeded_target_up_to_date_after_successful_incremental_compile",
+      "capture_log": "/private/tmp/raftsim_m9_v202_meat_grinder_dem_aligned_capture_v2.log",
+      "capture_log_sha256": "7ce004792d0e301528af5dbd1683c1632708eed176be247c407c4d9568f73b4e",
+      "manual_result": "technical_infrastructure_retained_photoreal_promotion_rejected",
+      "accepted_corrections": [
+        "All 1,760 placement probes read settled DEM-derived mesh vertices; no averaged or invented height is used.",
+        "The rejected bank ribbons are absent, authoritative terrain remains visible and unchanged, and the review actor is transient, non-colliding, non-navigable, and unsaved.",
+        "The frame gains a more legible right-of-center rock-garden line and a near-right-bank wrap-hazard benchmark without changing collision, hydraulics, buoyancy, raft physics, rescue, or gameplay."
+      ],
+      "rejection": "The single pale donor rock repeats visibly, the broad banks remain smooth, vegetation remains card-like, water lacks convincing turbulent volume, and the lighting/material integration remains synthetic."
+    },
+    {
+      "version": 203,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v203_meat_grinder_multidonor_riparian",
+      "implementation": "temporary seven-rock scan mix plus 142 detailed small-tree broadleaf analogs over the source-grounded v202 placement seam",
+      "direct_source_height_samples": 1760,
+      "procedural_fallback_height_samples": 0,
+      "procedural_bank_triangles": 0,
+      "bank_boulders": 90,
+      "rock_scan_variants": 7,
+      "channel_boulders": 5,
+      "pines": 57,
+      "small_tree_broadleaf_analogs": 142,
+      "build_log": "/private/tmp/raftsim_m9_v203_multidonor_build.log",
+      "build_log_sha256": "98a194825c4d831c41b62a6155206ca15e9a0363f89d142050743d667cb840d9",
+      "capture_log": "/private/tmp/raftsim_m9_v203_meat_grinder_multidonor_capture.log",
+      "capture_log_sha256": "5ad7e34c450d9c419676c0b3c684ae410957a9fec73fb752172fc0f96a453b2a",
+      "meat_grinder_capture_sha256": "e342f3e35c38195bf3d15e1041ea583857f4444cf63a980cb3a74e546833d86a",
+      "mean_absolute_rgb_delta_from_v202": 0.194376,
+      "manual_result": "rejected_and_removed_from_active_review_seam",
+      "rejection": "Additional scanned rocks reduce one-donor repetition, but the small-tree donor resolves as pale speckles, most canopy volume disappears into existing cards, and only 0.386719 percent of Meat Grinder pixels change by more than eight RGB levels. The composition is not materially stronger than v202.",
+      "rollback": "Seven-variant bank placement and the small-tree analog were removed; the capture directory and this ledger remain as negative evidence.",
+      "rollback_build_log": "/private/tmp/raftsim_m9_v203_rollback_to_v202_build.log",
+      "rollback_build_log_sha256": "2c70c5bd82be0e06db90bb86dadbd08f63ec43ea3aafb269f6d8a0a03c7106c6",
+      "restored_v202_source_sha256": "09ad522cd62b6ff0cca66aa6af12f2924c7c109a1f4c50d5d1a5f8aecff29387",
+      "rollback_build_result": "succeeded"
+    }
+  ],
+  "v202_captures_sha256": {
+    "chili_bar_launch_downstream": "4f3f13b6533ca8bc149d78a2c62aac5b9609bd3ed3fac245ed748cfe51112e13",
+    "meat_grinder_guide_eye": "54248a611ab04b2a8a07a4e743073debad607aaa8d7e4ce820e14491180df85c",
+    "troublemaker_approach": "0647d65ee1531cfa0a16d5161997d2eab4304647c57e34d26aab922060f517c4",
+    "coloma_bridge_context": "955a9d55d8093eee2e252f9794bd09908d8a6a55fc96e5d76884b1a0772d1411",
+    "salmon_falls_takeout": "181b4ec3bbc76086742712ca8cf0b4b225fa56f8dd4ea37eec8c5ebf8a7409c8"
+  },
+  "v202_pixel_delta_from_authoritative_v184": {
+    "meat_grinder_guide_eye": {
+      "mean_absolute_rgb": 11.05873,
+      "pixels_any_channel_gt_8_percent": 28.609918,
+      "pixels_any_channel_gt_16_percent": 9.421658
+    }
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "technical_retention": "retain hash-gated importer, provenance, isolated assets, guide-window review flag, settled-DEM vertex sampler, non-authoritative placement seam, captures, and this ledger",
+    "corrective_action": "Do not resume generated bank sheets or repeat one donor across the full slice. Production promotion requires a coherent Sierra-specific authored or scanned rock/sediment/root/vegetation kit, terrain-integrated material transitions, art-directed placement, production water volume, and named guide/art/geospatial review.",
+    "media_policy": "not approved for trailer, store, press, marketing, or navigational use"
+  },
+  "authority": {
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "water_sampling_changed": false,
+    "buoyancy_changed": false,
+    "raft_physics_changed": false,
+    "navigation_changed": false,
+    "map_saved": false,
+    "runtime_package_promoted": false
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_guide_review": "open",
+    "named_art_review": "open",
+    "named_geospatial_review": "open",
+    "named_legal_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

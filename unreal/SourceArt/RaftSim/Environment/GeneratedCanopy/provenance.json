@@ -1,6 +1,7 @@
 {
-  "schema": "raftsim.generated_canopy_source_art.v1",
+  "schema": "raftsim.generated_canopy_source_art.v2",
   "created_utc": "2026-07-19T00:00:00Z",
+  "last_updated_utc": "2026-07-29T00:00:00Z",
   "generator": "OpenAI image generation",
   "ownership": "project-generated first-party source art",
   "navigation_use": "not_for_navigation",
@@ -20,11 +21,31 @@
   "assets": [
     {
       "species": "Pinus ponderosa",
+      "profile": "mature",
       "generation_brief": "Create a photorealistic-natural full mature Sierra foothill ponderosa pine specimen for an Unreal Engine vegetation billboard. Show the entire tree from roots to crown in a straight-on orthographic-like view, with realistic bark, branches, and needle clusters. Isolate it against a perfectly flat #ff00ff magenta chroma background. Use even neutral daylight, no cast shadow, no ground, no scenery, no frame, no text, and no other objects.",
       "chroma_source": "ponderosa_pine_billboard_chroma.png",
       "chroma_sha256": "64c1effda80604ff232a90cb15467ff093f2e73f776dbe48191fc7b71a2a1f15",
       "alpha_source": "T_PonderosaPine_Billboard.png",
       "alpha_sha256": "abb985bb21888e5cd86f3843b12814e1fcfb9d3d911b0aca87e0470d1cac0bae"
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "intermediate",
+      "generation_brief": "Create a distinct photorealistic-natural intermediate-age Sierra foothill ponderosa pine specimen for an Unreal Engine vegetation billboard: complete root-to-crown silhouette, moderately narrow asymmetric crown, orange-brown plated bark, irregular branch whorls, sparse gaps, and muted olive-green needles. Isolate it against a perfectly flat #ff00ff magenta chroma background with neutral overcast light, generous padding, and no shadow, ground, scenery, text, or other objects.",
+      "preprocess": "Resampled the generated chroma source to 1024x1536 before matte extraction so all three Ponderosa profiles share the same import dimensions.",
+      "chroma_source": "ponderosa_pine_intermediate_billboard_chroma.png",
+      "chroma_sha256": "a86c3f11ad6e1ec28091db2d4036d900477c92732ca9cfcf47a2d26405a1f1d6",
+      "alpha_source": "T_PonderosaPine_Intermediate_Billboard.png",
+      "alpha_sha256": "46315638ec808d539c51a9ef682b25544aa195f007b80d7d0fcee9d1983971dc"
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "younger",
+      "generation_brief": "Create a distinct photorealistic-natural younger dry-bench Sierra foothill ponderosa pine specimen for an Unreal Engine vegetation billboard: complete root-to-crown silhouette, slender youthful trunk with early orange-brown plate bark, wind-and-drought-shaped open crown, asymmetric branch tiers, sparse gaps, and muted olive-green needles. Isolate it against a perfectly flat #ff00ff magenta chroma background with neutral overcast light, generous padding, and no shadow, ground, scenery, text, or other objects.",
+      "chroma_source": "ponderosa_pine_younger_billboard_chroma.png",
+      "chroma_sha256": "f9fc0ce910756cb2d61cdf373e1ad7900b99d2851ec1ce2d5f62264504b039ee",
+      "alpha_source": "T_PonderosaPine_Younger_Billboard.png",
+      "alpha_sha256": "9ede99ab1403399ce9cbf6cd5d73d8bbd4c9778f6f11e2c4ea2bc61837de31e0"
     },
     {
       "species": "Quercus wislizeni",
@@ -33,6 +54,231 @@
       "chroma_sha256": "f63672db2c33bf716bfd4ea2f20cacf740524468c55e5ee6da6f9fa0e6a389a5",
       "alpha_source": "T_InteriorLiveOak_Billboard.png",
       "alpha_sha256": "983dce12e28a4ef2cd15c8f1e90ef24afbc3a283c902a97c575ce0a7c924d2dc"
+    },
+    {
+      "species": "Alnus rhombifolia",
+      "profile": "mature_riparian",
+      "generation_brief": "Create a distinct photorealistic-natural mature California white alder typical of a Sierra Nevada foothill river corridor for an Unreal Engine vegetation billboard: complete root-to-crown silhouette, one dominant trunk splitting into upright leaders, gray-brown non-luminous bark, irregular airy oval crown, visible branch structure, realistic gaps, and muted medium/deep green deciduous foliage. Isolate it against a perfectly flat #ff00ff magenta chroma background with neutral overcast light, generous padding, and no shadow, ground, scenery, text, or other objects.",
+      "chroma_source": "white_alder_billboard_chroma.png",
+      "chroma_sha256": "7a1bbbaeacb892272c56eb80c0323b7b1100a9e07b6e48e4af2d1e0004bb7ec4",
+      "alpha_source": "T_WhiteAlder_Billboard.png",
+      "alpha_sha256": "863ddf0ceb758e2be2b11440c02fd732186a007c85ca712d394e56b3a4245198"
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "mature_photoreal_v1",
+      "generation_brief": "One isolated asymmetrical mature Sierra Nevada ponderosa pine, full root flare to crown, reddish plated trunk, irregular open crown, branch whorls, sparse dead lower limbs, varied needle clusters, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, or text.",
+      "chroma_source": "T_PonderosaPine_Mature_PhotorealV1_Chroma.png",
+      "chroma_sha256": "07ca5bf52cd68f419a365162828cd5b7bd31a38f81a4d4bf341d40ffaaf6de98",
+      "alpha_source": "T_PonderosaPine_Mature_PhotorealV1.png",
+      "alpha_sha256": "a5e8bcee111c4fdb7e2161f8b02fc83f61a334e1a88526745e1a603c606d14ad",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "intermediate_photoreal_v1",
+      "generation_brief": "One isolated intermediate-age Sierra Nevada ponderosa pine, full root flare to crown, moderately open asymmetric crown, visible reddish plated trunk, uneven whorls, dead lower limbs, realistic olive needles, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background.",
+      "chroma_source": "T_PonderosaPine_Intermediate_PhotorealV1_Chroma.png",
+      "chroma_sha256": "4a64c0d608e001141ca00a175da0a4b3af69486a13301f87fa9cb35db6f349b0",
+      "alpha_source": "T_PonderosaPine_Intermediate_PhotorealV1.png",
+      "alpha_sha256": "72078d886acf4650d78ea82b021e1d8ec8971724b35d6b0791240bf1ae1553a3",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "young_photoreal_v1",
+      "generation_brief": "One isolated young Sierra Nevada ponderosa pine, full root flare to crown, slender trunk, denser irregular youthful crown, uneven lateral branch lengths, realistic olive needles, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background.",
+      "chroma_source": "T_PonderosaPine_Young_PhotorealV1_Chroma.png",
+      "chroma_sha256": "d6deea9d1db8d9b7cd5cc2263b33f28dc013e9093d166737cbd5b7dc65956c1f",
+      "alpha_source": "T_PonderosaPine_Young_PhotorealV1.png",
+      "alpha_sha256": "510c73a93019f3ef164ae9247d71d8ea83d16e25dc9918225d943a9b6a013952",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Quercus wislizeni",
+      "profile": "mature_photoreal_v1",
+      "generation_brief": "One isolated mature California interior live oak, full root flare to crown, short twisting multi-fork trunk, broad irregular crown, dense small evergreen leaves with visible branching gaps and dry twigs, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background.",
+      "chroma_source": "T_InteriorLiveOak_PhotorealV1_Chroma.png",
+      "chroma_sha256": "2d2dcc76dce426f3d65af5e0c54860b8e6ed385f8977c13e415b012a908ae0c8",
+      "alpha_source": "T_InteriorLiveOak_PhotorealV1.png",
+      "alpha_sha256": "e0fffb7db1de382136d5761d3245fff169e74dc9c3faa405c649af42e804c2a5",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Alnus rhombifolia",
+      "profile": "mature_riparian_photoreal_v1",
+      "generation_brief": "One isolated mature Sierra riverbank white alder, full root flare to crown, pale gray mottled trunk dividing into upright stems, narrow irregular crown, medium-green serrated leaves, fine twigs and river-wind asymmetry, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background.",
+      "chroma_source": "T_WhiteAlder_PhotorealV1_Chroma.png",
+      "chroma_sha256": "dee0f41158a6c1c1acff51cdcd311f789fbcf83e8e56b1103814e91dad4b64e7",
+      "alpha_source": "T_WhiteAlder_PhotorealV1.png",
+      "alpha_sha256": "09074ccde92241db7b8ed30a3a8c073494cf06185a1ca81157268451626ec38c",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Ceanothus integerrimus analog",
+      "profile": "mature_dry_bank_photoreal_v1",
+      "generation_brief": "One isolated mature Sierra foothill deerbrush/ceanothus-like shrub, multiple woody stems, broad drought-shaped asymmetric crown, small matte olive leaves, dry twig tips and internal gaps, neutral diffuse scan lighting, and a perfectly flat #ff00ff chroma background.",
+      "chroma_source": "T_DeerbrushShrub_PhotorealV1_Chroma.png",
+      "chroma_sha256": "bd5426e929267c8f6db0d78e561db3bf4507e5bfe9f00b502d2de08edb0e070f",
+      "alpha_source": "T_DeerbrushShrub_PhotorealV1.png",
+      "alpha_sha256": "7b688f8e640c29189959f383fd8226cb107d96b0f5f808dac5caef29ef2d5ea9",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "mature_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible mature Sierra Nevada foothill ponderosa pine, full root flare to crown, reddish-orange plated bark, tall straight trunk, irregular open wind-shaped crown, long needle clusters concentrated at branch tips, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_PonderosaPine_Mature_PhotorealV2_Chroma.png",
+      "chroma_sha256": "204e6cc7c7a88949e060b3995e9c6a098b61d836532ac7bfac4394ec062286b7",
+      "alpha_source": "T_PonderosaPine_Mature_PhotorealV2.png",
+      "alpha_sha256": "3dca5056a654cb63f4b90449055908914eb2b9f580eeb801a99f9df57ea56e2e",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "intermediate_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible intermediate-age South Fork ponderosa pine, full root flare to crown, slightly curved reddish plated trunk, layered irregular branches, long needle clusters, fuller lower crown, natural asymmetry, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_PonderosaPine_Intermediate_PhotorealV2_Chroma.png",
+      "chroma_sha256": "85f6c7d552fe54296d2aa1dbbadf78851bc012ce9dcd8d3220b98debd898dfd9",
+      "alpha_source": "T_PonderosaPine_Intermediate_PhotorealV2.png",
+      "alpha_sha256": "e99a99ba5ecc85913cc4d58cf2e1a31e31c50687985838727726de5f2adcca79",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Pinus ponderosa",
+      "profile": "young_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible young ponderosa pine from a dry Sierra foothill slope, full root flare to crown, slender reddish-brown trunk, irregular open conical crown, wind-bent branches and long needle clusters, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_PonderosaPine_Young_PhotorealV2_Chroma.png",
+      "chroma_sha256": "acc85e424b93eaa71317aca630b04d5fc2d5a54c0abffc9d243279dcd028afff",
+      "alpha_source": "T_PonderosaPine_Young_PhotorealV2.png",
+      "alpha_sha256": "1c951858ab84e523fa86ccb925b5520ae55481ee0558275fd3869e53922925b3",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Quercus wislizeni",
+      "profile": "mature_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible mature California interior live oak from the South Fork canyon, full root flare to crown, broad asymmetric crown, low multi-trunk fork, dark fissured bark, dense small evergreen leaves, visible interior branches and negative gaps, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_InteriorLiveOak_PhotorealV2_Chroma.png",
+      "chroma_sha256": "5d224683ca6802eac82519ee4ffe8524f76fd8ea3bba6fb7af9467ee8f2b0d54",
+      "alpha_source": "T_InteriorLiveOak_PhotorealV2.png",
+      "alpha_sha256": "2bc8f6a11c131b24b12e740db868662a4698e669549b28d95d40af96f5bd37ae",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Alnus rhombifolia",
+      "profile": "mature_riparian_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible mature California white alder from a Sierra foothill riverbank, full root flare to crown, several slim pale-gray trunks, narrow irregular crown, fine branching, abundant small medium-green leaves with pale undersides, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_WhiteAlder_PhotorealV2_Chroma.png",
+      "chroma_sha256": "a39444a012baed0373cb76ac810752910724509c0d35d6d210055fe94897bbff",
+      "alpha_source": "T_WhiteAlder_PhotorealV2.png",
+      "alpha_sha256": "f72cb852e715f2e102b9c4ef2f7bb4ccf6e88ce579a2a5d813bc5bc56326bdc1",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
+    },
+    {
+      "species": "Ceanothus integerrimus analog",
+      "profile": "mature_dry_bank_photoreal_v2",
+      "generation_surface": "Codex built-in image_gen",
+      "model_identifier": "not_exposed_by_builtin_surface",
+      "seed": "not_exposed_by_builtin_surface",
+      "generated_utc": "2026-07-29T00:00:00Z",
+      "generation_brief": "One botanically plausible mature Sierra foothill deerbrush shrub, full base to crown, broad irregular multi-stem form, gray-brown woody stems, dense matte olive leaves, subtle spent flower clusters and visible interior gaps, soft neutral overcast scan lighting, and a perfectly flat #ff00ff chroma background without shadow, ground, scenery, text, or watermark.",
+      "chroma_source": "T_DeerbrushShrub_PhotorealV2_Chroma.png",
+      "chroma_sha256": "e754a274bebb430ef53c56393eead7515ed1dd3d58e3ada5a99f1815e17a11ab",
+      "alpha_source": "T_DeerbrushShrub_PhotorealV2.png",
+      "alpha_sha256": "7a5254f3c230eb293983d7770611e50282c34bd15b9f47e4a1bb987b5bfa654e",
+      "postprocess_override": {
+        "auto_key": "border",
+        "soft_matte": true,
+        "transparent_threshold": 12,
+        "opaque_threshold": 220,
+        "despill": true
+      }
     }
   ]
 }

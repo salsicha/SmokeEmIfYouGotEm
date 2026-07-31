@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Satan's Cesspool",
       "rapid_order": 12,
+      "source_elevation_datum_m": 217.59137514648438,
       "station_m": 27197.9136,
       "target_discharge_cfs": 3000.0,
       "target_discharge_m3s": 84.950539776,

@@ -1,0 +1,16 @@
+{
+  "schema": "raftsim.m9.presskit_media.v1",
+  "release_version": "1.0.0-rc1",
+  "approved_release_media": [],
+  "pending_capture_slots": [
+    "hero_guide_seat_named_rapid",
+    "flexible_raft_wrap_and_recovery",
+    "crew_command_and_paddling",
+    "throw_line_swimmer_rescue",
+    "scout_board_and_procedural_authority_cue",
+    "weather_and_full_reach_environment",
+    "ninety_second_in_engine_trailer"
+  ],
+  "promotion_rule": "Only exact RC executable captures with art, hazard-readability, and rights acceptance may move into approved_release_media.",
+  "passed": false
+}

@@ -69,6 +69,33 @@ void URaftSimPhysicsBridgeSubsystem::ConfigureBridge(
                 OutWaterSurfaceZCm = 0.0f;
                 return true;
             });
+
+        // D3 needs velocity as well as surface elevation, and a single raft-
+        // center sample cannot represent a lateral, crest, or seam crossing.
+        // Bind the same authoritative water adapter as a per-segment field;
+        // the raft adapter chooses the deformed tube sample positions.
+        RaftRuntime->SetFlexibleWaterFieldSampler(
+            [WeakWater](
+                const FVector& WorldPositionCm,
+                FRaftSimFlexUniformWater& OutWater) -> bool
+            {
+                OutWater = FRaftSimFlexUniformWater{};
+                OutWater.bWet = false;
+                URaftSimWaterRuntimeAdapter* Water = WeakWater.Get();
+                if (Water == nullptr || !Water->HasLiveWindow())
+                {
+                    return false;
+                }
+                FRaftSimWaterSample Sample;
+                if (!Water->SampleWaterAtWorldPosition(WorldPositionCm, Sample))
+                {
+                    return false;
+                }
+                OutWater.SurfaceHeightM = Sample.SurfaceHeightMeters;
+                OutWater.VelocityMps = Sample.VelocityMetersPerSecond;
+                OutWater.bWet = Sample.bWet;
+                return true;
+            });
     }
 }
 

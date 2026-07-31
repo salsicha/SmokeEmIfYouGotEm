@@ -1,0 +1,163 @@
+{
+  "schema": "raftsim.release_review.live_oak_branch_atlas_v2.v209",
+  "generated_on": "2026-07-29",
+  "status": "project_owned_source_retained_but_v208_and_v209_visual_promotion_rejected",
+  "authoritative_runtime_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v184_refined_guide_feature_foam",
+  "technical_comparison_baseline": "docs/environment-captures/south_fork_full_reach/photographic_v202_meat_grinder_dem_aligned_rock_garden",
+  "source_bundle": {
+    "manifest": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/interior_live_oak_branch_atlas_v2_manifest.json",
+    "manifest_sha256": "046814382ef4a7f11d8dc62f617e9a9d809ce272f65fec37ee41b1d997867797",
+    "generator": "OpenAI built-in image generation",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "referenced_images": [],
+    "prompt_location": "source_bundle.manifest source.prompt",
+    "species_visual_study": "Quercus wislizeni / California interior live oak",
+    "fidelity_boundary": "AI-generated branch-cluster visual study; not a surveyed individual-tree or botanical-measurement claim",
+    "production_promoted": false
+  },
+  "source_sha256": {
+    "generator": "f9d3484489da0cad096e5a6d268b3677beb457ecd1ab78a1f4bb9c7dcb10dfd3",
+    "generator_test": "2ce7b218fa152603bc33bf8a4a5c8efef291bd9ff12b26dd86d9960192dc8521",
+    "editor_source_layout_test": "a6cb49c6f6ddbe0f8fac4120184f39caa6fe6f6be30b2b2016d972a420b36b3e",
+    "canopy_editor_source": "753ddc0d4ef55e2462716a5859190904397e8a86b1c2919cc519d73974e718a1",
+    "capture_editor_source": "be58e4d869d997bf17e030a69bb61891ad49f1376b74c53f636de58fcdccee6b",
+    "generated_chroma": "05ba521fbb4bdc10c7b479bf75d0429c24fd8f47c9801da9a47787d6eb7a73bc",
+    "generated_alpha": "7945d057da74872861d12359aacac356557b5763f1e535f02e68197482f5ed43",
+    "albedo_opacity": "ac8c59e9719af3f016ea086c9b239af81803bd668291b356a7f2d3a838fd4520",
+    "normal": "967e5d0275b2b81ae5d6146c0b98c08125676afaf0af1c87e6c2548d631de50f",
+    "ao_roughness_subsurface": "caa8653bfbd9f9c9079c735f330a30edbb3fb20f0e550d75842cfbdfc0a01c7a"
+  },
+  "isolated_review_packages_sha256": {
+    "core_texture": "91a9064534a6e8f29ace1224a81066777328e3965048546eddf49d61f7a23e62",
+    "atlas_albedo_opacity": "a1a358f4cf88c1d5a8509ef3d680ab26c272c83cab86adeb6d638d2311326029",
+    "atlas_normal": "e33e9a007ce562464286835bd5139ea252eb64b4b192429ad044abbbd55ed1ed",
+    "atlas_ao_roughness_subsurface": "a07a9bc5936cdcb55756f5d17d19e56e56bf6bd64118171a918a0898ecc76aab",
+    "core_material": "d6e647a662d985256724e5f43a3565396602b2bac73006a129ca425518376a39",
+    "branch_material": "90e3389e1bae2a4024cef1e7528634259ccaefaca395b5e6490de7b0e4498cc7",
+    "expanded_review_mesh": "02dcaeadaae46618e89a026b8741aeacd518763c3237743b1533216b2231faa7"
+  },
+  "experiments": [
+    {
+      "version": 208,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v208_live_oak_branch_atlas_v2",
+      "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimLiveOakBranchAtlasV2Review -RaftSimExitAfterEnvironmentAutomation",
+      "implementation": "transiently swap OakBroadleafProxy and FarBroadleafCard HISM components to an isolated project-owned review mesh with the retained production oak billboard core plus 36 V2 branch cards; do not save the map",
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 0.083947,
+        "coloma_bridge_context": 0.170237,
+        "meat_grinder_guide_eye": 0.296754,
+        "salmon_falls_takeout": 0.05089,
+        "troublemaker_approach": 0.198892
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 0.320095,
+        "coloma_bridge_context": 0.584961,
+        "meat_grinder_guide_eye": 0.923394,
+        "salmon_falls_takeout": 0.156684,
+        "troublemaker_approach": 0.828559
+      },
+      "manual_result": "rejected_as_visually_ineffective",
+      "rejection": "The clean source atlas does not produce a material guide-eye improvement because the full-tree billboard core continues to dominate the crown. Broadleaf stands remain dark, repetitive, and visibly planar.",
+      "reproducibility_note": "The isolated review mesh package was subsequently reauthored in place for bounded v209 tuning. The hash-locked v208 captures remain the exact negative evidence; the superseded v208 mesh package is not retained as a separate runtime package."
+    },
+    {
+      "version": 209,
+      "capture_directory": "docs/environment-captures/south_fork_full_reach/photographic_v209_live_oak_branch_atlas_v2_expanded",
+      "automation_command": "-RaftSimCaptureSouthForkFullReachEnvironment -RaftSimPhotographicSouthForkCapture -RaftSimLiveOakBranchAtlasV2ExpandedReview -RaftSimExitAfterEnvironmentAutomation",
+      "implementation": "transiently use a brighter isolated core, 48 larger V2 branch cards, expanded radial and height ranges, and brighter review-only tints; production oak textures, materials, mesh references, ecology, placement, and map packages remain unchanged",
+      "mean_absolute_rgb_delta_from_v202": {
+        "chili_bar_launch_downstream": 0.278339,
+        "coloma_bridge_context": 0.601608,
+        "meat_grinder_guide_eye": 0.597508,
+        "salmon_falls_takeout": 0.517754,
+        "troublemaker_approach": 0.674222
+      },
+      "pixels_any_channel_gt_8_percent_from_v202": {
+        "chili_bar_launch_downstream": 1.411133,
+        "coloma_bridge_context": 2.164497,
+        "meat_grinder_guide_eye": 2.227105,
+        "salmon_falls_takeout": 1.173069,
+        "troublemaker_approach": 2.744683
+      },
+      "mean_absolute_rgb_delta_from_v208": {
+        "chili_bar_launch_downstream": 0.280324,
+        "coloma_bridge_context": 0.598699,
+        "meat_grinder_guide_eye": 0.365996,
+        "salmon_falls_takeout": 0.521428,
+        "troublemaker_approach": 0.6781
+      },
+      "pixels_any_channel_gt_8_percent_from_v208": {
+        "chili_bar_launch_downstream": 1.419379,
+        "coloma_bridge_context": 2.214193,
+        "meat_grinder_guide_eye": 1.639106,
+        "salmon_falls_takeout": 1.194553,
+        "troublemaker_approach": 2.80447
+      },
+      "manual_result": "rejected_and_canopy_card_scalar_tuning_stopped",
+      "rejection": "The larger and brighter cards introduce conspicuous pale leaf speckles and thin card silhouettes across the five views while the broad crown mass remains billboard-like. Additional scale, count, radius, or tint tuning would repeat this failed representation rather than close the photoreal gate."
+    }
+  ],
+  "capture_sha256": {
+    "v208": {
+      "chili_bar_launch_downstream": "6752dada131621f28efb4742e5c5cd6ce006f0a41d2513eb22aebbd889d70e90",
+      "coloma_bridge_context": "f49314cce397b0d5a7748812840ccdf56dda336f15e90ad8f6b7459f5261137b",
+      "meat_grinder_guide_eye": "64eac7d966230363a7c06d506d8705b20d6a499f0a4e5277cfc8edea51a95505",
+      "salmon_falls_takeout": "6c336584d0b6f9bd029885f307a0ca9cd5bb032f99315a8f69932256ccfb331e",
+      "troublemaker_approach": "cf972e48b7d6419ce4ae5639e863f4502c65ce0c58607650352366d378f83bcf"
+    },
+    "v209": {
+      "chili_bar_launch_downstream": "d0db8ccfff3d91b94e013dbb005e58441e93e8efc8584b0d521510d85b5f6fa0",
+      "coloma_bridge_context": "c7d682aebca8c303cd345050fe9cf90f32de74a1a5fb183e2531fcb6dd907d09",
+      "meat_grinder_guide_eye": "11d737902cc20bd2621a2db883793012c5abf24abd93bbbc6d2cd6307f8ab140",
+      "salmon_falls_takeout": "3daf427627dcefc1232def20d971ba41928e6e107b2c8664e138d44570179893",
+      "troublemaker_approach": "edbfb771fc64aa29b5861ab132d1ca4887a71753c3818d9c6bb14b215e9ea613"
+    }
+  },
+  "validation": {
+    "source_alpha_dimensions": [
+      1254,
+      1254
+    ],
+    "unreal_texture_dimensions": [
+      2048,
+      2048
+    ],
+    "occupied_opaque_pixels": 555671,
+    "reserved_row_opaque_pixels": 0,
+    "focused_generator_and_editor_contracts": "30/30 passed before final ledger lock",
+    "broader_m9_environment_source_contracts": "46 passed and 1 documented intentional fail-closed release-candidate assertion in 108.12 seconds",
+    "intentional_release_candidate_failure": "The release-candidate contract compares the current post-v317 RaftSimRaftMesh.cpp to the historical v42 review hash. m9_d6_project_chrono_v134_review.json requires this mismatch to remain unreconciled until an accepted M9 candidate.",
+    "editor_target_builds": "two incremental UE 5.8 Mac Development builds succeeded",
+    "isolated_asset_authoring": "succeeded for v208 and reauthored expanded v209 review package",
+    "fixed_camera_captures": "v208 5/5 and v209 5/5 saved",
+    "production_map_sha256_after_reviews": "35b0553d4a6146bbc04244d1f8c738314273e6f5e0f571982cc29e70c5a86a7e"
+  },
+  "manual_review": {
+    "production_promotion": "rejected",
+    "technical_retention": "retain the exact project-owned source, deterministic alpha/PBR derivation, isolated review packages, reversible HISM swap seam, fixed-camera captures, and this negative-evidence ledger",
+    "corrective_action": "Stop parameter tuning on crossed foliage cards. The next credible production canopy attempt requires authored or scanned species-appropriate trunk and branch topology, several crown-age and health variants, leaf clusters aligned to branch architecture, controlled near/mid/far representation transitions, understory and root integration, calibrated lighting, and named art plus ecology review.",
+    "media_policy": "not approved for trailer, store, press, marketing, navigational, or photoreal acceptance use"
+  },
+  "authority": {
+    "ecology_classification_changed": false,
+    "instance_placement_changed": false,
+    "collision_changed": false,
+    "hydraulics_changed": false,
+    "water_sampling_changed": false,
+    "buoyancy_changed": false,
+    "raft_physics_changed": false,
+    "navigation_changed": false,
+    "map_saved": false,
+    "runtime_package_promoted": false
+  },
+  "gate_effect": {
+    "photoreal_environment": "open",
+    "named_guide_review": "open",
+    "named_art_review": "open",
+    "named_geospatial_review": "open",
+    "named_legal_review": "open",
+    "release_media": "open",
+    "milestone_9": "fail_closed_uncommitted_unpushed"
+  }
+}

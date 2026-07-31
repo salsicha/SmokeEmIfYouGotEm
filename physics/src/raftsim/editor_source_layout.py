@@ -5,8 +5,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-
-EDITOR_PRIVATE_RELATIVE_PATH = Path("unreal/Plugins/RaftSim/Source/RaftSimEditor/Private")
+EDITOR_PRIVATE_RELATIVE_PATH = Path(
+    "unreal/Plugins/RaftSim/Source/RaftSimEditor/Private"
+)
 EDITOR_PUBLIC_RELATIVE_PATH = Path("unreal/Plugins/RaftSim/Source/RaftSimEditor/Public")
 
 RIVER_BUILD_TARGETS = (
@@ -53,9 +54,15 @@ def _registered_console_commands(source: str) -> list[dict[str, str | None]]:
     matches = list(assignment_pattern.finditer(source))
     commands = []
     for index, match in enumerate(matches):
-        end = matches[index + 1].start() if index + 1 < len(matches) else min(len(source), match.end() + 1400)
+        end = (
+            matches[index + 1].start()
+            if index + 1 < len(matches)
+            else min(len(source), match.end() + 1400)
+        )
         block = source[match.start() : end]
-        handler_match = re.search(r"&FRaftSimEditorModule::(?P<handler>[A-Za-z0-9_]+)", block)
+        handler_match = re.search(
+            r"&FRaftSimEditorModule::(?P<handler>[A-Za-z0-9_]+)", block
+        )
         commands.append(
             {
                 "command": match.group("command"),
@@ -109,7 +116,8 @@ def build_editor_source_inventory(repo_root: Path) -> dict[str, Any]:
         "startup_flags": _startup_flags(source),
         "river_build_targets": river_targets,
         "all_river_build_targets_present": all(
-            target["river_id_present"] and target["map_package_present"] for target in river_targets
+            target["river_id_present"] and target["map_package_present"]
+            for target in river_targets
         ),
     }
 

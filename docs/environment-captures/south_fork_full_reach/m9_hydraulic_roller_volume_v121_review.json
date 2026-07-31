@@ -1,0 +1,127 @@
+{
+  "schema": "raftsim.m9.hydraulic_roller_volume_review.v1",
+  "reviewed_utc": "2026-07-29T05:31:21Z",
+  "candidate": "m9_hydraulic_roller_volume_v121",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "human_approved": false,
+  "named_art_reviewer": null,
+  "named_guide_reviewer": null,
+  "marketing_approved": false,
+  "release_media_approved": false,
+  "captures": {
+    "baseline": {
+      "file": "m9_hydraulic_collapse_baseline_v118.png",
+      "camera": "breaking_water",
+      "diagnostic": "noboulderdressing",
+      "sha256": "cfb8221c1641ee9a53def0817cde307bda73cdaaa5b2dd26f76944ed27ddd0d1"
+    },
+    "retained_candidate": {
+      "file": "m9_hydraulic_roller_volume_v121.png",
+      "camera": "breaking_water",
+      "diagnostic": "noboulderdressing",
+      "sha256": "2fae1748cb1ffdc9368abe05d0d2b7ee5b974d19edbd664b85e369dfc3fe922d"
+    }
+  },
+  "source": {
+    "runtime_surface": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimWaterSurfaceActor.cpp",
+    "runtime_surface_sha256": "1947614d7690841e62e2bd393dfea14dfc24b761d3594284c2b1d3425562b9be",
+    "runtime_header": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimWaterSurfaceActor.h",
+    "runtime_header_sha256": "745e0c671ba5928791ed98d452bce5674f85d582106c57f5b5e41e57eff1d9b0",
+    "capture_harness": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimCaptureCommand.cpp",
+    "capture_harness_sha256": "50de896fe0f99a94b06f6a97626c2f05116c3e2338677b0363e132b66695a674",
+    "automation_test": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimWaterSurfaceTest.cpp",
+    "automation_test_sha256": "d177bcc2e3892ce640afe530068d260969cdf046d79d83c05b541a99168fafae",
+    "external_asset_inputs": []
+  },
+  "implementation": {
+    "authority": "existing live-water solver detections of supercritical-to-subcritical hydraulic transitions",
+    "presentation_only": true,
+    "component": "BreakingRollerVolumeMesh",
+    "nested_shell_layers": 3,
+    "across_segments_per_layer": 18,
+    "loop_segments_per_layer": 14,
+    "triangles_per_site": 1512,
+    "maximum_site_count": 24,
+    "maximum_triangle_count": 36288,
+    "captured_site_count": 1,
+    "captured_triangle_count": 1512,
+    "captured_triangle_count_within_bound": true,
+    "maximum_shell_width_m": 4.4,
+    "captured_moderate_jump_inner_crown_height_m": 0.86,
+    "captured_moderate_jump_outer_crown_height_m": 1.16,
+    "open_loop_degrees": 270.0,
+    "material": "/Game/RaftSim/Materials/M_RaftSim_BreakingWaterLip",
+    "project_owned_lace_and_flow_normal": true,
+    "alpha_perforated": true,
+    "collision_enabled": false,
+    "casts_shadow": false,
+    "affects_navigation": false,
+    "water_sampling_changed": false,
+    "solver_fields_changed": false,
+    "buoyancy_changed": false,
+    "d3_or_d4_changed": false,
+    "flip_wrap_pin_damage_rescue_or_progression_changed": false
+  },
+  "solver_evidence": {
+    "staged_raft_station_m": 960.0,
+    "depth_m": 0.412,
+    "speed_mps": 1.778,
+    "selected_breaking_site_station_m": 879.0,
+    "selected_breaking_site_lateral_m": 0.0,
+    "selected_breaking_site_intensity": 0.349,
+    "selected_breaking_site_presentation_coverage": 1.0,
+    "selected_breaking_site_edge_clearance_m": 15.0,
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "breaking_lip_triangles": 512,
+    "breaking_lip_visible": true,
+    "breaking_roller_triangles": 1512,
+    "breaking_roller_visible": true
+  },
+  "iteration_decisions": {
+    "v119": "rejected because the low-opacity shells were technically live but visually indistinguishable from the flat-foam baseline",
+    "v120": "rejected because the full-width high-opacity shells formed an artificial white dome and omitted cells exposed rectangular holes",
+    "v121": "retained as a localized, continuous, alpha-perforated hydraulic body that adds visible entrained-air depth without changing solver authority",
+    "v122": "rejected because high-frequency transverse crest modulation exposed the procedural grid as tent-like peaks; its source delta was reverted"
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "water_surface": {
+      "report": "/private/tmp/raftsim_m9_hydraulic_roller_v121_water_surface/index.json",
+      "report_sha256": "6b7c1ecb9bf83bf825735edac39872c8f37a5a73859cbb0f0f6be6f210023e98",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "m4": {
+      "report": "/private/tmp/raftsim_m9_hydraulic_roller_v121_m4/index.json",
+      "report_sha256": "75679ea236362c2c7c0d08dec10560d3d588079b6e0c2120636067f47b332042",
+      "succeeded": 3,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "m5_offscreen_metal": {
+      "report": "/private/tmp/raftsim_m9_hydraulic_roller_v121_m5_metal/index.json",
+      "report_sha256": "9202791580332a889153470c890f45da5cc1759288722ad0d1ad3cda61d7e86b",
+      "succeeded": 4,
+      "succeeded_with_warnings": 1,
+      "failed": 0,
+      "known_warning_only": "r.MotionVectorSimulation is not marked render-thread-safe"
+    },
+    "focused_relevant_python_contracts": "39 passed",
+    "release_packet_contract": "intentionally fail-closed on a stale unrelated RaftSimRaftMesh.cpp evidence hash; not reconciled before an accepted M9 candidate",
+    "capture_material_or_niagara_warnings": 0,
+    "capture_default_material_fallback": false
+  },
+  "visual_decision": {
+    "baseline_defect": "the accepted solver site presented as a broad flat foam field with small puffs but no readable hydraulic collapse body",
+    "retained_improvement": "the same site now has a bounded raised roller body and visible entrained-air depth without the rectangular holes or channel-width slab rejected in v120",
+    "photoreal_acceptance": false,
+    "reason_not_photoreal": "the body remains visibly procedural and the surrounding broad-water foam, terrain, shoreline, canopy, distant crew, and lighting remain below the release art target"
+  },
+  "decision": "Retain v121 as a solver-driven hydraulic-volume foundation. Reject it for photoreal, marketing, press, store, release-media, and named human art approval."
+}

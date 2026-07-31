@@ -1,0 +1,155 @@
+{
+  "schema": "raftsim.unreal.reviewed_environment_asset_import.v1",
+  "asset_id": "polyhaven_south_fork_bank_kit_2k",
+  "destination": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K",
+  "status": "isolated_review_candidate_imported",
+  "production_promoted": false,
+  "verified_source_files": [
+    {
+      "relative_path": "rock_face_01_2k.fbx",
+      "sha256": "c459ad32e8a0253db5efcf21d292a5c8308e1d07637dbbeb701ae193d9b622ae",
+      "bytes": 764220
+    },
+    {
+      "relative_path": "rock_face_01_diff_2k.jpg",
+      "sha256": "447525a84e88138bdaecd90d6a3dd957bd81031a8652fa1809c7a3af0033f465",
+      "bytes": 3167302
+    },
+    {
+      "relative_path": "rock_face_01_nor_gl_2k.jpg",
+      "sha256": "751749444a78cedbb0e1fcde38eb5cbb8ac30095fafec823c64f67fb7a04d8c6",
+      "bytes": 3970196
+    },
+    {
+      "relative_path": "rock_face_01_arm_2k.jpg",
+      "sha256": "4738d73c0cd757971dcb32e52ba644b9e520173127108a342a3478a8586a805d",
+      "bytes": 2592972
+    },
+    {
+      "relative_path": "tree_stump_02_2k.fbx",
+      "sha256": "6d291e6ad6ddcee45cd32c8572b80698bcd0042ff17bebcd062c40adc389d52c",
+      "bytes": 4439452
+    },
+    {
+      "relative_path": "tree_stump_02_diff_2k.jpg",
+      "sha256": "8078862e35578a8f7ea1e82072cb7e6f5d7f137290c2d0da6c783b3080a782b0",
+      "bytes": 3435356
+    },
+    {
+      "relative_path": "tree_stump_02_nor_gl_2k.jpg",
+      "sha256": "e59283307ef698f9a43e95db5493d98b2b03b5b90682d9bb6158c4187f6154ab",
+      "bytes": 5232690
+    },
+    {
+      "relative_path": "tree_stump_02_arm_2k.jpg",
+      "sha256": "d34610d4d6133c28688eb68208c9be223580f6c7b43e98c5d35dea48266512d3",
+      "bytes": 2924552
+    },
+    {
+      "relative_path": "roots_diff_2k.jpg",
+      "sha256": "45f2bce14592e5c1794b128a3992f18ab63a37e4b81fcb823f18094d8537d784",
+      "bytes": 3817494
+    },
+    {
+      "relative_path": "roots_nor_gl_2k.jpg",
+      "sha256": "801f39e0b21e87369424c5b498648b9a79617cd5ab20d8518949a3e38348f3cb",
+      "bytes": 5661872
+    },
+    {
+      "relative_path": "roots_arm_2k.jpg",
+      "sha256": "ec8a1e4862c640164bfdf7da01dbab657750449164486cba402f2591d37f906e",
+      "bytes": 3458178
+    },
+    {
+      "relative_path": "roots_disp_2k.png",
+      "sha256": "3c51f8556aec080992025edda292fe8bbcfa6c914214ad3deaf987bd25ca9fbb",
+      "bytes": 6392795
+    },
+    {
+      "relative_path": "rocky_gravel_diff_2k.jpg",
+      "sha256": "641b0a87d3c793c1670f6e6c68f4799e8c5045268b5c42632b8a4b6dddef4697",
+      "bytes": 4832644
+    },
+    {
+      "relative_path": "rocky_gravel_nor_gl_2k.jpg",
+      "sha256": "12769e23229fa996ac5b8173410304cbe6f536baf69969def7c2d0ee1d8fc2a3",
+      "bytes": 5922074
+    },
+    {
+      "relative_path": "rocky_gravel_arm_2k.jpg",
+      "sha256": "856d37d4ab6b2e0ab6e4e217ef3f5f0264995fdf9040367e19af8e60f3e16adc",
+      "bytes": 4225582
+    },
+    {
+      "relative_path": "rocky_gravel_disp_2k.png",
+      "sha256": "265ed30519843be15118da2427ba1ad02b5f52441d8ab9960cd35de849c7b114",
+      "bytes": 7165073
+    }
+  ],
+  "meshes": [
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/SM_RockFace01.SM_RockFace01",
+      "dimensions_cm": [
+        710.8232021331787,
+        562.4304533004761,
+        498.04371148347855
+      ],
+      "base_z_cm": -5.868561565876007,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_fallback_triangle_count_lod0": 3153,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_RockFace01_ReviewLit.M_RockFace01_ReviewLit",
+      "collision_policy": "disabled_on_transient_review_components"
+    },
+    {
+      "asset_path": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/SM_TreeStump02.SM_TreeStump02",
+      "dimensions_cm": [
+        152.16062664985657,
+        139.2036259174347,
+        52.209214866161346
+      ],
+      "base_z_cm": -23.348920047283173,
+      "lod0_build_scale": [
+        100.0,
+        100.0,
+        100.0
+      ],
+      "nanite_enabled": true,
+      "nanite_fallback_triangle_count_lod0": 1465,
+      "material_slot_count": 1,
+      "material": "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_TreeStump02_ReviewLit.M_TreeStump02_ReviewLit",
+      "collision_policy": "disabled_on_transient_review_components"
+    }
+  ],
+  "textures": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockFace01_ARM_2K.T_RockFace01_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockFace01_BaseColor_2K.T_RockFace01_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockFace01_NormalGL_2K.T_RockFace01_NormalGL_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockyGravel_ARM_2K.T_RockyGravel_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockyGravel_BaseColor_2K.T_RockyGravel_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockyGravel_Displacement_2K.T_RockyGravel_Displacement_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockyGravel_NormalGL_2K.T_RockyGravel_NormalGL_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_Roots_ARM_2K.T_Roots_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_Roots_BaseColor_2K.T_Roots_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_Roots_Displacement_2K.T_Roots_Displacement_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_Roots_NormalGL_2K.T_Roots_NormalGL_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_TreeStump02_ARM_2K.T_TreeStump02_ARM_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_TreeStump02_BaseColor_2K.T_TreeStump02_BaseColor_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_TreeStump02_NormalGL_2K.T_TreeStump02_NormalGL_2K"
+  ],
+  "materials": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_RockFace01_ReviewLit.M_RockFace01_ReviewLit",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_RockyGravel_ReviewLit.M_RockyGravel_ReviewLit",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_Roots_ReviewLit.M_Roots_ReviewLit",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/M_TreeStump02_ReviewLit.M_TreeStump02_ReviewLit"
+  ],
+  "surface_displacement_maps_imported_not_connected": [
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_Roots_Displacement_2K.T_Roots_Displacement_2K",
+    "/Game/RaftSim/Environment/ExternalReview/PolyHaven/SouthForkBankKit_2K/T_RockyGravel_Displacement_2K.T_RockyGravel_Displacement_2K"
+  ]
+}

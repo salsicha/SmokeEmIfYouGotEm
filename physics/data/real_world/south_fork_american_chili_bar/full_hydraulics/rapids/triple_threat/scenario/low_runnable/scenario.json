@@ -77,6 +77,7 @@
       "not_for_navigation": true,
       "rapid_name": "Triple Threat",
       "rapid_order": 7,
+      "source_elevation_datum_m": 359.5226724609375,
       "station_m": 4988.9664,
       "target_discharge_cfs": 900.0,
       "target_discharge_m3s": 25.4851619328,

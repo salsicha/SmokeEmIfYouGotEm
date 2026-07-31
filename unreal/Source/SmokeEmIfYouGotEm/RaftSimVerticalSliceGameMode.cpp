@@ -22,7 +22,8 @@ void ARaftSimVerticalSliceGameMode::BeginPlay()
 {
     Super::BeginPlay();
 
-    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested())
+    if (ARaftSimContentLockDirector::IsPackagedRegressionRequested() ||
+        ARaftSimContentLockDirector::IsReleaseCandidateQARequested())
     {
         GetWorld()->SpawnActor<ARaftSimContentLockDirector>(
             ARaftSimContentLockDirector::StaticClass(), FTransform::Identity);

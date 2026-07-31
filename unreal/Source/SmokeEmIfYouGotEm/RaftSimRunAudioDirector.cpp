@@ -130,7 +130,11 @@ void ConfigureComponent(UAudioComponent* Component, bool bSpatial)
 
 float Decay(float Value, float DeltaSeconds, float Rate)
 {
-    return FMath::FInterpTo(Value, 0.0f, DeltaSeconds, Rate);
+    // FInterpTo clamps DeltaSeconds * Rate to one. A single render/loading
+    // hitch can therefore erase an event envelope in one tick, making paddle
+    // and rescue transients inaudible. Exponential decay preserves the same
+    // frame-rate-independent time constant without a hitch-to-zero branch.
+    return Value * FMath::Exp(-Rate * FMath::Max(DeltaSeconds, 0.0f));
 }
 }
 

@@ -1,0 +1,121 @@
+{
+  "schema": "raftsim.m9.live_segment_water_review.v1",
+  "reviewed_utc": "2026-07-29T07:44:03Z",
+  "candidate": "m9_live_segment_water_v129",
+  "parent": "m9_capsize_transition_v128",
+  "status": "retained_technical_physics_foundation",
+  "human_approved": false,
+  "named_guide_reviewer": null,
+  "release_approved": false,
+  "problem": {
+    "previous_behavior": "The production bridge bound the live water runtime only to rigid-body buoyancy. D3 overwash and flip evaluation remained dry unless a deterministic test explicitly enabled a uniform water fixture.",
+    "release_relevance": "A shipping river could move and float the raft without ever supplying its velocity and local surface elevation to the flexible tube overwash model, so real river water could not initiate the D3 capsize path."
+  },
+  "source": {
+    "flex_model_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimFlexibleRaftModel.h",
+      "sha256": "bf37e34166642996833e0770cfad5c17e7e43ca5bd86ef6d2872b5a09c1b9099"
+    },
+    "flex_model_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimFlexibleRaftModel.cpp",
+      "sha256": "4df4aa32d799ae21c31d602e3d2a907c702e7fc9c5de2dd6f49900cf58067916"
+    },
+    "adapter_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Public/RaftSimChronoRuntimeAdapter.h",
+      "sha256": "ca5ca87d31d617c4f4205e0c121ce64c20ecd6c8e0727fb5d971d0f99bcb3259"
+    },
+    "adapter_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimChronoRuntimeAdapter.cpp",
+      "sha256": "49e39db70d73ebe07b980f9c90588398e41b5d77196a3b64ce0f3c3afe9149e9"
+    },
+    "production_bridge": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimPhysics/Private/RaftSimPhysicsBridgeSubsystem.cpp",
+      "sha256": "392d9b98bfc47381602fb570ddacad385cda23df44591f2b4458394328b05d04"
+    },
+    "raft_header": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Public/RaftSimRaftActor.h",
+      "sha256": "a2cc99898eddec6f85bc67e1a23f924de011d88a593be163f77c101775362d93"
+    },
+    "raft_runtime": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimRaft/Private/RaftSimRaftActor.cpp",
+      "sha256": "e02053a10b4994921527b5f0d83b3d7f3484bddd73be79e750b0d13e72f223bd"
+    },
+    "live_field_contract_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimFlexibleRaftVisualTest.cpp",
+      "sha256": "f0b092305b9b21b598acd85c5331561a153a94465b733ca0a3453b4a9a681ef4"
+    },
+    "actor_bridge_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimTestTankRaftTest.cpp",
+      "sha256": "3963efa28a3f4e57f57cebd74bc3ddf79e151782f80b33ea96b24bf2320ef9d8"
+    },
+    "real_river_test": {
+      "file": "unreal/Plugins/RaftSim/Source/RaftSimAutomation/Private/Tests/RaftSimRiverWindowTest.cpp",
+      "sha256": "3efc5e150e2fb69b8b4df0d337cb0cd7d306851196ee6dae5776a9c1ecfeaed1"
+    }
+  },
+  "implementation": {
+    "water_authority": "URaftSimWaterRuntimeAdapter live solver window",
+    "sample_positions": "every D2-deformed flexible tube segment transformed to world centimetres each authoritative raft substep",
+    "sample_payload": [
+      "surface_height_m",
+      "world_velocity_mps",
+      "wet_state"
+    ],
+    "d3_lookup": "SegmentId-keyed field with deterministic dry fallback for missing samples",
+    "allocation_policy": "adapter-owned map is reserved when the flexible layout is configured and reset without shrinking at 120 Hz",
+    "uniform_fixture_precedence_preserved": true,
+    "capsized_open_floor_remains_dry": true,
+    "buoyancy_sampler_changed": false,
+    "d3_threshold_or_latch_changed": false,
+    "d4_contact_wrap_pin_law_changed": false,
+    "terrain_geography_scoring_rescue_or_progression_changed": false
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "real_south_fork_coupling": {
+      "test": "RaftSim.M4.CurvedRiverCoordinateMapDrivesLiveWater",
+      "field": "full_hydraulics/full_reach_transit_seed median_runnable at station 5000 m",
+      "report": "/private/tmp/raftsim_m9_live_d3_real_river_final_v129/index.json",
+      "report_sha256": "2417317d990123311a3deb2874154e9fe58745a7b00fdd86ca70191fba3cbdc1",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "tube_segment_samples": 12,
+      "wet_samples": 12,
+      "maximum_cooked_speed_mps": 1.101,
+      "first_substep_retained_water_mass_kg": 2.87,
+      "first_substep_roll_moment_nm": 28.151,
+      "uniform_fixture_used": false
+    },
+    "m1_flexible_d3_d4_and_capsize_loading": {
+      "report": "/private/tmp/raftsim_m9_live_d3_m1_v129/index.json",
+      "report_sha256": "b8f583d0d2eb30fcb2247b9becd6ada2095b0834cf0aed2bc66cd5d7d29ad992",
+      "succeeded": 4,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "p1_production_bridge_float_and_paddle": {
+      "report": "/private/tmp/raftsim_m9_live_d3_p1_final_v129/index.json",
+      "report_sha256": "ed54b7ab07154cec17831d39c872131b90e19a7652974f76d9eb62db807f9f47",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0,
+      "calm_water_retained_mass_kg_max": 0.001
+    },
+    "p2_forced_overwash_flip_reflip": {
+      "report": "/private/tmp/raftsim_m9_live_d3_p2_flip_v129/index.json",
+      "report_sha256": "61f82cad77a5d7725e5077fd47918e3c079a4c73ec910b2fd26ad4c8a60528c0",
+      "succeeded": 1,
+      "succeeded_with_warnings": 0,
+      "failed": 0
+    },
+    "focused_python_source_contracts": "69 passed",
+    "git_diff_check": "passed"
+  },
+  "known_limit": {
+    "natural_named_rapid_capsize_proven": false,
+    "reason": "This slice proves that genuine cooked river data reaches D3 and creates asymmetric load, while the deterministic high-overwash integration test proves the downstream capsize loop. It does not yet prove that an unforced production run through a named rapid crosses the sustained flip threshold under shipping control inputs.",
+    "required_follow_up": "Run and tune a deterministic named-rapid traversal using only live solver samples, then retain evidence that at least one hazardous line crosses D3 flip risk and one guide-correct line remains recoverable without a fixture override."
+  },
+  "decision": "Retain v129. It closes the missing production water-to-D3 connection without weakening deterministic fixtures, capsized drainage, D4 authority, or the v128 visible capsize loop. It is a technical physics foundation, not proof of natural named-rapid capsize tuning and not release, guide, art, marketing, or store approval."
+}

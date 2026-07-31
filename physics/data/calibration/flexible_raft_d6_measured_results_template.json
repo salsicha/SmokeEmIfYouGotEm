@@ -1,12 +1,12 @@
 {
   "d6_complete": false,
-  "filled_result_count": 0,
+  "filled_result_count": 14,
   "fixture_count": 7,
   "generated_on": "2026-07-16",
   "measured_results": {
     "project_chrono_or_reviewed_compliant_model": {
       "post_contact_recovery": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "post_contact_recovery",
         "metric_paths_required": [
           "max_recovered_indentation_m",
@@ -14,17 +14,19 @@
           "total_holding_force_n"
         ],
         "metrics": {
-          "max_recovered_indentation_m": null,
-          "recovering_contact_count": null,
-          "total_holding_force_n": null
+          "max_recovered_indentation_m": 0.1104,
+          "recovering_contact_count": 2,
+          "total_holding_force_n": 0.0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "73f0cbc0ad13a3376bcddd77be05faa2f5a367d1deedb22f4b8b584f2380c4d4"
       },
       "pressure_flow_sweeps": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "pressure_flow_sweeps",
         "metric_paths_required": [
           "sweep_case_count",
@@ -75,80 +77,82 @@
           "sweeps[8].retained_water_roll_moment_nm"
         ],
         "metrics": {
-          "sweep_case_count": null,
+          "sweep_case_count": 9,
           "sweeps": [
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8976.212463611644,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 14000.0,
+              "overwash_flux_m3_s": 0.36491193855887694,
+              "retained_water_roll_moment_nm": 113.35989371331512
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8976.212463611644,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 14000.0,
+              "overwash_flux_m3_s": 0.5953826365960623,
+              "retained_water_roll_moment_nm": 184.95561605856673
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8976.212463611644,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 14000.0,
+              "overwash_flux_m3_s": 0.8258533346332477,
+              "retained_water_roll_moment_nm": 256.5513384038184
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8904.212463611644,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 18000.0,
+              "overwash_flux_m3_s": 0.36491193855887694,
+              "retained_water_roll_moment_nm": 113.35989371331512
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8904.212463611644,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 18000.0,
+              "overwash_flux_m3_s": 0.5953826365960623,
+              "retained_water_roll_moment_nm": 184.95561605856673
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8904.212463611644,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 18000.0,
+              "overwash_flux_m3_s": 0.8258533346332477,
+              "retained_water_roll_moment_nm": 256.5513384038184
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8832.212463611644,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 22000.0,
+              "overwash_flux_m3_s": 0.36491193855887694,
+              "retained_water_roll_moment_nm": 113.35989371331512
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8832.212463611644,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 22000.0,
+              "overwash_flux_m3_s": 0.5953826365960623,
+              "retained_water_roll_moment_nm": 184.95561605856673
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -8832.212463611644,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 22000.0,
+              "overwash_flux_m3_s": 0.8258533346332477,
+              "retained_water_roll_moment_nm": 256.5513384038184
             }
           ]
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "3ea3472d3d9a57b97bda2f1e8a4818aff9780c38ba07f1616aedd58e083d2441"
       },
       "rock_pinch_wrap": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "rock_pinch_wrap",
         "metric_paths_required": [
           "contact_count",
@@ -158,19 +162,21 @@
           "wrapping_contact_count"
         ],
         "metrics": {
-          "contact_count": null,
-          "max_indentation_m": null,
-          "min_release_margin_n": null,
-          "pinned_obstacle_count": null,
-          "wrapping_contact_count": null
+          "contact_count": 4,
+          "max_indentation_m": 0.22,
+          "min_release_margin_n": -8904.212463611644,
+          "pinned_obstacle_count": 1,
+          "wrapping_contact_count": 4
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "b2297b3b88a15aede9679e01f6d079a183ddadd863e9378882c1652cd672e700"
       },
       "static_seat_load_sag": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "static_seat_load_sag",
         "metric_paths_required": [
           "loaded_crew_mass_kg",
@@ -181,20 +187,22 @@
           "starboard_total_freeboard_loss_m"
         ],
         "metrics": {
-          "loaded_crew_mass_kg": null,
-          "max_seat_freeboard_loss_m": null,
-          "port_total_freeboard_loss_m": null,
-          "raft_length_m": null,
-          "raft_width_m": null,
-          "starboard_total_freeboard_loss_m": null
+          "loaded_crew_mass_kg": 385.0,
+          "max_seat_freeboard_loss_m": 0.01698688117680404,
+          "port_total_freeboard_loss_m": 0.03365234440977416,
+          "raft_length_m": 4.3,
+          "raft_width_m": 1.9,
+          "starboard_total_freeboard_loss_m": 0.034860701296583696
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "2af214365e97a36fd3e69bce4a6bfa7706d83917c931045317537fd1022a5189"
       },
       "timed_high_side_save": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "timed_high_side_save",
         "metric_paths_required": [
           "high_side_flip_margin_nm",
@@ -204,19 +212,21 @@
           "neutral_flip_threshold_nm"
         ],
         "metrics": {
-          "high_side_flip_margin_nm": null,
-          "high_side_flip_threshold_nm": null,
-          "margin_delta_nm": null,
-          "neutral_flip_margin_nm": null,
-          "neutral_flip_threshold_nm": null
+          "high_side_flip_margin_nm": 1738.4372901361644,
+          "high_side_flip_threshold_nm": 2302.7231121281466,
+          "margin_delta_nm": 223.442506867357,
+          "neutral_flip_margin_nm": 1514.9947832688074,
+          "neutral_flip_threshold_nm": 1800.0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "7d88769fd5389a70bed346fb15302e249fdf4f8839eb04df1c94421ad78be15a"
       },
       "traveling_crew_shift": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "traveling_crew_shift",
         "metric_paths_required": [
           "neutral_roll_load_bias_nm",
@@ -226,19 +236,21 @@
           "starboard_total_freeboard_delta_m"
         ],
         "metrics": {
-          "neutral_roll_load_bias_nm": null,
-          "port_roll_load_bias_nm": null,
-          "port_total_freeboard_delta_m": null,
-          "starboard_roll_load_bias_nm": null,
-          "starboard_total_freeboard_delta_m": null
+          "neutral_roll_load_bias_nm": 281.2159124999972,
+          "port_roll_load_bias_nm": -550.3164750000003,
+          "port_total_freeboard_delta_m": 0.0005864084891869237,
+          "starboard_roll_load_bias_nm": 550.3164750000001,
+          "starboard_total_freeboard_delta_m": -0.0006219483976226126
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "460e1ae6f0ad0e3cfb64721237bc35807e891fecfb5d8be99c6f3d0609759a34"
       },
       "upstream_tube_overwash_flip": {
-        "engine_version": "",
+        "engine_version": "Project Chrono/PyChrono 10.0.0 conda py312h8821d3a_677; ChSystemSMC+ChLinkTSDA; FEA=available; raftsim_project_chrono_d6_runner_v1",
         "fixture_id": "upstream_tube_overwash_flip",
         "metric_paths_required": [
           "reference_flip_margin_nm",
@@ -247,21 +259,23 @@
           "total_retained_water_mass_kg"
         ],
         "metrics": {
-          "reference_flip_margin_nm": null,
+          "reference_flip_margin_nm": 1514.9947832688074,
           "reference_flip_risk": false,
-          "retained_water_roll_moment_nm": null,
-          "total_overtopping_flux_m3_s": null,
-          "total_retained_water_mass_kg": null
+          "retained_water_roll_moment_nm": 285.0052167311926,
+          "total_overtopping_flux_m3_s": 0.917447985614655,
+          "total_retained_water_mass_kg": 30.5815995204885
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
+        "source_report": "physics/reports/d6/compliant/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "project_chrono_or_reviewed_compliant_model",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "4e918f0474862c84286173760b6d57c2d8a521787d4cbe1cc2e0ea7095c05725"
       }
     },
     "unreal_chaos_rigid_baseline": {
       "post_contact_recovery": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "post_contact_recovery",
         "metric_paths_required": [
           "max_recovered_indentation_m",
@@ -269,17 +283,19 @@
           "total_holding_force_n"
         ],
         "metrics": {
-          "max_recovered_indentation_m": null,
-          "recovering_contact_count": null,
-          "total_holding_force_n": null
+          "max_recovered_indentation_m": 0,
+          "recovering_contact_count": 0,
+          "total_holding_force_n": 0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "0fb42a0d7931c81d66b7feb3b89640c52ea4b7b52b21ee345745f7c76b6f39dd"
       },
       "pressure_flow_sweeps": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "pressure_flow_sweeps",
         "metric_paths_required": [
           "sweep_case_count",
@@ -330,80 +346,82 @@
           "sweeps[8].retained_water_roll_moment_nm"
         ],
         "metrics": {
-          "sweep_case_count": null,
+          "sweep_case_count": 9,
           "sweeps": [
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -16974.307011976485,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 14000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -1928.0562241421103,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 14000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": 18904.59155617178,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 14000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -16974.307011976485,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 18000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -1928.0562241421103,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 18000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": 18904.59155617178,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 18000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -16974.307011976485,
+              "incoming_velocity_mps": 1.2,
+              "nominal_pressure_pa": 22000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": -1928.0562241421103,
+              "incoming_velocity_mps": 2.4,
+              "nominal_pressure_pa": 22000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             },
             {
-              "contact_min_release_margin_n": null,
-              "incoming_velocity_mps": null,
-              "nominal_pressure_pa": null,
-              "overwash_flux_m3_s": null,
-              "retained_water_roll_moment_nm": null
+              "contact_min_release_margin_n": 18904.59155617178,
+              "incoming_velocity_mps": 3.6,
+              "nominal_pressure_pa": 22000,
+              "overwash_flux_m3_s": 0,
+              "retained_water_roll_moment_nm": 0
             }
           ]
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "23ff58be2ebc4f33600ec1de14309085561723f39697c1192a33a1c534530453"
       },
       "rock_pinch_wrap": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "rock_pinch_wrap",
         "metric_paths_required": [
           "contact_count",
@@ -413,19 +431,21 @@
           "wrapping_contact_count"
         ],
         "metrics": {
-          "contact_count": null,
-          "max_indentation_m": null,
-          "min_release_margin_n": null,
-          "pinned_obstacle_count": null,
-          "wrapping_contact_count": null
+          "contact_count": 1,
+          "max_indentation_m": 1.4,
+          "min_release_margin_n": -22042.93280363412,
+          "pinned_obstacle_count": 0,
+          "wrapping_contact_count": 0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "5e0bfeaa41da29c50f57c43dda196ec268710557f011ef581d32cb995532d93e"
       },
       "static_seat_load_sag": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "static_seat_load_sag",
         "metric_paths_required": [
           "loaded_crew_mass_kg",
@@ -436,20 +456,22 @@
           "starboard_total_freeboard_loss_m"
         ],
         "metrics": {
-          "loaded_crew_mass_kg": null,
-          "max_seat_freeboard_loss_m": null,
-          "port_total_freeboard_loss_m": null,
-          "raft_length_m": null,
-          "raft_width_m": null,
-          "starboard_total_freeboard_loss_m": null
+          "loaded_crew_mass_kg": 385,
+          "max_seat_freeboard_loss_m": 0,
+          "port_total_freeboard_loss_m": 0,
+          "raft_length_m": 4.3,
+          "raft_width_m": 1.9,
+          "starboard_total_freeboard_loss_m": 0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "5fbc51dec9d153453f1d226dad7a7fed61c368d81f33d3f0011bacc72c758f41"
       },
       "timed_high_side_save": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "timed_high_side_save",
         "metric_paths_required": [
           "high_side_flip_margin_nm",
@@ -459,19 +481,21 @@
           "neutral_flip_threshold_nm"
         ],
         "metrics": {
-          "high_side_flip_margin_nm": null,
-          "high_side_flip_threshold_nm": null,
-          "margin_delta_nm": null,
-          "neutral_flip_margin_nm": null,
-          "neutral_flip_threshold_nm": null
+          "high_side_flip_margin_nm": 4054.68,
+          "high_side_flip_threshold_nm": 7502.1975,
+          "margin_delta_nm": 1699.5825,
+          "neutral_flip_margin_nm": 2355.0975,
+          "neutral_flip_threshold_nm": 7502.1975
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "a494edd4d2fc848d2c5b423214bca0a776f9dec7bffa689aa70cc15e8777cab4"
       },
       "traveling_crew_shift": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "traveling_crew_shift",
         "metric_paths_required": [
           "neutral_roll_load_bias_nm",
@@ -481,19 +505,21 @@
           "starboard_total_freeboard_delta_m"
         ],
         "metrics": {
-          "neutral_roll_load_bias_nm": null,
-          "port_roll_load_bias_nm": null,
-          "port_total_freeboard_delta_m": null,
-          "starboard_roll_load_bias_nm": null,
-          "starboard_total_freeboard_delta_m": null
+          "neutral_roll_load_bias_nm": 0,
+          "port_roll_load_bias_nm": 2077.2675,
+          "port_total_freeboard_delta_m": 0,
+          "starboard_roll_load_bias_nm": -1699.5825,
+          "starboard_total_freeboard_delta_m": 0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "567c62b7a8fceb5383606f87423089f8a03fae37e197a444511744cc69a51fba"
       },
       "upstream_tube_overwash_flip": {
-        "engine_version": "",
+        "engine_version": "UnrealEngine 5.8.0-55116800+++UE5+Release-5.8; Chaos rigid body through UWorld physics scene",
         "fixture_id": "upstream_tube_overwash_flip",
         "metric_paths_required": [
           "reference_flip_margin_nm",
@@ -502,16 +528,18 @@
           "total_retained_water_mass_kg"
         ],
         "metrics": {
-          "reference_flip_margin_nm": null,
+          "reference_flip_margin_nm": 2355.0975,
           "reference_flip_risk": false,
-          "retained_water_roll_moment_nm": null,
-          "total_overtopping_flux_m3_s": null,
-          "total_retained_water_mass_kg": null
+          "retained_water_roll_moment_nm": 0,
+          "total_overtopping_flux_m3_s": 0,
+          "total_retained_water_mass_kg": 0
         },
-        "source_report": "",
-        "status": "not_measured",
+        "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+        "source_report": "physics/reports/d6/chaos/summary.json",
+        "source_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+        "status": "measured_engine_output",
         "target_id": "unreal_chaos_rigid_baseline",
-        "telemetry_sha256": ""
+        "telemetry_sha256": "43f6b7e558c80ab5f2c9cbfc01b5b65b726f3deac692546c0b35be426e0052f1"
       }
     }
   },
@@ -519,13 +547,17 @@
   "promotion_gate": {
     "may_drive_runtime_gameplay": false,
     "may_mark_d6_complete": false,
-    "reason": "This committed artifact is intentionally empty. It becomes input to build_flexible_raft_d6_comparison_report only after every source report, telemetry hash, engine version, and metric tree is filled."
+    "reason": "Both validated D6 target sets are populated; comparison and manual review remain required before promotion."
   },
   "required_result_count": 14,
   "schema": "raftsim.flexible_raft.d6_measured_results_template.v1",
+  "source_chaos_fixture_contract_path": "unreal/Content/RaftSim/Physics/flexible_raft_d6_chaos_fixture_contract.json",
+  "source_chaos_measured_results_sidecar_schema": "raftsim.flexible_raft.d6_chaos_measured_results_sidecar.v1",
+  "source_compliant_measured_results_sidecar_schema": "raftsim.flexible_raft.d6_compliant_measured_results_sidecar.v1",
+  "source_compliant_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
   "source_fixture_input_package_path": "physics/data/calibration/flexible_raft_d6_fixture_input_package.json",
   "source_measurement_manifest_path": "physics/data/calibration/flexible_raft_d6_measurement_manifest.json",
   "source_suite_path": "physics/data/calibration/flexible_raft_d6_behavioral_suite.json",
-  "status": "measured_results_template_empty",
+  "status": "all_measured_results_populated_comparison_and_manual_review_pending",
   "target_count": 2
 }

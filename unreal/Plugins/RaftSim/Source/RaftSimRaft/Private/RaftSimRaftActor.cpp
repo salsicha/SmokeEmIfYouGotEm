@@ -4,7 +4,9 @@
 #include "Components/StaticMeshComponent.h"
 #include "Engine/StaticMesh.h"
 #include "EngineUtils.h"
+#include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInterface.h"
+#include "ProfilingDebugging/CpuProfilerTrace.h"
 #include "ProceduralMeshComponent.h"
 #include "RaftSimChronoRuntimeAdapter.h"
 #include "RaftSimCrewAvatarActor.h"
@@ -28,6 +30,42 @@ constexpr float kCmPerM = 100.0f;
 bool IsFiniteVector(const FVector& Value)
 {
     return FMath::IsFinite(Value.X) && FMath::IsFinite(Value.Y) && FMath::IsFinite(Value.Z);
+}
+
+bool IsPropulsiveCrewCommand(ERaftSimCrewCommand Command)
+{
+    return Command == ERaftSimCrewCommand::AllForward ||
+        Command == ERaftSimCrewCommand::AllBackward ||
+        Command == ERaftSimCrewCommand::TurnLeft ||
+        Command == ERaftSimCrewCommand::TurnRight;
+}
+
+bool FlexVisualStateMatches(
+    const TArray<FRaftSimFlexVisualSegmentState>& Left,
+    const TArray<FRaftSimFlexVisualSegmentState>& Right)
+{
+    if (Left.Num() != Right.Num())
+    {
+        return false;
+    }
+    constexpr double ShapeToleranceM = 1.0e-6;
+    for (int32 Index = 0; Index < Left.Num(); ++Index)
+    {
+        const FRaftSimFlexVisualSegmentState& A = Left[Index];
+        const FRaftSimFlexVisualSegmentState& B = Right[Index];
+        if (A.SegmentId != B.SegmentId ||
+            !A.LocalPositionM.Equals(B.LocalPositionM, ShapeToleranceM) ||
+            !A.ContactNormalLocal.Equals(B.ContactNormalLocal, ShapeToleranceM) ||
+            !FMath::IsNearlyEqual(A.CompressionM, B.CompressionM, ShapeToleranceM) ||
+            !FMath::IsNearlyEqual(A.FreeboardLossM, B.FreeboardLossM, ShapeToleranceM) ||
+            !FMath::IsNearlyEqual(A.IndentationM, B.IndentationM, ShapeToleranceM) ||
+            A.bWrapping != B.bWrapping || A.bPinned != B.bPinned ||
+            A.bRecovering != B.bRecovering)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 }
 
@@ -276,66 +314,330 @@ float ARaftSimRaftActor::GetMaximumWaterContactIndentationM() const
         : 0.0f;
 }
 
+int32 ARaftSimRaftActor::GetWrappingRockContactCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().WrappingContactCount
+        : 0;
+}
+
+int32 ARaftSimRaftActor::GetPinnedRockObstacleCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().PinnedObstacleCount
+        : 0;
+}
+
+int32 ARaftSimRaftActor::GetRecoveringRockContactCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().RecoveringContactCount
+        : 0;
+}
+
+bool ARaftSimRaftActor::IsUsingLiveD3WaterField() const
+{
+    return RaftAdapter &&
+        RaftAdapter->GetLastFlexibleStepTelemetry().bUsedLiveWaterField;
+}
+
+int32 ARaftSimRaftActor::GetLiveD3WaterSampleCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().LiveWaterSampleCount
+        : 0;
+}
+
+int32 ARaftSimRaftActor::GetLiveD3WetSampleCount() const
+{
+    return RaftAdapter
+        ? RaftAdapter->GetLastFlexibleStepTelemetry().LiveWetSampleCount
+        : 0;
+}
+
+float ARaftSimRaftActor::GetD3RetainedWaterMassKg() const
+{
+    return RaftAdapter
+        ? static_cast<float>(
+              RaftAdapter->GetLastFlexibleStepTelemetry().TotalRetainedWaterMassKg)
+        : 0.0f;
+}
+
+bool ARaftSimRaftActor::GetDominantWaterContactPresentation(
+    FVector& OutWorldPositionCm,
+    FVector& OutWorldNormal,
+    float& OutIndentationM) const
+{
+    OutWorldPositionCm = FVector::ZeroVector;
+    OutWorldNormal = FVector::UpVector;
+    OutIndentationM = 0.0f;
+    if (!RaftAdapter)
+    {
+        return false;
+    }
+
+    const FRaftSimFlexVisualSegmentState* Dominant = nullptr;
+    for (const FRaftSimFlexVisualSegmentState& Segment :
+         RaftAdapter->GetFlexibleVisualSegments())
+    {
+        if (Segment.IndentationM > OutIndentationM)
+        {
+            Dominant = &Segment;
+            OutIndentationM = static_cast<float>(Segment.IndentationM);
+        }
+    }
+    if (!Dominant || OutIndentationM <= KINDA_SMALL_NUMBER)
+    {
+        return false;
+    }
+
+    OutWorldPositionCm = GetActorTransform().TransformPosition(
+        Dominant->LocalPositionM * 100.0f);
+    OutWorldNormal = GetActorTransform().TransformVectorNoScale(
+        Dominant->ContactNormalLocal).GetSafeNormal();
+    if (OutWorldNormal.IsNearlyZero())
+    {
+        OutWorldNormal = FVector::UpVector;
+    }
+    return true;
+}
+
 void ARaftSimRaftActor::BuildRaftVisual()
 {
     if (RaftVisual == nullptr)
     {
         return;
     }
-    RaftSimRaftMesh::FMeshData Tubes, Floor;
-    RaftSimRaftMesh::BuildInflatableRaft(
-        FootprintLengthM, FootprintWidthM, TubeRadiusM, Tubes, Floor, {},
-        RaftSimRaftMesh::FRaftSimRaftVisualCondition{
-            RaftCondition.PressureFraction,
-            RaftCondition.FabricIntegrity,
-            RaftCondition.PermanentCreaseAmplitudeM});
     const TArray<FLinearColor> NoColors;
-    RaftVisual->CreateMeshSection_LinearColor(
-        0, Tubes.Vertices, Tubes.Triangles, Tubes.Normals, Tubes.UVs, NoColors,
-        Tubes.Tangents, /*bCreateCollision=*/false);
-    RaftVisual->CreateMeshSection_LinearColor(
-        1, Floor.Vertices, Floor.Triangles, Floor.Normals, Floor.UVs, NoColors,
-        Floor.Tangents, /*bCreateCollision=*/false);
+    ProductionRaftRestSections.Reset();
+    ProductionRaftDeformedSections.Reset();
+    ProductionRaftDeformationCache.Reset();
+    LastRenderedFlexVisualSegments.Reset();
+    bHasRenderedFlexibleRaftState = false;
+    bUsingProductionRaftRestMesh = false;
+    if (UStaticMesh* ProductionMesh = LoadObject<UStaticMesh>(
+            nullptr,
+            TEXT("/Game/RaftSim/Rafts/Production/SM_RaftSim_ProductionPaddleRaft."
+                 "SM_RaftSim_ProductionPaddleRaft")))
+    {
+        bUsingProductionRaftRestMesh =
+            RaftSimRaftMesh::ExtractProductionRaftRestMesh(
+                ProductionMesh, ProductionRaftRestSections);
+    }
+
+    TArray<RaftSimRaftMesh::FMeshData> FallbackSections;
+    TArray<RaftSimRaftMesh::FMeshData>* Sections = &FallbackSections;
+    if (bUsingProductionRaftRestMesh)
+    {
+        RaftSimRaftMesh::DeformProductionRaftRestMesh(
+            ProductionRaftRestSections,
+            TubeRadiusM,
+            {},
+            RaftSimRaftMesh::FRaftSimRaftVisualCondition{
+                RaftCondition.PressureFraction,
+                RaftCondition.FabricIntegrity,
+                RaftCondition.PermanentCreaseAmplitudeM},
+            ProductionRaftDeformedSections,
+            &ProductionRaftDeformationCache);
+        Sections = &ProductionRaftDeformedSections;
+    }
+    else
+    {
+        FallbackSections.SetNum(5);
+        RaftSimRaftMesh::BuildInflatableRaft(
+            FootprintLengthM, FootprintWidthM, TubeRadiusM,
+            FallbackSections[0], FallbackSections[1], {},
+            RaftSimRaftMesh::FRaftSimRaftVisualCondition{
+                RaftCondition.PressureFraction,
+                RaftCondition.FabricIntegrity,
+                RaftCondition.PermanentCreaseAmplitudeM},
+            &FallbackSections[2], &FallbackSections[3], &FallbackSections[4]);
+    }
+    for (int32 SectionIndex = 0; SectionIndex < Sections->Num(); ++SectionIndex)
+    {
+        const RaftSimRaftMesh::FMeshData& Section = (*Sections)[SectionIndex];
+        RaftVisual->CreateMeshSection_LinearColor(
+            SectionIndex,
+            Section.Vertices,
+            Section.Triangles,
+            Section.Normals,
+            Section.UVs,
+            NoColors,
+            Section.Tangents,
+            /*bCreateCollision=*/false);
+    }
     if (UMaterialInterface* TubeMat = LoadObject<UMaterialInterface>(
             nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftTube.M_RaftSim_RaftTube")))
     {
-        RaftVisual->SetMaterial(0, TubeMat);
+        TubeMaterialInstance = UMaterialInstanceDynamic::Create(TubeMat, this);
+        RaftVisual->SetMaterial(0, TubeMaterialInstance ? TubeMaterialInstance : TubeMat);
     }
     if (UMaterialInterface* FloorMat = LoadObject<UMaterialInterface>(
             nullptr, TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftFloor.M_RaftSim_RaftFloor")))
     {
-        RaftVisual->SetMaterial(1, FloorMat);
+        FloorMaterialInstance = UMaterialInstanceDynamic::Create(FloorMat, this);
+        RaftVisual->SetMaterial(1, FloorMaterialInstance ? FloorMaterialInstance : FloorMat);
+    }
+    if (UMaterialInterface* RiggingMat = LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_RaftRigging.M_RaftSim_RaftRigging")))
+    {
+        RaftVisual->SetMaterial(2, RiggingMat);
+    }
+    if (UMaterialInterface* FittingsMat = LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_GalvanizedSteel.M_RaftSim_GalvanizedSteel")))
+    {
+        RaftVisual->SetMaterial(3, FittingsMat);
+    }
+    if (UMaterialInterface* RubberMat = LoadObject<UMaterialInterface>(
+            nullptr,
+            TEXT("/Game/RaftSim/Materials/M_RaftSim_BootRubber.M_RaftSim_BootRubber")))
+    {
+        RaftVisual->SetMaterial(4, RubberMat);
     }
 }
 
 void ARaftSimRaftActor::UpdateFlexibleRaftVisual()
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_UpdateFlexibleRaftVisual);
     if (RaftVisual == nullptr || RaftAdapter == nullptr)
     {
         return;
     }
 
-    RaftSimRaftMesh::FMeshData Tubes, Floor;
-    RaftSimRaftMesh::BuildInflatableRaft(
-        FootprintLengthM,
-        FootprintWidthM,
-        TubeRadiusM,
-        Tubes,
-        Floor,
-        RaftAdapter->GetFlexibleVisualSegments(),
-        RaftSimRaftMesh::FRaftSimRaftVisualCondition{
-            RaftCondition.PressureFraction,
-            RaftCondition.FabricIntegrity,
-            RaftCondition.PermanentCreaseAmplitudeM});
+    const TArray<FRaftSimFlexVisualSegmentState>& CurrentSegments =
+        RaftAdapter->GetFlexibleVisualSegments();
+    const RaftSimRaftMesh::FRaftSimRaftVisualCondition CurrentCondition{
+        RaftCondition.PressureFraction,
+        RaftCondition.FabricIntegrity,
+        RaftCondition.PermanentCreaseAmplitudeM};
+    constexpr float ConditionTolerance = 1.0e-6f;
+    const float CurrentEffectiveCreaseM = CurrentCondition.CreaseAmplitudeM *
+        (1.0f - CurrentCondition.Integrity);
+    const float LastEffectiveCreaseM = LastRenderedRaftVisualCondition.CreaseAmplitudeM *
+        (1.0f - LastRenderedRaftVisualCondition.Integrity);
+    const bool bConditionMatches = bHasRenderedFlexibleRaftState &&
+        FMath::IsNearlyEqual(
+            CurrentCondition.PressureFraction,
+            LastRenderedRaftVisualCondition.PressureFraction,
+            ConditionTolerance) &&
+        FMath::IsNearlyEqual(
+            CurrentEffectiveCreaseM,
+            LastEffectiveCreaseM,
+            ConditionTolerance);
+    if (bConditionMatches &&
+        FlexVisualStateMatches(CurrentSegments, LastRenderedFlexVisualSegments))
+    {
+        return;
+    }
+
+    TArray<RaftSimRaftMesh::FMeshData> FallbackSections;
+    TArray<RaftSimRaftMesh::FMeshData>* Sections = &FallbackSections;
+    if (bUsingProductionRaftRestMesh)
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_DeformProductionRaftMesh);
+        RaftSimRaftMesh::DeformProductionRaftRestMesh(
+            ProductionRaftRestSections,
+            TubeRadiusM,
+            CurrentSegments,
+            CurrentCondition,
+            ProductionRaftDeformedSections,
+            &ProductionRaftDeformationCache);
+        Sections = &ProductionRaftDeformedSections;
+    }
+    else
+    {
+        FallbackSections.SetNum(5);
+        RaftSimRaftMesh::BuildInflatableRaft(
+            FootprintLengthM,
+            FootprintWidthM,
+            TubeRadiusM,
+            FallbackSections[0],
+            FallbackSections[1],
+            CurrentSegments,
+            CurrentCondition,
+            &FallbackSections[2],
+            &FallbackSections[3],
+            &FallbackSections[4]);
+    }
     const TArray<FLinearColor> NoColors;
-    RaftVisual->UpdateMeshSection_LinearColor(
-        0, Tubes.Vertices, Tubes.Normals, Tubes.UVs, NoColors, Tubes.Tangents);
-    RaftVisual->UpdateMeshSection_LinearColor(
-        1, Floor.Vertices, Floor.Normals, Floor.UVs, NoColors, Floor.Tangents);
+    const TArray<FVector2D> NoUVs;
+    for (int32 SectionIndex = 0; SectionIndex < Sections->Num(); ++SectionIndex)
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_UploadProceduralMeshSection);
+        const RaftSimRaftMesh::FMeshData& Section = (*Sections)[SectionIndex];
+        RaftVisual->UpdateMeshSection_LinearColor(
+            SectionIndex,
+            Section.Vertices,
+            Section.Normals,
+            NoUVs,
+            NoColors,
+            Section.Tangents);
+    }
+    LastRenderedFlexVisualSegments = CurrentSegments;
+    LastRenderedRaftVisualCondition = CurrentCondition;
+    bHasRenderedFlexibleRaftState = true;
+}
+
+void ARaftSimRaftActor::UpdateRaftWetness(float DeltaSeconds)
+{
+    float TargetWetness = 0.0f;
+    if (Bridge != nullptr)
+    {
+        if (URaftSimWaterRuntimeAdapter* Water = Bridge->GetWaterRuntime())
+        {
+            FRaftSimWaterSample Sample;
+            if (Water->SampleWaterAtWorldPosition(GetActorLocation(), Sample) && Sample.bWet)
+            {
+                const float RelativeWaterSpeed =
+                    (Sample.VelocityMetersPerSecond - GetRaftVelocity()).Size();
+                const float ContactSaturation = FMath::Clamp(
+                    static_cast<float>(GetActiveWaterContactCount()) / 5.0f +
+                        GetMaximumWaterContactIndentationM() / 0.22f,
+                    0.0f,
+                    1.0f);
+                TargetWetness = FMath::Clamp(
+                    0.42f + Sample.DepthMeters * 0.18f + RelativeWaterSpeed / 7.5f +
+                        ContactSaturation * 0.36f,
+                    0.0f,
+                    1.0f);
+            }
+        }
+    }
+
+    const float InterpSpeed = TargetWetness > SurfaceWetness ? 7.5f : 0.085f;
+    SurfaceWetness = FMath::FInterpTo(
+        SurfaceWetness,
+        TargetWetness,
+        FMath::Clamp(DeltaSeconds, 0.0f, 0.25f),
+        InterpSpeed);
+    // SurfaceWetness remains the full physical/telemetry signal. The reusable
+    // coated-fabric material's saturated endpoint is intentionally extreme
+    // for drenched gear close-ups; driving it to one across an entire raft
+    // turned the tubes into clear-coated plastic under the hero sun. Preserve
+    // visible darkening and highlight breakup through a bounded presentation
+    // response while leaving contact, drying and gameplay state unchanged.
+    // Keep the full solver wetness for physics and telemetry, but compress the
+    // visual film response so coated fabric retains its authored weave and
+    // broad micro-roughness instead of reading as uniformly lacquered.
+    const float PresentationWetness = FMath::Clamp(
+        SurfaceWetness * 0.42f, 0.0f, 0.50f);
+    if (TubeMaterialInstance)
+    {
+        TubeMaterialInstance->SetScalarParameterValue(
+            TEXT("Wetness"), PresentationWetness);
+    }
+    if (FloorMaterialInstance)
+    {
+        FloorMaterialInstance->SetScalarParameterValue(
+            TEXT("Wetness"), PresentationWetness);
+    }
 }
 
 void ARaftSimRaftActor::UpdateRockObstacles()
 {
+    TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_UpdateRockObstacles);
     if (RaftAdapter == nullptr || GetWorld() == nullptr)
     {
         return;
@@ -474,7 +776,22 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         CrewReactionRemaining -= DeltaSeconds;
         if (CrewReactionRemaining <= 0.0f)
         {
+            const ERaftSimCrewCommand PreviousCommand = ActiveCrewCommand;
             ActiveCrewCommand = PendingCrewCommand;
+            if (ActiveCrewCommand != PreviousCommand)
+            {
+                // The visual stroke starts at its catch on this same command
+                // transition. Deliver the discrete reduced-model impulse near
+                // peak blade speed in the power phase, then repeat on the
+                // shared 0.8 s cadence instead of free-running a hidden timer
+                // while the crew rests.
+                constexpr float PowerImpulsePhase = 0.29f;
+                CrewStrokeTimer = IsPropulsiveCrewCommand(ActiveCrewCommand)
+                    ? FMath::Max(
+                        CrewStrokeIntervalSeconds * PowerImpulsePhase,
+                        FixedSubstepSeconds)
+                    : 0.0f;
+            }
         }
     }
 
@@ -533,13 +850,21 @@ void ARaftSimRaftActor::UpdateCrew(float DeltaSeconds)
         }
     }
 
-    // Paddle strokes on cadence for propulsion/turn commands.
+    // Paddle strokes on cadence for propulsion/turn commands. Rest, brace and
+    // emergency weight-shift poses do not advance an invisible paddle cycle.
+    if (!IsPropulsiveCrewCommand(ActiveCrewCommand))
+    {
+        CrewStrokeTimer = 0.0f;
+        return;
+    }
     CrewStrokeTimer -= DeltaSeconds;
     if (CrewStrokeTimer > 0.0f)
     {
         return;
     }
-    CrewStrokeTimer = CrewStrokeIntervalSeconds;
+    CrewStrokeTimer = FMath::Max(
+        CrewStrokeTimer + CrewStrokeIntervalSeconds,
+        FixedSubstepSeconds);
 
     const float PerPaddler = PaddleStrokeImpulseNs * 0.5f;
     const float Crew = static_cast<float>(FMath::Max(1, PaddlerCount));
@@ -628,7 +953,11 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
 
     FRaftSimPhysicsTickInput Input;
     Input.FrameDeltaSeconds = FMath::Min(DeltaSeconds, 0.25f);
-    const FRaftSimPhysicsTickOutput Output = Bridge->TickBridge(Input);
+    FRaftSimPhysicsTickOutput Output;
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_PhysicsBridgeTick);
+        Output = Bridge->TickBridge(Input);
+    }
     if (Output.CommittedPhysicsFrame > 0)
     {
         FVector Location = Output.RaftState.WorldTransform.GetTranslation();
@@ -667,12 +996,75 @@ void ARaftSimRaftActor::Tick(float DeltaSeconds)
         SetActorLocationAndRotation(Location, Rotation);
     }
 
-    UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
-    UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
-    UpdateRescueInteraction(FMath::Min(DeltaSeconds, 0.25f));
-    UpdateRaftCondition(FMath::Min(DeltaSeconds, 0.25f));
-    UpdateRescueLineVisual();
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_CapsizeUpdate);
+        UpdateCapsizeTransition(FMath::Min(DeltaSeconds, 0.25f));
+        UpdateCapsizeLoop(FMath::Min(DeltaSeconds, 0.25f));
+    }
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_CrewUpdate);
+        UpdateCrew(FMath::Min(DeltaSeconds, 0.25f));
+    }
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_RescueUpdate);
+        UpdateRescueInteraction(FMath::Min(DeltaSeconds, 0.25f));
+        UpdateRescueLineVisual();
+    }
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_ConditionUpdate);
+        UpdateRaftCondition(FMath::Min(DeltaSeconds, 0.25f));
+    }
     UpdateFlexibleRaftVisual();
+    {
+        TRACE_CPUPROFILER_EVENT_SCOPE(RaftSimRaft_WetnessUpdate);
+        UpdateRaftWetness(FMath::Min(DeltaSeconds, 0.25f));
+    }
+}
+
+void ARaftSimRaftActor::UpdateCapsizeTransition(float DeltaSeconds)
+{
+    if (RaftMode != ERaftSimRaftMode::Capsized ||
+        CapsizeTransitionRemainingSeconds <= 0.0f || RaftAdapter == nullptr)
+    {
+        return;
+    }
+    const float Duration = FMath::Max(CapsizeTransitionSeconds, FixedSubstepSeconds);
+    CapsizeTransitionRemainingSeconds = FMath::Max(
+        0.0f, CapsizeTransitionRemainingSeconds - FMath::Max(DeltaSeconds, 0.0f));
+    const float Alpha = FMath::Clamp(
+        1.0f - CapsizeTransitionRemainingSeconds / Duration, 0.0f, 1.0f);
+    const float SmoothAlpha = Alpha * Alpha * (3.0f - 2.0f * Alpha);
+    const FRotator LiveRotation = GetActorRotation();
+    const float TransitionPitchDegrees =
+        FMath::Lerp(CapsizeStartPitchDegrees, 0.0f, SmoothAlpha);
+    const float TransitionRollDegrees = FMath::Lerp(
+        CapsizeStartRollDegrees, CapsizeFlipDirection * 180.0f, SmoothAlpha);
+    const FQuat TransitionRotation = FRotator(
+        TransitionPitchDegrees, LiveRotation.Yaw, TransitionRollDegrees).Quaternion();
+    CapsizeTargetRotation = FRotator(
+        0.0f, LiveRotation.Yaw, CapsizeFlipDirection * 180.0f).Quaternion();
+    CapsizeRollAxisWorld = TransitionRotation.GetForwardVector().GetSafeNormal();
+    const float AngularSpeedRadiansPerSecond = CapsizeFlipDirection * PI *
+        (6.0f * Alpha * (1.0f - Alpha)) / Duration;
+
+    // The reduced rigid-body model does not resolve the air/water volume that
+    // carries a real raft through the unstable side-on phase. D3 decides when
+    // and which way the boat overturns; this bounded authoritative constraint
+    // advances that unresolved roll while the adapter continues integrating
+    // translation, buoyancy, drag and D4 contacts from the matching pose/rate.
+    SetActorRotation(TransitionRotation);
+    FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+    State.WorldTransform.SetTranslation(GetActorLocation());
+    State.WorldTransform.SetRotation(TransitionRotation);
+    State.AngularVelocityRadiansPerSecond = CapsizeRollAxisWorld *
+        AngularSpeedRadiansPerSecond;
+    if (CapsizeTransitionRemainingSeconds <= 0.0f)
+    {
+        State.WorldTransform.SetRotation(CapsizeTargetRotation.GetNormalized());
+        State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+        SetActorRotation(CapsizeTargetRotation.GetNormalized());
+    }
+    RaftAdapter->SetKinematicState(State);
 }
 
 void ARaftSimRaftActor::UpdateCapsizeLoop(float DeltaSeconds)
@@ -722,9 +1114,37 @@ void ARaftSimRaftActor::EnterCapsize()
     CapsizeLocation = GetActorLocation();
     CapsizeLocation.Z = FMath::Clamp(CapsizeLocation.Z, -200.0f, 200.0f);
 
-    // Roll the hull over so the flip is visible, and drain nothing yet — the
-    // retained water keeps it inverted until the guide re-flips.
-    AddActorLocalRotation(FRotator(0.0f, 0.0f, 160.0f));
+    if (RaftAdapter != nullptr)
+    {
+        // An open-floor paddle raft sheds retained deck water and crew mass
+        // when it rolls over. Keep the current authoritative pose and establish
+        // the D3-selected direction for the bounded roll constraint; every
+        // transition frame is copied back into this same adapter state.
+        RaftAdapter->SetFlexibleCapsized(true);
+        FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
+        State.WorldTransform = GetActorTransform();
+        const FRaftSimFlexStepTelemetry& Telemetry =
+            RaftAdapter->GetLastFlexibleStepTelemetry();
+        CapsizeFlipDirection = Telemetry.RetainedWaterRollMomentNm < 0.0 ? -1.0f : 1.0f;
+        if (FMath::IsNearlyZero(static_cast<float>(Telemetry.RetainedWaterRollMomentNm)))
+        {
+            CapsizeFlipDirection = GetActorRotation().Roll < 0.0f ? -1.0f : 1.0f;
+        }
+        const FRotator StartRotation = GetActorRotation();
+        CapsizeStartPitchDegrees = FMath::UnwindDegrees(StartRotation.Pitch);
+        CapsizeStartRollDegrees = FMath::UnwindDegrees(StartRotation.Roll);
+        CapsizeRollAxisWorld = GetActorForwardVector().GetSafeNormal();
+        if (CapsizeRollAxisWorld.IsNearlyZero())
+        {
+            CapsizeRollAxisWorld = FVector::ForwardVector;
+        }
+        CapsizeTargetRotation = FRotator(
+            0.0f, StartRotation.Yaw, CapsizeFlipDirection * 180.0f).Quaternion();
+        State.AngularVelocityRadiansPerSecond = FVector::ZeroVector;
+        RaftAdapter->SetKinematicState(State);
+        CapsizeTransitionRemainingSeconds = FMath::Max(
+            CapsizeTransitionSeconds, FixedSubstepSeconds);
+    }
 
     SpawnSwimmers(CrewSize, true);
 }
@@ -1076,10 +1496,12 @@ void ARaftSimRaftActor::ResetToCheckpoint()
     RescueFailureResetRemaining = -1.0f;
     RaftMode = ERaftSimRaftMode::Upright;
     FlipRiskLatchSeconds = 0.0f;
+    CapsizeTransitionRemainingSeconds = 0.0f;
     SetActorTransform(CheckpointTransform);
     RaftCondition = URaftSimRaftConditionLibrary::ApplyCheckpointRepair(RaftCondition);
     if (RaftAdapter)
     {
+        RaftAdapter->SetFlexibleCapsized(false);
         RaftAdapter->ResetFlexiblePersistentState();
         FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
         State.WorldTransform = CheckpointTransform;
@@ -1236,10 +1658,12 @@ void ARaftSimRaftActor::RequestReflip()
 
     // Drain retained water and begin reseating swimmers around the guide.
     RaftMode = ERaftSimRaftMode::Recovering;
+    CapsizeTransitionRemainingSeconds = 0.0f;
     SetActorLocationAndRotation(
         ReflipLocation, FRotator(0.0f, GetActorRotation().Yaw, 0.0f));
     if (RaftAdapter != nullptr)
     {
+        RaftAdapter->SetFlexibleCapsized(false);
         RaftAdapter->ResetFlexiblePersistentState();
         FRaftSimRaftKinematicState State = RaftAdapter->GetKinematicState();
         State.WorldTransform = GetActorTransform();

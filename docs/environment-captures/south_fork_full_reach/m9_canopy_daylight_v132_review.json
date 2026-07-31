@@ -1,0 +1,82 @@
+{
+  "schema": "raftsim.m9.canopy_daylight_review.v1",
+  "reviewed_utc": "2026-07-29T09:18:20Z",
+  "candidate": "m9_canopy_daylight_v132",
+  "parent": "m9_d6_genuine_chaos_v131",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "human_approved": false,
+  "physics_changed": false,
+  "source_art": {
+    "generation_surface": "Codex built-in image_gen",
+    "model_identifier": "not_exposed_by_builtin_surface",
+    "seed": "not_exposed_by_builtin_surface",
+    "profiles": 6,
+    "prompt_and_postprocess_record": "unreal/SourceArt/RaftSim/Environment/GeneratedCanopy/provenance.json",
+    "alpha_sources": {
+      "T_PonderosaPine_Mature_PhotorealV2.png": "3dca5056a654cb63f4b90449055908914eb2b9f580eeb801a99f9df57ea56e2e",
+      "T_PonderosaPine_Intermediate_PhotorealV2.png": "e99a99ba5ecc85913cc4d58cf2e1a31e31c50687985838727726de5f2adcca79",
+      "T_PonderosaPine_Young_PhotorealV2.png": "1c951858ab84e523fa86ccb925b5520ae55481ee0558275fd3869e53922925b3",
+      "T_InteriorLiveOak_PhotorealV2.png": "2bc8f6a11c131b24b12e740db868662a4698e669549b28d95d40af96f5bd37ae",
+      "T_WhiteAlder_PhotorealV2.png": "f72cb852e715f2e102b9c4ef2f7bb4ccf6e88ce579a2a5d813bc5bc56326bdc1",
+      "T_DeerbrushShrub_PhotorealV2.png": "7a5254f3c230eb293983d7770611e50282c34bd15b9f47e4a1bb987b5bfa654e"
+    }
+  },
+  "implementation": {
+    "canopy_topology": "unchanged two orthogonal planes; 8 vertices and 4 triangles per asset",
+    "placement_count": 65363,
+    "opacity_clip_before": 0.32,
+    "opacity_clip_after": 0.20,
+    "directional_light_lux_before": 6.5,
+    "directional_light_lux_after": 8.2,
+    "sky_light_intensity_before": 0.82,
+    "sky_light_intensity_after": 1.45,
+    "fixed_capture_exposure_bias_before": 0.0,
+    "fixed_capture_exposure_bias_after": 0.30
+  },
+  "full_reach_regeneration": {
+    "exit_code": 0,
+    "deterministic_world_partition_actor_identities": 176,
+    "terrain_tiles": 13,
+    "water_tiles": 39,
+    "procedurally_completed_shoreline_vertices": 37836,
+    "shoreline_transition_cells": 18207,
+    "foliage_instances": 65363,
+    "boulders": 113,
+    "spray_mist_instances": 255,
+    "infrastructure_actors": 72,
+    "fixed_captures_saved": 5
+  },
+  "historical_fixed_capture_sha256_before_v133_overwrite": {
+    "chili_bar_launch_downstream.png": "234db51271bbb916eccc620f52def4d92c3f68b0564914bcba7b7b406823230b",
+    "meat_grinder_guide_eye.png": "35dc25ffdcc906d2684cfe72da56eb1c1964d5d748f0f0dcaf266433ab09f170",
+    "troublemaker_approach.png": "09e841bcab4cbc7b9f5d1da9f87934d86108eb8f9c7573a88c9c85c63f63638d",
+    "coloma_bridge_context.png": "31d514cdce92050974b765eea145d9565a74fd461f1035ce859b54e74c7a721b",
+    "salmon_falls_takeout.png": "f7714d48be4b8b7441368a36d84c8fbcccdf964dc72a276725e55ebf129d4d5c",
+    "retention_note": "The five fixed capture slots are intentionally updated in place by later visual candidates; these hashes identify the inspected v132 state but no separately versioned bitmap is claimed."
+  },
+  "validation": {
+    "native_editor_build": "passed",
+    "editor_source_layout": "23/23 passed",
+    "full_reach_environment_automation": "passed and exited cleanly",
+    "m7_full_reach_presentation": {
+      "report": "/private/tmp/raftsim_m9_canopy_daylight_v132b_m7/index.json",
+      "report_sha256": "f4f3bb432d3b0eddb34584320ba2a6b7db6eb6363bc2d11adad85ba788ce900e",
+      "succeeded": 0,
+      "succeeded_with_warnings": 1,
+      "failed": 0,
+      "warning": "known UE 5.8 r.MotionVectorSimulation render-thread diagnostic"
+    }
+  },
+  "retained_improvements": [
+    "The six active South Fork profiles now use project-bound, species-specific V2 bitmap sources instead of the earlier pale generic canopy set.",
+    "The lower masked cutoff preserves fine needles, twigs, and crown gaps while retaining the bounded two-plane runtime topology.",
+    "The deterministic daylight bracket exposes more terrain, shoreline, bark, and crown separation without clipping the five fixed views."
+  ],
+  "open_visual_findings": [
+    "The two-plane foliage topology remains visible at guide-eye distance and lacks connected branch and crown volume.",
+    "Broad water is still dark and nearly planar, with insufficient refractive variation, overturning volume, entrained air, and rapid-scale foam structure.",
+    "Terrain macro detail, shoreline transitions, boulder integration, characters, PPE, raft, and animation remain visibly synthetic.",
+    "No named art, guide, geospatial, owner, or legal reviewer has approved this candidate for release or marketing media."
+  ],
+  "decision": "Retain the V2 project-bound sources and daylight readability bracket as technical production improvements. Keep the photoreal and release-media gates fail-closed."
+}

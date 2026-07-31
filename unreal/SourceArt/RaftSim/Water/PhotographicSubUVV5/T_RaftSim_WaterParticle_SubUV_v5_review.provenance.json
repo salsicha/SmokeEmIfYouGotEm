@@ -1,0 +1,366 @@
+{
+  "asset": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WaterParticle_SubUV_v5_review.png",
+  "authoritative_geography_claim": false,
+  "cell_dimensions_px": [
+    512,
+    512
+  ],
+  "class_gamma": {
+    "aerated_mist": 0.86,
+    "contact_droplets": 0.72,
+    "rapid_aerosol": 0.76,
+    "solver_spray": 0.68
+  },
+  "class_max_content_px": {
+    "aerated_mist": [
+      326,
+      326
+    ],
+    "contact_droplets": [
+      224,
+      224
+    ],
+    "rapid_aerosol": [
+      326,
+      204
+    ],
+    "solver_spray": [
+      324,
+      176
+    ]
+  },
+  "dimensions_px": [
+    2048,
+    2048
+  ],
+  "external_source_input": false,
+  "format": "8_bit_grayscale_png",
+  "frame_ranges": {
+    "aerated_mist": [
+      11,
+      13
+    ],
+    "contact_droplets": [
+      6,
+      10
+    ],
+    "rapid_aerosol": [
+      14,
+      15
+    ],
+    "solver_spray": [
+      0,
+      5
+    ]
+  },
+  "frame_sources": [
+    {
+      "source": "spray_foam",
+      "source_frame": 0,
+      "target_frame": 0
+    },
+    {
+      "source": "spray_foam",
+      "source_frame": 1,
+      "target_frame": 1
+    },
+    {
+      "source": "spray_foam",
+      "source_frame": 2,
+      "target_frame": 2
+    },
+    {
+      "source": "spray_foam",
+      "source_frame": 3,
+      "target_frame": 3
+    },
+    {
+      "source": "spray_foam",
+      "source_frame": 6,
+      "target_frame": 4
+    },
+    {
+      "source": "spray_foam",
+      "source_frame": 7,
+      "target_frame": 5
+    },
+    {
+      "source": "droplets",
+      "source_frame": 2,
+      "target_frame": 6
+    },
+    {
+      "source": "droplets",
+      "source_frame": 3,
+      "target_frame": 7
+    },
+    {
+      "source": "droplets",
+      "source_frame": 4,
+      "target_frame": 8
+    },
+    {
+      "source": "droplets",
+      "source_frame": 6,
+      "target_frame": 9
+    },
+    {
+      "source": "droplets",
+      "source_frame": 8,
+      "target_frame": 10
+    },
+    {
+      "source": "aerated_foam",
+      "source_frame": 0,
+      "target_frame": 11
+    },
+    {
+      "source": "aerated_foam",
+      "source_frame": 1,
+      "target_frame": 12
+    },
+    {
+      "source": "aerated_foam",
+      "source_frame": 2,
+      "target_frame": 13
+    },
+    {
+      "source": "aerated_foam",
+      "source_frame": 8,
+      "target_frame": 14
+    },
+    {
+      "source": "aerated_foam",
+      "source_frame": 10,
+      "target_frame": 15
+    }
+  ],
+  "generator": "unreal/Scripts/build_photographic_water_particle_atlas_v5.py",
+  "generator_version": "raftsim-photographic-water-particle-subuv-review-v5",
+  "grid": [
+    4,
+    4
+  ],
+  "image_generation_mode": "built_in_imagegen",
+  "minimum_black_padding_fraction": 0.181640625,
+  "minimum_black_padding_px": 93,
+  "mip_metrics": [
+    {
+      "active_pixels_gt_32": 73,
+      "active_pixels_gt_8": 84,
+      "bbox_height": 10,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 0,
+      "maximum": 237
+    },
+    {
+      "active_pixels_gt_32": 73,
+      "active_pixels_gt_8": 84,
+      "bbox_height": 10,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 1,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 61,
+      "active_pixels_gt_8": 70,
+      "bbox_height": 10,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 2,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 66,
+      "active_pixels_gt_8": 72,
+      "bbox_height": 8,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 3,
+      "maximum": 239
+    },
+    {
+      "active_pixels_gt_32": 52,
+      "active_pixels_gt_8": 63,
+      "bbox_height": 10,
+      "bbox_width": 18,
+      "border_max": 0,
+      "frame": 4,
+      "maximum": 244
+    },
+    {
+      "active_pixels_gt_32": 70,
+      "active_pixels_gt_8": 82,
+      "bbox_height": 10,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 5,
+      "maximum": 232
+    },
+    {
+      "active_pixels_gt_32": 64,
+      "active_pixels_gt_8": 70,
+      "bbox_height": 13,
+      "bbox_width": 12,
+      "border_max": 0,
+      "frame": 6,
+      "maximum": 250
+    },
+    {
+      "active_pixels_gt_32": 53,
+      "active_pixels_gt_8": 60,
+      "bbox_height": 14,
+      "bbox_width": 12,
+      "border_max": 0,
+      "frame": 7,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 50,
+      "active_pixels_gt_8": 59,
+      "bbox_height": 13,
+      "bbox_width": 8,
+      "border_max": 0,
+      "frame": 8,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 49,
+      "active_pixels_gt_8": 55,
+      "bbox_height": 12,
+      "bbox_width": 8,
+      "border_max": 0,
+      "frame": 9,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 43,
+      "active_pixels_gt_8": 54,
+      "bbox_height": 14,
+      "bbox_width": 8,
+      "border_max": 0,
+      "frame": 10,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 143,
+      "active_pixels_gt_8": 158,
+      "bbox_height": 20,
+      "bbox_width": 16,
+      "border_max": 0,
+      "frame": 11,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 138,
+      "active_pixels_gt_8": 170,
+      "bbox_height": 20,
+      "bbox_width": 18,
+      "border_max": 0,
+      "frame": 12,
+      "maximum": 245
+    },
+    {
+      "active_pixels_gt_32": 152,
+      "active_pixels_gt_8": 179,
+      "bbox_height": 20,
+      "bbox_width": 18,
+      "border_max": 0,
+      "frame": 13,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 138,
+      "active_pixels_gt_8": 156,
+      "bbox_height": 12,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 14,
+      "maximum": 255
+    },
+    {
+      "active_pixels_gt_32": 107,
+      "active_pixels_gt_8": 117,
+      "bbox_height": 12,
+      "bbox_width": 20,
+      "border_max": 0,
+      "frame": 15,
+      "maximum": 255
+    }
+  ],
+  "mip_review": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WaterParticle_SubUV_v5_mip32_preview.png",
+  "mip_review_sha256": "d789edc9710115fc575d8b36057f3ad70821b2da62c63ead3ea7d93ddebc63dd",
+  "mip_review_size_px": 32,
+  "ownership": "project_owned_first_party_image_generation",
+  "sha256": "0f68fd5ecdaf3ed2c9471da7e22863a3cb082885fdcd42568410494520fc8624",
+  "sources": {
+    "aerated_foam": {
+      "dimensions_px": [
+        1254,
+        1254
+      ],
+      "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_AeratedFoam_Source_v5.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: donor plate for mip-safe Unreal Engine Niagara aerated-river mist and rapid-foam sprites, legible at 32x32 pixels\nPrimary request: Create one exact square 4-by-4 contact sheet on a perfectly uniform pure black (#000000) background.\nSubject order, reading left-to-right then top-to-bottom:\nCells 0-7: eight distinct small aerated freshwater mist kernels. Each is an irregular porous patch made from a few connected aerated beads and broken thin film, with large black holes and a ragged asymmetric contour. It must read as wet microfoam spray, never smoke or a round cloud.\nCells 8-15: eight distinct rapid-foam fragments. Each is one broad horizontal or diagonal crescent, lace eyebrow, or torn aerated crest fragment with two to six large black holes, a broken leading edge, and a denser white underside. It is an individual fragment, not a complete breaking wave.\nStyle/medium: high-speed macro photography of real turbulent cold freshwater, neutral grayscale/white water only, strong simple silhouettes, physically plausible translucent film and aerated white cores, simplified for thumbnail and mip survival.\nComposition/framing: exact regular 4x4 layout with no visible grid. Center one event in each invisible cell. Mist kernels occupy 38-50 percent of a cell. Foam fragments occupy 50-65 percent width and 20-38 percent height. Keep at least 18 percent uniform pure-black padding on every cell edge. No overlap. All major strands and holes at least six source pixels wide.\nLighting/mood: neutral daylight, bright aerated water, realistic translucent edges, high local contrast.\nConstraints: uniform absolute-black background and cell boundaries; sixteen unique asymmetric silhouettes; no text or watermark.\nAvoid: smoke, clouds, fog balls, cotton, circular puffs, vertical paired puffs, complete splash plumes, fountains, complete breaking waves, dense microdroplet noise, paint splatter, fire, snow, repeated shapes, rectangles, visible grid, dividers, labels, borders, river surface, floor, reflection, landscape, rock, raft, people, sky, horizon, watermark.",
+      "sha256": "28e87280530803abf8ec41b8469b022de2af9ece6a33575c78f9da41560d1d8a"
+    },
+    "droplets": {
+      "dimensions_px": [
+        1254,
+        1254
+      ],
+      "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_Droplets_Source_v5.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: donor plate for particle-scale Unreal Engine Niagara whitewater droplet sprites that remain legible at 32x32 pixels\nPrimary request: Create one exact square 4-by-4 contact sheet containing sixteen visibly different sparse freshwater droplet events on a perfectly uniform pure black (#000000) background.\nSubject: Every invisible cell contains only one to three physically plausible airborne cold-river water beads. Use a simple bright bead silhouette with a small specular white core or crescent, optionally one short tapered directional tail or one tiny satellite bead. The bead should read as water, not a soap bubble: keep the center partially bright, avoid a hollow ring-only silhouette.\nStyle/medium: high-speed macro photography of real freshwater droplets, neutral grayscale/white water only, strong local contrast, simplified detail for thumbnail and mip survival.\nComposition/framing: exact regular 4x4 layout with no visible grid. Center each event in its invisible cell. Each event occupies 32-48 percent of its cell, remains fully contained, and has at least 20 percent pure-black padding on all four cell edges. No overlap. All significant features at least six source pixels thick.\nLighting/mood: neutral directional daylight, crisp translucent beads, bright aerated/specular core.\nConstraints: uniform absolute black background and cell boundaries; sixteen unique silhouettes; sparse particle-scale events only; no text or watermark.\nAvoid: soap bubbles, hollow glass rings, dense clusters, full splash plumes, foam sheets, mist, smoke, cloud, cotton, paint splatter, snow, repeated silhouettes, rectangular edges, visible grid, labels, borders, river surface, floor, reflection, landscape, raft, rock, person, sky, horizon, watermark.",
+      "sha256": "a27be8d61e7bfc285a168af80001c40c6d4fcacdeeffe35b1b71503b57444aaa"
+    },
+    "spray_foam": {
+      "dimensions_px": [
+        1254,
+        1254
+      ],
+      "path": "unreal/SourceArt/RaftSim/Water/PhotographicSubUVV5/T_RaftSim_WhitewaterParticleScale_SprayFoam_Source_v5.png",
+      "prompt": "Use case: photorealistic-natural\nAsset type: source plate for an Unreal Engine Niagara 4x4 SubUV particle atlas, designed to survive mipmapping and remain legible when each cell is downsampled to 32x32 pixels\nPrimary request: Create one exact square 4-by-4 contact sheet containing sixteen separate, simple, particle-scale whitewater elements on a perfectly uniform pure black (#000000) background. These are individual airborne water events, never complete splash plumes.\nSubject order, reading left-to-right then top-to-bottom:\nCells 0-5: six distinct ballistic spray fragments. Each cell contains only one torn thin water sheet or ribbon, generally stretched left-to-right or diagonally, with at most two or three attached bright beads. Use a clear asymmetric silhouette, strong white core, broken translucent edge, and generous negative space. No full plume and no mist cloud.\nCells 6-10: five distinct droplet events. Each contains only one to four crisp round water beads with one short directional tail or tiny satellite bead. Large simple shapes, sparse composition, no dense cluster.\nCells 11-13: three distinct aerated mist kernels. Each is one small porous irregular patch with a broken contour and visible black holes, not a round cloud, not smoke, and not cotton.\nCells 14-15: two distinct rapid-aerosol foam fragments. Each is one broad crescent or lace-like eyebrow of aerated water with holes and a ragged crest, not a circular puff.\nStyle/medium: physically plausible high-speed macro photography of real cold freshwater, neutral grayscale/white water only, realistic translucent membranes and aerated white cores, but simplify microdetail so the silhouette remains recognizable at thumbnail size.\nComposition/framing: exact regular 4x4 layout with no visible grid. Center each element within its invisible cell. Keep every element fully contained with at least 18 percent pure-black padding on all four cell edges. Spray fragments should occupy about 55-62 percent of cell width and 18-30 percent of cell height. Droplets should occupy 30-45 percent of the cell. Mist kernels and foam crescents should occupy 45-60 percent. No overlap between cells.\nLighting/mood: neutral directional daylight response, bright aeration, convincing translucent water, high local contrast.\nConstraints: background must be uniform absolute black across the entire image and every cell boundary; every silhouette must be visibly different; all major features must be at least four source pixels thick; no hidden floor or reflections; no watermark.\nAvoid: complete splash plumes, fountain shapes, vertical paired puffs, smoke, clouds, fog balls, cotton, paint splatter, snow, fire, dense microdroplet noise, repeated silhouettes, rectangular sprite edges, visible grid, dividers, labels, text, border, river surface, landscape, rocks, raft, people, sky, horizon, watermark.",
+      "sha256": "ef90e6e90f12929c9b5cd90157ba3b2083bdedb6e5417ae6ed28ed52a6d3324b"
+    }
+  },
+  "spray_foam_source_regions_px": {
+    "0": [
+      20,
+      60,
+      345,
+      260
+    ],
+    "1": [
+      340,
+      60,
+      635,
+      250
+    ],
+    "2": [
+      640,
+      60,
+      950,
+      250
+    ],
+    "3": [
+      940,
+      60,
+      1240,
+      245
+    ],
+    "6": [
+      630,
+      300,
+      940,
+      520
+    ],
+    "7": [
+      940,
+      320,
+      1240,
+      520
+    ]
+  },
+  "usage": "Review-only particle-scale presentation atlas; solver/contact state remains the sole emission authority."
+}

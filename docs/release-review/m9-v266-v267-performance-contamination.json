@@ -1,0 +1,50 @@
+{
+  "schema": "raftsim.m9.performance_contamination.v1",
+  "status": "v266_and_v267_absolute_timing_disqualified",
+  "observed_at_local": "2026-07-30T04:26:48-07:00",
+  "host_timezone": "America/Los_Angeles",
+  "competing_process": {
+    "pid_at_observation": 53675,
+    "start_time_local": "2026-07-29T20:34:15-07:00",
+    "elapsed_at_observation": "07:52:33",
+    "cpu_percent_at_observation": 77.5,
+    "memory_percent_at_observation": 2.4,
+    "executable": "/Users/Shared/Epic Games/UE_5.8/Engine/Binaries/Mac/UnrealEditor-Cmd",
+    "project": "unreal/SmokeEmIfYouGotEm.uproject",
+    "rendering_flags": [
+      "RaftSimCaptureSouthForkFullReachEnvironment",
+      "RaftSimPhotographicSouthForkCapture",
+      "RaftSimLiveOakBranchAtlasV2Review",
+      "RenderOffscreen",
+      "AllowCommandletRendering"
+    ],
+    "interpretation": "A separate rendered full-reach Unreal capture was active throughout both measurements. Its sustained CPU activity and commandlet-rendering flags make the host non-isolated; no absolute GPU or wall-clock result from the overlap may qualify a release or establish a product regression."
+  },
+  "affected_evidence": [
+    {
+      "id": "v266_packaged_shipping_normal_window_soak",
+      "path": "/private/tmp/RaftSim-1.0.0-rc1-macos-m9-v266-optimized-windowed/artifacts/full_reach_performance_soak.json",
+      "modified_time_local": "2026-07-30T04:04:20-07:00",
+      "sha256": "8bcba9c02f4538fd8f198c207c2ae637afc24dc78833dcad3cbdea571aa6be24",
+      "p95_frame_ms": 24.18258285522461,
+      "p95_gpu_ms": 23.493375778198242,
+      "p95_wall_clock_frame_ms": 29.97241973876953,
+      "disposition": "contaminated_negative_engineering_evidence_only"
+    },
+    {
+      "id": "v267_development_profilegpu",
+      "path": "/private/tmp/raftsim_m9_v267_profile_gpu.log",
+      "modified_time_local": "2026-07-30T04:07:43-07:00",
+      "sha256": "bf0f869f15fe53772c0f50e130c2c9a768eea572091ba7ab2fb2c249199456ae",
+      "disposition": "pass_attribution_may_guide_engineering_but_absolute_frame_and_pass_timings_are_not_qualification_evidence"
+    }
+  ],
+  "corrective_actions": {
+    "macos_preflight": "unreal/Scripts/build_mac_rc.sh now fails before packaging and again immediately before the player-presentation soak if any Unreal Editor or RaftSim packaged runtime is already running.",
+    "windows_preflight": "unreal/Scripts/build_win_rc.ps1 applies the equivalent fail-closed process isolation checks.",
+    "automation_lifecycle": "Unattended command-line environment automation now requests process exit after success or failure even when an older invocation omits RaftSimExitAfterEnvironmentAutomation; interactive editor invocations remain open.",
+    "renderer_profile_lock": "Both platform workflows explicitly apply and live-verify the intended post-travel renderer profile; the macOS soak reuses the successfully created fresh-profile UserDir, and Windows now does the same.",
+    "required_replacement": "Run a new normal-window packaged Shipping soak from exact-current sources only after all competing Unreal/game processes have exited."
+  },
+  "promotion_allowed": false
+}

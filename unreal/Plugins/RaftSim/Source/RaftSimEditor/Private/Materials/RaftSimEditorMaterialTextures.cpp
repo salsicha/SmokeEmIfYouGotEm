@@ -639,17 +639,28 @@ void ApplyFirstPartyMaterialTextureImportSettings(
          Spec.MapKey.StartsWith(TEXT("CompoundBranchlet")));
     const bool bSouthForkGeneratedCanopyTexture =
         Spec.RiverId == TEXT("south_fork_generated_canopy") &&
-        Spec.MapKey == TEXT("BillboardAlbedoOpacity");
+        (Spec.MapKey == TEXT("BillboardAlbedoOpacity") ||
+         Spec.MapKey == TEXT("AlbedoOpacity"));
+    const bool bSouthForkTerrainMacroTexture =
+        Spec.RiverId == TEXT("south_fork_full_reach") &&
+        Spec.MapKey == TEXT("MacroAlbedo");
     const bool bMaskedCanopyTexture =
         bNativeCanopyLeafTexture || bSouthForkGeneratedCanopyTexture;
-    Texture->MipGenSettings = bMaskedCanopyTexture ? TMGS_Sharpen5 : TMGS_FromTextureGroup;
+    // Sharpen4 retains alpha-tested crown mass while reducing the bright,
+    // noisy one-pixel edge produced by the former Sharpen5 far-field mips.
+    Texture->MipGenSettings = bMaskedCanopyTexture
+        ? TMGS_Sharpen4
+        : (bSouthForkTerrainMacroTexture ? TMGS_Sharpen4 : TMGS_FromTextureGroup);
     Texture->LODGroup = Spec.LODGroup;
     Texture->AddressX = Spec.AddressX;
     Texture->AddressY = Spec.AddressY;
     Texture->CompressionNoAlpha = Spec.bCompressionNoAlpha;
     Texture->DeferCompression = false;
     Texture->VirtualTextureStreaming = false;
-    Texture->NeverStream = bMaskedCanopyTexture;
+    // Eight 1024-square far-field macros cost only about 5.3 MiB as DXT1 with
+    // mips. Keep them resident so a short PIE capture cannot render an
+    // average-green streaming mip in place of the authoritative NAIP detail.
+    Texture->NeverStream = bMaskedCanopyTexture || bSouthForkTerrainMacroTexture;
     const bool bMaskedLeafAlbedo = bSouthForkGeneratedCanopyTexture ||
         (bNativeCanopyLeafTexture &&
          (Spec.MapKey.EndsWith(TEXT("LeafAlbedoOpacity")) ||
@@ -717,6 +728,13 @@ bool RebuildAndValidateFirstPartyTexturePlatformData(
     }
 
     Texture->BlockOnAnyAsyncBuild();
+    // UE 5.8 commandlets can leave newly saved Texture2D packages with no
+    // running-platform payload even when UpdateResourceWithParams requests a
+    // synchronous force rebuild. Use the exported cache begin/finish API
+    // before resource upload so the strict mip/dimension gate observes the
+    // real cooked representation rather than a transient 0x0.
+    Texture->BeginCachePlatformData();
+    Texture->FinishCachePlatformData();
     const UTexture::EUpdateResourceFlags RebuildFlags =
         static_cast<UTexture::EUpdateResourceFlags>(
             static_cast<uint32>(UTexture::EUpdateResourceFlags::ForceRebuild) |
@@ -804,7 +822,8 @@ UTexture2D* CreateOrUpdateFirstPartyMaterialTextureAsset(
         OutSummary += FString::Printf(TEXT("Failed to update first-party material texture source %s\n"), *ObjectPath);
         return nullptr;
     }
-    if (Spec.RiverId.StartsWith(TEXT("futaleufu_native_canopy")))
+    if (Spec.RiverId.StartsWith(TEXT("futaleufu_native_canopy")) ||
+        Spec.RiverId == TEXT("synthetic_crew_skin"))
     {
         if (!RebuildAndValidateFirstPartyTexturePlatformData(Texture, Spec, OutSummary))
         {

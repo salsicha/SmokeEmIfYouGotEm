@@ -1,0 +1,48 @@
+{
+  "candidate": "m9_canopy_radiometry_v95",
+  "status": "retained_technical_improvement_photoreal_rejected",
+  "capture": "m9_canopy_radiometry_v95.png",
+  "comparison_capture": "m9_canopy_baseline_restored_v94.png",
+  "camera": "river_action",
+  "physics_changed": false,
+  "implementation": {
+    "geometry_changed": false,
+    "instance_placement_changed": false,
+    "canopy_base_color": "species-separated, source-preserving energy reduction",
+    "foliage_transmission": "species-separated bounded reduction",
+    "foliage_instances": 65363
+  },
+  "image_measurement": {
+    "region": "upper 300 rows of matched 1280x720 frame",
+    "v94_mean_rgb": [131.9631, 138.2953, 119.6238],
+    "v95_mean_rgb": [126.8225, 134.6246, 115.1611],
+    "interpretation": "approximately four percent lower aggregate canopy-region energy with improved bark/leaf separation"
+  },
+  "solver_evidence": {
+    "active_contacts": 4,
+    "wrapping_contacts": 3,
+    "pinned_obstacles": 1,
+    "recovering_obstacles": 1,
+    "maximum_indentation_m": 0.22,
+    "surface_wetness": 0.999,
+    "contact_patch_triangles": 96,
+    "production_boulder_material": true,
+    "material_fallback_warning": false
+  },
+  "validation": {
+    "focused_source_contracts": "37/37 passed",
+    "editor_build": "passed",
+    "full_reach_material_rebuild": "passed",
+    "m5": "4/4 passed; three clean and one with known offscreen audio-device and motion-vector diagnostics"
+  },
+  "retained_improvements": [
+    "Sunlit canopy no longer converges as strongly toward a uniform beige value.",
+    "Ponderosa, white alder, and oak/deerbrush groups preserve distinct radiometric response.",
+    "The source-conditioned species mix and accepted three-plane geometry remain unchanged."
+  ],
+  "open_visual_findings": [
+    "Crossed radial cards remain visible at guide-eye distance.",
+    "Canopy lacks true branch and crown volume and remains too uniform at stand scale.",
+    "Water, shoreline, terrain, crew, raft highlights, foam, and aerosol remain below the photoreal target."
+  ]
+}
