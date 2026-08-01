@@ -97,10 +97,11 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
     }
     else if (RiverId == TEXT("pacuare"))
     {
-        // Pacuare uses a dedicated rainforest Single Layer Water parent. Keep
-        // the generated ribbon close to the surveyed bank profile, restrain
-        // analytic relief, and let volume transmission reveal shallow bed
-        // color without returning to the old opaque green render sheet.
+        // Pacuare uses an isolated opaque Default Lit rainforest parent after
+        // direct isolation and a procedural-bathymetry bracket both rejected
+        // Single Layer Water's hard foreground depth-composition band. Keep a
+        // bounded render overlap over known Landscape seam gaps without
+        // changing collision, solver geometry, or the analytic bank profile.
         Settings.BaseColorScale = 0.90f;
         Settings.EmissiveFillScale = 0.32f;
         Settings.Roughness = 0.32f;
@@ -110,7 +111,7 @@ FRaftSimLandscapeCandidateWaterSettings GetLandscapeCandidateWaterSettings(const
         Settings.SurfaceVariationStrength = 0.32f;
         Settings.PhaseG = 0.15f;
         Settings.VertexTintWeight = 0.30f;
-        Settings.RenderWidthScale = 1.05f;
+        Settings.RenderWidthScale = 1.35f;
         Settings.RenderNormalUpBlend = 0.82f;
         Settings.RenderDisplacementScale = 0.20f;
         Settings.ReflectionFillIntensity = 0.06f;

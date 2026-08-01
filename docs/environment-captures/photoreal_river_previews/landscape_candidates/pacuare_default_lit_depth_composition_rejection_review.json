@@ -1,0 +1,90 @@
+{
+  "schema": "raftsim.environment.pacuare_default_lit_depth_composition_rejection_review.v1",
+  "river_id": "pacuare",
+  "milestone": "pacuare_default_lit_depth_composition_rejection_and_shoreline_gap_demotion_v1",
+  "status": "accepted_technical_visual_correction_photoreal_promotion_rejected",
+  "supersedes_review": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_rainforest_single_layer_water_v1_review.json",
+  "decision": {
+    "active_parent": "/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater",
+    "material_instance": "/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_Pacuare_SolverSurfaceWaterCandidate",
+    "shading_model": "DefaultLit",
+    "blend_mode": "Opaque",
+    "single_layer_water_active": false,
+    "single_layer_volume_parameters": "retained_as_inactive_evaluation_metadata",
+    "render_width_scale": 1.35,
+    "render_width_authority": "noncolliding_render_overlap_only_does_not_change_solver_or_gameplay_width",
+    "render_displacement_scale": 0.2,
+    "render_normal_up_blend": 0.82
+  },
+  "rejected_brackets": [
+    {
+      "id": "pacuare_single_layer_water_v1",
+      "result": "rejected_hard_horizontal_near_camera_depth_composition_band",
+      "authority": "presentation_only"
+    },
+    {
+      "id": "procedural_reference_infill_bathymetry_v1",
+      "vertex_count": 31409,
+      "depth_range_cm": [48.5, 267.6],
+      "result": "rejected_did_not_remove_foreground_band_or_river_right_white_patch",
+      "active": false,
+      "authority": "never_collision_solver_survey_or_promoted_geometry"
+    },
+    {
+      "id": "terrain_colored_shoreline_infill_v1_v2",
+      "vertex_counts": [5390, 3850],
+      "result": "rejected_created_broad_tessellated_underlit_bank_facets",
+      "active": false,
+      "authority": "never_collision_solver_survey_or_promoted_geometry"
+    }
+  ],
+  "retained_captures": [
+    {
+      "view": "guide_seat_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_guide_seat_downstream.png",
+      "sha256": "d3b65e7c55f951d246e96850a4dcef70d92255645b8eb2b49d6b4ad2494e7a76"
+    },
+    {
+      "view": "river_eye_downstream",
+      "path": "docs/environment-captures/photoreal_river_previews/landscape_candidates/pacuare_river_eye_downstream.png",
+      "sha256": "4ba0127f141b993be848567c3b0a3400ab4a4cb095a08d5d094d505bbcd1d57b"
+    }
+  ],
+  "visual_assessment": {
+    "accepted_improvements": [
+      "hard_lower_frame_water_transition_removed_in_both_canonical_views",
+      "moving_multi_scale_normal_and_world_variation_response_retained",
+      "continuous_white_shoreline_gaps_reduced_to_one_tiny_distant_river_right_point",
+      "failed_synthetic_bathymetry_and_bank_slab_geometry_not_retained"
+    ],
+    "remaining_defects": [
+      "one_tiny_distant_river_right_render_gap_requires_source_aligned_production_bank_microgeometry",
+      "coarse_smooth_landscape_and_repeated_generic_foliage_remain_dominant",
+      "no_pacuare_specific_validated_solver_hydraulics_foam_or_spray",
+      "no_production_reflection_refraction_wet_bank_riverbed_mist_or_waterfall_vfx"
+    ]
+  },
+  "authority": {
+    "water_ribbon_collision": false,
+    "landscape_collision_changed": false,
+    "heightfield_changed": false,
+    "solver_geometry_changed": false,
+    "raft_forces_changed": false,
+    "cross_river_solver_field_reused": false
+  },
+  "technical_acceptance": {
+    "unreal_editor_build": "pass",
+    "mapcheck_errors": 0,
+    "mapcheck_warnings": 0,
+    "water_material_bound_components": "1_of_1",
+    "focused_native_test": "RaftSim.M9.FPacuareRainforestDefaultLitWater_pass",
+    "focused_python_and_source_layout_tests": "8_pass"
+  },
+  "photoreal_rejection_reasons": [
+    "compressed_coarse_preview_heightfield_and_smooth_banks",
+    "generic_repeated_vegetation_and_sparse_near_bank_ground_cover",
+    "missing_pacuare_specific_validated_solver_hydraulics_foam_and_spray",
+    "missing_production_reflection_refraction_wet_bank_riverbed_mist_and_waterfall_vfx",
+    "missing_named_pacuare_guide_water_vfx_environment_art_ecology_geospatial_and_performance_approval"
+  ]
+}

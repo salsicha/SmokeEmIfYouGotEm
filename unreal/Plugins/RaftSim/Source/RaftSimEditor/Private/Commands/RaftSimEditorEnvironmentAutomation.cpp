@@ -448,16 +448,15 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             Result.bDressingUsesOpaqueVolumetricVegetation;
         const bool bUsesZambeziSingleLayerWater =
             Candidate.PreviewSpec.RiverId == TEXT("zambezi_batoka_gorge");
-        const bool bUsesPacuareSingleLayerWater =
+        const bool bUsesPacuareRainforestDefaultLitWater =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
-        const bool bUsesSingleLayerWater =
-            bUsesZambeziSingleLayerWater || bUsesPacuareSingleLayerWater;
+        const bool bUsesSingleLayerWater = bUsesZambeziSingleLayerWater;
         const bool bUsesPacuareOrganicRainforestSurface =
             Candidate.PreviewSpec.RiverId == TEXT("pacuare");
         const FString WaterMaterialParentPath = bUsesZambeziSingleLayerWater
             ? TEXT("/Game/RaftSim/Environment/ZambeziRun/Water/Materials/M_RaftSim_Zambezi_SingleLayerWater")
-            : (bUsesPacuareSingleLayerWater
-                   ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestSingleLayerWater")
+            : (bUsesPacuareRainforestDefaultLitWater
+                   ? TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/M_RaftSim_Pacuare_RainforestDefaultLitWater")
                    : TEXT("/Game/RaftSim/Materials/LandscapeCandidates/M_RaftSim_SolverSurfaceWaterCandidate"));
         const FString WaterSingleLayerParameterKeyPrefix =
             bUsesSingleLayerWater
@@ -506,6 +505,19 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
         const FString DefaultUnderstoryMaterialAsset = FString::Printf(
             TEXT("/Game/RaftSim/Materials/LandscapeCandidates/MI_RaftSim_%s_Understory_BiomeFoliageCandidate"),
             *RiverAssetName);
+        const FString PacuareWaterDecisionJson = bUsesPacuareRainforestDefaultLitWater
+            ? TEXT(
+                  "      \"water_single_layer_capture_decision\": \"rejected_on_pacuare_after_direct_material_isolation_and_procedural_reference_infill_bathymetry_bracket\",\n"
+                  "      \"water_single_layer_failure_artifact\": \"hard_near_camera_horizontal_depth_composition_band\",\n"
+                  "      \"water_conditioned_bathymetry_bracket_status\": \"rejected_did_not_remove_foreground_band_or_river_right_white_patch\",\n"
+                  "      \"water_conditioned_bathymetry_active\": false,\n"
+                  "      \"water_conditioned_bathymetry_authority\": \"none_rejected_procedural_reference_infill_was_never_collision_solver_survey_or_promoted_geometry\",\n")
+            : TEXT(
+                  "      \"water_single_layer_capture_decision\": \"not_re_evaluated_by_pacuare_bracket\",\n"
+                  "      \"water_single_layer_failure_artifact\": null,\n"
+                  "      \"water_conditioned_bathymetry_bracket_status\": \"not_active_for_river\",\n"
+                  "      \"water_conditioned_bathymetry_active\": false,\n"
+                  "      \"water_conditioned_bathymetry_authority\": \"none\",\n");
 
         EntriesJson += FString::Printf(
             TEXT("%s    {\n")
@@ -631,6 +643,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
             TEXT("      \"landscape_dressing_conifer_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_understory_mesh_nanite_enabled\": %s,\n")
             TEXT("      \"landscape_dressing_promotion_status\": \"%s\",\n")
+            TEXT("%s")
             TEXT("      \"water_material_status\": \"%s\",\n")
             TEXT("      \"water_material_asset\": \"%s\",\n")
             TEXT("      \"water_material_parent\": \"%s\",\n")
@@ -899,12 +912,13 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                            Result.bDressingExternalConiferReviewAssetLoaded
                        ? TEXT("rights_reviewed_broadleaf_analog_and_fir_visual_comparison_only_not_species_guide_performance_or_gameplay_promoted")
                        : TEXT("complete_pve_sample_species_geometry_evaluation_only_requires_biome_specific_pve_exports_production_rock_asset_guide_and_performance_review"))),
+            *PacuareWaterDecisionJson,
             Result.bSolverSurfaceWaterMaterialBound
                 ? (bUsesSingleLayerWater
-                       ? (bUsesZambeziSingleLayerWater
-                              ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
-                              : TEXT("pacuare_rainforest_single_layer_water_volume_candidate_bound_and_captured"))
-                       : TEXT("solver_surface_default_lit_candidate_bound_and_captured"))
+                       ? TEXT("zambezi_single_layer_water_volume_candidate_bound_and_captured")
+                       : (bUsesPacuareRainforestDefaultLitWater
+                              ? TEXT("pacuare_rainforest_default_lit_candidate_bound_after_single_layer_capture_rejection")
+                              : TEXT("solver_surface_default_lit_candidate_bound_and_captured")))
                 : TEXT("solver_surface_water_generation_or_binding_failed"),
             *EscapeRaftSimJsonString(Result.WaterMaterialPath),
             *EscapeRaftSimJsonString(WaterMaterialParentPath),
@@ -913,9 +927,7 @@ bool FRaftSimEditorModule::CreateLandscapeImportCandidateMaps(
                 ? TEXT("SingleLayerWaterMaterialOutput_scattering_absorption_phase_and_behind_water_scale")
                 : TEXT("none_surface_only_solver_conditioned_shading"),
             bUsesSingleLayerWater
-                ? (bUsesZambeziSingleLayerWater
-                       ? TEXT("active_on_zambezi_isolated_parent")
-                       : TEXT("active_on_pacuare_isolated_parent"))
+                ? TEXT("active_on_zambezi_isolated_parent")
                 : TEXT("inactive_single_layer_evaluation_values_retained_in_manifest_only"),
             bHasSolverVisualizationFields
                 ? TEXT("validated_cpp_solver_visualization_fields_bound_review_only")

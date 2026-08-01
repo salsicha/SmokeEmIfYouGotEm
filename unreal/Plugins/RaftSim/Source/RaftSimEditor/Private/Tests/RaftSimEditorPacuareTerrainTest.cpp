@@ -122,11 +122,11 @@ bool FRaftSimPacuareOrganicRainforestTerrainTest::RunTest(
 }
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(
-    FRaftSimPacuareRainforestSingleLayerWaterTest,
-    "RaftSim.M9.FPacuareRainforestSingleLayerWater",
+    FRaftSimPacuareRainforestDefaultLitWaterTest,
+    "RaftSim.M9.FPacuareRainforestDefaultLitWater",
     EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
-bool FRaftSimPacuareRainforestSingleLayerWaterTest::RunTest(
+bool FRaftSimPacuareRainforestDefaultLitWaterTest::RunTest(
     const FString& Parameters)
 {
     UMaterialInstanceConstant* Instance = LoadObject<UMaterialInstanceConstant>(
@@ -150,12 +150,15 @@ bool FRaftSimPacuareRainforestSingleLayerWaterTest::RunTest(
         TEXT("Pacuare water has an isolated rainforest parent"),
         Parent->GetPathName(),
         FString(TEXT("/Game/RaftSim/Environment/PacuareRun/Water/Materials/"
-                     "M_RaftSim_Pacuare_RainforestSingleLayerWater."
-                     "M_RaftSim_Pacuare_RainforestSingleLayerWater")));
+                     "M_RaftSim_Pacuare_RainforestDefaultLitWater."
+                     "M_RaftSim_Pacuare_RainforestDefaultLitWater")));
     TestTrue(
-        TEXT("Pacuare uses Single Layer Water"),
+        TEXT("Pacuare uses capture-accepted Default Lit water"),
+        Parent->GetShadingModels().HasShadingModel(MSM_DefaultLit));
+    TestFalse(
+        TEXT("Rejected Pacuare Single Layer Water stays inactive"),
         Parent->GetShadingModels().HasShadingModel(MSM_SingleLayerWater));
-    TestEqual(TEXT("Pacuare water volume stays opaque"), Parent->BlendMode, BLEND_Opaque);
+    TestEqual(TEXT("Pacuare water stays opaque"), Parent->BlendMode, BLEND_Opaque);
     const UMaterialEditorOnlyData* EditorOnlyData = Parent->GetEditorOnlyData();
     TestNotNull(TEXT("Pacuare water graph is inspectable"), EditorOnlyData);
     if (EditorOnlyData)
@@ -183,7 +186,7 @@ bool FRaftSimPacuareRainforestSingleLayerWaterTest::RunTest(
         }
     }
     TestEqual(TEXT("Two independently moving normal layers exist"), PannerCount, 2);
-    TestEqual(TEXT("One physical water-volume output exists"), WaterOutputCount, 1);
+    TestEqual(TEXT("Rejected water-volume output is absent"), WaterOutputCount, 0);
     TestEqual(TEXT("Two world-space variation fields exist"), NoiseScales.Num(), 2);
     TestTrue(TEXT("Rainforest reach-scale variation exists"), NoiseScales.Contains(0.00042f));
     TestTrue(TEXT("Rainforest surface-scale variation exists"), NoiseScales.Contains(0.00210f));

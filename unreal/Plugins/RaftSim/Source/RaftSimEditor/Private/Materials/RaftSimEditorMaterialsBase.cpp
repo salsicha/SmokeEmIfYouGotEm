@@ -2889,7 +2889,7 @@ UMaterialInterface* LoadOrCreateLandscapeCandidateWaterMaterial(
         return nullptr;
     }
 
-    const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge") || Spec.RiverId == TEXT("pacuare");
+    const bool bUseSingleLayerWater = Spec.RiverId == TEXT("zambezi_batoka_gorge");
     UMaterial* Parent = Spec.RiverId == TEXT("pacuare") ? LoadOrCreatePacuareRainforestWaterParent(OutSummary) : LoadOrCreateLandscapeCandidateSolverSurfaceWaterParent(OutSummary, bUseSingleLayerWater);
     if (!Parent)
     {
